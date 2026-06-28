@@ -2,6 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @deprecated Use CServer_Server methods instead
+ */
 class CServer_Command extends CServer_Base {
     protected static $instance = [];
 

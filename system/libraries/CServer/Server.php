@@ -9,11 +9,6 @@ class CServer_Server {
     private $ssh;
 
     /**
-     * @var CServer_Config
-     */
-    private $config;
-
-    /**
      * @param null|CRemote_SSH|CRemote_SSH_Config $ssh
      */
     public function __construct($ssh = null) {
@@ -21,7 +16,6 @@ class CServer_Server {
             $ssh = new CRemote_SSH($ssh);
         }
         $this->ssh = $ssh;
-        $this->config = new CServer_Config($this);
     }
 
     /**
@@ -102,6 +96,36 @@ class CServer_Server {
     }
 
     /**
+     * @return string
+     */
+    public function getHostname() {
+        if ($this->isRemote()) {
+            return trim($this->runCommand('hostname'));
+        }
+
+        return gethostname();
+    }
+
+    /**
+     * @return string
+     */
+    public function getOS() {
+        $os = $this->config()->get('os');
+        if ($os == null) {
+            $os = PHP_OS;
+        }
+
+        return $os;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWindows() {
+        return $this->getOS() === 'WINNT';
+    }
+
+    /**
      * @param string $command
      *
      * @return string
@@ -126,25 +150,573 @@ class CServer_Server {
     }
 
     /**
-     * @return string
+     * @param string $strElem
+     * @param string &$strBuffer
+     *
+     * @return bool
      */
-    public function getHostname() {
-        if ($this->isRemote()) {
-            return trim($this->runCommand('hostname'));
+    public function readEnv($strElem, &$strBuffer) {
+        $strBuffer = '';
+        if ($this->isWindows()) {
+            if (isset($_SERVER)) {
+                foreach ($_SERVER as $index => $value) {
+                    if (is_string($value) && (trim($value) !== '') && (strtolower($index) === strtolower($strElem))) {
+                        $strBuffer = $value;
+
+                        return true;
+                    }
+                }
+            }
+        } else {
+            if (isset($_SERVER[$strElem]) && is_string($value = $_SERVER[$strElem]) && (trim($value) !== '')) {
+                $strBuffer = $value;
+
+                return true;
+            }
         }
 
-        return gethostname();
+        return false;
     }
 
     /**
-     * @return string
+     * @param string $strProgram
+     *
+     * @return null|string
      */
-    public function getOS() {
-        $os = $this->config()->get('os');
-        if ($os == null) {
-            $os = PHP_OS;
+    public function findProgram($strProgram) {
+        $pathParts = pathinfo($strProgram);
+        if (empty($pathParts['basename'])) {
+            return null;
         }
 
-        return $os;
+        $arrPath = [];
+        $isWindows = $this->isWindows();
+
+        if (empty($pathParts['dirname']) || ($pathParts['dirname'] == '.')) {
+            if ($isWindows && empty($pathParts['extension'])) {
+                $strProgram .= '.exe';
+                $pathParts = pathinfo($strProgram);
+            }
+            if ($isWindows) {
+                if ($this->readEnv('Path', $serverpath)) {
+                    $arrPath = preg_split('/;/', $serverpath, -1, PREG_SPLIT_NO_EMPTY);
+                }
+            } else {
+                if ($this->readEnv('PATH', $serverpath)) {
+                    $arrPath = preg_split('/:/', $serverpath, -1, PREG_SPLIT_NO_EMPTY);
+                }
+            }
+            $config = $this->config();
+            if (($config->getUnameo() === 'Android') && !empty($arrPath)) {
+                array_push($arrPath, '/system/bin');
+            }
+            if (is_string($config->getAddPaths())) {
+                if (preg_match(CServer::ARRAY_EXP, $config->getAddPaths())) {
+                    $arrPath = array_merge(eval($config->getAddPaths()), $arrPath);
+                } else {
+                    $arrPath = array_merge([$config->getAddPaths()], $arrPath);
+                }
+            }
+        } else {
+            array_push($arrPath, $pathParts['dirname']);
+            $strProgram = $pathParts['basename'];
+        }
+
+        if (empty($arrPath) && !$isWindows) {
+            $os = $this->getOS();
+            if ($os == 'Android') {
+                array_push($arrPath, '/system/bin');
+            } else {
+                array_push($arrPath, '/bin', '/sbin', '/usr/bin', '/usr/sbin', '/usr/local/bin', '/usr/local/sbin');
+            }
+        }
+
+        $exceptPath = '';
+        if ($isWindows && $this->readEnv('WinDir', $windir)) {
+            foreach ($arrPath as $strPath) {
+                if ((strtolower($strPath) == $windir . '\\system32') && is_dir($windir . '\\SysWOW64')) {
+                    if (is_dir($windir . '\\sysnative')) {
+                        $exceptPath = $windir . '\\sysnative';
+                    } else {
+                        $exceptPath = $windir . '\\SysWOW64';
+                    }
+                    array_push($arrPath, $exceptPath);
+
+                    break;
+                }
+            }
+        } elseif ($this->getOS() == 'Android') {
+            $exceptPath = '/system/bin';
+        }
+
+        $separator = $isWindows ? '\\' : '/';
+        foreach ($arrPath as $strPath) {
+            $strPath = rtrim($strPath, $separator);
+            $strProgramPath = $strPath . $separator . $strProgram;
+            if (($strPath !== $exceptPath) && !@is_dir($strPath)) {
+                continue;
+            }
+            if (is_executable($strProgramPath)) {
+                return $strProgramPath;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $strFileName
+     *
+     * @return bool
+     */
+    public function fileExists($strFileName) {
+        if ($this->isRemote()) {
+            $output = trim($this->runCommand('test -e ' . escapeshellarg($strFileName) . ' && echo 1 || echo 0'));
+
+            return $output === '1';
+        }
+
+        return @file_exists($strFileName);
+    }
+
+    /**
+     * @param string $strFileName
+     * @param string &$strRet
+     * @param int    $intLines
+     * @param int    $intBytes
+     * @param bool   $booErrorRep
+     *
+     * @return bool
+     */
+    public function rfts($strFileName, &$strRet, $intLines = 0, $intBytes = 4096, $booErrorRep = true) {
+        if ($this->isRemote()) {
+            $output = '';
+            $this->ssh->run('cat ' . $strFileName, function ($line) use (&$output) {
+                $output .= $line;
+            });
+
+            $strRet = $output;
+
+            return !cstr::contains($output, ['No such file or directory']);
+        }
+
+        $strFile = '';
+        $intCurLine = 1;
+        if (!@file_exists($strFileName)) {
+            if ($booErrorRep) {
+                CServer::error()->addError('file_exists(' . $strFileName . ')', 'the file does not exist on your machine');
+            }
+
+            return false;
+        }
+        if (!is_readable($strFileName)) {
+            if ($booErrorRep) {
+                CServer::error()->addError('fopen(' . $strFileName . ')', 'file permission error');
+            }
+
+            return false;
+        }
+        $fd = fopen($strFileName, 'r');
+        if (!$fd) {
+            if ($booErrorRep) {
+                CServer::error()->addError('fopen(' . $strFileName . ')', 'file can not read by phpsysinfo');
+            }
+
+            return false;
+        }
+        while (!feof($fd)) {
+            $strFile .= fgets($fd, $intBytes);
+            if ($intLines > 0 && $intCurLine >= $intLines) {
+                break;
+            }
+            $intCurLine++;
+        }
+        fclose($fd);
+        $strRet = $strFile;
+
+        return true;
+    }
+
+    /**
+     * @param string $strProgramname
+     * @param string $strArgs
+     * @param string &$strBuffer
+     * @param bool   $booErrorRep
+     * @param int    $timeout
+     *
+     * @return bool
+     */
+    public function executeProgram($strProgramname, $strArgs, &$strBuffer, $booErrorRep = true, $timeout = 30) {
+        if ($this->isRemote()) {
+            $output = '';
+            $command = $strProgramname . ' ' . $strArgs;
+            $this->ssh->run($command, function ($line) use (&$output) {
+                $output .= $line;
+            });
+            $strBuffer = $output;
+
+            return true;
+        }
+
+        $strSet = '';
+        if (!$this->isWindows() && preg_match('/^([^=]+=[^ \t]+)[ \t]+(.*)$/', $strProgramname, $strmatch)) {
+            $strSet = $strmatch[1] . ' ';
+            $strProgramname = $strmatch[2];
+        }
+
+        $strProgram = $this->findProgram($strProgramname);
+        if (!$strProgram) {
+            if ($booErrorRep) {
+                CServer::error()->addError('find_program("' . $strProgramname . '")', 'program not found on the machine');
+            }
+
+            return false;
+        }
+        if (preg_match('/\s/', $strProgram)) {
+            $strProgram = '"' . $strProgram . '"';
+        }
+
+        $config = $this->config();
+        if (!$this->isWindows() && is_string($config->getSudoCommands())) {
+            if (preg_match(CServer::ARRAY_EXP, $config->getSudoCommands())) {
+                $sudocommands = eval($config->getSudoCommands());
+            } else {
+                $sudocommands = [$config->getSudoCommands()];
+            }
+            if (in_array($strProgramname, $sudocommands)) {
+                $sudoProgram = $this->findProgram('sudo');
+                if (!$sudoProgram) {
+                    if ($booErrorRep) {
+                        CServer::error()->addError('find_program("sudo")', 'program not found on the machine');
+                    }
+
+                    return false;
+                }
+                if (preg_match('/\s/', $sudoProgram)) {
+                    $strProgram = '"' . $sudoProgram . '" ' . $strProgram;
+                } else {
+                    $strProgram = $sudoProgram . ' ' . $strProgram;
+                }
+            }
+        }
+
+        if ($strArgs) {
+            $arrArgs = preg_split('/ /', $strArgs, -1, PREG_SPLIT_NO_EMPTY);
+            for ($i = 0, $cnt = count($arrArgs); $i < $cnt; $i++) {
+                if ($arrArgs[$i] == '|') {
+                    $strNewcmd = $this->findProgram($arrArgs[$i + 1]);
+                    $strArgs = preg_replace("/\| " . $arrArgs[$i + 1] . '/', '| "' . $strNewcmd . '"', $strArgs);
+                }
+            }
+            $strArgs = ' ' . $strArgs;
+        }
+
+        $strBuffer = '';
+        $strError = '';
+
+        return $this->procOpen($strSet . $strProgram . $strArgs, $strBuffer, $strError, $booErrorRep, $timeout);
+    }
+
+    /**
+     * @param string $dfParam
+     * @param bool   $getInodes
+     *
+     * @return array
+     */
+    public function df($dfParam = '', $getInodes = true) {
+        $arrResult = [];
+        $mountParm = [];
+
+        if ($this->executeProgram('mount', '', $mount, $this->config()->isDebug())) {
+            $mount = preg_split("/\n/", $mount, -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($mount as $mountLine) {
+                if (preg_match("/(\S+) on ([\S ]+) type (.*) \((.*)\)/", $mountLine, $buf)) {
+                    $parm = ['mountpoint' => trim($buf[2]), 'fstype' => $buf[3], 'name' => $buf[1]];
+                    if (CServer_Storage::SHOW_MOUNT_OPTION) {
+                        $parm['options'] = $buf[4];
+                    }
+                    $mountParm[] = $parm;
+                } elseif (preg_match("/(\S+) is (.*) mounted on (\S+) \(type (.*)\)/", $mountLine, $buf)) {
+                    $parm = ['mountpoint' => trim($buf[3]), 'fstype' => $buf[4], 'name' => $buf[1]];
+                    if (CServer_Storage::SHOW_MOUNT_OPTION) {
+                        $parm['options'] = $buf[2];
+                    }
+                    $mountParm[] = $parm;
+                } elseif (preg_match("/(\S+) (.*) on (\S+) \((.*)\)/", $mountLine, $buf)) {
+                    $parm = ['mountpoint' => trim($buf[3]), 'fstype' => $buf[2], 'name' => $buf[1]];
+                    if (CServer_Storage::SHOW_MOUNT_OPTION) {
+                        $parm['options'] = $buf[4];
+                    }
+                    $mountParm[] = $parm;
+                } elseif (preg_match("/(\S+) on ([\S ]+) \((\S+)(,\s(.*))?\)/", $mountLine, $buf)) {
+                    $parm = ['mountpoint' => trim($buf[2]), 'fstype' => $buf[3], 'name' => $buf[1]];
+                    if (CServer_Storage::SHOW_MOUNT_OPTION) {
+                        $parm['options'] = isset($buf[5]) ? $buf[5] : '';
+                    }
+                    $mountParm[] = $parm;
+                }
+            }
+        } elseif ($this->rfts('/etc/mtab', $mount)) {
+            $mount = preg_split("/\n/", $mount, -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($mount as $mountLine) {
+                if (preg_match("/(\S+) (\S+) (\S+) (\S+) ([0-9]+) ([0-9]+)/", $mountLine, $buf)) {
+                    $mountPoint = preg_replace('/\\\\040/i', ' ', $buf[2]);
+                    $parm = ['mountpoint' => $mountPoint, 'fstype' => $buf[3], 'name' => $buf[1]];
+                    if (CServer_Storage::SHOW_MOUNT_OPTION) {
+                        $parm['options'] = $buf[4];
+                    }
+                    $mountParm[] = $parm;
+                }
+            }
+        }
+
+        $dfInodes = [];
+        if ($this->executeProgram('df', '-k ' . $dfParam, $df, $this->config()->isDebug()) && ($df !== '')) {
+            $df = preg_split("/\n/", $df, -1, PREG_SPLIT_NO_EMPTY);
+            if ($getInodes && CServer_Storage::SHOW_INODES) {
+                if ($this->executeProgram('df', '-i ' . $dfParam, $df2, $this->config()->isDebug())) {
+                    $df2 = preg_split("/\n/", $df2, -1, PREG_SPLIT_NO_EMPTY);
+                    foreach ($df2 as $df2Line) {
+                        if (preg_match("/^(\S+).*\s([0-9]+)%/", $df2Line, $inodeBuf)) {
+                            $dfInodes[$inodeBuf[1]] = $inodeBuf[2];
+                        }
+                    }
+                }
+            }
+            foreach ($df as $dfLine) {
+                $dfBuf1 = preg_split("/(\%\s)/", $dfLine, 3);
+                if (count($dfBuf1) < 2) {
+                    continue;
+                }
+                if (preg_match("/(.*)(\s+)(([0-9]+)(\s+)([0-9]+)(\s+)([\-0-9]+)(\s+)([0-9]+)$)/", $dfBuf1[0], $dfBuf2)) {
+                    $dfBuf = (count($dfBuf1) == 3)
+                        ? [$dfBuf2[1], $dfBuf2[4], $dfBuf2[6], $dfBuf2[8], $dfBuf2[10], $dfBuf1[2]]
+                        : [$dfBuf2[1], $dfBuf2[4], $dfBuf2[6], $dfBuf2[8], $dfBuf2[10], $dfBuf1[1]];
+                    if (count($dfBuf) == 6) {
+                        $dfBuf[5] = trim($dfBuf[5]);
+                        $dev = new CServer_Device_Disk();
+                        $dev->setName(trim($dfBuf[0]));
+                        if ($dfBuf[2] < 0) {
+                            $dev->setTotal($dfBuf[3] * 1024);
+                            $dev->setUsed($dfBuf[3] * 1024);
+                        } else {
+                            $dev->setTotal($dfBuf[1] * 1024);
+                            $dev->setUsed($dfBuf[2] * 1024);
+                            if ($dfBuf[3] > 0) {
+                                $dev->setFree($dfBuf[3] * 1024);
+                            }
+                        }
+                        if (CServer_Storage::SHOW_MOUNT_POINT) {
+                            $dev->setMountPoint($dfBuf[5]);
+                        }
+
+                        $this->applyMountOptions($dev, $mountParm, trim($dfBuf[0]), $dfBuf[5]);
+
+                        if ($getInodes && CServer_Storage::SHOW_INODES && isset($dfInodes[trim($dfBuf[0])])) {
+                            $dev->setPercentInodesUsed($dfInodes[trim($dfBuf[0])]);
+                        }
+                        $arrResult[] = $dev;
+                    }
+                }
+            }
+        } else {
+            foreach ($mountParm as $mp) {
+                $total = disk_total_space($mp['mountpoint']);
+                if (($mp['fstype'] != 'none') && ($total > 0)) {
+                    $dev = new CServer_Device_Disk();
+                    $dev->setName($mp['name']);
+                    $dev->setFsType($mp['fstype']);
+                    if (CServer_Storage::SHOW_MOUNT_POINT) {
+                        $dev->setMountPoint($mp['mountpoint']);
+                    }
+                    $dev->setTotal($total);
+                    $free = disk_free_space($mp['mountpoint']);
+                    if ($free > 0) {
+                        $dev->setFree($free);
+                    } else {
+                        $free = 0;
+                    }
+                    if ($total > $free) {
+                        $dev->setUsed($total - $free);
+                    }
+                    if (CServer_Storage::SHOW_MOUNT_OPTION) {
+                        $dev->setOptions($this->stripMountCredentials($mp['options']));
+                    }
+                    $arrResult[] = $dev;
+                }
+            }
+        }
+
+        return $arrResult;
+    }
+
+    /**
+     * @param string $cmd
+     * @param string &$strBuffer
+     * @param string &$strError
+     * @param bool   $booErrorRep
+     * @param int    $timeout
+     *
+     * @return bool
+     */
+    public function procOpen($cmd, &$strBuffer, &$strError, $booErrorRep = true, $timeout = 30) {
+        $pipes = [];
+        if ($this->isRemote()) {
+            $this->ssh->run($cmd, function ($line) use (&$strBuffer) {
+                $strBuffer .= $line;
+            });
+            $strBuffer = trim($strBuffer);
+
+            return true;
+        }
+
+        $process = null;
+        $config = $this->config();
+        if ($config->isModePopen()) {
+            if ($this->isWindows()) {
+                $process = $pipes[1] = popen($cmd . ' 2>nul', 'r');
+            } else {
+                $process = $pipes[1] = popen($cmd . ' 2>/dev/null', 'r');
+            }
+        } else {
+            $descriptorspec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
+            $process = proc_open($cmd, $descriptorspec, $pipes);
+        }
+
+        if (!is_resource($process)) {
+            if ($booErrorRep) {
+                CServer::error()->addError($cmd, "\nOpen process error");
+            }
+
+            return false;
+        }
+
+        $te = $this->timeoutfgets($pipes, $strBuffer, $strError, $timeout);
+
+        if ($config->isModePopen()) {
+            $returnValue = pclose($pipes[1]);
+        } else {
+            fclose($pipes[0]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            if ($te) {
+                proc_terminate($process);
+                $returnValue = 0;
+            } else {
+                $returnValue = proc_close($process);
+            }
+        }
+
+        $strError = trim($strError);
+        $strBuffer = trim($strBuffer);
+
+        if (!empty($strError)) {
+            if ($booErrorRep) {
+                CServer::error()->addError($cmd, $strError . "\nReturn value: " . $returnValue);
+            }
+
+            return $returnValue == 0;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array  $pipes
+     * @param string &$out
+     * @param string &$err
+     * @param int    $timeout
+     *
+     * @return bool
+     */
+    private function timeoutfgets($pipes, &$out, &$err, $timeout) {
+        $w = null;
+        $e = null;
+        $te = false;
+        $pipe2 = !$this->config()->isModePopen();
+
+        while (!(feof($pipes[1]) && (!$pipe2 || feof($pipes[2])))) {
+            $read = $pipe2 ? [$pipes[1], $pipes[2]] : [$pipes[1]];
+            $n = stream_select($read, $w, $e, $timeout);
+
+            if ($n === false) {
+                error_log('stream_select: failed !');
+
+                break;
+            } elseif ($n === 0) {
+                error_log('stream_select: timeout expired !');
+                $te = true;
+
+                break;
+            }
+
+            foreach ($read as $r) {
+                if ($r == $pipes[1]) {
+                    $out .= fread($r, 4096);
+                } elseif (feof($pipes[1]) && $pipe2 && ($r == $pipes[2])) {
+                    $err .= fread($r, 4096);
+                }
+            }
+        }
+
+        return $te;
+    }
+
+    /**
+     * @param CServer_Device_Disk $dev
+     * @param array               $mountParm
+     * @param string              $devName
+     * @param string              $mountPoint
+     *
+     * @return void
+     */
+    private function applyMountOptions(CServer_Device_Disk $dev, $mountParm, $devName, $mountPoint) {
+        $found = false;
+        foreach ($mountParm as $mp) {
+            if (($mp['name'] === $devName) && ($mp['mountpoint'] === $mountPoint)) {
+                $dev->setFsType($mp['fstype']);
+                if (CServer_Storage::SHOW_MOUNT_OPTION && (trim(carr::get($mp, 'options', '')) !== '')) {
+                    $dev->setOptions($this->stripMountCredentials($mp['options']));
+                }
+                $found = true;
+
+                break;
+            }
+        }
+        if (!$found) {
+            foreach ($mountParm as $mp) {
+                if ($mp['mountpoint'] === $mountPoint) {
+                    $dev->setFsType($mp['fstype']);
+                    if (CServer_Storage::SHOW_MOUNT_OPTION && (trim(carr::get($mp, 'options', '')) !== '')) {
+                        $dev->setOptions($this->stripMountCredentials($mp['options']));
+                    }
+
+                    break;
+                }
+            }
+        }
+        if (!$found && $dev->getFsType() === null) {
+            $dev->setFsType('unknown');
+        }
+    }
+
+    /**
+     * @param string $options
+     *
+     * @return string
+     */
+    private function stripMountCredentials($options) {
+        if (!CServer_Storage::SHOW_MOUNT_CREDENTIALS) {
+            $options = preg_replace('/(^guest,)|(^guest$)|(,guest$)/i', '', $options);
+            $options = preg_replace('/,guest,/i', ',', $options);
+            $options = preg_replace('/(^user=[^,]*,)|(^user=[^,]*$)|(,user=[^,]*$)/i', '', $options);
+            $options = preg_replace('/,user=[^,]*,/i', ',', $options);
+            $options = preg_replace('/(^username=[^,]*,)|(^username=[^,]*$)|(,username=[^,]*$)/i', '', $options);
+            $options = preg_replace('/,username=[^,]*,/i', ',', $options);
+            $options = preg_replace('/(^password=[^,]*,)|(^password=[^,]*$)|(,password=[^,]*$)/i', '', $options);
+            $options = preg_replace('/,password=[^,]*,/i', ',', $options);
+        }
+
+        return $options;
     }
 }
