@@ -2,6 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @deprecated uses CApp_Cloud which is a security risk
+ */
 trait CTrait_Controller_Cloud_Server_Info {
     public function info() {
         $errCode = 0;
@@ -41,7 +44,7 @@ trait CTrait_Controller_Cloud_Server_Info {
             $cardData['chart']['color'] = '#d9534f';
 
             $divCol = $divRow->addDiv()->addClass('col-md-4');
-            $divCol->addTemplate()->setTemplate('CApp/Card/Info')->setData($cardData);
+            $divCol->addView('cresenity.template.card.info', $cardData);
 
             //memory
             $cardData = [];
@@ -60,7 +63,7 @@ trait CTrait_Controller_Cloud_Server_Info {
             $cardData['chart']['color'] = '#d9534f';
 
             $divCol = $divRow->addDiv()->addClass('col-md-4');
-            $divCol->addTemplate()->setTemplate('CApp/Card/Info')->setData($cardData);
+            $divCol->addView('cresenity.template.card.info', $cardData);
 
             /* storage */
             $cardData = [];
@@ -79,7 +82,7 @@ trait CTrait_Controller_Cloud_Server_Info {
             $cardData['chart']['color'] = '#d9534f';
 
             $divCol = $divRow->addDiv()->addClass('col-md-4');
-            $divCol->addTemplate()->setTemplate('CApp/Card/Info')->setData($cardData);
+            $divCol->addView('cresenity.template.card.info', $cardData);
         }
 
         if ($errCode == 0) {
@@ -142,7 +145,7 @@ trait CTrait_Controller_Cloud_Server_Info {
         }
 
         $divCol = $divRow->addDiv()->addClass('col-md-12');
-        $divCol->addTemplate()->setTemplate('CApp/Card/Table')->setData($cardData);
+        $divCol->addView('cresenity.template.card.table', $cardData);
 
         return $app;
     }
