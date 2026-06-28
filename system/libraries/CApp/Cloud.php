@@ -2,6 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @deprecated High security risk — do not use
+ */
 class CApp_Cloud {
     /**
      * @var CApp_Cloud_AdapterInterface
