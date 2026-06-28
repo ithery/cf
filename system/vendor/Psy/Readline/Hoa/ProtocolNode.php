@@ -103,6 +103,7 @@ class ProtocolNode implements \ArrayAccess, \IteratorAggregate
     /**
      * Get a specific node.
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($name): self
     {
         if (!isset($this[$name])) {

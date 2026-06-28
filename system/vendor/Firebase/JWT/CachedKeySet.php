@@ -96,6 +96,7 @@ class CachedKeySet implements ArrayAccess
      * @param string $keyId
      * @return Key
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($keyId): Key
     {
         if (!$this->keyIdExists($keyId)) {

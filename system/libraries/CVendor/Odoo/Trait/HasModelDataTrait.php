@@ -58,6 +58,7 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->get($offset);
     }

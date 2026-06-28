@@ -117,6 +117,7 @@ class ParamBag implements \ArrayAccess, \IteratorAggregate
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->__get($key);

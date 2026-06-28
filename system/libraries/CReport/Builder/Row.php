@@ -32,6 +32,7 @@ class CReport_Builder_Row implements ArrayAccess {
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         if ($this->row instanceof CModel) {
             return $this->row->$offset;

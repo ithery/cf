@@ -1162,6 +1162,7 @@ class CBase_String implements Stringable, ArrayAccess {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->value[$offset];
     }

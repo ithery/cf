@@ -375,6 +375,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->get($offset);
     }

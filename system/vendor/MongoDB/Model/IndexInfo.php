@@ -198,6 +198,7 @@ class IndexInfo implements ArrayAccess
      * @param mixed $key
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->info[$key];

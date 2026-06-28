@@ -1161,6 +1161,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->make($key);
     }

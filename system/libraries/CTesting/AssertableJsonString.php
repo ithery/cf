@@ -353,6 +353,7 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->decoded[$offset];
     }

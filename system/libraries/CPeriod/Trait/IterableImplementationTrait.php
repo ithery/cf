@@ -8,6 +8,7 @@ trait CPeriod_Trait_IterableImplementationTrait {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return carr::get($this->periods, $offset);
     }

@@ -135,6 +135,7 @@ class CModel_ModelInfo implements ArrayAccess {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         if (!property_exists($this, $offset)) {
             throw new InvalidArgumentException("Property {$offset} does not exist.");

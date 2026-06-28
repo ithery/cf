@@ -576,6 +576,7 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->get($key);
     }

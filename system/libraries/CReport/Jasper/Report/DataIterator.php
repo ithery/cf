@@ -35,6 +35,7 @@ class CReport_Jasper_Report_DataIterator implements ArrayAccess, Iterator, Count
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         $row = $this->data->get($offset);
         if ($row) {

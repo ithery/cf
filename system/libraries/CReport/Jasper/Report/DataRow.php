@@ -32,6 +32,7 @@ class CReport_Jasper_Report_DataRow implements ArrayAccess {
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return carr::get($this->row, $offset);
     }

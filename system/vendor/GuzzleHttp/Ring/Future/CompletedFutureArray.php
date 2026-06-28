@@ -16,6 +16,7 @@ class CompletedFutureArray extends CompletedFutureValue implements FutureArrayIn
         return isset($this->result[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->result[$offset];

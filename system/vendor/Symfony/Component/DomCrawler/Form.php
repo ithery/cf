@@ -300,6 +300,7 @@ class Form extends Link implements \ArrayAccess
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet(mixed $name): FormField|array
     {
         return $this->fields->get($name);

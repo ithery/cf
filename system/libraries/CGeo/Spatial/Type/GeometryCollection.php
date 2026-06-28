@@ -93,6 +93,7 @@ class CGeo_Spatial_Type_GeometryCollection extends CGeo_Spatial_Type_Geometry im
      *
      * @return Geometry
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset): Geometry {
         // @phpstan-ignore-next-line
         return $this->geometries[$offset];

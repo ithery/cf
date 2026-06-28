@@ -168,6 +168,7 @@ class CDatabase_Driver_Sqlsrv_Result extends CDatabase_Result {
         return false;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         if ($this->total_rows <= $offset) {
             return false;

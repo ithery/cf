@@ -35,6 +35,7 @@ class CReport_Builder_Data implements ArrayAccess, Iterator, Countable {
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         $row = $this->data->get($offset);
         if ($row) {

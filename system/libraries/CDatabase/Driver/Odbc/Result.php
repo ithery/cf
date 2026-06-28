@@ -190,6 +190,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return false;
     }

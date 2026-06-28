@@ -150,6 +150,7 @@ class CDatabase_Driver_PDO_Sqlite_Result extends CDatabase_Result {
         return false;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         try {
             return $this->result->fetch($this->fetch_type, PDO::FETCH_ORI_ABS, $offset);

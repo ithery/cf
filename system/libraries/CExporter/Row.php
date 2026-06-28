@@ -108,6 +108,7 @@ class CExporter_Row implements ArrayAccess {
         return isset(($this->toArray())[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return ($this->toArray())[$offset];
     }

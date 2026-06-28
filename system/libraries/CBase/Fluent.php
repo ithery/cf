@@ -97,6 +97,7 @@ class CBase_Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->get($offset);
     }

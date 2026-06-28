@@ -3421,6 +3421,7 @@ class Matrix implements Tensor
      * @throws \Tensor\Exceptions\InvalidArgumentException
      * @return \Tensor\Vector
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($index) : Vector
     {
         if (isset($this->a[$index])) {

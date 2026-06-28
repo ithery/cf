@@ -122,6 +122,7 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
         return false;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         if (!$this->seek($offset)) {
             return false;

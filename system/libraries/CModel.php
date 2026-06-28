@@ -2246,6 +2246,7 @@ abstract class CModel implements ArrayAccess, Arrayable, Jsonable, CQueue_Queuea
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->getAttribute($offset);
     }

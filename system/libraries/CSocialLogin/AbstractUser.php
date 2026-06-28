@@ -145,6 +145,7 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Co
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->user[$offset];
     }

@@ -76,6 +76,7 @@ class COptional implements ArrayAccess {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return carr::get($this->value, $key);
     }

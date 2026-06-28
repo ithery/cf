@@ -127,6 +127,7 @@ class CollectionInfo implements ArrayAccess
      * @param mixed $key
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->info[$key];

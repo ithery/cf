@@ -177,6 +177,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->data[$key];
     }

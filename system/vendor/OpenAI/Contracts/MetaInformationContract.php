@@ -33,6 +33,7 @@ interface MetaInformationContract extends ArrayAccess
      * @param  TOffsetKey  $offset
      * @return TArray[TOffsetKey]
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet(mixed $offset): mixed;
 
     /**

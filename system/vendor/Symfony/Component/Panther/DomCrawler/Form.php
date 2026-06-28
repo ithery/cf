@@ -239,6 +239,7 @@ final class Form extends BaseForm
      *
      * @return FormField|FormField[]|FormField[][]
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($name): FormField|array
     {
         return $this->get($name);

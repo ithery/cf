@@ -69,6 +69,7 @@ abstract class CDatabase_ResultAbstract implements CDatabase_ResultInterface, Ar
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         if (!$this->seek($offset)) {
             return false;

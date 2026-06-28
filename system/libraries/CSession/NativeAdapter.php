@@ -11,6 +11,7 @@ class CSession_NativeAdapter implements \ArrayAccess {
         return c::session()->has($offset);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return c::session()->get($offset);
     }

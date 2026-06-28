@@ -192,6 +192,7 @@ class CBase_ValidatedInput implements CBase_Contract_ValidatedData {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key): mixed {
         return $this->input[$key];
     }

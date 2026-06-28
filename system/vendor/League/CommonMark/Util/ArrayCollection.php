@@ -98,6 +98,7 @@ final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @phpstan-return T|null
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return isset($this->elements[$offset]) ? $this->elements[$offset] : null;
     }

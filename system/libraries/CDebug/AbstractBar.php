@@ -460,6 +460,7 @@ class CDebug_AbstractBar implements ArrayAccess {
         throw new CDebug_DebugBar_Exception('DebugBar[] is read-only');
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->getCollector($key);
     }

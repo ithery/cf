@@ -24,6 +24,7 @@ trait ArrayAccessible
     /**
      * {@inheritDoc}
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet(mixed $offset): mixed
     {
         return $this->toArray()[$offset]; // @phpstan-ignore-line

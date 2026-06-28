@@ -152,6 +152,7 @@ class CDatabase_Driver_Pgsql_Result extends CDatabase_Result {
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         if (!$this->seek($offset)) {
             return false;

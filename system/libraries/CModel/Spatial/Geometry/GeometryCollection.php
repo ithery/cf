@@ -85,6 +85,7 @@ class CModel_Spatial_Geometry_GeometryCollection extends CModel_Spatial_Geometry
         return isset($this->items[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->offsetExists($offset) ? $this->items[$offset] : null;
     }

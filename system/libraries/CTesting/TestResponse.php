@@ -1226,6 +1226,7 @@ class CTesting_TestResponse implements ArrayAccess {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->responseHasView()
                     ? $this->viewData($offset)

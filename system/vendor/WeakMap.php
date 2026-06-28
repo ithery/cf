@@ -69,6 +69,7 @@ final class WeakMap implements ArrayAccess, Countable, IteratorAggregate {
         return false;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($object) {
         $this->housekeeping();
         $this->assertValidKey($object);
