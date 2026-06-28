@@ -23,7 +23,7 @@ class CDaemon_Factory {
      * @param string $socketName
      * @param array  $contextOption
      *
-     * @return \CDaemon_Worker_Listener_WebSocketListener
+     * @return CDaemon_Worker_Listener_SocketListener
      */
     public static function createSocketListenerWorker($socketName = '', $contextOption = []) {
         $worker = new CDaemon_Worker_Listener_SocketListener();

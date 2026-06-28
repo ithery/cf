@@ -4,6 +4,15 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 interface CDaemon_Worker_ViaInterface {
     /**
+     * Validate any dependencies.
+     *
+     * @param array $errors
+     *
+     * @return array
+     */
+    public function checkEnvironment(array $errors = []);
+
+    /**
      * Puts the message on the queue.
      *
      * @param CDaemon_Worker_Call $message

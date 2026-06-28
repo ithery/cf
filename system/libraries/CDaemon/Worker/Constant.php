@@ -2,8 +2,8 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CDaemon_Worker_Constant {
-    const EV_LISTENER_READ = 'OnRead';
-
-    const EV_LISTENER_WRITE = 'OnWrite';
+/**
+ * @deprecated Use CDaemon_Server_Constant instead.
+ */
+class CDaemon_Worker_Constant extends CDaemon_Server_Constant {
 }

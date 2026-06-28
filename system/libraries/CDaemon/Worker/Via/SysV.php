@@ -21,7 +21,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     /**
      * A handle to the IPC message queue.
      *
-     * @var resource
+     * @var resource|SysvMessageQueue
      */
     public $queue;
 
@@ -31,7 +31,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
      * really makes a lot of sense and they need access. I think these issues will be fixed with the improvements
      * to $this lexical scoping in PHP5.4.
      *
-     * @var resource
+     * @var resource|SysvSharedMemory
      */
     public $shm;
 
@@ -62,7 +62,9 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
 
     public function __destruct() {
         unset($this->mediator);
-        @shm_detach($this->shm);
+        if ($this->shm) {
+            @shm_detach($this->shm);
+        }
         $this->shm = null;
         $this->queue = null;
     }
@@ -77,10 +79,10 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
         if ($this->mediator->service->isParent()) {
             $this->setupShm();
         }
-        if (!is_resource($this->queue)) {
+        if (!$this->queue) {
             throw new Exception(__METHOD__ . " Failed. Could not attach message queue id {$this->mediator->guid}");
         }
-        if (!is_resource($this->shm)) {
+        if (!$this->shm) {
             throw new Exception(__METHOD__ . " Failed. Could not address shared memory block {$this->mediator->guid}");
         }
     }
@@ -139,7 +141,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
         // If we're trying to recover previous messages/shm, scan the shared memory block for call structs and import them
         // @todo if we keep this functionality, we need to at least remove it as a CLI option implemented by CDaemon_ServiceAbstract because this will not apply to other Via conveyances
         if ($this->mediator->service->isParent() && $this->mediator->service->isRecoverWorkers()) {
-            $max_id = $this->callCount;
+            $max_id = $this->mediator->getCallCount();
             for ($i = 0; $i < 100000; $i++) {
                 if (shm_has_var($this->shm, $i)) {
                     $o = @shm_get_var($this->shm, $i);
@@ -153,7 +155,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                 }
             }
             $this->mediator->log("Starting Job Numbering at ${max_id}.");
-            $this->callCount = $max_id;
+            $this->mediator->setCallCount($max_id);
         }
     }
 
@@ -185,7 +187,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
             if (!is_int($bytes)) {
                 throw new Exception(__METHOD__ . ' Failed. Could not set SHM allocation size. Expected Integer. Given: ' . gettype($bytes));
             }
-            if (is_resource($this->shm)) {
+            if ($this->shm !== null) {
                 throw new Exception(__METHOD__ . ' Failed. Can Not Re-Allocate SHM Size. You will have to restart the daemon without the --recoverworkers option to resize.');
             }
             $this->memoryAllocation = $bytes;
@@ -351,7 +353,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
      * @return void
      */
     private function purgeShm() {
-        if (!is_resource($this->shm)) {
+        if (!$this->shm !== null) {
             $this->setupIpc();
         }
         @shm_remove($this->shm);
@@ -366,7 +368,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
      * @return void
      */
     private function purgeMq() {
-        if (!is_resource($this->queue)) {
+        if (!$this->queue !== null) {
             $this->setupIpc();
         }
         @msg_remove_queue($this->queue);

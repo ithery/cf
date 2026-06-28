@@ -163,6 +163,7 @@ class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator imp
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->toArray();
     }

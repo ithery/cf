@@ -354,7 +354,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->on(self::ON_IDLE, [$this, 'statsTrim'], (empty($this->loopInterval)) ? null : ($this->loopInterval * 50)); // Throttle to about once every 50 iterations
         $this->setup();
         $this->log('Application Startup Complete. Starting Event Loop.');
-        $this->log('Event Loop Duration: ' . number_format($this->getLoopInterval(), 2)) . ' seconds';
+        $this->log('Event Loop Duration: ' . number_format($this->getLoopInterval(), 2) . ' seconds');
     }
 
     /**
@@ -554,7 +554,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * Run any task asynchronously by passing it to this method. Will fork into a child process, execute the supplied
      * code, and exit.
      *
-     * The $callable provided can be a standard PHP Callback, a Closure, or any object that implements Core_ITask
+     * The $callable provided can be a standard PHP Callback, a Closure, or any object that implements CDaemon_TaskAbstract
      *
      * Note: If the task uses MySQL or certain other outside resources, the connection will have to be
      * re-established in the child process. There are three options:
@@ -568,15 +568,15 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * 3. Run setup code specific to the current background task:
      *    If you need to run specific setup code for a task or worker you have to use an object. You can't use the shortened
-     *    form of passing a callback or closure. For tasks that means an object that implements Core_ITask. For workers,
-     *    it's Core_IWorker. The setup() and teardown() methods defined in the interfaces are natural places to handle
+     *    form of passing a callback or closure. For tasks that means an object that implements CDaemon_TaskAbstract. For workers,
+     *    it's CDaemon_WorkerInterface. The setup() and teardown() methods defined in the interfaces are natural places to handle
      *    database connections, etc.
      *
      * @param callable|CDaemon_TaskAbstract $task a valid PHP callback or closure
      *
      * @link https://github.com/shaneharter/PHP-Daemon/wiki/Tasks
      *
-     * @return Core_Lib_Process|bool Return a newly created Process object or false on failure
+     * @return CDaemon_Process|bool Return a newly created Process object or false on failure
      */
     public function task($task) {
         if ($this->shutdown) {
@@ -599,7 +599,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $group = 'tasks';
             $callable = $task;
         }
-        $proc = $this->getPlugin('ProcessManager')->fork($group);
+        /** @var CDaemon_Plugin_ProcessManager $processManager */
+        $processManager = $this->getPlugin('ProcessManager');
+        $proc = $processManager->fork($group);
         if ($proc === false) {
             // Parent Process - Fork Failed
             $e = new Exception();
@@ -630,7 +632,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             exit;
         }
 
-        // Parent Process - Return the newly created Core_Lib_Process object
+        // Parent Process - Return the newly created CDaemon_Process object
         return $proc;
     }
 
@@ -1044,7 +1046,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     }
 
     /**
-     * Load any plugin that implements the Core_IPlugin.
+     * Load any plugin that implements the CDaemon_PluginInterface.
      *
      * @param string                      $alias
      * @param null|CDaemon_PluginAbstract $instance
@@ -1055,17 +1057,17 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * two examples are identical:
      *
      * @example $this->plugin('ini');
-     * @example $this->plugin('ini', new Core_Plugin_Ini() );
+     * @example $this->plugin('ini', new CDaemon_Plugin_Ini() );
      *
-     * In both of the preceding examples, a Core_Plugin_Ini object is available throughout your application object
+     * In both of the preceding examples, a CDaemon_Plugin_Ini object is available throughout your application object
      * as $this->ini.
      *
      * More complex (or just less magical) code can be used when appropriate. Want to load multiple instances of a plugin?
      * Want to use more meaningful names in your application instead of just duplicating part of the class name?
      * You can do all that too. This is simple dependency injection. Inject whatever object you want at runtime as long
-     * as it implements Core_IPlugin.
-     * @example $this->plugin('credentials', new Core_Plugins_Ini());
-     *          $this->plugin('settings', new Core_Plugins_Ini());
+     * as it implements CDaemon_PluginInterface.
+     * @example $this->plugin('credentials', new CDaemon_Plugin_Ini());
+     *          $this->plugin('settings', new CDaemon_Plugin_Ini());
      *          $this->credentials->filename = '~/prod/credentials.ini';
      *          $this->settings->filename = BASE_PATH . '/MyDaemon/settings.ini';
      *          echo $this->credentials['mysql']['user']; // Echo the 'user' key in the 'mysql' section
@@ -1076,7 +1078,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * CDaemon_ServiceAbstract or in your application superclass.
      *
      * Note: The Lock objects in Core/Lock are also Plugins and can be loaded in nearly the same way.
-     * Take Core_Lock_File for instance.  The only difference is that you cannot magically load it using the alias
+     * Take CDaemon_Lock_File for instance.  The only difference is that you cannot magically load it using the alias
      * 'file' alone. The Plugin loader would not know to look for the file in the Lock directory. In these instances
      * the prefix is necessary.
      * @example $this->plugin('Lock_File'); // Instantiated at $this->Lock_File
@@ -1116,7 +1118,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @throws Exception
      *
-     * @return CDaemon_Plugin
+     * @return CDaemon_PluginAbstract
      */
     public function getPlugin($alias) {
         if (!isset($this->plugins[$alias])) {
@@ -1147,9 +1149,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @param string                           $alias  The name of the worker -- Will be instantiated at $this->{$alias}
      * @param callable|CDaemon_WorkerInterface $worker An object of type CDaemon_WorkerInterface OR a callable (function, callback, closure)
-     * @param CDaemon_Worker_ViaInterface      $via    A Core_IWorkerVia object that defines the medium for IPC (In theory could be any message queue, redis, memcache, etc)
+     * @param CDaemon_Worker_ViaInterface      $via    A CDaemon_Worker_ViaInterface object that defines the medium for IPC
      *
-     * @return CDaemon_Worker_Mediator Returns a Core_Worker class that can be used to interact with the Worker
+     * @return CDaemon_Worker_MediatorAbstract
      */
     protected function addWorker($alias, $worker, CDaemon_Worker_ViaInterface $via = null) {
         if (!$this->parent) {
@@ -1166,7 +1168,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
                 $mediator = new CDaemon_Worker_MediatorObject($alias, $this, $via);
                 // Ensure that there are no reserved method names in the worker object -- Determine if there will
                 // be a collision between worker methods and public methods on the Mediator class
-                // Exclude any methods required by the Core_IWorker interface from the check.
+                // Exclude any methods required by the CDaemon_WorkerInterface interface from the check.
                 $intersection = array_intersect(get_class_methods($worker), get_class_methods($mediator));
                 $intersection = array_diff($intersection, get_class_methods(CDaemon_WorkerInterface::class));
                 if (!empty($intersection)) {
@@ -1296,7 +1298,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             throw new Exception(__METHOD__ . ' Failed. Could not set loop interval. Number Expected. Given: ' . $setValue);
         }
         $this->loopInterval = $setValue;
-        $this->log('Adjusting Event Loop Duration: ' . number_format($this->getLoopInterval(), 2)) . ' seconds';
+        $this->log('Adjusting Event Loop Duration: ' . number_format($this->getLoopInterval(), 2) . ' seconds');
 
         $this->log('Current Process Priority: ' . pcntl_getpriority() . '');
     }

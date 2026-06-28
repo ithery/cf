@@ -2,5 +2,8 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-abstract class CDaemon_Worker_ProtocolAbstract implements CDaemon_Worker_ProtocolInterface {
+/**
+ * @deprecated Use CDaemon_Server_ProtocolAbstract instead.
+ */
+abstract class CDaemon_Worker_ProtocolAbstract extends CDaemon_Server_ProtocolAbstract implements CDaemon_Worker_ProtocolInterface {
 }
