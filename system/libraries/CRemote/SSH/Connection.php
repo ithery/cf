@@ -176,8 +176,15 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
      * @return \CRemote_SSH_Gateway
      */
     public function getGateway() {
-        if (!$this->gateway->connected() && !$this->gateway->connect($this->username)) {
-            throw new \RuntimeException('Unable to connect to remote server.');
+        if (!$this->gateway->connected()) {
+            try {
+                $connected = $this->gateway->connect($this->username);
+            } catch (\Exception $ex) {
+                throw new \RuntimeException('Unable to connect to remote server: ' . $ex->getMessage(), 0, $ex);
+            }
+            if (!$connected) {
+                throw new \RuntimeException('Unable to connect to remote server: authentication failed for user ' . $this->username);
+            }
         }
 
         return $this->gateway;
