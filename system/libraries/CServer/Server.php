@@ -428,6 +428,7 @@ class CServer_Server {
     public function df($dfParam = '', $getInodes = true) {
         $arrResult = [];
         $mountParm = [];
+        $mount = '';
 
         if ($this->executeProgram('mount', '', $mount, $this->config()->isDebug())) {
             $mount = preg_split("/\n/", $mount, -1, PREG_SPLIT_NO_EMPTY);
@@ -473,9 +474,11 @@ class CServer_Server {
         }
 
         $dfInodes = [];
+        $df = '';
         if ($this->executeProgram('df', '-k ' . $dfParam, $df, $this->config()->isDebug()) && ($df !== '')) {
             $df = preg_split("/\n/", $df, -1, PREG_SPLIT_NO_EMPTY);
             if ($getInodes && CServer_Storage::SHOW_INODES) {
+                $df2 = '';
                 if ($this->executeProgram('df', '-i ' . $dfParam, $df2, $this->config()->isDebug())) {
                     $df2 = preg_split("/\n/", $df2, -1, PREG_SPLIT_NO_EMPTY);
                     foreach ($df2 as $df2Line) {
