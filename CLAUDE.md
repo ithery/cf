@@ -7,11 +7,13 @@ Branches: `master` (main), `development`. Docs: `application/cresenity/default/d
 ## Commands
 
 ```bash
-./system/vendor/PHPUnit/phpunit          # Tests
+phpcf test                               # Tests (from root=framework, from app dir=app tests)
 ./system/vendor/PHPStan/phpstan analyse  # PHPStan level 4
 php-cs-fixer fix                         # Code format
 cd media/js/cres && npm run build        # JS build
 ```
+
+Framework tests in `tests/`, app tests in `application/{app}/default/tests/`.
 
 ## Code Style
 
