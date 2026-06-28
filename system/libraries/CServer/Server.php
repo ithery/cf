@@ -85,7 +85,7 @@ class CServer_Server {
      * @return CServer_PhpInfo
      */
     public function phpInfo() {
-        return new CServer_PhpInfo();
+        return new CServer_PhpInfo($this);
     }
 
     /**

@@ -77,8 +77,11 @@ class CServer {
         return self::server($sshConfig)->config();
     }
 
+    /**
+     * @return CServer_PhpInfo
+     */
     public static function phpInfo() {
-        return new CServer_PhpInfo();
+        return self::server()->phpInfo();
     }
 
     public static function getHostname() {
