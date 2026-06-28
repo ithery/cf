@@ -606,8 +606,8 @@ class CDaemon_Worker_Connection_TcpConnection extends CDaemon_Worker_ConnectionA
                         if ($this->_currentPackageLength > strlen($this->recvBuffer)) {
                             break;
                         }
-                    } // Wrong package.
-                    else {
+                    } else {
+                        // Wrong package.
                         Worker::safeEcho('error package. package_length=' . var_export($this->_currentPackageLength, true));
                         $this->destroy();
 

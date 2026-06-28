@@ -1968,6 +1968,9 @@ class CollectionTest extends TestCase {
 }
 // @codingStandardsIgnoreStart
 class TestSupportCollectionHigherOrderItem {
+    /**
+     * @var string
+     */
     public $name;
 
     public function __construct($name = 'ither') {
@@ -1978,6 +1981,11 @@ class TestSupportCollectionHigherOrderItem {
         return $this->name = strtoupper($this->name);
     }
 
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
     public function is($name) {
         return $this->name === $name;
     }
@@ -1986,10 +1994,20 @@ class TestSupportCollectionHigherOrderItem {
 class TestAccessorEloquentTestStub {
     protected $attributes = [];
 
+    /**
+     * TestAccessorEloquentTestStub constructor.
+     *
+     * @param array $attributes
+     */
     public function __construct($attributes) {
         $this->attributes = $attributes;
     }
 
+    /**
+     * @param string $attribute
+     *
+     * @return mixed
+     */
     public function __get($attribute) {
         $accessor = 'get' . lcfirst($attribute) . 'Attribute';
         if (method_exists($this, $accessor)) {
@@ -1999,6 +2017,11 @@ class TestAccessorEloquentTestStub {
         return $this->$attribute;
     }
 
+    /**
+     * @param string $attribute
+     *
+     * @return bool
+     */
     public function __isset($attribute) {
         $accessor = 'get' . lcfirst($attribute) . 'Attribute';
 
@@ -2009,14 +2032,25 @@ class TestAccessorEloquentTestStub {
         return isset($this->$attribute);
     }
 
+    /**
+     * @return mixed
+     */
     public function getSomeAttribute() {
         return $this->attributes['some'];
     }
 }
 
 class TestArrayAccessImplementation implements ArrayAccess {
+    /**
+     * @var array
+     */
     private $arr;
 
+    /**
+     * TestArrayAccessImplementation constructor.
+     *
+     * @param array $arr
+     */
     public function __construct($arr) {
         $this->arr = $arr;
     }
@@ -2026,6 +2060,7 @@ class TestArrayAccessImplementation implements ArrayAccess {
         return isset($this->arr[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->arr[$offset];
     }
@@ -2066,8 +2101,16 @@ class TestJsonSerializeWithScalarValueObject implements JsonSerializable {
 }
 
 class TestCollectionMapIntoObject {
+    /**
+     * @var mixed
+     */
     public $value;
 
+    /**
+     * TestCollectionMapIntoObject constructor.
+     *
+     * @param mixed $value
+     */
     public function __construct($value) {
         $this->value = $value;
     }

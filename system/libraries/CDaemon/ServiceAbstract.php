@@ -20,38 +20,89 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     const ON_ERROR = 0;    // error() or fatalError() is called
 
+    /**
+     * @var int
+     */
     const ON_SIGNAL = 1;    // the daemon has received a signal
 
+    /**
+     * @var int
+     */
     const ON_INIT = 2;    // the library has completed initialization, your setup() method is about to be called. Note: Not Available to Worker code.
 
+    /**
+     * @var int
+     */
     const ON_PREEXECUTE = 3;    // inside the event loop, right before your execute() method
 
+    /**
+     * @var int
+     */
     const ON_POSTEXECUTE = 4;    // and right after
 
+    /**
+     * @var int
+     */
     const ON_FORK = 5;    // in a background process right after it has been forked from the daemon
 
+    /**
+     * @var int
+     */
     const ON_PIDCHANGE = 6;    // whenever the pid changes -- in a background process for example
 
+    /**
+     * @var int
+     */
     const ON_IDLE = 7;    // called when there is idle time at the end of a loopInterval, or at the idleProbability when loopInterval isn't used
 
+    /**
+     * @var int
+     */
     const ON_REAP = 8;    // notification from the OS that a child process of this application has exited
 
+    /**
+     * @var int
+     */
     const ON_SHUTDOWN = 10;   // called at the top of the destructor
 
+    /**
+     * @var string
+     */
     protected $serviceName;
 
+    /**
+     * @var array
+     */
     protected $config;
 
+    /**
+     * @var int
+     */
     protected $startTime;
 
+    /**
+     * @var bool
+     */
     protected $shutdown = false;
 
+    /**
+     * @var bool
+     */
     protected $parent = true;
 
+    /**
+     * @var null|int
+     */
     protected $parentPid = null;
 
+    /**
+     * @var bool
+     */
     protected $isRecoverWorkers = false;
 
+    /**
+     * @var bool
+     */
     protected $isDebugWorkers = false;
 
     /**
@@ -59,18 +110,33 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     protected $pidFile = null;
 
+    /**
+     * @var bool
+     */
     protected $stdout = false;
 
+    /**
+     * @var bool
+     */
     protected $debug = true;
 
+    /**
+     * @var int
+     */
     protected $terminateLimit = 20;
 
+    /**
+     * @var int
+     */
     protected $logSizeToRotate = 500 * 1024;
 
+    /**
+     * @var int
+     */
     protected $logKeepToRotate = 10;
 
     /**
-     * @var CDaemon_Runner
+     * @var null|CDaemon_Runner
      */
     protected $runner = null;
 
@@ -119,6 +185,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     protected $autoRestartInterval = 43200;
 
+    /**
+     * @var bool If true, the daemon will continue running even if a fatal error occurs. If false, the daemon will attempt to restart itself after a fatal error.
+     */
     protected $isDaemonContinueOnFatalError = false;
 
     /**
@@ -162,7 +231,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @see CDaemon_ServiceAbstract::log()
      * @see CDaemon_ServiceAbstract::restart();
      *
-     * @var stream
+     * @var bool|resource
      */
     private static $logHandle = false;
 
@@ -186,6 +255,10 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         return $this->isDaemonContinueOnFatalError;
     }
 
+    /**
+     * @param mixed $serviceName
+     * @param mixed $config
+     */
     public function __construct($serviceName, $config) {
         $this->serviceName = $serviceName;
         $this->config = $config;
@@ -393,13 +466,10 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * Register a callback for the given $event. Use the event class constants for built-in events. Add and dispatch
      * your own events however you want.
      *
-     * @param $event    mixed scalar  When creating custom events, keep ints < 100 reserved for the daemon
-     * @param $callback closure|callback
-     * @param $throttle Optional time in seconds to throttle calls to the given $callback. For example, if
-     *                  $throttle = 10, the provided $callback will not be called more than once every 10 seconds, even if the
-     *                  given $event is dispatched more frequently than that.
-     * @param $criteria closure|callback Optional. If provided, any event payload will be passed to this callable and
-     *                  the event dispatched only if it returns truthy.
+     * @param mixed $event    When creating custom events, keep ints < 100 reserved for the daemon
+     * @param closure|callable $callback
+     * @param int|null $throttle Optional time in seconds to throttle calls to the given $callback. For example, if $throttle = 10, the provided $callback will not be called more than once every 10 seconds, even if the given $event is dispatched more frequently than that.
+     * @param callable|null $criteria Optional. If provided, any event payload will be passed to this callable and the event dispatched only if it returns truthy.
      *
      * @throws Exception
      *
@@ -564,6 +634,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         return $proc;
     }
 
+    /**
+     * Get a configuration value from the config array passed to the constructor.
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
     public function getConfig($key) {
         return carr::get($this->config, $key);
     }
@@ -602,6 +679,12 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         return carr::get($this->config, 'logFile');
     }
 
+    /**
+     * Log the provided $message if debug mode is enabled.
+     *
+     * @param string $label
+     * @param mixed  $message
+     */
     public function debug($message, $label = '') {
         if ($this->debug) {
             return;
@@ -616,6 +699,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * is literally no difference between using this and just passing the message to CDaemon_ServiceAbstract::log().
      *
      * @param string $label
+     * @param mixed  $message
      */
     public function error($message, $label = '') {
         $this->log($message, $label);
@@ -623,6 +707,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->dispatchEvent(new CDaemon_Event_Service_OnError($this, $message, $label));
     }
 
+    /**
+     * Dispatch an event to the CEvent system.
+     *
+     * @param mixed $event
+     *
+     * @return mixed
+     */
     public function dispatchEvent($event) {
         return CEvent::dispatch($event);
     }
@@ -870,6 +961,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->restart();
     }
 
+    /**
+     * Stop the process with the given PID.
+     *
+     * @param int $pid
+     *
+     * @return string
+     */
     private function stopPid($pid) {
         $command = 'kill -2 ' . $pid;
         $result = '';
@@ -1031,6 +1129,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     /**
      * Simple function to validate that alises for Plugins won't interfere with each other or with existing daemon properties.
      *
+     * @param mixed $alias
+     *
      * @throws Exception
      */
     private function checkPluginAlias($alias) {
@@ -1093,7 +1193,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @throws Exception
      *
-     * @return type
+     * @return CDaemon_Worker_MediatorAbstract
      */
     protected function getWorker($alias) {
         if (!isset($this->workers[$alias])) {
@@ -1105,6 +1205,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     /**
      * Simple function to validate that alises for Plugins or Workers won't interfere with each other or with existing daemon properties.
+     *
+     * @param mixed $alias
      *
      * @throws Exception
      */

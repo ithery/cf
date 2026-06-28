@@ -81,8 +81,8 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
                             Worker::log($e);
                             exit(250);
                         }
-                    } // Close connection.
-                    else {
+                    } else {
+                        // Close connection.
                         $connection->close("\x88\x02\x27\x10", true);
                     }
 
@@ -201,8 +201,8 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
             $connection->websocketCurrentFrameLength = 0;
             // Continue to read next frame.
             return static::input(substr($buffer, $current_frame_length), $connection);
-        } // The length of the received data is less than the length of a frame.
-        else {
+        } else {
+            // The length of the received data is less than the length of a frame.
             return 0;
         }
     }
