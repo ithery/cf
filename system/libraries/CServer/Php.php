@@ -9,10 +9,24 @@ class CServer_Php {
     protected $server;
 
     /**
-     * @param CServer_Server $server
+     * @var string
      */
-    public function __construct(CServer_Server $server) {
+    protected $phpBinary;
+
+    /**
+     * @param CServer_Server $server
+     * @param null|string    $phpBinary
+     */
+    public function __construct(CServer_Server $server, $phpBinary = null) {
         $this->server = $server;
+        $this->phpBinary = $phpBinary ?: 'php';
+    }
+
+    /**
+     * @return string
+     */
+    public function getPhpBinary() {
+        return $this->phpBinary;
     }
 
     /**
@@ -27,7 +41,7 @@ class CServer_Php {
      */
     public function getVersion() {
         if ($this->server->isRemote()) {
-            return trim($this->server->runCommand('php -r "echo phpversion();"'));
+            return trim($this->server->runCommand($this->phpBinary . ' -r "echo phpversion();"'));
         }
 
         return phpversion();
@@ -40,7 +54,7 @@ class CServer_Php {
      */
     public function getExtVersion($extName) {
         if ($this->server->isRemote()) {
-            return trim($this->server->runCommand('php -r "echo phpversion(\'' . $extName . '\');"'));
+            return trim($this->server->runCommand($this->phpBinary . ' -r "echo phpversion(\'' . $extName . '\');"'));
         }
 
         return phpversion($extName);
@@ -51,7 +65,7 @@ class CServer_Php {
      */
     public function getAllIniConfiguration() {
         if ($this->server->isRemote()) {
-            $output = trim($this->server->runCommand('php -r "echo json_encode(ini_get_all());"'));
+            $output = trim($this->server->runCommand($this->phpBinary . ' -r "echo json_encode(ini_get_all());"'));
 
             return json_decode($output, true) ?: [];
         }
@@ -66,7 +80,7 @@ class CServer_Php {
      */
     public function getAllIniConfigurationExt($extName) {
         if ($this->server->isRemote()) {
-            $output = trim($this->server->runCommand('php -r "echo json_encode(ini_get_all(\'' . $extName . '\'));"'));
+            $output = trim($this->server->runCommand($this->phpBinary . ' -r "echo json_encode(ini_get_all(\'' . $extName . '\'));"'));
 
             return json_decode($output, true) ?: [];
         }
@@ -81,7 +95,7 @@ class CServer_Php {
      */
     public function getIniConfiguration($varName) {
         if ($this->server->isRemote()) {
-            return trim($this->server->runCommand('php -r "echo ini_get(\'' . $varName . '\');"'));
+            return trim($this->server->runCommand($this->phpBinary . ' -r "echo ini_get(\'' . $varName . '\');"'));
         }
 
         return ini_get($varName);
@@ -92,7 +106,7 @@ class CServer_Php {
      */
     public function getIniLoadedFile() {
         if ($this->server->isRemote()) {
-            return trim($this->server->runCommand('php -r "echo php_ini_loaded_file();"'));
+            return trim($this->server->runCommand($this->phpBinary . ' -r "echo php_ini_loaded_file();"'));
         }
 
         return php_ini_loaded_file();
@@ -103,7 +117,7 @@ class CServer_Php {
      */
     public function getSapiName() {
         if ($this->server->isRemote()) {
-            return trim($this->server->runCommand('php -r "echo php_sapi_name();"'));
+            return trim($this->server->runCommand($this->phpBinary . ' -r "echo php_sapi_name();"'));
         }
 
         return php_sapi_name();
@@ -114,7 +128,7 @@ class CServer_Php {
      */
     public function getTempDir() {
         if ($this->server->isRemote()) {
-            return trim($this->server->runCommand('php -r "echo sys_get_temp_dir();"'));
+            return trim($this->server->runCommand($this->phpBinary . ' -r "echo sys_get_temp_dir();"'));
         }
 
         return sys_get_temp_dir();
