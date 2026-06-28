@@ -2,169 +2,229 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CServer_Memory extends CServer_Base {
+class CServer_Memory {
     /**
-     * @var CServer_Memory
+     * @var CServer_Server
      */
-    protected static $instance = [];
-
-    /**
-     * @var CServer_Memory_OS
-     */
-    protected $os;
+    protected $server;
 
     /**
      * @var CServer_Memory_Info
      */
     protected $info;
 
-    public function __construct(CRemote_SSH $ssh = null) {
-        $os = CServer::getOS();
+    /**
+     * @var bool
+     */
+    protected $memoryBuilt = false;
+
+    /**
+     * @var bool
+     */
+    protected $swapBuilt = false;
+
+    /**
+     * @param CServer_Server $server
+     */
+    public function __construct(CServer_Server $server) {
+        $this->server = $server;
         $this->info = new CServer_Memory_Info();
-        $osClass = 'CServer_Memory_OS_' . $os;
-        $this->os = new $osClass($this, $this->info);
-        $this->ssh = $ssh;
-        $this->host = $ssh ? $ssh->getHost() : 'localhost';
     }
 
     /**
-     * @param array|CRemote_SSH $sshConfig
-     *
-     * @return CServer_Memory
+     * @return CServer_Server
      */
-    public static function instance($sshConfig = null) {
-        if (!is_array(self::$instance)) {
-            self::$instance = [];
-        }
-        $host = 'localhost';
-        $ssh = null;
-        if ($sshConfig != null) {
-            $ssh = CServer_SSHRepository::instance()->getSSH($sshConfig);
-            $host = $ssh->getHost();
-        }
-        if (!isset(self::$instance[$host])) {
-            self::$instance[$host] = new CServer_Memory($ssh);
-        }
-
-        return self::$instance[$host];
+    public function getServer() {
+        return $this->server;
     }
 
-    public function getMemApplication() {
-        if (!$this->info->getMemApplication()) {
-            $this->os->buildMemory();
+    /**
+     * @return void
+     */
+    protected function buildMemory() {
+        if ($this->memoryBuilt) {
+            return;
         }
+        $this->memoryBuilt = true;
+
+        $mbuf = '';
+        if ($this->server->rfts('/proc/meminfo', $mbuf)) {
+            $lines = preg_split("/\n/", $mbuf, -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($lines as $line) {
+                if (preg_match('/^MemTotal:\s+(\d+)\s*kB/i', $line, $m)) {
+                    $this->info->setMemTotal($m[1] * 1024);
+                } elseif (preg_match('/^MemFree:\s+(\d+)\s*kB/i', $line, $m)) {
+                    $this->info->setMemFree($m[1] * 1024);
+                } elseif (preg_match('/^Cached:\s+(\d+)\s*kB/i', $line, $m)) {
+                    $this->info->setMemCache($m[1] * 1024);
+                } elseif (preg_match('/^Buffers:\s+(\d+)\s*kB/i', $line, $m)) {
+                    $this->info->setMemBuffer($m[1] * 1024);
+                }
+            }
+            $this->info->setMemUsed($this->info->getMemTotal() - $this->info->getMemFree());
+            if ($this->info->getMemCache() !== null && $this->info->getMemBuffer() !== null) {
+                $this->info->setMemApplication($this->info->getMemUsed() - $this->info->getMemCache() - $this->info->getMemBuffer());
+            }
+        }
+    }
+
+    /**
+     * @return void
+     */
+    protected function buildSwap() {
+        if ($this->swapBuilt) {
+            return;
+        }
+        $this->swapBuilt = true;
+
+        $sbuf = '';
+        if ($this->server->rfts('/proc/swaps', $sbuf, 0, 4096, false)) {
+            $swaps = preg_split("/\n/", $sbuf, -1, PREG_SPLIT_NO_EMPTY);
+            unset($swaps[0]);
+            foreach ($swaps as $swap) {
+                $parts = preg_split('/\s+/', $swap, 5);
+                $dev = CServer_Factory::createDeviceDisk();
+                $dev->setMountPoint($parts[0]);
+                $dev->setName('SWAP');
+                $dev->setTotal($parts[2] * 1024);
+                $dev->setUsed($parts[3] * 1024);
+                $dev->setFree($dev->getTotal() - $dev->getUsed());
+                $this->info->setSwapDevices($dev);
+            }
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getMemApplication() {
+        $this->buildMemory();
 
         return $this->info->getMemApplication();
     }
 
+    /**
+     * @return int
+     */
     public function getMemFree() {
-        if (!$this->info->getMemFree()) {
-            $this->os->buildMemory();
-        }
+        $this->buildMemory();
 
         return $this->info->getMemFree();
     }
 
+    /**
+     * @return int
+     */
     public function getMemBuffer() {
-        if (!$this->info->getMemBuffer()) {
-            $this->os->buildMemory();
-        }
+        $this->buildMemory();
 
         return $this->info->getMemBuffer();
     }
 
+    /**
+     * @return int
+     */
     public function getMemTotal() {
-        if (!$this->info->getMemTotal()) {
-            $this->os->buildMemory();
-        }
+        $this->buildMemory();
 
         return $this->info->getMemTotal();
     }
 
+    /**
+     * @return int
+     */
     public function getMemUsed() {
-        if (!$this->info->getMemUsed()) {
-            $this->os->buildMemory();
-        }
+        $this->buildMemory();
 
         return $this->info->getMemUsed();
     }
 
+    /**
+     * @return int
+     */
     public function getMemCache() {
-        if (!$this->info->getMemCache()) {
-            $this->os->buildMemory();
-        }
+        $this->buildMemory();
 
         return $this->info->getMemCache();
     }
 
+    /**
+     * @return float
+     */
     public function getMemPercentUsed() {
-        if (!$this->info->getMemPercentUsed()) {
-            $this->os->buildMemory();
-        }
+        $this->buildMemory();
 
         return $this->info->getMemPercentUsed();
     }
 
+    /**
+     * @return float
+     */
     public function getMemPercentBuffer() {
-        if (!$this->info->getMemPercentBuffer()) {
-            $this->os->buildMemory();
-        }
+        $this->buildMemory();
 
         return $this->info->getMemPercentBuffer();
     }
 
+    /**
+     * @return float
+     */
     public function getMemPercentApplication() {
-        if (!$this->info->getMemPercentApplication()) {
-            $this->os->buildMemory();
-        }
+        $this->buildMemory();
 
         return $this->info->getMemPercentApplication();
     }
 
+    /**
+     * @return float
+     */
     public function getMemPercentCache() {
-        if (!$this->info->getMemPercentCache()) {
-            $this->os->buildMemory();
-        }
+        $this->buildMemory();
 
         return $this->info->getMemPercentCache();
     }
 
+    /**
+     * @return array
+     */
     public function getSwapDevices() {
-        if (!$this->info->getSwapDevices()) {
-            $this->os->buildSwap();
-        }
+        $this->buildSwap();
 
         return $this->info->getSwapDevices();
     }
 
+    /**
+     * @return int
+     */
     public function getSwapFree() {
-        if (!$this->info->getSwapFree()) {
-            $this->os->buildSwap();
-        }
+        $this->buildSwap();
 
         return $this->info->getSwapFree();
     }
 
+    /**
+     * @return float
+     */
     public function getSwapPercentUsed() {
-        if (!$this->info->getSwapPercentUsed()) {
-            $this->os->buildSwap();
-        }
+        $this->buildSwap();
 
         return $this->info->getSwapPercentUsed();
     }
 
+    /**
+     * @return int
+     */
     public function getSwapTotal() {
-        if (!$this->info->getSwapTotal()) {
-            $this->os->buildSwap();
-        }
+        $this->buildSwap();
 
         return $this->info->getSwapTotal();
     }
 
+    /**
+     * @return int
+     */
     public function getSwapUsed() {
-        if (!$this->info->getSwapUsed()) {
-            $this->os->buildSwap();
-        }
+        $this->buildSwap();
 
         return $this->info->getSwapUsed();
     }

@@ -33,16 +33,26 @@ class CServer {
         return self::server($sshConfig)->storage();
     }
 
+    /**
+     * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
+     *
+     * @return CServer_Php
+     */
     public static function php($sshConfig = null) {
-        return CServer_Php::instance($sshConfig);
+        return self::server($sshConfig)->php();
     }
 
     public static function database() {
         return CServer_Database::instance();
     }
 
+    /**
+     * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
+     *
+     * @return CServer_Memory
+     */
     public static function memory($sshConfig = null) {
-        return CServer_Memory::instance($sshConfig);
+        return self::server($sshConfig)->memory();
     }
 
     public static function system($sshConfig = null) {

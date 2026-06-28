@@ -57,7 +57,7 @@ class CServer_Server {
      * @return CServer_Memory
      */
     public function memory() {
-        return CServer_Memory::instance($this->ssh);
+        return new CServer_Memory($this);
     }
 
     /**
