@@ -22,11 +22,19 @@ class CServer_Storage {
     protected $info;
 
     /**
+     * @var CServer_Storage_OS
+     */
+    protected $os;
+
+    /**
      * @param CServer_Server $server
      */
     public function __construct(CServer_Server $server) {
         $this->server = $server;
         $this->info = new CServer_Storage_Info();
+        $osName = $server->getOS();
+        $osClass = 'CServer_Storage_OS_' . $osName;
+        $this->os = new $osClass($server, $this->info);
     }
 
     /**
@@ -41,7 +49,7 @@ class CServer_Storage {
      */
     public function getDiskDevices() {
         if (!$this->info->getDiskDevices()) {
-            $this->buildDiskDevices();
+            $this->os->buildDiskDevices();
         }
 
         return $this->info->getDiskDevices();
@@ -81,30 +89,5 @@ class CServer_Storage {
         }
 
         return (float) @disk_total_space('/');
-    }
-
-    /**
-     * @return void
-     */
-    protected function buildDiskDevices() {
-        $dfArgs = '';
-        $hideFstypes = [];
-        $config = $this->server->config();
-        if (is_string($config->getHideFsTypes())) {
-            if (preg_match(CServer::ARRAY_EXP, $config->getHideFsTypes())) {
-                $hideFstypes = eval($config->getHideFsTypes());
-            } else {
-                $hideFstypes = [$config->getHideFsTypes()];
-            }
-        }
-        foreach ($hideFstypes as $fstype) {
-            $dfArgs .= '-x ' . $fstype . ' ';
-        }
-        $dfArgs = trim($dfArgs);
-        $param = $dfArgs !== '' ? '-P ' . $dfArgs . ' 2>/dev/null' : '-P 2>/dev/null';
-        $arrResult = $this->server->df($param);
-        foreach ($arrResult as $dev) {
-            $this->info->setDiskDevices($dev);
-        }
     }
 }

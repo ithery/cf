@@ -8,38 +8,41 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
      */
     protected $info;
 
-    protected $system;
+    /**
+     * @var CServer_Server
+     */
+    protected $server;
 
     /**
+     * @param CServer_Server      $server
      * @param CServer_System_Info $info
      */
-    public function __construct(CServer_System $system, CServer_System_Info $info) {
+    public function __construct(CServer_Server $server, CServer_System_Info $info) {
+        $this->server = $server;
         $this->info = $info;
-        $this->system = $system;
     }
 
     /**
-     * IP of the Host.
-     *
      * @return void
      */
     public function buildIp() {
-        $cmd = $this->createCommand();
-        if (CServer::config()->isUseVHost()) {
-            if (($cmd->readEnv('SERVER_ADDR', $result) || $cmd->readEnv('LOCAL_ADDR', $result)) //is server address defined
+        $result = '';
+        $config = $this->server->config();
+        if ($config->isUseVHost()) {
+            if (($this->server->readEnv('SERVER_ADDR', $result) || $this->server->readEnv('LOCAL_ADDR', $result))
                 && !strstr($result, '.') && strstr($result, ':')
-            ) { //is IPv6, quick version of preg_match('/\(([[0-9A-Fa-f\:]+)\)/', $result)
+            ) {
                 $dnsrec = dns_get_record($this->info->getHostname(), DNS_AAAA);
-                if (isset($dnsrec[0]['ipv6'])) { //is DNS IPv6 record
-                    $this->info->setIp($dnsrec[0]['ipv6']); //from DNS (avoid IPv6 NAT translation)
+                if (isset($dnsrec[0]['ipv6'])) {
+                    $this->info->setIp($dnsrec[0]['ipv6']);
                 } else {
-                    $this->info->setIp(preg_replace('/^::ffff:/i', '', $result)); //from SERVER_ADDR or LOCAL_ADDR
+                    $this->info->setIp(preg_replace('/^::ffff:/i', '', $result));
                 }
             } else {
-                $this->info->setIp(gethostbyname($this->info->getHostname())); //IPv4 only
+                $this->info->setIp(gethostbyname($this->info->getHostname()));
             }
         } else {
-            if ($cmd->readEnv('SERVER_ADDR', $result) || $cmd->readEnv('LOCAL_ADDR', $result)) {
+            if ($this->server->readEnv('SERVER_ADDR', $result) || $this->server->readEnv('LOCAL_ADDR', $result)) {
                 $this->info->setIp(preg_replace('/^::ffff:/i', '', $result));
             } else {
                 $this->info->setIp(gethostbyname($this->info->getHostname()));
@@ -48,41 +51,18 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
     }
 
     /**
-     * Number of Users.
-     *
      * @return void
      */
     public function buildUsers() {
-        $cmd = $this->createCommand();
-        if ($cmd->executeProgram('who', '', $strBuf, CServer::config()->isDebug())) {
-            if (strlen($strBuf) > 0) {
-                $lines = preg_split('/\n/', $strBuf);
+        $buf = '';
+        $config = $this->server->config();
+        if ($this->server->executeProgram('who', '', $buf, $config->isDebug())) {
+            if (strlen($buf) > 0) {
+                $lines = preg_split('/\n/', $buf);
                 $this->info->setUsers(count($lines));
             }
-        } elseif ($cmd->executeProgram('uptime', '', $buf, CServer::config()->isDebug()) && preg_match("/,\s+(\d+)\s+user[s]?,/", $buf, $ar_buf)) {
-            //} elseif ($cmd->executeProgram('uptime', '', $buf) && preg_match("/,\s+(\d+)\s+user[s]?,\s+load average[s]?:\s+(.*),\s+(.*),\s+(.*)$/", $buf, $ar_buf)) {
-            $this->info->setUsers($ar_buf[1]);
-        } else {
-            $processlist = glob('/proc/*/cmdline', GLOB_NOSORT);
-            if (is_array($processlist) && (($total = count($processlist)) > 0)) {
-                $count = 0;
-                $buf = '';
-                for ($i = 0; $i < $total; $i++) {
-                    if ($cmd->rfts($processlist[$i], $buf, 0, 4096, false)) {
-                        $name = str_replace(chr(0), ' ', trim($buf));
-                        if (preg_match('/^-/', $name)) {
-                            $count++;
-                        }
-                    }
-                }
-                if ($count > 0) {
-                    $this->info->setUsers($count);
-                }
-            }
+        } elseif ($this->server->executeProgram('uptime', '', $buf, $config->isDebug()) && preg_match("/,\s+(\d+)\s+user[s]?,/", $buf, $m)) {
+            $this->info->setUsers($m[1]);
         }
-    }
-
-    public function createCommand() {
-        return CServer::command($this->system->getSSH());
     }
 }
