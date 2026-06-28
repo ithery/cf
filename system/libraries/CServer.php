@@ -55,8 +55,13 @@ class CServer {
         return self::server($sshConfig)->memory();
     }
 
+    /**
+     * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
+     *
+     * @return CServer_System
+     */
     public static function system($sshConfig = null) {
-        return CServer_System::instance($sshConfig);
+        return self::server($sshConfig)->system();
     }
 
     public static function error() {

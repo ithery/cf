@@ -64,7 +64,7 @@ class CServer_Server {
      * @return CServer_System
      */
     public function system() {
-        return CServer_System::instance($this->ssh);
+        return new CServer_System($this);
     }
 
     /**
