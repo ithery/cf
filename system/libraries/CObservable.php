@@ -65,6 +65,8 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
+     * @deprecated use addView() instead
+     *
      * @param string $id
      *
      * @return CElement_Template
@@ -90,9 +92,9 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
-     * @param CElement_View}string $view
-     * @param null|array $data
-     * @param string     $id
+     * @param CElement_View|string $view
+     * @param null|array           $data
+     * @param string               $id
      *
      * @return CElement_View
      */
