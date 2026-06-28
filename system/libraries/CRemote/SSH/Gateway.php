@@ -13,76 +13,23 @@ use phpseclib3\System\SSH\Agent;
 
 class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     /**
-     * The host name of the server.
-     *
-     * @var string
+     * @var CRemote_SSH_Config
      */
-    protected $host;
+    protected $config;
 
     /**
-     * The SSH port on the server.
-     *
-     * @var int
-     */
-    protected $port = 22;
-
-    /**
-     * The timeout for commands.
-     *
-     * @var int
-     */
-    protected $timeout = 10;
-
-    /**
-     * The authentication credential set.
-     *
-     * @var array
-     */
-    protected $auth;
-
-    /**
-     * The SecLib connection instance.
-     *
      * @var \phpseclib3\Net\SFTP
      */
     protected $connection;
 
     /**
-     * Create a new gateway implementation.
-     *
-     * @param string $host
-     * @param mixed  $port
-     * @param array  $auth
-     * @param        $timeout
+     * @param CRemote_SSH_Config $config
      */
-    public function __construct($host, $port, array $auth, $timeout) {
-        $this->auth = $auth;
-        $this->setHostAndPort($host, $port);
-        $this->setTimeout($timeout);
+    public function __construct(CRemote_SSH_Config $config) {
+        $this->config = $config;
     }
 
     /**
-     * Set the host and port from a full host string.
-     *
-     * @param string $host
-     * @param string $port
-     *
-     * @return void
-     */
-    protected function setHostAndPort($host, $port) {
-        $this->port = $port;
-        if (!cstr::contains($host, ':')) {
-            $this->host = $host;
-        } else {
-            list($this->host, $this->port) = explode(':', $host);
-
-            $this->port = (int) $this->port;
-        }
-    }
-
-    /**
-     * Connect to the SSH server.
-     *
      * @param string $username
      *
      * @return bool
@@ -92,8 +39,6 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Determine if the gateway is connected.
-     *
      * @return bool
      */
     public function connected() {
@@ -101,22 +46,16 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Run a command against the server (non-blocking).
-     *
      * @param string $command
      * @param mixed  $callback
      *
      * @return string
      */
     public function run($command, $callback = null) {
-        $connection = $this->getConnection();
-
         return $this->getConnection()->exec($command, $callback);
     }
 
     /**
-     * Download the contents of a remote file.
-     *
      * @param string $remote
      * @param string $local
      *
@@ -127,8 +66,6 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Get the contents of a remote file.
-     *
      * @param string $remote
      *
      * @return string
@@ -138,19 +75,15 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Get the contents of a remote file.
-     *
      * @param string $remote
      *
-     * @return string
+     * @return int
      */
     public function getFilesize($remote) {
         return $this->getConnection()->filesize($remote);
     }
 
     /**
-     * Upload a local file to the server.
-     *
      * @param string $local
      * @param string $remote
      *
@@ -161,8 +94,6 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Upload a string to to the given file on the server.
-     *
      * @param string $remote
      * @param string $contents
      *
@@ -173,8 +104,6 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Get the underlying SFTP connection.
-     *
      * @return \phpseclib3\Net\SFTP
      */
     public function getConnection() {
@@ -182,143 +111,88 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
             return $this->connection;
         }
 
-        return $this->connection = new SFTP($this->host, $this->port, $this->timeout);
+        $host = $this->config->getConnectionHost();
+        $port = $this->config->getPort();
+
+        if (cstr::contains($host, ':')) {
+            list($host, $port) = explode(':', $host);
+            $port = (int) $port;
+        }
+
+        return $this->connection = new SFTP($host, $port, $this->config->getTimeout());
     }
 
     /**
-     * /**
-     * Get the authentication object for login.
-     *
      * @throws \InvalidArgumentException
      *
-     * @return \Crypt_RSA|\System_SSH_Agent|string
+     * @return \phpseclib3\Crypt\Common\PrivateKey|\phpseclib3\System\SSH\Agent|string
      */
     protected function getAuthForLogin() {
-        if ($this->useAgent()) {
-            return $this->getAgent();
-        } elseif ($this->hasRsaKey()) {
-            // If a "key" was specified in the auth credentials, we will load it into a
-            // secure RSA key instance, which will be used to connect to the servers
-            // in place of a password, and avoids the developer specifying a pass.
-            return $this->loadRsaKey($this->auth);
-        } elseif (isset($this->auth['password'])) {
-            // If a plain password was set on the auth credentials, we will just return
-            // that as it can be used to connect to the server. This will be used if
-            // there is no RSA key and it gets specified in the credential arrays.
-            return $this->auth['password'];
+        if ($this->config->getUseAgent()) {
+            return new Agent();
+        }
+        if ($this->config->hasPrivateKey()) {
+            return $this->loadPrivateKey();
+        }
+        if ($this->config->hasPassword()) {
+            return $this->config->getPassword();
         }
 
         throw new \InvalidArgumentException('Password / key is required.');
     }
 
     /**
-     * Determine if the SSH Agent should provide an RSA key.
-     *
-     * @return bool
-     */
-    protected function useAgent() {
-        return isset($this->auth['agent']) && $this->auth['agent'] === true;
-    }
-
-    /**
-     * Get a new SSH Agent instance.
-     *
-     * @return \phpseclib3\System\SSH\Agent
-     */
-    public function getAgent() {
-        return new Agent();
-    }
-
-    /**
-     * Determine if an RSA key is configured.
-     *
-     * @return bool
-     */
-    protected function hasRsaKey() {
-        $hasKey = (isset($this->auth['key']) && trim($this->auth['key']) != '');
-
-        return $hasKey || (isset($this->auth['keytext']) && trim($this->auth['keytext']) != '');
-    }
-
-    /**
-     * @param array $auth
-     *
      * @return \phpseclib3\Crypt\Common\PrivateKey
      */
-    protected function loadRsaKey(array $auth) {
-        $key = $this->getKey($auth);
-
-        return $key;
-    }
-
-    /**
-     * @param array $auth
-     *
-     * @return \phpseclib3\Crypt\Common\PrivateKey
-     */
-    protected function getKey(array $auth) {
-        return PublicKeyLoader::loadPrivateKey(trim(carr::get($auth, 'keytext')));
-    }
-
-    /**
-     * Read the contents of the RSA key.
-     *
-     * @param array $auth
-     *
-     * @return string
-     */
-    protected function readRsaKey(array $auth) {
-        if (isset($auth['key'])) {
-            return $this->files->get($auth['key']);
+    protected function loadPrivateKey() {
+        $keytext = $this->config->getPrivateKey();
+        if ($keytext !== null && trim($keytext) !== '') {
+            return PublicKeyLoader::loadPrivateKey(trim($keytext));
         }
 
-        return $auth['keytext'];
+        $keyPath = $this->config->getKeyPath();
+        if ($keyPath !== null && trim($keyPath) !== '') {
+            $keyContent = file_get_contents($keyPath);
+
+            return PublicKeyLoader::loadPrivateKey(trim($keyContent));
+        }
+
+        throw new \InvalidArgumentException('No private key available');
     }
 
     /**
-     * Get timeout.
-     *
      * @return int
      */
     public function getTimeout() {
-        return $this->timeout;
+        return $this->config->getTimeout();
     }
 
     /**
-     * Set timeout.
-     *
-     * $ssh->exec('ping 127.0.0.1'); on a Linux host will never return
-     * and will run indefinitely. setTimeout() makes it so it'll timeout.
-     * Setting $timeout to false or 0 will mean there is no timeout.
-     *
      * @param int $timeout
+     *
+     * @return void
      */
     public function setTimeout($timeout) {
-        $this->timeout = (int) $timeout;
+        $this->config->setTimeout($timeout);
         $this->connection = null;
         $this->getConnection();
     }
 
     /**
-     * Run a command against the server (blocking).
-     *
      * @param mixed $commands
-     * @param int   $timeout  timeout in second
+     * @param int   $timeout
      *
      * @return string
      */
     public function runBlocking($commands, $timeout = 2) {
         $connection = $this->getConnection();
         $connection->write($commands);
-
         $connection->setTimeout($timeout);
 
         return $connection->read();
     }
 
     /**
-     * Check whether a given file exists on the server.
-     *
      * @param string $remote
      *
      * @return bool
@@ -328,8 +202,6 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Rename a remote file.
-     *
      * @param string $remote
      * @param string $newRemote
      *
@@ -340,8 +212,6 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Delete a remote file from the server.
-     *
      * @param string $remote
      *
      * @return bool
@@ -351,8 +221,6 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Get the exit status of the last command.
-     *
      * @return int|bool
      */
     public function status() {
@@ -360,39 +228,32 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     }
 
     /**
-     * Get the host used by the gateway.
-     *
      * @return string
      */
     public function getHost() {
-        return $this->host;
+        return $this->config->getConnectionHost();
     }
 
     /**
-     * Get the port used by the gateway.
-     *
      * @return int
      */
     public function getPort() {
-        return $this->port;
+        return $this->config->getPort();
     }
 
     /**
-     * Get log ssh with defined NET_SSH2_LOGGING.
-     *
      * @return string
      */
     public function getLog() {
         return $this->getConnection()->getLog();
     }
 
+    /**
+     * @return void
+     */
     public function disconnect() {
         if ($this->connection) {
             $this->connection->disconnect();
         }
-    }
-
-    public function __destruct() {
-        //$this->disconnect();
     }
 }

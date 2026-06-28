@@ -47,21 +47,13 @@ class CRemote_SSH {
     }
 
     /**
-     * @param string              $name
+     * @param string             $name
      * @param CRemote_SSH_Config $config
      *
      * @return CRemote_SSH_Connection
      */
     protected function makeConnection($name, CRemote_SSH_Config $config) {
-        $this->setOutput($connection = new CRemote_SSH_Connection(
-            $name,
-            $config->getConnectionHost(),
-            $config->getPort(),
-            $config->getUsername(),
-            $config->toAuthArray(),
-            null,
-            $config->getTimeout()
-        ));
+        $this->setOutput($connection = new CRemote_SSH_Connection($name, $config));
 
         return $connection;
     }
