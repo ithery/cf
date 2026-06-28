@@ -34,11 +34,7 @@ final class CServer_PhpInfo {
      */
     public function get() {
         if (empty($this->info)) {
-            if ($this->server->isRemote()) {
-                $this->info = $this->getRemotePhpInfo();
-            } else {
-                $this->info = $this->getLocalPhpInfo();
-            }
+            $this->info = $this->parsePhpInfoHtml($this->getPhpInfoHtml());
         }
 
         return $this->info;
@@ -57,51 +53,33 @@ final class CServer_PhpInfo {
      * @return \CCollection
      */
     public function toCollection($filter = Filter::ALL) {
+        $data = $this->parsePhpInfoHtml($this->getPhpInfoHtml($filter));
+
+        return c::collect(array_map(function ($section) {
+            if (is_array($section)) {
+                return c::collect(array_map(function ($val) {
+                    return is_array($val) ? c::collect($val) : $val;
+                }, $section));
+            }
+
+            return $section;
+        }, $data));
+    }
+
+    /**
+     * @param int $filter
+     *
+     * @return string
+     */
+    protected function getPhpInfoHtml($filter = INFO_ALL) {
         if ($this->server->isRemote()) {
-            $html = trim($this->server->runCommand($this->server->php()->getPhpBinary() . ' -r "phpinfo(' . $filter . ');"'));
-        } else {
-            ob_start();
-            phpinfo($filter);
-            $html = ob_get_clean();
+            return trim($this->server->runCommand($this->server->php()->getPhpBinary() . ' -r "phpinfo(' . $filter . ');"'));
         }
 
-        $phpinfo = ['phpinfo' => c::collect()];
-
-        if (preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', $html, $matches, PREG_SET_ORDER)) {
-            c::collect($matches)->each(function ($match) use (&$phpinfo) {
-                if (strlen($match[1])) {
-                    $phpinfo[$match[1]] = c::collect();
-                } elseif (isset($match[3])) {
-                    $keys1 = array_keys($phpinfo);
-                    $phpinfo[end($keys1)][$match[2]] = isset($match[4]) ? c::collect([$match[3], $match[4]]) : $match[3];
-                } else {
-                    $keys1 = array_keys($phpinfo);
-                    $phpinfo[end($keys1)][] = $match[2];
-                }
-            });
-        }
-
-        return c::collect($phpinfo);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getLocalPhpInfo() {
         ob_start();
-        @phpinfo();
-        $html = ob_get_clean();
+        @phpinfo($filter);
 
-        return $this->parsePhpInfoHtml($html);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getRemotePhpInfo() {
-        $html = trim($this->server->runCommand($this->server->php()->getPhpBinary() . ' -r "phpinfo();"'));
-
-        return $this->parsePhpInfoHtml($html);
+        return ob_get_clean();
     }
 
     /**
