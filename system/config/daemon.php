@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'php_binary' => null,
     'supervisor' => [
         'enabled' => false,
         /*
