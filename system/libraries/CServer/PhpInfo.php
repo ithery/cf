@@ -46,6 +46,11 @@ final class CServer_PhpInfo {
         return PHP_VERSION;
     }
 
+    /**
+     * @param int $filter
+     *
+     * @return \CCollection
+     */
     public static function toCollection($filter = Filter::ALL) {
         ob_start();
 

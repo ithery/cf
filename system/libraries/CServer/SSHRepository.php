@@ -3,6 +3,9 @@
 class CServer_SSHRepository {
     protected $sshArray = [];
 
+    /**
+     * @var CServer_SSHRepository
+     */
     private static $instance;
 
     private function __construct() {
@@ -17,6 +20,11 @@ class CServer_SSHRepository {
         return self::$instance;
     }
 
+    /**
+     * @param array|CRemote_SSH_Config $sshConfig
+     *
+     * @return CRemote_SSH
+     */
     public function getSSH($sshConfig) {
         $ssh = null;
         if ($sshConfig instanceof CRemote_SSH) {
