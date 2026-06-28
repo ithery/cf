@@ -9,6 +9,11 @@ class CServer_Server {
     private $ssh;
 
     /**
+     * @var CServer_Config
+     */
+    private $config;
+
+    /**
      * @param null|CRemote_SSH|CRemote_SSH_Config $ssh
      */
     public function __construct($ssh = null) {
@@ -16,6 +21,7 @@ class CServer_Server {
             $ssh = new CRemote_SSH($ssh);
         }
         $this->ssh = $ssh;
+        $this->config = new CServer_Config($this);
     }
 
     /**
@@ -85,7 +91,7 @@ class CServer_Server {
      * @return CServer_Config
      */
     public function config() {
-        return CServer_Config::instance();
+        return CServer_Config::instance($this);
     }
 
     /**
@@ -134,10 +140,11 @@ class CServer_Server {
      * @return string
      */
     public function getOS() {
-        if ($this->isRemote()) {
-            return trim($this->runCommand('uname -s'));
+        $os = $this->config()->get('os');
+        if ($os == null) {
+            $os = PHP_OS;
         }
 
-        return CServer::getOS();
+        return $os;
     }
 }

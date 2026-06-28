@@ -39,7 +39,7 @@ class CServer {
     }
 
     /**
-     * @param type $sshConfig | optional
+     * @param array|null $sshConfig
      *
      * @return CServer_Command
      */
@@ -65,13 +65,11 @@ class CServer {
         return carr::get($processUser, 'name');
     }
 
+    /**
+     * @return string
+     */
     public static function getOS() {
-        $os = self::config()->get('os');
-        if ($os == null) {
-            $os = PHP_OS;
-        }
-
-        return $os;
+        return (new CServer_Server())->getOS();
     }
 
     public static function isWindows() {
