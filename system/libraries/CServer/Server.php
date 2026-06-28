@@ -118,6 +118,13 @@ class CServer_Server {
     }
 
     /**
+     * @return CServer_LetsEncrypt
+     */
+    public function letsEncrypt($docRoot = null) {
+        return new CServer_LetsEncrypt($this, $docRoot);
+    }
+
+    /**
      * @return CServer_Config
      */
     public function config() {
