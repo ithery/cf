@@ -28,3 +28,4 @@ Framework tests in `tests/`, app tests in `application/{app}/default/tests/`.
 - `application/` folders are separate repos (gitignored except `cresenity`)
 - Controller files lowercase; `return $app` from controllers (not `echo $app->render()`)
 - `modules/` DEPRECATED — use `system/libraries`
+- For bulk repetitive edits (e.g. converting 100+ entries), write a bash script instead of editing one-by-one to save quota/tokens
