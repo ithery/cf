@@ -3,6 +3,12 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CRemote_SSH_Config {
+    const AUTH_TYPE_PROMPT = 'prompt';
+
+    const AUTH_TYPE_PUBKEY = 'pubkey';
+
+    const AUTH_TYPE_AGENT = 'agent';
+
     /**
      * @var string
      */
@@ -309,6 +315,13 @@ class CRemote_SSH_Config {
     }
 
     /**
+     * @return array
+     */
+    public static function validAuthenticationTypes() {
+        return [self::AUTH_TYPE_PROMPT, self::AUTH_TYPE_PUBKEY, self::AUTH_TYPE_AGENT];
+    }
+
+    /**
      * @return bool
      */
     public function isValid() {
@@ -318,7 +331,16 @@ class CRemote_SSH_Config {
         if (strlen($this->username) == 0) {
             return false;
         }
-        if (!$this->useAgent && !$this->hasPrivateKey() && !$this->hasPassword()) {
+        if ($this->authenticationType !== null && !in_array($this->authenticationType, self::validAuthenticationTypes())) {
+            return false;
+        }
+        if ($this->authenticationType === self::AUTH_TYPE_PUBKEY && !$this->hasPrivateKey()) {
+            return false;
+        }
+        if ($this->authenticationType === self::AUTH_TYPE_PROMPT && !$this->hasPassword()) {
+            return false;
+        }
+        if ($this->authenticationType === null && !$this->useAgent && !$this->hasPrivateKey() && !$this->hasPassword()) {
             return false;
         }
 
@@ -337,7 +359,16 @@ class CRemote_SSH_Config {
         if (strlen($this->username) == 0) {
             throw new \InvalidArgumentException('Username is required');
         }
-        if (!$this->useAgent && !$this->hasPrivateKey() && !$this->hasPassword()) {
+        if ($this->authenticationType !== null && !in_array($this->authenticationType, self::validAuthenticationTypes())) {
+            throw new \InvalidArgumentException('Invalid authentication type: ' . $this->authenticationType . '. Valid types: ' . implode(', ', self::validAuthenticationTypes()));
+        }
+        if ($this->authenticationType === self::AUTH_TYPE_PUBKEY && !$this->hasPrivateKey()) {
+            throw new \InvalidArgumentException('Private key is required for pubkey authentication');
+        }
+        if ($this->authenticationType === self::AUTH_TYPE_PROMPT && !$this->hasPassword()) {
+            throw new \InvalidArgumentException('Password is required for prompt authentication');
+        }
+        if ($this->authenticationType === null && !$this->useAgent && !$this->hasPrivateKey() && !$this->hasPassword()) {
             throw new \InvalidArgumentException('Password or key is required');
         }
 
