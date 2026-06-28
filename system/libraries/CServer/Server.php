@@ -50,7 +50,7 @@ class CServer_Server {
      * @return CServer_Php
      */
     public function php() {
-        return CServer_Php::instance();
+        return new CServer_Php($this);
     }
 
     /**

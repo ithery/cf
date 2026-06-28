@@ -3,96 +3,131 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CServer_Php {
-    protected static $instance;
+    /**
+     * @var CServer_Server
+     */
+    protected $server;
 
-    public static function instance() {
-        if (self::$instance == null) {
-            return new CServer_Php();
-        }
-
-        return self::$instance;
+    /**
+     * @param CServer_Server $server
+     */
+    public function __construct(CServer_Server $server) {
+        $this->server = $server;
     }
 
     /**
-     * Gets the current PHP version.
-     *
+     * @return CServer_Server
+     */
+    public function getServer() {
+        return $this->server;
+    }
+
+    /**
      * @return string
      */
-    public static function getVersion() {
+    public function getVersion() {
+        if ($this->server->isRemote()) {
+            return trim($this->server->runCommand('php -r "echo phpversion();"'));
+        }
+
         return phpversion();
     }
 
     /**
-     * Gets the PHP extension version.
+     * @param string $extName
      *
-     * @param string $extName <p>
-     *                        An extension name.
-     *                        </p>
-     *
-     * @return string returns the version of that
-     *                extension, or <b>FALSE</b> if there is no version information associated or
-     *                the extension isn't enabled
+     * @return string
      */
-    public static function getExtVersion($extName) {
+    public function getExtVersion($extName) {
+        if ($this->server->isRemote()) {
+            return trim($this->server->runCommand('php -r "echo phpversion(\'' . $extName . '\');"'));
+        }
+
         return phpversion($extName);
     }
 
-    public static function getAllIniConfiguration() {
+    /**
+     * @return array
+     */
+    public function getAllIniConfiguration() {
+        if ($this->server->isRemote()) {
+            $output = trim($this->server->runCommand('php -r "echo json_encode(ini_get_all());"'));
+
+            return json_decode($output, true) ?: [];
+        }
+
         return ini_get_all();
     }
 
-    public static function getAllIniConfigurationExt($extName) {
+    /**
+     * @param string $extName
+     *
+     * @return array
+     */
+    public function getAllIniConfigurationExt($extName) {
+        if ($this->server->isRemote()) {
+            $output = trim($this->server->runCommand('php -r "echo json_encode(ini_get_all(\'' . $extName . '\'));"'));
+
+            return json_decode($output, true) ?: [];
+        }
+
         return ini_get_all($extName);
     }
 
     /**
-     * Gets the value of a configuration option.
+     * @param string $varName
      *
-     * @param string $varName <p>
-     *                        The configuration option name.
-     *                        </p>
-     *
-     * @return string the value of the configuration option as a string on success, or an
-     *                empty string for null values. Returns <b>FALSE</b> if the
-     *                configuration option doesn't exist.
+     * @return string
      */
-    public static function getIniConfiguration($varName) {
+    public function getIniConfiguration($varName) {
+        if ($this->server->isRemote()) {
+            return trim($this->server->runCommand('php -r "echo ini_get(\'' . $varName . '\');"'));
+        }
+
         return ini_get($varName);
     }
 
     /**
-     * Retrieve a path to the loaded php.ini file.
-     *
-     * @return string The loaded <i>php.ini</i> path, or <b>FALSE</b> if one is not loaded.
+     * @return string
      */
-    public static function getIniLoadedFile() {
+    public function getIniLoadedFile() {
+        if ($this->server->isRemote()) {
+            return trim($this->server->runCommand('php -r "echo php_ini_loaded_file();"'));
+        }
+
         return php_ini_loaded_file();
     }
 
     /**
-     * Returns the type of interface between web server and PHP.
-     *
-     * @return string the interface type, as a lowercase string
+     * @return string
      */
-    public static function getSapiName() {
+    public function getSapiName() {
+        if ($this->server->isRemote()) {
+            return trim($this->server->runCommand('php -r "echo php_sapi_name();"'));
+        }
+
         return php_sapi_name();
     }
 
     /**
-     * Returns directory path used for temporary files.
-     *
-     * @return string the path of the temporary directory
+     * @return string
      */
-    public static function getTempDir() {
+    public function getTempDir() {
+        if ($this->server->isRemote()) {
+            return trim($this->server->runCommand('php -r "echo sys_get_temp_dir();"'));
+        }
+
         return sys_get_temp_dir();
     }
 
     /**
-     * Gets the name of the owner of the current PHP script.
-     *
-     * @return string the username as a string
+     * @return string
      */
-    public static function getCurrentUser() {
+    public function getCurrentUser() {
+        if ($this->server->isRemote()) {
+            return trim($this->server->runCommand('whoami'));
+        }
+
         return get_current_user();
     }
 }
