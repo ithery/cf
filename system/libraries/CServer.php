@@ -149,12 +149,13 @@ class CServer {
     }
 
     /**
-     * @param mixed $options
+     * @param null|CServer_Server|array $server
+     * @param array                     $options
      *
      * @return \CServer_Service_Beanstalkd
      */
-    public static function createBeanstalkd($options = []) {
-        return new CServer_Service_Beanstalkd($options);
+    public static function createBeanstalkd($server = null, $options = []) {
+        return new CServer_Service_Beanstalkd($server, $options);
     }
 
     public static function isNpmInstalled() {
