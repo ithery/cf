@@ -14,6 +14,10 @@ class CServer {
      */
     const ARRAY_EXP = '/^return array \([^;]*\);$/';
 
+    /**
+     * @var array
+     */
+    protected static $serverInstances = [];
 
     /**
      * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
@@ -21,7 +25,18 @@ class CServer {
      * @return CServer_Server
      */
     public static function server($sshConfig = null) {
-        return new CServer_Server($sshConfig);
+        $key = 'localhost';
+        if ($sshConfig instanceof CRemote_SSH) {
+            $key = $sshConfig->getHost();
+        } elseif ($sshConfig instanceof CRemote_SSH_Config) {
+            $key = $sshConfig->getConnectionHost() . ':' . ($sshConfig->getPort() ?: 22) . ':' . ($sshConfig->getUsername() ?: 'root');
+        }
+
+        if (!isset(self::$serverInstances[$key])) {
+            self::$serverInstances[$key] = new CServer_Server($sshConfig);
+        }
+
+        return self::$serverInstances[$key];
     }
 
     /**
@@ -98,7 +113,7 @@ class CServer {
      * @return string
      */
     public static function getOS() {
-        return (new CServer_Server())->getOS();
+        return self::server()->getOS();
     }
 
     public static function isWindows() {

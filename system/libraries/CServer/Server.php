@@ -9,11 +9,38 @@ class CServer_Server {
     private $ssh;
 
     /**
+     * @var null|CServer_Storage
+     */
+    private $storageInstance;
+
+    /**
+     * @var null|CServer_Php
+     */
+    private $phpInstance;
+
+    /**
+     * @var null|CServer_Memory
+     */
+    private $memoryInstance;
+
+    /**
+     * @var null|CServer_System
+     */
+    private $systemInstance;
+
+    /**
+     * @var null|CServer_PhpInfo
+     */
+    private $phpInfoInstance;
+
+    /**
      * @param null|CRemote_SSH|CRemote_SSH_Config $ssh
      */
     public function __construct($ssh = null) {
         if ($ssh instanceof CRemote_SSH_Config) {
-            $ssh = new CRemote_SSH($ssh);
+            $ssh = CServer_SSHRepository::instance()->getSSH($ssh);
+        } elseif ($ssh instanceof CRemote_SSH) {
+            $ssh = CServer_SSHRepository::instance()->getSSH($ssh);
         }
         $this->ssh = $ssh;
     }
@@ -43,28 +70,44 @@ class CServer_Server {
      * @return CServer_Storage
      */
     public function storage() {
-        return new CServer_Storage($this);
+        if ($this->storageInstance === null) {
+            $this->storageInstance = new CServer_Storage($this);
+        }
+
+        return $this->storageInstance;
     }
 
     /**
      * @return CServer_Php
      */
     public function php() {
-        return new CServer_Php($this);
+        if ($this->phpInstance === null) {
+            $this->phpInstance = new CServer_Php($this);
+        }
+
+        return $this->phpInstance;
     }
 
     /**
      * @return CServer_Memory
      */
     public function memory() {
-        return new CServer_Memory($this);
+        if ($this->memoryInstance === null) {
+            $this->memoryInstance = new CServer_Memory($this);
+        }
+
+        return $this->memoryInstance;
     }
 
     /**
      * @return CServer_System
      */
     public function system() {
-        return new CServer_System($this);
+        if ($this->systemInstance === null) {
+            $this->systemInstance = new CServer_System($this);
+        }
+
+        return $this->systemInstance;
     }
 
     /**
@@ -85,7 +128,11 @@ class CServer_Server {
      * @return CServer_PhpInfo
      */
     public function phpInfo() {
-        return new CServer_PhpInfo($this);
+        if ($this->phpInfoInstance === null) {
+            $this->phpInfoInstance = new CServer_PhpInfo($this);
+        }
+
+        return $this->phpInfoInstance;
     }
 
     /**

@@ -28,7 +28,7 @@ class CServer_Config {
      */
     public function __construct(CServer_Server $server = null) {
         if ($server === null) {
-            $server = new CServer_Server();
+            $server = CServer::server();
         }
         $this->server = $server;
 
@@ -65,7 +65,7 @@ class CServer_Config {
      */
     public static function instance(CServer_Server $server = null) {
         if ($server === null) {
-            $server = new CServer_Server();
+            $server = CServer::server();
         }
 
         $host = $server->isRemote() ? $server->getSSH()->getHost() : 'localhost';

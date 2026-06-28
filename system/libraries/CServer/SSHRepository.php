@@ -1,6 +1,11 @@
 <?php
 
+defined('SYSPATH') or die('No direct access allowed.');
+
 class CServer_SSHRepository {
+    /**
+     * @var array
+     */
     protected $sshArray = [];
 
     /**
@@ -12,6 +17,9 @@ class CServer_SSHRepository {
         $this->sshArray = [];
     }
 
+    /**
+     * @return CServer_SSHRepository
+     */
     public static function instance() {
         if (!isset(self::$instance)) {
             self::$instance = new CServer_SSHRepository();
@@ -21,7 +29,7 @@ class CServer_SSHRepository {
     }
 
     /**
-     * @param array|CRemote_SSH_Config $sshConfig
+     * @param CRemote_SSH|CRemote_SSH_Config|array $sshConfig
      *
      * @return CRemote_SSH
      */
@@ -29,17 +37,34 @@ class CServer_SSHRepository {
         $ssh = null;
         if ($sshConfig instanceof CRemote_SSH) {
             $ssh = $sshConfig;
-            $sshConfig = $sshConfig->getConfig();
+            $sshConfig = $ssh->getConfig();
         }
 
-        $host = carr::get($sshConfig, 'host', carr::get($sshConfig, 'ip_address'));
-        if (!isset($this->sshArray[$host])) {
-            if ($ssh == null) {
+        if (!$sshConfig instanceof CRemote_SSH_Config) {
+            $sshConfig = new CRemote_SSH_Config($sshConfig);
+        }
+
+        $key = $this->resolveKey($sshConfig);
+        if (!isset($this->sshArray[$key])) {
+            if ($ssh === null) {
                 $ssh = CRemote::ssh($sshConfig);
             }
-            $this->sshArray[$host] = $ssh;
+            $this->sshArray[$key] = $ssh;
         }
 
-        return $this->sshArray[$host];
+        return $this->sshArray[$key];
+    }
+
+    /**
+     * @param CRemote_SSH_Config $config
+     *
+     * @return string
+     */
+    protected function resolveKey(CRemote_SSH_Config $config) {
+        $host = $config->getConnectionHost();
+        $port = $config->getPort() ?: 22;
+        $username = $config->getUsername() ?: 'root';
+
+        return $host . ':' . $port . ':' . $username;
     }
 }
