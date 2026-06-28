@@ -19,13 +19,12 @@ class CRemote_SSH {
     protected $connection;
 
     /**
-     * Get a remote connection instance.
-     *
-     * @param string|array|mixed $name
-     *
-     * @return CRemote_SSH_ConnectionInterface
+     * @param array|CRemote_SSH_Config $config
      */
-    public function __construct(array $config) {
+    public function __construct($config) {
+        if ($config instanceof CRemote_SSH_Config) {
+            $config = $config->toArray();
+        }
         $this->config = $config;
 
         $this->name = carr::get($config, 'name', carr::get($config, 'host'));

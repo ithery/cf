@@ -4,7 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CRemote {
     /**
-     * @param array $config
+     * @param array|CRemote_SSH_Config $config
      *
      * @return CRemote_SSH
      */
