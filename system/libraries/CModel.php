@@ -8,73 +8,73 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Class CModel.
  *
- * @method static       static                                    create($attributes = [])                                                                  Find a model by its primary key.
- * @method static       static|null                               find($id, $columns = ['*'])                                                               Find a model by its primary key.
- * @method static       CModel_Collection                         findMany($ids, $columns = ['*'])                                                          Find a model by its primary key.
- * @method static       static                                    findOrFail($id, $columns = ['*'])                                                         Find a model by its primary key or throw an exception.
- * @method static       CModel|CModel_Query|static|null           first($columns = ['*'])                                                                   Execute the query and get the first result.
- * @method static       CModel|CModel_Query|static                firstOrFail($columns = ['*'])                                                             Execute the query and get the first result or throw an exception.
- * @method static       CModel|CModel_Query|static                firstOrNew(array $attributes, array $values = [])                                         Get the first record matching the attributes or instantiate it.
- * @method static       CModel_Collection|CModel_Query[]|static[] get($columns = ['*'])                                                                     Execute the query as a "select" statement.
- * @method mixed        value($column)                                                                                                                      Get a single column's value from the first result of a query.
- * @method static       CCollection        pluck($column)                                                                                                   Get a single column's value from the first result of a query.
- * @method void         chunk($count, callable $callback)                                                                                                   Chunk the results of the query.
- * @method \CCollection lists($column, $key = null)                                                                                                         Get an array with the values of a given column.
- * @method static       \CPagination_LengthAwarePaginator         paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)             Paginate the given query.
- * @method static       \CPagination_PaginatorInterface           simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)       Paginate the given query into a simple paginator.
- * @method static       \CPagination_PaginatorCursorInterface     cursorPaginate($perPage = null, $columns = ['*'], $cursorName = 'cursor', $cursor = null) Paginate the given query into a cursor paginator.
- * @method void         onDelete(Closure $callback)                                                                                                         Register a replacement for the default delete function.
- * @method CModel[]     getModels($columns = ['*'])                                                                                                         Get the hydrated models without eager loading.
- * @method array        eagerLoadRelations(array $models)                                                                                                   Eager load the relationships for the models.
- * @method static       CModel_Query|static                       where($column, $operator = null, $value = null, $boolean = 'and')                         Add a basic where clause to the query.
- * @method static       CModel_Query|static                       whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)               Add a relationship count / exists condition to the query with where clauses.
- * @method static       CModel_Query|static                       orWhere($column, $operator = null, $value = null)                                         Add an "or where" clause to the query.
- * @method static       CModel_Query|static                       has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)  Add a relationship count condition to the query.
- * @method static       CModel_Query|static                       whereRaw($sql, array $bindings = [])
- * @method static       CModel_Query|static                       whereBetween($column, array $values)
- * @method static       CModel_Query|static                       whereNotBetween($column, array $values)
- * @method static       CModel_Query|static                       whereNested(Closure $callback)
- * @method static       CModel_Query|static                       addNestedWhereQuery($query)
- * @method static       CModel_Query|static                       whereExists(Closure $callback)
- * @method static       CModel_Query|static                       whereNotExists(Closure $callback)
- * @method static       CModel_Query|static                       whereIn($column, $values)
- * @method static       CModel_Query|static                       whereNotIn($column, $values)
- * @method static       CModel_Query|static                       whereNull($column)
- * @method static       CModel_Query|static                       whereNotNull($column)
- * @method static       CModel_Query|static                       whereDoesntHave($table, Closure $callback)
- * @method static       CModel_Query|static                       orWhereRaw($sql, array $bindings = [])
- * @method static       CModel_Query|static                       orWhereBetween($column, array $values)
- * @method static       CModel_Query|static                       orWhereNotBetween($column, array $values)
- * @method static       CModel_Query|static                       orWhereExists(Closure $callback)
- * @method static       CModel_Query|static                       orWhereNotExists(Closure $callback)
- * @method static       CModel_Query|static                       orWhereIn($column, $values)
- * @method static       CModel_Query|static                       orWhereNotIn($column, $values)
- * @method static       CModel_Query|static                       orWhereNull($column)
- * @method static       CModel_Query|static                       orWhereNotNull($column)
- * @method static       CModel_Query|static                       whereDate($column, $operator, $value)
- * @method static       CModel_Query|static                       whereDay($column, $operator, $value)
- * @method static       CModel_Query|static                       whereMonth($column, $operator, $value)
- * @method static       CModel_Query|static                       whereYear($column, $operator, $value)
- * @method static       CModel_Query|static                       join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
- * @method static       CModel_Query|static                       select($columns = ['*'])
- * @method static       CModel_Query|static                       groupBy(...$groups)
- * @method static       CModel_Query|static                       from($table)
- * @method static       CModel_Query|static                       newQuery()
- * @method static       CModel_Query|static                       withTrashed()
- * @method static       CModel_Query|static                       leftJoinSub($query, $as, $first, $operator = null, $second = null)
- * @method static       CModel_Query|static                       addSelect($column)
- * @method static       CModel_Query|static                       selectRaw($expression, array $bindings = [])
- * @method static       CModel_Query|static                       orderBy($column, $direction = 'asc')
- * @method static       CModel_Query|static                       orderByDesc($column)
- * @method static       CModel_Query|static                       skip($value)
- * @method static       CModel_Query|static                       offset($value)
- * @method static       CModel_Query|static                       take($value)
- * @method static       CModel_Query|static                       limit($value)
- * @method static       CModel_Query|static                       lockForUpdate()                                                                           Lock the selected rows in the table for updating.
- * @method static       mixed                                     sum($column)                                                                              Retrieve the sum of the values of a given column.
- * @method static       void                                      truncate()                                                                                Run a truncate statement on the table.
- * @method static       CDatabase_Result                          insert(array values)                                                                      Insert to table
- * @method static       int                                       count($columns = '*')                                                                     Retrieve the "count" result of the query.
+ * @method static static                                    create($attributes = [])
+ * @method static static|null                               find($id, $columns = null)
+ * @method static CModel_Collection                         findMany($ids, $columns = null)
+ * @method static static                                    findOrFail($id, $columns = null)
+ * @method static CModel|CModel_Query|static|null           first($columns = null)
+ * @method static CModel|CModel_Query|static                firstOrFail($columns = null)
+ * @method static CModel|CModel_Query|static                firstOrNew(array $attributes, array $values = [])
+ * @method static CModel_Collection|CModel_Query[]|static[] get($columns = null)
+ * @method mixed  value($column)
+ * @method static CCollection                               pluck($column)
+ * @method void   chunk($count, callable $callback)
+ * @method static CCollection                               lists($column, $key = null)
+ * @method static CPagination_LengthAwarePaginator          paginate($perPage = null, $columns = null, $pageName = 'page', $page = null)
+ * @method static CPagination_PaginatorInterface            simplePaginate($perPage = null, $columns = null, $pageName = 'page', $page = null)
+ * @method static CPagination_CursorPaginatorInterface      cursorPaginate($perPage = null, $columns = null, $cursorName = 'cursor', $cursor = null)
+ * @method void   onDelete(Closure $callback)
+ * @method CModel[] getModels($columns = null)
+ * @method array  eagerLoadRelations(array $models)
+ * @method static CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and')
+ * @method static CModel_Query|static whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
+ * @method static CModel_Query|static orWhere($column, $operator = null, $value = null)
+ * @method static CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
+ * @method static CModel_Query|static whereRaw($sql, array $bindings = [])
+ * @method static CModel_Query|static whereBetween($column, array $values)
+ * @method static CModel_Query|static whereNotBetween($column, array $values)
+ * @method static CModel_Query|static whereNested(Closure $callback)
+ * @method static CModel_Query|static addNestedWhereQuery($query)
+ * @method static CModel_Query|static whereExists(Closure $callback)
+ * @method static CModel_Query|static whereNotExists(Closure $callback)
+ * @method static CModel_Query|static whereIn($column, $values)
+ * @method static CModel_Query|static whereNotIn($column, $values)
+ * @method static CModel_Query|static whereNull($column)
+ * @method static CModel_Query|static whereNotNull($column)
+ * @method static CModel_Query|static whereDoesntHave($table, Closure $callback)
+ * @method static CModel_Query|static orWhereRaw($sql, array $bindings = [])
+ * @method static CModel_Query|static orWhereBetween($column, array $values)
+ * @method static CModel_Query|static orWhereNotBetween($column, array $values)
+ * @method static CModel_Query|static orWhereExists(Closure $callback)
+ * @method static CModel_Query|static orWhereNotExists(Closure $callback)
+ * @method static CModel_Query|static orWhereIn($column, $values)
+ * @method static CModel_Query|static orWhereNotIn($column, $values)
+ * @method static CModel_Query|static orWhereNull($column)
+ * @method static CModel_Query|static orWhereNotNull($column)
+ * @method static CModel_Query|static whereDate($column, $operator, $value = null)
+ * @method static CModel_Query|static whereDay($column, $operator, $value = null)
+ * @method static CModel_Query|static whereMonth($column, $operator, $value = null)
+ * @method static CModel_Query|static whereYear($column, $operator, $value = null)
+ * @method static CModel_Query|static join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+ * @method static CModel_Query|static select($columns = null)
+ * @method static CModel_Query|static groupBy(...$groups)
+ * @method static CModel_Query|static from($table)
+ * @method static CModel_Query|static newQuery()
+ * @method static CModel_Query|static withTrashed()
+ * @method static CModel_Query|static leftJoinSub($query, $as, $first, $operator = null, $second = null)
+ * @method static CModel_Query|static addSelect($column)
+ * @method static CModel_Query|static selectRaw($expression, array $bindings = [])
+ * @method static CModel_Query|static orderBy($column, $direction = 'asc')
+ * @method static CModel_Query|static orderByDesc($column)
+ * @method static CModel_Query|static skip($value)
+ * @method static CModel_Query|static offset($value)
+ * @method static CModel_Query|static take($value)
+ * @method static CModel_Query|static limit($value)
+ * @method static CModel_Query|static lockForUpdate()
+ * @method static mixed               sum($column)
+ * @method static void                truncate()
+ * @method static CDatabase_Result    insert(array $values)
+ * @method static int                 count($columns = '*')
  *
  * @see CModel_Query
  */
@@ -331,10 +331,22 @@ abstract class CModel implements ArrayAccess, Arrayable, Jsonable, CQueue_Queuea
         }
     }
 
+    /**
+     * Set Mapping.
+     *
+     * @param array $mappings
+     */
     public static function setMapping($mappings) {
         self::$mappings = $mappings;
     }
 
+    /**
+     * Create a new model instance based on the table name.
+     *
+     * @param string $tableName
+     *
+     * @return CModel|CModel_Query
+     */
     public static function factory($tableName) {
         if (isset(self::$mappings[$tableName])) {
             return new self::$mappings[$tableName]();
