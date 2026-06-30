@@ -5,5 +5,6 @@ class CHouseKeeping_Database_LogActivity {
         $bottomDate = c::now()->subDays($keepDays);
         $query = $modelName::query()->where('created', '<', $bottomDate);
         $query->forceDelete();
+        return true;
     }
 }
