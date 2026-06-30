@@ -5,12 +5,24 @@ defined('SYSPATH') or die('No direct access allowed.');
 use CApp_Navigation_Helper as Helper;
 
 abstract class CNavigation_RendererAbstract implements CApp_Navigation_EngineInterface {
+    /**
+     * @var array
+     */
     protected $roleNavs = [];
 
+    /**
+     * @var int|null
+     */
     protected $roleId = null;
 
+    /**
+     * @var int|null
+     */
     protected $appId = null;
 
+    /**
+     * @var array|null
+     */
     protected $navs = null;
 
     public function __construct($options = []) {
@@ -41,15 +53,14 @@ abstract class CNavigation_RendererAbstract implements CApp_Navigation_EngineInt
 
         $this->roleNavs = [];
 
-        if (!CApp::isAdministrator()) {
-            if (CApp::instance()->isAuthEnabled()) {
-                $db = c::db();
-                $q = 'select nav from role_nav where role_id=' . $db->escape($roleId) . ' and app_id=' . $db->escape($appId);
-                if ($roleId == null) {
-                    $q = 'select nav from role_nav where role_id is null and app_id=' . $db->escape($appId);
-                }
-                $this->roleNavs = $db->getArray($q);
+
+        if (CApp::instance()->isAuthEnabled()) {
+            $db = c::db();
+            $q = 'select nav from role_nav where role_id=' . $db->escape($roleId) . ' and app_id=' . $db->escape($appId);
+            if ($roleId == null) {
+                $q = 'select nav from role_nav where role_id is null and app_id=' . $db->escape($appId);
             }
+            $this->roleNavs = $db->getArray($q);
         }
     }
 }
