@@ -4,11 +4,16 @@ defined('SYSPATH') or die('No direct access allowed.');
 
  //@codingStandardsIgnoreStart
 trait CApp_Trait_GenerateCode {
-    public static function _get_next_counter($key_counter) {
+    /**
+     * @param string $keyCounter
+     *
+     * @return string
+     */
+    public static function _get_next_counter($keyCounter) {
         $db = c::db();
         $next_counter = 1;
         $is_insert = 1;
-        $q = 'select case when counter is null then 1 else counter+1 end as next_counter from sys_counter where `key`=' . $db->escape($key_counter) . ' for update';
+        $q = 'select case when counter is null then 1 else counter+1 end as next_counter from sys_counter where `key`=' . $db->escape($keyCounter) . ' for update';
 
         $r = $db->query($q);
 
@@ -18,13 +23,13 @@ trait CApp_Trait_GenerateCode {
         }
         $cmd = '';
         if ($is_insert == 1) {
-            $cmd = 'insert into sys_counter(`key`,counter,created) values (' . $db->escape($key_counter) . ',1,now());';
+            $cmd = 'insert into sys_counter(`key`,counter,created) values (' . $db->escape($keyCounter) . ',1,now());';
         } else {
-            $cmd = 'update sys_counter set counter = counter+1, updated = now() where `key` = ' . $db->escape($key_counter) . '';
+            $cmd = 'update sys_counter set counter = counter+1, updated = now() where `key` = ' . $db->escape($keyCounter) . '';
         }
         $db->query($cmd);
 
-        $q = 'select case when counter is null then 1 else counter end as next_counter from sys_counter where `key`=' . $db->escape($key_counter) . '';
+        $q = 'select case when counter is null then 1 else counter end as next_counter from sys_counter where `key`=' . $db->escape($keyCounter) . '';
 
         $r = $db->query($q);
 
@@ -36,9 +41,14 @@ trait CApp_Trait_GenerateCode {
         return $next_counter;
     }
 
-    public static function _get_key_counter($key_format) {
-        $result = $key_format;
-        preg_match_all("/{([\w]*)}/", $key_format, $matches, PREG_SET_ORDER);
+    /**
+     * @param string $keyFormat
+     *
+     * @return string
+     */
+    public static function _get_key_counter($keyFormat) {
+        $result = $keyFormat;
+        preg_match_all("/{([\w]*)}/", $keyFormat, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $val) {
             $str = $val[1]; //matches str without bracket {}
@@ -70,12 +80,22 @@ trait CApp_Trait_GenerateCode {
         return $result;
     }
 
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
     public static function _get_next_code($key) {
         $key_format = self::get_format($key);
 
         return self::_get_next_code_from_format($key_format);
     }
 
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
     protected static function get_format($key) {
         $db = c::db();
         $ukey = strtoupper($key);
@@ -91,11 +111,16 @@ trait CApp_Trait_GenerateCode {
         return $result;
     }
 
-    public static function _get_next_code_from_format($key_format) {
-        $key_counter = self::_get_key_counter($key_format);
+    /**
+     * @param string $keyFormat
+     *
+     * @return string
+     */
+    public static function _get_next_code_from_format($keyFormat) {
+        $key_counter = self::_get_key_counter($keyFormat);
         $result = $key_counter;
         $counter = self::_get_next_counter($key_counter);
-        preg_match_all("/{([\w]*)}/", $key_format, $matches, PREG_SET_ORDER);
+        preg_match_all("/{([\w]*)}/", $keyFormat, $matches, PREG_SET_ORDER);
         foreach ($matches as $val) {
             $str = $val[1]; //matches str without bracket {}
             $b_str = $val[0]; //matches str with bracket {}
