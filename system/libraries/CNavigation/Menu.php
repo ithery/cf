@@ -9,6 +9,13 @@ class CNavigation_Menu {
      */
     protected $items;
 
+    /**
+     * Create a new menu instance.
+     *
+     * @param array $menu
+     *
+     * @return void
+     */
     public function __construct($menu) {
         $this->items = $menu;
     }

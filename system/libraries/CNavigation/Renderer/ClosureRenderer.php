@@ -5,6 +5,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 use CApp_Navigation_Helper as Helper;
 
 class CNavigation_Renderer_ClosureRenderer extends CNavigation_RendererAbstract {
+    /**
+     * @var callable|null
+     */
     protected $closure;
 
     public function setClosure(callable $closure) {
