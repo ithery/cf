@@ -3,6 +3,10 @@
 abstract class CNotification_MessageAbstract implements CNotification_MessageInterface {
     use CTrait_HasOptions;
     use CNotification_Trait_MessageEventTrait;
+
+    /**
+     * @var array
+     */
     protected $config;
 
     /**
@@ -12,6 +16,10 @@ abstract class CNotification_MessageAbstract implements CNotification_MessageInt
      */
     protected $dispatcher;
 
+    /**
+     * @param array $config
+     * @param array $options
+     */
     public function __construct($config, $options) {
         $this->options = $options;
         $this->config = $config;

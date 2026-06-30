@@ -1,8 +1,14 @@
 <?php
 
 abstract class CNotification_ChannelAbstract implements CNotification_ChannelInterface {
+    /**
+     * @var string
+     */
     protected $channelName;
 
+    /**
+     * @var array
+     */
     protected $config;
 
     /**
@@ -10,6 +16,9 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
      */
     protected $messageHandler = null;
 
+    /**
+     * @param array $config
+     */
     public function __construct($config = []) {
         $this->config = $config;
         $this->channelName = 'Custom';
@@ -29,6 +38,11 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         return $this;
     }
 
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
     public function getChannelConfig($key) {
         return CF::config(
             'notification.' . strtolower(cstr::snake($this->channelName)) . '.' . $key,
@@ -70,6 +84,12 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         return $taskQueue;
     }
 
+    /**
+     * @param string $className
+     * @param array  $options
+     *
+     * @return mixed
+     */
     public function sendWithoutQueue($className, array $options = []) {
         $message = new $className();
         $message->setOptions($options);
@@ -80,82 +100,82 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         return $messageResult;
     }
 
+    /**
+     * @param CNotification_MessageAbstract $message
+     * @param mixed                         $result
+     *
+     * @return mixed
+     */
     public function handleResult($message, $result) {
         if (is_array($result)) {
             $result = c::collect($result);
         }
-        $hasError = false;
-        $result->each(function ($value, $key) use ($message, &$hasError) {
-            $errCode = 0;
-            $errMessage = '';
-            $logNotificationModel = null;
-
+        $result->each(function ($value) use ($message) {
             $logNotificationModel = $this->insertLogNotification($message, $value);
+            $errorMessage = null;
 
-            if ($errCode == 0) {
-                try {
-                    if ($this->messageHandler != null) {
-                        $result = $this->messageHandler->__invoke($value, $logNotificationModel);
-                    } else {
-                        $result = $this->handleMessage($value, $logNotificationModel);
-                    }
+            try {
+                if ($this->messageHandler != null) {
+                    $vendorResponse = $this->messageHandler->__invoke($value, $logNotificationModel);
+                } else {
+                    $vendorResponse = $this->handleMessage($value, $logNotificationModel);
+                }
 
-                    $vendorResponse = $result;
-                    if ($vendorResponse instanceof CVendor_SendGrid_Response) {
-                        $vendorResponse = [
-                            'statusCode' => $vendorResponse->statusCode(),
-                            'body' => $vendorResponse->body(),
-                            'headers' => $vendorResponse->headers()
+                if ($vendorResponse instanceof CVendor_SendGrid_Response) {
+                    $vendorResponse = [
+                        'statusCode' => $vendorResponse->statusCode(),
+                        'body' => $vendorResponse->body(),
+                        'headers' => $vendorResponse->headers(),
+                    ];
+                }
+
+                if ($vendorResponse instanceof CVendor_Firebase_Messaging_MulticastSendReport) {
+                    $resultResponse = ['success' => [], 'fail' => []];
+                    foreach ($vendorResponse->successes()->getItems() as $report) {
+                        $resultResponse['success'][] = [
+                            'type' => $report->target()->type(),
+                            'value' => $report->target()->value(),
+                            'result' => $report->result(),
                         ];
                     }
-
-                    if ($vendorResponse instanceof CVendor_Firebase_Messaging_MulticastSendReport) {
-                        $resultResponse = [];
-                        $resultResponse['success'] = [];
-                        $resultResponse['fail'] = [];
-                        foreach ($vendorResponse->successes()->getItems() as $report) {
-                            $resultResponse['success'][] = [
-                                'type' => $report->target()->type(),
-                                'value' => $report->target()->value(),
-                                'result' => $report->result(),
-                            ];
-                        }
-                        foreach ($vendorResponse->failures()->getItems() as $report) {
-                            $resultResponse['fail'][] = [
-                                'type' => $report->target()->type(),
-                                'value' => $report->target()->value(),
-                                'result' => $report->result(),
-                                'error' => $report->error() instanceof Exception ? $report->error()->getMessage() : $report->error(),
-                            ];
-                        }
-                        $vendorResponse = $resultResponse;
+                    foreach ($vendorResponse->failures()->getItems() as $report) {
+                        $resultResponse['fail'][] = [
+                            'type' => $report->target()->type(),
+                            'value' => $report->target()->value(),
+                            'result' => $report->result(),
+                            'error' => $report->error() instanceof Exception ? $report->error()->getMessage() : $report->error(),
+                        ];
                     }
-
-                    if (!is_string($vendorResponse)) {
-                        $vendorResponse = json_encode($vendorResponse);
-                    }
-
-                    $logNotificationModel->vendor_response = $vendorResponse;
-
-                    //CDaemon::log('vendor response:' . $vendorResponse);
-                } catch (Exception $ex) {
-                    //throw $ex;
-                    $errCode++;
-                    $errMessage = '[' . get_class($ex) . '] ' . $ex->getMessage() . ':' . $ex->getTraceAsString();
+                    $vendorResponse = $resultResponse;
                 }
+
+                if (!is_string($vendorResponse)) {
+                    $vendorResponse = json_encode($vendorResponse);
+                }
+
+                $logNotificationModel->vendor_response = $vendorResponse;
+            } catch (Exception $ex) {
+                $errorMessage = '[' . get_class($ex) . '] ' . $ex->getMessage() . ':' . $ex->getTraceAsString();
             }
-            if ($errCode > 0) {
-                $logNotificationModel->error = $errMessage;
+
+            if ($errorMessage !== null) {
+                $logNotificationModel->error = $errorMessage;
                 $logNotificationModel->notification_status = 'FAILED';
             } else {
                 $logNotificationModel->notification_status = 'SUCCESS';
             }
 
             $logNotificationModel->save();
-            //$message->onNotificationSent($logNotificationModel);
         });
+        return $result;
     }
 
+    /**
+     * @param CNotification_MessageAbstract $message
+     * @param mixed                         $result
+     *
+     * @return CModel
+     */
     protected function insertLogNotification($message, $result) {
         $model = CNotification::manager()->createLogNotificationModel();
         $options = c::collect($result);
@@ -206,6 +226,9 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         return $model;
     }
 
+    /**
+     * @return string|null
+     */
     public function getVendorName() {
         $vendor = carr::get($this->config, 'vendor');
         if (strlen($vendor) == 0) {
@@ -234,5 +257,11 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
         return CNotification::manager()->createMessage($vendor, $vendorConfig, $data);
     }
 
+    /**
+     * @param mixed $data
+     * @param mixed $logNotificationModel
+     *
+     * @return mixed
+     */
     abstract protected function handleMessage($data, $logNotificationModel);
 }

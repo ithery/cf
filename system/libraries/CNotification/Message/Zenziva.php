@@ -3,6 +3,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CNotification_Message_Zenziva extends CNotification_MessageAbstract {
+    /**
+     * @return array
+     */
     public function send() {
         $userKey = carr::get($this->config, 'key');
         $userPass = carr::get($this->config, 'secret');
@@ -10,15 +13,9 @@ class CNotification_Message_Zenziva extends CNotification_MessageAbstract {
         $message = $this->getOption('message');
         $msisdn = $this->getOption('recipient');
         $otp = $this->getOption('otp');
-        $text = urlencode($message);
-        $smsMethod = 'sendsms/';
-        if ($otp) {
-            $smsMethod = 'sendOTP/';
-        }
-        $url = 'https://console.zenziva.net/reguler/api/' . $smsMethod; // New API Zenziva
-        // $url = 'https://reguler.zenziva.net/apps/smsapi.php?userkey=' . $userKey . '&passkey=' . $userPass . '&nohp=' . $msisdn . '&pesan=' . $text;
-        $curl = CCurl::factory($url);
-        $curl->setSSL();
+        $smsMethod = $otp ? 'sendOTP/' : 'sendsms/';
+        $url = 'https://console.zenziva.net/reguler/api/' . $smsMethod;
+
         $post = [
             'userkey' => $userKey,
             'passkey' => $userPass,
@@ -29,17 +26,19 @@ class CNotification_Message_Zenziva extends CNotification_MessageAbstract {
         } else {
             $post['message'] = $message;
         }
+
+        $curl = CCurl::factory($url);
+        $curl->setSSL();
         $curl->setRawPost($post);
         $response = $curl->exec()->response();
 
-        if (preg_match('#<status>0</status>#ims', $response, $matches)) {
-            $exceptionRequest = new Exception('Error from SMS Response:' . $response);
-
-            throw $exceptionRequest;
+        if (preg_match('#<status>0</status>#ims', $response)) {
+            throw new CNotification_Exception('Error from SMS Response:' . $response);
         }
-        $return = [];
-        $return['request'] = $url;
-        $return['response'] = $response;
-        // return $return;
+
+        return [
+            'request' => $url,
+            'response' => $response,
+        ];
     }
 }

@@ -1,8 +1,14 @@
 <?php
 
 class CNotification_Message_Database extends CNotification_MessageAbstract {
+    /**
+     * @var string
+     */
     protected $type;
 
+    /**
+     * @return void
+     */
     public function send() {
         $model = $this->getOption('recipient');
 
@@ -37,6 +43,7 @@ class CNotification_Message_Database extends CNotification_MessageAbstract {
             throw new Exception('title for database channel must be max 1000 chars');
         }
 
+        /** @var class-string<CModel_Notification_NotificationModel> $notificationModelClass */
         $notificationModelClass = CF::config('notification.database.model', CModel_Notification_NotificationModel::class);
 
         $notificationModel = new $notificationModelClass();
@@ -62,6 +69,11 @@ class CNotification_Message_Database extends CNotification_MessageAbstract {
         $notificationModel->save();
     }
 
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
     public function setType($type) {
         $this->type = $type;
 

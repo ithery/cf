@@ -7,6 +7,9 @@ class CNotification_Event_FirebaseFailure {
      */
     public $report;
 
+    /**
+     * @param SendReport $report
+     */
     public function __construct(SendReport $report) {
         $this->report = $report;
     }

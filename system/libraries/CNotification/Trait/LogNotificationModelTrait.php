@@ -1,6 +1,9 @@
 <?php
 
 trait CNotification_Trait_LogNotificationModelTrait {
+    /**
+     * @param array $attributes
+     */
     public function __construct(array $attributes = []) {
         parent::__construct($attributes);
         $this->primaryKey = 'log_notification_id';

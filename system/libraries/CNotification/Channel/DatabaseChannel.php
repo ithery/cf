@@ -1,11 +1,20 @@
 <?php
 
 class CNotification_Channel_DatabaseChannel extends CNotification_ChannelAbstract {
+    /**
+     * @param array $config
+     */
     public function __construct($config = []) {
         parent::__construct($config);
         $this->channelName = 'Database';
     }
 
+    /**
+     * @param mixed $data
+     * @param mixed $logNotificationModel
+     *
+     * @return mixed
+     */
     protected function handleMessage($data, $logNotificationModel) {
         $message = new CNotification_Message_Database($this->config, $data);
         $message->setType($logNotificationModel->message_class);

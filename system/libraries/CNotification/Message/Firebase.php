@@ -3,6 +3,9 @@ use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
 
 class CNotification_Message_Firebase extends CNotification_MessageAbstract {
+    /**
+     * @return CVendor_Firebase_Messaging_MulticastSendReport
+     */
     public function send() {
         $firebase = CVendor::firebase(carr::get($this->config, 'key'), carr::except($this->config, ['key']));
         $tokens = carr::wrap($this->getOption('recipient'));

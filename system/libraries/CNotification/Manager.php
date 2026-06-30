@@ -1,12 +1,24 @@
 <?php
 
 class CNotification_Manager {
+    /**
+     * @var CNotification_ChannelInterface[]
+     */
     protected $channels;
 
+    /**
+     * @var array
+     */
     protected $vendors;
 
+    /**
+     * @var CNotification_Manager
+     */
     protected static $instance;
 
+    /**
+     * @var array
+     */
     protected $messageHandlers;
 
     /**
@@ -20,14 +32,28 @@ class CNotification_Manager {
         return static::$instance;
     }
 
+    /**
+     * Use instance() instead.
+     */
     private function __construct() {
         $this->channels = [];
     }
 
+    /**
+     * @param string $vendor
+     * @param string $messageHandler
+     *
+     * @return void
+     */
     protected function registerMessageHandler($vendor, $messageHandler) {
         $this->messageHandlers[$vendor] = $messageHandler;
     }
 
+    /**
+     * @param string $channel
+     *
+     * @return string|null
+     */
     protected function getDefaultChannelClass($channel) {
         $channelClassMap = [
             'email' => CNotification_Channel_EmailChannel::class,
@@ -42,6 +68,12 @@ class CNotification_Manager {
         return $channelClass;
     }
 
+    /**
+     * @param string $channelName
+     * @param CNotification_ChannelInterface $channel
+     *
+     * @return CNotification_ChannelInterface
+     */
     public function registerChannel($channelName, $channel) {
         return $this->channels[$channelName] = $channel;
     }
@@ -66,6 +98,12 @@ class CNotification_Manager {
         return $this->channels[$channel];
     }
 
+    /**
+     * @param string  $channelName
+     * @param Closure $messageHandler
+     *
+     * @return CNotification_Channel_CustomChannel
+     */
     public function createCustomChannel($channelName, $messageHandler) {
         $channel = new CNotification_Channel_CustomChannel(['channel' => $channelName]);
         $channel->setMessageHandler($messageHandler);
@@ -82,7 +120,7 @@ class CNotification_Manager {
      */
     public function createMessage($vendor, $config = [], $data = []) {
         $vendorClass = $this->toMessageClass($vendor);
-        $className = 'CNotification_Message_' . $vendorClass . '';
+        $className = 'CNotification_Message_' . $vendorClass;
 
         return new $className($config, $data);
     }
@@ -101,10 +139,13 @@ class CNotification_Manager {
             default:
                 return ucfirst(cstr::camel($vendor));
         }
-
-        return ucfirst(cstr::camel($vendor));
     }
 
+    /**
+     * @param string $vendor
+     *
+     * @return string|null
+     */
     protected function getMessageHandlerClass($vendor) {
         $messageClass = carr::get($this->messageHandlers, $vendor);
         if ($messageClass == null) {
@@ -114,6 +155,11 @@ class CNotification_Manager {
         return $messageClass;
     }
 
+    /**
+     * @param string $vendor
+     *
+     * @return string
+     */
     protected function getDefaultMessageHandlerClass($vendor) {
         $classMap = [
             'sendgrid' => CNotification_Message_SendGrid::class,

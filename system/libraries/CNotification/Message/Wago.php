@@ -1,6 +1,9 @@
 <?php
 
 class CNotification_Message_Wago extends CNotification_MessageAbstract {
+    /**
+     * @return array
+     */
     public function send() {
         $token = $this->getOption('token', carr::get($this->config, 'token'));
 

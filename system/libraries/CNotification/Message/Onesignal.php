@@ -1,6 +1,9 @@
 <?php
 
 class CNotification_Message_Onesignal extends CNotification_MessageAbstract {
+    /**
+     * @return mixed
+     */
     public function send() {
         $oneSignal = CVendor::oneSignal($this->config);
         $options = $this->getOptions();

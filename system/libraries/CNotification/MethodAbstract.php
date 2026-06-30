@@ -6,6 +6,11 @@ abstract class CNotification_MethodAbstract implements CNotification_MethodInter
     public function __construct() {
     }
 
-    public function onNotificatonSent($logNotificationModel) {
+    /**
+     * @param mixed $logNotificationModel
+     *
+     * @return void
+     */
+    public function onNotificationSent($logNotificationModel) {
     }
 }
