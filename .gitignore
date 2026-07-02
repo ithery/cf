@@ -92,6 +92,9 @@ botlog.log
 
 #ignore vscode
 .vscode
+
+#ignore claude code local settings
+.claude/settings.local.json
 .php_cs.cache
 *.py
 
