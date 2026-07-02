@@ -3,6 +3,9 @@
 use Opis\Closure\SerializableClosure;
 
 class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
+    /**
+     * @var string
+     */
     protected $modelClass;
 
     /**
@@ -10,6 +13,10 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
      */
     protected $queryCallback;
 
+    /**
+     * @param string        $modelClass
+     * @param null|callable $queryCallback
+     */
     public function __construct($modelClass, $queryCallback = null) {
         $this->modelClass = $modelClass;
         $this->queryCallback = $queryCallback != null ? new SerializableClosure($queryCallback) : null;
@@ -224,6 +231,14 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $query;
     }
 
+    /**
+     * @param CModel_Query $query
+     * @param string       $relationPath
+     * @param string       $column
+     * @param int          $index
+     *
+     * @return null|string
+     */
     protected function withSelectRelationColumn($query, $relationPath, $column, $index) {
         $alias = 'mdp_sort_' . $index;
 
@@ -260,6 +275,14 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $key;
     }
 
+    /**
+     * @param CModel_Query    $query
+     * @param CModel_Relation $relation
+     * @param string[]        $joinRelations
+     * @param string          $column
+     *
+     * @return CDatabase_Query_Builder
+     */
     protected function createSelectJoinQuery(CModel_Query $query, CModel_Relation $relation, array $joinRelations, $column) {
         $tableAlias = 'mdp_join_main';
         $relatedModel = $relation->getRelated();
@@ -313,7 +336,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         }
         $newQuery->select($columnAlias . '.' . $column);
 
-        if ($relation instanceof CModel_Relation_BelongsToOne) {
+        if ($relation instanceof CModel_Relation_BelongsToMany) {
             $joinAlias = 'mdp_bto_join_' . $column;
 
             $joinTable = $relation->getTable();
@@ -332,6 +355,12 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $newQuery;
     }
 
+    /**
+     * @param CModel_Query $query
+     * @param string       $fieldName
+     *
+     * @return bool
+     */
     protected function isRelationField($query, $fieldName) {
         if (method_exists($query->getModel(), $fieldName)) {
             try {
@@ -350,6 +379,15 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return false;
     }
 
+    /**
+     * @param null|int   $perPage
+     * @param array      $columns
+     * @param string     $pageName
+     * @param null|int   $page
+     * @param null|mixed $callback
+     *
+     * @return CPagination_LengthAwarePaginator
+     */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {
         //do nothing
         $query = $this->getModelQuery($callback);
@@ -363,6 +401,11 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $query->paginate($perPage, $columns, $pageName, $page);
     }
 
+    /**
+     * @param null|mixed $callback
+     *
+     * @return null|CModel
+     */
     public function first($callback = null) {
         //do nothing
         $query = $this->getModelQuery($callback);
@@ -381,12 +424,20 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return in_array(CModel_SoftDelete_SoftDeleteTrait::class, c::classUsesRecursive($model));
     }
 
+    /**
+     * @param callable $callback
+     *
+     * @return $this
+     */
     public function queryCallback($callback) {
         $this->queryCallback = $callback;
 
         return $this;
     }
 
+    /**
+     * @return CInterface_Enumerable
+     */
     public function toEnumerable() {
         $query = $this->getModelQuery();
 

@@ -5,12 +5,24 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CManager_Asset_Compiler {
     use CTrait_HasOptions;
 
+    /**
+     * @var string[]
+     */
     protected $files;
 
+    /**
+     * @var string
+     */
     protected $outFile;
 
+    /**
+     * @var string
+     */
     protected $type;
 
+    /**
+     * @var int
+     */
     protected $maxImportSize;
 
     /**
@@ -27,8 +39,15 @@ class CManager_Asset_Compiler {
      */
     protected $lastModTimeCompiledAsset = 0;
 
+    /**
+     * @var string
+     */
     protected $separator = "\n";
 
+    /**
+     * @param string[] $files
+     * @param array    $options
+     */
     public function __construct(array $files, $options = []) {
         $files = carr::map($files, function ($script) {
             return preg_replace('/\?.*/', '', $script);
@@ -49,12 +68,18 @@ class CManager_Asset_Compiler {
         $this->determineLastModified();
     }
 
+    /**
+     * @return void
+     */
     protected function determineType() {
         $firstFile = carr::first($this->files);
         $extension = pathinfo($firstFile, PATHINFO_EXTENSION);
         $this->type = strtolower($extension);
     }
 
+    /**
+     * @return void
+     */
     protected function determineOutFile() {
         $firstFile = carr::first($this->files);
         $ymd = date('Ymd', filemtime($firstFile));
@@ -62,6 +87,9 @@ class CManager_Asset_Compiler {
         $this->outFile = $basePath . 'compiled/asset/' . $this->type . '/' . $ymd . '/' . md5(implode(':', $this->files)) . '.' . $this->type;
     }
 
+    /**
+     * @return void
+     */
     protected function determineLastModified() {
         //Set the instance variable to store the last modified time of the newest file
         $this->lastModTimeNewestAsset = 0;
@@ -79,14 +107,23 @@ class CManager_Asset_Compiler {
         }
     }
 
+    /**
+     * @return string
+     */
     protected function outputPath() {
         return 'compiled';
     }
 
+    /**
+     * @return bool
+     */
     public function needToRecompile() {
         return $this->lastModTimeCompiledAsset < $this->lastModTimeNewestAsset;
     }
 
+    /**
+     * @return string
+     */
     public function compile() {
         if ($this->needToRecompile()) {
             $dirname = dirname($this->outFile);
