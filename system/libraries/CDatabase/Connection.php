@@ -1884,6 +1884,11 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return $column;
     }
 
+    /**
+     * @param string $table
+     *
+     * @return string
+     */
     public function escapeTable($table) {
         if (stripos($table, ' AS ') !== false) {
             // Force 'AS' to uppercase
@@ -1921,10 +1926,16 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return $str;
     }
 
+    /**
+     * @return void
+     */
     public function disableBenchmark() {
         return $this->disableQueryLog();
     }
 
+    /**
+     * @return void
+     */
     public function enableBenchmark() {
         return $this->enableQueryLog();
     }
@@ -1943,10 +1954,20 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return $this->flushQueryLog();
     }
 
+    /**
+     * @return null|string
+     */
     public function lastQuery() {
         return carr::get(carr::last($this->getQueryLog()), 'compiled');
     }
 
+    /**
+     * @param string $query
+     * @param array  $bindings
+     * @param bool   $useReadPdo
+     *
+     * @return null|mixed
+     */
     public function getRow($query, $bindings = [], $useReadPdo = true) {
         $r = $this->select($query, $bindings, $useReadPdo);
         if (is_array($r) && count($r) > 0) {
@@ -1956,6 +1977,12 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return null;
     }
 
+    /**
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return null|mixed
+     */
     public function getValue($query, $bindings = []) {
         $row = $this->getRow($query, $bindings);
         $value = null;
@@ -1968,6 +1995,12 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return $value;
     }
 
+    /**
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return array
+     */
     public function getArray($query, $bindings = []) {
         $r = $this->select($query, $bindings);
         $res = [];
@@ -1978,6 +2011,12 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return $res;
     }
 
+    /**
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return array
+     */
     public function getList($query, $bindings = []) {
         $r = $this->select($query, $bindings);
         $res = [];
@@ -1989,10 +2028,18 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return $res;
     }
 
+    /**
+     * @return never
+     *
+     * @throws Exception
+     */
     protected function getDoctrineDriver() {
         throw new Exception('Doctrine Driver is not implemented on this connection');
     }
 
+    /**
+     * @return bool
+     */
     public function ping() {
         $pdo = $this->getPdoForSelect();
         if (!$pdo) {
@@ -2092,6 +2139,12 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         return $this->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
     }
 
+    /**
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return array
+     */
     public function fetchAll($query, $bindings = []) {
         //dont change this to select because this method should return PDO::FETCH_ASSOC
         return $this->query($query, $bindings)->fetchAll();
