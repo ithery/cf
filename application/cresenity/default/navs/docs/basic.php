@@ -41,4 +41,9 @@ return [
         'label' => c::__('Database'),
         'uri' => 'docs/basic/database',
     ],
+    [
+        'name' => 'basic.i18n',
+        'label' => c::__('Translation (i18n)'),
+        'uri' => 'docs/basic/i18n',
+    ],
 ];
