@@ -435,7 +435,7 @@ trait CModel_Trait_Attributes {
      *
      * @param string $key
      *
-     * @throws \Illuminate\Database\Eloquent\MissingAttributeException
+     * @throws \CModel_Exception_MissingAttributeException
      *
      * @return null
      */
