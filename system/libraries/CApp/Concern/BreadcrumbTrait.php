@@ -51,6 +51,25 @@ trait CApp_Concern_BreadcrumbTrait {
         return $breadcrumb;
     }
 
+    /**
+     * @return bool
+     */
+    public function isShowBreadcrumb() {
+        return $this->showBreadcrumb;
+    }
+
+    /**
+     * @return null|Closure
+     */
+    public function getBreadcrumbCallback() {
+        return $this->breadcrumbCallback;
+    }
+
+    /**
+     * @param null|Closure $callback
+     *
+     * @return CApp
+     */
     public function setBreadcrumbCallback($callback) {
         $this->breadcrumbCallback = c::toSerializableClosure($callback);
 

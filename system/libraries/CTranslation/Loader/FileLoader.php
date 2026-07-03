@@ -26,7 +26,7 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
     /**
      * All of the registered paths to JSON translation files.
      *
-     * @var string
+     * @var array
      */
     protected $jsonPaths = [];
 
