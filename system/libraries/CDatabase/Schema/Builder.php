@@ -538,12 +538,15 @@ class CDatabase_Schema_Builder {
 
         $table = $segments[1] ?? $segments[0];
 
-        $schema = match (true) {
-            isset($segments[1]) => $segments[0],
-            is_string($withDefaultSchema) => $withDefaultSchema,
-            $withDefaultSchema => $this->getCurrentSchemaName(),
-            default => null,
-        };
+        if (isset($segments[1])) {
+            $schema = $segments[0];
+        } elseif (is_string($withDefaultSchema)) {
+            $schema = $withDefaultSchema;
+        } elseif ($withDefaultSchema) {
+            $schema = $this->getCurrentSchemaName();
+        } else {
+            $schema = null;
+        }
 
         return [$schema, $table];
     }
