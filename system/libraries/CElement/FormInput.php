@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Description of CElement_FormInput.
- *
- * @author Hery
- */
 class CElement_FormInput extends CElement_Element {
     use CTrait_Compat_Element_FormInput;
 
@@ -106,13 +101,34 @@ class CElement_FormInput extends CElement_Element {
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return $this
+     */
     public function addValidation($name, $value = '') {
-        if (strlen($value) == 0) {
-            $value = $name;
-        }
         $this->validation->addValidation($name, $value);
 
         return $this;
+    }
+
+    /**
+     * Get the Laravel-style validation rules (eg. ['required', 'min:5']) declared
+     * on this field via addValidation(), used by CElement_Component_Form to build
+     * its Form::setValidation() rules array.
+     *
+     * @return array
+     */
+    public function getValidationRules() {
+        return $this->validation->rules();
     }
 
     public function setType($type) {

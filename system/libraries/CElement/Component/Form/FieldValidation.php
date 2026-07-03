@@ -1,106 +1,92 @@
 <?php
 
+/**
+ * Holds validation rules for a single form field.
+ *
+ * Rules are normalized to the Laravel-style rule strings (eg. 'required', 'min:5')
+ * used by {@see CElement_Component_Form_Validation} / {@see CValidation}, so field-level
+ * validation declared via addValidation() can be collected by CElement_Component_Form
+ * and validated through the same pipeline as Form::setValidation().
+ */
 class CElement_Component_Form_FieldValidation {
     use CTrait_Compat_Element_Form_FieldValidation;
 
-    private $validation = null;
+    /**
+     * @var array
+     */
+    private $rules;
 
     public function __construct() {
-        $this->validation = [];
+        $this->rules = [];
     }
 
     public static function factory() {
         return new CElement_Component_Form_FieldValidation();
     }
 
-    public function addValidation($name, $param) {
-        $this->validation[$name] = $param;
-    }
-
-    public function required() {
-        $this->validation['required'] = 'required';
-
-        return $this;
-    }
-
-    public function min($n) {
-        $this->validation['min'] = $n;
-
-        return $this;
-    }
-
-    public function max($n) {
-        $this->validation['max'] = $n;
-
-        return $this;
-    }
-
-    public function equals($n) {
-        $this->validation['equals'] = $n;
-
-        return $this;
-    }
-
-    public function notequals($n) {
-        $this->validation['notequals'] = $n;
-
-        return $this;
-    }
-
-    public function custom($n) {
-        $this->validation['custom'] = $n;
-
-        return $this;
-    }
-
-    public function validationClass() {
-        return ' validate[' . $this->renderClass() . ']';
-    }
-
-    protected function renderClass() {
-        $validation_class = '';
-        foreach ($this->validation as $k => $v) {
-            if ($v != false) {
-                if (strlen($validation_class) > 0) {
-                    $validation_class .= ', ';
-                }
-                switch (strtolower($k)) {
-                    case 'required':
-                        $validation_class .= 'required';
-
-                        break;
-                    case 'condrequired':
-                        $validation_class .= 'condRequired[' . $v . ']';
-
-                        break;
-                    case 'min':
-                        $validation_class .= 'min[' . $v . ']';
-
-                        break;
-                    case 'max':
-                        $validation_class .= 'max[' . $v . ']';
-
-                        break;
-                    case 'equals':
-                        $validation_class .= 'equals[' . $v . ']';
-
-                        break;
-                    case 'notequals':
-                        $validation_class .= 'notequals[' . $v . ']';
-
-                        break;
-                    case 'custom':
-                        $validation_class .= 'custom[' . $v . ']';
-
-                        break;
-                    default:
-                        $validation_class .= '' . $k . '[' . $v . ']';
-
-                        break;
-                }
-            }
+    /**
+     * @param string      $name
+     * @param mixed       $param
+     *
+     * @return $this
+     */
+    public function addValidation($name, $param = '') {
+        $rule = $this->normalizeRule($name, $param);
+        if ($rule !== null && !in_array($rule, $this->rules, true)) {
+            $this->rules[] = $rule;
         }
 
-        return $validation_class;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function rules() {
+        return $this->rules;
+    }
+
+    /**
+     * Normalize a rule name/param pair into a Laravel-style rule string.
+     *
+     * Supports both the new single-argument style, eg. addValidation('required'),
+     * addValidation('min:5'), and the legacy two-argument style,
+     * eg. addValidation('min', 5), addValidation('condrequired', 'other_field').
+     *
+     * @param mixed $name
+     * @param mixed $param
+     *
+     * @return string|null
+     */
+    private function normalizeRule($name, $param) {
+        if ($name === null || $name === '') {
+            return null;
+        }
+        if ($param === null || (is_scalar($param) && strlen((string) $param) == 0)) {
+            //single-argument call, $name is the rule itself
+            return $name;
+        }
+
+        switch (strtolower($name)) {
+            case 'condrequired':
+                return 'required_with:' . $param;
+            case 'custom':
+                return (string) $param;
+            case 'equals':
+                return 'same:' . $param;
+            case 'notequals':
+                return 'different:' . $param;
+            default:
+                return $name . ':' . $param;
+        }
+    }
+
+    /**
+     * @deprecated no longer renders anything, validation is now driven by Form::setValidation()
+     *
+     * @return string
+     */
+    public function validationClass() {
+        return '';
     }
 }

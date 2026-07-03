@@ -136,6 +136,14 @@ class CElement_Component_Form extends CElement_Component {
     protected $validationPromptPosition;
 
     /**
+     * Raw validation rules array passed explicitly via setValidation(), kept separately
+     * so it can be merged with rules collected from child FormInput::addValidation() calls.
+     *
+     * @var array
+     */
+    protected $explicitValidationRules;
+
+    /**
      * @param string $formId
      *
      * @return void
@@ -164,6 +172,7 @@ class CElement_Component_Form extends CElement_Component {
         $this->action_before_submit = '';
         $this->disable_js = false;
         $this->validationPromptPosition = 'topRight';
+        $this->explicitValidationRules = [];
 
         CManager::instance()->registerModule('validation');
     }
@@ -313,6 +322,8 @@ class CElement_Component_Form extends CElement_Component {
      */
     public function setValidation($validationData = true) {
         if (is_array($validationData)) {
+            $this->explicitValidationRules = $validationData;
+
             CManager::asset()->module()->registerRunTimeModules('validate');
 
             /**
@@ -408,9 +419,54 @@ class CElement_Component_Form extends CElement_Component {
     }
 
     /**
+     * Collect Laravel-style validation rules declared via addValidation() on descendant
+     * CElement_FormInput elements, keyed by field name, merged with rules set explicitly
+     * through setValidation().
+     *
+     * @return array
+     */
+    protected function collectValidationRules() {
+        $rules = [];
+        $this->collectValidationRulesFrom($this, $rules);
+
+        foreach ($this->explicitValidationRules as $name => $explicitRules) {
+            $explicitRules = is_array($explicitRules) ? $explicitRules : [$explicitRules];
+            $rules[$name] = isset($rules[$name]) ? array_merge($rules[$name], $explicitRules) : $explicitRules;
+        }
+
+        return $rules;
+    }
+
+    /**
+     * @param CRenderable $node
+     * @param array       $rules
+     *
+     * @return void
+     */
+    protected function collectValidationRulesFrom(CRenderable $node, array &$rules) {
+        foreach ($node->childs() as $child) {
+            if ($child instanceof CElement_FormInput) {
+                $name = $child->getName();
+                $fieldRules = $child->getValidationRules();
+                if (strlen($name) > 0 && count($fieldRules) > 0) {
+                    $rules[$name] = isset($rules[$name]) ? array_unique(array_merge($rules[$name], $fieldRules)) : $fieldRules;
+                }
+            }
+            if ($child instanceof CRenderable) {
+                $this->collectValidationRulesFrom($child, $rules);
+            }
+        }
+    }
+
+    /**
      * @return void
      */
     public function build() {
+        $validationRules = $this->collectValidationRules();
+        if (count($validationRules) > 0) {
+            $this->setValidation($validationRules);
+        }
+
         if ($this->autocomplete) {
             $this->setAttr('autocomplete', 'on');
         } else {
@@ -449,6 +505,8 @@ class CElement_Component_Form extends CElement_Component {
      * @return string
      */
     public function js($indent = 0) {
+        $this->buildOnce();
+
         if ($this->disable_js) {
             return parent::js($indent);
         }
@@ -579,7 +637,10 @@ class CElement_Component_Form extends CElement_Component {
             $validation_if_open = '';
             $validation_if_close = '';
 
-            if ($this->validation) {
+            //only the legacy boolean setValidation(true) mode drives the old validationEngine
+            //plugin; array-based validation (setValidation($array) / field addValidation()) is
+            //handled above through the jQuery Validation Plugin pipeline instead.
+            if ($this->validation === true) {
                 $validation_if_open = "if ($('#" . $this->id . "').validationEngine('validate') ) {";
                 $validation_if_close = "					} else {
 						$('#" . $this->id . " .confirm').removeAttr('data-submitted');
@@ -657,7 +718,10 @@ class CElement_Component_Form extends CElement_Component {
         } else {
             $js->appendln('//Form validation')->br();
             $strvalidation = '';
-            if ($this->validation) {
+            //only the legacy boolean setValidation(true) mode drives the old validationEngine
+            //plugin; array-based validation (setValidation($array) / field addValidation()) is
+            //handled above through the jQuery Validation Plugin pipeline instead.
+            if ($this->validation === true) {
                 $strvalidation = "$('#" . $this->id . "').validationEngine('attach', {promptPosition:'" . $this->validationPromptPosition . "'});";
             }
 

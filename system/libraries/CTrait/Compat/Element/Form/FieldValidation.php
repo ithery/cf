@@ -30,9 +30,7 @@ trait CTrait_Compat_Element_Form_FieldValidation {
      * @deprecated 1.2 dont use this anymore
      */
     public function condrequired($input) {
-        $this->validation['condrequired'] = $input;
-
-        return $this;
+        return $this->addValidation('condrequired', $input);
     }
 
     /**
