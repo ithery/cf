@@ -114,11 +114,11 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
         // was not passed, we will use the default locales which was given to us when
         // the translator was instantiated. Then, we can load the lines and return.
         $locales = $fallback ? $this->localeArray($locale) : [$locale ?: $this->locale];
-        foreach ($locales as $locale) {
+        foreach ($locales as $currentLocale) {
             if (!is_null($line = $this->getLine(
                 $namespace,
                 $group,
-                $locale,
+                $currentLocale,
                 $item,
                 $replace
             ))
