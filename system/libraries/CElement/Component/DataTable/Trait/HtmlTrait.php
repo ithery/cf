@@ -241,6 +241,22 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     $html->decIndent()->appendln('</tr>')->br();
                 }
             }
+            if ($no === 0) {
+                $emptyColspan = count($this->columns);
+                if ($this->haveRowAction()) {
+                    $emptyColspan++;
+                }
+                if ($this->numbering) {
+                    $emptyColspan++;
+                }
+                if ($this->checkbox) {
+                    $emptyColspan++;
+                }
+                $emptyMessage = carr::get($this->labels, 'noData', carr::get($this->labels, 'emptyTable'));
+                $html->appendln('<tr class="odd">')->incIndent()->br();
+                $html->appendln('<td colspan="' . $emptyColspan . '" class="text-center dataTables_empty">' . $emptyMessage . '</td>')->br();
+                $html->decIndent()->appendln('</tr>')->br();
+            }
         }
 
         $this->js_cell .= $js;
