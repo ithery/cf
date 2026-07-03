@@ -10,18 +10,48 @@ abstract class CElement extends CObservable {
      */
     protected $classes;
 
+    /**
+     * HTML tag name for this element.
+     *
+     * @var string
+     */
     protected $tag;
 
+    /**
+     * HTML attributes for this element.
+     *
+     * @var array
+     */
     protected $attr;
 
+    /**
+     * Custom css style for this element, keyed by property name.
+     *
+     * @var array
+     */
     protected $custom_css;
 
+    /**
+     * @var mixed
+     */
     protected $bootstrap;
 
+    /**
+     * @var CElement_PseudoElement|null
+     */
     protected $before;
 
+    /**
+     * @var CElement_PseudoElement|null
+     */
     protected $after;
 
+    /**
+     * @param string|null $id
+     * @param string      $tag
+     *
+     * @return void
+     */
     public function __construct($id = null, $tag = 'div') {
         parent::__construct($id);
 
@@ -46,6 +76,11 @@ abstract class CElement extends CObservable {
         return $this;
     }
 
+    /**
+     * @param string $tag
+     *
+     * @return void
+     */
     public function setTag($tag) {
         $this->tag = $tag;
     }
@@ -191,6 +226,13 @@ abstract class CElement extends CObservable {
         return $this->setAttr($k, $v);
     }
 
+    /**
+     * Get attribute value.
+     *
+     * @param string $k
+     *
+     * @return mixed|null
+     */
     public function getAttr($k) {
         if (isset($this->attr[$k])) {
             return $this->attr[$k];
@@ -199,14 +241,27 @@ abstract class CElement extends CObservable {
         return null;
     }
 
+    /**
+     * Get opening tag of this element.
+     *
+     * @return string
+     */
     public function pretag() {
         return '<' . $this->tag . '>';
     }
 
+    /**
+     * Get closing tag of this element.
+     *
+     * @return string
+     */
     public function posttag() {
         return '</' . $this->tag . '>';
     }
 
+    /**
+     * @return array
+     */
     public function toArray() {
         $data = parent::toArray();
         if (!empty($this->classes)) {
@@ -219,14 +274,27 @@ abstract class CElement extends CObservable {
         return $data;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     protected function htmlChild($indent = 0) {
         return parent::html($indent);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     protected function jsChild($indent = 0) {
         return parent::js($indent);
     }
 
+    /**
+     * @return string
+     */
     public function __toString() {
         $return = '<h3> HTML </h3>'
                 . '<pre>'

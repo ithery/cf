@@ -31,6 +31,11 @@ class CElement_Component_Form extends CElement_Component {
      */
     protected $action;
 
+    /**
+     * Target attribute of form element.
+     *
+     * @var string
+     */
     protected $target;
 
     /**
@@ -51,32 +56,90 @@ class CElement_Component_Form extends CElement_Component {
      */
     protected $autoFocus;
 
+    /**
+     * Ajax url used for remote validation, generated when validation data is an array.
+     *
+     * @var string
+     */
     protected $remoteValidationUrl;
 
+    /**
+     * Whether this form is submitted through ajax.
+     *
+     * @var bool
+     */
     protected $ajax_submit;
 
+    /**
+     * @var string
+     */
     protected $ajax_success_script_callback;
 
+    /**
+     * Data type expected from ajax submit response.
+     *
+     * @var string
+     */
     protected $ajax_datatype;
 
+    /**
+     * Whether to redirect after a successful ajax submit.
+     *
+     * @var bool
+     */
     protected $ajax_redirect;
 
+    /**
+     * @var string
+     */
     protected $ajax_redirect_url;
 
+    /**
+     * @var array
+     */
     protected $ajax_submit_handlers;
 
+    /**
+     * Element id/selector target that will be updated with the ajax submit response.
+     *
+     * @var bool|string
+     */
     protected $ajax_submit_target;
 
+    /**
+     * Element class target that will be updated with the ajax submit response.
+     *
+     * @var bool|string
+     */
     protected $ajax_submit_target_class;
 
+    /**
+     * @var string
+     */
     protected $action_before_submit;
 
+    /**
+     * Disable custom js generation when this value is true.
+     *
+     * @var bool
+     */
     protected $disable_js;
 
+    /**
+     * @var CObservable_Listener|null
+     */
     protected $submitListener;
 
+    /**
+     * @var string
+     */
     protected $validationPromptPosition;
 
+    /**
+     * @param string $formId
+     *
+     * @return void
+     */
     public function __construct($formId = '') {
         parent::__construct($formId);
         $this->tag = 'form';
@@ -105,11 +168,19 @@ class CElement_Component_Form extends CElement_Component {
         CManager::instance()->registerModule('validation');
     }
 
+    /**
+     * @param string|null $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         /** @phpstan-ignore-next-line */
         return new static($id);
     }
 
+    /**
+     * @return CObservable_Listener
+     */
     public function onSubmitListener() {
         return $this->addListener('submit');
     }
@@ -178,6 +249,11 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param string $position
+     *
+     * @return void
+     */
     public function setValidationPromptPosition($position) {
         $this->validationPromptPosition = $position;
     }
@@ -290,12 +366,22 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param string $datatype
+     *
+     * @return $this
+     */
     public function setAjaxDataType($datatype) {
         $this->ajax_datatype = $datatype;
 
         return $this;
     }
 
+    /**
+     * @param string $target
+     *
+     * @return $this
+     */
     public function setAjaxSubmitTarget($target) {
         $this->ajax_submit_target = $target;
 
@@ -357,6 +443,11 @@ class CElement_Component_Form extends CElement_Component {
         }
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         if ($this->disable_js) {
             return parent::js($indent);
