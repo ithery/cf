@@ -9,8 +9,24 @@ class CElement_List_ActionList extends CElement_List {
 
     public $actions = [];
 
+    /**
+     * @var string
+     */
     protected $style;
 
+    /**
+     * @var array
+     */
+    protected $btn_dropdown_classes;
+
+    /**
+     * @var int
+     */
+    protected $label_size;
+
+    /**
+     * @var bool
+     */
     protected $withCaret;
 
     public function __construct($listId = null) {

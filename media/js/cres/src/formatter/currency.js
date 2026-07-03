@@ -35,7 +35,7 @@ export const unformatCurrency = (rp) => {
     const replaceAll = (string, find, replace) => {
         let escapedFind = find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
         return string.replace(new RegExp(escapedFind, 'g'), replace);
-    }
+    };
 
     if (typeof rp == 'undefined') {
         rp = '';
