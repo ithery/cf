@@ -6,28 +6,64 @@ class CElement_Component_Nestable extends CElement_Component {
     use CTrait_Compat_Element_Nestable,
         CTrait_Element_ActionList_Row;
 
+    /**
+     * @var array
+     */
     protected $data;
 
+    /**
+     * @var string
+     */
     protected $idKey;
 
+    /**
+     * @var string
+     */
     protected $valueKey;
 
+    /**
+     * @var bool
+     */
     protected $applyjs;
 
+    /**
+     * @var string
+     */
     protected $input;
 
+    /**
+     * @var bool|callable
+     */
     protected $displayCallback;
 
+    /**
+     * @var callable|string
+     */
     protected $filterActionCallbackFunc;
 
+    /**
+     * @var array
+     */
     protected $requires;
 
+    /**
+     * @var bool
+     */
     protected $checkbox;
 
+    /**
+     * @var bool
+     */
     protected $disableDnd;
 
+    /**
+     * @var string
+     */
     protected $js_cell;
 
+    /**
+     * @var bool
+     */
     protected $isCollapsed = false;
 
     /**
@@ -35,6 +71,9 @@ class CElement_Component_Nestable extends CElement_Component {
      */
     protected $query;
 
+    /**
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
         CManager::registerModule('jquery.nestable');
@@ -61,6 +100,12 @@ class CElement_Component_Nestable extends CElement_Component {
         return new static($id);
     }
 
+    /**
+     * @param callable|string $func
+     * @param string          $require
+     *
+     * @return $this
+     */
     public function setDisplayCallback($func, $require = '') {
         $this->displayCallback = $func;
         if (strlen($require) > 0) {
@@ -70,6 +115,12 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param callable|string $func
+     * @param string          $require
+     *
+     * @return $this
+     */
     public function filterActionCallbackFunc($func, $require = '') {
         $this->filterActionCallbackFunc = $func;
         if (strlen($require) > 0) {
@@ -79,6 +130,12 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param CTreeDB  $treedb
+     * @param null|int $parentId
+     *
+     * @return $this
+     */
     public function setDataFromTreeDb(CTreeDB $treedb, $parentId = null) {
         $this->data = $treedb->getChildrenData($parentId);
 
@@ -96,6 +153,12 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param CModel|string $model
+     * @param null|callable $queryCallback
+     *
+     * @return $this
+     */
     public function setDataFromModel($model, $queryCallback = null) {
         if (is_string($model)) {
             $this->query = CManager::createModelDataProvider($model, $queryCallback);
@@ -134,60 +197,104 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param array $array
+     *
+     * @return $this
+     */
     public function setDataFromArray($array = []) {
         $this->data = $array;
 
         return $this;
     }
 
+    /**
+     * @param string $idKey
+     *
+     * @return $this
+     */
     public function setIdKey($idKey) {
         $this->idKey = $idKey;
 
         return $this;
     }
 
+    /**
+     * @param bool $disableDnd
+     *
+     * @return $this
+     */
     public function setDisableDnd($disableDnd) {
         $this->disableDnd = $disableDnd;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function disableDnd() {
         $this->disableDnd = true;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function enableDnd() {
         $this->disableDnd = false;
 
         return $this;
     }
 
+    /**
+     * @param bool $checkbox
+     *
+     * @return $this
+     */
     public function setHaveCheckbox($checkbox) {
         $this->checkbox = $checkbox;
 
         return $this;
     }
 
+    /**
+     * @param string $input
+     *
+     * @return $this
+     */
     public function setInput($input) {
         $this->input = $input;
 
         return $this;
     }
 
+    /**
+     * @param string $valueKey
+     *
+     * @return $this
+     */
     public function setValueKey($valueKey) {
         $this->valueKey = $valueKey;
 
         return $this;
     }
 
+    /**
+     * @param bool $boolean
+     *
+     * @return $this
+     */
     public function setApplyJs($boolean) {
         $this->applyjs = $boolean;
 
         return $this;
     }
 
+    /**
+     * @return void
+     */
     protected function getDataFromQuery() {
         $models = $this->query->toEnumerable();
         $childArray = [];
@@ -210,6 +317,11 @@ class CElement_Component_Nestable extends CElement_Component {
         $this->data = $childArray;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         if ($this->query != null) {
             $this->getDataFromQuery();
@@ -288,6 +400,11 @@ class CElement_Component_Nestable extends CElement_Component {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);
@@ -331,6 +448,13 @@ class CElement_Component_Nestable extends CElement_Component {
         return $js->text();
     }
 
+    /**
+     * @param CStringBuilder $html
+     * @param array          $row
+     * @param int|string     $key
+     *
+     * @return string
+     */
     protected function drawActionAndGetJs(CStringBuilder $html, array $row, $key) {
         $js = '';
         if ($this->haveRowAction()) {
