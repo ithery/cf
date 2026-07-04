@@ -66,6 +66,11 @@ return [
         'uri' => 'demo/controls/editorjs/index',
     ],
     [
+        'name' => 'controls.summernote',
+        'label' => c::__('Summernote'),
+        'uri' => 'demo/controls/summernote/index',
+    ],
+    [
         'name' => 'controls.querybuilder',
         'label' => c::__('Query Builder'),
         'uri' => 'demo/controls/querybuilder/index',
