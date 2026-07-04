@@ -1,6 +1,6 @@
 <?php
 
-class CImage_GoogleChart_Formula extends CImage_GoogleChart_Chart {
+class CImage_QuickChart_Formula extends CImage_QuickChart_Chart {
     /**
      * @param int $width  It is set by default to 0 because the server will size the png automatically
      * @param int $height It is set by default to 0 because the server will size the png automatically

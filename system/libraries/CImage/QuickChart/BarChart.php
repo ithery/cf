@@ -1,6 +1,6 @@
 <?php
 
-class CImage_GoogleChart_BarChart extends CImage_GoogleChart_Chart {
+class CImage_QuickChart_BarChart extends CImage_QuickChart_Chart {
     /**
      * Constructor for the gBarChart.
      *

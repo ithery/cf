@@ -122,7 +122,7 @@ class CImage_Chart_Runner extends CController {
     }
 
     public function google() {
-        $piChart = new CImage_GoogleChart_PieChart();
+        $piChart = new CImage_QuickChart_PieChart();
         // or if you installed via composer
         // $piChart = new gchart\gPieChart();
 

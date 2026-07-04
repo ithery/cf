@@ -1,6 +1,6 @@
 <?php
 
-class CImage_GoogleChart_Chart {
+class CImage_QuickChart_Chart {
     /**
      * Data set values.
      * Every array entry is a data set.
@@ -19,11 +19,16 @@ class CImage_GoogleChart_Chart {
     /**
      * API server URL.
      *
+     * Google's Image Charts API (chart.apis.google.com / chart.googleapis.com) was deprecated
+     * in 2012 and has since been fully shut down (both hostnames now return HTTP 404). QuickChart.io
+     * provides a compatible drop-in replacement that accepts the same Google Image Charts query
+     * parameters (chs/cht/chd/chco/chdl/chxt/...), so we point there instead.
+     *
      * @var string
      *
      * @usedby getUrl()
      */
-    private $baseUrl = 'chart.apis.google.com/chart?';
+    private $baseUrl = 'quickchart.io/chart?';
 
     /**
      * Width of the chart.
@@ -181,7 +186,7 @@ class CImage_GoogleChart_Chart {
             return $data;
         }
         $encodedData = [];
-        $max = CImage_GoogleChart_Helper::getMaxOfArray($data);
+        $max = CImage_QuickChart_Helper::getMaxOfArray($data);
         if ($max > 100) {
             $rate = $max / 100;
             foreach ($data as $array) {
@@ -213,7 +218,7 @@ class CImage_GoogleChart_Chart {
      */
     private function simpleEncodeData($data) {
         $encode_string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        $max = CImage_GoogleChart_Helper::getMaxOfArray($data);
+        $max = CImage_QuickChart_Helper::getMaxOfArray($data);
         $encodedData = [];
         if ($max > 61) {
             $rate = $max / 61.0;
@@ -291,7 +296,7 @@ class CImage_GoogleChart_Chart {
      */
     private function extendedEncodeData($data) {
         $encode_string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-.';
-        $max = CImage_GoogleChart_Helper::getMaxOfArray($data);
+        $max = CImage_QuickChart_Helper::getMaxOfArray($data);
         $encodedData = [];
         if ($max > 4095) {
             $rate = $max / 4095.0;
@@ -696,7 +701,7 @@ class CImage_GoogleChart_Chart {
      * Returns the url code for the image.
      */
     public function getUrl() {
-        $fullUrl = 'http://';
+        $fullUrl = 'https://';
         if (isset($this->serverNum)) {
             $fullUrl .= $this->getServerNumber() . '.';
         }
@@ -728,25 +733,14 @@ class CImage_GoogleChart_Chart {
      * See view.html and img.php for an example of how to use this function.
      * Please refer to the API documentation for further examples.
      *
-     * @param bool $post If true, the renderer will use a POST request for the image. If false, the
-     *                   renderer will use the standard url request. By default, the renderer will use
-     *                   the url request.
+     * @param bool $post Unused. QuickChart.io (unlike the old Google Image Charts API this
+     *                   replaces) only accepts POSTed chart data as its own JSON config format,
+     *                   not these query-string parameters, so POST mode is not supported here;
+     *                   the GET-based URL from getUrl() is always used instead.
      */
     public function renderImage($post = false) {
         header('Content-type: image/png');
-        if ($post) {
-            $this->setDataSetString();
-            $url = 'http://chart.apis.google.com/chart?chid=' . md5(uniqid(rand(), true));
-            $context = stream_context_create(
-                ['http' => [
-                    'method' => 'POST',
-                    'header' => 'Content-type: application/x-www-form-urlencoded' . "\r\n",
-                    'content' => urldecode(http_build_query($this->chart, '', '&'))]]
-            );
-            fpassthru(fopen($url, 'r', false, $context));
-        } else {
-            $url = str_replace('&amp;', '&', $this->getUrl());
-            readfile($url);
-        }
+        $url = str_replace('&amp;', '&', $this->getUrl());
+        readfile($url);
     }
 }

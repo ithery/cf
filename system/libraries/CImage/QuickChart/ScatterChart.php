@@ -1,6 +1,6 @@
 <?php
 
-class CImage_GoogleChart_ScatterChart extends CImage_GoogleChart_Chart {
+class CImage_QuickChart_ScatterChart extends CImage_QuickChart_Chart {
     public function __construct($width = 200, $height = 200) {
         $this->setDimensions($width, $height);
         $this->setProperty('cht', 's');

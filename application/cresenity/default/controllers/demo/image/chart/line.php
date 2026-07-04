@@ -22,8 +22,8 @@ class Controller_Demo_Image_Chart_Line extends \Cresenity\Demo\Controller {
         $uri = $imageChart->toUri();
         $app->addImg()->setSrc($uri);
 
-        $app->addH5()->add('With Google Engine');
-        $imageChart->setEngine('google');
+        $app->addH5()->add('With QuickChart Engine');
+        $imageChart->setEngine('quickchart');
         $uri = $imageChart->toUri();
         $app->addImg()->setSrc($uri);
 

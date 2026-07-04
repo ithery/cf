@@ -1,5 +1,5 @@
 <?php
-class CImage_GoogleChart_MeterChart extends CImage_GoogleChart_Chart {
+class CImage_QuickChart_MeterChart extends CImage_QuickChart_Chart {
     /**
      * Google-o-Meter Chart constructor.
      *

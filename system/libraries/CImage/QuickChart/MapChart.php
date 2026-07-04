@@ -1,6 +1,6 @@
 <?php
 
-class CImage_GoogleChart_MapChart extends CImage_GoogleChart_Chart {
+class CImage_QuickChart_MapChart extends CImage_QuickChart_Chart {
     /**
      * Map Chart constructor.
      *

@@ -1,16 +1,16 @@
 <?php
 
-class CImage_GoogleChart_GroupedBarChart extends CImage_GoogleChart_BarChart {
+class CImage_QuickChart_StackedBarChart extends CImage_QuickChart_BarChart {
     public function __construct($width = 200, $height = 200) {
-        $this->setChartType('g', 'v');
+        $this->setChartType('s', 'v');
         $this->setDimensions($width, $height);
     }
 
     public function setHorizontal($isHorizontal = true) {
         if ($isHorizontal) {
-            $this->setChartType('g', 'h');
+            $this->setChartType('s', 'h');
         } else {
-            $this->setChartType('g', 'v');
+            $this->setChartType('s', 'v');
         }
     }
 }

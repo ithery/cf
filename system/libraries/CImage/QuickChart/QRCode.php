@@ -1,6 +1,6 @@
 <?php
 
-class CImage_GoogleChart_QRCode extends CImage_GoogleChart_Chart {
+class CImage_QuickChart_QRCode extends CImage_QuickChart_Chart {
     public function __construct($width = 150, $height = 150) {
         $this->setDimensions($width, $height);
         $this->setProperty('cht', 'qr');

@@ -1,21 +1,21 @@
 <?php
 
-class CImage_Chart_Engine_GoogleEngine extends CImage_Chart_EngineAbstract {
+class CImage_Chart_Engine_QuickChartEngine extends CImage_Chart_EngineAbstract {
     use CImage_Chart_Trait_UseColorTrait;
 
     public function toUri() {
         $chart = $this->builder->getChart();
-        $googleChart = null;
+        $quickChart = null;
         if ($chart instanceof CChart_Chart_BarChart) {
             $type = 'g';
             $direction = $chart->getDirection() == CChart::DIRECTION_VERTICAL ? 'v' : 'h';
-            $googleChart = new CImage_GoogleChart_BarChart($this->builder->getWidth(), $this->builder->getHeight(), $type, $direction);
+            $quickChart = new CImage_QuickChart_BarChart($this->builder->getWidth(), $this->builder->getHeight(), $type, $direction);
         } elseif ($chart instanceof CChart_Chart_PieChart) {
-            $googleChart = new CImage_GoogleChart_PieChart($this->builder->getWidth(), $this->builder->getHeight());
+            $quickChart = new CImage_QuickChart_PieChart($this->builder->getWidth(), $this->builder->getHeight());
         } elseif ($chart instanceof CChart_Chart_LineChart) {
-            $googleChart = new CImage_GoogleChart_LineChart($this->builder->getWidth(), $this->builder->getHeight());
+            $quickChart = new CImage_QuickChart_LineChart($this->builder->getWidth(), $this->builder->getHeight());
 
-            // $googleChart->setProperty('chm', 'N,000000,0,,10|N,000000,1,,10');
+            // $quickChart->setProperty('chm', 'N,000000,0,,10|N,000000,1,,10');
         }
 
         if ($chart instanceof CChart_Contract_ChartHaveAxis) {
@@ -27,18 +27,18 @@ class CImage_Chart_Engine_GoogleEngine extends CImage_Chart_EngineAbstract {
                 $chartAxis[] = 'y';
             }
             if (count($chartAxis) > 0) {
-                $googleChart->setProperty('chxt', implode(',', $chartAxis));
+                $quickChart->setProperty('chxt', implode(',', $chartAxis));
             }
-            $googleChart->setProperty('chds', 'a');
+            $quickChart->setProperty('chds', 'a');
         }
         foreach ($chart->getValues() as $value) {
-            $googleChart->addDataSet($value);
+            $quickChart->addDataSet($value);
         }
         if ($chart instanceof CChart_Contract_ChartHaveDirection && $chart->getDirection() == CChart::DIRECTION_HORIZONTAL) {
             $property = '1:|' . implode('|', $chart->getDataLabels()) . '';
-            $googleChart->setProperty('chxl', $property);
+            $quickChart->setProperty('chxl', $property);
         } else {
-            $googleChart->setLabels($chart->getDataLabels());
+            $quickChart->setLabels($chart->getDataLabels());
         }
 
         $seriesLabels = $chart->getSeriesLabels();
@@ -48,31 +48,31 @@ class CImage_Chart_Engine_GoogleEngine extends CImage_Chart_EngineAbstract {
 
         if ($chart->isShowLegend() && count($seriesLabels) > 0) {
             $legendPosition = $chart->getLegendPosition();
-            $googleChart->setLegend($seriesLabels);
-            $googleChart->setLegendPosition($legendPosition);
+            $quickChart->setLegend($seriesLabels);
+            $quickChart->setLegendPosition($legendPosition);
         }
 
         $colors = c::collect($chart->getColors())->map(function ($color) {
             return $this->toRgba($color);
         })->all();
 
-        $googleChart->setColors($colors);
+        $quickChart->setColors($colors);
 
         if ($chart->getTitle()) {
-            $googleChart->setTitle($chart->getTitle());
+            $quickChart->setTitle($chart->getTitle());
         }
         if ($chart instanceof CChart_Contract_ChartHave3D) {
             if ($chart->is3D()) {
-                $googleChart->set3D(true, false);
+                $quickChart->set3D(true, false);
             }
         }
-        $googleChart->setChartMargins([
+        $quickChart->setChartMargins([
             $this->builder->getLeftMargin(),
             $this->builder->getRightMargin(),
             $this->builder->getTopMargin(),
             $this->builder->getBottomMargin()
         ]);
 
-        return $googleChart->getUrl();
+        return $quickChart->getUrl();
     }
 }

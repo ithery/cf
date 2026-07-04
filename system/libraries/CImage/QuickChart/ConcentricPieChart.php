@@ -1,6 +1,6 @@
 <?php
 
-class CImage_GoogleChart_ConcentricPieChart extends CImage_GoogleChart_PieChart {
+class CImage_QuickChart_ConcentricPieChart extends CImage_QuickChart_PieChart {
     public function __construct($width = 350, $height = 200) {
         $this->setProperty('cht', 'pc');
         $this->setDimensions($width, $height);

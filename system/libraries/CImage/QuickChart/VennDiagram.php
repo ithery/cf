@@ -1,6 +1,6 @@
 <?php
 
-class CImage_GoogleChart_VennDiagram extends CImage_GoogleChart_Chart {
+class CImage_QuickChart_VennDiagram extends CImage_QuickChart_Chart {
     private $sizes;
 
     private $intersections;

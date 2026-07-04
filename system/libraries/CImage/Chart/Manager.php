@@ -28,13 +28,14 @@ class CImage_Chart_Manager {
     }
 
     /**
-     * Creates a Google chart engine instance.
+     * Creates a QuickChart.io-backed chart engine instance (drop-in replacement for the
+     * long-defunct Google Image Charts API, using the same query parameter format).
      *
      * @param CImage_Chart_Builder $builder
-     * @return CImage_Chart_Engine_GoogleEngine
+     * @return CImage_Chart_Engine_QuickChartEngine
      */
-    public function createGoogleEngine(CImage_Chart_Builder $builder) {
-        return new CImage_Chart_Engine_GoogleEngine($builder);
+    public function createQuickchartEngine(CImage_Chart_Builder $builder) {
+        return new CImage_Chart_Engine_QuickChartEngine($builder);
     }
 
     /**

@@ -1,16 +1,16 @@
 <?php
 
-class CImage_GoogleChart_OverlappedBarChart extends CImage_GoogleChart_BarChart {
+class CImage_QuickChart_GroupedBarChart extends CImage_QuickChart_BarChart {
     public function __construct($width = 200, $height = 200) {
-        $this->setChartType('o', 'v');
+        $this->setChartType('g', 'v');
         $this->setDimensions($width, $height);
     }
 
     public function setHorizontal($isHorizontal = true) {
         if ($isHorizontal) {
-            $this->setChartType('o', 'h');
+            $this->setChartType('g', 'h');
         } else {
-            $this->setChartType('o', 'v');
+            $this->setChartType('g', 'v');
         }
     }
 }

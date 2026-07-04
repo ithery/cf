@@ -1,6 +1,6 @@
 <?php
 
-class CImage_GoogleChart_FunnelChart extends CImage_GoogleChart_BarChart {
+class CImage_QuickChart_FunnelChart extends CImage_QuickChart_BarChart {
     public function __construct($width = 200, $height = 200) {
         $this->setChartType('s', 'h');
         $this->setDimensions($width, $height);

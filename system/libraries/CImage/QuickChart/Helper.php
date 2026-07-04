@@ -1,6 +1,6 @@
 <?php
 
-class CImage_GoogleChart_Helper {
+class CImage_QuickChart_Helper {
     public static function getMaxOfArray($arrayToCheck) {
         $maxValue = 0;
 
