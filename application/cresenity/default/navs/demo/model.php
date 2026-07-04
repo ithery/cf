@@ -20,4 +20,9 @@ return [
         'label' => c::__('Chartable Trait'),
         'uri' => 'demo/model/chartable/index',
     ],
+    [
+        'name' => 'model.nested',
+        'label' => c::__('Nested Model'),
+        'uri' => 'demo/model/nested/index',
+    ],
 ];
