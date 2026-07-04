@@ -14,14 +14,29 @@ class CAjax_Method implements Jsonable {
      */
     public $data = [];
 
+    /**
+     * @var string
+     */
     public $type = '';
 
+    /**
+     * @var string
+     */
     public $target = '';
 
+    /**
+     * @var array
+     */
     public $param = [];
 
+    /**
+     * @var array
+     */
     public $args = [];
 
+    /**
+     * @var int|DateTimeInterface
+     */
     public $expiration;
 
     /**
@@ -64,6 +79,11 @@ class CAjax_Method implements Jsonable {
         return $this;
     }
 
+    /**
+     * @param int|DateTimeInterface $expiration
+     *
+     * @return $this
+     */
     public function setExpiration($expiration) {
         $expiration = $expiration instanceof DateTimeInterface
         ? $expiration->getTimestamp() : $expiration;

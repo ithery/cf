@@ -82,6 +82,14 @@ class c {
         return static::property($value);
     }
 
+    /**
+     * Creates a function that checks if the value at `property` of a given object equals `source`.
+     *
+     * @param array|string $property the path of the property to get
+     * @param mixed        $source   the value to compare
+     *
+     * @return callable returns the new matcher function
+     */
     public static function baseMatchesProperty($property, $source) {
         return function ($value, $index, $collection) use ($property, $source) {
             $propertyVal = static::property($property);
@@ -117,6 +125,14 @@ class c {
         };
     }
 
+    /**
+     * Performs a deep comparison between two values to determine if they are equivalent.
+     *
+     * @param mixed $value the value to compare
+     * @param mixed $other the other value to compare
+     *
+     * @return bool
+     */
     public static function isEqual($value, $other) {
         $factory = CComparator::createFactory();
         $comparator = $factory->getComparatorFor($value, $other);
@@ -401,6 +417,11 @@ class c {
         return CCarbon::today($tz);
     }
 
+    /**
+     * @param bool $getAsNumber
+     *
+     * @return array|int|float
+     */
     public static function hrtime($getAsNumber = false) {
         if (function_exists('hrtime')) {
             return hrtime($getAsNumber);
@@ -426,6 +447,12 @@ class c {
         return c::e($str);
     }
 
+    /**
+     * @param string $path
+     * @param int    $count number of times to go up a directory level
+     *
+     * @return string
+     */
     public static function dirname($path, $count = 1) {
         if ($count > 1) {
             return dirname(static::dirname($path, --$count));
@@ -688,6 +715,18 @@ class c {
         return static::abort(404);
     }
 
+    /**
+     * Throw an HttpException with the given data.
+     *
+     * @param CHTTP_Response|\CInterface_Responsable|int $code
+     * @param string                                     $message
+     * @param array                                      $headers
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @return void
+     */
     public static function abort($code, $message = '', array $headers = []) {
         if ($code instanceof CHTTP_Response) {
             throw new CHTTP_Exception_ResponseException($code);
@@ -1115,6 +1154,9 @@ class c {
         return CDatabase::manager()->connection($name);
     }
 
+    /**
+     * @return string
+     */
     public static function userAgent() {
         return !empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '';
     }
@@ -1238,6 +1280,14 @@ class c {
         return $target;
     }
 
+    /**
+     * Remove an item from an array or object using "dot" notation.
+     *
+     * @param mixed        $target
+     * @param array|string $key
+     *
+     * @return void
+     */
     public static function forget(&$target, $key) {
         $segments = is_array($key) ? $key : explode('.', $key);
 
@@ -1318,16 +1368,39 @@ class c {
         return $a > $b ? 1 : -1;
     }
 
+    /**
+     * Dispatch a job (or Closure) to its appropriate queue handler.
+     *
+     * @param object|Closure $job
+     *
+     * @return CQueue_PendingClosureDispatch|CQueue_PendingDispatch
+     */
     public static function dispatch($job) {
         return $job instanceof Closure
             ? new CQueue_PendingClosureDispatch(CQueue_CallQueuedClosure::create($job))
             : new CQueue_PendingDispatch($job);
     }
 
+    /**
+     * Dispatch a command to its appropriate handler in the current process.
+     *
+     * @param object      $job
+     * @param null|mixed  $handler
+     *
+     * @return mixed
+     */
     public static function dispatchSync($job, $handler = null) {
         return CQueue::dispatcher()->dispatchSync($job, $handler);
     }
 
+    /**
+     * Dispatch a command to its appropriate handler in the current process without a queue.
+     *
+     * @param object     $job
+     * @param null|mixed $handler
+     *
+     * @return mixed
+     */
     public static function dispatchNow($job, $handler = null) {
         return CQueue::dispatcher()->dispatchNow($job, $handler);
     }
@@ -1646,6 +1719,21 @@ class c {
         return $cookie->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
     }
 
+    /**
+     * Create a cookie and queue it to be sent with the next response.
+     *
+     * @param string      $name
+     * @param null|string $value
+     * @param int         $minutes
+     * @param null|string $path
+     * @param null|string $domain
+     * @param null|bool   $secure
+     * @param bool        $httpOnly
+     * @param bool        $raw
+     * @param null|string $sameSite
+     *
+     * @return void
+     */
     public static function setCookie($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null) {
         $cookie = CHTTP::cookie()->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
 
@@ -1717,6 +1805,15 @@ class c {
         return $difference;
     }
 
+    /**
+     * JSON-encode $data, defaulting to HTML-safe encoding flags (safe to embed in an attribute/script tag).
+     *
+     * @param mixed    $data
+     * @param null|int $options
+     * @param int      $depth
+     *
+     * @return string
+     */
     public static function json($data, $options = null, $depth = 512) {
         if ($options == null) {
             $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
@@ -1725,10 +1822,24 @@ class c {
         return json_encode($data, $options, $depth);
     }
 
+    /**
+     * JSON-encode $data and escape it for safe use inside an HTML attribute value.
+     *
+     * @param mixed    $data
+     * @param null|int $options
+     * @param int      $depth
+     *
+     * @return string
+     */
     public static function jsonAttr($data, $options = null, $depth = 512) {
         return htmlspecialchars(c::json($data, $options, $depth), ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
     public static function escAttr($string) {
         return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
     }
@@ -1831,6 +1942,14 @@ class c {
         return $property ? $faker->{$property} : $faker;
     }
 
+    /**
+     * Measure the average execution time (in seconds) of $callback over $times runs.
+     *
+     * @param callable $callback
+     * @param int      $times
+     *
+     * @return float
+     */
     public static function stopwatch($callback, $times = 1) {
         $totalTime = 0;
 
@@ -1845,6 +1964,12 @@ class c {
         return $totalTime / $times;
     }
 
+    /**
+     * @param mixed $a
+     * @param mixed $b
+     *
+     * @return void
+     */
     public static function swap(&$a, &$b) {
         $temp = $a;
         $a = $b;
@@ -1861,6 +1986,17 @@ class c {
         return new CCarbon($time, $tz);
     }
 
+    /**
+     * Invoke $callback with $args. Accepts a plain callable, a 'Class::method' or 'Class@method'
+     * string, or a (Opis/CFunction) SerializableClosure.
+     *
+     * @param callable|string|\Opis\Closure\SerializableClosure|CFunction_SerializableClosure $callback
+     * @param array                                                                           $args
+     *
+     * @throws Exception
+     *
+     * @return mixed
+     */
     public static function call($callback, array $args = []) {
         if (is_string($callback)) {
             $className = null;
@@ -2060,6 +2196,12 @@ class c {
         return $cache->get($object, $hash);
     }
 
+    /**
+     * Conditionally join CSS class names together (à la the "clsx"/"classnames" JS packages).
+     * Accepts strings, arrays, or a map of class-name => bool.
+     *
+     * @return string
+     */
     public static function clsx() {
         $args = func_get_args();
 
@@ -2217,6 +2359,14 @@ class c {
         return $basePath;
     }
 
+    /**
+     * Resolve the scalar value of a (possibly backed/unit) enum, passing anything else through as-is.
+     *
+     * @param mixed $value
+     * @param mixed $default used when $value is null
+     *
+     * @return mixed
+     */
     public static function enumValue($value, $default = null) {
         if (interface_exists('BackedEnum') && $value instanceof \BackedEnum) {
             return $value->value;
@@ -2233,6 +2383,11 @@ class c {
         return c::value($default);
     }
 
+    /**
+     * @param array $array
+     *
+     * @return mixed
+     */
     public static function arrayLast(array $array) {
         return $array ? current(array_slice($array, -1)) : null;
     }

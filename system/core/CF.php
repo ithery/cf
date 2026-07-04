@@ -120,7 +120,9 @@ final class CF {
     /**
      * Check CF is running on development.
      *
-     * @return bool
+     * @param string|string[] ...$environments
+     *
+     * @return bool|string
      */
     public static function environment(...$environments) {
         if (count($environments) > 0) {
