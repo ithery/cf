@@ -21,6 +21,8 @@ class CAjax {
 
     const TYPE_DEPENDS_ON = 'DependsOn';
 
+    const TYPE_TREE = 'Tree';
+
     /**
      * @param null|array|string $options
      *

@@ -6,6 +6,7 @@ import { initProgressBar, ProgressBar } from './ProgressBar';
 import { initNestable, Nestable } from './Nestable';
 import { initImage, Image } from './Image';
 import { initCountDownTimer, CountDownTimer } from './CountDownTimer';
+import { initTree, Tree } from './Tree';
 
 const initComponent = (element) => {
     const elementName = element.getAttribute('cres-element');
@@ -33,6 +34,9 @@ const initComponent = (element) => {
     if(elementName == 'component:CountDownTimer') {
         initCountDownTimer(element);
     }
+    if(elementName == 'component:Tree') {
+        initTree(element);
+    }
 };
 const component = {
     ShowMore,
@@ -42,7 +46,8 @@ const component = {
     ProgressBar,
     Nestable,
     Image,
-    CountDownTimer
+    CountDownTimer,
+    Tree
 };
 export {
     component,

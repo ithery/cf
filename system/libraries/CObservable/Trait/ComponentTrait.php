@@ -180,6 +180,17 @@ trait CObservable_Trait_ComponentTrait {
     /**
      * @param null|string $id
      *
+     * @return CElement_Tree
+     */
+    public function addTree($id = null) {
+        return c::tap(new CElement_Tree($id), function (CElement_Tree $el) {
+            $this->wrapper->add($el);
+        });
+    }
+
+    /**
+     * @param null|string $id
+     *
      * @return CElement_Component_PrismCode
      */
     public function addPrismCode($id = null) {
