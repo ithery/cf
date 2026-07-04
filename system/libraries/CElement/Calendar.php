@@ -1,16 +1,43 @@
 <?php
 
+/**
+ * Renders a fullCalendar-backed calendar element, sourcing events either from a
+ * fixed list or via ajax against a SQL query.
+ */
 class CElement_Calendar extends CElement {
     use CTrait_Compat_Element_FormInput_Calendar;
 
+    /**
+     * @var array
+     */
     protected $events = [];
 
+    /**
+     * Whether events are fetched via ajax (using $query/$keyField) instead of $events.
+     *
+     * @var bool
+     */
     protected $ajax;
 
+    /**
+     * SQL query used as the event source when $ajax is true.
+     *
+     * @var string
+     */
     protected $query;
 
+    /**
+     * Column used to filter $query by the calendar's visible date range.
+     *
+     * @var string
+     */
     protected $keyField;
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id = null) {
         parent::__construct($id);
 
@@ -31,6 +58,11 @@ class CElement_Calendar extends CElement {
         return new static($id, $tag);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
 
@@ -42,6 +74,14 @@ class CElement_Calendar extends CElement {
         return $html->text();
     }
 
+    /**
+     * Ajax endpoint invoked by fullCalendar to fetch events for the visible date range,
+     * echoing the matching rows as a JSON event list.
+     *
+     * @param object $data
+     *
+     * @return void
+     */
     public static function ajax($data) {
         $db = c::db();
         $q = $data->query;
@@ -91,6 +131,9 @@ class CElement_Calendar extends CElement {
         echo json_encode($data);
     }
 
+    /**
+     * @return string
+     */
     public function create_ajax_url() {
         return CAjaxMethod::factory()
             ->set_type('callback')
@@ -101,6 +144,11 @@ class CElement_Calendar extends CElement {
             ->makeurl();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = CStringBuilder::factory();
 
@@ -144,22 +192,44 @@ class CElement_Calendar extends CElement {
         return $js->text();
     }
 
+    /**
+     * @param array $events
+     *
+     * @return $this
+     */
     public function setEvents($events) {
         $this->events = $events;
 
         return $this;
     }
 
+    /**
+     * @param string $query
+     *
+     * @return $this
+     */
     public function setQuery($query) {
         $this->query = $query;
 
         return $this;
     }
 
+    /**
+     * Alias for setKeyField().
+     *
+     * @param string $keyField
+     *
+     * @return $this
+     */
     public function set_key_field($keyField) {
         return $this->setKeyField($keyField);
     }
 
+    /**
+     * @param string $keyField
+     *
+     * @return $this
+     */
     public function setKeyField($keyField) {
         $this->keyField = $keyField;
 

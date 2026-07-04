@@ -1,18 +1,49 @@
 <?php
 
+/**
+ * Renders a jstree-backed file/folder tree element that fetches nodes and
+ * content via ajax callbacks.
+ */
 class CElement_Tree extends CElement {
+    use CTrait_Compat_Element_Tree;
+
+    /**
+     * @var string|null
+     */
     protected $url;
 
+    /**
+     * @var string
+     */
     protected $target;
 
+    /**
+     * @var array
+     */
     protected $data = [];
 
+    /**
+     * @var callable|null
+     */
     protected $callback;
 
+    /**
+     * List of file paths to require_once before invoking the callback (see ajax()).
+     *
+     * @var array
+     */
     protected $requires;
 
+    /**
+     * @var array
+     */
     protected $custom_field_data = [];
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id = '') {
         parent::__construct($id);
 
@@ -22,36 +53,67 @@ class CElement_Tree extends CElement {
         c::manager()->registerModule('jstree');
     }
 
+    /**
+     * @param string|null $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         /** @phpstan-ignore-next-line */
         return new static($id);
     }
 
-    public function set_data($data) {
+    /**
+     * @param array $data
+     *
+     * @return $this
+     */
+    public function setData($data) {
         $this->data = $data;
 
         return $this;
     }
 
-    public function set_custom_field_data($custom_field_data) {
+    /**
+     * @param array $custom_field_data
+     *
+     * @return $this
+     */
+    public function setCustomFieldData($custom_field_data) {
         $this->custom_field_data = $custom_field_data;
 
         return $this;
     }
 
-    public function set_target($target) {
+    /**
+     * @param string $target
+     *
+     * @return $this
+     */
+    public function setTarget($target) {
         $this->target = $target;
 
         return $this;
     }
 
-    public function set_url($url) {
+    /**
+     * @param string $url
+     *
+     * @return $this
+     */
+    public function setUrl($url) {
         $this->url = $url;
 
         return $this;
     }
 
-    public function set_callback(callable $callback, $require = null) {
+    /**
+     * @param callable           $callback
+     * @param array|string|null  $require  one or more file paths to require_once before invoking the callback
+     *
+     * @return $this
+     */
+    public function setCallback(callable $callback, $require = null) {
         $this->callback = $callback;
         if ($require != null) {
             if (!is_array($require)) {
@@ -65,6 +127,13 @@ class CElement_Tree extends CElement {
         return $this;
     }
 
+    /**
+     * Recursively render a `<ul><li>` tree markup from node data.
+     *
+     * @param array $data
+     *
+     * @return string
+     */
     public function render($data) {
         $html = new CStringBuilder();
 
@@ -87,6 +156,11 @@ class CElement_Tree extends CElement {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
 
@@ -156,6 +230,15 @@ class CElement_Tree extends CElement {
         return $html->text();
     }
 
+    /**
+     * Ajax endpoint invoked by the jstree client to fetch node/content data. Requires
+     * the files listed in $data->requires, then delegates to $data->tree_callback,
+     * echoing its result as JSON.
+     *
+     * @param object $data
+     *
+     * @return void
+     */
     public static function ajax($data) {
         $operation = $data->operation;
         $requires = $data->requires;
@@ -173,6 +256,11 @@ class CElement_Tree extends CElement {
         call_user_func($data->tree_callback, $args);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
 

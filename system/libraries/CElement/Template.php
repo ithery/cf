@@ -20,10 +20,20 @@ class CElement_Template extends CElement {
         $this->setData($data);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         return $this->getTemplateHtml();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         return $this->getTemplateJs();
     }

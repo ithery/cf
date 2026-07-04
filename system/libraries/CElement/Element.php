@@ -2,13 +2,38 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * Base class for elements that render as a single HTML tag (with optional children),
+ * as opposed to CElement_View/CElement_Template which render from a view/template.
+ */
 abstract class CElement_Element extends CElement {
+    /**
+     * Whether build() has already run for this instance, guarded by buildOnce().
+     *
+     * @var bool
+     */
     protected $isBuilded = false;
 
+    /**
+     * Whether the tag is self-closing (rendered via onetag() instead of pretag()/posttag()).
+     *
+     * @var bool
+     */
     protected $isOneTag = false;
 
+    /**
+     * Whether rendered HTML/JS should be indented.
+     *
+     * @var bool
+     */
     protected $haveIndent = true;
 
+    /**
+     * @param string|null $id
+     * @param string      $tag
+     *
+     * @return void
+     */
     public function __construct($id = null, $tag = 'div') {
         parent::__construct($id, $tag);
 
@@ -16,14 +41,29 @@ abstract class CElement_Element extends CElement {
         $this->isOneTag = false;
     }
 
+    /**
+     * Get self-closing tag markup (eg. `<img ... />`).
+     *
+     * @return string
+     */
     public function onetag() {
         return '<' . $this->tag . ' ' . $this->htmlAttr() . ' />';
     }
 
+    /**
+     * Get opening tag markup.
+     *
+     * @return string
+     */
     public function pretag() {
         return '<' . $this->tag . ' ' . $this->htmlAttr() . ' >';
     }
 
+    /**
+     * Get closing tag markup.
+     *
+     * @return string
+     */
     public function posttag() {
         return '</' . $this->tag . '>';
     }
@@ -39,6 +79,11 @@ abstract class CElement_Element extends CElement {
         return $this;
     }
 
+    /**
+     * Build the `id`/`class`/`style` and additional HTML attribute string for this element's tag.
+     *
+     * @return string
+     */
     protected function htmlAttr() {
         $customCss = $this->custom_css;
         $customCss = static::renderStyle($customCss);
@@ -67,6 +112,11 @@ abstract class CElement_Element extends CElement {
         return $htmlAttr;
     }
 
+    /**
+     * Run build() exactly once per instance, memoized via $isBuilded.
+     *
+     * @return void
+     */
     protected function buildOnce() {
         //just build once
         if (!$this->isBuilded) {
@@ -75,25 +125,65 @@ abstract class CElement_Element extends CElement {
         }
     }
 
+    /**
+     * Get the rendered HTML of the "before" pseudo-element.
+     *
+     * @param int $indent
+     *
+     * @return string
+     */
     public function beforeHtml($indent = 0) {
         return $this->before()->html($indent);
     }
 
+    /**
+     * Get the rendered HTML of the "after" pseudo-element.
+     *
+     * @param int $indent
+     *
+     * @return string
+     */
     public function afterHtml($indent = 0) {
         return $this->after()->html($indent);
     }
 
+    /**
+     * Get the rendered JS of the "before" pseudo-element.
+     *
+     * @param int $indent
+     *
+     * @return string
+     */
     public function beforeJs($indent = 0) {
         return $this->before()->js($indent);
     }
 
+    /**
+     * Get the rendered JS of the "after" pseudo-element.
+     *
+     * @param int $indent
+     *
+     * @return string
+     */
     public function afterJs($indent = 0) {
         return $this->after()->js($indent);
     }
 
+    /**
+     * Hook for subclasses to prepare attributes/state before rendering. Called once via buildOnce().
+     *
+     * @return void
+     */
     protected function build() {
     }
 
+    /**
+     * Render this element (and its children) to an HTML string.
+     *
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
 
@@ -134,6 +224,13 @@ abstract class CElement_Element extends CElement {
         return $html->text();
     }
 
+    /**
+     * Render this element's (and its children's) JS to a string.
+     *
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);
