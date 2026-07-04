@@ -75,7 +75,6 @@ body {
     color: #cc131f;
     font-weight: 600;
     border-radius: 0.5rem;
-    margin: 1px 10px;
 }
 .bg-sidenav-theme .sidenav-item.open:not(.sidenav-item-closing) > .sidenav-toggle,
 .bg-sidenav-theme .sidenav-item.active > .sidenav-link,
@@ -624,4 +623,36 @@ pre code {
 .dropdown-item,
 .sidenav-link {
     transition: all 0.15s ease;
+}
+
+/* ===== Query Builder ===== */
+
+/* Reskin jQuery QueryBuilder's stock (Bootstrap 3-era) theme to match this theme's flat/rounded look. */
+.query-builder .rules-group-container {
+    border: 1px solid #e5e7eb;
+    background: #fafbfc;
+    border-radius: 0.5rem;
+}
+.query-builder .rule-container,
+.query-builder .rule-placeholder {
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 0.5rem;
+}
+.query-builder .rule-placeholder {
+    border-style: dashed;
+}
+.query-builder .rules-list > *::before,
+.query-builder .rules-list > *::after {
+    border-color: #cbd5e1;
+}
+.query-builder .rule-value-container {
+    border-left-color: #e5e7eb;
+}
+.query-builder .has-error {
+    background-color: rgba(204, 19, 31, 0.06);
+    border-color: rgba(204, 19, 31, 0.35);
+}
+.query-builder .error-container {
+    color: #cc131f;
 }
