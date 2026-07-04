@@ -2,9 +2,12 @@
 
 /**
  * Renders a fullCalendar-backed calendar element, sourcing events either from a
- * fixed list or via ajax against a SQL query.
+ * fixed list or via ajax against a SQL query. Rendering/behavior is handled
+ * client-side by cres.js (see media/js/cres/src/element/component/Calendar),
+ * the same way CElement_Tree works: this class only builds the markup and
+ * passes config via the `cres-config` attribute.
  */
-class CElement_Calendar extends CElement {
+class CElement_Calendar extends CElement_Component {
     use CTrait_Compat_Element_FormInput_Calendar;
 
     /**
@@ -34,7 +37,7 @@ class CElement_Calendar extends CElement {
     protected $keyField;
 
     /**
-     * @param string|null $id
+     * @param null|string $id
      *
      * @return void
      */
@@ -49,29 +52,32 @@ class CElement_Calendar extends CElement {
      * This function is used to create new Calendar.
      *
      * @param string $id
-     * @param mixed  $tag
      *
      * @return \CElement_Calendar
      */
-    public static function factory($id = null, $tag = 'div') {
-        /** @phpstan-ignore-next-line */
-        return new static($id, $tag);
+    public static function factory($id = null) {
+        return new static($id);
     }
 
     /**
-     * @param int $indent
-     *
-     * @return string
+     * @return void
      */
-    public function html($indent = 0) {
-        $html = new CStringBuilder();
+    protected function build() {
+        parent::build();
 
-        $classes = $this->generate_class();
+        $this->addClass('cres:element:component:Calendar');
 
-        $html->appendln("<div id='" . $this->id . "' class = '" . $classes . "'>");
-        $html->appendln('</div>');
+        $config = [
+            'ajax' => $this->ajax,
+        ];
+        if ($this->ajax) {
+            $config['ajaxUrl'] = $this->createAjaxUrl();
+        } else {
+            $config['events'] = $this->events;
+        }
 
-        return $html->text();
+        $this->setAttr('cres-element', 'component:Calendar');
+        $this->setAttr('cres-config', c::json($config));
     }
 
     /**
@@ -134,62 +140,14 @@ class CElement_Calendar extends CElement {
     /**
      * @return string
      */
-    public function create_ajax_url() {
-        return CAjaxMethod::factory()
-            ->set_type('callback')
-            ->set_method('post')
-            ->set_data('callable', [CElement_Calendar::class, 'ajax'])
-            ->set_data('query', $this->query)
-            ->set_data('key_field', $this->keyField)
-            ->makeurl();
-    }
-
-    /**
-     * @param int $indent
-     *
-     * @return string
-     */
-    public function js($indent = 0) {
-        $js = CStringBuilder::factory();
-
-        $js->appendln("
-            jQuery('#" . $this->id . "').fullCalendar({
-                header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'month,agendaWeek,agendaDay'
-                },
-                buttonText: {
-                    today: 'today',
-                    month: 'month',
-                    week: 'week',
-                    day: 'day'
-                },
-                timeFormat: 'H:mm',
-                eventLimit: true,
-            ");
-        if ($this->ajax) {
-            $ajax_url = $this->create_ajax_url();
-            $js->appendln("
-                eventSources: [
-                    {
-                        url: '" . $ajax_url . "',
-                        type: 'POST',
-                    }
-                ]
-            ");
-        } else {
-            $event_js = '';
-            foreach ($this->events as $key => $value) {
-            }
-        }
-        $js->appendln('
-            });
-            ');
-
-        $js->append(parent::js($indent));
-
-        return $js->text();
+    public function createAjaxUrl() {
+        return CAjax::createMethod()
+            ->setType(CAjax::TYPE_CALLBACK)
+            ->setMethod('post')
+            ->setData('callable', [CElement_Calendar::class, 'ajax'])
+            ->setData('query', $this->query)
+            ->setData('key_field', $this->keyField)
+            ->makeUrl();
     }
 
     /**
@@ -199,6 +157,7 @@ class CElement_Calendar extends CElement {
      */
     public function setEvents($events) {
         $this->events = $events;
+        $this->ajax = false;
 
         return $this;
     }
@@ -210,19 +169,9 @@ class CElement_Calendar extends CElement {
      */
     public function setQuery($query) {
         $this->query = $query;
+        $this->ajax = true;
 
         return $this;
-    }
-
-    /**
-     * Alias for setKeyField().
-     *
-     * @param string $keyField
-     *
-     * @return $this
-     */
-    public function set_key_field($keyField) {
-        return $this->setKeyField($keyField);
     }
 
     /**

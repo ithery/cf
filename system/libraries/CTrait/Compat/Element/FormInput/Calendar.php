@@ -25,4 +25,15 @@ trait CTrait_Compat_Element_FormInput_Calendar {
     public function set_events($events) {
         return $this->setEvents($events);
     }
+
+    /**
+     * Alias for setKeyField().
+     *
+     * @param string $keyField
+     *
+     * @return $this
+     */
+    public function set_key_field($keyField) {
+        return $this->setKeyField($keyField);
+    }
 }

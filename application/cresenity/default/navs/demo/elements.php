@@ -80,4 +80,9 @@ return [
         'label' => c::__('Nestable'),
         'uri' => 'demo/elements/nestable/index',
     ],
+    [
+        'name' => 'elements.calendar',
+        'label' => c::__('Calendar'),
+        'uri' => 'demo/elements/calendar/index',
+    ],
 ];

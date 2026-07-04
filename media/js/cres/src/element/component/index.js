@@ -7,6 +7,7 @@ import { initNestable, Nestable } from './Nestable';
 import { initImage, Image } from './Image';
 import { initCountDownTimer, CountDownTimer } from './CountDownTimer';
 import { initTree, Tree } from './Tree';
+import { initCalendar, Calendar } from './Calendar';
 
 const initComponent = (element) => {
     const elementName = element.getAttribute('cres-element');
@@ -37,6 +38,9 @@ const initComponent = (element) => {
     if(elementName == 'component:Tree') {
         initTree(element);
     }
+    if(elementName == 'component:Calendar') {
+        initCalendar(element);
+    }
 };
 const component = {
     ShowMore,
@@ -47,7 +51,8 @@ const component = {
     Nestable,
     Image,
     CountDownTimer,
-    Tree
+    Tree,
+    Calendar
 };
 export {
     component,
