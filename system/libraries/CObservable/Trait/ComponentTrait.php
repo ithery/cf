@@ -191,10 +191,10 @@ trait CObservable_Trait_ComponentTrait {
     /**
      * @param null|string $id
      *
-     * @return CElement_Calendar
+     * @return CElement_Component_Calendar
      */
     public function addCalendar($id = null) {
-        return c::tap(new CElement_Calendar($id), function (CElement_Calendar $el) {
+        return c::tap(new CElement_Component_Calendar($id), function (CElement_Component_Calendar $el) {
             $this->wrapper->add($el);
         });
     }

@@ -7,11 +7,13 @@ class Controller_Demo_Elements_Calendar extends \Cresenity\Demo\Controller {
         $app->setTitle('Calendar');
 
         $widget = $app->addWidget()->setTitle('Calendar Demo');
-        $widget->addDiv()->add('Contoh CElement_Calendar dengan data event tetap (tanpa ajax).');
+        $widget->addDiv()->add('Contoh CElement_Component_Calendar dengan data event tetap (tanpa ajax).');
         $widget->addBr();
 
         $today = date('Y-m-d');
-        $widget->addCalendar()->setEvents([
+        $calendar = $widget->addCalendar();
+        $events = $calendar->getEvents();
+        $events->setData([
             [
                 'title' => 'Kickoff Meeting',
                 'start' => $today . ' 09:00:00',
@@ -35,6 +37,34 @@ class Controller_Demo_Elements_Calendar extends \Cresenity\Demo\Controller {
                 'allDay' => true,
             ],
         ]);
+        $events->addData([
+            'title' => 'Team Building',
+            'start' => date('Y-m-d', strtotime('+10 day')) . ' 09:00:00',
+            'end' => date('Y-m-d', strtotime('+10 day')) . ' 17:00:00',
+            'backgroundColor' => '#6f42c1',
+            'borderColor' => '#6f42c1',
+        ]);
+
+        $widgetAjax = $app->addWidget()->setTitle('Calendar Demo (Ajax)');
+        $widgetAjax->addDiv()->add('Contoh CElement_Component_Calendar yang mengambil event via ajax dari query SQL, bersumber dari model \Cresenity\Demo\Model\CalendarEvent.');
+        $widgetAjax->addBr();
+
+        $calendarAjax = $widgetAjax->addCalendar();
+        $calendarAjax->setEvents(function ($startDate, $endDate, CElement_Component_Calendar_CalendarEvents $events) {
+            $dbEvents = \Cresenity\Demo\Model\CalendarEvent::where('start', '>=', $startDate)
+                ->where('start', '<=', $endDate)
+                ->get();
+            foreach ($dbEvents as $event) {
+                $events->addData([
+                    'title' => $event->title,
+                    'start' => $event->start,
+                    'end' => $event->end,
+                    'backgroundColor' => $event->background_color,
+                    'borderColor' => $event->border_color,
+                    'allDay' => $event->all_day,
+                ]);
+            }
+        });
 
         return $app;
     }

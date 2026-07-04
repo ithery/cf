@@ -23,6 +23,8 @@ class CAjax {
 
     const TYPE_TREE = 'Tree';
 
+    const TYPE_CALENDAR = 'Calendar';
+
     /**
      * @param null|array|string $options
      *

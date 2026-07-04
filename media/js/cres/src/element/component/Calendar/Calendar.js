@@ -14,18 +14,25 @@ export default class Calendar {
             return;
         }
 
+        const buttonText = Object.assign(
+            { today: 'today', month: 'month', week: 'week', day: 'day' },
+            this.config.buttonText || {}
+        );
+
+        if (this.config.locale) {
+            // registers the locale (deriving month/weekday names from moment's locale data)
+            // and its default button text, before it's requested by name below
+            $.fullCalendar.lang(this.config.locale, { buttonText });
+        }
+
         const options = {
+            lang: this.config.locale || 'en',
             header: {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
             },
-            buttonText: {
-                today: 'today',
-                month: 'month',
-                week: 'week',
-                day: 'day'
-            },
+            buttonText,
             timeFormat: 'H:mm',
             eventLimit: true
         };
