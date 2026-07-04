@@ -2,6 +2,10 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * Nested-set (modified preorder tree traversal) helper for managing
+ * hierarchical data stored in a database table using lft/rgt/depth columns.
+ */
 class CTreeDB {
     use CTrait_Compat_TreeDb;
 
@@ -25,12 +29,27 @@ class CTreeDB {
      */
     protected $orgId = null;
 
+    /**
+     * @var array
+     */
     protected $filters = [];
 
-    protected $have_priority = false;
+    /**
+     * @var bool
+     */
+    protected $havePriority = false;
 
-    protected $delete_child;
+    /**
+     * @var bool
+     */
+    protected $deleteChild;
 
+    /**
+     * @param string                    $tableName name of the table to manage as a tree
+     * @param null|string               $domain    domain used to resolve the current org context, defaults to CF::domain()
+     * @param null|CDatabase_Connection $db        database connection, defaults to c::db()
+     * @param string                    $prefix    table name prefix used to derive the primary key column name
+     */
     public function __construct($tableName, $domain = null, $db = null, $prefix = '') {
         if ($domain == null) {
             $domain = CF::domain();
@@ -60,14 +79,14 @@ class CTreeDB {
         $this->tableName = $tableName;
         $this->db = $db;
         $this->filters = [];
-        $this->delete_child = false;
+        $this->deleteChild = false;
     }
 
     /**
-     * @param string    $tableName
-     * @param string    $domain
-     * @param CDatabase $db
-     * @param type      $prefix
+     * @param string               $tableName
+     * @param string               $domain
+     * @param CDatabase_Connection $db
+     * @param string               $prefix
      *
      * @return \CTreeDB
      */
@@ -75,10 +94,11 @@ class CTreeDB {
         return new CTreeDB($tableName, $domain, $db, $prefix);
     }
 
-    public function setDisplayCallback() {
-        return $this;
-    }
-
+    /**
+     * @param string $pkColumn
+     *
+     * @return $this
+     */
     public function setPkColumn($pkColumn) {
         $this->pkColumn = $pkColumn;
 
@@ -96,24 +116,47 @@ class CTreeDB {
         return $this;
     }
 
+    /**
+     * Add an equality (or IS NULL, when $v is null) filter applied to every query built by this instance.
+     *
+     * @param string $k column name
+     * @param mixed  $v value to filter by, null to filter rows where the column is null
+     *
+     * @return $this
+     */
     public function addFilter($k, $v) {
         $this->filters[$k] = $v;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool whether deleting a node should cascade to its children
+     *
+     * @return $this
+     */
     public function setDeleteChild($bool) {
-        $this->delete_child = $bool;
+        $this->deleteChild = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $boolean whether tree rebuilds should order siblings by the `priority` column instead of `lft`
+     *
+     * @return $this
+     */
     public function setHavePriority($boolean) {
-        $this->have_priority = $boolean;
+        $this->havePriority = $boolean;
 
         return $this;
     }
 
+    /**
+     * Build the SQL fragment (starting with " AND ...") from the filters added via addFilter().
+     *
+     * @return string
+     */
     protected function filterWhere() {
         $where = '';
         $db = $this->db;
@@ -124,10 +167,18 @@ class CTreeDB {
                 $where .= ' AND ' . $db->escapeColumn($k) . ' = ' . $db->escape($v);
             }
         }
+
         //if(strlen($where)>0) $where = substr($where,5);
         return $where;
     }
 
+    /**
+     * Get a flat, depth-indented list of all active nodes ordered by tree position (lft).
+     *
+     * @param string $indent string repeated per depth level and prepended to the node name
+     *
+     * @return array list of rows containing the primary key column and the indented `name`
+     */
     public function getList($indent = '') {
         $db = $this->db;
 
@@ -147,6 +198,14 @@ class CTreeDB {
         return $db->getList($q);
     }
 
+    /**
+     * Insert a new node into the tree, shifting lft/rgt values of existing nodes to make room.
+     *
+     * @param array    $data      column => value pairs to insert; `parent_id`, `lft`, `rgt` and `depth` are set/overwritten by this method
+     * @param null|int $parent_id parent node id to insert under, or null to insert as a root node
+     *
+     * @return null|string last inserted id, or null if the insert failed
+     */
     public function insert($data, $parent_id = null) {
         $db = $this->db;
         if ($parent_id != null) {
@@ -213,6 +272,14 @@ class CTreeDB {
         return $inserted ? $db->getPdo()->lastInsertId() : null;
     }
 
+    /**
+     * Soft-delete a node (status=0) and close the lft/rgt gap it leaves behind.
+     * When setDeleteChild(true) has been set, all of its descendants are soft-deleted too.
+     *
+     * @param int $id id of the node to delete
+     *
+     * @return void
+     */
     public function delete($id) {
         $app = CApp::instance();
         $user = $app->user();
@@ -237,7 +304,7 @@ class CTreeDB {
         $q .= ' ' . $this->filter_where() . ' ';
         $db->query($q);
 
-        if ($this->delete_child == true) {
+        if ($this->deleteChild == true) {
             $child_list = $this->getChildrenList($id);
             if (is_array($child_list) && count($child_list) > 0) {
                 foreach ($child_list as $child_list_k => $child_list_v) {
@@ -261,6 +328,15 @@ class CTreeDB {
         $db->query($q);
     }
 
+    /**
+     * Update a node's data. If an orgId is set, the whole tree is rebuilt afterwards.
+     *
+     * @param int      $id        id of the node to update
+     * @param array    $data      column => value pairs to update
+     * @param null|int $parent_id unused, kept for signature compatibility
+     *
+     * @return void
+     */
     public function update($id, $data, $parent_id) {
         $db = $this->db;
 
@@ -270,6 +346,13 @@ class CTreeDB {
         }
     }
 
+    /**
+     * Get all ancestor nodes of a given node, ordered from root down (shallowest depth first).
+     *
+     * @param int $parent_id id of the node to get ancestors for
+     *
+     * @return CDatabase_Result|mixed
+     */
     public function getParents($parent_id) {
         $db = $this->db;
 
@@ -292,6 +375,13 @@ class CTreeDB {
         return $r;
     }
 
+    /**
+     * Get the immediate (closest) ancestor of a given node.
+     *
+     * @param int $parent_id id of the node to get the parent for
+     *
+     * @return null|array the parent row, or null if none found
+     */
     public function getFirstParent($parent_id) {
         $db = $this->db;
         $q = 'SELECT rgt,lft
@@ -313,6 +403,14 @@ class CTreeDB {
         return $r;
     }
 
+    /**
+     * Get a flat, depth-indented list of active nodes ordered by tree position (lft).
+     *
+     * @param null|int $id     when given, restrict the list to descendants of this node; otherwise list all nodes
+     * @param string   $indent string repeated per depth level and prepended to the node name
+     *
+     * @return array list of rows containing the primary key column and the indented `name`
+     */
     public function getChildrenList($id = null, $indent = '') {
         $db = $this->db;
 
@@ -357,6 +455,13 @@ class CTreeDB {
         return $db->getList($q);
     }
 
+    /**
+     * Get only the leaf nodes (nodes with no children, i.e. rgt = lft + 1), optionally restricted to descendants of a node.
+     *
+     * @param null|int $id when given, restrict the list to descendants of this node; otherwise consider all nodes
+     *
+     * @return array list of rows containing the primary key column and `name`
+     */
     public function getChildrenLeafList($id = null) {
         $db = $this->db;
 
@@ -403,6 +508,13 @@ class CTreeDB {
         return $list;
     }
 
+    /**
+     * Get the full row data of active nodes, ordered by tree position (lft), optionally restricted to descendants of a node.
+     *
+     * @param null|int $id when given, restrict the result to descendants of this node; otherwise return all nodes
+     *
+     * @return array list of full node rows
+     */
     public function getChildrenData($id = null) {
         $db = $this->db;
         $q = 'select * from ' . $db->escapeTable($this->tableName) . ' where status>0 ' . $this->filter_where();
@@ -431,6 +543,15 @@ class CTreeDB {
         return $r;
     }
 
+    /**
+     * Rebuild lft/rgt/depth for the entire tree (active nodes only), starting from all root nodes.
+     *
+     * @param bool $force when false, requires orgId to be set and throws otherwise
+     *
+     * @throws Exception when $force is false and orgId is not set
+     *
+     * @return void
+     */
     public function rebuildTreeAll($force = false) {
         if (!$force) {
             if ($this->orgId == null) {
@@ -467,6 +588,11 @@ class CTreeDB {
         }
     }
 
+    /**
+     * Rebuild lft/rgt/depth for the entire tree, ignoring the `status` column (includes soft-deleted nodes).
+     *
+     * @return void
+     */
     public function rebuildTreeAllIgnoreStatus() {
         $db = $this->db;
         $q = 'select ' . $db->escapeColumn($this->pkColumn) . ' from ' . $db->escapeTable($this->tableName) . ' where 1=1 ';
@@ -489,6 +615,15 @@ class CTreeDB {
         }
     }
 
+    /**
+     * Recursively rebuild lft/rgt/depth for a node and its active children, starting from the given left value.
+     *
+     * @param null|int $id    id of the node to rebuild, or null to rebuild all root nodes
+     * @param int      $left  lft value to assign to this node
+     * @param int      $depth depth value to assign to this node
+     *
+     * @return int the rgt value assigned to this node, plus 1 (the next available lft value for a sibling)
+     */
     public function rebuildTree($id = null, $left = 1, $depth = 0) {
         // the right value of this node is the left value + 1
         $db = $this->db;
@@ -509,7 +644,7 @@ class CTreeDB {
             $q .= ' and parent_id is null';
         }
 
-        if ($this->have_priority) {
+        if ($this->havePriority) {
             $q .= ' ORDER BY priority';
         } else {
             $q .= ' ORDER BY lft,' . $db->escapeColumn($this->pkColumn) . ' asc';
@@ -534,10 +669,20 @@ class CTreeDB {
             'depth' => $depth,
         ];
         $db->update($this->tableName, $data, [$this->pkColumn => $id]);
+
         // return the right value of this node + 1
         return $right + 1;
     }
 
+    /**
+     * Recursively rebuild lft/rgt/depth for a node and its children, ignoring the `status` column (includes soft-deleted nodes).
+     *
+     * @param null|int $id    id of the node to rebuild, or null to rebuild all root nodes
+     * @param int      $left  lft value to assign to this node
+     * @param int      $depth depth value to assign to this node
+     *
+     * @return int the rgt value assigned to this node, plus 1 (the next available lft value for a sibling)
+     */
     public function rebuildTreeIgnoreStatus($id = null, $left = 1, $depth = 0) {
         // the right value of this node is the left value + 1
         $db = $this->db;
@@ -554,7 +699,7 @@ class CTreeDB {
             $q .= ' and parent_id is null';
         }
 
-        if ($this->have_priority) {
+        if ($this->havePriority) {
             $q .= ' ORDER BY priority';
         } else {
             $q .= ' ORDER BY lft asc';
@@ -578,6 +723,7 @@ class CTreeDB {
             'depth' => $depth,
         ];
         $db->update($this->tableName, $data, [$this->pkColumn => $id]);
+
         // return the right value of this node + 1
         return $right + 1;
     }

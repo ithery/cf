@@ -95,8 +95,6 @@ class CAjax_Method implements Jsonable {
     }
 
     /**
-     * @param array $type
-     *
      * @return $this
      */
     public function setArgs(array $args) {
@@ -219,8 +217,7 @@ class CAjax_Method implements Jsonable {
     }
 
     /**
-     * @param CAjax_Method $ajaxMethod
-     * @param null|array   $input
+     * @param null|array $input
      *
      * @throws CAjax_Exception
      *
