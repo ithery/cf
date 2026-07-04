@@ -70,4 +70,14 @@ return [
         'label' => c::__('Progress Bar'),
         'uri' => 'demo/elements/progressBar/index',
     ],
+    [
+        'name' => 'elements.tree',
+        'label' => c::__('Tree'),
+        'uri' => 'demo/elements/tree/index',
+    ],
+    [
+        'name' => 'elements.nestable',
+        'label' => c::__('Nestable'),
+        'uri' => 'demo/elements/nestable/index',
+    ],
 ];
