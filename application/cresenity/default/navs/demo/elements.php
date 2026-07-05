@@ -71,9 +71,9 @@ return [
         'uri' => 'demo/elements/progressBar/index',
     ],
     [
-        'name' => 'elements.tree',
-        'label' => c::__('Tree'),
-        'uri' => 'demo/elements/tree/index',
+        'name' => 'elements.treeview',
+        'label' => c::__('Tree View'),
+        'uri' => 'demo/elements/treeview/index',
     ],
     [
         'name' => 'elements.nestable',
@@ -84,5 +84,10 @@ return [
         'name' => 'elements.calendar',
         'label' => c::__('Calendar'),
         'uri' => 'demo/elements/calendar/index',
+    ],
+    [
+        'name' => 'elements.filemanager',
+        'label' => c::__('File Manager'),
+        'uri' => 'demo/elements/filemanager/index',
     ],
 ];

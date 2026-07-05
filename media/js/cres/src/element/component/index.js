@@ -6,7 +6,7 @@ import { initProgressBar, ProgressBar } from './ProgressBar';
 import { initNestable, Nestable } from './Nestable';
 import { initImage, Image } from './Image';
 import { initCountDownTimer, CountDownTimer } from './CountDownTimer';
-import { initTree, Tree } from './Tree';
+import { initTreeView, TreeView } from './TreeView';
 import { initCalendar, Calendar } from './Calendar';
 
 const initComponent = (element) => {
@@ -35,8 +35,8 @@ const initComponent = (element) => {
     if(elementName == 'component:CountDownTimer') {
         initCountDownTimer(element);
     }
-    if(elementName == 'component:Tree') {
-        initTree(element);
+    if(elementName == 'component:TreeView') {
+        initTreeView(element);
     }
     if(elementName == 'component:Calendar') {
         initCalendar(element);
@@ -51,7 +51,7 @@ const component = {
     Nestable,
     Image,
     CountDownTimer,
-    Tree,
+    TreeView,
     Calendar
 };
 export {

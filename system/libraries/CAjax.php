@@ -21,7 +21,7 @@ class CAjax {
 
     const TYPE_DEPENDS_ON = 'DependsOn';
 
-    const TYPE_TREE = 'Tree';
+    const TYPE_TREE_VIEW = 'TreeView';
 
     const TYPE_CALENDAR = 'Calendar';
 

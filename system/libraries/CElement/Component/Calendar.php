@@ -3,7 +3,7 @@
 /**
  * Renders a fullCalendar-backed calendar element. Rendering/behavior is handled
  * client-side by cres.js (see media/js/cres/src/element/component/Calendar), the
- * same way CElement_Tree works: this class only builds the markup and passes
+ * same way CElement_Component_TreeView works: this class only builds the markup and passes
  * config via the `cres-config` attribute.
  *
  * $events starts out as a CElement_Component_Calendar_CalendarEvents (created in the
