@@ -15,9 +15,7 @@ class Controller_Demo_Elements_Filemanager extends \Cresenity\Demo\Controller {
 
         $fileManager = $widget->addFileManager('demoFileManager');
         $fileManager->setDisk('local')
-            ->setRootPath('application/cresenity/default/data/demo/file-manager')
-            ->setConfig('folder_categories.file.folder_name', '')
-            ->setConfig('folder_categories.image.folder_name', '');
+            ->setRootPath('application/cresenity/default/data/demo/file-manager');
 
         return $app;
     }
