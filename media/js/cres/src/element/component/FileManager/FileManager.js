@@ -1,3 +1,4 @@
+import ElementHistoryState from '../../../history/ElementHistoryState';
 import { cropMethod } from './method/crop';
 import { downloadMethod } from './method/download';
 import { moveMethod } from './method/move';
@@ -216,6 +217,7 @@ export default class FileManager {
                     })
             );
         });
+        this.initHistoryState();
         this.loadFolders();
         this.performFmRequest('error')
             .done((response) => {
@@ -232,6 +234,34 @@ export default class FileManager {
         });
 
         this.initializeUpload();
+    }
+
+    /**
+     * Wires this instance up to the browser's back/forward buttons via
+     * ElementHistoryState (see media/js/cres/src/history/ElementHistoryState.js),
+     * namespaced per-instance so multiple FileManagers on the same page don't
+     * clobber each other's history state. goTo() (see below) is what actually
+     * pushes an entry whenever the open folder changes; this only reacts to
+     * the user navigating back/forward to one of those entries.
+     *
+     * Also seeds the initial folder from the `path` query string param, if
+     * present, since a hard page load/refresh never carries history.state
+     * with it.
+     */
+    initHistoryState() {
+        if (!this.element.id) {
+            this.element.id = 'cfm-' + Math.random().toString(36).slice(2, 10);
+        }
+
+        this.initialWorkingDir = this.getUrlParam('path') || '';
+        if (this.initialWorkingDir) {
+            this.find('.fm-working-dir').val(this.initialWorkingDir);
+        }
+
+        this.historyState = new ElementHistoryState('filemanager:' + this.element.id);
+        this.historyState.onChange((state) => {
+            this.goTo(state ? state.path : this.initialWorkingDir, false);
+        });
     }
 
     /**
@@ -636,9 +666,22 @@ export default class FileManager {
     // ==  Folder actions  ==
     // ======================
 
-    goTo(new_dir) {
+    /**
+     * @param {string} new_dir
+     * @param {boolean} [pushHistory] false when called from a popstate
+     *                                (ElementHistoryState#onChange above) --
+     *                                otherwise every back navigation would
+     *                                immediately push a new forward entry.
+     */
+    goTo(new_dir, pushHistory = true) {
         this.find('.fm-working-dir').val(new_dir);
         this.loadItems();
+
+        if (pushHistory) {
+            let url = window.cresenity.url.addQueryString(window.location.href, 'path', new_dir);
+
+            this.historyState.push({path: new_dir}, url);
+        }
     }
 
     getPreviousDir() {
