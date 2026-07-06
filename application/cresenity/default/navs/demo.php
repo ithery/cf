@@ -56,6 +56,12 @@ return [
         'subnav' => include dirname(__FILE__) . '/demo/cresjs.php',
     ],
     [
+        'name' => 'report',
+        'label' => c::__('Report'),
+        'icon' => 'ti-bar-chart',
+        'subnav' => include dirname(__FILE__) . '/demo/report.php',
+    ],
+    [
         'name' => 'module',
         'label' => c::__('Module'),
         'icon' => 'ti-package',

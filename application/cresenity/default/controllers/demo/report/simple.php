@@ -1,6 +1,6 @@
 <?php
 
-class Controller_Demo_Module_Report_Simple extends \Cresenity\Demo\Controller {
+class Controller_Demo_Report_Simple extends \Cresenity\Demo\Controller {
     public function __construct() {
         parent::__construct();
     }
@@ -8,7 +8,7 @@ class Controller_Demo_Module_Report_Simple extends \Cresenity\Demo\Controller {
     public function index() {
         $app = c::app();
         $app->title('Report - Simple');
-        $app->addIframe()->setSrc(c::url('demo/module/report/simple/pdf'))
+        $app->addIframe()->setSrc(c::url('demo/report/simple/pdf'))
             ->customCss('width', '100%')
             ->customCss('height', '800px');
 
@@ -17,7 +17,7 @@ class Controller_Demo_Module_Report_Simple extends \Cresenity\Demo\Controller {
 
     public function pdf() {
         $report = CReport::builder();
-        $xml = c::view('demo.page.module.report.simple-jrxml')->render();
+        $xml = c::view('demo.page.report.simple-jrxml')->render();
         $report->fromXml($xml);
         $report->setDataFromModel(Cresenity\Demo\Model\Country::class, function (CModel_Query $query) {
             $query->orderBy('continent');

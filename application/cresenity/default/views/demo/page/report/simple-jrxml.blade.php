@@ -89,7 +89,7 @@
                 <textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression>
             </textField>
 
-            <textField pattern="d-M-yyyy h:mm:ss a">
+            <textField>
                 <reportElement x="0" y="0" width="178" height="20" uuid="ffd558c2-8b05-4669-8142-a7fdbc3ed46a"/>
                 <textElement textAlignment="Left">
                     <font size="8"/>
