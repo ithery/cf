@@ -149,6 +149,12 @@ abstract class CObservable extends CRenderable {
         return $this;
     }
 
+    /**
+     * @param string $type
+     * @param string $id
+     *
+     * @return CElement
+     */
     public function addElement($type, $id = '') {
         $element = null;
         if (CManager::instance()->isRegisteredElement($type)) {
@@ -190,6 +196,11 @@ abstract class CObservable extends CRenderable {
         $this->add('<div class="clear-both"></div>');
     }
 
+    /**
+     * @param string $param
+     *
+     * @return void
+     */
     public function setHandlerParam($param) {
         foreach ($this->listeners as $listener) {
             $listener->setHandlerParam($param);

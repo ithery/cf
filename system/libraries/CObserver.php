@@ -1,8 +1,14 @@
 <?php
 
 class CObserver {
+    /**
+     * @var CObserver
+     */
     private static $instance;
 
+    /**
+     * @var CObject[]
+     */
     private $objectList;
 
     private function __construct() {
