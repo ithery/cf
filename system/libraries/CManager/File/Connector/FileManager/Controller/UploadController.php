@@ -24,7 +24,11 @@ class CManager_File_Connector_FileManager_Controller_UploadController extends CM
             }
         }
         if (is_array($uploadedFiles)) {
-            $response = count($errorBag) > 0 ? $errorBag : parent::$successResponse;
+            if (count($errorBag) > 0) {
+                return $this->errorResponse(implode("\n", $errorBag));
+            }
+
+            return $this->successResponse();
         } else { // upload via ckeditor 'Upload' tab
             if (is_null($newFilename)) {
                 $response = $errorBag[0];

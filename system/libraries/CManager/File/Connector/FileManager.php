@@ -36,6 +36,13 @@ class CManager_File_Connector_FileManager extends CManager_File_ConnectorAbstrac
         return $controller->execute();
     }
 
+    /**
+     * Get controller class name by method name.
+     *
+     * @param string $method
+     *
+     * @return null|string
+     */
     protected function getControllerByMethod($method) {
         $method = ucfirst($method);
         $availableMethod = array_keys(static::$defaultMethodControllerMapping);

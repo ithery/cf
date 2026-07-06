@@ -18,9 +18,6 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
      */
     protected $args;
 
-    /**
-     * @param string $methodCall
-     */
     public function __construct(CAjax_Method $ajaxMethod) {
         $this->ajaxMethod = $ajaxMethod;
         $this->input = array_merge($_GET, $_POST);
@@ -79,6 +76,15 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
         return $this->ajaxMethod->getArgs();
     }
 
+    /**
+     * Convert response to JSON.
+     *
+     * @param int    $errCode
+     * @param string $errMessage
+     * @param array  $data
+     *
+     * @return \CHTTP_JsonResponse
+     */
     public function toJsonResponse($errCode, $errMessage, $data = []) {
         return c::response()->json([
             'errCode' => $errCode,
@@ -87,6 +93,14 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
         ]);
     }
 
+    /**
+     * Invoke a callback function with the given arguments.
+     *
+     * @param callable $callback
+     * @param array    $args
+     *
+     * @return mixed
+     */
     public function invokeCallback($callback, array $args = []) {
         return c::call($callback, $args);
     }

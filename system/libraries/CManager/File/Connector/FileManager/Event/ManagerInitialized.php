@@ -1,6 +1,9 @@
 <?php
 
 class CManager_File_Connector_FileManager_Event_ManagerInitialized {
+    /**
+     * @var CManager_File_Connector_FileManager_FM
+     */
     protected $fm;
 
     public function __construct(CManager_File_Connector_FileManager_FM $fm) {

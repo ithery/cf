@@ -109,6 +109,13 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
         return c::response()->json($return);
     }
 
+    /**
+     * Generates a unique file ID based on the current date and a random MD5 hash.
+     *
+     * @param string $extension the file extension
+     *
+     * @return string the generated file ID
+     */
     public function generateFileId($extension) {
         return date('Ymd') . cutils::randmd5() . 'i' . $extension;
     }

@@ -12,8 +12,8 @@ class CManager_File_Connector_FileManager_Controller_DownloadController extends 
         return c::response()->stream(function () use ($stream) {
             fpassthru($stream);
         }, 200, [
-            'Content-Type' => $path->getMimetype($path),
-            'Content-Length' => $path->getSize($path),
+            'Content-Type' => $path->mimeType(),
+            'Content-Length' => $path->size(),
             'Content-disposition' => 'attachment; filename="' . basename($path->path()) . '"',
         ]);
     }

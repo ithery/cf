@@ -1,0 +1,989 @@
+/* CElement_Component_FileManager -- modernized rework of the legacy fm.css.
+   Selectors/ids are kept 1:1 with the DOM hooks FileManager.js relies on;
+   only the visual treatment (radius, shadows, spacing, transitions, palette) changed. */
+
+$fm-dark: #2b2f3a;
+$fm-accent: #4dd0c8;
+$fm-border: rgba(43, 47, 58, 0.08);
+$fm-radius: 10px;
+
+.cres\:element\:component\:FileManager {
+    a {
+        color: $fm-dark;
+        text-decoration: none !important;
+        cursor: pointer;
+    }
+
+    .fm-nav {
+        a {
+            color: #fff;
+        }
+    }
+
+    .fm-nav, .fm-nav .dropdown-menu, .bg-main {
+        background-color: $fm-dark;
+        border-radius: $fm-radius;
+        color: #fff;
+    }
+
+    .fm-nav {
+        height: 44px;
+        border-radius: $fm-radius $fm-radius 0 0;
+    }
+
+    /* Explicit and well above any per-item "..." dropdown (grid badge / list
+       row) -- .fm-nav is itself a stacking context (sticky-top + z-index), but
+       forcing it here too avoids relying on that context nesting resolving
+       the way we'd expect against .fm-content's descendants. */
+    .fm-nav .dropdown-menu {
+        z-index: 1050;
+    }
+
+    .fm-nav-buttons {
+        .nav-link {
+            border-radius: 6px;
+            transition: background-color 0.15s ease;
+
+            &:hover, &.active {
+                background-color: rgba(255, 255, 255, 0.12);
+            }
+        }
+
+        .dropdown-menu {
+            overflow: hidden;
+            min-width: 230px;
+            padding: 0.35rem 0;
+
+            /* overrides Bootstrap's own .dropdown-item text color, which otherwise
+               wins over the dark menu's `color: #fff` since it targets the class directly */
+            > a.dropdown-item {
+                display: flex;
+                align-items: center;
+                padding: 0.5rem 1rem;
+                color: #fff;
+
+                i {
+                    margin-right: 0.5rem;
+                }
+
+                &:hover, &:focus, &.active {
+                    color: #fff;
+                    background-color: rgba(255, 255, 255, 0.08);
+                }
+            }
+        }
+    }
+
+    .navbar-brand {
+        padding: 0;
+    }
+
+    .fm-nav-normal {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+
+    /* Google Drive-style: replaces .fm-nav-normal whenever anything is
+       selected -- see toggleActions() in FileManager.js. */
+    .fm-selection-toolbar {
+        display: flex;
+        align-items: center;
+        flex: 1 1 auto;
+        min-width: 0;
+
+        .fm-selection-clear {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            transition: background-color 0.15s ease;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.12);
+            }
+        }
+
+        .fm-selection-count {
+            font-weight: 500;
+            white-space: nowrap;
+            margin-right: 1rem;
+        }
+    }
+
+    .fm-selection-actions {
+        display: flex;
+        align-items: center;
+    }
+
+    .fm-selection-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        margin-right: 0.25rem;
+        transition: background-color 0.15s ease;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+        }
+    }
+
+    .fm-actions {
+        display: flex;
+        background: #fff;
+        box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+
+        > a {
+            display: inline-block;
+            line-height: 4rem;
+            text-align: center;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: background-color 0.15s ease;
+
+            &:hover {
+                background-color: rgba(43, 47, 58, 0.04);
+            }
+
+            > i {
+                margin-right: 0.35rem;
+            }
+
+            + a {
+                border-left: 1px solid $fm-border;
+            }
+        }
+    }
+
+    .breadcrumb-item:not(.active) {
+        transition: color 0.15s ease;
+
+        &:hover {
+            cursor: pointer;
+            color: $fm-accent;
+        }
+    }
+
+    .fm-main {
+        position: relative;
+        width: 100%;
+        padding: 0;
+
+        /* Toggled on .fm-main itself while a file is dragged over any part of the
+           folder/file view (not just the upload panel) -- see initializeUpload(). */
+        &.fm-drag-hover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 500;
+            border: 3px dashed $fm-accent;
+            background-color: rgba(77, 208, 200, 0.08);
+            pointer-events: none;
+        }
+    }
+
+    /* Lives inside the dark .fm-nav navbar now, left side -- leading icon swaps
+       to a spinner while loading() is true (see FileManager.js). */
+    .fm-breadcrumbs {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+
+        .fm-breadcrumb-icon, .fm-loading {
+            color: rgba(255, 255, 255, 0.85);
+            margin-right: 0.6rem;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            min-width: 0;
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+
+        /* Ellipsis on each segment's own text only -- NOT on .fm-breadcrumbs/
+           .breadcrumb above, since overflow:hidden there would also clip the
+           active segment's absolutely-positioned .dropdown-menu popup. */
+        .breadcrumb-item {
+            color: rgba(255, 255, 255, 0.75);
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            + .breadcrumb-item::before {
+                color: rgba(255, 255, 255, 0.4);
+            }
+        }
+    }
+
+    /* The active (last) breadcrumb segment doubles as the New Folder/Upload
+       trigger -- Drive-style ("root > cat ▾"), see loadItems() in FileManager.js. */
+    .fm-breadcrumbs .breadcrumb-item.dropdown {
+        /* Overrides the plain .breadcrumb-item rule's overflow:hidden above --
+           needed so this segment's .dropdown-menu popup isn't clipped by its
+           own li. */
+        max-width: none;
+        overflow: visible;
+
+        .dropdown-toggle {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .dropdown-menu {
+            min-width: 200px;
+            padding: 0.35rem 0;
+
+            .dropdown-item {
+                display: flex;
+                align-items: center;
+                padding: 0.5rem 1rem;
+                color: #fff;
+
+                i {
+                    margin-right: 0.5rem;
+                }
+
+                &:hover, &:focus {
+                    color: #fff;
+                    background-color: rgba(255, 255, 255, 0.08);
+                }
+            }
+        }
+    }
+
+    /* Small, Drive-style prompt (New Folder / Rename) -- scoped to .fm-dialog
+       only, not a global Bootstrap modal override. */
+    .fm-dialog {
+        .modal-dialog {
+            max-width: 400px;
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .modal-header {
+            border: none;
+            padding: 0 0 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: $fm-dark;
+        }
+
+        .modal-body {
+            padding: 0;
+        }
+
+        .form-control {
+            border-radius: 6px;
+        }
+
+        .modal-footer {
+            border: none;
+            padding: 1.25rem 0 0;
+
+            .btn {
+                width: auto;
+            }
+        }
+    }
+
+    /* Delete-confirmation prompt -- same compact/centered treatment as .fm-dialog,
+       scoped to .fm-notify only (not a global Bootstrap modal override). */
+    .fm-notify {
+        .modal-dialog {
+            max-width: 400px;
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .modal-body {
+            padding: 0 0 1rem;
+            color: $fm-dark;
+        }
+
+        .modal-footer {
+            border: none;
+            padding: 0;
+
+            .btn {
+                width: auto;
+            }
+        }
+    }
+
+    /* Google Drive-style "Upload options" (name conflict) prompt -- same
+       compact/centered treatment as .fm-dialog/.fm-notify. */
+    .fm-duplicate-dialog {
+        .modal-dialog {
+            max-width: 420px;
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 16px;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .modal-header {
+            border: none;
+            padding: 0 0 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: $fm-dark;
+        }
+
+        .modal-body {
+            padding: 0;
+            color: $fm-dark;
+        }
+
+        .fm-duplicate-message {
+            margin-bottom: 1rem;
+        }
+
+        .form-check {
+            padding-left: 1.75rem;
+
+            + .form-check {
+                margin-top: 0.5rem;
+            }
+        }
+
+        .modal-footer {
+            border: none;
+            padding: 1.25rem 0 0;
+
+            .btn {
+                width: auto;
+            }
+        }
+    }
+
+    /* Dedicated FileManager toast stack (bottom-left) -- see toast() in
+       FileManager.js. Newest toast is appended last but rendered nearest the
+       corner via column-reverse, so the stack grows upward without the
+       fixed-position anchor having to move. */
+    .fm-toast-container {
+        position: fixed;
+        z-index: 1060;
+        left: 1.5rem;
+        bottom: 1.5rem;
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 0.5rem;
+        max-width: calc(100vw - 3rem);
+    }
+
+    .fm-toast {
+        display: flex;
+        align-items: center;
+        padding: 0.65rem 1rem;
+        max-width: 360px;
+        border-radius: $fm-radius;
+        background-color: $fm-dark;
+        color: #fff;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+
+        &.fm-toast-show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fm-toast-icon {
+        flex: 0 0 auto;
+        margin-right: 0.6rem;
+        display: none;
+    }
+
+    .fm-toast-success .fm-toast-icon-success {
+        display: inline-block;
+        color: $fm-accent;
+    }
+
+    .fm-toast-error .fm-toast-icon-error {
+        display: inline-block;
+        color: #ff6b6b;
+    }
+
+    .fm-toast-message {
+        font-size: 0.875rem;
+        word-break: break-word;
+    }
+
+    @media screen and (min-width: 992px) {
+        .fm-main {
+            width: calc(100% - 250px);
+        }
+
+        .invisible-lg {
+            visibility: hidden;
+        }
+    }
+
+    .fm-tree {
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+        width: 250px;
+        border-right: 1px solid $fm-border;
+    }
+
+    .fm-tree-body {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: 6px 0;
+    }
+
+    .fm-tree-root, .fm-tree-children {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .fm-tree-children {
+        padding-left: 16px;
+    }
+
+    .fm-tree-node {
+        display: flex;
+        align-items: center;
+        max-width: 100%;
+        padding: 6px 10px;
+        margin: 1px 6px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+
+        &:hover {
+            background-color: rgba(43, 47, 58, 0.06);
+        }
+
+        &.active {
+            background-color: rgba(43, 47, 58, 0.08);
+            font-weight: 600;
+        }
+    }
+
+    .fm-tree-toggle {
+        flex: 0 0 14px;
+        margin-right: 4px;
+        font-size: 0.7rem;
+        color: rgba(43, 47, 58, 0.45);
+        text-align: center;
+        transition: transform 0.15s ease;
+
+        &.fm-tree-toggle-expanded {
+            transform: rotate(90deg);
+        }
+    }
+
+    .fm-tree-icon {
+        flex: 0 0 auto;
+        margin-right: 8px;
+        color: $fm-dark;
+    }
+
+    .fm-tree-label {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.9rem;
+    }
+
+    @media screen and (max-width: 991px) {
+        .fm-tree {
+            position: absolute;
+            z-index: 999;
+            left: 0;
+            transform: translateX(-150%);
+            transition: transform 0.3s ease;
+            height: 100%;
+            max-width: 250px;
+            width: 100%;
+            box-shadow: 2px 0 16px rgba(0, 0, 0, 0.12);
+
+            &.in {
+                transform: translateX(0);
+            }
+        }
+
+        .fm-nav {
+            height: auto;
+        }
+    }
+
+    .fm-empty {
+        height: 60vh;
+        color: rgba(43, 47, 58, 0.4);
+
+        &:not(.d-none) {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        > i {
+            font-size: 8rem;
+            margin-bottom: 0.5rem;
+        }
+    }
+
+    .carousel-image {
+        height: 50vh;
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        margin: 0 auto;
+    }
+
+    .carousel-image-text {
+        width: 90%;
+        max-width: 700px;
+        background-color: #fff;
+        border: 1px solid $fm-border;
+        border-radius: $fm-radius;
+        overflow: auto;
+    }
+
+    .carousel-text-preview {
+        margin: 0;
+        padding: 1rem;
+        font-size: 0.85rem;
+        color: $fm-dark;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .carousel-indicators {
+        bottom: 0;
+    }
+
+    .carousel-label, .carousel-label:hover {
+        position: absolute;
+        bottom: 0;
+        background: linear-gradient(transparent 10px, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.55));
+        padding: 40px 20px 30px;
+        width: 100%;
+        color: #fff;
+        word-break: break-word;
+        text-align: center;
+    }
+
+    .carousel-control-background {
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* Upload panel: a small floating, non-blocking card (Google Drive-style) instead
+       of a modal, so uploading doesn't stop the user from browsing or queuing more
+       files. Each queued file gets an .fm-upload-item row (see below) showing its
+       own progress, cloned from .fm-upload-item-template. */
+    .fm-upload-panel {
+        position: fixed;
+        z-index: 1050;
+        right: 1.5rem;
+        bottom: 1.5rem;
+        width: 320px;
+        max-width: calc(100vw - 3rem);
+        max-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        border-radius: $fm-radius;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+        overflow: hidden;
+    }
+
+    .fm-upload-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        background-color: $fm-dark;
+        color: #fff;
+        font-weight: 500;
+
+        a {
+            color: rgba(255, 255, 255, 0.7);
+
+            &:hover {
+                color: #fff;
+            }
+        }
+    }
+
+    .fm-upload-list {
+        overflow-y: auto;
+        padding: 0.75rem;
+
+        &:empty::before {
+            content: attr(data-empty-label);
+            display: block;
+            text-align: center;
+            color: #999;
+            padding: 1rem 0;
+        }
+    }
+
+    .fm-upload-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 0;
+
+        + .fm-upload-item {
+            border-top: 1px solid $fm-border;
+        }
+    }
+
+    .fm-upload-item-name {
+        flex: 1 1 auto;
+        min-width: 0;
+        font-size: 0.85rem;
+        margin-right: 0.75rem;
+    }
+
+    .fm-upload-item-progress {
+        flex: 0 0 60px;
+        height: 6px;
+        border-radius: 3px;
+        background-color: $fm-border;
+        overflow: hidden;
+    }
+
+    .fm-upload-item-progress-bar {
+        height: 100%;
+        width: 0;
+        background-color: $fm-accent;
+        transition: width 0.15s ease;
+    }
+
+    .fm-upload-item-success, .fm-upload-item-error {
+        flex: 0 0 auto;
+        margin-left: 0.5rem;
+    }
+
+    @media screen and (max-width: 480px) {
+        .fm-upload-panel {
+            right: 1rem;
+            bottom: 1rem;
+            left: 1rem;
+            width: auto;
+        }
+    }
+
+
+    /* Items */
+
+    /* padding-bottom preserves space for the fixed .fm-actions bar */
+    .fm-content.preserve_actions_space {
+        padding-bottom: 4rem;
+    }
+
+    .square {
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+        transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .grid {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0.75rem;
+        justify-content: left;
+
+        .fm-item {
+            position: relative;
+            margin: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            border-radius: $fm-radius;
+            overflow: visible;
+            cursor: pointer;
+            transition: box-shadow 0.15s ease, transform 0.15s ease;
+
+            &:hover {
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+                transform: translateY(-2px);
+            }
+
+            /* Soft wash, matching the list row's selected style below --
+               square/item_name get their own tint since each paints its own
+               opaque background over the card. */
+            &.fm-item-selected {
+                box-shadow: 0 0 0 1px rgba(77, 208, 200, 0.4);
+
+                .square, .item_name {
+                    background-color: rgba(77, 208, 200, 0.12);
+                    border-color: $fm-accent;
+                }
+            }
+
+            /* A folder currently being dragged over as a drag-to-move target --
+               see bindItemDragAndDrop() in FileManager.js. */
+            &.fm-drop-hover {
+                box-shadow: 0 0 0 2px $fm-accent;
+
+                .square, .item_name {
+                    background-color: rgba(77, 208, 200, 0.2);
+                }
+            }
+        }
+    }
+
+    .grid .square {
+        border: 1px solid $fm-border;
+        border-radius: $fm-radius $fm-radius 0 0;
+        width: 135px;
+        height: 135px;
+    }
+
+    .square > div {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .square > i {
+        color: $fm-dark;
+    }
+
+    .grid .square > i {
+        padding: 20px;
+        font-size: 80px;
+    }
+
+    .grid .item_name {
+        border: 1px solid $fm-border;
+        border-top: none;
+        border-radius: 0 0 $fm-radius $fm-radius;
+        margin-top: -1px;
+        padding: 10px;
+        text-align: center;
+        max-width: calc(135px);
+        background: #fff;
+    }
+
+    time {
+        font-size: 0.8rem;
+    }
+
+    .grid time {
+        display: none;
+    }
+
+    .info > * {
+        max-width: calc(100vw - 70px - 60px);
+    }
+
+    /* Mime icon generator overwrite */
+
+    .grid .mime-icon::before {
+        top: calc(45% - 1rem);
+        font-size: 2rem;
+    }
+
+    .fm-list-table .mime-icon::before {
+        top: calc(45% - 0.5rem);
+        font-size: 1rem;
+    }
+
+    .mime-icon .ico {
+        height: 100%;
+        display: inline-flex;
+        align-items: center;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .bg-light {
+        background-color: #f4f5f7 !important;
+    }
+
+    /* Per-item "..." dropdown: overlaid top-right on grid cards, a plain last
+       column on list rows. */
+    .fm-item-actions {
+        .fm-item-actions-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            color: $fm-dark;
+            transition: background-color 0.15s ease;
+
+            &:hover {
+                background-color: rgba(43, 47, 58, 0.08);
+            }
+        }
+
+        .dropdown-menu {
+            min-width: 190px;
+            padding: 0.35rem 0;
+
+            .dropdown-item {
+                display: flex;
+                align-items: center;
+                padding: 0.5rem 1rem;
+                color: $fm-dark;
+
+                i {
+                    margin-right: 0.5rem;
+                }
+
+                &:hover, &:focus {
+                    color: $fm-dark;
+                    background-color: rgba(43, 47, 58, 0.06);
+                }
+            }
+        }
+    }
+
+    .grid .fm-item-actions {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        z-index: 2;
+        background-color: rgba(255, 255, 255, 0.85);
+        border-radius: 50%;
+    }
+
+    /* Google Drive-style sortable table for list mode. */
+    .fm-list-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th, td {
+            padding: 0.6rem 1rem;
+            text-align: left;
+        }
+
+        thead th {
+            border-bottom: 1px solid $fm-border;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: rgba(43, 47, 58, 0.6);
+            white-space: nowrap;
+        }
+
+        .fm-list-th {
+            cursor: pointer;
+            user-select: none;
+
+            &:hover, &.active {
+                color: $fm-dark;
+            }
+        }
+
+        .fm-list-sort-icon {
+            margin-left: 0.3rem;
+            color: $fm-accent;
+        }
+
+        .fm-list-th-actions {
+            width: 44px;
+        }
+
+        tbody tr {
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+
+            &:hover {
+                background-color: rgba(43, 47, 58, 0.04);
+            }
+
+            &.fm-item-selected {
+                background-color: rgba(77, 208, 200, 0.12);
+            }
+
+            /* A folder row currently being dragged over -- see
+               bindItemDragAndDrop() in FileManager.js. */
+            &.fm-drop-hover {
+                background-color: rgba(77, 208, 200, 0.2);
+                box-shadow: inset 0 0 0 2px $fm-accent;
+            }
+
+            + tr td {
+                border-top: 1px solid $fm-border;
+            }
+        }
+
+        .fm-list-cell-name {
+            display: flex;
+            align-items: center;
+            border-top: none !important;
+        }
+
+        .square {
+            flex: 0 0 auto;
+            margin-right: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+        }
+
+        .item_name {
+            font-size: 0.9rem;
+        }
+
+        .fm-list-cell-modified, .fm-list-cell-size {
+            font-size: 0.85rem;
+            color: rgba(43, 47, 58, 0.7);
+            white-space: nowrap;
+        }
+
+        .fm-list-cell-actions {
+            text-align: right;
+        }
+    }
+}
+
+/* positioning context for .fm-tree's mobile slide-in panel */
+.capp-fm-body {
+    position: relative;
+}

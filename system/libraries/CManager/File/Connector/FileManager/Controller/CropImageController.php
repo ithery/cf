@@ -2,18 +2,22 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-use CManager_File_Connector_FileManager_FM as FM;
 use Intervention\Image\ImageManager;
 
 class CManager_File_Connector_FileManager_Controller_CropImageController extends CManager_File_Connector_FileManager_AbstractController {
+    /**
+     * @return \CHTTP_JsonResponse
+     */
     public function execute() {
-        $this->crop(true);
+        return $this->crop(true);
     }
 
     /**
      * Crop the image (called via ajax).
      *
-     * @param mixed $overWrite
+     * @param bool $overWrite
+     *
+     * @return \CHTTP_JsonResponse
      */
     public function crop($overWrite = true) {
         $fm = $this->fm();
@@ -26,21 +30,25 @@ class CManager_File_Connector_FileManager_Controller_CropImageController extends
             $crop_path = $fm->path()->setName(implode('.', $fileParts))->path('absolute');
         }
 
-        $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageIsCropping($image_path));
-        $cropInfo = c::collect(CHTTP::request()->input())->only('dataWidth', 'dataHeight', 'dataX', 'dataY');
-        $width = carr::get($cropInfo, 'dataWidth');
-        $height = carr::get($cropInfo, 'dataHeight');
-        $x = carr::get($cropInfo, 'dataX');
-        $y = carr::get($cropInfo, 'dataY');
+        try {
+            $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageIsCropping($image_path));
+            $cropInfo = c::collect(CHTTP::request()->input())->only('dataWidth', 'dataHeight', 'dataX', 'dataY');
+            $width = carr::get($cropInfo, 'dataWidth');
+            $height = carr::get($cropInfo, 'dataHeight');
+            $x = carr::get($cropInfo, 'dataX');
+            $y = carr::get($cropInfo, 'dataY');
 
-        $imageManager = new ImageManager();
-        $imageManager->make($image_path)
-            ->crop($width, $height, $x, $y)
-            ->save($crop_path);
-        // make new thumbnail
-        $fm->path()->makeThumbnail($image_name);
-        $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasCropped($image_path));
+            $imageManager = new ImageManager();
+            $imageManager->make($image_path)
+                ->crop($width, $height, $x, $y)
+                ->save($crop_path);
+            // make new thumbnail
+            $fm->path()->makeThumbnail($image_name);
+            $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasCropped($image_path));
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage());
+        }
 
-        return c::response(parent::$successResponse);
+        return $this->successResponse();
     }
 }

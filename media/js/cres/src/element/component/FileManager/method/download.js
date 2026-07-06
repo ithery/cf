@@ -1,4 +1,4 @@
-export const downloadMethod = (items) => {
+export function downloadMethod(items) {
     items.forEach((item, index) => {
         let data = this.defaultParameters();
         data.file = item.name;
@@ -11,4 +11,4 @@ export const downloadMethod = (items) => {
             window.location.href = this.settings.connectorUrl + '/download?' + $.param(data);
         }, index * 100);
     });
-};
+}

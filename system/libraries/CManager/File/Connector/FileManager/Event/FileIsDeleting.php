@@ -3,8 +3,14 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CManager_File_Connector_FileManager_Event_FileIsDeleting {
+    /**
+     * @var string
+     */
     private $path;
 
+    /**
+     * @param string $path
+     */
     public function __construct($path) {
         $this->path = $path;
     }

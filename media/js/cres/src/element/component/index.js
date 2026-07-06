@@ -8,6 +8,7 @@ import { initImage, Image } from './Image';
 import { initCountDownTimer, CountDownTimer } from './CountDownTimer';
 import { initTreeView, TreeView } from './TreeView';
 import { initCalendar, Calendar } from './Calendar';
+import { initFileManager, FileManager } from './FileManager';
 
 const initComponent = (element) => {
     const elementName = element.getAttribute('cres-element');
@@ -41,6 +42,9 @@ const initComponent = (element) => {
     if(elementName == 'component:Calendar') {
         initCalendar(element);
     }
+    if(elementName == 'component:FileManager') {
+        initFileManager(element);
+    }
 };
 const component = {
     ShowMore,
@@ -52,7 +56,8 @@ const component = {
     Image,
     CountDownTimer,
     TreeView,
-    Calendar
+    Calendar,
+    FileManager
 };
 export {
     component,

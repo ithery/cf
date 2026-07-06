@@ -3,17 +3,15 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 use League\Flysystem\UnableToRetrieveMetadata;
-use CManager_File_Connector_FileManager_FM as FM;
 
 class CManager_File_Connector_FileManager_Controller_ItemController extends CManager_File_Connector_FileManager_AbstractController {
     /**
-     * Get list of folders as json to populate treeview.
+     * Lists the files/folders in the current working directory.
      *
-     * @return mixed
+     * @return \CHTTP_JsonResponse
      */
     public function execute() {
         $fm = $this->fm();
-        $data = [];
 
         try {
             $data = [
@@ -27,6 +25,6 @@ class CManager_File_Connector_FileManager_Controller_ItemController extends CMan
             return c::abort(404);
         }
 
-        return c::response()->json($data);
+        return $this->successResponse($data);
     }
 }

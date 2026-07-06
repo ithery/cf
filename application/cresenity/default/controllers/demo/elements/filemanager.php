@@ -8,8 +8,7 @@ class Controller_Demo_Elements_Filemanager extends \Cresenity\Demo\Controller {
 
         $widget = $app->addWidget()->setTitle('File Manager Demo');
         $widget->addDiv()->add(
-            'Contoh CElement_Component_FileManager dengan root direktori di '
-            . 'application/cresenity/default/data/demo/file-manager.'
+            'Contoh CElement_Component_FileManager'
         );
         $widget->addBr();
 

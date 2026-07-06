@@ -1,4 +1,4 @@
-export const useMethod = (items) => {
+export function useMethod(items) {
     let useTinymce3 = (url) => {
         if (!this.usingTinymce3()) {
             return;
@@ -99,4 +99,4 @@ export const useMethod = (items) => {
         // No editor found, open/download file using browser's default method
         window.open(url);
     }
-};
+}

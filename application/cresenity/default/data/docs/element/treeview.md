@@ -1,57 +1,70 @@
 # Element - Tree View
 
-The `CElement_Component_TreeView` component renders an interactive tree structure using jsTree. It is used for displaying hierarchical data such as file structures, categories, or organizational charts.
+The `CElement_Component_TreeView` component renders an interactive jsTree-backed tree — file structures, categories, org charts. Rendering/behavior is handled client-side by cres.js, driven server-side by a `cres-config` attribute built from a `CElement_Component_TreeView_Node` tree.
 
-Create a tree view:
+Add one using `addTreeView()`:
 
 ```php
 $app = c::app();
-$tree = CElement_Component_TreeView::factory();
-$tree->setData([
-    ['text' => 'Root Node', 'children' => [
-        ['text' => 'Child 1'],
-        ['text' => 'Child 2', 'children' => [
-            ['text' => 'Grandchild 1'],
-            ['text' => 'Grandchild 2'],
-        ]],
+$tree = $app->addTreeView();
+$tree->setNodes([
+    ['text' => 'Documents', 'icon' => 'fas fa-folder', 'children' => [
+        ['text' => 'report.pdf', 'icon' => 'fas fa-file-pdf'],
+        ['text' => 'notes.txt', 'icon' => 'fas fa-file-alt'],
     ]],
     ['text' => 'Another Root'],
 ]);
-$app->add($tree);
 
 return $app;
 ```
 
 ---
 
-### Data Format
+### Fixed Data
 
-The tree data follows the jsTree format. Each node is an array with:
+`setNodes(array $nodes)` replaces the whole tree. Each entry is either a `CElement_Component_TreeView_Node`, a plain array (`text`, `icon`, `children`, `id`), or a bare string (used as `text`):
 
 | Key | Description |
 |-----|------------|
 | `text` | Display text for the node |
-| `children` | Array of child nodes (optional) |
 | `icon` | Custom icon class (optional) |
+| `children` | Array of child nodes (optional) |
+| `id` | Node id, useful when the node needs to be referenced later (optional) |
+
+You can also build the tree imperatively via `getNodes()`, which returns the root `CElement_Component_TreeView_Node`:
 
 ```php
-$tree->setData([
-    [
-        'text' => 'Documents',
-        'icon' => 'fas fa-folder',
-        'children' => [
-            ['text' => 'report.pdf', 'icon' => 'fas fa-file-pdf'],
-            ['text' => 'notes.txt', 'icon' => 'fas fa-file-alt'],
-        ],
-    ],
-    [
-        'text' => 'Images',
-        'icon' => 'fas fa-folder',
-        'children' => [
-            ['text' => 'photo.jpg', 'icon' => 'fas fa-file-image'],
-        ],
-    ],
-]);
+$tree->getNodes()
+    ->addChild((new CElement_Component_TreeView_Node('Images'))
+        ->setIcon('fas fa-folder')
+        ->addChild('photo.jpg'));
+```
+
+---
+
+### Ajax / Lazy Loading
+
+`setNodes(callable $nodes)` switches the tree to ajax mode instead: each time jsTree expands a node, the callback is invoked as `$nodes($parentId, CElement_Component_TreeView_Node $node)` and should push that node's children into `$node` via `addChild()`.
+
+```php
+$tree->setNodes(function ($parentId, CElement_Component_TreeView_Node $node) {
+    $categories = NestedCategory::query()->where('parent_id', $parentId)->get();
+    foreach ($categories as $category) {
+        $node->addChild(
+            (new CElement_Component_TreeView_Node($category->name))
+                ->setId($category->id)
+                ->setHasChildren($category->children()->exists())
+        );
+    }
+});
+```
+
+Use `setHasChildren(true)` on a child to force jsTree to render an expand arrow before its own children have been loaded yet (e.g. based on a cheap `exists()` check rather than eagerly loading the whole subtree).
+
+If the callback needs classes/files not already autoloaded (it runs through `CAjax::TYPE_TREE_VIEW`/`CAjax_Engine_TreeView` on a fresh request), pass them as the second argument:
+
+```php
+$tree->setNodes($callback, app_path('models/NestedCategory.php'));
 ```
 
 ---
