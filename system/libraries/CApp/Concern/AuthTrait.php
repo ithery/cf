@@ -7,10 +7,19 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Jul 27, 2019, 10:53:10 PM
  */
 trait CApp_Concern_AuthTrait {
+    /**
+     * @var bool
+     */
     protected $authEnabled = true;
 
+    /**
+     * @var null|CApp_Model_Roles
+     */
     private $role = null;
 
+    /**
+     * @var null|callable
+     */
     private $roleResolver = null;
 
     /**
@@ -46,6 +55,9 @@ trait CApp_Concern_AuthTrait {
         return $this->guard = $guard;
     }
 
+    /**
+     * @return bool
+     */
     public function isUserLogin() {
         if (!$this->authEnabled) {
             return false;
@@ -54,6 +66,11 @@ trait CApp_Concern_AuthTrait {
         return $this->user() != null;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setLoginRequired($bool) {
         return $this->setAuthEnable($bool);
     }
@@ -76,6 +93,11 @@ trait CApp_Concern_AuthTrait {
         return $this->auth()->user();
     }
 
+    /**
+     * @param callable $resolver
+     *
+     * @return $this
+     */
     public function setRoleResolver($resolver) {
         $this->roleResolver = $resolver;
         $this->role = null;
@@ -83,6 +105,9 @@ trait CApp_Concern_AuthTrait {
         return $this;
     }
 
+    /**
+     * @return \Closure
+     */
     protected function defaultRoleResolver() {
         return function () {
             if (!CSession::sessionConfigured()) {
@@ -101,6 +126,9 @@ trait CApp_Concern_AuthTrait {
         };
     }
 
+    /**
+     * @return null|CApp_Model_Roles
+     */
     protected function resolveRole() {
         $resolver = $this->roleResolver ?: $this->defaultRoleResolver();
 
@@ -152,20 +180,34 @@ trait CApp_Concern_AuthTrait {
         return $this->auth()->guard()->getProvider()->retrieveById($userId);
     }
 
+    /**
+     * @return bool
+     */
     public function isAuthEnabled() {
         return $this->authEnabled;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setAuthEnable($bool = true) {
         $this->authEnabled = $bool;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function enableAuth() {
         return $this->setAuthEnable(true);
     }
 
+    /**
+     * @return $this
+     */
     public function disableAuth() {
         return $this->setAuthEnable(false);
     }

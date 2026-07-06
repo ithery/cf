@@ -116,9 +116,53 @@ class CManager_File_Connector_FileManager_FM_Path {
      * @return $this
      */
     public function setName($item_name) {
+        if ($item_name !== null && $item_name !== '') {
+            $this->assertNameIsSafe($item_name);
+        }
         $this->item_name = $item_name;
 
         return $this;
+    }
+
+    /**
+     * A file/folder name must be a single path segment -- rejects '/', '\\'
+     * and '..'/'.' so a tampered `file`/`name`/`items[]`/etc. request input
+     * can't smuggle in a nested or parent-traversing path (e.g.
+     * "../../../etc/passwd") and escape the configured root_path.
+     *
+     * @param mixed $name
+     *
+     * @throws \Exception
+     */
+    private function assertNameIsSafe($name) {
+        if (!is_string($name)
+            || strpbrk($name, '/\\') !== false
+            || $name === '.'
+            || $name === '..'
+        ) {
+            $this->error('invalid-path');
+        }
+    }
+
+    /**
+     * Rejects any '..' path segment -- prevents a tampered `working_dir`/
+     * `path`/`goToFolder` request input from traversing above the file
+     * manager's configured root_path. Directory paths are otherwise allowed
+     * to contain multiple segments (unlike item names, see assertNameIsSafe()).
+     *
+     * @param mixed $path
+     *
+     * @throws \Exception
+     */
+    private function assertWorkingDirIsSafe($path) {
+        if (!is_string($path)) {
+            $this->error('invalid-path');
+        }
+        foreach (explode('/', str_replace('\\', '/', $path)) as $segment) {
+            if ($segment === '..') {
+                $this->error('invalid-path');
+            }
+        }
     }
 
     /**
@@ -286,6 +330,7 @@ class CManager_File_Connector_FileManager_FM_Path {
      */
     public function normalizeWorkingDir() {
         $path = $this->working_dir ?: $this->fm->input('working_dir') ?: $this->fm->getRootFolder();
+        $this->assertWorkingDirIsSafe($path);
         if ($this->is_thumb) {
             // Prevent if working dir is "/" normalizeWorkingDir will add double "//" that breaks S3 functionality
             $path = rtrim($path, DS) . DS . $this->fm->getThumbFolderName();

@@ -34,6 +34,12 @@ class CManager_File_Connector_FileManager_AbstractController {
         return $this->fm;
     }
 
+    /**
+     * @param string $error_type
+     * @param array  $variables
+     *
+     * @return array
+     */
     public function error($error_type, $variables = []) {
         return $this->fm()->error($error_type, $variables);
     }

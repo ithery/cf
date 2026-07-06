@@ -68,6 +68,7 @@ return [
     'error-size' => 'Over limit size:',
     'error-instance' => 'The uploaded file should be an instance of UploadedFile',
     'error-invalid' => 'Invalid upload request',
+    'error-invalid-path' => 'Path file atau folder tidak valid!',
     'error-other' => 'An error has occured: ',
     'error-too-large' => 'Request entity too large!',
     'btn-upload' => 'Upload File(s)',
