@@ -29,12 +29,23 @@ $fm-radius: 10px;
     .fm-nav {
         height: 44px;
         border-radius: $fm-radius $fm-radius 0 0;
+
+        /* .fm-nav (sticky-top) is its own stacking context, so a z-index set only
+           on its .dropdown-menu descendant (below) has no effect outside of it --
+           what actually competes with .fm-content's stuff is .fm-nav's OWN
+           z-index. Bootstrap's .sticky-top only sets it to 2 here, which loses
+           to several plain (non-stacking-context) elements inside .fm-content
+           that carry their own absolute-positioned z-index, e.g. .grid
+           .fm-item-actions (z-index: 2, ties and loses on DOM order) and the
+           mime-icons plugin's .ico:before (z-index: 9) -- hence the sort
+           dropdown rendering underneath grid item badges/icons. Set well above
+           every one of those instead of chasing each new one found. */
+        z-index: 1000;
     }
 
     /* Explicit and well above any per-item "..." dropdown (grid badge / list
-       row) -- .fm-nav is itself a stacking context (sticky-top + z-index), but
-       forcing it here too avoids relying on that context nesting resolving
-       the way we'd expect against .fm-content's descendants. */
+       row) for descendant popups that escape .fm-nav's own stacking context
+       (e.g. via position: fixed). */
     .fm-nav .dropdown-menu {
         z-index: 1050;
     }
@@ -50,6 +61,13 @@ $fm-radius: 10px;
         }
 
         .dropdown-menu {
+            /* Bootstrap's navbar CSS only promotes .navbar-nav .dropdown-menu to
+               position: absolute at the navbar's own .navbar-expand-* breakpoint
+               (here, >=992px) -- below that it's position: static, so this menu
+               renders in normal document flow instead of floating over the
+               content, stacking/overlapping with whatever's underneath. This is
+               meant to always float regardless of viewport width. */
+            position: absolute !important;
             overflow: hidden;
             min-width: 230px;
             padding: 0.35rem 0;
