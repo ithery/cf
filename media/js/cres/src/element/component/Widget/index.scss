@@ -1,0 +1,32 @@
+/* CElement_Component_Widget's collapse/expand toggle -- see build() in
+   CElement_Component_Widget_Header (the button) and Widget.js (the behavior).
+   Only present when CElement_Component_Widget::setCollapse() was called. */
+.cres\:element\:component\:Widget {
+    .widget-collapse-toggle {
+        /* .widget-title (the header) is a flex container, so float has no
+           effect on this flex item -- margin-left: auto is what actually
+           pushes it to the right edge (same trick as .actions' own ml-auto). */
+        margin-left: auto;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: inherit;
+        text-decoration: none !important;
+
+        i {
+            color: inherit;
+            transition: transform 0.15s ease;
+        }
+    }
+
+    &.widget-collapsed {
+        > .widget-collapse-content {
+            display: none;
+        }
+
+        .widget-collapse-toggle i {
+            transform: rotate(180deg);
+        }
+    }
+}

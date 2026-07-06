@@ -9,44 +9,43 @@ defined('SYSPATH') or die('No direct access allowed.');
 // @codingStandardsIgnoreStart
 trait CTrait_Compat_Element_Widget {
     /**
-     * @param mixed $title
-     * @param mixed $lang
-     *
-     * @deprecated since version 1.1, please Use setTitle
+     * @param string     $title
+     * @param bool|array $lang
      *
      * @return CElement_Component_Widget
+     *
+     * @deprecated since version 1.1, please Use setTitle
      */
     public function set_title($title, $lang = true) {
+        /** @var CElement_Component_Widget $this */
         return $this->setTitle($title, $lang);
     }
 
     /**
-     * @param type $icon
+     * @param string $icon
      *
      * @return $this
      *
      * @deprecated 1.1
      */
     public function set_icon($icon) {
+        /** @var CElement_Component_Widget $this */
         return $this->setIcon($icon);
     }
 
     /**
-     * Undocumented function.
-     *
-     * @param [type] $bool
+     * @param bool $bool
      *
      * @return $this
      *
      * @deprecated 1.1
      */
     public function set_nopadding($bool) {
+        /** @var CElement_Component_Widget $this */
         return $this->setNoPadding($bool);
     }
 
     /**
-     * Undocumented function.
-     *
      * @param string $id
      *
      * @return CElement_Component_Action
@@ -59,23 +58,19 @@ trait CTrait_Compat_Element_Widget {
     }
 
     /**
-     * Undocumented function.
+     * @param string $style
      *
-     * @param [type] $style
-     *
-     * @return void
+     * @return CElement_Component_Widget
      *
      * @deprecated 1.1
      */
     public function set_header_action_style($style) {
+        /** @var CElement_Component_Widget $this */
         return $this->setHeaderActionStyle($style);
     }
 
     /**
-     * Undocumented function.
-     *
-     * @param string      $id
-     * @param null|string $id
+     * @param string $id
      *
      * @return CElement_FormInput_Checkbox_Switcher
      *
@@ -87,80 +82,71 @@ trait CTrait_Compat_Element_Widget {
     }
 
     /**
-     * Undocumented function.
-     *
-     * @return void
+     * @return bool
      *
      * @deprecated 1.1
      */
     public function get_collapse() {
+        /** @var CElement_Component_Widget $this */
         return $this->collapse;
     }
 
     /**
-     * Undocumented function.
-     *
-     * @return void
+     * @return bool
      *
      * @deprecated 1.1
      */
     public function get_close() {
+        /** @var CElement_Component_Widget $this */
         return $this->close;
     }
 
     /**
-     * Undocumented function.
-     *
-     * @param [type] $collapse
+     * @param bool $collapse
      * @param bool $js_collapse
      *
-     * @return void
+     * @return $this
      *
-     * @deprecated 1.1
+     * @deprecated 1.1, use setCollapse
      */
     public function set_collapse($collapse, $js_collapse = false) {
-        $this->collapse = $collapse;
-        $this->js_collapse = $js_collapse;
-
-        return $this;
+        /** @var CElement_Component_Widget $this */
+        return $this->setCollapse($collapse, $js_collapse);
     }
 
     /**
-     * Undocumented function.
+     * @param bool $close
      *
-     * @param [type] $close
-     *
-     * @return void
+     * @return $this
      *
      * @deprecated 1.1
      */
     public function set_close($close) {
+        /** @var CElement_Component_Widget $this */
         $this->close = $close;
 
         return $this;
     }
 
     /**
-     * Undocumented function.
+     * @param string $height
      *
-     * @param [type] $height
-     *
-     * @return void
+     * @return $this
      */
     public function set_height($height) {
+        /** @var CElement_Component_Widget $this */
         $this->height = $height;
 
         return $this;
     }
 
     /**
-     * Undocumented function.
+     * @param bool $bool
      *
-     * @param [type] $bool
-     *
-     * @return void
+     * @return $this
      */
     public function set_scroll($bool) {
+        /** @var CElement_Component_Widget $this */
         $this->scroll = $bool;
 
         return $this;
