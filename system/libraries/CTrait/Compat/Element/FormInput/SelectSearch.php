@@ -24,6 +24,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
      * @return $this
      */
     public function set_multiple($bool = true) {
+        /** @var CElement_FormInput_SelectSearch $this */
         return $this->setMultiple($bool);
     }
 
@@ -35,6 +36,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
      * @return $this
      */
     public function set_delay($val) {
+        /** @var CElement_FormInput_SelectSearch $this */
         return $this->setDelay($val);
     }
 
@@ -46,6 +48,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
      * @return $this
      */
     public function set_auto_select($bool = true) {
+        /** @var CElement_FormInput_SelectSearch $this */
         return $this->setAutoSelect($bool);
     }
 
@@ -57,6 +60,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
      * @return $this
      */
     public function set_min_input_length($minInputLength) {
+        /** @var CElement_FormInput_SelectSearch $this */
         return $this->setMinInputLength($minInputLength);
     }
 
@@ -68,6 +72,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
      * @return $this
      */
     public function set_key_field($keyField) {
+        /** @var CElement_FormInput_SelectSearch $this */
         return $this->setKeyField($keyField);
     }
 
@@ -79,6 +84,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
      * @return $this
      */
     public function set_search_field($searchField) {
+        /** @var CElement_FormInput_SelectSearch $this */
         return $this->setSearchField($searchField);
     }
 
@@ -90,6 +96,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
      * @return $this
      */
     public function set_query($query) {
+        /** @var CElement_FormInput_SelectSearch $this */
         return $this->setQuery($query);
     }
 
@@ -101,6 +108,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
      * @return $this
      */
     public function set_format_result($fmt) {
+        /** @var CElement_FormInput_SelectSearch $this */
         return $this->setFormatResult($fmt);
     }
 
@@ -112,6 +120,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
      * @return $this
      */
     public function set_format_selection($fmt) {
+        /** @var CElement_FormInput_SelectSearch $this */
         return $this->setFormatSelection($fmt);
     }
 
@@ -135,6 +144,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
      * @return $this
      */
     public function add_dropdown_class($c) {
+        /** @var CElement_FormInput_SelectSearch $this */
         if (is_array($c)) {
             $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
         } else {
@@ -150,6 +160,7 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
      * @return string
      */
     public function create_ajax_url() {
+        /** @var CElement_FormInput_SelectSearch $this */
         return $this->createAjaxUrl();
     }
 }

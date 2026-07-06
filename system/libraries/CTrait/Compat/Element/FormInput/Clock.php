@@ -18,6 +18,7 @@ trait CTrait_Compat_Element_FormInput_Clock {
      * @return type
      */
     public function set_placeholder($placeholder) {
+        /** @var CElement_FormInput_Clock $this */
         return $this->setPlaceholder($placeholder);
     }
 }

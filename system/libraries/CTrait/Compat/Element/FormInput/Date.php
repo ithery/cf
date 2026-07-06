@@ -16,6 +16,7 @@ trait CTrait_Compat_Element_FormInput_Date {
      * @deprecated since version 1.2
      */
     public function set_placeholder($placeholder) {
+        /** @var CElement_FormInput_Date $this */
         return $this->setPlaceholder($placeholder);
     }
 
@@ -28,6 +29,7 @@ trait CTrait_Compat_Element_FormInput_Date {
      * @deprecated since version 1.2
      */
     public function set_start_date($str) {
+        /** @var CElement_FormInput_Date $this */
         return $this->setStartDate($str);
     }
 
@@ -37,6 +39,7 @@ trait CTrait_Compat_Element_FormInput_Date {
      * @deprecated since version 1.2
      */
     public function set_have_button($boolean) {
+        /** @var CElement_FormInput_Date $this */
         $this->have_button = $boolean;
 
         return $this;
@@ -48,6 +51,7 @@ trait CTrait_Compat_Element_FormInput_Date {
      * @deprecated since version 1.2
      */
     public function set_end_date($str) {
+        /** @var CElement_FormInput_Date $this */
         return $this->setEndDate($str);
     }
 
@@ -57,6 +61,7 @@ trait CTrait_Compat_Element_FormInput_Date {
      * @deprecated since version 1.2
      */
     public function add_disable_day($day) {
+        /** @var CElement_FormInput_Date $this */
         return $this->addDisableDaysOfWeek($day);
     }
 }

@@ -7,6 +7,11 @@ class CElement_List_ActionList extends CElement_List {
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
 
+    /**
+     * Unused -- child actions are tracked via CElement_List::add()/htmlChild(), not this array.
+     *
+     * @var array
+     */
     public $actions = [];
 
     /**
@@ -40,6 +45,11 @@ class CElement_List_ActionList extends CElement_List {
         $this->withCaret = true;
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         /** @phpstan-ignore-next-line */
         return new static($id);
@@ -63,24 +73,45 @@ class CElement_List_ActionList extends CElement_List {
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getStyle() {
         return $this->style;
     }
 
+    /**
+     * @return $this
+     */
     public function removeCaret() {
         $this->withCaret = false;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     protected function htmlCaret() {
         return $this->withCaret ? '<span class="caret"></span>' : '';
     }
 
+    /**
+     * Propagates $style to every child CElement_Component_Action, so they
+     * render appropriately for the list style (e.g. plain buttons vs. a
+     * dropdown's menu items).
+     *
+     * @return void
+     */
     protected function applyStyleToChild() {
         $this->apply('style', $this->style, [CElement_Component_Action::class]);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $this->applyStyleToChild();
 
@@ -190,6 +221,11 @@ class CElement_List_ActionList extends CElement_List {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

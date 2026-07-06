@@ -18,6 +18,7 @@ trait CTrait_Compat_Element_FormInput_Currency {
      * @return string
      */
     public function set_placeholder($placeholder) {
+        /** @var CElement_FormInput_Currency $this */
         return $this->setPlaceholder($placeholder);
     }
 }

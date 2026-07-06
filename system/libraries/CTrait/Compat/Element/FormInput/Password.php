@@ -18,6 +18,7 @@ trait CTrait_Compat_Element_FormInput_Password {
      * @return $this
      */
     public function set_placeholder($placeholder) {
+        /** @var CElement_FormInput_Password $this */
         return $this->setPlaceholder($placeholder);
     }
 
@@ -29,6 +30,7 @@ trait CTrait_Compat_Element_FormInput_Password {
      * @return $this
      */
     public function set_autocomplete($bool) {
+        /** @var CElement_FormInput_Password $this */
         return $this->setAutocomplete($bool);
     }
 }

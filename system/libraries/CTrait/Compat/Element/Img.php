@@ -12,9 +12,11 @@ trait CTrait_Compat_Element_Img {
      *
      * @param string $src
      *
-     * @return @deprecated 1.2
+     * @return $this
+     * @deprecated 1.2
      */
     public function set_src($src) {
+        /** @var CElement_Element_Img $this */
         return $this->setSrc($src);
     }
 }

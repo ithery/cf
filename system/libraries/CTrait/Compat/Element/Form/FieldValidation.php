@@ -3,6 +3,8 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
+ * @see CElement_Component_Form_FieldValidation
+ *
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
@@ -19,6 +21,7 @@ trait CTrait_Compat_Element_Form_FieldValidation {
      * @return $this
      */
     public function add_validation($name, $param) {
+        /** @var CElement_Component_Form_FieldValidation $this */
         return $this->addValidation($name, $param);
     }
 
@@ -30,6 +33,7 @@ trait CTrait_Compat_Element_Form_FieldValidation {
      * @deprecated 1.2 dont use this anymore
      */
     public function condrequired($input) {
+        /** @var CElement_Component_Form_FieldValidation $this */
         return $this->addValidation('condrequired', $input);
     }
 
@@ -39,6 +43,7 @@ trait CTrait_Compat_Element_Form_FieldValidation {
      * @deprecated 1.2
      */
     public function validation_class() {
+        /** @var CElement_Component_Form_FieldValidation $this */
         return $this->validationClass();
     }
 }

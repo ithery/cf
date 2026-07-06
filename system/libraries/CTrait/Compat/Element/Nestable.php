@@ -16,67 +16,89 @@ trait CTrait_Compat_Element_Nestable {
      * @return $this
      */
     public function set_data_from_treedb($treedb, $parent_id = null) {
+        /** @var CElement_Component_Nestable $this */
         return $this->setDataFromTreeDb($treedb, $parent_id);
     }
 
     /**
-     * @deprecated since 1.2
+     * @param bool $boolean
      *
-     * @param mixed $boolean
+     * @return $this
+     *
+     * @deprecated since 1.2
      */
     public function set_applyjs($boolean) {
+        /** @var CElement_Component_Nestable $this */
         return $this->setApplyJs($boolean);
     }
 
     /**
-     * @deprecated since 1.2
+     * @param string $style
      *
-     * @param mixed $style
+     * @return $this
+     *
+     * @deprecated since 1.2
      */
     public function set_action_style($style) {
+        /** @var CElement_Component_Nestable $this */
         return $this->setRowActionStyle($style);
     }
 
     /**
+     * @return int
+     *
      * @deprecated since 1.2
      */
     public function action_count() {
+        /** @var CElement_Component_Nestable $this */
         return $this->rowActionCount();
     }
 
     /**
-     * @deprecated since 1.2
+     * @param string $id
      *
-     * @param mixed $id
+     * @return CElement_Component_Action
+     *
+     * @deprecated since 1.2
      */
     public function add_row_action($id = '') {
+        /** @var CElement_Component_Nestable $this */
         return $this->addRowAction($id);
     }
 
     /**
+     * @return bool
+     *
      * @deprecated since 1.2
      */
     public function have_action() {
+        /** @var CElement_Component_Nestable $this */
         return $this->haveRowAction();
     }
 
     /**
-     * @deprecated since 1.2
+     * @param callable|Closure $func
+     * @param string           $require
      *
-     * @param mixed $func
-     * @param mixed $require
+     * @return $this
+     *
+     * @deprecated since 1.2
      */
     public function display_callback_func($func, $require = '') {
+        /** @var CElement_Component_Nestable $this */
         return $this->setDisplayCallback($func, $require);
     }
 
     /**
-     * @deprecated since 1.2
+     * @param callable|Closure $func
+     * @param string           $require
      *
-     * @param mixed $func
-     * @param mixed $require
+     * @return $this
+     *
+     * @deprecated since 1.2
      */
     public function filter_action_callback_func($func, $require = '') {
+        /** @var CElement_Component_Nestable $this */
         return $this->filterActionCallbackFunc($func, $require);
     }
 
@@ -88,24 +110,31 @@ trait CTrait_Compat_Element_Nestable {
      * @return $this
      */
     public function set_id_key($idKey) {
+        /** @var CElement_Component_Nestable $this */
         return $this->setIdKey($idKey);
     }
 
     /**
-     * @deprecated since 1.2
+     * @param bool $disableDnd
      *
-     * @param mixed $disableDnd
+     * @return $this
+     *
+     * @deprecated since 1.2
      */
     public function set_disable_dnd($disableDnd) {
+        /** @var CElement_Component_Nestable $this */
         return $this->setDisableDnd($disableDnd);
     }
 
     /**
-     * @deprecated since 1.2
+     * @param bool $checkbox
      *
-     * @param mixed $checkbox
+     * @return $this
+     *
+     * @deprecated since 1.2
      */
     public function set_have_checkbox($checkbox) {
+        /** @var CElement_Component_Nestable $this */
         return $this->setHaveCheckbox($checkbox);
     }
 
@@ -117,6 +146,7 @@ trait CTrait_Compat_Element_Nestable {
      * @return $this
      */
     public function set_value_key($valueKey) {
+        /** @var CElement_Component_Nestable $this */
         return $this->setValueKey($valueKey);
     }
 
@@ -128,6 +158,7 @@ trait CTrait_Compat_Element_Nestable {
      * @return $this
      */
     public function set_input($input) {
+        /** @var CElement_Component_Nestable $this */
         return $this->setInput($input);
     }
 
@@ -139,6 +170,7 @@ trait CTrait_Compat_Element_Nestable {
      * @return $this
      */
     public function set_data_from_array($a) {
+        /** @var CElement_Component_Nestable $this */
         return $this->setDataFromArray($a);
     }
 
@@ -151,6 +183,7 @@ trait CTrait_Compat_Element_Nestable {
      * @return $this
      */
     public function displayCallbackFunc($func, $require = '') {
+        /** @var CElement_Component_Nestable $this */
         return $this->setDisplayCallback($func, $require);
     }
 }

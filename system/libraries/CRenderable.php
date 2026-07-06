@@ -14,14 +14,41 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
      */
     protected $renderable;
 
+    /**
+     * Extra raw JS appended after children's own js() in js(), see addJs().
+     *
+     * @var string
+     */
     protected $additionalJs;
 
+    /**
+     * Whether html()/js() render anything at all for this node (and, while
+     * iterating a parent's children, whether it's skipped there too).
+     *
+     * @var bool
+     */
     protected $visibility;
 
+    /**
+     * This node's parent, set via setParent()/add(); null for a root node
+     * or after detach().
+     *
+     * @var null|CRenderable
+     */
     protected $parent;
 
+    /**
+     * The renderable that add() actually appends children to -- itself by
+     * default, but subclasses (e.g. widgets wrapping their content in an
+     * inner div) may point this at a descendant instead.
+     *
+     * @var CRenderable
+     */
     protected $wrapper;
 
+    /**
+     * @param null|string $id
+     */
     protected function __construct($id = null) {
         parent::__construct($id);
 
@@ -32,26 +59,45 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $this->parent = null;
     }
 
+    /**
+     * @return int
+     */
     public function childCount() {
         return count($this->renderable);
     }
 
+    /**
+     * @return CCollection|CRenderable[]
+     */
     public function childs() {
         return $this->renderable;
     }
 
+    /**
+     * @param CRenderable $parent
+     *
+     * @return $this
+     */
     public function setParent($parent) {
         $this->parent = &$parent;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setVisibility($bool) {
         $this->visibility = $bool;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isVisible() {
         return $this->visibility;
     }
@@ -82,6 +128,11 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return $this;
     }
 
+    /**
+     * @param mixed $renderable
+     *
+     * @return $this
+     */
     public function add($renderable) {
         if ($renderable instanceof CRenderable) {
             $renderable->setParent($this);
@@ -94,12 +145,20 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return $this;
     }
 
+    /**
+     * @param string $js
+     *
+     * @return $this
+     */
     public function addJs($js) {
         $this->additionalJs .= $js;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function clear() {
         foreach ($this->renderable as $r) {
             if ($r instanceof CRenderable) {
@@ -114,14 +173,25 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function parentHtml() {
         return parent::html();
     }
 
+    /**
+     * @return string
+     */
     public function parentJs() {
         return parent::js();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         if (!$this->visibility) {
             return '';
@@ -162,6 +232,11 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         if (!$this->visibility) {
             return '';
@@ -178,6 +253,9 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return $js->text();
     }
 
+    /**
+     * @return string json-encoded {html, js (base64), js_require, css_require}
+     */
     public function json() {
         $data = [];
         $data['html'] = cmsg::flash_all() . $this->html();
@@ -188,6 +266,11 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return json_encode($data);
     }
 
+    /**
+     * @param bool $recursive
+     *
+     * @return void
+     */
     public function regenerateId($recursive = false) {
         parent::regenerateId();
         if ($recursive) {
@@ -199,6 +282,9 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         }
     }
 
+    /**
+     * @return array
+     */
     public function toArray() {
         $data = parent::toArray();
         $data['visibility'] = $this->visibility;
@@ -229,7 +315,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     }
 
     /**
-     * @return CEvent_Dispatcher;
+     * @return CEvent_Dispatcher
      */
     public function getEvent() {
         return CEvent::dispatcher();
@@ -253,15 +339,25 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
      *
      * @param string  $event
      * @param Closure $callback
+     *
+     * @return void
      */
     public function listen($event, Closure $callback) {
         $this->getEvent()->listen($event, $callback);
     }
 
+    /**
+     * @return null|CRenderable
+     */
     public function &getParent() {
         return $this->parent;
     }
 
+    /**
+     * @param array $styles map of CSS property => value
+     *
+     * @return string inline style attribute value, e.g. 'color:red;width:10px;'
+     */
     public static function renderStyle(array $styles) {
         if ($styles == null) {
             return '';
@@ -274,6 +370,9 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return $ret;
     }
 
+    /**
+     * @return $this
+     */
     public function detach() {
         $this->parent = null;
 

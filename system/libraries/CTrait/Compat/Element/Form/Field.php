@@ -16,6 +16,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function set_label($text, $lang = true) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->setLabel($text, $lang);
     }
 
@@ -27,6 +28,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function set_style_form_group($style_form_group) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->setStyleFormGroup($style_form_group);
     }
 
@@ -38,6 +40,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function set_group_id($id) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->setGroupId($id);
     }
 
@@ -49,6 +52,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function add_group_class($class) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->addGroupClass($class);
     }
 
@@ -61,6 +65,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function group_custom_css($key, $val) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->groupCustomCss($key, $val);
     }
 
@@ -72,6 +77,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function set_label_size($size) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->setLabelSize($size);
     }
 
@@ -83,6 +89,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function set_info_text($info_text) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->setInfoText($info_text);
     }
 
@@ -92,6 +99,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function show_label() {
+        /** @var CElement_Component_Form_Field $this */
         return $this->showLabel();
     }
 
@@ -101,6 +109,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function hide_label() {
+        /** @var CElement_Component_Form_Field $this */
         return $this->hideLabel();
     }
 
@@ -110,6 +119,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function style_form_inline() {
+        /** @var CElement_Component_Form_Field $this */
         return $this->styleFormInline();
     }
 
@@ -121,6 +131,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function add_label_class($label_class) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->addLabelClass($label_class);
     }
 
@@ -132,6 +143,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function add_control_class($control_class) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->addControlClass($control_class);
     }
 
@@ -141,6 +153,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return string
      */
     public function get_inline_without_default() {
+        /** @var CElement_Component_Form_Field $this */
         return $this->getInlineWithoutDefault();
     }
 
@@ -152,6 +165,7 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function set_inline_without_default($inline_without_default) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->setInlineWithoutDefault($inline_without_default);
     }
 }
