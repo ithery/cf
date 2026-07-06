@@ -1,6 +1,6 @@
 <?php
 
-class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
+class Controller_Demo_Module_Validation_Form extends \Cresenity\Demo\Controller {
     public function index() {
         $app = c::app();
 
@@ -46,16 +46,11 @@ class Controller_Demo_Module_Validation extends \Cresenity\Demo\Controller {
             $url = carr::get($post, 'url');
         }
 
-        $app->setTitle('Validation');
-        // $widget = $app->addWidget()->addClass('mb-3')->setTitle('Simply Validation');
-        // $email = 'absd.com';
-        // $widget->addDiv()->add('Email: ' . $email);
-        // $widget->addDiv()->add('Is Email: ' . (c::validate($email, 'email') ? 'True' : 'False'));
-        // $email = 'absd@dd.com';
-        // $widget->addDiv()->add('Email: ' . $email);
-        // $widget->addDiv()->add('Is Email: ' . (c::validate($email, 'email') ? 'True' : 'False'));
+        $app->setTitle('Validation - Form Demo');
 
         $widget = $app->addWidget()->setTitle('Form Demo');
+        $widget->addDiv()->addClass('mb-3 text-muted')
+            ->add('Validation rules are declared in one place and attached to the whole form via Form::setValidation($validationData).');
         $form = $widget->addForm();
         $form->addField()->setLabel('Name')->addTextControl('name')->setPlaceholder('Your name')->setValue($name);
         $form->addField()->setLabel('Email')->addEmailControl('email')->setPlaceholder('Input Email..')->setValue($email);

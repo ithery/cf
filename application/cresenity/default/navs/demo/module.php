@@ -18,7 +18,7 @@ return [
     [
         'name' => 'module.validation',
         'label' => c::__('Validation'),
-        'uri' => 'demo/module/validation/index',
+        'subnav' => include dirname(__FILE__) . '/module/validation.php',
     ],
     [
         'name' => 'module.geo',
