@@ -36,8 +36,10 @@ class CManager_File_Connector_FileManager_Controller_DeleteController extends CM
 
                 $fm->path()->setName($nameToDelete)->delete();
                 $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileWasDeleted($filePath));
-            } catch (\League\Flysystem\FileNotFoundException $ex) {
-                // do nothing on FileNotFoundException
+            } catch (\League\Flysystem\UnableToDeleteFile $ex) {
+                // do nothing on UnableToDeleteFile
+            } catch (\League\Flysystem\UnableToDeleteDirectory $ex) {
+                // do nothing on UnableToDeleteDirectory
             } catch (\Exception $ex) {
                 $errors[] = $ex->getMessage();
             }
