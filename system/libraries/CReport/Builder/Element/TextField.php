@@ -13,6 +13,9 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
      */
     protected $textFieldExpression;
 
+    /**
+     * @var null|float
+     */
     protected $forceHeight;
 
     public function __construct() {
@@ -28,10 +31,22 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         $this->textFieldExpression = '';
     }
 
+    /**
+     * Override the element height for the current generate pass (used by stretch with overflow).
+     *
+     * @param float $height
+     *
+     * @return void
+     */
     public function forceHeight($height) {
         $this->forceHeight = $height;
     }
 
+    /**
+     * Remove the height override.
+     *
+     * @return void
+     */
     public function unforceHeight() {
         $this->forceHeight = null;
     }
@@ -54,14 +69,28 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         return $this->textFieldExpression;
     }
 
+    /**
+     * @return float
+     */
     public function getHeightForGenerate() {
         return $this->forceHeight !== null ? $this->forceHeight : $this->height;
     }
 
+    /**
+     * @param SimpleXMLElement $xml
+     *
+     * @return static
+     */
     public static function fromXml(SimpleXMLElement $xml) {
         $element = new self();
         if ($xml['isStretchWithOverflow']) {
             $element->setStretchWithOverflow(CReport_Builder_JrXmlToPhpEnum::getBoolEnum((string) $xml['isStretchWithOverflow']));
+        }
+        if ($xml['textAdjust']) {
+            $element->setStretchWithOverflow(cstr::lower((string) $xml['textAdjust']) == 'stretchheight');
+        }
+        if ($xml['pattern']) {
+            $element->setPattern((string) $xml['pattern']);
         }
         foreach ($xml as $tag => $xmlElement) {
             if ($tag == 'reportElement') {
@@ -87,6 +116,9 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         return $element;
     }
 
+    /**
+     * @return string
+     */
     public function toJrXml() {
         $openTag = '<textField isStretchWithOverflow="' . CReport_Builder_PhpToJrXmlEnum::getBoolEnum($this->isStretchWithOverflow) . '">';
 
@@ -112,6 +144,13 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         return $xml;
     }
 
+    /**
+     * Evaluate the text field expression and apply the pattern if any.
+     *
+     * @param CReport_Generator $generator
+     *
+     * @return string
+     */
     private function getTextAfterExpression(CReport_Generator $generator) {
         $text = $this->getTextFieldExpression();
 
@@ -133,6 +172,12 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         return $text;
     }
 
+    /**
+     * @param CReport_Generator                    $generator
+     * @param CReport_Generator_ProcessorAbstract $processor
+     *
+     * @return void
+     */
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         if ($generator->evaluatePrintWhenExpression($this->printWhenExpression)) {
             $text = $this->getTextAfterExpression($generator);
@@ -172,6 +217,14 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
         }
     }
 
+    /**
+     * Calculate the rendered cell height for this text field.
+     *
+     * @param CReport_Generator                    $generator
+     * @param CReport_Generator_ProcessorAbstract $processor
+     *
+     * @return float
+     */
     public function getCellHeight(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         if (!$generator->evaluatePrintWhenExpression($this->printWhenExpression)) {
             return 0;

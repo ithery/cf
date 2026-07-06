@@ -7,6 +7,9 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
         parent::__construct();
     }
 
+    /**
+     * @return string
+     */
     public function toJrXml() {
         $openTag = '<detail>';
         $body = $this->jrXmlWrapWithBand($this->getChildrenJrXml());
@@ -15,6 +18,11 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
 
+    /**
+     * @param SimpleXMLElement $xml
+     *
+     * @return static
+     */
     public static function fromXml(SimpleXMLElement $xml) {
         $element = new self();
 
@@ -28,6 +36,17 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
         return $element;
     }
 
+    /**
+     * Generate group header bands when the group expression value changes from the previous row.
+     *
+     * @param CReport_Generator                    $generator
+     * @param CReport_Generator_ProcessorAbstract $processor
+     * @param int                                  $rowIndex
+     * @param CReport_Builder_Row                  $row
+     * @param null|CReport_Builder_Row             $lastRow
+     *
+     * @return void
+     */
     protected function generaterGroupHeaders(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor, $rowIndex, $row, $lastRow) {
         foreach ($generator->getGroups() as $group) {
             /** @var CReport_Builder_Element_Group $group */
@@ -49,6 +68,18 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
         }
     }
 
+    /**
+     * Generate group footer bands when the group expression value will change on the next row,
+     * then reset the group variables.
+     *
+     * @param CReport_Generator                    $generator
+     * @param CReport_Generator_ProcessorAbstract $processor
+     * @param int                                  $rowIndex
+     * @param CReport_Builder_Row                  $row
+     * @param null|CReport_Builder_Row             $nextRow
+     *
+     * @return void
+     */
     protected function generaterGroupFooters(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor, $rowIndex, $row, $nextRow) {
         foreach ($generator->getReport()->getGroupElements() as $group) {
             /** @var CReport_Builder_Element_Group $group */
@@ -77,6 +108,14 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
         }
     }
 
+    /**
+     * Get the band height needed when a stretch-with-overflow text field grows beyond the band height.
+     *
+     * @param CReport_Generator                    $generator
+     * @param CReport_Generator_ProcessorAbstract $processor
+     *
+     * @return null|float null when no stretch-with-overflow text field exists
+     */
     public function getHeightForOverflow(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         $height = null;
         if ($processor instanceof CReport_Generator_Processor_PdfProcessor) {
@@ -112,6 +151,14 @@ class CReport_Builder_Element_Detail extends CReport_Builder_ElementAbstract {
         return $height;
     }
 
+    /**
+     * Iterate all data rows, generating group headers, detail columns, and group footers.
+     *
+     * @param CReport_Generator                    $generator
+     * @param CReport_Generator_ProcessorAbstract $processor
+     *
+     * @return void
+     */
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         $data = $generator->getData();
         $generator->setProcessingDetail(true);

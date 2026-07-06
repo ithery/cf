@@ -26,17 +26,18 @@ class CReport_Builder_Element_Rectangle extends CReport_Builder_ElementAbstract 
         return $element;
     }
 
+    /**
+     * @return string
+     */
     public function toJrXml() {
-        // <reportElement x="20" y="0" width="779" height="100"/>
-        //         <imageExpression><![CDATA["' . $headerImagePath . '"]]></imageExpression>
-        $openTag = '<line';
+        $openTag = '<rectangle';
         $openTag .= '>';
 
         $reportElement = $this->getReportElementJrXml();
         $graphicElement = $this->getGraphicElementJrXml();
 
         $body = $reportElement . $graphicElement;
-        $closeTag = '</line>';
+        $closeTag = '</rectangle>';
         $tag = $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
 
         return $tag;

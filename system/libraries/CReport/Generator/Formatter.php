@@ -5,8 +5,20 @@ class CReport_Generator_Formatter {
 
     public static $thousandSeparator = ',';
 
+    /**
+     * Format a value using a JasperReports style pattern (number, date, or sprintf when prefixed with %).
+     *
+     * @param mixed  $txt
+     * @param string $pattern
+     *
+     * @return mixed
+     */
     public static function formatPattern($txt, $pattern) {
         if ($txt !== '') {
+            if (preg_match('/^[#0][#0.,]*(;.*)?$/', $pattern) && !is_numeric($txt)) {
+                //numeric pattern with non numeric value, coerce to zero to avoid number_format type error
+                $txt = 0;
+            }
             $nome_meses = ['Janeiro', 'Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
             if (substr($pattern, 0, 1) === '%') {
                 return sprintf($pattern, $txt);

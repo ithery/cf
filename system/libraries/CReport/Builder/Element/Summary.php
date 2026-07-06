@@ -7,6 +7,11 @@ class CReport_Builder_Element_Summary extends CReport_Builder_ElementAbstract {
         parent::__construct();
     }
 
+    /**
+     * @param SimpleXMLElement $xml
+     *
+     * @return static
+     */
     public static function fromXml(SimpleXMLElement $xml) {
         $element = new self();
 
@@ -20,6 +25,9 @@ class CReport_Builder_Element_Summary extends CReport_Builder_ElementAbstract {
         return $element;
     }
 
+    /**
+     * @return string
+     */
     public function toJrXml() {
         $openTag = '<summary>';
         $body = $this->jrXmlWrapWithBand($this->getChildrenJrXml());
@@ -28,6 +36,12 @@ class CReport_Builder_Element_Summary extends CReport_Builder_ElementAbstract {
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
 
+    /**
+     * @param CReport_Generator                    $generator
+     * @param CReport_Generator_ProcessorAbstract $processor
+     *
+     * @return void
+     */
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         $height = $this->getHeight();
 

@@ -7,6 +7,9 @@ class CReport_Builder_Element_GroupFooter extends CReport_Builder_ElementAbstrac
         parent::__construct();
     }
 
+    /**
+     * @return string
+     */
     public function toJrXml() {
         $openTag = '<groupFooter>';
 
@@ -16,6 +19,11 @@ class CReport_Builder_Element_GroupFooter extends CReport_Builder_ElementAbstrac
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
 
+    /**
+     * @param SimpleXMLElement $xml
+     *
+     * @return static
+     */
     public static function fromXml(SimpleXMLElement $xml) {
         $element = new self();
 
@@ -29,6 +37,12 @@ class CReport_Builder_Element_GroupFooter extends CReport_Builder_ElementAbstrac
         return $element;
     }
 
+    /**
+     * @param CReport_Generator                    $generator
+     * @param CReport_Generator_ProcessorAbstract $processor
+     *
+     * @return void
+     */
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         $height = $this->getHeight();
         $processor->preventYOverflow($generator, $height);

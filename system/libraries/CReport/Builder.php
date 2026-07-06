@@ -49,10 +49,21 @@ class CReport_Builder {
         return $this;
     }
 
+    /**
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return mixed
+     */
     public function setParameter($key, $value) {
         return $this->dictionary->setParameterValue($key, $value);
     }
 
+    /**
+     * @param string $size paper size name, e.g. A4, LETTER, defaults to A4 when unknown
+     *
+     * @return $this
+     */
     public function setPaperSize($size) {
         $size = cstr::upper($size);
         $sizes = carr::get(CReport_Paper::$pageFormats, $size);
@@ -101,6 +112,11 @@ class CReport_Builder {
         return $this;
     }
 
+    /**
+     * @param string $orientation CReport::ORIENTATION_LANDSCAPE or CReport::ORIENTATION_PORTRAIT
+     *
+     * @return void
+     */
     public function setOrientation($orientation) {
         $this->report->setOrientation(cstr::lower($orientation) == CReport_Paper::ORIENTATION_LANDSCAPE ? CReport_Paper::ORIENTATION_LANDSCAPE : CReport_Paper::ORIENTATION_PORTRAIT);
     }

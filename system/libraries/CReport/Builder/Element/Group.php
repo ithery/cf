@@ -3,8 +3,14 @@
 class CReport_Builder_Element_Group extends CReport_Builder_ElementAbstract {
     use CReport_Builder_Trait_Property_NamePropertyTrait;
 
+    /**
+     * @var string
+     */
     protected $groupExpression;
 
+    /**
+     * @var bool
+     */
     protected $isReprintHeaderOnEachPage;
 
     public function __construct() {
@@ -14,22 +20,40 @@ class CReport_Builder_Element_Group extends CReport_Builder_ElementAbstract {
         $this->isReprintHeaderOnEachPage = false;
     }
 
+    /**
+     * Set the expression that determines the group break, e.g. `$F{invoice_no}`.
+     *
+     * @param string $groupExpression
+     *
+     * @return $this
+     */
     public function setGroupExpression($groupExpression) {
         $this->groupExpression = $groupExpression;
 
         return $this;
     }
 
+    /**
+     * @param bool $isReprintHeaderOnEachPage
+     *
+     * @return $this
+     */
     public function setReprintHeaderOnEachPage($isReprintHeaderOnEachPage) {
         $this->isReprintHeaderOnEachPage = $isReprintHeaderOnEachPage;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isReprintHeaderOnEachPage() {
         return $this->isReprintHeaderOnEachPage;
     }
 
+    /**
+     * @return string
+     */
     public function getGroupExpression() {
         return $this->groupExpression;
     }
@@ -100,6 +124,11 @@ class CReport_Builder_Element_Group extends CReport_Builder_ElementAbstract {
         return $this->getGroupFooterElements()->first();
     }
 
+    /**
+     * @param SimpleXMLElement $xml
+     *
+     * @return static
+     */
     public static function fromXml(SimpleXMLElement $xml) {
         $element = new self();
 
@@ -119,6 +148,9 @@ class CReport_Builder_Element_Group extends CReport_Builder_ElementAbstract {
         return $element;
     }
 
+    /**
+     * @return string
+     */
     public function toJrXml() {
         // <reportElement x="20" y="0" width="779" height="100"/>
         //         <imageExpression><![CDATA["' . $headerImagePath . '"]]></imageExpression>
@@ -139,6 +171,12 @@ class CReport_Builder_Element_Group extends CReport_Builder_ElementAbstract {
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
 
+    /**
+     * @param CReport_Generator                    $generator
+     * @param CReport_Generator_ProcessorAbstract $processor
+     *
+     * @return void
+     */
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         parent::generate($generator, $processor);
     }

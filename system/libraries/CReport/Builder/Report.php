@@ -4,28 +4,64 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
     use CReport_Builder_Trait_HasChildrenElementTrait;
     use CReport_Builder_Trait_Property_FontPropertyTrait;
 
+    /**
+     * @var string
+     */
     protected $name;
 
+    /**
+     * @var float
+     */
     protected $pageWidth;
 
+    /**
+     * @var float
+     */
     protected $pageHeight;
 
+    /**
+     * @var float
+     */
     protected $columnWidth;
 
+    /**
+     * @var float
+     */
     protected $leftMargin;
 
+    /**
+     * @var float
+     */
     protected $rightMargin;
 
+    /**
+     * @var float
+     */
     protected $topMargin;
 
+    /**
+     * @var float
+     */
     protected $bottomMargin;
 
+    /**
+     * @var CReport_Builder_ElementAbstract[]
+     */
     protected $children;
 
+    /**
+     * @var string
+     */
     protected $orientation;
 
+    /**
+     * @var CReport_Builder_Object_Font
+     */
     protected $defaultFont;
 
+    /**
+     * @param null|string $name
+     */
     public function __construct($name = null) {
         $this->name = $name ?: 'CReport';
         $paperSize = CReport_Paper::$pageFormats['A4'];
@@ -35,25 +71,32 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         $this->leftMargin = 20;
         $this->topMargin = 20;
         $this->bottomMargin = 20;
-        $this->leftMargin = 20;
         $this->rightMargin = 20;
         $this->font = new CReport_Builder_Object_Font();
         $this->defaultFont = new CReport_Builder_Object_Font();
     }
 
+    /**
+     * @param SimpleXMLElement $xml
+     *
+     * @return static
+     */
     public static function fromXml(SimpleXMLElement $xml) {
-        $report = new self($xml['name']);
+        $report = new self((string) $xml['name']);
         if ($xml['pageWidth']) {
             $report->setPageWidth((float) $xml['pageWidth']);
         }
         if ($xml['pageHeight']) {
             $report->setPageHeight((float) $xml['pageHeight']);
         }
+        if ($xml['columnWidth']) {
+            $report->setColumnWidth((float) $xml['columnWidth']);
+        }
         if ($xml['leftMargin']) {
             $report->setLeftMargin((float) $xml['leftMargin']);
         }
         if ($xml['rightMargin']) {
-            $report->setRightMargin((float) $xml['leftMargin']);
+            $report->setRightMargin((float) $xml['rightMargin']);
         }
         if ($xml['topMargin']) {
             $report->setTopMargin((float) $xml['topMargin']);
@@ -72,6 +115,11 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         return $report;
     }
 
+    /**
+     * @param SimpleXMLElement $xml
+     *
+     * @return $this
+     */
     public function addChildrenFromXml(SimpleXMLElement $xml) {
         foreach ($xml as $tag => $xmlElement) {
             if (!CReport_Builder_ElementFactory::isIgnore($tag)) {
@@ -82,6 +130,11 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         return $this;
     }
 
+    /**
+     * @param CReport_Builder_ElementAbstract $element
+     *
+     * @return $this
+     */
     public function addChildren(CReport_Builder_ElementAbstract $element) {
         $this->children[] = $element;
 
@@ -187,6 +240,11 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         return $this;
     }
 
+    /**
+     * @param string $orientation
+     *
+     * @return $this
+     */
     public function setOrientation($orientation) {
         $this->orientation = $orientation;
 
@@ -267,15 +325,18 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
     }
 
     /**
-     * @return CReport_Builder_Element_Group
+     * @return CReport_Builder_Element_Variable
      */
     public function addVariable() {
-        $group = new CReport_Builder_Element_Variable();
-        $this->children[] = $group;
+        $variable = new CReport_Builder_Element_Variable();
+        $this->children[] = $variable;
 
-        return $group;
+        return $variable;
     }
 
+    /**
+     * @return string
+     */
     protected function getDefaultFontTag() {
         return '<defaultFont '
         . ' name="' . $this->getFontName() . '"'
@@ -287,6 +348,9 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         . '/>';
     }
 
+    /**
+     * @return string
+     */
     public function toJrXml() {
         $openTag = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL
             . '<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"' . PHP_EOL
@@ -312,9 +376,21 @@ class CReport_Builder_Report implements CReport_Builder_Contract_JrXmlElementInt
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
 
+    /**
+     * @return void
+     */
     public function toJson() {
     }
 
+    /**
+     * Generate all root bands in order. Group elements are skipped because their
+     * header/footer bands are generated by the detail band on group break.
+     *
+     * @param CReport_Generator                    $generator
+     * @param CReport_Generator_ProcessorAbstract $processor
+     *
+     * @return void
+     */
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         foreach ($this->children as $child) {
             if ($child instanceof CReport_Builder_Element_Group) {

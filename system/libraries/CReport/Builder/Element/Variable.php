@@ -3,18 +3,39 @@
 class CReport_Builder_Element_Variable extends CReport_Builder_ElementAbstract {
     use CReport_Builder_Trait_Property_NamePropertyTrait;
 
+    /**
+     * @var string
+     */
     protected $variableExpression;
 
+    /**
+     * @var string
+     */
     protected $calculation;
 
+    /**
+     * @var string
+     */
     protected $incrementType;
 
+    /**
+     * @var null|string
+     */
     protected $initialValueExpression;
 
+    /**
+     * @var string
+     */
     protected $dataType;
 
+    /**
+     * @var string
+     */
     protected $resetType;
 
+    /**
+     * @var null|string
+     */
     protected $resetGroup;
 
     public function __construct() {
@@ -37,70 +58,126 @@ class CReport_Builder_Element_Variable extends CReport_Builder_ElementAbstract {
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getVariableExpression() {
         return $this->variableExpression;
     }
 
+    /**
+     * @return string
+     */
     public function getDataType() {
         return $this->dataType;
     }
 
+    /**
+     * @param string $dataType one of the CReport::DATA_TYPE_* constants
+     *
+     * @return $this
+     */
     public function setDataType($dataType) {
         $this->dataType = $dataType;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getCalculation() {
         return $this->calculation;
     }
 
+    /**
+     * @param string $calculation one of the CReport::CALCULATION_* constants
+     *
+     * @return $this
+     */
     public function setCalculation($calculation) {
         $this->calculation = $calculation;
 
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     public function getInitialValueExpression() {
         return $this->initialValueExpression;
     }
 
+    /**
+     * @param null|string $initialValueExpression
+     *
+     * @return $this
+     */
     public function setInitialValueExpression($initialValueExpression) {
         $this->initialValueExpression = $initialValueExpression;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getIncrementType() {
         return $this->incrementType;
     }
 
+    /**
+     * @param string $incrementType
+     *
+     * @return $this
+     */
     public function setIncrementType($incrementType) {
         $this->incrementType = $incrementType;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getResetType() {
         return $this->resetType;
     }
 
+    /**
+     * @param string $resetType one of the CReport::RESET_TYPE_* constants
+     *
+     * @return $this
+     */
     public function setResetType($resetType) {
         $this->resetType = $resetType;
 
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     public function getResetGroup() {
         return $this->resetGroup;
     }
 
+    /**
+     * @param string $resetGroup group name whose break resets this variable
+     *
+     * @return $this
+     */
     public function setResetGroup($resetGroup) {
         $this->resetGroup = $resetGroup;
 
         return $this;
     }
 
+    /**
+     * @param SimpleXMLElement $xml
+     *
+     * @return static
+     */
     public static function fromXml(SimpleXMLElement $xml) {
         $element = new self();
         if ($xml['name']) {
@@ -130,6 +207,9 @@ class CReport_Builder_Element_Variable extends CReport_Builder_ElementAbstract {
         return $element;
     }
 
+    /**
+     * @return string
+     */
     public function toJrXml() {
         // <reportElement x="20" y="0" width="779" height="100"/>
         //         <imageExpression><![CDATA["' . $headerImagePath . '"]]></imageExpression>
@@ -164,6 +244,12 @@ class CReport_Builder_Element_Variable extends CReport_Builder_ElementAbstract {
         return $openTag . PHP_EOL . $body . PHP_EOL . $closeTag;
     }
 
+    /**
+     * @param CReport_Generator                    $generator
+     * @param CReport_Generator_ProcessorAbstract $processor
+     *
+     * @return void
+     */
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         parent::generate($generator, $processor);
     }
