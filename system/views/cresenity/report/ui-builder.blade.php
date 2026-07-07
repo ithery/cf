@@ -29,6 +29,8 @@
     .cr-rb-el.selected { border: 1px solid #2e77c9; }
     .cr-rb-el .cr-rb-handle { position: absolute; right: 0; bottom: 0; width: 8px; height: 8px; background: #2e77c9; cursor: nwse-resize; display: none; }
     .cr-rb-el.selected .cr-rb-handle { display: block; }
+    .cr-rb-band-resize { position: absolute; left: 0; right: 0; bottom: -3px; height: 7px; cursor: ns-resize; z-index: 5; }
+    .cr-rb-band-resize:hover, .cr-rb-band-resize.selected { background: rgba(46,119,201,.35); }
     .cr-rb-props label { font-size: 11px; color: #5b7083; margin-bottom: 0; display: block; }
     .cr-rb-props .form-control, .cr-rb-props .form-select { font-size: 12px; padding: 2px 6px; height: auto; }
     .cr-rb-props-row { display: flex; gap: 6px; margin-bottom: 6px; }
@@ -42,12 +44,21 @@
     .cr-rb-btn-xs { padding: 1px 7px; font-size: 11px; line-height: 1.4; }
 </style>
 
+<script type="application/json" id="cr-rb-config">@json(['datasets' => isset($datasets) ? $datasets : [], 'previewUrl' => isset($previewUrl) ? $previewUrl : ''])</script>
+
 <div class="cr-rbuilder" x-data="crReportBuilder()" x-init="init()">
     <!-- Toolbar -->
     <div class="cr-rb-toolbar">
         <strong>Report UI Builder</strong>
         <span class="cr-rb-muted">1 unit = 1 point</span>
         <span style="flex:1"></span>
+        <template x-if="datasets.length">
+            <select class="form-select form-select-sm" x-model="dataset" title="Dataset">
+                <option value="">- no dataset -</option>
+                <template x-for="d in datasets" :key="d.name"><option :value="d.name" x-text="d.name"></option></template>
+            </select>
+        </template>
+        <button type="button" class="btn btn-sm btn-outline-primary" x-show="previewUrl" x-on:click="previewPdf()">Preview PDF</button>
         <button type="button" class="btn btn-sm btn-outline-secondary" x-on:click="loadSample()">Load Sample</button>
         <button type="button" class="btn btn-sm btn-outline-secondary" x-on:click="openLoad()">Load JRXML</button>
         <button type="button" class="btn btn-sm btn-primary" x-on:click="openOutput()">Generate JRXML</button>
@@ -70,6 +81,24 @@
                         </div>
                     </template>
                     <div class="cr-rb-muted">Drag a tool onto a band, or click the tool then click a band.</div>
+                </div>
+            </div>
+
+            <div class="cr-rb-panel" x-show="datasets.length">
+                <div class="cr-rb-panel-title">Fields</div>
+                <div class="cr-rb-panel-body">
+                    <template x-for="f in currentFields()" :key="f">
+                        <div class="cr-rb-palette-item" draggable="true"
+                            :class="{active: armedTool === 'field:' + f}"
+                            x-on:click="armedTool = (armedTool === 'field:' + f ? null : 'field:' + f)"
+                            x-on:dragstart="paletteDragStart($event, 'field:' + f)"
+                            x-on:dragend="dragTool = null">
+                            <i class="ti ti-tag"></i>
+                            <span x-text="'$F{' + f + '}'"></span>
+                        </div>
+                    </template>
+                    <div class="cr-rb-muted" x-show="!dataset">Select a dataset on the toolbar to list its fields.</div>
+                    <div class="cr-rb-muted" x-show="dataset">Drag a field onto a band to create a text field.</div>
                 </div>
             </div>
 
@@ -134,6 +163,7 @@
                                     <div class="cr-rb-handle" x-on:mousedown.stop="startDrag($event, row.band, el, 'resize')"></div>
                                 </div>
                             </template>
+                            <div class="cr-rb-band-resize" :class="{selected: sel.kind === 'band' &amp;&amp; sel.band === row.band}" title="Drag to resize band height" x-on:mousedown.stop.prevent="startBandResize($event, row.band)"></div>
                         </div>
                     </div>
                 </template>
@@ -440,6 +470,9 @@ function crReportBuilder() {
         ],
         armedTool: null,
         dragTool: null,
+        datasets: [],
+        dataset: '',
+        previewUrl: '',
         sel: {kind: 'report', band: null, element: null, group: null, variable: null},
         drag: null,
         output: '',
@@ -453,6 +486,60 @@ function crReportBuilder() {
             var self = this;
             window.addEventListener('mousemove', function(e) { self.onDragMove(e); });
             window.addEventListener('mouseup', function() { self.drag = null; });
+            window.addEventListener('keydown', function(e) { self.onKeyDown(e); });
+
+            var config = document.getElementById('cr-rb-config');
+            if (config) {
+                try {
+                    var parsed = JSON.parse(config.textContent || '{}');
+                    this.datasets = parsed.datasets || [];
+                    this.previewUrl = parsed.previewUrl || '';
+                    if (this.datasets.length) {
+                        this.dataset = this.datasets[0].name;
+                    }
+                } catch (e) {
+                    //ignore malformed config
+                }
+            }
+        },
+        currentFields: function() {
+            var self = this;
+            var found = this.datasets.filter(function(d) { return d.name === self.dataset; })[0];
+            return found ? found.fields : [];
+        },
+        previewPdf: function() {
+            if (!this.previewUrl) {
+                return;
+            }
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = this.previewUrl;
+            form.target = '_blank';
+            var addField = function(name, value) {
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            };
+            addField('jrxml', this.generate());
+            addField('dataset', this.dataset);
+            document.body.appendChild(form);
+            form.submit();
+            form.remove();
+        },
+        onKeyDown: function(e) {
+            if (e.key !== 'Delete' && e.key !== 'Backspace') {
+                return;
+            }
+            var tag = (e.target.tagName || '').toUpperCase();
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || e.target.isContentEditable) {
+                return;
+            }
+            if (this.sel.kind === 'element' && this.sel.element) {
+                e.preventDefault();
+                this.deleteElement();
+            }
         },
 
         /* ---------- selection ---------- */
@@ -605,7 +692,13 @@ function crReportBuilder() {
             var rect = evt.currentTarget.getBoundingClientRect();
             var x = this.snap(evt.clientX - rect.left);
             var y = this.snap(evt.clientY - rect.top);
-            var el = this.newElement(type, x, y);
+            var el;
+            if (type.indexOf('field:') === 0) {
+                el = this.newElement('textField', x, y);
+                el.expression = '$F{' + type.substring(6) + '}';
+            } else {
+                el = this.newElement(type, x, y);
+            }
             el.x = Math.max(0, Math.min(el.x, this.contentWidth() - el.width));
             el.y = Math.max(0, Math.min(el.y, Math.max(0, band.height - el.height)));
             band.elements.push(el);
@@ -644,6 +737,14 @@ function crReportBuilder() {
                 origX: el.x, origY: el.y, origW: el.width, origH: el.height
             };
         },
+        startBandResize: function(evt, band) {
+            this.selectBandByObject(band);
+            this.drag = {
+                band: band, el: null, mode: 'band',
+                startX: evt.clientX, startY: evt.clientY,
+                origH: band.height
+            };
+        },
         onDragMove: function(evt) {
             if (!this.drag) {
                 return;
@@ -651,6 +752,10 @@ function crReportBuilder() {
             var d = this.drag;
             var dx = evt.clientX - d.startX;
             var dy = evt.clientY - d.startY;
+            if (d.mode === 'band') {
+                d.band.height = Math.max(5, this.snap(d.origH + dy));
+                return;
+            }
             if (d.mode === 'move') {
                 d.el.x = Math.max(0, Math.min(this.snap(d.origX + dx), this.contentWidth() - d.el.width));
                 d.el.y = Math.max(0, Math.min(this.snap(d.origY + dy), Math.max(0, d.band.height - d.el.height)));
