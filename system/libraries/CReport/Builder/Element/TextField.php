@@ -145,13 +145,13 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
     }
 
     /**
-     * Evaluate the text field expression and apply the pattern if any.
+     * Evaluate the text field expression without applying the pattern.
      *
      * @param CReport_Generator $generator
      *
      * @return string
      */
-    private function getTextAfterExpression(CReport_Generator $generator) {
+    private function getRawText(CReport_Generator $generator) {
         $text = $this->getTextFieldExpression();
 
         if ($text) {
@@ -160,6 +160,18 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
             $text = $this->getText();
         }
 
+        return $text;
+    }
+
+    /**
+     * Apply the pattern to an evaluated text when the element has one.
+     *
+     * @param CReport_Generator $generator
+     * @param string            $text
+     *
+     * @return string
+     */
+    private function applyPattern(CReport_Generator $generator, $text) {
         $pattern = $this->getPattern();
         if ($pattern) {
             $textToFormat = $text;
@@ -173,6 +185,17 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
     }
 
     /**
+     * Evaluate the text field expression and apply the pattern if any.
+     *
+     * @param CReport_Generator $generator
+     *
+     * @return string
+     */
+    private function getTextAfterExpression(CReport_Generator $generator) {
+        return $this->applyPattern($generator, $this->getRawText($generator));
+    }
+
+    /**
      * @param CReport_Generator                    $generator
      * @param CReport_Generator_ProcessorAbstract $processor
      *
@@ -180,7 +203,8 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
      */
     public function generate(CReport_Generator $generator, CReport_Generator_ProcessorAbstract $processor) {
         if ($generator->evaluatePrintWhenExpression($this->printWhenExpression)) {
-            $text = $this->getTextAfterExpression($generator);
+            $rawText = $this->getRawText($generator);
+            $text = $this->applyPattern($generator, $rawText);
             if ($this->style) {
                 $this->applyStyle($generator);
             }
@@ -194,6 +218,8 @@ class CReport_Builder_Element_TextField extends CReport_Builder_ElementAbstract 
             $options['width'] = $this->getWidth();
             $options['height'] = $this->getHeightForGenerate();
             $options['text'] = $text;
+            $options['rawText'] = $rawText;
+            $options['pattern'] = $this->getPattern();
             $options['textAlignment'] = $this->getTextAlignment();
             $options['verticalAlignment'] = $this->getVerticalAlignment();
             $options['letterSpacing'] = $this->getLetterSpacing();

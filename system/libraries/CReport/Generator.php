@@ -76,6 +76,9 @@ class CReport_Generator {
      */
     protected $instructions;
 
+    /**
+     * @var bool
+     */
     private $columnFooterDrawn;
 
     /**
@@ -93,10 +96,21 @@ class CReport_Generator {
      */
     private $processor;
 
+    /**
+     * @var null|CReport_Builder_ElementAbstract
+     */
     private $currentBand;
 
+    /**
+     * @var int
+     */
     private $detailNumberOnPage;
 
+    /**
+     * @param CReport_Builder_Report                        $report
+     * @param CReport_Builder_Dictionary                    $dictionary
+     * @param null|CManager_Contract_DataProviderInterface $dataProvider
+     */
     public function __construct(CReport_Builder_Report $report, CReport_Builder_Dictionary $dictionary, CManager_Contract_DataProviderInterface $dataProvider = null) {
         $this->report = $report;
         $this->dictionary = $dictionary;
@@ -118,72 +132,137 @@ class CReport_Generator {
         $this->detailNumberOnPage = 0;
     }
 
+    /**
+     * @param CReport_Builder_ElementAbstract $currentBand
+     *
+     * @return void
+     */
     public function setCurrentBand(CReport_Builder_ElementAbstract $currentBand) {
         $this->currentBand = $currentBand;
     }
 
+    /**
+     * @return null|CReport_Builder_ElementAbstract
+     */
     public function getCurrentBand() {
         return $this->currentBand;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setProcessingPageFooter($bool) {
         $this->isProcessingPageFooter = $bool;
 
         return $this;
     }
 
+    /**
+     * Queue an instruction to run after the whole report is generated, e.g. for $V{PAGE_COUNT}.
+     *
+     * @param CReport_Generator_ProcessorAbstract $processor
+     * @param Closure                              $closure
+     *
+     * @return void
+     */
     public function addInstruction(CReport_Generator_ProcessorAbstract $processor, Closure $closure) {
         $this->instructions[] = new CReport_Generator_Instruction($processor->getY(), $this->getPageNumber(), $closure);
     }
 
+    /**
+     * @return bool
+     */
     public function isProcessingHook() {
         return $this->isProcessingHook;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setProcessingHook($bool) {
         $this->isProcessingHook = $bool;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isProcessingPageFooter() {
         return $this->isProcessingPageFooter;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setProcessingDetail($bool) {
         $this->isProcessingDetail = $bool;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isProcessingDetail() {
         return $this->isProcessingDetail;
     }
 
+    /**
+     * @param CManager_Contract_DataProviderInterface $dataProvider
+     *
+     * @return void
+     */
     public function setDataProvider(CManager_Contract_DataProviderInterface $dataProvider) {
         $this->dataProvider = $dataProvider;
         $this->data = $this->dataProvider ? new CReport_Builder_Data($this->dataProvider->toEnumerable()) : new CReport_Builder_Data(c::collect());
         $this->currentRow = carr::first($this->data);
     }
 
+    /**
+     * Get a field value from the current row, with dot notation for nested relations.
+     *
+     * @param string     $field
+     * @param null|mixed $default
+     *
+     * @return mixed
+     */
     public function getFieldValue($field, $default = null) {
         $fields = explode('.', $field);
         $value = $this->currentRow;
-        foreach ($fields as $field) {
+        foreach ($fields as $fieldPart) {
             if ($value instanceof CModel) {
-                $value = $value->$field;
+                $value = $value->$fieldPart;
             } else {
-                $value = carr::get($value, $field);
+                $value = carr::get($value, $fieldPart);
             }
         }
 
-        return $value;
+        return $value !== null ? $value : $default;
     }
 
+    /**
+     * @param string $expression
+     * @param string $evaluationTime
+     *
+     * @return mixed
+     */
     public function getExpression(string $expression, string $evaluationTime = CReport::EVALUATION_TIME_NOW) {
         return $this->evaluator->getExpression($expression, $evaluationTime);
     }
 
+    /**
+     * @param mixed  $text
+     * @param string $pattern
+     *
+     * @return mixed
+     */
     public function formatPattern($text, string $pattern) {
         return $this->formatter->formatPattern($text, $pattern);
     }
@@ -237,6 +316,9 @@ class CReport_Generator {
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function incrementPageNumber() {
         $this->pageNumber++;
         $this->columnFooterDrawn = false;
@@ -245,42 +327,70 @@ class CReport_Generator {
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function incrementDetailNumberOnPage() {
         $this->detailNumberOnPage = $this->detailNumberOnPage + 1;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setColumnFooterDrawn($bool = true) {
         $this->columnFooterDrawn = $bool;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isColumnFooterDrawn() {
         return $this->columnFooterDrawn;
     }
 
+    /**
+     * @return int
+     */
     public function getPageNumber() {
         return $this->pageNumber;
     }
 
+    /**
+     * @return int
+     */
     public function getTotalRows() {
         return $this->data->count();
     }
 
+    /**
+     * @return int
+     */
     public function getColumnNumber() {
         return $this->columnNumber;
     }
 
+    /**
+     * @param null|string $expression
+     *
+     * @return bool
+     */
     public function evaluatePrintWhenExpression(string $expression = null) {
         return $this->evaluator->evaluatePrintWhenExpression($expression);
     }
 
+    /**
+     * @return int
+     */
     public function getDetailNumberOnPage() {
         return $this->detailNumberOnPage;
     }
 
     /**
-     * @return CCollection|CReport_Builder_Element_Groups[]
+     * @return CCollection|CReport_Builder_Element_Group[]
      */
     public function getGroups() {
         return $this->report->getGroupElements();
@@ -330,30 +440,60 @@ class CReport_Generator {
         return $this->report->getColumnHeaderElement();
     }
 
+    /**
+     * @param int $columnNumber
+     *
+     * @return $this
+     */
     public function setColumnNumber($columnNumber) {
         $this->columnNumber = $columnNumber;
 
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function getReportCount() {
         return $this->reportCount;
     }
 
+    /**
+     * @param int $reportCount
+     *
+     * @return $this
+     */
     public function setReportCount($reportCount) {
         $this->reportCount = $reportCount;
 
         return $this;
     }
 
+    /**
+     * Recalculate all variables against the current row.
+     *
+     * @return void
+     */
     public function variablesCalculation() {
-        return $this->calculator->variablesCalculation($this->currentRow);
+        $this->calculator->variablesCalculation();
     }
 
+    /**
+     * @param string     $name
+     * @param null|mixed $default
+     *
+     * @return mixed
+     */
     public function getParameterValue($name, $default = null) {
         return $this->dictionary->getParameterValue($name, $default);
     }
 
+    /**
+     * @param string     $name
+     * @param null|mixed $default
+     *
+     * @return mixed
+     */
     public function getVariableValue($name, $default = null) {
         //get the global variables
         $globalVariables = [
@@ -370,18 +510,32 @@ class CReport_Generator {
         return $this->dictionary->getVariableValue($name, $default);
     }
 
+    /**
+     * @return bool
+     */
     public function isProcessingPdf() {
         return $this->isProcessingPdf;
     }
 
+    /**
+     * @return bool
+     */
     public function isProcessingExcel() {
         return $this->isProcessingExcel;
     }
 
+    /**
+     * @return null|CReport_Generator_ProcessorAbstract
+     */
     public function getProcessor() {
         return $this->processor;
     }
 
+    /**
+     * Check whether rendering the current and next detail row would trigger a page break.
+     *
+     * @return bool
+     */
     public function willChangePage() {
         if ($this->isProcessingDetail() && $this->isProcessingPdf()) {
             $processor = $this->getProcessor();
@@ -404,6 +558,13 @@ class CReport_Generator {
         return false;
     }
 
+    /**
+     * Run the report generation against a processor.
+     *
+     * @param CReport_Generator_ProcessorAbstract $processor
+     *
+     * @return void
+     */
     protected function generate(CReport_Generator_ProcessorAbstract $processor) {
         $this->pageNumber = 1;
 
@@ -414,6 +575,9 @@ class CReport_Generator {
         }
     }
 
+    /**
+     * @return CReport_Adapter_Pdf_TCPDF
+     */
     public function getPdf() {
         foreach ($this->getFonts() as $font) {
             CReport_Pdf_FontManager::instance()->addFont($font->getName(), $font->getPath());
@@ -430,6 +594,9 @@ class CReport_Generator {
         return $pdf;
     }
 
+    /**
+     * @return CReport_Adapter_Excel_PhpSpreadsheet
+     */
     public function getExcel() {
         $this->isProcessingExcel = true;
 
@@ -442,5 +609,24 @@ class CReport_Generator {
         // $pdf = CReport_Jasper_Instructions::get();
 
         return $excel;
+    }
+
+    /**
+     * Generate the report and wrap the resulting grid as a CExporter export.
+     *
+     * @return CReport_Excel_Export
+     */
+    public function getExcelExport() {
+        $this->isProcessingExcel = true;
+
+        $this->processor = new CReport_Generator_Processor_ExcelProcessor($this->report);
+        $this->generate($this->processor);
+        $this->isProcessingExcel = false;
+        /** @var CReport_Generator_Processor_ExcelProcessor $processor */
+        $processor = $this->processor;
+        $grid = $processor->getGrid();
+        $this->processor = null;
+
+        return new CReport_Excel_Export($grid);
     }
 }

@@ -8,6 +8,9 @@ class Controller_Demo_Report_MasterDetail extends \Cresenity\Demo\Controller {
     public function index() {
         $app = c::app();
         $app->title('Report - Master Detail');
+        $app->addDiv()->addClass('mb-2')
+            ->addAction()->setLabel('Download Excel')->addClass('btn btn-sm btn-outline-success')
+            ->setLink(c::url('demo/report/masterDetail/excel'));
         $app->addIframe()->setSrc(c::url('demo/report/masterDetail/pdf'))
             ->customCss('width', '100%')
             ->customCss('height', '800px');
@@ -16,6 +19,29 @@ class Controller_Demo_Report_MasterDetail extends \Cresenity\Demo\Controller {
     }
 
     public function pdf() {
+        return $this->buildReport()->downloadPdf();
+    }
+
+    public function excel() {
+        return $this->buildReport()->downloadExcel('master-detail.xlsx');
+    }
+
+    /**
+     * @return CReport_Builder
+     */
+    private function buildReport() {
+        $report = CReport::builder();
+        $xml = c::view('demo.page.report.master-detail-jrxml')->render();
+        $report->fromXml($xml);
+        $report->setDataFromCollection($this->buildRows());
+
+        return $report;
+    }
+
+    /**
+     * @return CCollection
+     */
+    private function buildRows() {
         $salesList = Cresenity\Demo\Model\Sales::query()->orderBy('sales_id')->get()->take(8);
         $detailList = Cresenity\Demo\Model\SalesDetail::query()->get();
         $customerList = Cresenity\Demo\Model\Customer::query()->get()->keyBy('customer_id');
@@ -38,11 +64,6 @@ class Controller_Demo_Report_MasterDetail extends \Cresenity\Demo\Controller {
             }
         }
 
-        $report = CReport::builder();
-        $xml = c::view('demo.page.report.master-detail-jrxml')->render();
-        $report->fromXml($xml);
-        $report->setDataFromCollection($rows);
-
-        return $report->downloadPdf();
+        return $rows;
     }
 }

@@ -113,6 +113,17 @@ class CReport_Builder {
     }
 
     /**
+     * @param string $name dataset name registered in CReport_DatasetRegistry
+     *
+     * @return $this
+     */
+    public function setDataFromDataset($name) {
+        $this->dataProvider = CReport_DatasetRegistry::resolve($name);
+
+        return $this;
+    }
+
+    /**
      * @param string $orientation CReport::ORIENTATION_LANDSCAPE or CReport::ORIENTATION_PORTRAIT
      *
      * @return void
@@ -145,6 +156,32 @@ class CReport_Builder {
         $excel = $generator->getExcel();
 
         return $excel;
+    }
+
+    /**
+     * Get the report as a CExporter export, ready for CExporter::download/store/queue.
+     *
+     * @return CReport_Excel_Export
+     */
+    public function getExcelExport() {
+        $generator = new CReport_Generator($this->report, $this->dictionary, $this->dataProvider);
+
+        return $generator->getExcelExport();
+    }
+
+    /**
+     * Download the report as xlsx through CExporter.
+     *
+     * @param null|string $filename
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function downloadExcel($filename = null) {
+        if ($filename == null) {
+            $filename = 'report-' . date('YmdHis') . '-' . uniqid() . '.xlsx';
+        }
+
+        return CExporter::download($this->getExcelExport(), $filename);
     }
 
     /**
