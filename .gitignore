@@ -9,6 +9,8 @@ error_log
 application/*
 !application/cresenity
 
+#ignore project folder
+project/*
 
 /config/
 /config/*
