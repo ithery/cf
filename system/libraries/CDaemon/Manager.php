@@ -155,7 +155,13 @@ class CDaemon_Manager {
                 $job->resolveName() . ($status == 'released_after_exception' ? ' Attempts:' . $job->attempts() : ''),
                 $exception ? $exception->getMessage() : ''
             );
-            $output->writeln($message);
+
+            try {
+                $output->writeln($message);
+            } catch (Throwable $writeException) {
+                // daemon may run detached with no attached console/pipe reader;
+                // a broken output stream must not kill the worker loop
+            }
         };
 
         CEvent::dispatcher()->listen(CQueue_Event_JobProcessing::class, function ($event) use ($writeOutput) {
