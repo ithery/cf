@@ -3,6 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 trait CApp_Concern_ViewTrait {
+    /** @var callable */
     protected static $viewCallback;
 
     private $viewName = 'cresenity/capp/page';
@@ -16,6 +17,13 @@ trait CApp_Concern_ViewTrait {
      */
     private $view;
 
+    /**
+     * Set the view.
+     *
+     * @param CView_View|string $view
+     *
+     * @return $this
+     */
     public function setView($view) {
         if (!($view instanceof CView_View)) {
             $view = CView::factory($view);

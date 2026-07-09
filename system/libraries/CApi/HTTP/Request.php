@@ -42,6 +42,12 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
             $old->content
         );
 
+        // Headers are normally re-derived from the `server` bag above, but that
+        // misses any header set directly on $old->headers (e.g. via ->set())
+        // without a matching HTTP_* server entry. Reapply those explicitly, same
+        // as createFrom() already does, so they survive this reconstruction.
+        $new->headers->replace($old->headers->all());
+
         if ($session = $old->getSession()) {
             $new->setSession($session);
         }
