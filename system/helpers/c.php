@@ -255,8 +255,8 @@ class c {
     public static function traitUsesRecursive($trait) {
         $traits = class_uses($trait);
 
-        foreach ($traits as $trait) {
-            $traits += self::traitUsesRecursive($trait);
+        foreach ($traits as $usedTrait) {
+            $traits += self::traitUsesRecursive($usedTrait);
         }
 
         return $traits;
@@ -276,8 +276,8 @@ class c {
 
         $results = [];
 
-        foreach (array_reverse(class_parents($class)) + [$class => $class] as $class) {
-            $results += self::traitUsesRecursive($class);
+        foreach (array_reverse(class_parents($class)) + [$class => $class] as $classOrParent) {
+            $results += self::traitUsesRecursive($classOrParent);
         }
 
         return array_unique($results);
@@ -347,6 +347,7 @@ class c {
      * Return the default value of the given value.
      *
      * @param mixed $value
+     * @param mixed ...$args arguments to invoke $value with, if it's a Closure
      *
      * @return mixed
      */
@@ -361,11 +362,10 @@ class c {
     //@codingStandardsIgnoreStart
 
     /**
-     * Dispatch an event and call the listeners.
+     * Dispatch an event and call the listeners, or get the event dispatcher
+     * if called with no arguments.
      *
-     * @param string|object $event
-     * @param mixed         $payload
-     * @param bool          $halt
+     * @param mixed ...$args forwarded to CEvent::dispatch($event, $payload = [], $halt = false)
      *
      * @return null|array|CEvent_Dispatcher
      */
@@ -481,7 +481,7 @@ class c {
     /**
      * Encode HTML special characters in a string.
      *
-     * @param CBase_DeferringDisplayableValue|Htmlable|string $value
+     * @param CBase_DeferringDisplayableValueInterface|Htmlable|string $value
      * @param bool                                                       $doubleEncode
      *
      * @return string
@@ -907,6 +907,8 @@ class c {
     /**
      * Return a new literal or anonymous object using named arguments.
      *
+     * @param mixed ...$arguments
+     *
      * @return \stdClass
      */
     public static function literal(...$arguments) {
@@ -973,8 +975,8 @@ class c {
      * @return void
      */
     public static function dump($var) {
-        foreach (func_get_args() as $var) {
-            VarDumper::dump($var);
+        foreach (func_get_args() as $arg) {
+            VarDumper::dump($arg);
         }
     }
 
@@ -1651,8 +1653,6 @@ class c {
      *
      * If an array is passed, we'll assume you want to put to the cache.
      *
-     * @param  dynamic  key|key,default|data,expiration|null
-     *
      * @throws \Exception
      *
      * @return \CCache_Manager|mixed
@@ -2049,7 +2049,7 @@ class c {
     }
 
     /**
-     * @param null|sting $locale
+     * @param null|string $locale
      *
      * @return array
      */

@@ -19,7 +19,7 @@
  */
 trait CModel_Metable_MetableTrait {
     /**
-     * @var CCollection|CModel_Metable_Meta[]
+     * @var CCollection|array<string, CModel_Metable_Meta>
      */
     private $indexedMetaCollection;
 

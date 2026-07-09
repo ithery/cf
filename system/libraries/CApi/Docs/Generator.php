@@ -240,7 +240,7 @@ class CApi_Docs_Generator {
     /**
      * Generate servers section or basePath depending on Swagger version.
      *
-     * @return $this
+     * @return self
      */
     protected function populateServers(): self {
         if ($this->basePath !== null) {
