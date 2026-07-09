@@ -90,7 +90,7 @@ trait CModel_Cacheable_CacheableTrait {
      */
     protected static function flushCacheKeys($modelName) {
         $flushedKeys = [];
-        $keysFile = storage_path('framework/cache/data/rinvex.cacheable.json');
+        $keysFile = storage_path('temp/'.CF::appCode().'/model/keys.cacheable.json');
         $cacheKeys = static::getCacheKeys($keysFile);
         if (isset($cacheKeys[$modelName])) {
             $flushedKeys = $cacheKeys[$modelName];
