@@ -2,10 +2,19 @@
 use League\Fractal\Manager as FractalManager;
 
 class CApi_Manager {
+    /**
+     * @var CApi_Manager[]
+     */
     protected static $instance = [];
 
+    /**
+     * @var bool
+     */
     protected $middlewareEnabled = true;
 
+    /**
+     * @var array
+     */
     protected $middleware = [];
 
     /**
@@ -20,22 +29,49 @@ class CApi_Manager {
      */
     private $config;
 
+    /**
+     * @var CApi_ExceptionHandler
+     */
     private $exceptionHandler;
 
+    /**
+     * @var CApi_Routing_Router
+     */
     private $router;
 
+    /**
+     * @var CApi_Contract_Routing_AdapterInterface
+     */
     private $routerAdapter;
 
+    /**
+     * @var CApi_Dispatcher
+     */
     private $dispatcher;
 
+    /**
+     * @var CApi_Auth
+     */
     private $auth;
 
+    /**
+     * @var CApi_HTTP_Parser_Accept
+     */
     private $httpParseAccept;
 
+    /**
+     * @var CApi_Transformer_Factory
+     */
     private $transformer;
 
+    /**
+     * @var CApi_HTTP_Response_FormatAbstract
+     */
     private $resultFormatter;
 
+    /**
+     * @var null|callable
+     */
     private $methodResolver;
 
     /**
@@ -57,11 +93,22 @@ class CApi_Manager {
         return static::$instance[$group];
     }
 
+    /**
+     * CApi_Manager constructor.
+     *
+     * @param string $group
+     */
     public function __construct($group) {
         $this->group = $group;
         $this->config = CF::config('api.groups.' . $group, []);
     }
 
+    /**
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
     public function getConfig($key, $default = null) {
         return carr::get($this->config, $key, $default);
     }
@@ -77,6 +124,9 @@ class CApi_Manager {
         return $this->resultFormatter;
     }
 
+    /**
+     * @return CApi_Transformer_Factory
+     */
     public function transformer() {
         if ($this->transformer == null) {
             $transformerAdapter = new CApi_Transformer_Adapter_FractalAdapter(new FractalManager());
@@ -138,6 +188,9 @@ class CApi_Manager {
         return $this->router;
     }
 
+    /**
+     * @return CApi_Auth
+     */
     public function auth() {
         if ($this->auth == null) {
             $this->auth = new CApi_Auth($this->router(), $this->getConfig('auth', []));
@@ -146,6 +199,9 @@ class CApi_Manager {
         return $this->auth;
     }
 
+    /**
+     * @return CApi_HTTP_Parser_Accept
+     */
     public function httpParseAccept() {
         if ($this->httpParseAccept == null) {
             $this->httpParseAccept = new CApi_HTTP_Parser_Accept(
@@ -159,32 +215,55 @@ class CApi_Manager {
         return $this->httpParseAccept;
     }
 
+    /**
+     * @return array
+     */
     public function getMiddleware() {
         return $this->middleware;
     }
 
+    /**
+     * @return null|callable
+     */
     public function getMethodResolver() {
         return $this->methodResolver;
     }
 
+    /**
+     * @param callable $callback
+     *
+     * @return $this
+     */
     public function setMethodResolver($callback) {
         $this->methodResolver = $callback;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function shouldSkipMiddleware() {
         return !$this->middlewareEnabled;
     }
 
+    /**
+     * @return CApi_Kernel
+     */
     protected function kernel() {
         return new CApi_Kernel($this->group);
     }
 
+    /**
+     * @return CApi_Dispatcher
+     */
     public function createDispatcher() {
         return new CApi_Dispatcher($this->group);
     }
 
+    /**
+     * @return CApi_Docs_GeneratorFactory
+     */
     public function createDocsGenerator() {
         return new CApi_Docs_GeneratorFactory($this->group);
     }
