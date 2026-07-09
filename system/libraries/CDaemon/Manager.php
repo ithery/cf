@@ -184,6 +184,18 @@ class CDaemon_Manager {
         CEvent::dispatcher()->listen(CQueue_Event_JobExceptionOccurred::class, function (CQueue_Event_JobExceptionOccurred $event) use ($writeOutput) {
             $writeOutput($event->job, 'error', $event->exception);
         });
+
+        // if the supervisor that spawned this worker dies (crash/OOM/kill) without a graceful
+        // terminate(), this worker gets reparented to init (ppid 1) and would otherwise keep
+        // running forever unmanaged, since a freshly (re)started supervisor has no memory of it
+        // and just spawns its own replacement workers. Quitting here lets it drain naturally.
+        $parentId = (int) carr::get($config, 'parentId');
+        CEvent::dispatcher()->listen(CQueue_Event_Looping::class, function () use ($worker, $parentId) {
+            if ($parentId > 1 && posix_getppid() <= 1) {
+                $worker->shouldQuit = true;
+            }
+        });
+
         $worker->setName($name)
             ->setCache(null)
             ->daemon($connection, $queue, $workerOptions);
