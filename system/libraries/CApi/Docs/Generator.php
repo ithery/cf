@@ -48,6 +48,9 @@ class CApi_Docs_Generator {
      */
     protected $yamlDocsFile;
 
+    /**
+     * @var array
+     */
     protected $constants;
 
     /**

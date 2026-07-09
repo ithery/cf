@@ -23,12 +23,22 @@ class CApi_Dispatcher {
      */
     protected $oauthEnable = false;
 
+    /**
+     * Create a new API dispatcher instance.
+     *
+     * @param string $group
+     */
     public function __construct($group) {
         $this->group = $group;
         $this->prefix = CF::config('api.groups.' . $group . '.prefix', '');
         $this->methodNamespace = '';
     }
 
+    /**
+     * @param string $prefix
+     *
+     * @return $this
+     */
     public function setPrefix($prefix) {
         $this->prefix = trim($prefix, '/');
 
@@ -45,6 +55,11 @@ class CApi_Dispatcher {
         return $this;
     }
 
+    /**
+     * @param string $methodNamespace
+     *
+     * @return $this
+     */
     public function setMethodNamespace($methodNamespace) {
         $this->methodNamespace = $methodNamespace;
 
@@ -94,6 +109,13 @@ class CApi_Dispatcher {
         };
     }
 
+    /**
+     * @param string              $className
+     * @param CHTTP_Request|array $request
+     * @param string              $method
+     *
+     * @return CApi_HTTP_Response
+     */
     public function dispatchMethod($className, $request, $method = 'POST') {
         if (!($request instanceof CHTTP_Request)) {
             $request = new CHTTP_Request($request, $request);

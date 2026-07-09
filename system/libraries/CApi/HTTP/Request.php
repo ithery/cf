@@ -10,8 +10,18 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
      */
     protected $accept;
 
+    /**
+     * The API data for the request.
+     *
+     * @var array
+     */
     protected $apiData = [];
 
+    /**
+     * The session resolver callback.
+     *
+     * @var \Closure
+     */
     protected $sessionResolver;
 
     /**
@@ -51,6 +61,13 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
         return $this->accept['version'];
     }
 
+    /**
+     * Set the group for the request.
+     *
+     * @param null|mixed $group
+     *
+     * @return void
+     */
     public function setGroup($group) {
         $this->group = $group;
         $this->parseAcceptHeader();

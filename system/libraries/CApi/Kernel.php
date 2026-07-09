@@ -6,6 +6,11 @@ class CApi_Kernel {
 
     protected $isHandled = false;
 
+    /**
+     * Create a new API kernel instance.
+     *
+     * @param string $group
+     */
     public function __construct($group) {
         $this->group = $group;
     }

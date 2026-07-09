@@ -34,7 +34,7 @@ trait CApp_Concern_ViewTrait {
      * @return CView_View
      */
     public function getView() {
-        /** @var CApp $this */
+        /** @var CApp|CApp_Concern_ViewTrait $this */
         if (!$this->isUserLogin() && $this->isAuthEnabled()) {
             $view = $this->viewLoginName;
 
@@ -70,12 +70,22 @@ trait CApp_Concern_ViewTrait {
         self::$viewCallback = $viewCallback;
     }
 
+    /**
+     * @param string $viewName
+     *
+     * @return $this
+     */
     public function setViewName($viewName) {
         $this->setView($viewName);
 
         return $this;
     }
 
+    /**
+     * @param string $viewLoginName
+     *
+     * @return $this
+     */
     public function setViewLoginName($viewLoginName) {
         $this->viewLoginName = $viewLoginName;
 

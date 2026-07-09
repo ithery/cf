@@ -33,6 +33,9 @@ abstract class CApi_MethodAbstract implements Arrayable {
      */
     protected $sessionId = null;
 
+    /**
+     * @var null|CApi_Session
+     */
     protected $session;
 
     /**
@@ -85,6 +88,13 @@ abstract class CApi_MethodAbstract implements Arrayable {
         return $this;
     }
 
+    /**
+     * Set the group for the method.
+     *
+     * @param string $group
+     *
+     * @return $this
+     */
     public function setGroup($group) {
         $this->group = $group;
 
@@ -184,6 +194,14 @@ abstract class CApi_MethodAbstract implements Arrayable {
         return $this->errCode > 0;
     }
 
+    /**
+     * Get the translated message for the given key.
+     *
+     * @param string $message
+     * @param array  $params
+     *
+     * @return string
+     */
     public function lang($message, $params = []) {
         return c::__($message, $params, $this->lang);
     }
@@ -203,6 +221,15 @@ abstract class CApi_MethodAbstract implements Arrayable {
         return CApi::session($this->sessionId(), $this->sessionOptions);
     }
 
+    /**
+     * Validate the given data against the specified rules.
+     *
+     * @param array|null $data
+     * @param array      $rules
+     * @param array      $messages
+     *
+     * @return void
+     */
     protected function validate($data, $rules, $messages = []) {
         if ($data == null) {
             $data = $this->request();

@@ -6,6 +6,9 @@ class CApi_MethodResponse {
      */
     protected $method;
 
+    /**
+     * @var CApi_HTTP_Request
+     */
     protected $request;
 
     public function __construct(CApi_HTTP_Request $request, CApi_MethodAbstract $method) {
