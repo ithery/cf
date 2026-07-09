@@ -354,7 +354,9 @@ abstract class CModel_MongoDB_Model extends CModel {
     }
 
     /**
-     * @inheritdoc
+     * @param CDatabase_Query_Builder $query
+     *
+     * @return CModel_MongoDB_Query
      */
     public function newEloquentBuilder($query) {
         return new CModel_MongoDB_Query($query);

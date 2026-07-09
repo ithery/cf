@@ -1,5 +1,12 @@
 <?php
 class CHouseKeeping_FileTemp_AjaxFileTemp {
+    /**
+     * Execute the housekeeping process to delete old temporary ajax files.
+     *
+     * @param int $keepDays The number of days to keep temporary ajax files. Files older than this will be deleted.
+     *
+     * @return bool Returns true if the housekeeping process was successful.
+     */
     public static function execute($keepDays = 90) {
         $executed = false;
 

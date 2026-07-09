@@ -7,7 +7,7 @@ class CModel_HasTranslation_Exception_AttributeIsNotTranslatable extends Excepti
      * @param string $key
      * @param CModel $model
      *
-     * @return \static
+     * @return static
      */
     public static function make($key, $model) {
         $translatableAttributes = implode(', ', $model->getTranslatableAttributes());
