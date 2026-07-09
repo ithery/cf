@@ -454,7 +454,7 @@ trait CModel_Metable_MetableTrait {
         $direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
         $field = $q->getQuery()->getGrammar()->wrap("{$table}.value");
 
-        $q->orderByRaw("cast({$field} as decimal) ${direction}");
+        $q->orderByRaw("cast({$field} as decimal) {$direction}");
     }
 
     /**
