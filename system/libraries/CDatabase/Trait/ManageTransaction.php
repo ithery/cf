@@ -343,8 +343,8 @@ trait CDatabase_Trait_ManageTransaction {
     protected function handleRollBackException($e) {
         if ($this->causedByLostConnection($e)) {
             $this->transactions = 0;
-            if ($this->transactionManager) {
-                $this->transactionManager->rollback(
+            if ($this->transactionsManager) {
+                $this->transactionsManager->rollback(
                     $this->getName(),
                     $this->transactions
                 );
