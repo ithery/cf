@@ -578,6 +578,12 @@ return [
     'sidenav' => [
         'js' => ['plugins/sidenav/sidenav.js'],
     ],
+    'tabler-icons' => [
+        'css' => ['icon/tabler-icons.css'],
+        'files' => [
+            'css/icon/tabler-icons',
+        ],
+    ],
     'theme-material' => [
         'css' => [
             'theme/theme-material/colors-material.css',

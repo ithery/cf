@@ -92,12 +92,24 @@ class CConsole_Command_Asset_AssetInstallCommand extends CConsole_Command_AppCom
         }
     }
 
+    /**
+     * Install the specified theme modules.
+     *
+     * @param array $modules
+     * @return void
+     */
     public function installThemeModules($modules) {
         foreach ($modules as $module) {
             $this->installModule($module);
         }
     }
 
+    /**
+     * Install the specified module.
+     *
+     * @param string $module
+     * @return void
+     */
     public function installModule($module) {
         if (!array_key_exists($module, $this->appModules)) {
             //we check the system modules
@@ -151,6 +163,12 @@ class CConsole_Command_Asset_AssetInstallCommand extends CConsole_Command_AppCom
         }
     }
 
+    /**
+     * Install the specified theme JS files.
+     *
+     * @param array $jsFiles
+     * @return void
+     */
     public function installThemeJs($jsFiles) {
         foreach ($jsFiles as $jsFile) {
             $source = DOCROOT . 'media' . DS . 'js' . DS . $jsFile;
@@ -161,6 +179,12 @@ class CConsole_Command_Asset_AssetInstallCommand extends CConsole_Command_AppCom
         }
     }
 
+    /**
+     * Install the specified theme CSS files.
+     *
+     * @param array $cssFiles
+     * @return void
+     */
     public function installThemeCss($cssFiles) {
         foreach ($cssFiles as $cssFile) {
             $source = DOCROOT . 'media' . DS . 'css' . DS . $cssFile;
@@ -179,6 +203,13 @@ class CConsole_Command_Asset_AssetInstallCommand extends CConsole_Command_AppCom
         }
     }
 
+    /**
+     * Copy a file from the source to the destination.
+     *
+     * @param string $source
+     * @param string $destination
+     * @return void
+     */
     public function copyFile($source, $destination) {
         $destinationDir = dirname($destination);
         if (!CFile::exists($source)) {
