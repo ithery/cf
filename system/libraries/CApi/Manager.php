@@ -8,6 +8,17 @@ class CApi_Manager {
     protected static $instance = [];
 
     /**
+     * When true, overrides the per-instance $middlewareEnabled flag for every
+     * group, including ones not created yet. Groups are instantiated lazily
+     * (on first c::api($group) call), which can happen after a test has already
+     * called withoutMiddleware() in setUp() — a per-instance-only flag would
+     * silently miss those, so this needs to be checked independently of $instance.
+     *
+     * @var bool
+     */
+    protected static $globallyDisabled = false;
+
+    /**
      * @var bool
      */
     protected $middlewareEnabled = true;
@@ -244,7 +255,47 @@ class CApi_Manager {
      * @return bool
      */
     public function shouldSkipMiddleware() {
-        return !$this->middlewareEnabled;
+        return static::$globallyDisabled || !$this->middlewareEnabled;
+    }
+
+    /**
+     * Disable all middleware for this API group's requests (used in testing).
+     *
+     * @return $this
+     */
+    public function withoutMiddleware() {
+        $this->middlewareEnabled = false;
+
+        return $this;
+    }
+
+    /**
+     * Re-enable middleware for this API group's requests.
+     *
+     * @return $this
+     */
+    public function withMiddleware() {
+        $this->middlewareEnabled = true;
+
+        return $this;
+    }
+
+    /**
+     * Disable middleware for every API group, including ones not instantiated yet.
+     *
+     * @return void
+     */
+    public static function withoutMiddlewareForAllGroups() {
+        static::$globallyDisabled = true;
+    }
+
+    /**
+     * Re-enable middleware for every API group.
+     *
+     * @return void
+     */
+    public static function withMiddlewareForAllGroups() {
+        static::$globallyDisabled = false;
     }
 
     /**

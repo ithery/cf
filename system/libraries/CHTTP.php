@@ -115,6 +115,24 @@ class CHTTP {
     }
 
     /**
+     * Disable all HTTP-level route middleware for subsequent requests (used in testing).
+     *
+     * @return void
+     */
+    public static function withoutMiddleware() {
+        static::$middlewareEnabled = false;
+    }
+
+    /**
+     * Re-enable HTTP-level route middleware for subsequent requests.
+     *
+     * @return void
+     */
+    public static function withMiddleware() {
+        static::$middlewareEnabled = true;
+    }
+
+    /**
      * @return CHTTP_Cookie
      */
     public static function cookie() {

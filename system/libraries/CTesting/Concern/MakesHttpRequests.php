@@ -58,8 +58,6 @@ trait CTesting_Concern_MakesHttpRequests {
     /**
      * Define additional headers to be sent with the request.
      *
-     * @param array $headers
-     *
      * @return $this
      */
     public function withHeaders(array $headers) {
@@ -108,8 +106,6 @@ trait CTesting_Concern_MakesHttpRequests {
     /**
      * Define a set of server variables to be sent with the requests.
      *
-     * @param array $server
-     *
      * @return $this
      */
     public function withServerVariables(array $server) {
@@ -121,19 +117,33 @@ trait CTesting_Concern_MakesHttpRequests {
     /**
      * Disable middleware for the test.
      *
+     * With no argument, disables middleware everywhere (both regular HTTP routes
+     * via CHTTP and every configured API group via CApi_Manager). Given one or more
+     * middleware class names, only those are turned into a pass-through no-op by
+     * overriding their binding in the container that CBase_Pipeline resolves from.
+     *
      * @param null|string|array $middleware
      *
      * @return $this
      */
     public function withoutMiddleware($middleware = null) {
         if (is_null($middleware)) {
-            $this->app->instance('middleware.disable', true);
+            CHTTP::withoutMiddleware();
+            CApi_Manager::withoutMiddlewareForAllGroups();
 
             return $this;
         }
 
         foreach ((array) $middleware as $abstract) {
             $this->app->instance($abstract, new class() {
+                /**
+                 * Handle the request and return a response.
+                 *
+                 * @param mixed    $request
+                 * @param callable $next
+                 *
+                 * @return mixed
+                 */
                 public function handle($request, $next) {
                     return $next($request);
                 }
@@ -152,7 +162,8 @@ trait CTesting_Concern_MakesHttpRequests {
      */
     public function withMiddleware($middleware = null) {
         if (is_null($middleware)) {
-            unset($this->app['middleware.disable']);
+            CHTTP::withMiddleware();
+            CApi_Manager::withMiddlewareForAllGroups();
 
             return $this;
         }
@@ -166,8 +177,6 @@ trait CTesting_Concern_MakesHttpRequests {
 
     /**
      * Define additional cookies to be sent with the request.
-     *
-     * @param array $cookies
      *
      * @return $this
      */
@@ -193,8 +202,6 @@ trait CTesting_Concern_MakesHttpRequests {
 
     /**
      * Define additional cookies will not be encrypted before sending with the request.
-     *
-     * @param array $cookies
      *
      * @return $this
      */
@@ -259,7 +266,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @return $this
      */
     public function from($url) {
-        $this->app['session']->setPreviousUrl($url);
+        c::session()->setPreviousUrl($url);
 
         return $this->withHeader('referer', $url);
     }
@@ -268,7 +275,6 @@ trait CTesting_Concern_MakesHttpRequests {
      * Visit the given URI with a GET request.
      *
      * @param string $uri
-     * @param array  $headers
      *
      * @return CTesting_TestResponse
      */
@@ -283,7 +289,6 @@ trait CTesting_Concern_MakesHttpRequests {
      * Visit the given URI with a GET request, expecting a JSON response.
      *
      * @param string $uri
-     * @param array  $headers
      *
      * @return CTesting_TestResponse
      */
@@ -295,8 +300,6 @@ trait CTesting_Concern_MakesHttpRequests {
      * Visit the given URI with a POST request.
      *
      * @param string $uri
-     * @param array  $data
-     * @param array  $headers
      *
      * @return CTesting_TestResponse
      */
@@ -311,8 +314,6 @@ trait CTesting_Concern_MakesHttpRequests {
      * Visit the given URI with a POST request, expecting a JSON response.
      *
      * @param string $uri
-     * @param array  $data
-     * @param array  $headers
      *
      * @return CTesting_TestResponse
      */
@@ -324,8 +325,6 @@ trait CTesting_Concern_MakesHttpRequests {
      * Visit the given URI with a PUT request.
      *
      * @param string $uri
-     * @param array  $data
-     * @param array  $headers
      *
      * @return \CTesting_TestResponse
      */
@@ -340,8 +339,6 @@ trait CTesting_Concern_MakesHttpRequests {
      * Visit the given URI with a PUT request, expecting a JSON response.
      *
      * @param string $uri
-     * @param array  $data
-     * @param array  $headers
      *
      * @return CTesting_TestResponse
      */
@@ -353,8 +350,6 @@ trait CTesting_Concern_MakesHttpRequests {
      * Visit the given URI with a PATCH request.
      *
      * @param string $uri
-     * @param array  $data
-     * @param array  $headers
      *
      * @return CTesting_TestResponse
      */
@@ -369,8 +364,6 @@ trait CTesting_Concern_MakesHttpRequests {
      * Visit the given URI with a PATCH request, expecting a JSON response.
      *
      * @param string $uri
-     * @param array  $data
-     * @param array  $headers
      *
      * @return CTesting_TestResponse
      */
@@ -382,8 +375,6 @@ trait CTesting_Concern_MakesHttpRequests {
      * Visit the given URI with a DELETE request.
      *
      * @param string $uri
-     * @param array  $data
-     * @param array  $headers
      *
      * @return CTesting_TestResponse
      */
@@ -398,8 +389,6 @@ trait CTesting_Concern_MakesHttpRequests {
      * Visit the given URI with a DELETE request, expecting a JSON response.
      *
      * @param string $uri
-     * @param array  $data
-     * @param array  $headers
      *
      * @return CTesting_TestResponse
      */
@@ -411,8 +400,6 @@ trait CTesting_Concern_MakesHttpRequests {
      * Visit the given URI with an OPTIONS request.
      *
      * @param string $uri
-     * @param array  $data
-     * @param array  $headers
      *
      * @return CTesting_TestResponse
      */
@@ -427,8 +414,6 @@ trait CTesting_Concern_MakesHttpRequests {
      * Visit the given URI with an OPTIONS request, expecting a JSON response.
      *
      * @param string $uri
-     * @param array  $data
-     * @param array  $headers
      *
      * @return CTesting_TestResponse
      */
@@ -441,8 +426,6 @@ trait CTesting_Concern_MakesHttpRequests {
      *
      * @param string $method
      * @param string $uri
-     * @param array  $data
-     * @param array  $headers
      *
      * @return CTesting_TestResponse
      */
@@ -526,8 +509,6 @@ trait CTesting_Concern_MakesHttpRequests {
 
     /**
      * Transform headers array to array of $_SERVER vars with HTTP_* format.
-     *
-     * @param array $headers
      *
      * @return array
      */
