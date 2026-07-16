@@ -16,7 +16,21 @@ class CResources_Downloader_DefaultDownloader implements CResources_DownloaderIn
             ],
         ]);
 
-        if (!$stream = @fopen($url, 'r', false, $context)) {
+        $retryTimes = (int) CF::config('resource.resource_downloader_retry_times', 3, false);
+        $retryDelay = (int) CF::config('resource.resource_downloader_retry_delay', 2, false);
+
+        $stream = false;
+        for ($attempt = 0; $attempt <= $retryTimes; $attempt++) {
+            $stream = @fopen($url, 'r', false, $context);
+            if ($stream !== false) {
+                break;
+            }
+            if ($attempt < $retryTimes) {
+                sleep($retryDelay);
+            }
+        }
+
+        if ($stream === false) {
             throw CResources_Exception_FileCannotBeAdded_UnreachableUrl::create($url);
         }
 
