@@ -13,6 +13,8 @@ application/*
 project/*
 #ignore frontend folder
 frontend/*
+#ignore mobile folder
+mobile/*
 
 /config/
 /config/*
