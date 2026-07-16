@@ -11,6 +11,8 @@ application/*
 
 #ignore project folder
 project/*
+#ignore frontend folder
+frontend/*
 
 /config/
 /config/*

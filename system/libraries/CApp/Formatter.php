@@ -4,24 +4,54 @@
  * This class for utilize application format.
  */
 class CApp_Formatter {
+    /**
+     * @var string
+     */
     protected $dateFormat;
 
+    /**
+     * @var string
+     */
     protected $datetimeFormat;
 
+    /**
+     * @var string
+     */
     protected $thousandSeparator;
 
+    /**
+     * @var string
+     */
     protected $decimalSeparator;
 
+    /**
+     * @var int
+     */
     protected $decimalDigit;
 
+    /**
+     * @var int
+     */
     protected $currencyDecimalDigit;
 
+    /**
+     * @var string
+     */
     protected $currencyPrefix;
 
+    /**
+     * @var string
+     */
     protected $currencySuffix;
 
+    /**
+     * @var bool
+     */
     protected $currencyStripZeroDecimal;
 
+    /**
+     * @var CApp_Formatter
+     */
     private static $instance;
 
     public static function instance() {
@@ -48,6 +78,11 @@ class CApp_Formatter {
         return $this->dateFormat;
     }
 
+    /**
+     * @param string $format
+     *
+     * @return CApp_Formatter
+     */
     public function setDateFormat($format) {
         $this->dateFormat = $format;
 
@@ -58,6 +93,11 @@ class CApp_Formatter {
         return $this->datetimeFormat;
     }
 
+    /**
+     * @param string $format
+     *
+     * @return CApp_Formatter
+     */
     public function setDatetimeFormat($format) {
         $this->datetimeFormat = $format;
 
@@ -68,6 +108,11 @@ class CApp_Formatter {
         return $this->thousandSeparator;
     }
 
+    /**
+     * @param string $thousandSeparator
+     *
+     * @return CApp_Formatter
+     */
     public function setThousandSeparator($thousandSeparator) {
         $this->thousandSeparator = $thousandSeparator;
 
@@ -78,6 +123,11 @@ class CApp_Formatter {
         return $this->decimalSeparator;
     }
 
+    /**
+     * @param string $decimalSeparator
+     *
+     * @return CApp_Formatter
+     */
     public function setDecimalSeparator($decimalSeparator) {
         $this->decimalSeparator = $decimalSeparator;
 
@@ -88,12 +138,22 @@ class CApp_Formatter {
         return $this->decimalDigit;
     }
 
+    /**
+     * @param int $decimalDigit
+     *
+     * @return CApp_Formatter
+     */
     public function setDecimalDigit($decimalDigit) {
         $this->decimalDigit = $decimalDigit;
 
         return $this;
     }
 
+    /**
+     * @param int $decimalDigit
+     *
+     * @return CApp_Formatter
+     */
     public function setCurrencyDecimalDigit($decimalDigit) {
         $this->currencyDecimalDigit = $decimalDigit;
 
@@ -120,6 +180,11 @@ class CApp_Formatter {
         return $this->currencyStripZeroDecimal;
     }
 
+    /**
+     * @param string $prefix
+     *
+     * @return CApp_Formatter
+     */
     public function setCurrencyPrefix($prefix) {
         $this->currencyPrefix = $prefix;
 
@@ -133,6 +198,11 @@ class CApp_Formatter {
         return $this->currencyPrefix;
     }
 
+    /**
+     * @param string $suffix
+     *
+     * @return CApp_Formatter
+     */
     public function setCurrencySuffix($suffix) {
         $this->currencySuffix = $suffix;
 
@@ -146,6 +216,12 @@ class CApp_Formatter {
         return $this->currencySuffix;
     }
 
+    /**
+     * @param string $x
+     * @param string|null $format
+     *
+     * @return string
+     */
     public function formatDate($x, $format = null) {
         if (strlen($x) == 0) {
             return $x;
@@ -159,6 +235,12 @@ class CApp_Formatter {
         return $carbon->translatedFormat($dateFormat);
     }
 
+    /**
+     * @param string $x
+     * @param string|null $fromFormat
+     *
+     * @return string
+     */
     public function unformatDate($x, $fromFormat = null) {
         $dateFormat = $fromFormat ?: $this->dateFormat;
 
@@ -171,6 +253,12 @@ class CApp_Formatter {
         return $date->format('Y-m-d');
     }
 
+    /**
+     * @param string $x
+     * @param string|null $format
+     *
+     * @return string
+     */
     public function formatDatetime($x, $format = null) {
         if (strlen($x) == 0) {
             return $x;
@@ -185,6 +273,12 @@ class CApp_Formatter {
         return $carbon->translatedFormat($datetimeFormat);
     }
 
+    /**
+     * @param string $x
+     * @param string|null $fromFormat
+     *
+     * @return string
+     */
     public function unformatDatetime($x, $fromFormat = null) {
         if ($x instanceof DateTime) {
             return $x->format('Y-m-d H:i:s');
@@ -195,6 +289,17 @@ class CApp_Formatter {
         return $date->format('Y-m-d H:i:s');
     }
 
+    /**
+     * @param string $x
+     * @param int|null $decimalDigit
+     * @param string|null $decimalSeparator
+     * @param string|null $thousandSeparator
+     * @param string|null $currencyPrefix
+     * @param string|null $currencySuffix
+     * @param bool|null $stripZeroDecimal
+     *
+     * @return string
+     */
     public function formatCurrency($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $currencyPrefix = null, $currencySuffix = null, $stripZeroDecimal = null) {
         $decimalSeparator = $decimalSeparator ?: $this->decimalSeparator;
         $thousandSeparator = $thousandSeparator ?: $this->thousandSeparator;
@@ -216,16 +321,37 @@ class CApp_Formatter {
         return $currencyPrefix . $x . $currencySuffix;
     }
 
+    /**
+     * @param string $x
+     * @param string|null $decimalSeparator
+     * @param string|null $thousandSeparator
+     *
+     * @return string
+     */
     public function formatNumber($x, $decimalSeparator = null, $thousandSeparator = null) {
         return $this->formatDecimal($x, 0, $decimalSeparator, $thousandSeparator, true);
     }
 
+    /**
+     * @param string $x
+     * @param int|null $decimalDigit
+     * @param string|null $decimalSeparator
+     * @param string|null $thousandSeparator
+     * @param bool        $stripZeroDecimal
+     *
+     * @return string
+     */
     public function formatDecimal($x, $decimalDigit = null, $decimalSeparator = null, $thousandSeparator = null, $stripZeroDecimal = false) {
         $decimalDigit = $decimalDigit ?: $this->decimalDigit;
 
         return $this->formatCurrency($x, $decimalDigit, $decimalSeparator, $thousandSeparator, '', '', $stripZeroDecimal);
     }
 
+    /**
+     * @param string $number
+     *
+     * @return float|int
+     */
     public function unformatCurrency($number) {
         $number = preg_replace('/^[^\d]+/', '', $number);
 
@@ -236,10 +362,29 @@ class CApp_Formatter {
         return $number;
     }
 
+    /**
+     * @param string $number
+     *
+     * @return float|int
+     */
     public function unformatNumber($number) {
         return $this->unformatCurrency($number);
     }
 
+    /**
+     * @param string $number
+     *
+     * @return float|int
+     */
+    public function unformatDecimal($number) {
+        return $this->unformatCurrency($number);
+    }
+
+    /**
+     * @param int $bytes
+     *
+     * @return string
+     */
     public function formatSize($bytes) {
         $si_prefix = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $base = 1024;
