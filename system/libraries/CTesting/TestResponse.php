@@ -396,7 +396,7 @@ class CTesting_TestResponse implements ArrayAccess {
     public function assertSee($value, $escape = true) {
         $value = carr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map([c::class, 'e'], ($value)) : $value;
 
         foreach ($values as $value) {
             PHPUnit::assertStringContainsString((string) $value, $this->getContent());
@@ -414,7 +414,7 @@ class CTesting_TestResponse implements ArrayAccess {
      * @return $this
      */
     public function assertSeeInOrder(array $values, $escape = true) {
-        $values = $escape ? array_map('e', ($values)) : $values;
+        $values = $escape ? array_map([c::class, 'e'], ($values)) : $values;
 
         PHPUnit::assertThat($values, new CTesting_Constraint_SeeInOrder($this->getContent()));
 
@@ -432,7 +432,7 @@ class CTesting_TestResponse implements ArrayAccess {
     public function assertSeeText($value, $escape = true) {
         $value = carr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map([c::class, 'e'], ($value)) : $value;
 
         c::tap(strip_tags($this->getContent()), function ($content) use ($values) {
             foreach ($values as $value) {
@@ -452,7 +452,7 @@ class CTesting_TestResponse implements ArrayAccess {
      * @return $this
      */
     public function assertSeeTextInOrder(array $values, $escape = true) {
-        $values = $escape ? array_map('e', ($values)) : $values;
+        $values = $escape ? array_map([c::class, 'e'], ($values)) : $values;
 
         PHPUnit::assertThat($values, new CTesting_Constraint_SeeInOrder(strip_tags($this->getContent())));
 
@@ -470,7 +470,7 @@ class CTesting_TestResponse implements ArrayAccess {
     public function assertDontSee($value, $escape = true) {
         $value = carr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map([c::class, 'e'], ($value)) : $value;
 
         foreach ($values as $value) {
             PHPUnit::assertStringNotContainsString((string) $value, $this->getContent());
@@ -490,7 +490,7 @@ class CTesting_TestResponse implements ArrayAccess {
     public function assertDontSeeText($value, $escape = true) {
         $value = carr::wrap($value);
 
-        $values = $escape ? array_map('e', ($value)) : $value;
+        $values = $escape ? array_map([c::class, 'e'], ($value)) : $value;
 
         c::tap(strip_tags($this->getContent()), function ($content) use ($values) {
             foreach ($values as $value) {

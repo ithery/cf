@@ -72,6 +72,22 @@ final class CAuth_Manager implements CAuth_Contract_AuthFactoryInterface {
     }
 
     /**
+     * Drop all cached guard instances, so the next guard() call resolves a
+     * fresh one instead of reusing whatever user setUser()/attempt() left
+     * cached on it.
+     *
+     * This manager is a process-wide singleton, which is harmless in
+     * production (fresh PHP process per request) but means an authenticated
+     * user set via actingAs() in one test otherwise leaks into every later
+     * test in the same run - see CTesting_TestCase::tearDown().
+     *
+     * @return void
+     */
+    public function forgetGuards() {
+        $this->guards = [];
+    }
+
+    /**
      * Resolve the given guard.
      *
      * @param string $name

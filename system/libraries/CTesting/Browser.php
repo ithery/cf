@@ -3,16 +3,19 @@ use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverPoint;
 use Facebook\WebDriver\WebDriverDimension;
 use Facebook\WebDriver\Remote\WebDriverBrowserType;
-
+/**
+ * @see https://github.com/laravel/dusk
+ */
 class CTesting_Browser {
-    use CTesting_BrowserConcern_InteractsWithAuthentication,
-        CTesting_BrowserConcern_InteractsWithCookies,
-        CTesting_BrowserConcern_InteractsWithElements,
-        CTesting_BrowserConcern_InteractsWithJavascript,
-        CTesting_BrowserConcern_InteractsWithMouse,
-        CTesting_BrowserConcern_MakesAssertions,
-        CTesting_BrowserConcern_MakesUrlAssertions,
-        CTesting_BrowserConcern_WaitsForElements;
+    use CTesting_Browser_Concern_InteractsWithAuthentication,
+        CTesting_Browser_Concern_InteractsWithCookies,
+        CTesting_Browser_Concern_InteractsWithElements,
+        CTesting_Browser_Concern_InteractsWithJavascript,
+        CTesting_Browser_Concern_InteractsWithKeyboard,
+        CTesting_Browser_Concern_InteractsWithMouse,
+        CTesting_Browser_Concern_MakesAssertions,
+        CTesting_Browser_Concern_MakesUrlAssertions,
+        CTesting_Browser_Concern_WaitsForElements;
     use CTrait_Macroable {
         __call as macroCall;
     }
@@ -79,7 +82,7 @@ class CTesting_Browser {
     /**
      * The element resolver instance.
      *
-     * @var \Laravel\Dusk\ElementResolver
+     * @var \CTesting_Browser_ElementResolver
      */
     public $resolver;
 
@@ -121,7 +124,7 @@ class CTesting_Browser {
     /**
      * Browse to the given URL.
      *
-     * @param string|Page $url
+     * @param string|\CTesting_Browser_Page $url
      *
      * @return $this
      */
@@ -179,7 +182,7 @@ class CTesting_Browser {
     /**
      * Set the current page object.
      *
-     * @param mixed $page
+     * @param \CTesting_Browser_Page $page
      *
      * @return $this
      */
@@ -194,7 +197,7 @@ class CTesting_Browser {
     /**
      * Set the current page object without executing the assertions.
      *
-     * @param mixed $page
+     * @param \CTesting_Browser_Page $page
      *
      * @return $this
      */

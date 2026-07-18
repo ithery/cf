@@ -140,6 +140,19 @@ class CTesting_TestCase extends BaseTestCase {
         CHTTP::withMiddleware();
         CApi_Manager::withMiddlewareForAllGroups();
 
+        // CAuth_Manager caches resolved guards (with whatever user actingAs()/be()
+        // set on them) in a process-wide singleton, so an authenticated user from
+        // one test otherwise leaks into every later test in the same run.
+        CAuth::manager()->forgetGuards();
+
+        // The session store is resolved once from the container and reused for
+        // every simulated request (like everything else here), so a test that
+        // performs a real login (writing the auth id into session, not just
+        // actingAs()'s in-memory setUser()) leaves that session data readable
+        // by every later test's fresh guard, even after forgetGuards() above -
+        // a new guard instance still reads from the same still-populated store.
+        c::session()->flush();
+
         if (class_exists('Mockery')) {
             if ($container = Mockery::getContainer()) {
                 $this->addToAssertionCount($container->mockery_getExpectationCount());
