@@ -145,6 +145,15 @@ class CTesting_TestCase extends BaseTestCase {
         // one test otherwise leaks into every later test in the same run.
         CAuth::manager()->forgetGuards();
 
+        // CApp_Auth (c::app()->user(), and anything built on it like OH::user())
+        // caches its own resolved guard per guard name on first access, on top of
+        // CAuth_Manager's cache above - forgetGuards() orphans that cached guard
+        // object without CApp_Auth knowing, so later actingAs() calls stop being
+        // visible through this path even though CAuth_Manager itself is fresh.
+        if (class_exists(CApp_Auth::class)) {
+            CApp_Auth::forgetInstances();
+        }
+
         // The session store is resolved once from the container and reused for
         // every simulated request (like everything else here), so a test that
         // performs a real login (writing the auth id into session, not just

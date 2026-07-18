@@ -74,6 +74,24 @@ class CApp_Auth {
         return static::$instance[$guard];
     }
 
+    /**
+     * Drop all cached per-guard CApp_Auth instances (and the
+     * CAuth_Contract_StatefulGuardInterface each one caches internally in
+     * $resolvedGuard), so the next instance()/guard() call resolves fresh
+     * instead of reusing a guard object that CAuth_Manager::forgetGuards()
+     * has already orphaned.
+     *
+     * This class is a process-wide singleton, which is harmless in
+     * production (fresh PHP process per request) but means a user set via
+     * actingAs() in one test leaks into every later test in the same run -
+     * see CTesting_TestCase::tearDown().
+     *
+     * @return void
+     */
+    public static function forgetInstances() {
+        static::$instance = null;
+    }
+
     public function __construct($guard) {
         $this->guard = $guard;
         $this->features = new CApp_Auth_Features();
