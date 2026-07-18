@@ -1,6 +1,9 @@
 <?php
 
-trait CTesting_Concern_ProvidesBrowser {
+/**
+ * @mixin \PHPUnit\Framework\TestCase
+ */
+trait CTesting_Browser_Concern_ProvidesBrowser {
     /**
      * All of the active browser instances.
      *
@@ -201,14 +204,21 @@ trait CTesting_Concern_ProvidesBrowser {
     /**
      * Create the remote web driver instance.
      *
+     * A freshly spawned chromedriver process (see
+     * CTesting_Chrome_SupportChromeTrait::startChromeDriver(), started right
+     * before this in CTesting_BrowserTestCase::setUp()) can take longer than
+     * 250ms (5 retries x 50ms, the original budget here) to bind its port,
+     * causing a "Connection refused" WebDriverCurlException on the very
+     * first test of a run. 20 retries x 250ms gives it up to 5s.
+     *
      * @throws \Exception
      *
      * @return \Facebook\WebDriver\Remote\RemoteWebDriver
      */
     protected function createWebDriver() {
-        return c::retry(5, function () {
+        return c::retry(20, function () {
             return $this->driver();
-        }, 50);
+        }, 250);
     }
 
     /**
