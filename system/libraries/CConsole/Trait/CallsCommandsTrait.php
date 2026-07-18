@@ -67,7 +67,9 @@ trait CConsole_Trait_CallsCommandsTrait {
             $output
         );
 
-        $this->restorePrompts();
+        if (method_exists($this, 'restorePrompts')) {
+            $this->restorePrompts();
+        }
 
         return $result;
     }

@@ -12,6 +12,7 @@ class CConsole_Command extends SymfonyCommand {
     use CConsole_Trait_InteractsWithSignalsTrait;
     use CConsole_Trait_HasParametersTrait;
     use CConsole_Trait_CallsCommandsTrait;
+    use CConsole_Trait_ConfiguresPromptsTrait;
     use CTrait_Macroable;
 
     /**
@@ -139,6 +140,13 @@ class CConsole_Command extends SymfonyCommand {
             ['input' => $input, 'output' => $output]
         );
         $this->components = c::container()->make(CConsole_View_ComponentFactory::class, ['output' => $this->output]);
+
+        try {
+            $this->configurePrompts($input);
+        } catch (Throwable $e) {
+            // Prompts is a non-essential UX layer; never let a failure here
+            // (e.g. an unsupported environment) break command execution.
+        }
 
         try {
             return parent::run(

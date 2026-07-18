@@ -1649,6 +1649,15 @@ class c {
     }
 
     /**
+     * Get the prompt facade, used for interactive console prompts.
+     *
+     * @return \CConsole_Prompt_Facade
+     */
+    public static function prompt() {
+        return new CConsole_Prompt_Facade();
+    }
+
+    /**
      * Get / set the specified cache value.
      *
      * If an array is passed, we'll assume you want to put to the cache.
