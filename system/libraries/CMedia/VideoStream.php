@@ -15,6 +15,11 @@ class CMedia_VideoStream {
 
     private $size = 0;
 
+    /**
+     * Constructor.
+     *
+     * @param string $filePath
+     */
     public function __construct($filePath) {
         $this->path = $filePath;
     }
