@@ -2,14 +2,17 @@
 
 use PHPUnit\Framework\Assert as PHPUnit;
 
-trait CTesting_BrowserConcern_InteractsWithAuthentication {
+/**
+ * @mixin \CTesting_Browser
+ */
+trait CTesting_Browser_Concern_InteractsWithAuthentication {
     /**
      * Log into the application as the default user.
      *
      * @return $this
      */
     public function login() {
-        return $this->loginAs(call_user_func(Browser::$userResolver));
+        return $this->loginAs(call_user_func(CTesting_Browser::$userResolver));
     }
 
     /**

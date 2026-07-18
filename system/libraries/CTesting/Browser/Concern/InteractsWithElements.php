@@ -5,7 +5,10 @@ use Facebook\WebDriver\WebDriverKeys;
 use Facebook\WebDriver\Remote\LocalFileDetector;
 use Facebook\WebDriver\Interactions\WebDriverActions;
 
-trait CTesting_BrowserConcern_InteractsWithElements {
+/**
+ * @mixin \CTesting_Browser
+ */
+trait CTesting_Browser_Concern_InteractsWithElements {
     /**
      * Get all of the elements matching the given selector.
      *
@@ -179,6 +182,7 @@ trait CTesting_BrowserConcern_InteractsWithElements {
      * @return $this
      */
     public function appendSlowly($field, $value, $pause = 100) {
+        /** @var CTesting_Browser $this */
         foreach (str_split($value) as $char) {
             $this->append($field, $char)->pause($pause);
         }

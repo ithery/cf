@@ -3,7 +3,10 @@
 use PHPUnit\Framework\Assert as PHPUnit;
 use PHPUnit\Framework\Constraint\String\RegularExpression;
 
-trait CTesting_BrowserConcern_MakesUrlAssertions {
+/**
+ * @mixin \CTesting_Browser
+ */
+trait CTesting_Browser_Concern_MakesUrlAssertions {
     /**
      * Assert that the current URL (without the query string) matches the given string.
      *

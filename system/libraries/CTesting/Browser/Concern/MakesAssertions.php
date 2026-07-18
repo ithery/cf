@@ -4,7 +4,10 @@ use Facebook\WebDriver\Exception\NoSuchElementException;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-trait CTesting_BrowserConcern_MakesAssertions {
+/**
+ * @mixin \CTesting_Browser
+ */
+trait CTesting_Browser_Concern_MakesAssertions {
     /**
      * Indicates the browser has made an assertion about the source code of the page.
      *

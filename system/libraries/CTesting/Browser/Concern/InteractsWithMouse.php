@@ -3,7 +3,10 @@
 use Facebook\WebDriver\Interactions\WebDriverActions;
 use Facebook\WebDriver\WebDriverBy;
 
-trait CTesting_BrowserConcern_InteractsWithMouse {
+/**
+ * @mixin \CTesting_Browser
+ */
+trait CTesting_Browser_Concern_InteractsWithMouse {
     /**
      * Move the mouse by offset X and Y.
      *

@@ -1,11 +1,14 @@
 <?php
 
 use Carbon\Carbon;
-use Facebook\WebDriver\Exception\TimeOutException;
+use Facebook\WebDriver\Exception\TimeoutException;
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\Exception\NoSuchElementException;
 
-trait CTesting_BrowserConcern_WaitsForElements {
+/**
+ * @mixin \CTesting_Browser
+ */
+trait CTesting_Browser_Concern_WaitsForElements {
     /**
      * Execute the given callback in a scoped browser once the selector is available.
      *
@@ -13,11 +16,12 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param \Closure $callback
      * @param int      $seconds
      *
-     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
      *
      * @return $this
      */
     public function whenAvailable($selector, Closure $callback, $seconds = null) {
+        /** @var CTesting_Browser $this */
         return $this->waitFor($selector, $seconds)->with($selector, $callback);
     }
 
@@ -27,7 +31,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param string $selector
      * @param int    $seconds
      *
-     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
      *
      * @return $this
      */
@@ -45,7 +49,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param string $selector
      * @param int    $seconds
      *
-     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
      *
      * @return $this
      */
@@ -69,7 +73,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param string $text
      * @param int    $seconds
      *
-     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
      *
      * @return $this
      */
@@ -89,7 +93,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param array|string $text
      * @param int          $seconds
      *
-     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
      *
      * @return $this
      */
@@ -110,7 +114,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param array|string $text
      * @param int          $seconds
      *
-     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
      *
      * @return $this
      */
@@ -128,7 +132,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param string $link
      * @param int    $seconds
      *
-     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
      *
      * @return $this
      */
@@ -146,7 +150,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param string $path
      * @param int    $seconds
      *
-     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
      *
      * @return $this
      */
@@ -163,7 +167,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param array  $parameters
      * @param int    $seconds
      *
-     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
      *
      * @return $this
      */
@@ -178,7 +182,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param int    $seconds
      * @param string $message
      *
-     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
      *
      * @return $this
      */
@@ -240,6 +244,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @return $this
      */
     public function waitForDialog($seconds = null) {
+        /** @var CTesting_Browser $this */
         $seconds = is_null($seconds) ? static::$waitSeconds : $seconds;
 
         $this->driver->wait($seconds, 100)->until(
@@ -256,7 +261,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param \Closure $callback
      * @param int      $seconds
      *
-     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
      *
      * @return $this
      */
@@ -282,11 +287,12 @@ trait CTesting_BrowserConcern_WaitsForElements {
      * @param \Closure    $callback
      * @param null|string $message
      *
-     * @throws \Facebook\WebDriver\Exception\TimeOutException
+     * @throws \Facebook\WebDriver\Exception\TimeoutException
      *
      * @return $this
      */
     public function waitUsing($seconds, $interval, Closure $callback, $message = null) {
+        /** @var CTesting_Browser $this */
         $seconds = is_null($seconds) ? static::$waitSeconds : $seconds;
 
         $this->pause($interval);
@@ -316,7 +322,7 @@ trait CTesting_BrowserConcern_WaitsForElements {
     }
 
     /**
-     * Prepare custom TimeOutException message for sprintf().
+     * Prepare custom TimeoutException message for sprintf().
      *
      * @param string $message
      * @param string $expected

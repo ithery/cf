@@ -2,7 +2,10 @@
 
 use Facebook\WebDriver\Exception\NoSuchCookieException;
 
-trait CTesting_BrowserConcern_InteractsWithCookies {
+/**
+ * @mixin \CTesting_Browser
+ */
+trait CTesting_Browser_Concern_InteractsWithCookies {
     /**
      * Get or set an encrypted cookie's value.
      *

@@ -1,6 +1,9 @@
 <?php
 
-trait CTesting_BrowserConcern_InteractsWithJavascript {
+/**
+ * @mixin \CTesting_Browser
+ */
+trait CTesting_Browser_Concern_InteractsWithJavascript {
     /**
      * Execute JavaScript within the browser.
      *
