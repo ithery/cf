@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * Real-browser tests here run against a live server over the network - see
+ * baseUrl() below, which you must point at this app's dev/staging domain.
+ * There is no per-test DB transaction rollback the way Feature tests get it,
+ * so keep browser tests read-only navigation/assertions where possible; if a
+ * test must create data, clean it up explicitly afterwards.
+ */
+abstract class AbstractBrowserTestCase extends \CTesting_BrowserTestCase {
+    protected function setUp() {
+        parent::setUp();
+        // Without an explicit --port, chromedriver binds to a random free
+        // port instead of the one driver() below connects to, so every
+        // session creation fails with "Connection refused" no matter how
+        // long we retry.
+        static::startChromeDriver(['--port=9515']);
+    }
+
+    /**
+     * TODO: point this at the app's real dev/staging domain.
+     *
+     * @return string
+     */
+    protected function baseUrl() {
+        return 'http://' . CF::domain();
+    }
+
+    /**
+     * @return \Facebook\WebDriver\Remote\RemoteWebDriver
+     */
+    protected function driver() {
+        $arguments = [
+            '--disable-gpu',
+            '--no-sandbox',
+            '--window-size=1920,1080',
+            '--ignore-certificate-errors',
+        ];
+
+        if (!$this->hasHeadlessDisabled()) {
+            $arguments[] = '--headless=new';
+        }
+
+        $options = (new \Facebook\WebDriver\Chrome\ChromeOptions())->addArguments($arguments);
+
+        return \Facebook\WebDriver\Remote\RemoteWebDriver::create(
+            'http://localhost:9515',
+            \Facebook\WebDriver\Remote\DesiredCapabilities::chrome()->setCapability(
+                \Facebook\WebDriver\Chrome\ChromeOptions::CAPABILITY,
+                $options
+            )
+        );
+    }
+
+    /**
+     * Set by `phpcf test:browser --browse`, for running with a visible
+     * browser window instead of headless during local debugging.
+     *
+     * @return bool
+     */
+    protected function hasHeadlessDisabled() {
+        return (bool) (getenv('DUSK_HEADLESS_DISABLED') ?: c::env('DUSK_HEADLESS_DISABLED'));
+    }
+}
