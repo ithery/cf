@@ -1616,7 +1616,16 @@ export const initCore = (History) => {
                 currentHash = History.getHash();
                 if (currentHash) {
                     // Expand Hash
-                    currentState = History.extractState(currentHash||History.getLocationHref(), true);
+                    // `create=false`: only claim this hash if it's one History.js actually
+                    // registered itself (via a prior pushState/replaceState). With `create=true`
+                    // this used to fabricate a state for ANY hash shaped like a path
+                    // (extractState -> getFullUrl misreads a leading "/" as a root-relative
+                    // URL, e.g. "#/foo/bar" -> replaceState to "https://host/foo/bar"),
+                    // hijacking hash-routing owned by unrelated code on the page (e.g.
+                    // Swagger UI's deepLinking, which sets "#/Tag/operation" via the native
+                    // history API directly, bypassing History.js entirely). See
+                    // https://github.com/browserstate/history.js/issues/341 upstream.
+                    currentState = History.extractState(currentHash||History.getLocationHref(), false);
                     if (currentState) {
                         // We were able to parse it, it must be a State!
                         // Let's forward to replaceState
