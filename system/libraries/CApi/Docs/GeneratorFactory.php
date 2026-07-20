@@ -89,7 +89,7 @@ class CApi_Docs_GeneratorFactory {
     public function __construct($group) {
         $this->group = $group;
 
-        $config = CF::config('api.groups.' . $this->group . 'docs');
+        $config = CF::config('api.groups.' . $this->group . '.docs');
         $this->annotationDirs = carr::get($config, 'path.annotations', []);
         $this->excludeDirs = carr::get($config, 'path.excludes', []);
         $this->outputDir = carr::get($config, 'path.output.directory', '');
