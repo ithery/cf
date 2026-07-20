@@ -48,10 +48,10 @@ class CApi_Docs_SecurityDefinition {
     /**
      * Inject security schemes settings.
      *
-     * @param Collection $documentation The parse json
+     * @param CCollection $documentation The parse json
      * @param array      $config        The securityScheme settings from l5-swagger
      *
-     * @return Collection
+     * @return CCollection
      */
     protected function injectSecuritySchemes(CCollection $documentation, array $config) {
         $components = c::collect();
@@ -101,7 +101,7 @@ class CApi_Docs_SecurityDefinition {
     /**
      * Converts an array to an object.
      *
-     * @param $array
+     * @param array $array
      *
      * @return object
      */

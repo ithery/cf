@@ -3,6 +3,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 trait CApp_Trait_BaseTrait {
+    /**
+     * @var array|null
+     */
     private static $org = null;
 
     /**
@@ -363,10 +366,22 @@ trait CApp_Trait_BaseTrait {
         return c::url('cresenity/transparent/' . $width . '/' . $height);
     }
 
+    /**
+     * @param string $code
+     *
+     * @return string
+     */
     public static function qrCodeImageUrl($code) {
         return c::url('cresenity/qrcode?d=' . rawurlencode($code));
     }
 
+    /**
+     * @param string $email
+     * @param int    $s       Size in pixels, defaults to 100px [ 1 - 2048 ]
+     * @param string $default
+     *
+     * @return string
+     */
     public static function gravatarImageUrl($email, $s = 100, $default = 'mp') {
         if ($default == null) {
             $default = static::noImageUrl();
@@ -376,14 +391,30 @@ trait CApp_Trait_BaseTrait {
         return 'https://www.gravatar.com/avatar/' . $hash . '?s=' . $s . '&d=' . rawurlencode($default);
     }
 
+    /**
+     * @param string $name
+     * @param int    $size
+     *
+     * @return string
+     */
     public static function initialAvatarUrl($name, $size = 100) {
         return c::url('cresenity/avatar/initials/?name=' . cstr::lower($name) . '&size=' . $size);
     }
 
+    /**
+     * @param string $action
+     *
+     * @return bool
+     */
     public static function havePermission($action) {
         return CApp_Navigation_Helper::havePermission($action);
     }
 
+    /**
+     * @param string $permissionName
+     *
+     * @return bool
+     */
     public static function checkPermission($permissionName) {
         if (!static::havePermission($permissionName)) {
             static::notAccessible();
@@ -451,6 +482,13 @@ trait CApp_Trait_BaseTrait {
         return carr::get(CF::config('environment'), 'environment', 'production');
     }
 
+    /**
+     * @param int    $errCode
+     * @param string $errMessage
+     * @param array  $data
+     *
+     * @return string
+     */
     public static function jsonResponse($errCode, $errMessage, $data = []) {
         return json_encode([
             'errCode' => $errCode,
@@ -459,6 +497,13 @@ trait CApp_Trait_BaseTrait {
         ]);
     }
 
+    /**
+     * @param int    $errCode
+     * @param string $errMessage
+     * @param array  $data
+     *
+     * @return CHTTP_Response
+     */
     public static function toJsonResponse($errCode, $errMessage, $data = []) {
         return c::response()->json([
             'errCode' => $errCode,
@@ -467,6 +512,9 @@ trait CApp_Trait_BaseTrait {
         ]);
     }
 
+    /**
+     * @return string
+     */
     public static function link() {
         $args = func_get_args();
         $args = array_map(function ($val) {
