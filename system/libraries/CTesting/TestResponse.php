@@ -398,8 +398,8 @@ class CTesting_TestResponse implements ArrayAccess {
 
         $values = $escape ? array_map([c::class, 'e'], ($value)) : $value;
 
-        foreach ($values as $value) {
-            PHPUnit::assertStringContainsString((string) $value, $this->getContent());
+        foreach ($values as $item) {
+            PHPUnit::assertStringContainsString((string) $item, $this->getContent());
         }
 
         return $this;
@@ -408,8 +408,7 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert that the given strings are contained in order within the response.
      *
-     * @param array $values
-     * @param bool  $escape
+     * @param bool $escape
      *
      * @return $this
      */
@@ -446,8 +445,7 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert that the given strings are contained in order within the response text.
      *
-     * @param array $values
-     * @param bool  $escape
+     * @param bool $escape
      *
      * @return $this
      */
@@ -472,8 +470,8 @@ class CTesting_TestResponse implements ArrayAccess {
 
         $values = $escape ? array_map([c::class, 'e'], ($value)) : $value;
 
-        foreach ($values as $value) {
-            PHPUnit::assertStringNotContainsString((string) $value, $this->getContent());
+        foreach ($values as $item) {
+            PHPUnit::assertStringNotContainsString((string) $item, $this->getContent());
         }
 
         return $this;
@@ -504,8 +502,7 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert that the response is a superset of the given JSON.
      *
-     * @param array $data
-     * @param bool  $strict
+     * @param bool $strict
      *
      * @return $this
      */
@@ -532,8 +529,6 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert that the response has the exact given JSON.
      *
-     * @param array $data
-     *
      * @return $this
      */
     public function assertExactJson(array $data) {
@@ -544,8 +539,6 @@ class CTesting_TestResponse implements ArrayAccess {
 
     /**
      * Assert that the response has the similar JSON as given.
-     *
-     * @param array $data
      *
      * @return $this
      */
@@ -558,8 +551,6 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert that the response contains the given JSON fragment.
      *
-     * @param array $data
-     *
      * @return $this
      */
     public function assertJsonFragment(array $data) {
@@ -571,8 +562,7 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert that the response does not contain the given JSON fragment.
      *
-     * @param array $data
-     * @param bool  $exact
+     * @param bool $exact
      *
      * @return $this
      */
@@ -585,8 +575,6 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert that the response does not contain the exact JSON fragment.
      *
-     * @param array $data
-     *
      * @return $this
      */
     public function assertJsonMissingExact(array $data) {
@@ -598,7 +586,6 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert that the response has a given JSON structure.
      *
-     * @param null|array $structure
      * @param null|array $responseData
      *
      * @return $this
@@ -612,7 +599,6 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert that the response JSON has the expected count of items at the given key.
      *
-     * @param int         $count
      * @param null|string $key
      *
      * @return $this
@@ -794,8 +780,6 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert that the response view has a given list of bound data.
      *
-     * @param array $bindings
-     *
      * @return $this
      */
     public function assertViewHasAll(array $bindings) {
@@ -889,8 +873,6 @@ class CTesting_TestResponse implements ArrayAccess {
 
     /**
      * Assert that the session has a given list of values.
-     *
-     * @param array $bindings
      *
      * @return $this
      */
@@ -1174,8 +1156,6 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Set the previous exceptions on the response.
      *
-     * @param \CCollection $exceptions
-     *
      * @return $this
      */
     public function withExceptions(CCollection $exceptions) {
@@ -1210,10 +1190,8 @@ class CTesting_TestResponse implements ArrayAccess {
      * Determine if the given offset exists.
      *
      * @param string $offset
-     *
-     * @return bool
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset): bool {
         return $this->responseHasView()
                     ? isset($this->original->gatherData()[$offset])
                     : isset($this->json()[$offset]);
@@ -1240,10 +1218,8 @@ class CTesting_TestResponse implements ArrayAccess {
      * @param mixed  $value
      *
      * @throws \LogicException
-     *
-     * @return void
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value): void {
         throw new LogicException('Response data may not be mutated using array access.');
     }
 
@@ -1256,6 +1232,7 @@ class CTesting_TestResponse implements ArrayAccess {
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         throw new LogicException('Response data may not be mutated using array access.');
     }
