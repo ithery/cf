@@ -43,18 +43,48 @@ class cstr {
      */
     protected static $studlyCache = [];
 
+    /**
+     * Get the length of the given string.
+     *
+     * @param string $str
+     *
+     * @return int
+     */
     public static function len($str) {
         return static::length($str);
     }
 
+    /**
+     * Get the length of the given string.
+     *
+     * @param string $str
+     *
+     * @return int
+     */
     public static function toupper($str) {
         return strtoupper($str);
     }
 
+    /**
+     * Convert a string to lowercase.
+     *
+     * @param string $str
+     *
+     * @return string
+     */
     public static function tolower($str) {
         return strtolower($str);
     }
 
+    /**
+     * Find the position of the first occurrence of a substring in a string.
+     *
+     * @param string $string
+     * @param string $needle
+     * @param int    $offset
+     *
+     * @return int
+     */
     public static function pos($string, $needle, $offset = 0) {
         return strpos($string, $needle, $offset);
     }
@@ -190,7 +220,6 @@ class cstr {
      * Replace a given value in the string sequentially with an array.
      *
      * @param string $search
-     * @param array  $replace
      * @param string $subject
      *
      * @return string
@@ -826,23 +855,23 @@ class cstr {
             return false;
         }
 
-        foreach ($patterns as $pattern) {
-            $pattern = (string) $pattern;
+        foreach ($patterns as $singlePattern) {
+            $singlePattern = (string) $singlePattern;
             // If the given value is an exact match we can of course return true right
             // from the beginning. Otherwise, we will translate asterisks and do an
             // actual pattern match against the two strings to see if they match.
-            if ($pattern == $value) {
+            if ($singlePattern == $value) {
                 return true;
             }
 
-            $pattern = preg_quote($pattern, '#');
+            $singlePattern = preg_quote($singlePattern, '#');
 
             // Asterisks are translated into zero-or-more regular expression wildcards
             // to make it convenient to check if the strings starts with the given
             // pattern such as "library/*", making any string check convenient.
-            $pattern = str_replace('\*', '.*', $pattern);
+            $singlePattern = str_replace('\*', '.*', $singlePattern);
 
-            if (preg_match('#^' . $pattern . '\z#u', $value) === 1) {
+            if (preg_match('#^' . $singlePattern . '\z#u', $value) === 1) {
                 return true;
             }
         }
@@ -902,7 +931,6 @@ class cstr {
     /**
      * Swap multiple keywords in a string with other keywords.
      *
-     * @param array  $map
      * @param string $subject
      *
      * @return string
@@ -1183,10 +1211,24 @@ class cstr {
         return isset($languageSpecific[$language]) ? $languageSpecific[$language] : null;
     }
 
+    /**
+     * Determine if a given string contains uppercase character(s).
+     *
+     * @param string $string
+     *
+     * @return bool
+     */
     public static function haveUpper($string) {
         return preg_match('~^\p{Lu}~u', $string);
     }
 
+    /**
+     * Convert a value to kebab case.
+     *
+     * @param string $string
+     *
+     * @return string
+     */
     public static function kebabCase($string) {
         return static::kebab($string);
     }
@@ -1214,7 +1256,6 @@ class cstr {
      * Converts GitHub flavored Markdown into HTML.
      *
      * @param string $string
-     * @param array  $options
      *
      * @return string
      */
@@ -1228,7 +1269,6 @@ class cstr {
      * Converts inline Markdown into HTML.
      *
      * @param string $string
-     * @param array  $options
      *
      * @return string
      */
@@ -1428,8 +1468,6 @@ class cstr {
     /**
      * Set the callable that will be used to generate UUIDs.
      *
-     * @param null|callable $factory
-     *
      * @return void
      */
     public static function createUuidsUsing(callable $factory = null) {
@@ -1439,7 +1477,6 @@ class cstr {
     /**
      * Set the sequence that will be used to generate UUIDs.
      *
-     * @param array         $sequence
      * @param null|callable $whenMissing
      *
      * @return void
@@ -1474,8 +1511,6 @@ class cstr {
 
     /**
      * Always return the same UUID when generating new UUIDs.
-     *
-     * @param null|\Closure $callback
      *
      * @return \Ramsey\Uuid\UuidInterface
      */
@@ -1580,10 +1615,10 @@ class cstr {
             $pattern = [$pattern];
         }
 
-        foreach ($pattern as $pattern) {
-            $pattern = (string) $pattern;
+        foreach ($pattern as $singlePattern) {
+            $singlePattern = (string) $singlePattern;
 
-            if (preg_match($pattern, $value) === 1) {
+            if (preg_match($singlePattern, $value) === 1) {
                 return true;
             }
         }
@@ -1730,10 +1765,24 @@ class cstr {
         return new CBase_HtmlString($string);
     }
 
+    /**
+     * Encode a string to base64 URL safe.
+     *
+     * @param string $input
+     *
+     * @return string
+     */
     public function base64UrlEncode($input) {
         return strtr(base64_encode($input), '+/=', '._-');
     }
 
+    /**
+     * Decode a base64 URL safe string.
+     *
+     * @param string $input
+     *
+     * @return string
+     */
     public function base64UrlDecode($input) {
         return base64_decode(strtr($input, '._-', '+/='));
     }
