@@ -13,6 +13,11 @@ class CHTTP_Request extends SymfonyRequest implements Arrayable, ArrayAccess {
         CHTTP_Trait_InteractsWithContentTypes,
         CHTTP_Trait_InteractsWithFlashData;
 
+    /**
+     * The CBrowser instance.
+     *
+     * @var null|CBrowser
+     */
     protected $browser;
 
     /**
@@ -122,8 +127,6 @@ class CHTTP_Request extends SymfonyRequest implements Arrayable, ArrayAccess {
 
     /**
      * Get the full URL for the request with the added query string parameters.
-     *
-     * @param array $query
      *
      * @return string
      */
@@ -294,8 +297,6 @@ class CHTTP_Request extends SymfonyRequest implements Arrayable, ArrayAccess {
     /**
      * Merge new input into the current request's input array.
      *
-     * @param array $input
-     *
      * @return $this
      */
     public function merge(array $input) {
@@ -306,8 +307,6 @@ class CHTTP_Request extends SymfonyRequest implements Arrayable, ArrayAccess {
 
     /**
      * Replace the input for the current request.
-     *
-     * @param array $input
      *
      * @return $this
      */
@@ -368,7 +367,6 @@ class CHTTP_Request extends SymfonyRequest implements Arrayable, ArrayAccess {
     /**
      * Create a new request instance from the given request.
      *
-     * @param \CHTTP_Request      $from
      * @param null|\CHTTP_Request $to
      *
      * @return static
@@ -406,8 +404,6 @@ class CHTTP_Request extends SymfonyRequest implements Arrayable, ArrayAccess {
 
     /**
      * Create an request from a Symfony instance.
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return static
      *
@@ -570,8 +566,6 @@ class CHTTP_Request extends SymfonyRequest implements Arrayable, ArrayAccess {
     /**
      * Set the user resolver callback.
      *
-     * @param \Closure $callback
-     *
      * @return $this
      */
     public function setUserResolver(Closure $callback) {
@@ -592,8 +586,6 @@ class CHTTP_Request extends SymfonyRequest implements Arrayable, ArrayAccess {
 
     /**
      * Set the route resolver callback.
-     *
-     * @param \Closure $callback
      *
      * @return $this
      */
@@ -703,10 +695,25 @@ class CHTTP_Request extends SymfonyRequest implements Arrayable, ArrayAccess {
         return $this->browser;
     }
 
+    /**
+     * Validate the request with given rules.
+     *
+     * @param mixed ...$params
+     *
+     * @return \CValidation_Validator
+     */
     public function validate(array $rules, ...$params) {
         return c::validator()->validate($this->all(), $rules, ...$params);
     }
 
+    /**
+     * Validate the request with given rules and error bag.
+     *
+     * @param mixed ...$params
+     * @param mixed $errorBag
+     *
+     * @return \CValidation_Validator
+     */
     public function validateWithBag($errorBag, array $rules, ...$params) {
         try {
             return $this->validate($rules, ...$params);
