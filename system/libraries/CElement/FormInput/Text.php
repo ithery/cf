@@ -6,16 +6,31 @@ class CElement_FormInput_Text extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Text,
         CTrait_Element_Property_Placeholder;
 
-    protected $input_style;
+    /**
+     * @var string
+     */
+    protected $inputStyle;
 
-    protected $button_position;
+    /**
+     * @var null|mixed
+     */
+    protected $buttonPosition;
 
+    /**
+     * @var null|CElement_Component_Action
+     */
     protected $action;
 
+    /**
+     * @var string
+     */
     protected $icon;
 
     protected $themeType = 'text';
 
+    /**
+     * @param null|string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -23,8 +38,8 @@ class CElement_FormInput_Text extends CElement_FormInput {
 
         $this->placeholder = '';
 
-        $this->input_style = 'default';
-        $this->button_position = null;
+        $this->inputStyle = 'default';
+        $this->buttonPosition = null;
         $this->action = null;
 
         $this->addClass('form-control');

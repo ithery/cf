@@ -21,29 +21,23 @@ trait CTrait_Compat_Element_FormInput_Text {
     }
 
     /**
-     * Reads an undefined dynamic property -- CElement_FormInput_Text has no
-     * $input_style property, so this always returns null.
+     * @deprecated, please use the $inputStyle property directly
      *
      * @return null|mixed
-     *
-     * @deprecated
      */
     public function get_input_style() {
         /** @var CElement_FormInput_Text $this */
-        return $this->input_style;
+        return $this->inputStyle;
     }
 
     /**
-     * Reads an undefined dynamic property -- CElement_FormInput_Text has no
-     * $button_position property, so this always returns null.
+     * @deprecated, please use the $buttonPosition property directly
      *
      * @return null|mixed
-     *
-     * @deprecated
      */
     public function get_button_position() {
         /** @var CElement_FormInput_Text $this */
-        return $this->button_position;
+        return $this->buttonPosition;
     }
 
     /**
@@ -60,37 +54,29 @@ trait CTrait_Compat_Element_FormInput_Text {
     }
 
     /**
-     * Sets an undefined dynamic property -- CElement_FormInput_Text has no
-     * $input_style property, so this has no observable effect besides making
-     * get_input_style() (above) echo it back.
+     * @deprecated, please set the $inputStyle property directly
      *
      * @param mixed $input_style
      *
      * @return $this
-     *
-     * @deprecated
      */
     public function set_input_style($input_style) {
         /** @var CElement_FormInput_Text $this */
-        $this->input_style = $input_style;
+        $this->inputStyle = $input_style;
 
         return $this;
     }
 
     /**
-     * Sets an undefined dynamic property -- CElement_FormInput_Text has no
-     * $button_position property, so this has no observable effect besides
-     * making get_button_position() (above) echo it back.
+     * @deprecated, please set the $buttonPosition property directly
      *
      * @param mixed $button_position
      *
      * @return $this
-     *
-     * @deprecated
      */
     public function set_button_position($button_position) {
         /** @var CElement_FormInput_Text $this */
-        $this->button_position = $button_position;
+        $this->buttonPosition = $button_position;
 
         return $this;
     }

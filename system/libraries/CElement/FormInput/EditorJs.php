@@ -154,6 +154,13 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
         return $config;
     }
 
+    /**
+     * Get the tool by key.
+     *
+     * @param string $key
+     *
+     * @return null|CElement_FormInput_EditorJs_ToolAbstract
+     */
     public function getTool($key) {
         return carr::get($this->tools, $key);
     }

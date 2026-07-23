@@ -22,6 +22,11 @@ class CElement_FormInput_Select extends CElement_FormInput {
 
     protected $isOptionHtml;
 
+    /**
+     * @var string
+     */
+    protected $icon;
+
     protected $themeType = 'select';
 
     public function __construct($id) {
@@ -197,7 +202,23 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $html->decIndent()->appendln('</select>')->br();
 
         //$html->appendln('<input type="text" name="'.$this->name.'" id="'.$this->id.'" class="input-unstyled'.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.'>')->br();
-        return $html->text();
+        $selectHtml = $html->text();
+
+        if ($this->icon !== null && strlen($this->icon) > 0) {
+            $wrapped = new CStringBuilder();
+            $wrapped->setIndent($indent);
+            $wrapped->appendln('<div class="input-group">')
+                ->incIndent()
+                ->appendln('<span class="input-group-text"><i class="' . c::e($this->icon) . '"></i></span>')
+                ->append($selectHtml)
+                ->decIndent()
+                ->appendln('</div>')
+                ->br();
+
+            return $wrapped->text();
+        }
+
+        return $selectHtml;
     }
 
     public function js($indent = 0) {
@@ -318,6 +339,21 @@ class CElement_FormInput_Select extends CElement_FormInput {
 
     public function setHideSearch($bool) {
         $this->hide_search = $bool;
+
+        return $this;
+    }
+
+    /**
+     * Show an icon (eg. a Tabler `ti ti-mail` class) inside a Bootstrap
+     * input-group prepended to this field. Not set (default) renders the
+     * bare `<select>` exactly as before -- purely additive.
+     *
+     * @param string $icon
+     *
+     * @return $this
+     */
+    public function setIcon($icon) {
+        $this->icon = $icon;
 
         return $this;
     }
