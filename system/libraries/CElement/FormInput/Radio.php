@@ -15,6 +15,8 @@ class CElement_FormInput_Radio extends CElement_FormInput {
 
     protected $inline;
 
+    protected $themeType = 'radio';
+
     public function __construct($id) {
         parent::__construct($id);
 

@@ -298,6 +298,11 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $autoRefreshInterval = 0;
 
     /**
+     * @var string
+     */
+    protected $themeType = 'table';
+
+    /**
      * @param string $id
      */
     public function __construct($id = '') {

@@ -8,6 +8,8 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
 
     protected $row;
 
+    protected $themeType = 'textarea';
+
     public function __construct($id) {
         parent::__construct($id);
 

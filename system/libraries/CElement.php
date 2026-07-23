@@ -47,6 +47,20 @@ abstract class CElement extends CObservable {
     protected $after;
 
     /**
+     * Theme key used to auto-inject extra CSS classes from the active theme's
+     * `data.<themeType>.classes` config (see an app's `default/themes/*.php`
+     * files), eg. declaring `protected $themeType = 'select';` on a subclass
+     * makes a theme's `'select' => ['classes' => 'ki-select']` entry get
+     * merged into every instance automatically. Declare this on a subclass
+     * (as a property default, so it's set before this constructor runs) to
+     * opt in; left null (default) it's a no-op, and a theme with no matching
+     * key is also a no-op -- purely additive, zero breaking change either way.
+     *
+     * @var string|null
+     */
+    protected $themeType;
+
+    /**
      * @param string|null $id
      * @param string      $tag
      *
@@ -60,6 +74,10 @@ abstract class CElement extends CObservable {
         $this->custom_css = [];
 
         $this->tag = $tag;
+
+        if ($this->themeType !== null) {
+            $this->addClass(c::theme($this->themeType . '.classes', ''));
+        }
     }
 
     /**

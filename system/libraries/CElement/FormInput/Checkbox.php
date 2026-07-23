@@ -14,6 +14,8 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
 
     protected $style = '';
 
+    protected $themeType = 'checkbox';
+
     public function __construct($id) {
         parent::__construct($id);
 

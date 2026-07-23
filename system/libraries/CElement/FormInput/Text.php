@@ -12,6 +12,10 @@ class CElement_FormInput_Text extends CElement_FormInput {
 
     protected $action;
 
+    protected $icon;
+
+    protected $themeType = 'text';
+
     public function __construct($id) {
         parent::__construct($id);
 
@@ -33,6 +37,21 @@ class CElement_FormInput_Text extends CElement_FormInput {
      */
     public static function factory($id = null) {
         return new CElement_FormInput_Text($id);
+    }
+
+    /**
+     * Show an icon (eg. a Tabler `ti ti-mail` class) inside a Bootstrap
+     * input-group prepended to this field. Not set (default) renders the
+     * bare `<input>` exactly as before -- purely additive.
+     *
+     * @param string $icon
+     *
+     * @return $this
+     */
+    public function setIcon($icon) {
+        $this->icon = $icon;
+
+        return $this;
     }
 
     public function html($indent = 0) {
@@ -62,7 +81,19 @@ class CElement_FormInput_Text extends CElement_FormInput {
         foreach ($this->attr as $k => $v) {
             $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
-        $html->appendln('<input type="text" placeholder="' . c::e($this->placeholder) . '" name="' . $this->name . '" id="' . $this->id . '" class="form-control input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . c::e($this->value) . '"' . $disabled . $custom_css . $addition_attribute . '/>')->br();
+        $inputHtml = '<input type="text" placeholder="' . c::e($this->placeholder) . '" name="' . $this->name . '" id="' . $this->id . '" class="form-control input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . c::e($this->value) . '"' . $disabled . $custom_css . $addition_attribute . '/>';
+
+        if ($this->icon !== null && strlen($this->icon) > 0) {
+            $html->appendln('<div class="input-group">')
+                ->incIndent()
+                ->appendln('<span class="input-group-text"><i class="' . c::e($this->icon) . '"></i></span>')
+                ->appendln($inputHtml)
+                ->decIndent()
+                ->appendln('</div>')
+                ->br();
+        } else {
+            $html->appendln($inputHtml)->br();
+        }
 
         return $html->text();
     }

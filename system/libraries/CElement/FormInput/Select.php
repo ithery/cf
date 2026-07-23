@@ -22,6 +22,8 @@ class CElement_FormInput_Select extends CElement_FormInput {
 
     protected $isOptionHtml;
 
+    protected $themeType = 'select';
+
     public function __construct($id) {
         parent::__construct($id);
 
@@ -35,8 +37,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $this->maximumSelectionLength = false;
         $this->select2Version = c::theme('select2.version');
         $this->isOptionHtml = false;
-        $additionClass = CManager::theme()->getData('select.classes', '');
-        $this->addClass('form-control form-select ' . $additionClass);
+        $this->addClass('form-control form-select');
     }
 
     public static function factory($id = null) {

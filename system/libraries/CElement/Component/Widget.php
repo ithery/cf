@@ -87,6 +87,17 @@ class CElement_Component_Widget extends CElement_Component {
     private $bodyClass;
 
     /**
+     * Theme key for the generic base-CElement `<themeType>.classes` hook
+     * (see CElement::$themeType) -- additive on top of the existing
+     * 'widget.class.wrapper'/'widget.class.body' settings above, eg. a theme
+     * can set `'widget' => ['classes' => 'ki-card']` for an extra class on
+     * the outer wrapper without touching the wrapper/body base classes.
+     *
+     * @var string
+     */
+    protected $themeType = 'widget';
+
+    /**
      * @param string $id
      */
     public function __construct($id) {

@@ -111,6 +111,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     protected $onModal;
 
     /**
+     * @var string
+     */
+    protected $themeType = 'selectsearch';
+
+    /**
      * @param null|string $id
      */
     public function __construct($id = null) {
