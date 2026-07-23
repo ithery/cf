@@ -56,7 +56,7 @@ trait CTrait_Compat_Element_FormInput_Select {
      */
     public function get_hide_search() {
         /** @var CElement_FormInput_Select $this */
-        return $this->hide_search;
+        return $this->hideSearch;
     }
 
     /**
@@ -67,7 +67,7 @@ trait CTrait_Compat_Element_FormInput_Select {
      */
     public function add_group_list($group, $list) {
         /** @var CElement_FormInput_Select $this */
-        $this->group_list[$group] = $list;
+        $this->groupList[$group] = $list;
 
         return $this;
     }
@@ -80,13 +80,13 @@ trait CTrait_Compat_Element_FormInput_Select {
     public function add_dropdown_class($c) {
         /** @var CElement_FormInput_Select $this */
         if (is_array($c)) {
-            $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
+            $this->dropdownClasses = array_merge($c, $this->dropdownClasses);
         } else {
             if ($this->bootstrap == '3.3') {
                 $c = str_replace('span', 'col-md-', $c);
                 $c = str_replace('row-fluid', 'row', $c);
             }
-            $this->dropdown_classes[] = $c;
+            $this->dropdownClasses[] = $c;
         }
 
         return $this;

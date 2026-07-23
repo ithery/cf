@@ -8,6 +8,9 @@ class CManager_EditorJs {
      */
     protected array $rendererCallbacks = [];
 
+    /**
+     * @var CManager_EditorJs
+     */
     private static $instance;
 
     public static function instance() {
@@ -86,6 +89,11 @@ class CManager_EditorJs {
         }
     }
 
+    /**
+     * @param array $block
+     *
+     * @return array
+     */
     protected function getBlockData($block) {
         $data = $block['data'];
         if (isset($block['tunes'])) {

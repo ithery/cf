@@ -1,11 +1,16 @@
 <?php
 /**
+ * EditorJS form input element.
+ *
  * @see CManager_EditorJs
  */
 class CElement_FormInput_EditorJs extends CElement_FormInput {
     use CTrait_Element_Property_Placeholder;
     use CElement_FormInput_EditorJs_Trait_EditorJsToolTrait;
 
+    /**
+     * @var CManager_EditorJs
+     */
     protected $editor;
 
     /**
@@ -28,6 +33,11 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
      */
     protected $uploadImageByUrlEndpoint;
 
+    /**
+     * Constructor.
+     *
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'hidden';
@@ -53,28 +63,54 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
         $this->uploadImageByUrlEndpoint = c::url('cresenity/editorjs/upload/url');
     }
 
+    /**
+     * Set the endpoint URL for uploading images by file.
+     *
+     * @param string $url
+     * @return $this
+     */
     public function setUploadImageByFileEndpoint($url) {
         $this->uploadImageByFileEndpoint = $url;
 
         return $this;
     }
 
+    /**
+     * @param string $url
+     * @return $this
+     */
     public function setUploadImageByUrlEndpoint($url) {
         $this->uploadImageByUrlEndpoint = $url;
 
         return $this;
     }
 
+    /**
+     * Set the initial block type for the editor.
+     *
+     * @param string $block
+     * @return $this
+     */
     public function setInitialBlock($block) {
         $this->initialBlock = $block;
 
         return $this;
     }
 
+    /**
+     * Get the editor holder element ID.
+     *
+     * @return string
+     */
     public function holderId() {
         return $this->id . '-editor';
     }
 
+    /**
+     * Build the editor input element and register necessary scripts.
+     *
+     * @return void
+     */
     public function build() {
         $divHolder = $this->before()->addDiv($this->holderId())->addClass('editorjs-holder cres-editor-js');
         $divHolder->setAttr('data-input-id', $this->id);
@@ -132,6 +168,11 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
         $manager->registerJs('plugins/editorjs/raw-2.4.0.js');
     }
 
+    /**
+     * Build the configuration array for EditorJS.
+     *
+     * @return array
+     */
     protected function buildControlConfig() {
         $editorSettings = [
             'placeholder' => (string) $this->placeholder,

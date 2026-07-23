@@ -8,66 +8,144 @@ class CElement_FormInput_Select extends CElement_FormInput {
     use CTrait_Element_Property_DependsOn;
     use CTrait_Element_Property_Placeholder;
 
-    protected $group_list = [];
+    /**
+     * Options grouped into `<optgroup>` blocks, keyed by group label,
+     * each value being a `value => label` list for that group.
+     *
+     * @var array
+     */
+    protected $groupList = [];
 
+    /**
+     * Whether this select allows multiple selected values.
+     *
+     * @var bool
+     */
     protected $multiple;
 
-    protected $dropdown_classes;
+    /**
+     * Extra CSS classes applied to the rendered select2 dropdown panel
+     * (select2's `dropdownCssClass` option).
+     *
+     * @var array
+     */
+    protected $dropdownClasses;
 
-    protected $hide_search;
+    /**
+     * When true, hides the select2 search box by setting
+     * `minimumResultsForSearch: Infinity`.
+     *
+     * @var bool
+     */
+    protected $hideSearch;
 
+    /**
+     * Maximum number of options that can be selected when `multiple` is
+     * enabled. `false` means no limit.
+     *
+     * @var int|bool
+     */
     protected $maximumSelectionLength;
 
+    /**
+     * Select2 library version to initialize with (eg. `'4'`).
+     *
+     * @var string
+     */
     protected $select2Version;
 
+    /**
+     * Whether option labels/data-content should be rendered as HTML via
+     * select2's `templateResult`/`templateSelection` callbacks.
+     *
+     * @var bool
+     */
     protected $isOptionHtml;
 
     /**
+     * Icon class (eg. a Tabler `ti ti-mail` class) rendered in a
+     * Bootstrap input-group prepended to this field.
+     *
      * @var string
      */
     protected $icon;
 
+    /**
+     * @var string
+     */
     protected $themeType = 'select';
 
+    /**
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->dropdown_classes = [];
+        $this->dropdownClasses = [];
         $this->tag = 'select';
         $this->multiple = false;
         $this->type = 'select';
         $this->placeholder = '';
         $this->applyJs = 'false';
-        $this->hide_search = false;
+        $this->hideSearch = false;
         $this->maximumSelectionLength = false;
         $this->select2Version = c::theme('select2.version');
         $this->isOptionHtml = false;
         $this->addClass('form-control form-select');
     }
 
+    /**
+     * @param string|null $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         /** @phpstan-ignore-next-line */
         return new static($id);
     }
 
+    /**
+     * Enable or disable multi-select mode.
+     *
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setMultiple($bool = true) {
         $this->multiple = $bool;
 
         return $this;
     }
 
+    /**
+     * Set the maximum number of items that can be selected in a multi-select.
+     *
+     * @param int $length
+     *
+     * @return $this
+     */
     public function setMaximumSelectionLength($length) {
         $this->maximumSelectionLength = $length;
 
         return $this;
     }
 
+    /**
+     * Set whether option labels/data-content should be treated as HTML.
+     *
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setIsOptionHtml($bool = true) {
         $this->isOptionHtml = $bool;
 
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function toArray() {
         $data = [];
         $data = array_merge_recursive($data, parent::toArray());
@@ -102,11 +180,19 @@ class CElement_FormInput_Select extends CElement_FormInput {
         return $data;
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         parent::build();
         $this->addClass('form-control');
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         parent::html($indent);
         $html = new CStringBuilder();
@@ -146,8 +232,8 @@ class CElement_FormInput_Select extends CElement_FormInput {
             ->appendln('<select name="' . $name . '" id="' . $this->id . '" class="' . $classes . $this->validation->validationClass() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')
             ->incIndent()
             ->br();
-        if (count($this->group_list) > 0) {
-            foreach ($this->group_list as $g => $list) {
+        if (count($this->groupList) > 0) {
+            foreach ($this->groupList as $g => $list) {
                 if (strlen($g) > 0) {
                     $html->appendln('<optgroup label="' . $g . '">')->br();
                 }
@@ -221,6 +307,11 @@ class CElement_FormInput_Select extends CElement_FormInput {
         return $selectHtml;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);
@@ -241,15 +332,15 @@ class CElement_FormInput_Select extends CElement_FormInput {
                 $classes = ' ' . $classes;
             }
 
-            $dropdown_classes = $this->dropdown_classes;
-            $dropdown_classes = implode(' ', $dropdown_classes);
-            if (strlen($dropdown_classes) > 0) {
-                $dropdown_classes = ' ' . $dropdown_classes;
+            $dropdownClasses = $this->dropdownClasses;
+            $dropdownClasses = implode(' ', $dropdownClasses);
+            if (strlen($dropdownClasses) > 0) {
+                $dropdownClasses = ' ' . $dropdownClasses;
             }
             $js->append("$('#" . $this->id . "').select2({
-                        dropdownCssClass: '" . $dropdown_classes . "', // apply css that makes the dropdown taller
+                        dropdownCssClass: '" . $dropdownClasses . "', // apply css that makes the dropdown taller
             ");
-            if ($this->hide_search) {
+            if ($this->hideSearch) {
                 $js->append('minimumResultsForSearch: Infinity,');
             }
             if ($this->maximumSelectionLength !== false) {
@@ -337,8 +428,15 @@ class CElement_FormInput_Select extends CElement_FormInput {
         return $js->text();
     }
 
+    /**
+     * Set whether to hide the select2 search box.
+     *
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setHideSearch($bool) {
-        $this->hide_search = $bool;
+        $this->hideSearch = $bool;
 
         return $this;
     }

@@ -5,6 +5,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_SelectTag extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectTag;
 
+    /**
+     * @var bool
+     */
     protected $multiple;
 
     public function __construct($id = null) {
