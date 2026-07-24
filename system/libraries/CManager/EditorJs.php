@@ -191,7 +191,7 @@ class CManager_EditorJs {
     }
 
     /**
-     * @param $blockData
+     * @param array $blockData
      *
      * @return string
      */
