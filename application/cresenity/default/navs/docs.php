@@ -74,6 +74,11 @@ return [
                 'uri' => 'docs/other/websocket',
             ],
             [
+                'name' => 'other.ccolor',
+                'label' => c::__('CColor'),
+                'uri' => 'docs/other/ccolor',
+            ],
+            [
                 'name' => 'other.maintenance',
                 'label' => c::__('Maintenance'),
                 'uri' => 'docs/other/maintenance',
