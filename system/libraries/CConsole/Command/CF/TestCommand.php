@@ -44,7 +44,7 @@ class CConsole_Command_CF_TestCommand extends CConsole_Command {
         }
 
         $options = [];
-        $phpunitArgs = carr::get($this->input->getArguments(), 'phpunitArgs');
+        $phpunitArgs = $this->rawPhpunitArgs();
 
         $commands = array_merge(
             $this->binary(),
@@ -72,6 +72,35 @@ class CConsole_Command_CF_TestCommand extends CConsole_Command {
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Symfony's ArgvInput::bind() aborts entirely (leaving every declared
+     * argument unbound) the moment it hits an option this command's
+     * signature doesn't declare - e.g. `--filter=X`, which phpunit
+     * understands but this command doesn't. ignoreValidationErrors() only
+     * suppresses the resulting exception, it doesn't make binding lenient,
+     * so $this->input->getArguments()['phpunitArgs'] silently comes back
+     * empty whenever such an option is present, and every phpunit arg
+     * meant to scope the run (--filter, a specific test file, etc.) is
+     * lost - the run then executes the *entire* configured test suite
+     * instead of the intended subset. See the identical fix/note on
+     * CConsole_Command_TestCommand::rawPhpunitArgs().
+     *
+     * @return array
+     */
+    protected function rawPhpunitArgs() {
+        $argv = carr::get($_SERVER, 'argv', []);
+        $index = array_search($this->getName(), $argv, true);
+        if ($index === false) {
+            return carr::get($this->input->getArguments(), 'phpunitArgs', []);
+        }
+
+        $rawArgs = array_slice($argv, $index + 1);
+
+        return array_values(array_filter($rawArgs, function ($arg) {
+            return $arg !== '--without-tty';
+        }));
     }
 
     /**
