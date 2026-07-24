@@ -117,7 +117,7 @@ class CTesting_Browser_Console_BrowserCommand extends CConsole_Command {
 
     /**
      * Environment variables passed to the phpunit process. --browse maps to
-     * DUSK_HEADLESS_DISABLED, read by AbstractBrowserTestCase::driver() to
+     * BROWSER_TEST_HEADLESS_DISABLED, read by AbstractBrowserTestCase::driver() to
      * decide whether to add the --headless chrome argument.
      *
      * @return array
@@ -126,7 +126,7 @@ class CTesting_Browser_Console_BrowserCommand extends CConsole_Command {
         $variables = [];
 
         if ($this->option('browse')) {
-            $variables['DUSK_HEADLESS_DISABLED'] = 1;
+            $variables['BROWSER_TEST_HEADLESS_DISABLED'] = 1;
         }
 
         return $variables;

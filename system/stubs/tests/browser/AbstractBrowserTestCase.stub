@@ -59,6 +59,6 @@ abstract class AbstractBrowserTestCase extends \CTesting_BrowserTestCase {
      * @return bool
      */
     protected function hasHeadlessDisabled() {
-        return (bool) (getenv('DUSK_HEADLESS_DISABLED') ?: c::env('DUSK_HEADLESS_DISABLED'));
+        return (bool) (getenv('BROWSER_TEST_HEADLESS_DISABLED') ?: c::env('BROWSER_TEST_HEADLESS_DISABLED'));
     }
 }
