@@ -45,7 +45,7 @@ class CValidation {
      * @return CValidation_Factory|CValidation_Validator
      */
     public static function factory($data = null, array $rules = null, array $messages = [], array $customAttributes = []) {
-        if ($data != null) {
+        if ($data !== null) {
             return CValidation_Factory::instance()->make($data, $rules, $messages, $customAttributes);
         }
 

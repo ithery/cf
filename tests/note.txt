@@ -247,6 +247,62 @@ in Wave 1, then "wait and reapply") was the right fix; the right fix was
 in a completely different file (CModel/Collection.php) that owns the
 actual defect.
 
+[CHECKPOINT COMMIT PUSHED: f13090a18 - Waves 1a/1b/1c/2a/2b/3a/3b]
+All verified stable (full suite: only the 17 known sqlite-env failures
+remain). Pushed to git.cresenity.com:root/CApp.git development.
+Wave 3c (BelongsToMany/MorphToMany/Pivot) and 3d (MorphOne/MorphMany/
+MorphTo) still running at commit time, deliberately excluded, will be a
+follow-up commit.
+
+[Wave 3d - CModel MorphOne/MorphMany/MorphTo - DONE]
+3 new files (ModelMorphOneTest.php 17, ModelMorphManyTest.php 14,
+ModelMorphToTest.php 15), 46 tests all green. Zero source bugs found -
+clean result, all documented as confirmed-correct-behavior. Notable real
+differences from this repo's own BelongsTo/HasOne (not bugs, just
+worth knowing): MorphOneOrMany::setForeignAttributesForCreate() uses
+magic property assignment ($model->{$key}=$value) instead of
+setAttribute() like HasOneOrMany does; MorphTo::associate() always calls
+setRelation() even for null/non-model values (BelongsTo::associate()
+calls unsetRelation() in that case instead - deliberate divergence,
+matches real Laravel); MorphTo::newRelatedInstanceFor() re-resolves the
+relation via $parent->{$relationName}() since MorphTo has no single fixed
+related class. Also flagged a CF-specific gotcha: CModel defaults
+primaryKey to 'id' only when $table is NOT explicitly set - declaring
+$table without $primaryKey silently makes the key 'foo_id' instead of
+'id'.
+
+[Wave 3c - CModel BelongsToMany/MorphToMany/Pivot - DONE]
+3 new files (ModelBelongsToManyTest.php 55, ModelMorphToManyTest.php 12,
+ModelPivotTest.php 21 [Pivot+MorphPivot combined]), 88 tests all green,
+zero source bugs (everything that looked surprising turned out to be
+correct-as-implemented once traced through). Notable documented
+divergences from Laravel worth knowing about if anyone works on this code
+later: sync()'s detach-id array is NOT reindexed (array_diff preserves
+original keys); attach() with a custom pivot class (using()) calls
+newPivot() TWICE per record (once for a throwaway cast pass, once for
+the real save); MorphPivot's getCurrentlyAttachedPivots() only sets
+morph fields when the mapped record is already a MorphPivot instance -
+with the default (non-using()) pivot class the morph fields silently
+never get set; CF's timestamp columns are 'created'/'updated' not
+'created_at'/'updated_at' (same as noted elsewhere).
+
+[Wave 4 - CValidation - DONE]
+tests/Validation/ (new dir): ValidatorTest.php (62 tests, core
+mechanics - sometimes/after/bail/custom messages/Rule objects/nested
+wildcard rules) + ValidationRulesTest.php (100 tests, one/few per
+individual validate*() rule method - covers 85 of 96 implemented rules;
+skipped: active_url/exists/unique/current_password - DB/network-dependent
+with no easy mock seam; file/image/mimes/mimetypes/dimensions - need
+real File/UploadedFile instances). 162 total, all green.
+Real bug found and fixed by me (was flagged by the rules agent but out of
+its assigned file scope): system/libraries/CValidation.php::factory()
+used `if ($data != null)` (loose comparison) - since PHP treats
+`[] == null` as true, calling CValidation::factory([], $rules) (a
+perfectly plausible real call, empty-array form data) silently returned
+the CValidation_Factory singleton instead of a real Validator, so
+chaining ->passes()/->fails() would fatal with "Call to undefined
+method". Changed to `!==`.
+
 [Wave 2b - CDatabase Schema Builder tests - DONE, BIG one]
 5 new test files under tests/Database/ (DatabaseSchemaBuilderTest.php,
 DatabaseMySqlSchemaGrammarTest.php, DatabaseSQLiteSchemaGrammarTest.php,
