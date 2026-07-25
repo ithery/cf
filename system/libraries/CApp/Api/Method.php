@@ -8,20 +8,46 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
      */
     protected $api;
 
+    /**
+     * @var string
+     */
     protected $method;
 
+    /**
+     * @var int
+     */
     protected $errCode = 0;
 
+    /**
+     * @var string
+     */
     protected $errMessage = '';
 
+    /**
+     * @var array
+     */
     protected $data = [];
 
+    /**
+     * @var string
+     */
     protected $refId;
 
+    /**
+     * @var string
+     */
     protected $domain;
 
+    /**
+     * @var array|null
+     */
     private $request = null;
 
+    /**
+     * @param CApp_Api   $api
+     * @param string     $method
+     * @param array|null $request
+     */
     public function __construct(CApp_Api $api, $method, $request = null) {
         $this->api = $api;
         $this->domain = $this->api->getDomain();
@@ -33,10 +59,16 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
         }
     }
 
+    /**
+     * @return string
+     */
     public function sessionId() {
         return $this->refId;
     }
 
+    /**
+     * @return array
+     */
     public function request() {
         if ($this->request == null) {
             return array_merge($_GET, $_POST);
@@ -45,6 +77,9 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
         return $this->request;
     }
 
+    /**
+     * @return array
+     */
     public function result() {
         $data = $this->data;
         if (is_array($data) && count($data) == 0) {
@@ -59,14 +94,23 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
         return $return;
     }
 
+    /**
+     * @return int
+     */
     public function getErrCode() {
         return $this->errCode;
     }
 
+    /**
+     * @return string
+     */
     public function getErrMessage() {
         return $this->errMessage;
     }
 
+    /**
+     * @return void
+     */
     public function auth() {
         $apiKey = CF::config('devcloud.api_key');
         $secretKey = CF::config('devcloud.secret_key');
@@ -110,6 +154,9 @@ abstract class CApp_Api_Method implements CApp_Api_MethodInterface {
         }
     }
 
+    /**
+     * @return string
+     */
     public function domain() {
         return $this->domain;
     }

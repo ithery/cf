@@ -6,6 +6,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan <hery@itton.co.id>
  */
 class CApp_ErrorHandler {
+    /**
+     * @var array
+     */
     public static $errorLang = [
         E_RECOVERABLE_ERROR => [1, 'Recoverable Error', 'An error was detected which prevented the loading of this page. If this problem persists, please contact the website administrator.'],
         E_ERROR => [1, 'Fatal Error', ''],
@@ -17,6 +20,13 @@ class CApp_ErrorHandler {
         E_NOTICE => [2, 'Runtime Message', ''],
     ];
 
+    /**
+     * @param Exception   $exception
+     * @param string|null $email
+     * @param string|null $subject
+     *
+     * @return void|CVendor_SendGrid_Response
+     */
     public static function sendExceptionEmail(Exception $exception, $email = null, $subject = null) {
         $html = static::getHtml($exception);
         $app = CApp::instance();
@@ -71,6 +81,11 @@ class CApp_ErrorHandler {
         return CEmail::sender($smtpOptions)->send($email, $subject . ' [FOR ADMINISTRATOR]', $message, $smtpOptions);
     }
 
+    /**
+     * @param Exception $exception
+     *
+     * @return string
+     */
     public static function getHtml(Exception $exception) {
         $code = $exception->getCode();
         $type = get_class($exception);

@@ -5,6 +5,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\Process\Process;
 
 class CApp_Api_Method_Server_Git_Pull extends CApp_Api_Method_Server {
+    /**
+     * @return $this
+     */
     public function execute() {
         $output = '';
         $successOutput = '';

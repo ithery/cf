@@ -3,6 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CApp_Api_Method_Server_DomainUpdate extends CApp_Api_Method_Server {
+    /**
+     * Creates a new domain record on this server.
+     *
+     * @return $this
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

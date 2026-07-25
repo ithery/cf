@@ -8,8 +8,17 @@ defined('SYSPATH') or die('No direct access allowed.');
 use CHelper_File as File;
 
 class CApp_Config {
+    /**
+     * @var array
+     */
     protected static $configData = [];
 
+    /**
+     * @param string      $name
+     * @param null|string $appCode
+     *
+     * @return mixed
+     */
     public static function getData($name, $appCode = null) {
         if ($appCode == null) {
             $appCode = CF::appCode();
@@ -25,6 +34,12 @@ class CApp_Config {
         return $data;
     }
 
+    /**
+     * @param string $key
+     * @param string $domain
+     *
+     * @return mixed
+     */
     public static function get($key, $domain = '') {
         if (strlen($domain) == 0) {
             $domain = CF::domain();

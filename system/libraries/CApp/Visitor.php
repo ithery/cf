@@ -48,7 +48,7 @@ class CApp_Visitor {
     /**
      * Visitor constructor.
      *
-     * @param $config
+     * @param array $config
      *
      * @throws \Exception
      */
@@ -63,7 +63,7 @@ class CApp_Visitor {
     /**
      * Change the driver on the fly.
      *
-     * @param $driver
+     * @param string $driver
      *
      * @throws \Exception
      *
@@ -209,6 +209,8 @@ class CApp_Visitor {
      * Create a visit log.
      *
      * @param CModel $model
+     *
+     * @return mixed
      */
     public function visit(CModel $model = null) {
         foreach ($this->except as $path) {
@@ -233,6 +235,8 @@ class CApp_Visitor {
      *
      * @param string $model
      * @param int    $seconds
+     *
+     * @return mixed
      */
     public function onlineVisitors(string $model, $seconds = 180) {
         return c::container($model)->online()->get();
@@ -307,7 +311,7 @@ class CApp_Visitor {
      *
      * @throws \Exception
      *
-     * @return Driver
+     * @return CApp_Visitor_Contract_UserAgentParserInterface
      */
     protected function getFreshDriverInstance() {
         $this->validateDriver();

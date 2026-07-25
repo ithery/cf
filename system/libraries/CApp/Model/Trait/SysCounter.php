@@ -10,6 +10,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @property int                                                       $status
  */
 trait CApp_Model_Trait_SysCounter {
+    /**
+     * @param array $attributes
+     */
     public function __construct(array $attributes = []) {
         parent::__construct($attributes);
         $this->primaryKey = 'sys_counter_id';

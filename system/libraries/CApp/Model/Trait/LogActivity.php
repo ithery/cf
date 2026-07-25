@@ -28,6 +28,9 @@
  * @property      null|string                 $deletedby
  */
 trait CApp_Model_Trait_LogActivity {
+    /**
+     * @param array $attributes
+     */
     public function __construct(array $attributes = []) {
         parent::__construct($attributes);
         $this->primaryKey = 'log_activity_id';

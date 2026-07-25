@@ -94,7 +94,7 @@ class CApp_Mobile_Detector {
      * The matches extracted from the regex expression.
      * This is good for debug.
      *
-     * @var string
+     * @var array|null
      */
     protected $matchesArray = null;
 
@@ -683,6 +683,8 @@ class CApp_Mobile_Detector {
      *
      * @param array $httpHeaders The headers to set. If null, then using PHP's _SERVER to extract
      *                           the headers. The default null is left for backwards compatibility.
+     *
+     * @return void
      */
     public function setHttpHeaders($httpHeaders = null) {
         // use global _SERVER if $httpHeaders aren't defined
@@ -739,6 +741,11 @@ class CApp_Mobile_Detector {
         return null;
     }
 
+    /**
+     * Retrieve the list of known mobile HTTP headers.
+     *
+     * @return array
+     */
     public function getMobileHeaders() {
         return self::$mobileHeaders;
     }
@@ -849,6 +856,8 @@ class CApp_Mobile_Detector {
      *
      * @param string $type The type. Must be a self::DETECTION_TYPE_* constant. The default
      *                     parameter is null which will default to self::DETECTION_TYPE_MOBILE.
+     *
+     * @return void
      */
     public function setDetectionType($type = null) {
         if ($type === null) {
@@ -860,10 +869,20 @@ class CApp_Mobile_Detector {
         $this->detectionType = $type;
     }
 
+    /**
+     * Retrieve the matching regular expression from the last match() call.
+     *
+     * @return null|string
+     */
     public function getMatchingRegex() {
         return $this->matchingRegex;
     }
 
+    /**
+     * Retrieve the matches array from the last match() call.
+     *
+     * @return null|array
+     */
     public function getMatchesArray() {
         return $this->matchesArray;
     }

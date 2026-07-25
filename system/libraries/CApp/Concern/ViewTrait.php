@@ -6,14 +6,20 @@ trait CApp_Concern_ViewTrait {
     /** @var callable */
     protected static $viewCallback;
 
+    /**
+     * @var string
+     */
     private $viewName = 'cresenity/capp/page';
 
+    /**
+     * @var string
+     */
     private $viewLoginName = 'cresenity/capp/login';
 
     /**
      * View.
      *
-     * @var CView_View}string
+     * @var CView_View|string
      */
     private $view;
 
@@ -74,6 +80,11 @@ trait CApp_Concern_ViewTrait {
         return $this->view;
     }
 
+    /**
+     * @param callable $viewCallback
+     *
+     * @return void
+     */
     public function setViewCallback(callable $viewCallback) {
         self::$viewCallback = $viewCallback;
     }
@@ -100,6 +111,9 @@ trait CApp_Concern_ViewTrait {
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isUsingBlade() {
         /** @var CApp $this */
         if (!$this->isUserLogin() && $this->config('have_user_login') && $this->isAuthEnabled()) {

@@ -148,6 +148,9 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
      */
     private static $instance = null;
 
+    /**
+     * CApp_SEO_OpenGraph constructor.
+     */
     private function __construct() {
         $this->config = CF::config('seo.opengraph');
     }
@@ -579,7 +582,7 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
      *
      * @param array $attributes opengraph place attributes
      *
-     * @return OpenGraphContract
+     * @return static
      */
     public function setPlace($attributes = []) {
         $validkeys = [
@@ -597,7 +600,7 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
      *
      * @param array $attributes opengraph product attributes
      *
-     * @return OpenGraphContract
+     * @return static
      */
     public function setProduct($attributes = []) {
         $validkeys = [
@@ -698,7 +701,11 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     }
 
     /**
-     * @inheritdoc
+     * Set images property, replacing any existing images.
+     *
+     * @param array $urls
+     *
+     * @return static
      */
     public function setImages(array $urls) {
         $this->images = $urls;

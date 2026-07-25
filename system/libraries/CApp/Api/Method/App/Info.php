@@ -5,6 +5,12 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\Process\Process;
 
 class CApp_Api_Method_App_Info extends CApp_Api_Method_App {
+    /**
+     * Returns CF version info along with a map of available app-related API method
+     * abilities and whether their handler class exists.
+     *
+     * @return $this
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

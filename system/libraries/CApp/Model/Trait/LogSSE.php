@@ -10,6 +10,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @property int     $status
  */
 trait CApp_Model_Trait_LogSSE {
+    /**
+     * @param array $attributes
+     */
     public function __construct(array $attributes = []) {
         parent::__construct($attributes);
         $this->primaryKey = 'log_sse_id';
@@ -20,10 +23,10 @@ trait CApp_Model_Trait_LogSSE {
     /**
      * Saves SSE event in database table.
      *
-     * @param $message
-     * @param $type
-     * @param $event
-     * @param mixed $ref
+     * @param array      $message
+     * @param string     $type
+     * @param string     $event
+     * @param null|mixed $ref
      *
      * @return bool
      */
@@ -56,6 +59,8 @@ trait CApp_Model_Trait_LogSSE {
 
     /**
      * Deletes already processed events.
+     *
+     * @return void
      */
     public function deleteProcessed() {
         if (!CF::config('sse.keep_events_logs', true)) {

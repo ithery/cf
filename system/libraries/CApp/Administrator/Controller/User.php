@@ -5,6 +5,10 @@ defined('SYSPATH') or die('No direct access allowed.');
 use CApp_Administrator as Administrator;
 
 class CApp_Administrator_Controller_User extends CApp_Administrator_Controller {
+    /**
+     * Creates the controller, registering the datatable module and the
+     * administrator navigation before delegating to the parent controller.
+     */
     public function __construct() {
         $app = CApp::instance();
         if (!isset($_COOKIE['capp-administrator'])) {

@@ -3,12 +3,24 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 trait CApp_Concern_BootstrapTrait {
+    /**
+     * @var bool
+     */
     protected static $registerComponentBooted = false;
 
+    /**
+     * @var bool
+     */
     protected static $registerControlBooted = false;
 
+    /**
+     * @var bool
+     */
     protected static $registerBladeBooted = false;
 
+    /**
+     * @return void
+     */
     public static function registerComponent() {
         if (!static::$registerComponentBooted) {
             CComponent_RenameMe_SupportEvents::init();
@@ -91,6 +103,9 @@ trait CApp_Concern_BootstrapTrait {
         }
     }
 
+    /**
+     * @return void
+     */
     public static function registerBlade() {
         if (!static::$registerBladeBooted) {
             CView::blade()->directive('CApp', [CApp_Blade_Directive::class, 'directive']);
@@ -116,6 +131,9 @@ trait CApp_Concern_BootstrapTrait {
         }
     }
 
+    /**
+     * @return void
+     */
     public static function registerControl() {
         if (!static::$registerControlBooted) {
             $manager = CManager::instance();

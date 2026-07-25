@@ -4,10 +4,21 @@
  * @see CApp
  */
 trait CApp_Concern_RendererTrait {
+    /**
+     * @var bool
+     */
     protected $rendered = false;
 
+    /**
+     * @var null|array
+     */
     protected $viewData = null;
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderContent($options = []) {
         /** @var CApp $this */
         $viewData = $this->getViewData();
@@ -15,6 +26,12 @@ trait CApp_Concern_RendererTrait {
         return carr::get($viewData, 'content');
     }
 
+    /**
+     * @param null|array|Closure|CNavigation_Nav|string $nav
+     * @param mixed                                      $renderer
+     *
+     * @return string
+     */
     public function renderNavigation($nav = null, $renderer = null) {
         /** @var CApp $this */
         if ($nav == null) {
@@ -36,6 +53,11 @@ trait CApp_Concern_RendererTrait {
         return $renderer->render($nav->getData());
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderStyles($options = []) {
         /** @var CApp $this */
         $viewData = $this->getViewData();
@@ -75,6 +97,11 @@ trait CApp_Concern_RendererTrait {
 HTML;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderScripts($options = []) {
         $viewData = $this->getViewData();
         $endClientScript = carr::get($viewData, 'end_client_script', '');
@@ -115,27 +142,50 @@ HTML;
 HTML;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderTitle($options = []) {
         $viewData = $this->getViewData();
 
         return carr::get($viewData, 'title');
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderPageTitle($options = []) {
         $viewData = $this->getViewData();
 
         return carr::get($viewData, 'pageTitle');
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderMessages($options = []) {
         return CApp_Message::flashAll();
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderSeo($options = []) {
         /** @var CApp $this */
         return $this->seo()->generate();
     }
 
+    /**
+     * @return array
+     */
     public function getViewData() {
         /** @var CApp $this */
         if ($this->viewData == null) {
@@ -216,6 +266,9 @@ HTML;
         return $this->viewData;
     }
 
+    /**
+     * @return void
+     */
     public function allModuleData() {
         $allModule = CManager::asset()->module()->allModules();
         foreach ($allModule as $moduleName => $module) {
@@ -232,6 +285,9 @@ HTML;
         }
     }
 
+    /**
+     * @return bool
+     */
     public function rendered() {
         return $this->rendered;
     }

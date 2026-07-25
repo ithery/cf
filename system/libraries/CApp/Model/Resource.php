@@ -24,10 +24,23 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CApp_Model_Resource extends CApp_Model implements CModel_Resource_ResourceInterface {
     use CModel_Resource_ResourceTrait;
 
+    /**
+     * @var string
+     */
     protected $table = 'resource';
 
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array
+     */
     protected $guarded = ['resource_id'];
 
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
     protected $casts = [
         'manipulations' => 'array',
         'custom_properties' => 'array',

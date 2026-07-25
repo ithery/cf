@@ -1,6 +1,11 @@
 <?php
 
 class CApp_Api_Method_Server_Temp extends CApp_Api_Method_Server {
+    /**
+     * Dispatch the requested temp sub-command (deleteFile, listFile, content) and store its result.
+     *
+     * @return $this
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

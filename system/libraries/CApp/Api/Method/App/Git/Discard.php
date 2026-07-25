@@ -5,6 +5,12 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\Process\Process;
 
 class CApp_Api_Method_App_Git_Discard extends CApp_Api_Method_App {
+    /**
+     * Runs `git checkout -- .` on the app's git directory to discard local
+     * changes, and returns the output.
+     *
+     * @return $this
+     */
     public function execute() {
         $output = '';
         $successOutput = '';

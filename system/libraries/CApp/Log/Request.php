@@ -10,6 +10,11 @@ use CApp_Base as Base;
 use CApp_Navigation_Helper as NavHelper;
 
 class CApp_Log_Request {
+    /**
+     * @param array $data
+     *
+     * @return bool|void
+     */
     public static function populate($data = []) {
         $db = c::db();
         $appId = Base::appId();

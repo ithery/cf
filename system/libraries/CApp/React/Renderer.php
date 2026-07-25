@@ -1,6 +1,11 @@
 <?php
 
 class CApp_React_Renderer {
+    /**
+     * The react component name.
+     *
+     * @var string
+     */
     protected $name;
 
     /**
@@ -17,6 +22,10 @@ class CApp_React_Renderer {
      */
     protected $path;
 
+    /**
+     * @param string      $name
+     * @param null|string $content
+     */
     public function __construct($name, $content = null) {
         $this->name = $name;
 
@@ -38,6 +47,13 @@ class CApp_React_Renderer {
         }
     }
 
+    /**
+     * Render the react component to HTML.
+     *
+     * @param array $props
+     *
+     * @return string
+     */
     public function render($props) {
         $nodeJs = CServer::nodeJs();
         // const reactDevelopmentUrl = 'https://unpkg.com/react@17/umd/react.development.js';

@@ -100,6 +100,11 @@ JS;
         return $wrapperJs;
     }
 
+    /**
+     * @param string $consoleReplay
+     *
+     * @return void
+     */
     protected function logErrors($consoleReplay) {
         if (!$this->logger) {
             return;
@@ -110,6 +115,11 @@ JS;
         }
     }
 
+    /**
+     * @param string $consoleReplay
+     *
+     * @return array
+     */
     protected function extractErrorLines($consoleReplay) {
         $report = [];
         $lines = explode("\n", $consoleReplay);
@@ -123,6 +133,14 @@ JS;
         return $report;
     }
 
+    /**
+     * @param string $consoleReplay
+     * @param string $componentName
+     *
+     * @throws CApp_React_Exception_EvalJsException
+     *
+     * @return void
+     */
     protected function throwError($consoleReplay, $componentName) {
         $report = implode("\n", $this->extractErrorLines($consoleReplay));
 

@@ -3,6 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CApp_Api_Method_Server_GetFileList extends CApp_Api_Method_Server {
+    /**
+     * Lists files under the requested directory relative to DOCROOT.
+     *
+     * @return $this
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

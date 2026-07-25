@@ -1,6 +1,11 @@
 <?php
 
 class CApp_Api_Method_Server_Temp_ListFile extends CApp_Api_Method_Server_Temp_Abstract {
+    /**
+     * List files under the temp directory requested by the client.
+     *
+     * @return array
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

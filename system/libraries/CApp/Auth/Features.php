@@ -1,8 +1,18 @@
 <?php
 
 class CApp_Auth_Features {
+    /**
+     * @var array
+     */
     protected static $features;
 
+    /**
+     * Set the list of enabled features.
+     *
+     * @param array $features
+     *
+     * @return void
+     */
     public static function setFeatures($features) {
         static::$features = $features;
     }

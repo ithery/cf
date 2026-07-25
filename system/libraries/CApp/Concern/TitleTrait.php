@@ -6,12 +6,27 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @see CApp
  */
 trait CApp_Concern_TitleTrait {
+    /**
+     * @var null|string
+     */
     protected $title;
 
+    /**
+     * @var null|string
+     */
     protected $rawTitle;
 
+    /**
+     * @var bool
+     */
     private $showTitle = true;
 
+    /**
+     * @param string $title
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function setTitle($title, $lang = true) {
         /** @var CApp $this */
         $this->rawTitle = $title;
@@ -25,14 +40,23 @@ trait CApp_Concern_TitleTrait {
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     public function getTitle() {
         return $this->rawTitle;
     }
 
+    /**
+     * @return null|string
+     */
     public function getTranslationTitle() {
         return $this->title;
     }
 
+    /**
+     * @return bool
+     */
     public function haveTitle() {
         return strlen($this->title) > 0;
     }
@@ -54,6 +78,11 @@ trait CApp_Concern_TitleTrait {
         return $this->getTitle();
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function showTitle($bool) {
         $this->showTitle = $bool;
 

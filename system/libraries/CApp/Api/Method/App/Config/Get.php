@@ -3,6 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CApp_Api_Method_App_Config_Get extends CApp_Api_Method_App {
+    /**
+     * Loads the app's config data into $this->data.
+     *
+     * @return $this
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

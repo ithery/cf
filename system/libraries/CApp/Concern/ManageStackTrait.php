@@ -3,6 +3,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 trait CApp_Concern_ManageStackTrait {
+    /**
+     * @var int
+     */
     protected $renderCount = 0;
 
     /**

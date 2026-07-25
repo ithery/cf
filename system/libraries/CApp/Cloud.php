@@ -37,6 +37,11 @@ class CApp_Cloud {
         $this->adapter = $adapter;
     }
 
+    /**
+     * @param string $apiName
+     *
+     * @return mixed
+     */
     public function api($apiName) {
         $api = new CApp_Cloud_Api($this->adapter);
 

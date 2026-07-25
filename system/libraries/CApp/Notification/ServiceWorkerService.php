@@ -1,6 +1,11 @@
 <?php
 
 class CApp_Notification_ServiceWorkerService {
+    /**
+     * @param array $config
+     *
+     * @return string
+     */
     public function generate($config) {
         $driver = carr::get($config, 'driver');
         $options = carr::get($config, 'options');
@@ -13,6 +18,11 @@ class CApp_Notification_ServiceWorkerService {
         return $output;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     protected function firebaseScript($options) {
         $jsonOptions = json_encode($options);
 

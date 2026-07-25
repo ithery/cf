@@ -24,6 +24,9 @@ class CApp_Model_Visit extends CModel {
         'headers' => 'array',
     ];
 
+    /**
+     * @param array $attributes
+     */
     public function __construct(array $attributes = []) {
         if (!isset($this->table)) {
             $this->setTable(CF::config('visitor.table_name'));

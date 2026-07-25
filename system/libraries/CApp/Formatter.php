@@ -54,6 +54,9 @@ class CApp_Formatter {
      */
     private static $instance;
 
+    /**
+     * @return CApp_Formatter
+     */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
@@ -62,6 +65,9 @@ class CApp_Formatter {
         return static::$instance;
     }
 
+    /**
+     * Formatter constructor.
+     */
     private function __construct() {
         $this->dateFormat = CF::config('app.format.date', CF::config('date_formatted', 'Y-m-d'));
         $this->datetimeFormat = CF::config('app.format.datetime', CF::config('long_date_formatted', 'Y-m-d H:i:s'));
@@ -74,6 +80,9 @@ class CApp_Formatter {
         $this->currencyStripZeroDecimal = CF::config('app.format.currency_strip_zero_decimal', false);
     }
 
+    /**
+     * @return string
+     */
     public function getDateFormat() {
         return $this->dateFormat;
     }
@@ -89,6 +98,9 @@ class CApp_Formatter {
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getDatetimeFormat() {
         return $this->datetimeFormat;
     }
@@ -104,6 +116,9 @@ class CApp_Formatter {
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getThousandSeparator() {
         return $this->thousandSeparator;
     }
@@ -119,6 +134,9 @@ class CApp_Formatter {
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getDecimalSeparator() {
         return $this->decimalSeparator;
     }
@@ -134,6 +152,9 @@ class CApp_Formatter {
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function getDecimalDigit() {
         return $this->decimalDigit;
     }
@@ -167,6 +188,11 @@ class CApp_Formatter {
         return $this->currencyDecimalDigit;
     }
 
+    /**
+     * @param bool $isStriped
+     *
+     * @return CApp_Formatter
+     */
     public function setCurrencyStripZeroDecimal($isStriped = true) {
         $this->currencyStripZeroDecimal = $isStriped;
 

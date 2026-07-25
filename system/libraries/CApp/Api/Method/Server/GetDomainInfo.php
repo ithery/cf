@@ -3,6 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CApp_Api_Method_Server_GetDomainInfo extends CApp_Api_Method_Server {
+    /**
+     * Returns the stored info for the requested domain.
+     *
+     * @return $this
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

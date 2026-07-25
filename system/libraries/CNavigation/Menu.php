@@ -20,10 +20,16 @@ class CNavigation_Menu {
         $this->items = $menu;
     }
 
+    /**
+     * @return array
+     */
     public function getItems() {
         return $this->items;
     }
 
+    /**
+     * @return int
+     */
     public function count() {
         return count($this->items);
     }

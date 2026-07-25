@@ -3,10 +3,22 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 trait CApp_Trait_VarTrait {
+    /**
+     * @var array|null
+     */
     protected static $globalVars;
 
+    /**
+     * @var array|null
+     */
     protected static $vars;
 
+    /**
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
     public static function getGlobalVar($key, $default = null) {
         if (!isset(self::$globalVars[$key])) {
             $db = c::db();
@@ -20,6 +32,12 @@ trait CApp_Trait_VarTrait {
         return self::$globalVars[$key];
     }
 
+    /**
+     * @param string $key
+     * @param mixed  $val
+     *
+     * @return bool
+     */
     public static function setGlobalVar($key, $val) {
         $db = c::db();
         $row = $db->getRow('select * from var where org_id is null and `key` = ' . $db->escape($key));
@@ -41,6 +59,13 @@ trait CApp_Trait_VarTrait {
         return true;
     }
 
+    /**
+     * @param string   $key
+     * @param int|null $orgId
+     * @param mixed    $default
+     *
+     * @return mixed
+     */
     public static function getVar($key, $orgId = null, $default = null) {
         if ($orgId == null) {
             $orgId = CApp_Base::orgId();
@@ -63,6 +88,13 @@ trait CApp_Trait_VarTrait {
         return self::$vars[$orgId][$key];
     }
 
+    /**
+     * @param string   $key
+     * @param mixed    $val
+     * @param int|null $orgId
+     *
+     * @return bool
+     */
     public static function setVar($key, $val, $orgId = null) {
         if ($orgId == null) {
             $orgId = CApp_Base::orgId();

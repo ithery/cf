@@ -53,6 +53,11 @@ class CApp_Visitor_Agent extends MobileDetect {
         'WeChat' => 'MicroMessenger',
     ];
 
+    /**
+     * Crawler detector instance.
+     *
+     * @var CrawlerDetect
+     */
     protected static CrawlerDetect $crawlerDetect;
 
     /**
@@ -62,6 +67,11 @@ class CApp_Visitor_Agent extends MobileDetect {
      */
     protected array $store = [];
 
+    /**
+     * Get the detection rules.
+     *
+     * @return array
+     */
     public function getRules(): array {
         static $rules;
 
@@ -147,7 +157,11 @@ class CApp_Visitor_Agent extends MobileDetect {
     }
 
     /**
+     * @param string $key
+     *
      * @throws RandomException
+     *
+     * @return string
      */
     protected function createCacheKey(string $key): string {
         $userAgentKey = $this->hasUserAgent() ? $this->userAgent : '';
@@ -347,6 +361,11 @@ class CApp_Visitor_Agent extends MobileDetect {
 
     /**
      * @inheritdoc
+     *
+     * @param string $name
+     * @param array  $arguments
+     *
+     * @return mixed
      */
     public function __call($name, $arguments) {
         // Make sure the name starts with 'is', otherwise

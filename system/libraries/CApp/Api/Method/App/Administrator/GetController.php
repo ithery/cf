@@ -1,6 +1,12 @@
 <?php
 
 class CApp_Api_Method_App_Administrator_GetController extends CApp_Api_Method_App {
+    /**
+     * Scans the app's controllers directory and populates $this->data with
+     * each controller class's name and public/private methods.
+     *
+     * @return void
+     */
     public function execute() {
         $appCode = $this->appCode;
         $controllerPath = DOCROOT . 'application/' . $appCode . '/default/controllers/';

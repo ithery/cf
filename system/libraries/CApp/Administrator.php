@@ -8,12 +8,21 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CApp_Administrator {
     const ADMIN_SESSSION_KEY = 'administrator';
 
+    /**
+     * @var array
+     */
     protected static $navs = [];
 
+    /**
+     * @return bool
+     */
     public static function isEnabled() {
         return isset($_COOKIE['capp-administrator']);
     }
 
+    /**
+     * @return bool
+     */
     public static function isLogin() {
         $session = c::session();
         $admin = $session->get(self::ADMIN_SESSSION_KEY);
@@ -21,6 +30,11 @@ class CApp_Administrator {
         return $admin != null;
     }
 
+    /**
+     * @param string $password
+     *
+     * @return bool
+     */
     public static function login($password) {
         if (md5($password) == 'a5d93c9e4eacf2120c6c478064832e8f') {
             $adminData = [
@@ -39,15 +53,26 @@ class CApp_Administrator {
         return false;
     }
 
+    /**
+     * @return void
+     */
     public static function logout() {
         $session = c::session();
         $session->delete(self::ADMIN_SESSSION_KEY);
     }
 
+    /**
+     * @param array $nav
+     *
+     * @return void
+     */
     public static function addNav($nav) {
         static::$navs[] = $nav;
     }
 
+    /**
+     * @return array
+     */
     public static function getNav() {
         return static::$navs;
     }

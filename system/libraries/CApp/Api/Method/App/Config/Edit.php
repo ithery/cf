@@ -3,6 +3,12 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CApp_Api_Method_App_Config_Edit extends CApp_Api_Method_App {
+    /**
+     * Updates a single app config key/value and writes it back to the
+     * app's config/app.php file.
+     *
+     * @return $this
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

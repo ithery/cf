@@ -1,8 +1,14 @@
 <?php
 
 trait CApp_Concern_OrgTrait {
+    /**
+     * @var null|CModel|CApp_Model_Org
+     */
     private $org = null;
 
+    /**
+     * @var null|int
+     */
     private $orgId = null;
 
     /**
@@ -26,6 +32,9 @@ trait CApp_Concern_OrgTrait {
         return null;
     }
 
+    /**
+     * @return null|int
+     */
     public function orgId() {
         return CApp_Base::orgId();
     }

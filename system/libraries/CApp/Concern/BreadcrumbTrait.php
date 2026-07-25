@@ -20,6 +20,11 @@ trait CApp_Concern_BreadcrumbTrait {
      */
     private $breadcrumbCallback = null;
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function showBreadcrumb($bool = true) {
         $this->showBreadcrumb = $bool;
 
@@ -42,6 +47,9 @@ trait CApp_Concern_BreadcrumbTrait {
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getBreadcrumb() {
         $breadcrumb = $this->breadcrumb;
         if ($this->breadcrumbCallback != null) {

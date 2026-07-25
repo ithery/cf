@@ -3,10 +3,19 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CApp_Api {
+    /**
+     * @var null|string
+     */
     protected $domain = null;
 
+    /**
+     * @var CApp_Api[]
+     */
     private static $instance = [];
 
+    /**
+     * @param string $domain
+     */
     protected function __construct($domain) {
         $this->domain = $domain;
     }

@@ -4,7 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CApp_Project {
     /**
-     * @param type $type
+     * @param string $type
      *
      * @return \CApp_Project_AbstractGenerator
      */

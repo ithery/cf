@@ -155,6 +155,8 @@ class CNavigation_Manager {
 
     /**
      * @param mixed $activeCallback
+     *
+     * @return $this
      */
     public function setActiveCallback($activeCallback) {
         $this->activeCallback = $activeCallback;

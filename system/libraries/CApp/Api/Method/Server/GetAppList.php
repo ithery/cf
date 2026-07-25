@@ -3,6 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CApp_Api_Method_Server_GetAppList extends CApp_Api_Method_Server {
+    /**
+     * Lists the app folders present under the server's application directory.
+     *
+     * @return $this
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

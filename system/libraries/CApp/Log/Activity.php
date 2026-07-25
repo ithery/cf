@@ -6,6 +6,12 @@ use CApp_Base as Base;
 use CApp_Navigation_Helper as NavHelper;
 
 class CApp_Log_Activity {
+    /**
+     * @param string $description
+     * @param array  $data
+     *
+     * @return void
+     */
     public static function populate($description, $data) {
         $modelName = CF::config('app.model.log_activity', CApp_Model_LogActivity::class);
         $model = new $modelName();
@@ -80,6 +86,11 @@ class CApp_Log_Activity {
         $model->save();
     }
 
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
     protected static function normalizeDataForJsonEncoding($data) {
         foreach ($data as $dataIndex => $record) {
             $beforeData = carr::get($record, 'before');

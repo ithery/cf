@@ -5,6 +5,13 @@ defined('SYSPATH') or die('No direct access allowed.');
 use CApp_Navigation_Helper as Helper;
 
 class CNavigation_Renderer_SidenavRenderer extends CNavigation_RendererAbstract {
+    /**
+     * @param null|array $navs
+     * @param int        $level
+     * @param int        $child
+     *
+     * @return bool|string
+     */
     public function render($navs = null, $level = 0, &$child = 0) {
         $domain = CF::domain();
 

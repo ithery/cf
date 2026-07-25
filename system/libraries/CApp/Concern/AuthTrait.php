@@ -23,7 +23,7 @@ trait CApp_Concern_AuthTrait {
     private $roleResolver = null;
 
     /**
-     * @var string
+     * @var null|string
      */
     private $guard = null;
 

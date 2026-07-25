@@ -3,11 +3,15 @@
 class CApp_Visitor_Driver_JenssegersAgentDriver implements CApp_Visitor_Contract_UserAgentParserInterface {
     /**
      * Request container.
+     *
+     * @var CHTTP_Request
      */
     protected CHTTP_Request $request;
 
     /**
      * Agent parser.
+     *
+     * @var CApp_Visitor_Agent
      */
     protected CApp_Visitor_Agent $parser;
 
@@ -23,6 +27,8 @@ class CApp_Visitor_Driver_JenssegersAgentDriver implements CApp_Visitor_Contract
 
     /**
      * Retrieve device's name.
+     *
+     * @return string
      */
     public function device() : string {
         return $this->parser->device();
@@ -30,6 +36,8 @@ class CApp_Visitor_Driver_JenssegersAgentDriver implements CApp_Visitor_Contract
 
     /**
      * Retrieve platform's name.
+     *
+     * @return string
      */
     public function platform() : string {
         return $this->parser->platform();
@@ -37,6 +45,8 @@ class CApp_Visitor_Driver_JenssegersAgentDriver implements CApp_Visitor_Contract
 
     /**
      * Retrieve browser's name.
+     *
+     * @return string
      */
     public function browser() : string {
         return $this->parser->browser();
@@ -44,6 +54,8 @@ class CApp_Visitor_Driver_JenssegersAgentDriver implements CApp_Visitor_Contract
 
     /**
      * Retrieve languages.
+     *
+     * @return array
      */
     public function languages() : array {
         return $this->parser->languages();
@@ -51,6 +63,8 @@ class CApp_Visitor_Driver_JenssegersAgentDriver implements CApp_Visitor_Contract
 
     /**
      * Initialize userAgent parser.
+     *
+     * @return CApp_Visitor_Agent
      */
     protected function initParser(): CApp_Visitor_Agent {
         $parser = new CApp_Visitor_Agent();

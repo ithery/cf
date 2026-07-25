@@ -6,6 +6,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @deprecated 1.6 Use CNavigation_Manager instead
  */
 class CApp_Navigation_Helper {
+    /**
+     * @var array<int|string, array<int|string, array>>
+     */
     protected static $role_navs = [];
 
     /**
@@ -209,12 +212,30 @@ class CApp_Navigation_Helper {
         return $role->rolePermission()->where('name', '=', $action)->where('app_id', '=', $appId)->count() > 0;
     }
 
+    /**
+     * @param mixed       $appId
+     * @param mixed       $roleId
+     * @param mixed       $appRoleId
+     * @param null|string $domain
+     *
+     * @return array
+     */
     public static function appUserRightsArray($appId, $roleId, $appRoleId = '', $domain = null) {
         $navs = CApp_Navigation_Data::get($domain);
 
         return self::asUserRightsArray($appId, $roleId, $navs, $appRoleId, $domain);
     }
 
+    /**
+     * @param mixed                        $appId
+     * @param mixed                        $roleId
+     * @param null|array|CNavigation_Nav   $navs
+     * @param mixed                        $appRoleId
+     * @param mixed                        $domain
+     * @param int                          $level
+     *
+     * @return array
+     */
     public static function asUserRightsArray($appId, $roleId, $navs = null, $appRoleId = '', $domain = '', $level = 0) {
         if ($navs == null) {
             $navs = CApp_Navigation::instance()->navs();
@@ -388,6 +409,15 @@ class CApp_Navigation_Helper {
         return true;
     }
 
+    /**
+     * @param string     $action
+     * @param null|mixed $nav
+     * @param mixed      $appId
+     * @param mixed      $domain
+     * @param mixed      $appRoleId
+     *
+     * @return bool
+     */
     public static function permissionAvailable($action, $nav = null, $appId = '', $domain = '', $appRoleId = '') {
         if ($nav == null) {
             $nav = self::nav();
@@ -420,6 +450,13 @@ class CApp_Navigation_Helper {
         return true;
     }
 
+    /**
+     * @param null|array $navs
+     * @param int        $level
+     * @param int        $child
+     *
+     * @return bool|string
+     */
     public static function render($navs = null, $level = 0, &$child = 0) {
         if ($navs == null) {
             $navs = CApp_Navigation::instance()->navs();

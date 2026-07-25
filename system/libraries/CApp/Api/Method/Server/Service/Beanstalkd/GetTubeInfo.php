@@ -1,6 +1,9 @@
 <?php
 
 class CApp_Api_Method_Server_Service_Beanstalkd_GetTubeInfo extends CApp_Api_Method_Server {
+    /**
+     * @return $this
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

@@ -5,6 +5,13 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\Process\Process;
 
 class CApp_Api_Method_App_Git_Clean extends CApp_Api_Method_App {
+    /**
+     * Verifies that `git clean -n`'s would-remove list matches the
+     * untracked files reported by `git status`, then runs `git clean -f`
+     * on the app's git directory.
+     *
+     * @return $this
+     */
     public function execute() {
         $output = '';
         $successOutput = '';

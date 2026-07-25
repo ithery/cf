@@ -9,12 +9,12 @@ class CApp_Cloud_Api {
     const ENDPOINT = 'https://cpanel.ittron.co.id/api';
 
     /**
-     * @var AdapterInterface
+     * @var CApp_Cloud_AdapterInterface
      */
     protected $adapter;
 
     /**
-     * @var AdapterInterface
+     * @var string
      */
     protected $endPoint;
 
@@ -27,6 +27,11 @@ class CApp_Cloud_Api {
         $this->endPoint = $endPoint ?: static::ENDPOINT;
     }
 
+    /**
+     * Build the default POST payload sent with every API request.
+     *
+     * @return array
+     */
     public function getDefaultPost() {
         $default = [];
         $default['domain'] = CF::domain();
@@ -34,6 +39,16 @@ class CApp_Cloud_Api {
         return $default;
     }
 
+    /**
+     * Execute an API query, merging the given data with the default POST payload.
+     *
+     * @param string $query    the API endpoint path to call
+     * @param array  $postData additional POST data merged with the default payload
+     *
+     * @throws CApp_Cloud_Exception_ApiException if the response is not a valid array or the API reports an error
+     *
+     * @return mixed the 'data' entry of the decoded API response
+     */
     public function execute($query, $postData = []) {
         $post = array_merge($this->getDefaultPost(), $postData);
         $errCode = 0;

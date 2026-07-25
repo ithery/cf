@@ -22,20 +22,44 @@ class CApp_Auth {
      */
     public static $confirmPasswordsUsingCallback;
 
+    /**
+     * @var null|callable|string
+     */
     protected $loginView;
 
+    /**
+     * @var null|callable|string
+     */
     protected $twoFactorChallengeView;
 
+    /**
+     * @var null|callable|string
+     */
     protected $registerView;
 
+    /**
+     * @var null|callable|string
+     */
     protected $resetPasswordView;
 
+    /**
+     * @var null|callable|string
+     */
     protected $confirmPasswordView;
 
+    /**
+     * @var null|callable|string
+     */
     protected $verifyEmailView;
 
+    /**
+     * @var null|callable|string
+     */
     protected $requestPasswordResetLinkView;
 
+    /**
+     * @var CApp_Auth_Features
+     */
     protected $features;
 
     /**
@@ -48,14 +72,29 @@ class CApp_Auth {
      */
     protected $resolvedGuard;
 
+    /**
+     * @var null|array
+     */
     protected $resolvedGuardConfig;
 
+    /**
+     * @var null|array
+     */
     protected $resolvedProviderConfig;
 
+    /**
+     * @var null|string
+     */
     protected $resolvedRoleModelClass;
 
+    /**
+     * @var null|string
+     */
     protected $resolvedRoleNavModelClass;
 
+    /**
+     * @var null|string
+     */
     protected $resolvedRolePermissionModelClass;
 
     /**
@@ -63,6 +102,13 @@ class CApp_Auth {
      */
     private static $instance;
 
+    /**
+     * Get (or create) the singleton CApp_Auth instance for the given guard.
+     *
+     * @param string $guard
+     *
+     * @return CApp_Auth
+     */
     public static function instance($guard) {
         if (static::$instance == null) {
             static::$instance = [];
@@ -92,6 +138,9 @@ class CApp_Auth {
         static::$instance = null;
     }
 
+    /**
+     * @param string $guard
+     */
     public function __construct($guard) {
         $this->guard = $guard;
         $this->features = new CApp_Auth_Features();
@@ -100,7 +149,7 @@ class CApp_Auth {
     /**
      * Get Auth Features Instance.
      *
-     * @return CApp_Auth_Features;
+     * @return CApp_Auth_Features
      */
     public function features() {
         return $this->features;
@@ -233,10 +282,23 @@ class CApp_Auth {
         return $this->guard;
     }
 
+    /**
+     * Create a new login rate limiter instance.
+     *
+     * @return CApp_Auth_LoginRateLimiter
+     */
     public static function loginRateLimiter() {
         return new CApp_Auth_LoginRateLimiter(new CCache_RateLimiter(c::cache()->store()));
     }
 
+    /**
+     * Attempt to authenticate a user using the given credentials.
+     *
+     * @param array $credentials
+     * @param bool  $remember
+     *
+     * @return bool
+     */
     public function attempt(array $credentials = [], $remember = false) {
         return $this->guard()->attempt($credentials, $remember);
     }
@@ -325,6 +387,11 @@ class CApp_Auth {
         return $this->resolvedRoleNavModelClass;
     }
 
+    /**
+     * Get the configuration array for the current guard.
+     *
+     * @return null|array
+     */
     public function getGuardConfig() {
         if ($this->resolvedGuardConfig === null) {
             $this->resolvedGuardConfig = CF::config('auth.guards.' . $this->guard);
@@ -333,6 +400,11 @@ class CApp_Auth {
         return $this->resolvedGuardConfig;
     }
 
+    /**
+     * Get the configuration array for the current guard's provider.
+     *
+     * @return array
+     */
     public function getProviderConfig() {
         if ($this->resolvedProviderConfig === null) {
             $authConfig = CF::config('auth.providers.' . carr::get($this->getGuardConfig(), 'provider'), []);

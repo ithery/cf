@@ -3,12 +3,21 @@
 class CApp_PWA_ManifestService {
     use CApp_PWA_Trait_GroupConfigTrait;
 
+    /**
+     * @var string
+     */
     protected $group;
 
+    /**
+     * @param string $group
+     */
     public function __construct($group) {
         $this->group = $group;
     }
 
+    /**
+     * @return array
+     */
     public function generate() {
         $basicManifest = [
             'name' => $this->getGroupConfig('manifest.name'),

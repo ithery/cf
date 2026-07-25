@@ -3,14 +3,29 @@
 class CApp_PWA {
     use CApp_PWA_Trait_GroupConfigTrait;
 
+    /**
+     * @var string
+     */
     protected $group;
 
+    /**
+     * @var bool
+     */
     protected $enabled = false;
 
+    /**
+     * @var string
+     */
     protected $startUrl = '';
 
+    /**
+     * @var bool
+     */
     protected $debug = true;
 
+    /**
+     * @param string $group
+     */
     public function __construct($group = 'default') {
         $this->group = $group;
         $startUrl = $this->getGroupConfig('start_url', '/');
@@ -19,6 +34,9 @@ class CApp_PWA {
         $this->debug = $this->getGroupConfig('debug', true);
     }
 
+    /**
+     * @return void
+     */
     public function enable() {
         $startUrl = $this->startUrl;
         $theme = $this->getGroupConfig('theme');
@@ -70,6 +88,9 @@ class CApp_PWA {
         return $this->enabled;
     }
 
+    /**
+     * @return bool
+     */
     public function isDebug() {
         return $this->debug;
     }

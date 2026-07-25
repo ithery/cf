@@ -1,6 +1,9 @@
 <?php
 
 class CApp_Api_Method_Server_Temp_DeleteFile extends CApp_Api_Method_Server_Temp_Abstract {
+    /**
+     * @return array
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

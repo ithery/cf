@@ -3,26 +3,59 @@
  * @see CApp
  */
 class CApp_Notification {
+    /**
+     * @var bool
+     */
     protected $enabled = false;
 
+    /**
+     * @var bool
+     */
     protected $debug = false;
 
+    /**
+     * @var null|string
+     */
     protected $driver;
 
+    /**
+     * @var array
+     */
     protected $config;
 
+    /**
+     * @var array
+     */
     protected $options;
 
+    /**
+     * @var string
+     */
     protected $startUrl;
 
+    /**
+     * @var string
+     */
     protected $sendTokenPath;
 
+    /**
+     * @var string
+     */
     protected $tokenLocalStorageKey;
 
+    /**
+     * @var null|string
+     */
     protected $group;
 
+    /**
+     * @var CApp_Notification
+     */
     private static $instance;
 
+    /**
+     * @return CApp_Notification
+     */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
@@ -31,6 +64,9 @@ class CApp_Notification {
         return static::$instance;
     }
 
+    /**
+     * CApp_Notification constructor.
+     */
     private function __construct() {
         $this->group = null;
         $this->config = CF::config('notification.web');
@@ -46,6 +82,11 @@ class CApp_Notification {
         $this->options = $options;
     }
 
+    /**
+     * @param null|string $group
+     *
+     * @return void
+     */
     public function enable($group = null) {
         if (!$this->enabled) {
             $this->group = $group;
@@ -116,10 +157,16 @@ class CApp_Notification {
         return $this->tokenLocalStorageKey;
     }
 
+    /**
+     * @return null|string
+     */
     public function getDriver() {
         return $this->driver;
     }
 
+    /**
+     * @return array
+     */
     public function getOptions() {
         return $this->options;
     }

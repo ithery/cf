@@ -5,6 +5,12 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\Process\Process;
 
 class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
+    /**
+     * Runs an allowed git command (status, fetch, or pull) on the app's
+     * git directory and returns the output.
+     *
+     * @return $this
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

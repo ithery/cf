@@ -3,6 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CApp_Api_Method_App_GitStatus extends CApp_Api_Method_App {
+    /**
+     * Runs a `git status` on the app's directory via shell_exec and returns the output.
+     *
+     * @return $this
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

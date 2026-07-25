@@ -25,6 +25,9 @@ abstract class CNavigation_RendererAbstract implements CApp_Navigation_EngineInt
      */
     protected $navs = null;
 
+    /**
+     * @param array $options
+     */
     public function __construct($options = []) {
         $app = CApp::instance();
 

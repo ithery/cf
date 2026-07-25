@@ -9,7 +9,7 @@ class CApp_Event_OnRenderableAdded {
     public $renderableClass;
 
     /**
-     * @var content
+     * @var mixed
      */
     public $content;
 
@@ -29,12 +29,15 @@ class CApp_Event_OnRenderableAdded {
     }
 
     /**
-     * @return CRenderable
+     * @return string
      */
     public function getRenderableClass() {
         return $this->renderableClass;
     }
 
+    /**
+     * @return mixed
+     */
     public function getContent() {
         return $this->content;
     }

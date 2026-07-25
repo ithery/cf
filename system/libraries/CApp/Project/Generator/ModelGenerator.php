@@ -3,20 +3,43 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerator {
+    /**
+     * @var string
+     */
     public $fieldsFillable;
 
+    /**
+     * @var string
+     */
     public $fieldsHidden;
 
+    /**
+     * @var string
+     */
     public $fieldsCast;
 
+    /**
+     * @var string
+     */
     public $fieldsDate;
 
+    /**
+     * @var CCollection
+     */
     public $columns;
 
+    /**
+     * CApp_Project_Generator_ModelGenerator constructor.
+     */
     public function __construct() {
         parent::__construct();
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function generate($options = []) {
         if (!is_array($options)) {
             $options = [];
@@ -142,6 +165,8 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
 
     /**
      * Returns the stub to use to generate the class.
+     *
+     * @return string
      */
     public function getStub() {
         return DOCROOT . 'modules/cresenity/data/stub/generator/model.stub';
@@ -149,6 +174,8 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
 
     /**
      * Returns all the options that the user specified.
+     *
+     * @return void
      */
     protected function fixOptions() {
         // debug
@@ -159,6 +186,8 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
 
     /**
      * Reset all variables to be filled again when using multiple.
+     *
+     * @return void
      */
     public function resetFields() {
         $this->fieldsFillable = '';

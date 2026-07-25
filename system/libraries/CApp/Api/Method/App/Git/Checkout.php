@@ -5,6 +5,12 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\Process\Process;
 
 class CApp_Api_Method_App_Git_Checkout extends CApp_Api_Method_App {
+    /**
+     * Runs `git checkout` for the requested branch on the app's git
+     * directory and returns the output.
+     *
+     * @return $this
+     */
     public function execute() {
         $output = '';
         $successOutput = '';

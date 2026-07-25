@@ -3,6 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CApp_Api_Method_Server_DomainDelete extends CApp_Api_Method_Server {
+    /**
+     * Deletes a domain record from this server.
+     *
+     * @return $this
+     */
     public function execute() {
         $errCode = 0;
         $errMessage = '';

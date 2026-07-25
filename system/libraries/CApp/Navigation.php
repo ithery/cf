@@ -8,14 +8,25 @@ use CApp_Navigation_Helper as Helper;
  * @deprecated 1.6, dont use this anymore
  */
 class CApp_Navigation {
+    /**
+     * @var CApp_Navigation[]
+     */
     public static $instance = [];
 
+    /**
+     * @var callable[]
+     */
     protected static $accessCallback = [];
 
+    /**
+     * @var callable[]
+     */
     protected static $activeCallback = [];
 
     /**
      * @param string $domain optional
+     *
+     * @return null|callable
      */
     public static function getAccessCallback($domain = null) {
         if ($domain == null) {
@@ -27,6 +38,8 @@ class CApp_Navigation {
 
     /**
      * @param string $domain optional
+     *
+     * @return null|callable
      */
     public static function getActiveCallback($domain = null) {
         if ($domain == null) {
@@ -37,8 +50,10 @@ class CApp_Navigation {
     }
 
     /**
-     * @param callable $navigationCallback
-     * @param string   $domain             optional
+     * @param callable $accessCallback
+     * @param string   $domain         optional
+     *
+     * @return void
      */
     public static function setAccessCallback(callable $accessCallback, $domain = null) {
         if ($domain == null) {
@@ -51,6 +66,8 @@ class CApp_Navigation {
     /**
      * @param callable $activeCallback
      * @param string   $domain         optional
+     *
+     * @return void
      */
     public static function setActiveCallback(callable $activeCallback, $domain = null) {
         if ($domain == null) {
@@ -77,9 +94,17 @@ class CApp_Navigation {
         return self::$instance[$domain];
     }
 
+    /**
+     * @param null|string $domain
+     */
     public function __construct($domain = null) {
     }
 
+    /**
+     * @param null|string $domain
+     *
+     * @return array
+     */
     public static function navs($domain = null) {
         if ($domain == null) {
             $domain = CF::domain();
@@ -92,7 +117,7 @@ class CApp_Navigation {
     /**
      * @param array $options
      *
-     * @return html of the element
+     * @return string html of the element
      */
     public static function render($options = []) {
         $engine = carr::get($options, 'engine', 'Bootstrap');
@@ -107,6 +132,14 @@ class CApp_Navigation {
         return $app->renderNavigation();
     }
 
+    /**
+     * @param null|array  $navs
+     * @param int         $level
+     * @param int         $child
+     * @param null|string $domain
+     *
+     * @return array|bool
+     */
     public static function filterNavWithAccess($navs = null, $level = 0, &$child = 0, $domain = null) {
         if ($domain == null) {
             $domain = CF::domain();

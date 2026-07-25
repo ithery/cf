@@ -1,6 +1,12 @@
 <?php
 
 class CApp_Api_Method_App_Administrator_GetNavigation extends CApp_Api_Method_App {
+    /**
+     * Loads the app's navigation files and populates $this->data keyed by
+     * each navigation file's basename.
+     *
+     * @return void
+     */
     public function execute() {
         $appCode = $this->appCode;
         $defaultPath = DOCROOT . 'application/' . $appCode . '/default/';

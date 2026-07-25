@@ -16,6 +16,8 @@ interface CApp_Cloud_AdapterInterface {
      * @param string $url
      *
      * @throws HttpException
+     *
+     * @return string
      */
     public function delete($url);
 
