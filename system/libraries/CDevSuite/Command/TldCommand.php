@@ -15,14 +15,12 @@ class CDevSuite_Command_TldCommand extends CDevSuite_CommandAbstract {
         }
 
         $oldTld = CDevSuite::configuration()->read()['tld'];
+        $tld = trim($tld, '.');
 
         if (CServer::getOS() == CServer::OS_WINNT) {
             CDevSuite::acrylic()->updateTld($tld);
         } else {
-            CDevSuite::acrylic()->updateTld(
-                $oldTld,
-                $tld = trim($tld, '.')
-            );
+            CDevSuite::dnsMasq()->updateTld($oldTld, $tld);
         }
 
         CDevSuite::configuration()->updateKey('tld', $tld);

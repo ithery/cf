@@ -14,8 +14,18 @@ class CDevSuite_Linux_System extends CDevSuite_System {
      * @return void
      */
     public function symlinkToUsersBin() {
-        //die('DD');
-        //$this->cli->run('ln -snf ' . dirname(__DIR__, 2) . '/devsuite' . ' ' . $this->devSuiteBin);
+        $this->unlinkFromUsersBin();
+
+        $this->cli->runAsUser('ln -s "' . realpath(__DIR__ . '/../../../data/devsuite/scripts/linux/bootstrap.sh') . '" ' . $this->devSuiteBin);
+    }
+
+    /**
+     * Remove the symlink from the user's local bin.
+     *
+     * @return void
+     */
+    public function unlinkFromUsersBin() {
+        $this->cli->quietlyAsUser('rm ' . $this->devSuiteBin);
     }
 
     /**

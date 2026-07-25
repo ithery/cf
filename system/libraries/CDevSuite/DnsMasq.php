@@ -37,4 +37,14 @@ abstract class CDevSuite_DnsMasq {
      * @return void
      */
     abstract public function uninstall();
+
+    /**
+     * Update the TLD/domain resolved by DnsMasq.
+     *
+     * @param string $oldTld Old TLD
+     * @param string $newTld New TLD
+     *
+     * @return void
+     */
+    abstract public function updateTld($oldTld, $newTld);
 }
