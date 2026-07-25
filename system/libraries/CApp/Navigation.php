@@ -111,7 +111,6 @@ class CApp_Navigation {
         if ($domain == null) {
             $domain = CF::domain();
         }
-        $is_admin = CApp::instance()->isAdministrator();
         if ($navs == null && $level == 0) {
             $navs = static::navs($domain);
         }
@@ -134,7 +133,7 @@ class CApp_Navigation {
             $icon = carr::get($clonedNav, 'icon');
 
             if (strlen($controller) > 0) {
-                if (!$is_admin && ccfg::get('have_user_access')) {
+                if (CF::config('app.have_user_access')) {
                     if (!Helper::haveAccess($d)) {
                         continue;
                     }
@@ -161,7 +160,7 @@ class CApp_Navigation {
                     continue;
                 }
                 if (isset($d['controller']) && $d['controller'] != '') {
-                    if (!$is_admin && ccfg::get('have_user_access')) {
+                    if (CF::config('app.have_user_access')) {
                         if (!Helper::haveAccess($d)) {
                             continue;
                         }

@@ -6,7 +6,6 @@ use CApp_Navigation_Helper as Helper;
 
 class CNavigation_Renderer_BootstrapRenderer extends CNavigation_RendererAbstract {
     public function render($navs = null, $level = 0, &$child = 0) {
-        $is_admin = CApp::instance()->isAdministrator();
         if ($navs == null) {
             $navs = $this->navs;
         }
@@ -46,7 +45,7 @@ class CNavigation_Renderer_BootstrapRenderer extends CNavigation_RendererAbstrac
                     continue;
                 }
                 if (isset($d['controller']) && $d['controller'] != '') {
-                    if (!$is_admin && CF::config('app.have_user_access')) {
+                    if (CF::config('app.have_user_access')) {
                         if (!Helper::haveAccess($d)) {
                             continue;
                         }

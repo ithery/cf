@@ -59,13 +59,15 @@ This will create the structure `application/myproject/`.
 
 ### Create a New Project
 
-To scaffold a new application, use the `phpcf` CLI tool from the framework root directory:
+To scaffold a new application, first create the app's directory under `application/`, then run `phpcf init` from inside it:
 
 ```bash
-phpcf app:create myproject
+mkdir -p application/myproject
+cd application/myproject
+phpcf init
 ```
 
-You will be prompted to enter a unique application code.
+The application code is taken from the folder name, so `phpcf init` must be run from inside `application/{code}/`. This launches an interactive wizard that asks for the application's class prefix (and optionally an admin preset), then generates the project scaffolding. You can also pass `--prefix=`, `--domain=`, `--title=` up front to skip the corresponding question.
 
 #### Configure the Domain
 

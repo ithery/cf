@@ -5,7 +5,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
  */
-
 class CConsole_Command_App_AppCodeCommand extends CConsole_Command {
     /**
      * The name and signature of the console command.
@@ -23,7 +22,7 @@ class CConsole_Command_App_AppCodeCommand extends CConsole_Command {
         if (strlen($appCode) > 0) {
             $data = CDomain::get($domain);
             $data['app_code'] = $appCode;
-            CDomain::set($domain, $data, 'domain');
+            CDomain::set($domain, $data);
             $currentAppCode = $appCode;
         }
 

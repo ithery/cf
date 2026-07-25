@@ -1,28 +1,24 @@
 # PHPCF - Application
 
-### app:create
+### init
 
-Membuat aplikasi baru.
-
-```
-phpcf app:create {code} --domain= --prefix= --title=
-```
-
-### app:preset
-
-Mengatur preset aplikasi.
+Wizard interaktif untuk membuat aplikasi baru. Harus dijalankan dari dalam folder aplikasinya sendiri (`application/{code}/`) — kode aplikasi otomatis diambil dari nama folder tersebut, tidak perlu diinput. Wizard akan menanyakan prefix class aplikasi (dipakai untuk generate base library, mis. `OH.php` untuk app dengan prefix `OH`), dan opsional preset admin, lalu membuat scaffolding project-nya.
 
 ```
-phpcf app:preset
+cd application/propmind
+phpcf init
 ```
 
-### app:preset:admin
-
-Mengatur preset admin untuk aplikasi.
+Opsi berikut boleh diisi untuk melewati pertanyaan wizard yang bersangkutan:
 
 ```
-phpcf app:preset:admin
+phpcf init --domain= --prefix= --title= --admin
 ```
+
+- `--domain` — domain lokal untuk aplikasi ini, default `{code}.test`
+- `--prefix` — prefix class untuk base library aplikasi (mis. `PM`), tidak boleh `CF`
+- `--title` — judul aplikasi, default nama kode aplikasi
+- `--admin` — jika diberikan, langsung scaffold preset admin tanpa ditanya
 
 ### app:code
 

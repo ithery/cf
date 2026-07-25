@@ -257,7 +257,7 @@ abstract class CConsole_Prompt {
     /**
      * Get the current output instance.
      *
-     * @return OutputInterface
+     * @return CConsole_Prompt_Output_ConsoleOutput
      */
     protected static function output() {
         if (!isset(self::$output)) {

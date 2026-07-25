@@ -63,60 +63,136 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
 
+    /**
+     * @var null|CApp[]
+     */
     public static $instance = null;
 
+    /**
+     * @var mixed
+     */
     protected $renderer;
 
+    /**
+     * @var array
+     */
     protected $data = [];
 
+    /**
+     * @var null|string
+     */
     protected $id = null;
 
     /**
-     * @var CApp_PWA
+     * @var array<string, CApp_PWA>
      */
-    protected $pwa;
+    protected $pwa = [];
 
     /**
      * @var CApp_Element
      */
     protected $element;
 
+    /**
+     * @var null|Closure
+     */
     protected $baseResolver = null;
 
+    /**
+     * @var string
+     */
     protected $content = '';
 
+    /**
+     * @var string
+     */
     protected $js = '';
 
+    /**
+     * @var string
+     */
     private $custom_js = '';
 
+    /**
+     * @var string
+     */
     private $custom_header = '';
 
+    /**
+     * @var string
+     */
     private $custom_footer = '';
 
+    /**
+     * @var array
+     */
     private $custom_data = [];
 
+    /**
+     * @var bool
+     */
     private $signup = false;
 
+    /**
+     * @var bool
+     */
     private $activation = false;
 
+    /**
+     * @var bool
+     */
     private $resend = false;
 
+    /**
+     * @var string
+     */
     private $additional_head = '';
 
+    /**
+     * @var array
+     */
     private $ajaxData = [];
 
+    /**
+     * @var bool
+     */
     private $renderMessage = true;
 
+    /**
+     * @var bool
+     */
     private $keepMessage = false;
 
+    /**
+     * @var bool
+     */
     private $useRequireJs = false;
 
+    /**
+     * @var null|bool
+     */
     private static $haveScrollToTop = null;
 
+    /**
+     * @var bool
+     */
     private $coreModuleIsRegistered = false;
 
+    /**
+     * @var null|CApp_Visitor
+     */
     private $visitor;
 
+    /**
+     * Whether the app output has already been rendered. Set by CApp_Concern_RendererTrait.
+     *
+     * @var bool
+     */
+    protected $rendered = false;
+
+    /**
+     * @param null|string $domain
+     */
     public function __construct($domain = null) {
         $this->element = new CApp_Element();
 
@@ -175,6 +251,12 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return new CBase_ForwarderStaticClass(c::value($this->baseResolver));
     }
 
+    /**
+     * @param string $method
+     * @param array  $parameters
+     *
+     * @return mixed
+     */
     public function __call($method, $parameters) {
         if (method_exists($this->element, $method)) {
             return call_user_func_array([$this->element, $method], $parameters);
@@ -243,6 +325,9 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return CNavigation::manager();
     }
 
+    /**
+     * @return bool
+     */
     public static function isAjax() {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
@@ -261,10 +346,20 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return new CApp_Data();
     }
 
+    /**
+     * @param string      $message
+     * @param array       $params
+     * @param null|string $lang
+     *
+     * @return null|string
+     */
     public static function getTranslation($message, $params = [], $lang = null) {
         return c::__($message, $params, $lang);
     }
 
+    /**
+     * @return CComponent_Manager
+     */
     public static function component() {
         return CComponent_Manager::instance();
     }
@@ -281,6 +376,12 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return CDatabase::manager()->connection($dbName);
     }
 
+    /**
+     * @param array|string $key
+     * @param mixed        $value
+     *
+     * @return CApp
+     */
     public function setAjaxData($key, $value = null) {
         if (is_array($key)) {
             $this->ajaxData = array_merge($this->ajaxData, $key);
@@ -291,10 +392,20 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return void
+     */
     public function setRenderMessage($bool) {
         $this->renderMessage = $bool;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return void
+     */
     public function setKeepMessage($bool) {
         $this->keepMessage = $bool;
     }
@@ -308,47 +419,73 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return CTranslation::translator();
     }
 
+    /**
+     * @param array $data
+     * @param array $rules
+     * @param array $messages
+     * @param array $customAttributes
+     *
+     * @return array
+     */
     public function validate(array $data, array $rules, array $messages = [], array $customAttributes = []) {
         $validation = CValidation::factory();
 
         return $validation->validate($data, $rules, $messages, $customAttributes);
     }
 
+    /**
+     * @return null|int|string
+     */
     public function appId() {
         return CF::appId();
     }
 
+    /**
+     * @return CManager
+     */
     public function manager() {
         return CManager::instance();
     }
 
+    /**
+     * @return string
+     */
     public function name() {
         return strlen(CF::appCode()) > 0 ? CF::appCode() : CF::appCode();
     }
 
+    /**
+     * @return string
+     */
     public function code() {
         return CF::appCode();
     }
 
+    /**
+     * @param string $type
+     * @param string $message
+     *
+     * @return void
+     */
     public function message($type, $message) {
         return CApp_Message::add($type, $message);
     }
 
+    /**
+     * @return mixed
+     */
     public function controller() {
         return CHTTP::kernel()->controller();
     }
 
+    /**
+     * @param string      $path
+     * @param null|string $domain
+     *
+     * @return mixed
+     */
     public static function config($path, $domain = null) {
         return CApp_Config::get($path, $domain);
-    }
-
-    /**
-     * @deprecated
-     *
-     * @return bool
-     */
-    public static function isAdmin() {
-        return static::isAdministrator();
     }
 
     /**
@@ -380,30 +517,55 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return self::$instance[$domain];
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return CApp
+     */
     public function signup($bool = true) {
         $this->signup = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return CApp
+     */
     public function resend($bool = true) {
         $this->resend = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return CApp
+     */
     public function activation($bool = true) {
         $this->activation = $bool;
 
         return $this;
     }
 
+    /**
+     * @param string $js
+     *
+     * @return CApp
+     */
     public function addCustomJs($js) {
         $this->custom_js .= $js;
 
         return $this;
     }
 
+    /**
+     * @param bool $force
+     *
+     * @return void
+     */
     public function registerCoreModules($force = false) {
         if ($force || !$this->coreModuleIsRegistered) {
             $manager = CManager::instance();
@@ -437,6 +599,9 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         }
     }
 
+    /**
+     * @return CApp
+     */
     public function reset() {
         $this->rendered = false;
         $this->element->clear();
@@ -456,6 +621,12 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return $this->setCustomData($key, $value);
     }
 
+    /**
+     * @param array|string $key
+     * @param mixed        $value
+     *
+     * @return CApp
+     */
     public function setCustomData($key, $value = null) {
         if (is_array($key)) {
             $this->custom_data = $key;
@@ -470,6 +641,12 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return $this;
     }
 
+    /**
+     * @param null|string $key
+     * @param mixed       $default
+     *
+     * @return mixed
+     */
     public function getCustomData($key = null, $default = null) {
         if ($key === null) {
             return $this->custom_data;
@@ -478,6 +655,13 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return carr::get($this->custom_data, $key, $default);
     }
 
+    /**
+     * @param null|int|string $roleId
+     * @param null|int|string $orgId
+     * @param null|string     $type
+     *
+     * @return array
+     */
     public function getRoleChildList($roleId = null, $orgId = null, $type = null) {
         if (strlen($roleId) == 0) {
             $roleId = c::optional($this->role())->role_id;
@@ -503,12 +687,20 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return $childList;
     }
 
+    /**
+     * @param string $buffer
+     *
+     * @return string
+     */
     protected function minifyJavascript($buffer) {
         $minifier = new CManager_Asset_Compiler_Minify_MinifyJs();
 
         return $minifier->execute($buffer);
     }
 
+    /**
+     * @return array
+     */
     public function toArray() {
         $data = [];
         $data['title'] = $this->title;
@@ -583,6 +775,12 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return $this->toJson($options);
     }
 
+    /**
+     * @param Exception   $exception
+     * @param null|string $email
+     *
+     * @return void
+     */
     public static function sendExceptionEmail(Exception $exception, $email = null) {
         $ignoredExceptions = [
             CDaemon_Exception_AlreadyRunningException::class,
@@ -626,22 +824,28 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
     }
 
     /**
-     * @deprecated 1.6, dont use this anymore
+     * @deprecated 1.8, use c::manager()->theme()->setTheme() instead
      *
-     * @return bool
+     * @param string $theme
+     *
+     * @return void
      */
-    public static function isAdministrator() {
-        return carr::first(explode('/', trim(curl::current(), '/'))) == 'administrator';
-    }
-
     public static function setTheme($theme) {
         return CManager::theme()->setTheme($theme);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return void
+     */
     public static function setHaveScrollToTop($bool = true) {
         static::$haveScrollToTop = $bool;
     }
 
+    /**
+     * @return bool
+     */
     public static function haveScrollToTop() {
         if (static::$haveScrollToTop === null) {
             static::$haveScrollToTop = CF::config('cresjs', 'scroll_to_top', false);
@@ -650,6 +854,12 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return static::$haveScrollToTop;
     }
 
+    /**
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return CApp
+     */
     public function setData($key, $value) {
         $this->data[$key] = $value;
 
@@ -665,6 +875,11 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
         return CApp_Formatter::instance();
     }
 
+    /**
+     * @param string $group
+     *
+     * @return void
+     */
     public function enablePWA($group) {
         $this->pwa($group)->enable();
     }

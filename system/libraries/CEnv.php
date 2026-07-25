@@ -4,16 +4,16 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CEnv {
     /**
-     * Indicates if the putenv adapter is enabled.
+     * The resolved environment variable adapter.
      *
-     * @var bool
+     * @var null|CEnv_AdapterInterface
      */
     protected static $adapter;
 
     /**
-     * Indicates if the putenv adapter is enabled.
+     * The resolved .env file adapter.
      *
-     * @var bool
+     * @var null|CEnv_Adapter_DotEnvAdapter
      */
     protected static $dotEnvAdapter;
 

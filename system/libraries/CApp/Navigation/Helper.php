@@ -143,9 +143,6 @@ class CApp_Navigation_Helper {
         if (!$app->isAuthEnabled()) {
             return true;
         }
-        if (CApp::isAdministrator()) {
-            return true;
-        }
         if ($roleId == 'PUBLIC') {
             $roleId = null;
         }
@@ -424,7 +421,6 @@ class CApp_Navigation_Helper {
     }
 
     public static function render($navs = null, $level = 0, &$child = 0) {
-        $isAdministrator = CApp::instance()->isAdministrator();
         if ($navs == null) {
             $navs = CApp_Navigation::instance()->navs();
         }
@@ -473,7 +469,7 @@ class CApp_Navigation_Helper {
                     continue;
                 }
                 if (isset($d['controller']) && $d['controller'] != '') {
-                    if (!$isAdministrator && ccfg::get('have_user_access')) {
+                    if (CF::config('app.have_user_access')) {
                         if (!self::haveAccess($d)) {
                             continue;
                         }
