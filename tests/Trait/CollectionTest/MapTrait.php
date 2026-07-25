@@ -10,7 +10,7 @@ trait CollectionTest_MapTrait {
         $data = $data->map(function ($item, $key) {
             return $key . '-' . strrev($item);
         });
-        $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
+        $this->assertEquals(['first' => 'first-rehti', 'last' => 'last-llewto'], $data->all());
     }
 
     /**
@@ -260,5 +260,17 @@ trait CollectionTest_MapTrait {
             ],
             $data->all()
         );
+    }
+
+    /**
+     * @param CCollection $collection
+     * @dataProvider collectionClassProvider
+     */
+    public function testMapTransform($collection) {
+        $data = new $collection(['ither', 'dayle']);
+
+        $data = $data->mapTransform('uppercase');
+
+        $this->assertSame(['ITHER', 'DAYLE'], $data->all());
     }
 }

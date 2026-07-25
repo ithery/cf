@@ -1223,7 +1223,7 @@ class cstr {
      * @return bool
      */
     public static function haveUpper($string) {
-        return preg_match('~^\p{Lu}~u', $string);
+        return (bool) preg_match('~^\p{Lu}~u', $string);
     }
 
     /**

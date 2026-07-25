@@ -86,4 +86,65 @@ class OptionalTest extends TestCase {
 
         $this->assertFalse(isset($optional->item));
     }
+
+    public function testCreateReturnsOptionalInstance() {
+        $optional = COptional::create('test');
+
+        $this->assertInstanceOf(COptional::class, $optional);
+    }
+
+    public function testOffsetSetOnArray() {
+        $targetArr = ['item' => 'foo'];
+
+        $optional = new COptional($targetArr);
+        $optional['item'] = 'bar';
+
+        $this->assertSame('bar', $optional['item']);
+    }
+
+    public function testOffsetSetOnArrayAddsNewKey() {
+        $optional = new COptional([]);
+        $optional['item'] = 'baz';
+
+        $this->assertSame('baz', $optional['item']);
+    }
+
+    public function testOffsetSetOnNonAccessibleValueDoesNothing() {
+        $optional = new COptional(new stdClass());
+        $optional['item'] = 'should-not-be-set';
+
+        $this->assertFalse(isset($optional['item']));
+    }
+
+    public function testOffsetUnsetOnArray() {
+        $targetArr = ['item' => 'foo'];
+
+        $optional = new COptional($targetArr);
+        unset($optional['item']);
+
+        $this->assertFalse(isset($optional['item']));
+    }
+
+    public function testCallMethodOnObject() {
+        $optional = new COptional(new TestOptionalGreeter());
+
+        $this->assertSame('Hello, World', $optional->greet('World'));
+    }
+
+    public function testCallMethodOnNullReturnsNull() {
+        $optional = new COptional(null);
+
+        $this->assertNull($optional->greet('World'));
+    }
+}
+// @codingStandardsIgnoreStart
+class TestOptionalGreeter {
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    public function greet($name) {
+        return 'Hello, ' . $name;
+    }
 }

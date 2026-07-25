@@ -65,6 +65,27 @@ trait CollectionTest_AggregateTrait {
 
     /**
      * @param CCollection $collection
+     *
+     * @dataProvider collectionClassProvider
+     */
+    public function testAverageIsAliasForAvg($collection) {
+        $c = new $collection([1, 2, 3, 4, 5]);
+        $this->assertSame($c->avg(), $c->average());
+
+        $c = new $collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $this->assertSame($c->avg('foo'), $c->average('foo'));
+        $this->assertSame($c->avg(function ($item) {
+            return $item->foo;
+        }), $c->average(function ($item) {
+            return $item->foo;
+        }));
+
+        $c = new $collection();
+        $this->assertNull($c->average());
+    }
+
+    /**
+     * @param CCollection $collection
      * @dataProvider collectionClassProvider
      */
     public function testGroupByAttributePreservingKeys($collection) {

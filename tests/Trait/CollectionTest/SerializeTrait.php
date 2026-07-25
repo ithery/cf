@@ -1,5 +1,6 @@
 <?php
 use Mockery as m;
+use Illuminate\Contracts\Support\Arrayable;
 
 trait CollectionTest_SerializeTrait {
     /**
@@ -151,5 +152,20 @@ trait CollectionTest_SerializeTrait {
 
         $c->offsetUnset(1);
         $this->assertFalse(isset($c[1]));
+    }
+
+    /**
+     * @param CCollection $collection
+     * @dataProvider collectionClassProvider
+     */
+    public function testEscapingWhenCastingToString($collection) {
+        $c = new $collection([['name' => 'A "double quoted" string']]);
+
+        $this->assertSame('[{"name":"A \"double quoted\" string"}]', (string) $c);
+        $this->assertSame(
+            '[{&quot;name&quot;:&quot;A \&quot;double quoted\&quot; string&quot;}]',
+            (string) $c->escapeWhenCastingToString()
+        );
+        $this->assertSame('[{"name":"A \"double quoted\" string"}]', (string) $c->escapeWhenCastingToString(false));
     }
 }

@@ -60,7 +60,7 @@ class carr {
     /**
      * Alias of isAssoc.
      *
-     * @param array $value array to check
+     * @param array $array array to check
      *
      * @return bool
      *
@@ -1207,7 +1207,7 @@ class carr {
         $ret = '';
         foreach ($array as $item) {
             if (is_array($item)) {
-                $ret .= self::implodes($item, $glue) . $glue;
+                $ret .= self::implodes($glue, $item) . $glue;
             } else {
                 $ret .= $item . $glue;
             }
@@ -1320,11 +1320,19 @@ class carr {
             return null;
         }
         $func = function ($array, $iteratee, $accumulator, $initAccum = null) {
-            $length = \count(\is_array($array) ? $array : \iterator_to_array($array));
+            $array = \is_array($array) ? $array : \iterator_to_array($array);
+            $length = \count($array);
+            $skipFirstKey = null;
             if ($initAccum && $length) {
-                $accumulator = \current($array);
+                $accumulator = \reset($array);
+                $skipFirstKey = \key($array);
             }
             foreach ($array as $key => $value) {
+                if ($skipFirstKey !== null && $key === $skipFirstKey) {
+                    $skipFirstKey = null;
+
+                    continue;
+                }
                 $accumulator = $iteratee($accumulator, $value, $key, $array);
             }
 

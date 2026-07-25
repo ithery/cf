@@ -539,12 +539,13 @@ class CDatabase_Query_Grammar_SqlServerGrammar extends CDatabase_Query_Grammar {
      * Wrap a table in keyword identifiers.
      *
      * @param \CDatabase_Query_Expression|string $table
+     * @param null|string                        $prefix
      *
      * @return string
      */
-    public function wrapTable($table) {
+    public function wrapTable($table, $prefix = null) {
         if (!$this->isExpression($table)) {
-            return $this->wrapTableValuedFunction(parent::wrapTable($table));
+            return $this->wrapTableValuedFunction(parent::wrapTable($table, $prefix));
         }
 
         return $this->getValue($table);

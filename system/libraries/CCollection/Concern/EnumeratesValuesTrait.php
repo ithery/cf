@@ -636,12 +636,22 @@ trait CCollection_Concern_EnumeratesValuesTrait {
     /**
      * Filter the items, removing any items that don't match the given type.
      *
-     * @param string $type
+     * @param class-string|class-string[] $type
      *
      * @return static
      */
     public function whereInstanceOf($type) {
         return $this->filter(function ($value) use ($type) {
+            if (is_array($type)) {
+                foreach ($type as $classType) {
+                    if ($value instanceof $classType) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
             return $value instanceof $type;
         });
     }
@@ -945,13 +955,13 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      * @return \Closure
      */
     protected function operatorForWhere($key, $operator = null, $value = null) {
-        if (func_num_args() === 1 || $operator === null) {
+        if (func_num_args() === 1) {
             $value = true;
 
             $operator = '=';
         }
 
-        if (func_num_args() === 2 || $value === null) {
+        if (func_num_args() === 2) {
             $value = $operator;
 
             $operator = '=';

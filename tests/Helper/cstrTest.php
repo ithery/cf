@@ -567,6 +567,317 @@ class cstrTest extends TestCase {
         $this->assertSame('aaaaa', cstr::repeat('a', 5));
         $this->assertSame('', cstr::repeat('', 5));
     }
+
+    public function testApa() {
+        $this->assertSame('', cstr::apa(''));
+        $this->assertSame('This Is a Test', cstr::apa('this is a test'));
+        $this->assertSame('Creating a Company Using Guzzle Http Client', cstr::apa('Creating a Company Using Guzzle Http Client'));
+        $this->assertSame('Capitalize a Hyphenated-Word Right', cstr::apa('capitalize a hyphenated-word right'));
+        // "on" is a minor word (<= 3 chars) so it stays lowercase inside the hyphenated segment
+        $this->assertSame('Deliver on-Time Every Time', cstr::apa('Deliver On-time Every Time'));
+    }
+
+    public function testBetweenFirst() {
+        $this->assertSame('abc', cstr::betweenFirst('abc', '', 'c'));
+        $this->assertSame('abc', cstr::betweenFirst('abc', 'a', ''));
+        $this->assertSame('abc', cstr::betweenFirst('abc', '', ''));
+        $this->assertSame('b', cstr::betweenFirst('abc', 'a', 'c'));
+        $this->assertSame('a', cstr::betweenFirst('[a]ab[b]', '[', ']'));
+        $this->assertSame('foo', cstr::betweenFirst('foofoobar', 'foo', 'bar'));
+    }
+
+    public function testCharAt() {
+        $this->assertSame('S', cstr::charAt('Salsa & Chips', 0));
+        $this->assertSame('C', cstr::charAt('Salsa & Chips', 8));
+        $this->assertSame('s', cstr::charAt('Salsa & Chips', -1));
+        $this->assertFalse(cstr::charAt('Salsa & Chips', 100));
+        $this->assertFalse(cstr::charAt('Salsa & Chips', -100));
+        $this->assertSame('ö', cstr::charAt('Jönköping', 1));
+    }
+
+    public function testEllipsis() {
+        $this->assertSame('Laravel is...', cstr::ellipsis('Laravel is a free, open source PHP web application framework.', 10));
+        $this->assertSame('Laravel is a free, open source PHP web application framework.', cstr::ellipsis('Laravel is a free, open source PHP web application framework.', 1000));
+    }
+
+    public function testEscapeRegExp() {
+        $this->assertSame('\\[lodash\\]\\(https://lodash\\.com/\\)', cstr::escapeRegExp('[lodash](https://lodash.com/)'));
+        $this->assertSame('foo', cstr::escapeRegExp('foo'));
+        $this->assertSame('a\\^b', cstr::escapeRegExp('a^b'));
+    }
+
+    public function testExcerpt() {
+        $this->assertSame('This is my name', cstr::excerpt('This is my name', 'my'));
+        $this->assertNull(cstr::excerpt('This is my name', 'nope'));
+        $this->assertSame('...is my na...', cstr::excerpt('This is my name', 'my', ['radius' => 3]));
+        $this->assertSame('(...)is my na(...)', cstr::excerpt('This is my name', 'my', ['radius' => 3, 'omission' => '(...)']));
+        // an empty phrase matches at the very start of the string
+        $this->assertSame('This is my name', cstr::excerpt('This is my name', ''));
+    }
+
+    public function testHaveUpper() {
+        $this->assertTrue(cstr::haveUpper('Hello'));
+        $this->assertFalse(cstr::haveUpper('hello'));
+        // only checks the first character
+        $this->assertFalse(cstr::haveUpper('hELLO'));
+    }
+
+    public function testHumanize() {
+        $this->assertSame('Author-Name', cstr::humanize('author-name'));
+        $this->assertSame('Author Name', cstr::humanize('authorName'));
+    }
+
+    public function testInlineMarkdown() {
+        $this->assertSame("<strong>Laravel</strong>\n", cstr::inlineMarkdown('**Laravel**'));
+        $this->assertSame("<em>hello world</em>\n", cstr::inlineMarkdown('*hello world*'));
+        // block-level markdown (e.g. headings) is not converted, since this is inline-only
+        $this->assertSame("# hello world\n", cstr::inlineMarkdown('# hello world'));
+    }
+
+    public function testIsJson() {
+        $this->assertTrue(cstr::isJson('1'));
+        $this->assertTrue(cstr::isJson('[1,2,3]'));
+        $this->assertTrue(cstr::isJson('{"first": "John", "last": "Doe"}'));
+        $this->assertFalse(cstr::isJson('{first: "John", "last": "Doe"}'));
+        $this->assertFalse(cstr::isJson('This is not a valid json string'));
+        $this->assertFalse(cstr::isJson(''));
+        $this->assertFalse(cstr::isJson(null));
+        $this->assertFalse(cstr::isJson(['foo' => 'bar']));
+    }
+
+    public function testIsMatch() {
+        $this->assertTrue(cstr::isMatch('/^bar/', 'bar foo'));
+        $this->assertFalse(cstr::isMatch('/foo (.*)/', 'bar foo'));
+        $this->assertTrue(cstr::isMatch(['/foo (.*)/', '/bar (.*)/'], 'bar foo'));
+        $this->assertTrue(cstr::isMatch('/^7/', 7.123));
+        $this->assertFalse(cstr::isMatch('/^bar/', 7.123));
+    }
+
+    public function testIsUlid() {
+        $this->assertTrue(cstr::isUlid((string) cstr::ulid()));
+        $this->assertFalse(cstr::isUlid('not-a-ulid'));
+        $this->assertFalse(cstr::isUlid(123));
+    }
+
+    public function testKebabCase() {
+        $this->assertSame('laravel-php-framework', cstr::kebabCase('LaravelPhpFramework'));
+        $this->assertSame(cstr::kebab('FooBar'), cstr::kebabCase('FooBar'));
+    }
+
+    public function testLcfirst() {
+        $this->assertSame('laravel', cstr::lcfirst('Laravel'));
+        $this->assertSame('laravel framework', cstr::lcfirst('Laravel framework'));
+        $this->assertSame('мама', cstr::lcfirst('Мама'));
+        $this->assertSame('мама мыла раму', cstr::lcfirst('Мама мыла раму'));
+    }
+
+    public function testLen() {
+        $this->assertEquals(11, cstr::len('foo bar baz'));
+        $this->assertEquals(0, cstr::len(''));
+        $this->assertEquals(cstr::length('foo bar baz'), cstr::len('foo bar baz'));
+    }
+
+    public function testLimitWords() {
+        $this->assertSame('Taylor...', cstr::limitWords('Taylor Otwell', 1));
+        $this->assertSame('Taylor___', cstr::limitWords('Taylor Otwell', 1, '___'));
+        $this->assertSame('Taylor Otwell', cstr::limitWords('Taylor Otwell', 3));
+        $this->assertSame(cstr::words('Taylor Otwell', 1), cstr::limitWords('Taylor Otwell', 1));
+    }
+
+    public function testPlural() {
+        $this->assertSame('cars', cstr::plural('car'));
+        $this->assertSame('car', cstr::plural('car', 1));
+        $this->assertSame('children', cstr::plural('child'));
+        // uncountable words are left unchanged
+        $this->assertSame('sheep', cstr::plural('sheep'));
+        $this->assertSame('CARS', cstr::plural('CAR'));
+        $this->assertSame('Cars', cstr::plural('Car'));
+    }
+
+    public function testPluralStudly() {
+        $this->assertSame('VerifiedHumans', cstr::pluralStudly('VerifiedHuman'));
+        $this->assertSame('UserFeedback', cstr::pluralStudly('UserFeedback'));
+        $this->assertSame('VerifiedHuman', cstr::pluralStudly('VerifiedHuman', 1));
+    }
+
+    public function testPos() {
+        $this->assertSame(4, cstr::pos('foo bar', 'bar'));
+        $this->assertFalse(cstr::pos('foo bar', 'baz'));
+        $this->assertSame(8, cstr::pos('foo bar bar', 'bar', 5));
+        $this->assertSame(0, cstr::pos('foo bar', 'foo'));
+    }
+
+    public function testReplaceEnd() {
+        $this->assertSame('foobarbar', cstr::replaceEnd('foo', 'bar', 'foobarfoo'));
+        $this->assertSame('foofoobar', cstr::replaceEnd('foo', 'bar', 'foofoobar'));
+        $this->assertSame('foobarfoobar', cstr::replaceEnd('foo', 'bar', 'foobarfoobar'));
+        $this->assertSame('foobar', cstr::replaceEnd('', 'bar', 'foobar'));
+    }
+
+    public function testReplaceMatches() {
+        $this->assertSame('foolaravelbar', cstr::replaceMatches('/[^A-Za-z0-9]++/', '', 'foo laravel bar'));
+        $this->assertSame('[1]a[2]b[3]c', cstr::replaceMatches('/\d/', function ($matches) {
+            return '[' . $matches[0] . ']';
+        }, '1a2b3c'));
+    }
+
+    public function testReplaceStart() {
+        $this->assertSame('Laravel World', cstr::replaceStart('Hello', 'Laravel', 'Hello World'));
+        $this->assertSame('Hello World', cstr::replaceStart('World', 'Laravel', 'Hello World'));
+        $this->assertSame('Hello World', cstr::replaceStart('', 'Laravel', 'Hello World'));
+    }
+
+    public function testReverse() {
+        $this->assertSame('dlroW olleH', cstr::reverse('Hello World'));
+        // multibyte-safe
+        $this->assertSame('dlróW olleХ', cstr::reverse('Хello Wórld'));
+        $this->assertSame('', cstr::reverse(''));
+    }
+
+    public function testSanitize() {
+        $this->assertSame('hello-world-', cstr::sanitize('hello world!!'));
+        $this->assertSame('-a-b-', cstr::sanitize('  a---b  '));
+        $this->assertSame('my-file-2-.txt', cstr::sanitize('my file (2).txt', true));
+        $this->assertSame('', cstr::sanitize(''));
+    }
+
+    public function testSingular() {
+        $this->assertSame('car', cstr::singular('cars'));
+        $this->assertSame('child', cstr::singular('children'));
+        $this->assertSame('Cat', cstr::singular('Cats'));
+    }
+
+    public function testSquish() {
+        $this->assertSame('laravel framework', cstr::squish(' laravel   framework '));
+        $this->assertSame('laravel framework', cstr::squish("laravel\t\tframework"));
+        $this->assertSame('123', cstr::squish('123'));
+    }
+
+    public function testSubstrReplace() {
+        $this->assertSame('Hello Laravel', cstr::substrReplace('Hello World', 'Laravel', 6));
+        $this->assertSame('Hello Laravel', cstr::substrReplace('Hello World', 'Laravel', 6, 5));
+        $this->assertSame('13:00', cstr::substrReplace('1300', ':', 2, 0));
+    }
+
+    public function testSwap() {
+        $this->assertSame(
+            'Burritos are fantastic!',
+            cstr::swap(['Tacos' => 'Burritos', 'great' => 'fantastic'], 'Tacos are great!')
+        );
+        $this->assertSame('foo bar baz', cstr::swap([], 'foo bar baz'));
+    }
+
+    public function testTolower() {
+        $this->assertSame('foo bar', cstr::tolower('FOO BAR'));
+        $this->assertSame(cstr::lower('FOO BAR BAZ'), cstr::tolower('FOO BAR BAZ'));
+    }
+
+    public function testToupper() {
+        $this->assertSame('FOO BAR', cstr::toupper('foo bar'));
+        $this->assertSame(cstr::upper('foo bar baz'), cstr::toupper('foo bar baz'));
+    }
+
+    public function testTransliterate() {
+        $this->assertSame('deja', cstr::transliterate('déjà'));
+        $this->assertSame('semences', cstr::transliterate('semences'));
+        $this->assertSame('', cstr::transliterate(''));
+    }
+
+    public function testUcsplit() {
+        $this->assertEquals(['Foo', 'Bar'], cstr::ucsplit('FooBar'));
+        $this->assertEquals(['foo ', 'Bar'], cstr::ucsplit('foo Bar'));
+        $this->assertEquals(['Foo_', 'Bar'], cstr::ucsplit('Foo_Bar'));
+    }
+
+    public function testUlid() {
+        $ulid = cstr::ulid();
+        $this->assertInstanceOf(Symfony\Component\Uid\Ulid::class, $ulid);
+        $this->assertTrue(cstr::isUlid((string) $ulid));
+        $this->assertNotSame((string) cstr::ulid(), (string) cstr::ulid());
+    }
+
+    public function testUnicodeWords() {
+        $this->assertEquals(['Fred', 'Wilma', 'Pebbles'], cstr::unicodeWords('Fred, Wilma, & Pebbles'));
+        $this->assertEquals(['foo', 'Bar'], cstr::unicodeWords('fooBar'));
+        $this->assertEquals([], cstr::unicodeWords(''));
+    }
+
+    public function testWrap() {
+        $this->assertSame('"Laravel"', cstr::wrap('Laravel', '"'));
+        $this->assertSame('"Laravel"is "Framework"', cstr::wrap('is', '"Laravel"', ' "Framework"'));
+        $this->assertSame('PHP', cstr::wrap('PHP', '', ''));
+    }
+
+    public function testCreateUuidsUsing() {
+        $uuid = Ramsey\Uuid\Uuid::fromString('00000000-0000-0000-0000-000000000000');
+
+        cstr::createUuidsUsing(function () use ($uuid) {
+            return $uuid;
+        });
+
+        try {
+            $this->assertSame((string) $uuid, (string) cstr::uuid());
+            $this->assertSame((string) $uuid, (string) cstr::uuid());
+        } finally {
+            cstr::createUuidsNormally();
+        }
+    }
+
+    public function testCreateUuidsNormally() {
+        cstr::createUuidsUsing(function () {
+            return Ramsey\Uuid\Uuid::fromString('00000000-0000-0000-0000-000000000000');
+        });
+
+        cstr::createUuidsNormally();
+
+        $this->assertNotSame(
+            '00000000-0000-0000-0000-000000000000',
+            (string) cstr::uuid()
+        );
+    }
+
+    public function testCreateUuidsUsingSequence() {
+        $one = Ramsey\Uuid\Uuid::uuid4();
+        $two = Ramsey\Uuid\Uuid::uuid4();
+
+        cstr::createUuidsUsingSequence([$one, $two]);
+
+        try {
+            $this->assertSame((string) $one, (string) cstr::uuid());
+            $this->assertSame((string) $two, (string) cstr::uuid());
+            // once the sequence is exhausted, it falls back to a normally generated uuid
+            $this->assertInstanceOf(Ramsey\Uuid\UuidInterface::class, cstr::uuid());
+        } finally {
+            cstr::createUuidsNormally();
+        }
+    }
+
+    public function testFreezeUuids() {
+        $frozenUuid = cstr::freezeUuids();
+
+        try {
+            $this->assertSame((string) $frozenUuid, (string) cstr::uuid());
+            $this->assertSame((string) $frozenUuid, (string) cstr::uuid());
+        } finally {
+            cstr::createUuidsNormally();
+        }
+    }
+
+    public function testFreezeUuidsWithCallback() {
+        $captured = null;
+        $matchesInsideCallback = null;
+
+        $returned = cstr::freezeUuids(function ($uuid) use (&$captured, &$matchesInsideCallback) {
+            $captured = (string) $uuid;
+            $matchesInsideCallback = ((string) cstr::uuid() === $captured);
+        });
+
+        $this->assertSame((string) $returned, $captured);
+        $this->assertTrue($matchesInsideCallback);
+
+        // uuid generation returns to normal (random) once the callback finishes
+        $this->assertNotSame($captured, (string) cstr::uuid());
+    }
 }
 // @codingStandardsIgnoreStart
 class StringableObjectStub {

@@ -1185,7 +1185,7 @@ class CDatabase_Schema_Blueprint {
      */
     public function removeColumn($name) {
         $this->columns = array_values(array_filter($this->columns, function ($c) use ($name) {
-            return $c['attributes']['name'] != $name;
+            return $c['name'] != $name;
         }));
 
         return $this;

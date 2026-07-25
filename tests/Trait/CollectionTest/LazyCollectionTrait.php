@@ -8,7 +8,7 @@ trait CollectionTest_LazyCollectionTrait {
 
         $data->add(6);
 
-        $this->assertInstanceOf(LazyCollection::class, $lazy);
+        $this->assertInstanceOf(CCollection_LazyCollection::class, $lazy);
         $this->assertSame([1, 2, 3, 4, 5], $lazy->all());
     }
 }

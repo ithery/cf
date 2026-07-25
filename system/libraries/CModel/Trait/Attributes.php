@@ -8,6 +8,7 @@ use Carbon\CarbonInterface;
 use Brick\Math\RoundingMode;
 use Illuminate\Contracts\Support\Arrayable;
 use Brick\Math\Exception\MathException as BrickMathException;
+use CModel_Casts_Attribute as Attribute;
 
 trait CModel_Trait_Attributes {
     /**

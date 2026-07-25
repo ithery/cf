@@ -77,6 +77,223 @@ Fixed 3 of the 20 baseline failures (all real bugs, not test/env issues):
    (only the pre-existing sqlite-driver-missing ones remain), no new
    failures introduced.
 
+[Wave 1a - cstrTest gap-fill - DONE]
+30 new test methods added, tests/Helper/cstrTest.php now 109/109 passing
+(was 79). Bug fixed: cstr::haveUpper() returned int (preg_match's raw
+return) instead of bool per its own @return bool docblock - assertTrue()
+failed under strict comparison. Cast to (bool), verified no other callers
+affected. Also documented (not bugs, just surprising real behavior worth
+knowing): apa() capitalizes minor words inside hyphenated segments
+regardless of position; sanitize() doesn't trim leading/trailing dashes
+(slug() does); humanize() preserves dashes on already-hyphenated input;
+freezeUuids() only pins UUIDs for the duration of its callback (uses
+finally to restore); isJson() has dead code (`defined(JSON_THROW_ON_ERROR)`
+missing quotes around the constant name, so that branch never runs) but the
+fallback path already produces correct results so left as-is.
+
+[Wave 1b - carrTest gap-fill - DONE]
+44 new test methods, tests/Helper/carrTest.php now 80/80 passing. 2 real
+bugs fixed in system/helpers/carr.php:
+- carr::implodes() recursive branch called self::implodes($item, $glue) -
+  swapped param order vs every other caller (including carr::implode()
+  itself) - silently dropped nested array content. Fixed to
+  self::implodes($glue, $item).
+- carr::reduce() without an explicit accumulator seeded it from the first
+  element via current($array) but then still iterated that same element
+  again in the foreach, double-counting it (reduce([1,2,3,4], sum) gave 11
+  instead of 10). Fixed to skip the seeded key.
+Both verified against actual call sites in the codebase (implodes: 2 call
+sites, both flat arrays, unaffected; reduce: 22 call sites, all pass an
+explicit accumulator, unaffected) - i.e. these bugs were real but latent,
+nothing currently in prod code was hitting the buggy path.
+
+(See "operatorForWhere saga" entry further down for the full story on a
+bug that took 3 rounds to actually fix correctly - short version: root
+cause was in CModel/Collection.php, not CCollection itself.)
+
+[Wave 3a - CModel core (ModelTest.php + ModelAttributeCastingTest.php) - DONE]
+64 new tests (41 + 23), all green. 2 real bugs fixed in CModel's own code:
+- system/libraries/CModel/Trait/Attributes.php used bare `Attribute::class`
+  (3x) to detect Laravel-9-style `protected function foo(): Attribute`
+  accessor/mutators, with no `use` import - in this global-namespace file
+  that resolved to PHP's *built-in* `\Attribute` class (the PHP 8 attribute
+  reflection API) instead of `CModel_Casts_Attribute`, so
+  hasAttributeMutator()/hasAttributeSetMutator() always returned false,
+  silently disabling the ENTIRE Attribute::make() accessor/mutator feature
+  framework-wide. Fixed with `use CModel_Casts_Attribute as Attribute;`.
+- system/libraries/CModel/Casts/Attribute.php was missing a `$withCaching`
+  property that Attributes.php reads unconditionally (only surfaced once
+  the above bug was fixed and that code path became reachable) - threw
+  "Undefined property" on every Attribute-based accessor read. Added
+  `public $withCaching = false;` (matches Laravel's real default).
+These two bugs together meant CModel_Casts_Attribute::make() has probably
+never worked in this codebase. Worth a heads up if anyone has been relying
+on it and silently getting no caching/wrong values.
+
+[Wave 3b - CModel HasOne/HasMany/HasManyThrough relations - DONE]
+65 new tests (22+20+23) across ModelHasOneTest.php/ModelHasManyTest.php/
+ModelHasManyThroughTest.php, all green, zero source bugs found. Notable:
+CModel_Relation_HasOneOrManyThrough (system/libraries/CModel/Relation/
+HasOneOrManyThrough.php) is DEAD CODE - nothing extends it (HasManyThrough
+extends CModel_Relation directly and duplicates the logic inline instead).
+Flagging as a cleanup candidate, not touching it since it's out of scope
+and zero-risk to leave alone. Also: HasManyThrough/HasOneThrough skip
+save()/create() (matches real Laravel, not a bug); ofMany()/pagination/
+chunking/lazy were skipped as low-value-for-effort (thin query-builder
+forwards).
+
+[Wave 1c - CCollection/LazyCollection gap-fill - DONE, BIG one]
+Biggest finding: 8 of 10 tests/Trait/CollectionTest/*.php files were DEAD
+CODE - tests/CollectionTest.php only wired in BasicTrait+ExceptionTrait;
+AggregateTrait/ContainTrait/FilteringTrait/LazyCollectionTrait/MapTrait/
+OperationTrait/PartitionTrait/SerializeTrait (~2700 lines, ~150 test
+methods) existed on disk but never actually ran. Wired them all in, which
+surfaced several previously-silent failures:
+- Stale test fixtures from an old "Taylor->ither" rebrand that never
+  actually got exercised (expected 'TAYLOR' where the real default is now
+  'ither'/'ITHER', etc) - fixed the test expectations, not the source.
+  SerializeTrait was also missing a `use Illuminate\Contracts\Support\
+  Arrayable;` so its Mockery mocks were silently mocking the wrong
+  interface. LazyCollectionTrait referenced a nonexistent bare
+  `LazyCollection::class`.
+- whereInstanceOf() didn't support an array of types - fixed (matches
+  Laravel).
+- CCollection_LazyCollection was missing sliding/containsOneItem/hasAny/
+  dot/firstOrFail/toBase/sole/mapTransform entirely - added all of them
+  (sliding needed a real generator-based rewrite, not a naive port).
+  Also enabled CCollection_LazyCollection::class in the shared
+  collectionClassProvider() so ~300 parameterized Collection tests now run
+  against LazyCollection too (was commented out - another silent gap).
+New/expanded Support-tier files: tests/FluentTest.php (new, 17 tests for
+CBase_Fluent, had zero coverage before), tests/OptionalTest.php (9->16),
+tests/PeriodTest.php (1->42).
+Real CPeriod bugs found and DOCUMENTED (not fixed, per "report bugs, don't
+autofix" - out of this agent's assigned scope):
+- CPeriod_Trait_GetterTrait::start()/end() read undefined
+  $this->start/$this->end (real properties are $startDate/$endDate) ->
+  always throws. Breaks asString() too.
+- CPeriod_Trait_OperationTrait::overlap() calls
+  CPeriod_Factory::makeWithBoundaries() with an extra leading
+  static::class arg, misaligning every param against the real 4-param
+  signature -> always throws. Breaks overlapAny()/diffSymmetric() too.
+- gap()-like methods mutate the ORIGINAL period's own end/start date as a
+  side effect (constructor aliases $includedEnd/$includedStart to the
+  SAME object as $endDate/$startDate, and CCarbon::add()/sub() mutate in
+  place rather than returning a new instance).
+These CPeriod bugs are real and probably worth a follow-up fix pass, but
+weren't touched here since they're outside CCollection's scope.
+Final: CollectionTest 591->640 (after my later Collection.php fix, see
+below), LazyCollectionTest 11, OptionalTest 16, PeriodTest 42, FluentTest
+17.
+
+[Wave 2a - CDatabase Query Builder SQL tests - DONE, BIG one]
+tests/Database/DatabaseQueryBuilderTest.php created, 152 tests, all green.
+2 real bugs fixed:
+- system/libraries/CDatabase/Query/Grammar/SqlServerGrammar.php::wrapTable()
+  had an incompatible signature vs the parent (missing $prefix=null param)
+  -> HARD PHP FATAL ERROR the instant the SQL Server grammar is
+  instantiated on PHP 8.2. The whole SqlServerGrammar was unusable. This
+  explains the "fatal error in SqlServerGrammar" the carr/ModelCore agents
+  saw mid-flight earlier - self-resolved now.
+- system/libraries/CDatabase/Query/Grammar.php::compileBasicHaving() and
+  compileHavingBetween() both duplicated the `boolean` prefix that the
+  caller compileHavings() already prepends -> produced garbled/invalid SQL
+  ("having and and ... or or ...") for any query with a HAVING clause.
+Also confirmed real (pre-existing, unfixed - too invasive/high-risk):
+CDatabase_Query_Builder's constructor ignores its own $grammar/$processor
+params, always pulling from $connection->getQueryGrammar()/getPostProcessor()
+instead. Worked around in tests via a stubbed Connection mock rather than
+touching Builder.php itself.
+Documented (not fixed - genuinely missing features, not bugs): no
+closure/nested having() support (compileNestedHavings exists but dead,
+unreachable); whereJsonContainsKey()/orWhereJsonContainsKey() don't exist
+(silently misparses as a bogus where clause via __call magic instead of
+erroring - worth knowing); whereBitwise() only implemented on
+Postgres/SqlServer grammars, throws "undefined method" on MySql/Sqlite.
+
+[operatorForWhere saga - ACTUALLY RESOLVED, root cause fixed properly]
+Correction to both earlier notes above: my original band-aid fix (restoring
+the `|| $operator === null` / `|| $value === null` fallback in
+operatorForWhere()) was itself WRONG, not just fragile. The CCollection
+agent's independent analysis (after it finished all its own work) was
+correct: that fallback fixes the ModelCollectionTest case but BREAKS the
+opposite case - a genuine 3-arg call with an intentionally-null $value
+(e.g. `where($key, '=', null)`, which whereNull()/whereNotNull() rely on)
+gets misinterpreted: func_num_args()===3 but $value===null triggers the
+second fallback branch, which overwrites $value with the operator string
+'=' instead of leaving it null. So my fix was trading one bug for another.
+The REAL root cause: CModel_Collection::contains() (system/libraries/
+CModel/Collection.php) always called `parent::contains($key, $operator,
+$value)` with all 3 params explicitly, even when ITS OWN caller only
+passed 2 (operator/value default to null but PHP still "passes" them
+explicitly when you name them in the call) - this inflates func_num_args()
+downstream to 3 regardless of what the original public caller gave,
+which is what actually confuses operatorForWhere(). Fixed AT THE SOURCE
+instead: changed that one call to `parent::contains(...func_get_args())`,
+which forwards exactly as many args as CModel_Collection::contains()
+itself received - preserving the true original arg count all the way
+down. This lets operatorForWhere() stay a clean, unmodified, exact port of
+upstream Laravel (func_num_args()===1/===2, no fallback needed) AND fixes
+ModelCollectionTest correctly. Verified: ModelCollectionTest 38/38,
+CollectionTest 640/640, full suite 1628 passed / down to exactly the 17
+pre-existing sqlite-driver baseline failures + 5 unrelated failures in
+ModelBelongsToManyTest that belong to a different, still-running agent
+(expected mid-flight, not this issue).
+LESSON (revised from before): when two agents' fixes to the same symptom
+conflict, don't assume the first one to land is correct just because it's
+"already fixed" - re-derive from first principles which one is actually
+the root cause. In this case neither of my first two attempts (fallback
+in Wave 1, then "wait and reapply") was the right fix; the right fix was
+in a completely different file (CModel/Collection.php) that owns the
+actual defect.
+
+[Wave 2b - CDatabase Schema Builder tests - DONE, BIG one]
+5 new test files under tests/Database/ (DatabaseSchemaBuilderTest.php,
+DatabaseMySqlSchemaGrammarTest.php, DatabaseSQLiteSchemaGrammarTest.php,
+DatabasePostgresSchemaGrammarTest.php, DatabaseSqlServerSchemaGrammarTest.php),
+195 tests total, all green. 4 real bugs fixed, two of them severe:
+- CDatabase_Schema_Blueprint::removeColumn() used $c['attributes']['name']
+  on a CBase_Fluent (Fluent's ArrayAccess resolves attributes directly, so
+  ['attributes'] was always null) -> every call threw. Fixed to $c['name'].
+- CDatabase_Schema_Grammar_PostgresGrammar was COMPLETELY UNLOADABLE:
+  compileTables()/compileViews()/compileTypes()/compileRenameColumn()/
+  compileChange() all had signatures incompatible with the abstract base
+  class (PHP fatals on LSP violation) - the whole Postgres schema grammar
+  was dead on arrival. Fixed all 5 signatures to match the base contract.
+- CDatabase_Schema_Grammar_SqlServerGrammar: same class of bug
+  (compileRenameColumn/compileChange/wrapTable signature mismatches) ->
+  also completely unloadable. Fixed.
+- CDatabase_Schema_Grammar_MariaDbGrammar::compileRenameColumn(): same bug
+  relative to its MySqlGrammar parent. Fixed (bonus, same root cause).
+So: Postgres and SqlServer SCHEMA grammar support was totally broken before
+today (on top of SqlServer QUERY grammar also being totally broken, fixed
+in Wave 2a) - this framework's non-MySQL/SQLite database dialect support
+was essentially unusable and nobody could have caught it without
+instantiating these classes, which nothing in the existing test suite did.
+Documented-not-fixed (real behavior bugs, but out of "small safe fix"
+territory or ambiguous intent): Blueprint::dropTimestamps() still drops
+`created_at`/`updated_at` while timestamps() creates `created`/`updated`
+(this framework's actual convention per CModel::CREATED/UPDATED) - so
+dropTimestamps() never removes what timestamps() created. Same issue in
+timestampsTz(). SqlServerGrammar (schema side) never overrides wrapValue()
+so it quotes identifiers as "users" instead of real SQL Server's [users]
+(inconsistent with the Query-side SqlServerGrammar, which does use
+brackets correctly) - flagged but not fixed since fixing it means
+re-auditing every expected-SQL test string, out of scope for right now.
+
+[Cross-cutting: operatorForWhere fix got clobbered - RESOLVED]
+The CModel-core agent's report (independently) reproduced the SAME 2
+ModelCollectionTest failures I'd already fixed - meaning the CCollection
+gap-fill agent (still running at that point) overwrote my direct fix on a
+later edit pass to the same file. Rather than fight it with more direct
+edits, sent it an in-band correction message via SendMessage with the
+full context/fix. Confirmed applied+durable: ModelCollectionTest 38/38,
+LazyCollectionTest 11/11. CollectionTest itself still had 29 failures at
+that point (missing methods `sole`/`firstOrFail` etc via
+BadMethodCallException) but that's the CCollection gap-fill agent's own
+in-progress work, not a regression from this fix - still running as of
+this writing.
+
 Remaining 17 baseline failures are ALL because pdo_sqlite is not installed
 for the active PHP 8.2 CLI in this sandbox (php7.4-sqlite3 is installed but
 not php8.2-sqlite3; confirmed via `PDO::getAvailableDrivers()` - sqlite not

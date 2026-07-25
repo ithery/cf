@@ -763,7 +763,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
 
         $parameter = $this->parameter($having['value']);
 
-        return $having['boolean'] . ' ' . $column . ' ' . $having['operator'] . ' ' . $parameter;
+        return $column . ' ' . $having['operator'] . ' ' . $parameter;
     }
 
     /**
@@ -782,7 +782,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
 
         $max = $this->parameter(c::last($having['values']));
 
-        return $having['boolean'] . ' ' . $column . ' ' . $between . ' ' . $min . ' and ' . $max;
+        return $column . ' ' . $between . ' ' . $min . ' and ' . $max;
     }
 
     /**

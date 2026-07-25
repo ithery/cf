@@ -60,9 +60,11 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
     /**
      * Compile the query to determine the tables.
      *
+     * @param null|string|string[] $schema unused - kept for signature compatibility with CDatabase_Schema_Grammar::compileTables()
+     *
      * @return string
      */
-    public function compileTables()
+    public function compileTables($schema = null)
     {
         return 'select c.relname as name, n.nspname as schema, pg_total_relation_size(c.oid) as size, '
             ."obj_description(c.oid, 'pg_class') as comment from pg_class c, pg_namespace n "
@@ -72,18 +74,22 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
     /**
      * Compile the query to determine the views.
      *
+     * @param null|string|string[] $schema unused - kept for signature compatibility with CDatabase_Schema_Grammar::compileViews()
+     *
      * @return string
      */
-    public function compileViews() {
+    public function compileViews($schema = null) {
         return "select viewname as name, schemaname as schema, definition from pg_views where schemaname not in ('pg_catalog', 'information_schema') order by viewname";
     }
 
     /**
      * Compile the query to determine the user-defined types.
      *
+     * @param null|string|string[] $schema unused - kept for signature compatibility with CDatabase_Schema_Grammar::compileTypes()
+     *
      * @return string
      */
-    public function compileTypes() {
+    public function compileTypes($schema = null) {
         return 'select t.typname as name, n.nspname as schema, t.typtype as type, t.typcategory as category, '
             ."((t.typinput = 'array_in'::regproc and t.typoutput = 'array_out'::regproc) or t.typtype = 'm') as implicit "
             .'from pg_type t join pg_namespace n on n.oid = t.typnamespace '
@@ -224,7 +230,7 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
      * @param  \CDatabase_Connection  $connection
      * @return array|string
      */
-    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection) {
+    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection = null) {
         return $connection->usingNativeSchemaOperations()
             ? sprintf(
                 'alter table %s rename column %s to %s',
@@ -245,7 +251,7 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
      *
      * @throws \RuntimeException
      */
-    public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection) {
+    public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection = null) {
         if (! $connection->usingNativeSchemaOperations()) {
             return parent::compileChange($blueprint, $command, $connection);
         }

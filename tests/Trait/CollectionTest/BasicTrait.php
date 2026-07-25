@@ -199,4 +199,22 @@ trait CollectionTest_BasicTrait {
         $result = $data->last(null, 'default');
         $this->assertSame('default', $result);
     }
+
+    /**
+     * @param CCollection $collection
+     * @dataProvider collectionClassProvider
+     */
+    public function testToBase($collection) {
+        /** @var PHPUnit\Framework\TestCase $this */
+        $data = new $collection(['foo' => 'bar']);
+        $base = $data->toBase();
+
+        $this->assertInstanceOf(CCollection::class, $base);
+        $this->assertNotInstanceOf(TestCollectionSubclass::class, $base);
+        $this->assertSame(['foo' => 'bar'], $base->all());
+
+        $subclass = TestCollectionSubclass::make(['foo' => 'bar']);
+        $this->assertInstanceOf(TestCollectionSubclass::class, $subclass);
+        $this->assertNotInstanceOf(TestCollectionSubclass::class, $subclass->toBase());
+    }
 }

@@ -971,4 +971,456 @@ class carrTest extends TestCase {
             ['name' => 'John', 'age' => 8,  'meta' => ['key' => 3]],
         ], $sortedWithCallable);
     }
+
+    // ------------------------------------------------------------------
+    // Newly added coverage below (aliases, dot-path helpers, misc utils)
+    // ------------------------------------------------------------------
+
+    public function testIsAssocAliasMatchesIsAssoc() {
+        $this->assertTrue(carr::is_assoc(['a' => 'a', 0 => 'b']));
+        $this->assertTrue(carr::is_assoc([1 => 'a', 2 => 'b']));
+        $this->assertFalse(carr::is_assoc(['a', 'b']));
+        $this->assertSame(carr::isAssoc(['x' => 1]), carr::is_assoc(['x' => 1]));
+    }
+
+    public function testIsArrayAliasMatchesIsArray() {
+        $this->assertTrue(carr::isArray([]));
+        $this->assertTrue(carr::isArray(new ArrayObject([1, 2])));
+        $this->assertFalse(carr::isArray('not an array'));
+        $this->assertFalse(carr::isArray(false));
+
+        $this->assertTrue(carr::is_array([]));
+        $this->assertTrue(carr::is_array(new ArrayObject([1, 2])));
+        $this->assertFalse(carr::is_array('not an array'));
+        $this->assertFalse(carr::is_array(false));
+    }
+
+    public function testPathIsAliasOfGet() {
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        $this->assertEquals(carr::get($array, 'products.desk'), carr::path($array, 'products.desk'));
+        $this->assertSame('default', carr::path($array, 'products.chair', 'default'));
+    }
+
+    public function testSetPathIsAliasOfSet() {
+        $array = ['products' => ['desk' => ['price' => 100]]];
+        carr::set_path($array, 'products.desk.price', 200);
+        $this->assertEquals(['products' => ['desk' => ['price' => 200]]], $array);
+    }
+
+    public function testCallbackString() {
+        $this->assertSame(['limit', ['10', '20']], carr::callback_string('limit[10,20]'));
+        $this->assertSame(['required', null], carr::callback_string('required'));
+        $this->assertSame(['min', ['5']], carr::callback_string('min[5]'));
+
+        // Escaped commas inside a single param are unescaped after splitting.
+        $this->assertSame(['foo', ['a,b', 'c']], carr::callback_string('foo[a\,b,c]'));
+    }
+
+    public function testRotate() {
+        $source = [
+            'row1' => ['a' => 1, 'b' => 2],
+            'row2' => ['a' => 3, 'b' => 4],
+        ];
+        $expected = [
+            'a' => ['row1' => 1, 'row2' => 3],
+            'b' => ['row1' => 2, 'row2' => 4],
+        ];
+        $this->assertEquals($expected, carr::rotate($source));
+
+        // With keep_keys = false, sub-array values are re-indexed before rotating.
+        $source2 = [
+            'row1' => [1, 2],
+            'row2' => [3, 4],
+        ];
+        $expected2 = [
+            0 => ['row1' => 1, 'row2' => 3],
+            1 => ['row1' => 2, 'row2' => 4],
+        ];
+        $this->assertEquals($expected2, carr::rotate($source2, false));
+    }
+
+    public function testRemove() {
+        $array = ['name' => 'Desk', 'price' => 100];
+        $value = carr::remove('name', $array);
+        $this->assertSame('Desk', $value);
+        $this->assertEquals(['price' => 100], $array);
+
+        $this->assertNull(carr::remove('missing', $array));
+        $this->assertEquals(['price' => 100], $array);
+    }
+
+    public function testExtract() {
+        $data = ['level1' => ['level2a' => 'value1', 'level2b' => 'value2']];
+
+        $result = carr::extract($data, ['level1.level2a', 'password']);
+        $this->assertEquals(['level1' => ['level2a' => 'value1'], 'password' => null], $result);
+
+        $result2 = carr::extract($data, ['level1.level2a', 'password'], 'N/A');
+        $this->assertEquals(['level1' => ['level2a' => 'value1'], 'password' => 'N/A'], $result2);
+    }
+
+    public function testMerge() {
+        $john = ['name' => 'john', 'children' => ['fred', 'paul', 'sally', 'jane']];
+        $mary = ['name' => 'mary', 'children' => ['jane']];
+        $merged = carr::merge($john, $mary);
+        $this->assertSame(['name' => 'mary', 'children' => ['fred', 'paul', 'sally', 'jane']], $merged);
+
+        // Indexed (list) arrays are appended, skipping values already present.
+        $this->assertSame([1, 2, 3], carr::merge([1, 2], [2, 3]));
+
+        // More than two arrays may be merged at once.
+        $result = carr::merge(['a' => 1], ['b' => 2], ['c' => 3]);
+        $this->assertSame(['a' => 1, 'b' => 2, 'c' => 3], $result);
+    }
+
+    public function testOverwrite() {
+        $a1 = ['name' => 'john', 'mood' => 'happy', 'food' => 'bacon'];
+        $a2 = ['name' => 'jack', 'food' => 'tacos', 'drink' => 'beer'];
+
+        // "drink" does not exist on $a1, so it is not added.
+        $result = carr::overwrite($a1, $a2);
+        $this->assertSame(['name' => 'jack', 'mood' => 'happy', 'food' => 'tacos'], $result);
+
+        $a3 = ['name' => 'jill'];
+        $result2 = carr::overwrite($a1, $a2, $a3);
+        $this->assertSame(['name' => 'jill', 'mood' => 'happy', 'food' => 'tacos'], $result2);
+    }
+
+    public function testUnshiftAssoc() {
+        $array = ['b' => 2, 'c' => 3];
+        $result = carr::unshift_assoc($array, 'a', 1);
+        $this->assertSame(['a' => 1, 'b' => 2, 'c' => 3], $result);
+        // Passed by reference, so the original is mutated too.
+        $this->assertSame(['a' => 1, 'b' => 2, 'c' => 3], $array);
+    }
+
+    public function testMapRecursiveAndItsAlias() {
+        $array = ['a' => 1, 'b' => ['c' => 2, 'd' => 3]];
+        $double = function ($v) {
+            return $v * 2;
+        };
+        $expected = ['a' => 2, 'b' => ['c' => 4, 'd' => 6]];
+
+        $this->assertSame($expected, carr::mapRecursive($double, $array));
+        // map_recursive is a straight alias of mapRecursive.
+        $this->assertSame($expected, carr::map_recursive($double, $array));
+    }
+
+    public function testBinarySearch() {
+        $haystack = [1, 3, 5, 7, 9];
+        $this->assertSame(2, carr::binary_search(5, $haystack));
+        $this->assertFalse(carr::binary_search(4, $haystack));
+        $this->assertSame(0, carr::binary_search(1, $haystack));
+        $this->assertSame(4, carr::binary_search(9, $haystack));
+
+        // Unsorted haystack requires $sort = true to work correctly.
+        $unsorted = [9, 1, 5, 3, 7];
+        $this->assertSame(2, carr::binary_search(5, $unsorted, true));
+    }
+
+    public function testRange() {
+        $this->assertSame([10 => 10, 20 => 20, 30 => 30], carr::range(10, 30));
+        $this->assertSame([1 => 1, 2 => 2, 3 => 3], carr::range(1, 3));
+        // A step less than 1 yields an empty array.
+        $this->assertSame([], carr::range(0, 100));
+        $this->assertSame([], carr::range(-1, 100));
+    }
+
+    public function testToObject() {
+        $array = ['name' => 'John', 'address' => ['city' => 'NYC']];
+        $object = carr::to_object($array);
+
+        $this->assertInstanceOf(stdClass::class, $object);
+        $this->assertSame('John', $object->name);
+        $this->assertInstanceOf(stdClass::class, $object->address);
+        $this->assertSame('NYC', $object->address->city);
+    }
+
+    public function testReplace() {
+        $result = carr::replace(['a' => 1, 'b' => 2], ['b' => 3, 'c' => 4]);
+        $this->assertSame(['a' => 1, 'b' => 3, 'c' => 4], $result);
+
+        $result2 = carr::replace(['a' => 1], ['b' => 2], ['a' => 3]);
+        $this->assertSame(['a' => 3, 'b' => 2], $result2);
+
+        // A non-array argument triggers an E_USER_WARNING and returns null.
+        $this->assertNull(@carr::replace(['a' => 1], 'not-an-array'));
+    }
+
+    public function testHash() {
+        $hash1 = carr::hash([3, 1, 2]);
+        $hash2 = carr::hash([1, 2, 3]);
+        // array_multisort() means order does not matter for the hash.
+        $this->assertSame($hash1, $hash2);
+        $this->assertSame(32, strlen($hash1));
+
+        $hash3 = carr::hash([1, 2, 4]);
+        $this->assertNotSame($hash1, $hash3);
+    }
+
+    public function testHead() {
+        $this->assertSame(100, carr::head([100, 200, 300]));
+        $this->assertSame('a', carr::head(['x' => 'a', 'y' => 'b']));
+        $this->assertFalse(carr::head([]));
+    }
+
+    public function testImplode() {
+        $array = ['a' => 1, 'b' => 2];
+        $this->assertSame('a=1&b=2', carr::implode('=', '&', $array));
+
+        // Nested arrays are flattened per value using carr::implodes(',', ...).
+        $nested = ['a' => [1, 2], 'b' => 3];
+        $this->assertSame('a=1,2&b=3', carr::implode('=', '&', $nested));
+
+        // A non-array third argument is simply returned untouched.
+        $this->assertSame('not-an-array', carr::implode('=', '&', 'not-an-array'));
+    }
+
+    public function testImplodes() {
+        $this->assertSame('a,b,c', carr::implodes(',', ['a', 'b', 'c']));
+        $this->assertSame('not-an-array', carr::implodes(',', 'not-an-array'));
+        $this->assertSame('', carr::implodes(',', []));
+
+        // Nested arrays are recursively imploded with the same glue.
+        $nested = ['x', ['y', 'z']];
+        $this->assertSame('x,y,z', carr::implodes(',', $nested));
+    }
+
+    public function testInArrayWildcard() {
+        $this->assertTrue(carr::inArrayWildcard('foo.bar', ['foo.*', 'baz.*']));
+        $this->assertTrue(carr::inArrayWildcard('foo', ['foo']));
+        $this->assertFalse(carr::inArrayWildcard('qux', ['foo.*', 'baz.*']));
+        $this->assertFalse(carr::inArrayWildcard('foo', []));
+    }
+
+    public function testIsIterable() {
+        $this->assertTrue(carr::isIterable([]));
+        $this->assertTrue(carr::isIterable([1, 2, 3]));
+        $this->assertTrue(carr::isIterable(new ArrayObject()));
+        $this->assertFalse(carr::isIterable('string'));
+        $this->assertFalse(carr::isIterable(null));
+        $this->assertFalse(carr::isIterable(123));
+    }
+
+    public function testCount() {
+        $this->assertSame(3, carr::count([1, 2, 3]));
+        $this->assertSame(0, carr::count([]));
+        $this->assertSame(2, carr::count(['a' => 1, 'b' => 2]));
+    }
+
+    public function testSortDesc() {
+        $array = ['a' => 3, 'b' => 1, 'c' => 2];
+        $this->assertSame(['a' => 3, 'c' => 2, 'b' => 1], carr::sortDesc($array));
+
+        $sortedWithCallback = carr::sortDesc($array, function ($value) {
+            return $value;
+        });
+        $this->assertSame(['a' => 3, 'c' => 2, 'b' => 1], $sortedWithCallback);
+    }
+
+    public function testToCssStyles() {
+        $styles = carr::toCssStyles([
+            'background-color: red',
+            'display: none' => true,
+            'font-weight: bold' => false,
+        ]);
+
+        $this->assertSame('background-color: red; display: none;', $styles);
+    }
+
+    public function testWhereNotNull() {
+        $array = ['a' => 1, 'b' => null, 'c' => 0, 'd' => false, 'e' => ''];
+        $this->assertSame(['a' => 1, 'c' => 0, 'd' => false, 'e' => ''], carr::whereNotNull($array));
+    }
+
+    public function testArrayMergeRecursiveDistinct() {
+        $array1 = ['a' => 1, 'b' => ['x' => 1, 'y' => 2]];
+        $array2 = ['b' => ['y' => 3, 'z' => 4], 'c' => 5];
+        $expected = ['a' => 1, 'b' => ['x' => 1, 'y' => 3, 'z' => 4], 'c' => 5];
+
+        $this->assertSame($expected, carr::arrayMergeRecursiveDistinct($array1, $array2));
+
+        // Unlike carr::merge(), list values are merged key-by-key (not
+        // appended/re-indexed), so only the overlapping index is replaced.
+        $list1 = ['tags' => ['a', 'b']];
+        $list2 = ['tags' => ['c']];
+        $this->assertSame(['tags' => ['c', 'b']], carr::arrayMergeRecursiveDistinct($list1, $list2));
+    }
+
+    public function testMirror() {
+        $this->assertSame(['a' => 'a', 'b' => 'b'], carr::mirror(['a', 'b']));
+        $this->assertSame([], carr::mirror([]));
+    }
+
+    public function testTranspose() {
+        // transpose() expects a numerically (0-based) keyed list of rows.
+        $array = [
+            0 => [1, 2, 3],
+            1 => [4, 5, 6],
+        ];
+        $expected = [
+            [0 => 1, 1 => 4],
+            [0 => 2, 1 => 5],
+            [0 => 3, 1 => 6],
+        ];
+        $this->assertSame($expected, carr::transpose($array));
+
+        // Special-cased when the outer array has a single row: each element
+        // of that row is wrapped into its own single-item array.
+        $single = ['only' => [1, 2, 3]];
+        $this->assertSame([[1], [2], [3]], carr::transpose($single));
+    }
+
+    public function testReduce() {
+        $sum = carr::reduce([1, 2, 3, 4], function ($carry, $item) {
+            return $carry + $item;
+        }, 0);
+        $this->assertSame(10, $sum);
+
+        // Without an explicit accumulator, the first element seeds it and is
+        // not visited again.
+        $sum2 = carr::reduce([1, 2, 3, 4], function ($carry, $item) {
+            return $carry + $item;
+        });
+        $this->assertSame(10, $sum2);
+
+        $this->assertNull(carr::reduce(null, function ($c, $i) {
+            return $c;
+        }, 0));
+
+        $concatenated = carr::reduce(['a' => 1, 'b' => 2], function ($result, $value, $key) {
+            $result[] = "{$key}:{$value}";
+
+            return $result;
+        }, []);
+        $this->assertSame(['a:1', 'b:2'], $concatenated);
+    }
+
+    public function testFilter() {
+        $result = carr::filter([1, 2, 3, 4, 5], function ($v) {
+            return $v % 2 === 0;
+        });
+        $this->assertSame([1 => 2, 3 => 4], $result);
+
+        $users = [
+            ['user' => 'barney', 'active' => true],
+            ['user' => 'fred', 'active' => false],
+        ];
+
+        // The `matches` iteratee shorthand.
+        $result2 = array_values(carr::filter($users, ['active' => true]));
+        $this->assertSame([['user' => 'barney', 'active' => true]], $result2);
+
+        // The `property` iteratee shorthand.
+        $result3 = array_values(carr::filter($users, 'active'));
+        $this->assertSame([['user' => 'barney', 'active' => true]], $result3);
+    }
+
+    public function testFind() {
+        $users = [
+            ['user' => 'barney', 'age' => 36, 'active' => true],
+            ['user' => 'fred', 'age' => 40, 'active' => false],
+            ['user' => 'pebbles', 'age' => 1, 'active' => true],
+        ];
+
+        $result = carr::find($users, function ($o) {
+            return $o['age'] < 40;
+        });
+        $this->assertSame($users[0], $result);
+
+        $result2 = carr::find($users, function ($o) {
+            return $o['age'] > 100;
+        });
+        $this->assertNull($result2);
+
+        // fromIndex skips leading elements.
+        $result3 = carr::find($users, function ($o) {
+            return $o['age'] < 40;
+        }, 1);
+        $this->assertSame($users[2], $result3);
+    }
+
+    public function testFindLastIndex() {
+        $users = [
+            ['user' => 'barney', 'active' => true],
+            ['user' => 'fred', 'active' => false],
+            ['user' => 'pebbles', 'active' => false],
+        ];
+
+        $index = carr::findLastIndex($users, function ($u) {
+            return $u['user'] === 'pebbles';
+        });
+        $this->assertSame(2, $index);
+
+        $index2 = carr::findLastIndex($users, function ($u) {
+            return $u['active'] === false;
+        });
+        $this->assertSame(2, $index2);
+
+        $index3 = carr::findLastIndex($users, function ($u) {
+            return $u['user'] === 'wilma';
+        });
+        $this->assertSame(-1, $index3);
+    }
+
+    public function testMap() {
+        $result = carr::map([1, 2, 3], function ($v) {
+            return $v * $v;
+        });
+        $this->assertSame([1, 4, 9], $result);
+
+        $users = [['user' => 'barney'], ['user' => 'fred']];
+        // The `property` iteratee shorthand.
+        $result2 = carr::map($users, 'user');
+        $this->assertSame(['barney', 'fred'], $result2);
+    }
+
+    public function testMapTransform() {
+        $result = carr::mapTransform(['hello', 'world'], 'uppercase');
+        $this->assertSame(['HELLO', 'WORLD'], $result);
+    }
+
+    public function testConcat() {
+        $array = [1];
+        $other = carr::concat($array, 2, [3], [[4]]);
+        $this->assertSame([1, 2, 3, [4]], $other);
+        // The original array is left untouched.
+        $this->assertSame([1], $array);
+    }
+
+    public function testSome() {
+        $this->assertTrue(carr::some([null, 0, 'yes', false], function ($value) {
+            return is_bool($value);
+        }));
+        $this->assertFalse(carr::some([1, 2, 3], function ($value) {
+            return $value > 10;
+        }));
+
+        $users = [
+            ['user' => 'barney', 'active' => true],
+            ['user' => 'fred', 'active' => false],
+        ];
+        // The `property` iteratee shorthand.
+        $this->assertTrue(carr::some($users, 'active'));
+        $this->assertFalse(carr::some([['active' => false]], 'active'));
+    }
+
+    public function testEach() {
+        $sum = 0;
+        $result = carr::each([1, 2, 3], function ($value) use (&$sum) {
+            $sum += $value;
+        });
+        $this->assertSame(6, $sum);
+        $this->assertSame([1, 2, 3], $result);
+
+        // Returning false from the iteratee stops iteration early.
+        $visited = [];
+        carr::each([1, 2, 3], function ($value) use (&$visited) {
+            $visited[] = $value;
+            if ($value === 2) {
+                return false;
+            }
+        });
+        $this->assertSame([1, 2], $visited);
+    }
 }

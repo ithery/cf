@@ -395,7 +395,8 @@ trait CollectionTest_FilteringTrait {
         ], $data->groupBy->name->toArray());
 
         $this->assertEquals([
-            'TAYLOR' => [$data->get(0), $data->get(1)],
+            'ITHER' => [$data->get(0)],
+            'TAYLOR' => [$data->get(1)],
             'FOO' => [$data->get(2)],
         ], $data->groupBy->uppercase()->toArray());
     }
@@ -414,7 +415,7 @@ trait CollectionTest_FilteringTrait {
 
         $data = new $collection([new TestSupportCollectionHigherOrderItem(), new TestSupportCollectionHigherOrderItem()]);
 
-        $this->assertEquals(['TAYLOR', 'TAYLOR'], $data->each->uppercase()->map->name->toArray());
+        $this->assertEquals(['ITHER', 'ITHER'], $data->each->uppercase()->map->name->toArray());
     }
 
     /**
@@ -431,7 +432,7 @@ trait CollectionTest_FilteringTrait {
 
         $data = new $collection([new TestSupportCollectionHigherOrderItem(), new TestSupportCollectionHigherOrderItem()]);
 
-        $this->assertEquals(['TAYLOR', 'TAYLOR'], $data->each->uppercase()->map->name->toArray());
+        $this->assertEquals(['ITHER', 'ITHER'], $data->each->uppercase()->map->name->toArray());
     }
 
     /**

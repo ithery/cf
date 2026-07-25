@@ -5,12 +5,28 @@ use Illuminate\Contracts\Support\Jsonable;
 use Symfony\Component\VarDumper\VarDumper;
 use Illuminate\Contracts\Support\Arrayable;
 
+require_once dirname(__FILE__) . '/Trait/CollectionTest/AggregateTrait.php';
 require_once dirname(__FILE__) . '/Trait/CollectionTest/BasicTrait.php';
+require_once dirname(__FILE__) . '/Trait/CollectionTest/ContainTrait.php';
 require_once dirname(__FILE__) . '/Trait/CollectionTest/ExceptionTrait.php';
+require_once dirname(__FILE__) . '/Trait/CollectionTest/FilteringTrait.php';
+require_once dirname(__FILE__) . '/Trait/CollectionTest/LazyCollectionTrait.php';
+require_once dirname(__FILE__) . '/Trait/CollectionTest/MapTrait.php';
+require_once dirname(__FILE__) . '/Trait/CollectionTest/OperationTrait.php';
+require_once dirname(__FILE__) . '/Trait/CollectionTest/PartitionTrait.php';
+require_once dirname(__FILE__) . '/Trait/CollectionTest/SerializeTrait.php';
 
 class CollectionTest extends TestCase {
+    use CollectionTest_AggregateTrait;
     use CollectionTest_BasicTrait;
+    use CollectionTest_ContainTrait;
     use CollectionTest_ExceptionTrait;
+    use CollectionTest_FilteringTrait;
+    use CollectionTest_LazyCollectionTrait;
+    use CollectionTest_MapTrait;
+    use CollectionTest_OperationTrait;
+    use CollectionTest_PartitionTrait;
+    use CollectionTest_SerializeTrait;
 
     public function testPopReturnsAndRemovesLastItemInCollection() {
         $c = new CCollection(['foo', 'bar']);
@@ -1716,6 +1732,27 @@ class CollectionTest extends TestCase {
      *
      * @dataProvider collectionClassProvider
      */
+    public function testReduceManyIsAliasForReduceSpread($collection) {
+        $data = new $collection([-1, 0, 1, 2, 3, 4, 5]);
+
+        list($sum, $max, $min) = $data->reduceMany(function ($sum, $max, $min, $value) {
+            $sum += $value;
+            $max = max($max, $value);
+            $min = min($min, $value);
+
+            return [$sum, $max, $min];
+        }, 0, PHP_INT_MIN, PHP_INT_MAX);
+
+        $this->assertEquals(14, $sum);
+        $this->assertEquals(5, $max);
+        $this->assertEquals(-1, $min);
+    }
+
+    /**
+     * @param CCollection $collection
+     *
+     * @dataProvider collectionClassProvider
+     */
     public function testPipe($collection) {
         $data = new $collection([1, 2, 3]);
 
@@ -1955,6 +1992,31 @@ class CollectionTest extends TestCase {
     }
 
     /**
+     * @param CCollection $collection
+     *
+     * @dataProvider collectionClassProvider
+     */
+    public function testDot($collection) {
+        $data = $collection::make([
+            'name' => 'Taylor',
+            'meta' => [
+                'foo' => 'bar',
+                'baz' => 'boom',
+                'bam' => [
+                    'boom' => 'bip',
+                ],
+            ],
+        ])->dot();
+
+        $this->assertSame([
+            'name' => 'Taylor',
+            'meta.foo' => 'bar',
+            'meta.baz' => 'boom',
+            'meta.bam.boom' => 'bip',
+        ], $data->all());
+    }
+
+    /**
      * Provides each collection class, respectively.
      *
      * @return array
@@ -1962,7 +2024,7 @@ class CollectionTest extends TestCase {
     public function collectionClassProvider() {
         return [
             [CCollection::class],
-            //[LazyCollection::class],
+            [CCollection_LazyCollection::class],
         ];
     }
 }
