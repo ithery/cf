@@ -27,44 +27,9 @@ abstract class CDevSuite_Deploy_RemoteProcessor {
     protected function getProcess($host, CDevSuite_Deploy_Task $task) {
         $target = $this->getConfiguredServer($host) ?: $host;
 
-        $env = $this->getEnvironment($host);
         CDevSuite::info('Prepare script:' . PHP_EOL . $task->script . PHP_EOL . 'to:' . $target);
 
         $process = new CDevSuite_Deploy_Process(CDevSuite::ssh()->getRemoteSsh($target), $task);
-        return [$target, $process->setTimeout(null)];
-
-        if (in_array($target, ['local', 'localhost', '127.0.0.1'])) {
-            $process = Process::fromShellCommandline($task->script, null, $env);
-        } else {
-            // Here we'll run the SSH task on the server inline. We do not need to write the
-            // script out to a file or anything. We will start the SSH process then pass
-            // these lines of output back to the parent callback for display purposes.
-            $delimiter = 'EOF-DEVSUITE-DEPLOY';
-
-            foreach ($env as $k => $v) {
-                if ($v !== false) {
-                    $env[$k] = 'export ' . $k . '="' . $v . '"' . PHP_EOL;
-                }
-            }
-
-            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                $process = Process::fromShellCommandline("putty.exe -ssh $target -T");
-
-                $process->setInput(
-                    implode(PHP_EOL, $env)
-                        . 'set -e ' . PHP_EOL
-                        . str_replace("\r", '', $task->script)
-                );
-            } else {
-                $process = Process::fromShellCommandline(
-                    "ssh $target 'bash -se' << \\$delimiter" . PHP_EOL
-                                . implode(PHP_EOL, $env) . PHP_EOL
-                                . 'set -e' . PHP_EOL
-                                . $task->script . PHP_EOL
-                                . $delimiter
-                );
-            }
-        }
 
         return [$target, $process->setTimeout(null)];
     }

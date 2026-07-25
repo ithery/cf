@@ -20,6 +20,23 @@ class CDevSuite_Deploy {
     protected $files;
 
     /**
+     * Command line options that should not be gathered dynamically.
+     *
+     * @var array
+     */
+    protected $ignoreOptions = [
+        '--continue',
+        '--pretend',
+        '--help',
+        '--quiet',
+        '--version',
+        '--asci',
+        '--no-asci',
+        '--no-interactions',
+        '--verbose',
+    ];
+
+    /**
      * Create a new Deploy instance.
      *
      * @return void
@@ -161,6 +178,22 @@ class CDevSuite_Deploy {
         }
 
         return $options;
+    }
+
+    /**
+     * Ask the user to confirm running the given task. $confirm is the task's
+     * "confirm" option — either a custom prompt message, or a truthy value
+     * to show the default prompt.
+     *
+     * @param string      $task
+     * @param bool|string $confirm
+     *
+     * @return bool
+     */
+    protected function confirmTaskWithUser($task, $confirm) {
+        $message = is_string($confirm) ? $confirm : "Are you sure you want to run the [{$task}] task?";
+
+        return CDevSuite::confirm($message, false);
     }
 
     /**

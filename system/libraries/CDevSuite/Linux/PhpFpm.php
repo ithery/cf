@@ -232,7 +232,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
         $status = $this->sm->status($service);
 
         if (strpos($status, 'not-found') || strpos($status, 'not be found')) {
-            return new DomainException('Unable to determine PHP service name.');
+            throw new DomainException('Unable to determine PHP service name.');
         }
 
         return $service;

@@ -9,8 +9,6 @@ class CDevSuite_Mac_Db_MariaDB extends CDevSuite_Db_MariaDb {
      */
     public $brew;
 
-    const NGINX_CONF = '/usr/local/etc/nginx/nginx.conf';
-
     /**
      * Create a new MariaDb instance.
      *
@@ -22,7 +20,7 @@ class CDevSuite_Mac_Db_MariaDB extends CDevSuite_Db_MariaDb {
     }
 
     /**
-     * Install the configuration files for Nginx.
+     * Install MariaDB via Homebrew.
      *
      * @return void
      */
@@ -36,29 +34,26 @@ class CDevSuite_Mac_Db_MariaDB extends CDevSuite_Db_MariaDb {
     }
 
     /**
-     * Stop the Nginx service.
+     * Stop the MariaDB service.
      *
      * @return void
      */
     public function stop() {
-        //CDevSuite::info('Stopping nginx...');
-
-        //$this->cli->quietly('sudo brew services stop ' . $this->brew->nginxServiceName());
+        $this->brew->stopService($this->brew->mariaDbServiceName());
     }
 
     /**
-     * Forcefully uninstall Nginx.
+     * Forcefully uninstall MariaDB.
      *
      * @return void
      */
     public function uninstall() {
-        //$this->brew->stopService(['nginx', 'nginx-full']);
-        //$this->brew->uninstallFormula('nginx nginx-full');
-        //$this->cli->quietly('rm -rf /usr/local/etc/nginx /usr/local/var/log/nginx');
+        $this->brew->stopService($this->brew->mariaDbServiceName());
+        $this->brew->uninstallFormula('mariadb');
     }
 
     /**
-     * Restart the Nginx service.
+     * Restart the MariaDB service.
      *
      * @return void
      */

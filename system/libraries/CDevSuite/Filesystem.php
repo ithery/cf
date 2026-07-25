@@ -39,13 +39,18 @@ class CDevSuite_Filesystem {
     /**
      * Create a directory as root.
      *
-     * @param string $path
+     * @param string      $path
+     * @param null|string $owner
+     * @param int         $mode
      *
      * @return void
      */
-    public function mkdirAsRoot($path) {
-        $command = sprintf('sudo mkdir "%s"', $path);
-        CDevSuite::commandLine()->run($command);
+    public function mkdirAsRoot($path, $owner = null, $mode = 0755) {
+        CDevSuite::commandLine()->run(sprintf('sudo mkdir -m %o "%s"', $mode, $path));
+
+        if ($owner) {
+            CDevSuite::commandLine()->run(sprintf('sudo chown %s "%s"', $owner, $path));
+        }
     }
 
     /**

@@ -128,7 +128,7 @@ class CDevSuite_Ssh {
      */
     public function existsOrExit($key) {
         if (!$this->exists($key)) {
-            CDevSuite::error('Databaes configuration: ' . $key . ' not exists');
+            CDevSuite::error('Database configuration: ' . $key . ' not exists');
             exit(CConsole::FAILURE_EXIT);
         }
     }

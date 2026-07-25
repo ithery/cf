@@ -77,13 +77,6 @@ class CDevSuite_Linux_Db_MariaDB extends CDevSuite_Db_MariaDb {
      */
     public function uninstall() {
         $this->stop();
-        $this->files->restoreAsRoot($this->nginx_conf);
-        $this->files->restoreAsRoot('/etc/nginx/fastcgi_params');
-        $this->files->unlinkAsRoot($this->sites_enabled_conf);
-        $this->files->unlinkAsRoot($this->sites_available_conf);
-
-        if ($this->files->exists('/etc/nginx/sites-available/default')) {
-            $this->files->symlinkAsRoot('/etc/nginx/sites-available/default', '/etc/nginx/sites-enabled/default');
-        }
+        $this->sm->disable('mariadb-server');
     }
 }

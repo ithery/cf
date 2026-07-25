@@ -96,15 +96,15 @@ trait CDevSuite_Trait_ConsoleTrait {
     }
 
     /**
-     * Confirm the given text to the console.
+     * Ask the user to confirm the given text on the console.
      *
      * @param string $output
      * @param bool   $default
      *
-     * @return void
+     * @return bool
      */
     public static function confirm($output, $default = true) {
-        static::getOutputStyle()->confirm($output, $default);
+        return static::getOutputStyle()->confirm($output, $default);
     }
 
     /**
