@@ -2,8 +2,6 @@
 
 /**
  * Description of DevCloud.
- *
- * @author Hery
  */
 class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
     protected $requiredFiles = [

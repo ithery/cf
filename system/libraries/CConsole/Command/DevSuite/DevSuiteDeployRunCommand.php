@@ -2,8 +2,6 @@
 
 /**
  * Description of DeployRunCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteDeployRunCommand extends CConsole_Command_DevSuiteCommand {
     /**

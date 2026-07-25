@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteStartCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteStartCommand extends CConsole_Command_DevSuiteCommand {
     /**

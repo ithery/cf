@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteUninstallCommand
- *
- * @author Hery
  */
 
 class CConsole_Command_DevSuite_DevSuiteUninstallCommand extends CConsole_Command_DevSuiteCommand {

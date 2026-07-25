@@ -2,8 +2,6 @@
 
 /**
  * Description of MariaDB.
- *
- * @author Hery
  */
 class CDevSuite_Windows_Db_MariaDb extends CDevSuite_Db_MariaDb {
     const SERVICE = 'mariadbservice';

@@ -2,8 +2,6 @@
 
 /**
  * Description of DbCloneCommand.
- *
- * @author Hery
  */
 class CDevSuite_Command_DbCloneCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

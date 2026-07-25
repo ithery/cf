@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteBootstrapper.
- *
- * @author Hery
  */
 class CDevSuite_Bootstrap_DevSuiteBootstrapper extends CDevSuite_Bootstrap_Bootstrapper {
     public function bootstrap() {

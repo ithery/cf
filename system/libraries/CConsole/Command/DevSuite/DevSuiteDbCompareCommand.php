@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteDbCompareCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteDbCompareCommand extends CConsole_Command_DevSuiteCommand {
     /**

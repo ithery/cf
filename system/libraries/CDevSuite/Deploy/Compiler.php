@@ -2,8 +2,6 @@
 
 /**
  * Description of Compiler
- *
- * @author Hery
  */
 class CDevSuite_Deploy_Compiler {
     /**

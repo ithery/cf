@@ -2,8 +2,6 @@
 
 /**
  * Description of Task
- *
- * @author Hery
  */
 class CDevSuite_Deploy_Task {
     /**

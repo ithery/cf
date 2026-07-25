@@ -2,8 +2,6 @@
 
 /**
  * Description of Deploy.
- *
- * @author Hery
  */
 
 use Symfony\Component\Process\Process;

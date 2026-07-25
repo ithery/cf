@@ -2,8 +2,6 @@
 
 /**
  * Description of SSH.
- *
- * @author Hery
  */
 
 use Symfony\Component\Process\Process;

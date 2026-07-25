@@ -2,8 +2,6 @@
 
 /**
  * Description of SecureCommand.
- *
- * @author Hery
  */
 class CDevSuite_Command_SecureCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

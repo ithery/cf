@@ -2,8 +2,6 @@
 
 /**
  * Description of Db.
- *
- * @author Hery
  */
 class CDevSuite_Db {
     public $files;

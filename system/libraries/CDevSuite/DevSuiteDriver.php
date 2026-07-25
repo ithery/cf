@@ -2,8 +2,6 @@
 
 /**
  * Description of Driver.
- *
- * @author Hery
  */
 abstract class CDevSuite_DevSuiteDriver {
     /**

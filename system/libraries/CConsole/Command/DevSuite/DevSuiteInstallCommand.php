@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteInstallCommand
- *
- * @author Hery
  */
 use Symfony\Component\Console\Input\InputArgument;
 

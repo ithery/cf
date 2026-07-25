@@ -2,8 +2,6 @@
 
 /**
  * Description of DeployRunCommand.
- *
- * @author Hery
  */
 class CDevSuite_Command_DeployRunCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

@@ -2,8 +2,6 @@
 
 /**
  * Description of DbInstallCommand.
- *
- * @author Hery
  */
 class CDevSuite_Command_DbInstallCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

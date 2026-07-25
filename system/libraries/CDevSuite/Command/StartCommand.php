@@ -2,8 +2,6 @@
 
 /**
  * Description of StartCommand
- *
- * @author Hery
  */
 class CDevSuite_Command_StartCommand extends CDevSuite_CommandAbstract {
     public function run(CConsole_Command $cfCommand) {

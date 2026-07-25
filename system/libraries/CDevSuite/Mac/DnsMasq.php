@@ -2,8 +2,6 @@
 
 /**
  * Description of DnsMasq.
- *
- * @author Hery
  */
 class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
     public $brew;

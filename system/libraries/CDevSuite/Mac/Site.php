@@ -2,8 +2,6 @@
 
 /**
  * Description of Site.
- *
- * @author Hery
  */
 class CDevSuite_Mac_Site extends CDevSuite_Site {
     /**

@@ -2,8 +2,6 @@
 
 /**
  * Description of TldCommand.
- *
- * @author Hery
  */
 class CDevSuite_Command_TldCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

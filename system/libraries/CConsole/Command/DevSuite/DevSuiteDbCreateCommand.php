@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteDBCreateCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteDbCreateCommand extends CConsole_Command_DevSuiteCommand {
     /**

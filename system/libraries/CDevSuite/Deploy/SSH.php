@@ -2,8 +2,6 @@
 
 /**
  * Description of SSH
- *
- * @author Hery
  */
 class CDevSuite_Deploy_SSH extends CDevSuite_Deploy_RemoteProcessor {
     use CDevSuite_Deploy_Trait_ConfigurationParserTrait;

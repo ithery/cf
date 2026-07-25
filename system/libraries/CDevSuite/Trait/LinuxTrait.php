@@ -2,8 +2,6 @@
 
 /**
  * Description of LinuxTrait
- *
- * @author Hery
  */
 trait CDevSuite_Trait_LinuxTrait {
     /**

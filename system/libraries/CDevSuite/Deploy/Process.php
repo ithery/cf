@@ -2,8 +2,6 @@
 
 /**
  * Description of Process
- *
- * @author Hery
  */
 class CDevSuite_Deploy_Process {
     /**

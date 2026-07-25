@@ -2,8 +2,6 @@
 
 /**
  * Description of Nginx.
- *
- * @author Hery
  */
 abstract class CDevSuite_Nginx {
     /**

@@ -2,8 +2,6 @@
 
 /**
  * Description of DependencyBootstrapper.
- *
- * @author Hery
  */
 class CDevSuite_Bootstrap_WindowsBootstrapper_DependencyChecker extends CDevSuite_Bootstrap_Bootstrapper {
     public function bootstrap() {

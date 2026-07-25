@@ -2,8 +2,6 @@
 
 /**
  * Description of MariaDb
- *
- * @author Hery
  */
 class CDevSuite_Mac_Db_MariaDB extends CDevSuite_Db_MariaDb {
     public $brew;

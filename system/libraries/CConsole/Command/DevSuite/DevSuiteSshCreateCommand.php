@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteSshCreateCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteSshCreateCommand extends CConsole_Command_DevSuiteCommand {
     /**

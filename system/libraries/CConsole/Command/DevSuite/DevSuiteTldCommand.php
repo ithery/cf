@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteTldCommand
- *
- * @author Hery
  */
 
 class CConsole_Command_DevSuite_DevSuiteTldCommand extends CConsole_Command_DevSuiteCommand {

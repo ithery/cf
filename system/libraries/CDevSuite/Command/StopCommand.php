@@ -2,8 +2,6 @@
 
 /**
  * Description of StopCommand
- *
- * @author Hery
  */
 
 class CDevSuite_Command_StopCommand extends CDevSuite_CommandAbstract {

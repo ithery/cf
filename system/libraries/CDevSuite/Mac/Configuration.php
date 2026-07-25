@@ -2,8 +2,6 @@
 
 /**
  * Description of Configuration.
- *
- * @author Hery
  */
 class CDevSuite_Mac_Configuration extends CDevSuite_Configuration {
     /**

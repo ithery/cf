@@ -2,8 +2,6 @@
 
 /**
  * Description of DeployInitCommand.
- *
- * @author Hery
  */
 class CDevSuite_Command_DeployInitCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

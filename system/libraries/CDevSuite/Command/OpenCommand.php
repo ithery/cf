@@ -2,8 +2,6 @@
 
 /**
  * Description of OpenCommand.
- *
- * @author Hery
  */
 class CDevSuite_Command_OpenCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

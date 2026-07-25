@@ -3,8 +3,6 @@
 /**
  * Description of Winsw.
  *
- * @author Hery
- *
  * @deprecated 1.8
  */
 class CDevSuite_Winsw {

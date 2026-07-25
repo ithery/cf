@@ -2,8 +2,6 @@
 
 /**
  * Description of Site.
- *
- * @author Hery
  */
 use phpseclib\Crypt\RSA;
 use phpseclib\File\X509;

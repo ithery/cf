@@ -2,8 +2,6 @@
 
 /**
  * Description of PhpFpm.
- *
- * @author Hery
  */
 use Symfony\Component\Process\Process;
 

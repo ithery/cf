@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteLinkCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteLinkCommand extends CConsole_Command_DevSuiteCommand {
     /**

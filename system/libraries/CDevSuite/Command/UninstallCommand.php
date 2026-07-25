@@ -2,8 +2,6 @@
 
 /**
  * Description of UninstallCommand.
- *
- * @author Hery
  */
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 

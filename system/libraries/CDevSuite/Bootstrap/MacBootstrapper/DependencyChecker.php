@@ -2,8 +2,6 @@
 
 /**
  * Description of DependencyChecker.
- *
- * @author Hery
  */
 class CDevSuite_Bootstrap_MacBootstrapper_DependencyChecker extends CDevSuite_Bootstrap_Bootstrapper {
     public function bootstrap() {

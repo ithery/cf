@@ -2,8 +2,6 @@
 
 /**
  * Description of ServerCreateCommand
- *
- * @author Hery
  */
 class CDevSuite_Command_SshCreateCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

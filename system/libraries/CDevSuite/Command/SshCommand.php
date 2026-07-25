@@ -2,8 +2,6 @@
 
 /**
  * CDevSuite_Command_SshCommand
- *
- * @author Hery
  */
 class CDevSuite_Command_SshCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

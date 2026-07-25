@@ -2,8 +2,6 @@
 
 /**
  * Description of MariaDb
- *
- * @author Hery
  */
 use Symfony\Component\Process\Process;
 

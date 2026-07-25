@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteSshListCommand.
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteSshCommand extends CConsole_Command_DevSuiteCommand {
     /**

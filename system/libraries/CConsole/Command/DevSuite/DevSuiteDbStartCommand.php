@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteDbStart
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteDbStartCommand extends CConsole_Command_DevSuiteCommand {
     /**

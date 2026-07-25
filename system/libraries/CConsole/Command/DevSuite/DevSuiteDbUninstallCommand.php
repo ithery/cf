@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteDbInstall
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteDbUninstallCommand extends CConsole_Command_DevSuiteCommand {
     /**

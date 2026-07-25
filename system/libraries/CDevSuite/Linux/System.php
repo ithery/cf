@@ -2,8 +2,6 @@
 
 /**
  * Description of System.
- *
- * @author Hery
  */
 class CDevSuite_Linux_System extends CDevSuite_System {
     public $devSuiteBin = '/usr/local/bin/devsuite';

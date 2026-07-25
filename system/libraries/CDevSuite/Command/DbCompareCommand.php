@@ -2,8 +2,6 @@
 
 /**
  * Description of DbCompareCommand.
- *
- * @author Hery
  */
 class CDevSuite_Command_DbCompareCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

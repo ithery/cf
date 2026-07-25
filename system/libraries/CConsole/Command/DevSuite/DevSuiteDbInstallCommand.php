@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteDbInstall
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteDbInstallCommand extends CConsole_Command_DevSuiteCommand {
     /**

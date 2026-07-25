@@ -2,8 +2,6 @@
 
 /**
  * Description of PhpFpm.
- *
- * @author Hery
  */
 class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
     /**

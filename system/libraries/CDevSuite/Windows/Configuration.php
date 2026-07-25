@@ -2,8 +2,6 @@
 
 /**
  * Description of Configuration.
- *
- * @author Hery
  */
 class CDevSuite_Windows_Configuration extends CDevSuite_Configuration {
     /**

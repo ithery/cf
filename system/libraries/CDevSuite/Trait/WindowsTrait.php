@@ -2,8 +2,6 @@
 
 /**
  * Description of WindowsTrait
- *
- * @author Hery
  */
 trait CDevSuite_Trait_WindowsTrait {
     /**

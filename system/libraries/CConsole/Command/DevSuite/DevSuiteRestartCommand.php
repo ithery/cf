@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteRestartCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteRestartCommand extends CConsole_Command_DevSuiteCommand {
     /**

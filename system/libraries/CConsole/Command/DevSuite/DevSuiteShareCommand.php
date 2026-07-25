@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteShareCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteShareCommand extends CConsole_Command_DevSuiteCommand {
     /**

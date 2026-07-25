@@ -2,8 +2,6 @@
 
 /**
  * Description of DevCloud.
- *
- * @author Hery
  */
 abstract class CDevSuite_DevCloud {
     protected $baseDownloadUrl;

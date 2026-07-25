@@ -2,8 +2,6 @@
 
 /**
  * Description of DbSyncCommand.
- *
- * @author Hery
  */
 class CDevSuite_Command_DbSyncCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

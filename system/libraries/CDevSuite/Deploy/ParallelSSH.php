@@ -2,8 +2,6 @@
 
 /**
  * Description of ParallelSSH
- *
- * @author Hery
  */
 use Symfony\Component\Process\Process;
 

@@ -2,8 +2,6 @@
 
 /**
  * Description of SSHConfigFile
- *
- * @author Hery
  */
 class CDevSuite_Deploy_SSHConfigFile {
     /**

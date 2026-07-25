@@ -2,8 +2,6 @@
 
 /**
  * Description of CommandLine.
- *
- * @author Hery
  */
 
 use Symfony\Component\Process\Process;

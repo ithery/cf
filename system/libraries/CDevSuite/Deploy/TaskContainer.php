@@ -2,8 +2,6 @@
 
 /**
  * Description of TaskContainer
- *
- * @author Hery
  */
 class CDevSuite_Deploy_TaskContainer {
     /**

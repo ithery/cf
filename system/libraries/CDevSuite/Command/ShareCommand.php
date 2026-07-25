@@ -2,8 +2,6 @@
 
 /**
  * Description of ShareCommand
- *
- * @author Hery
  */
 class CDevSuite_Command_ShareCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

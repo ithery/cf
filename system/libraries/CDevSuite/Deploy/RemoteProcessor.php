@@ -2,8 +2,6 @@
 
 /**
  * Description of RemoteProcessor
- *
- * @author Hery
  */
 use Symfony\Component\Process\Process;
 

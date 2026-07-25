@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteStopCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteStopCommand extends CConsole_Command_DevSuiteCommand {
     /**

@@ -2,8 +2,6 @@
 
 /**
  * Description of ConfigurationParserTrait.
- *
- * @author Hery
  */
 trait CDevSuite_Deploy_Trait_ConfigurationParserTrait {
     /**

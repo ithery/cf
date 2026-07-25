@@ -2,8 +2,6 @@
 
 /**
  * Description of PruneBootstrapper.
- *
- * @author Hery
  */
 class CDevSuite_Bootstrap_PruneBootstrapper extends CDevSuite_Bootstrap_Bootstrapper {
     public function bootstrap() {

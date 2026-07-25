@@ -2,8 +2,6 @@
 
 /**
  * Description of Bootstrap.
- *
- * @author Hery
  */
 class CDevSuite_Bootstrap {
     protected $booted = false;

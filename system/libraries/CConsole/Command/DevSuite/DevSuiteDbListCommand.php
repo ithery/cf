@@ -2,8 +2,6 @@
 
 /**
  * Description of DBSuiteDBListCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteDbListCommand extends CConsole_Command_DevSuiteCommand {
     /**

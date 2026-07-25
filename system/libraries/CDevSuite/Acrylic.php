@@ -2,8 +2,6 @@
 
 /**
  * Description of Acrylic.
- *
- * @author Hery
  */
 class CDevSuite_Acrylic {
     /**

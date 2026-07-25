@@ -2,8 +2,6 @@
 
 /**
  * Description of DbDeleteCommand.
- *
- * @author Hery
  */
 class CDevSuite_Command_DbDeleteCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

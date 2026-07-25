@@ -2,8 +2,6 @@
 
 /**
  * Description of Site.
- *
- * @author Hery
  */
 abstract class CDevSuite_Site {
     /**

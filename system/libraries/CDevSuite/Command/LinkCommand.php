@@ -2,8 +2,6 @@
 
 /**
  * Description of LinkCommand.
- *
- * @author Hery
  */
 class CDevSuite_Command_LinkCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

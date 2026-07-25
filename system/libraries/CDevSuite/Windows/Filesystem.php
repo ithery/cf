@@ -2,8 +2,6 @@
 
 /**
  * Description of Filesystem
- *
- * @author Hery
  */
 class CDevSuite_Windows_Filesystem extends CDevSuite_Filesystem {
     /**

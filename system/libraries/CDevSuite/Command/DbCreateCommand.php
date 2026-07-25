@@ -2,8 +2,6 @@
 
 /**
  * Description of DbCreateCommand.
- *
- * @author Hery
  */
 class CDevSuite_Command_DbCreateCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {

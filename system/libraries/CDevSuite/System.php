@@ -2,8 +2,6 @@
 
 /**
  * Description of System.
- *
- * @author Hery
  */
 abstract class CDevSuite_System {
     public $cli;
