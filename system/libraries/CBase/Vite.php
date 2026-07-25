@@ -154,7 +154,7 @@ class CBase_Vite implements CInterface_Htmlable {
      * @return string
      */
     public function hotFile() {
-        return $this->hotFile ?? CF::publicPath('/hot');
+        return $this->hotFile ?? $this->absolutePath('/hot');
     }
 
     /**
@@ -669,13 +669,43 @@ class CBase_Vite implements CInterface_Htmlable {
 
         $chunk = $this->chunk($this->manifest($buildDirectory), $asset);
 
-        $path = CF::publicPath($buildDirectory . '/' . $chunk['file']);
+        $path = $this->absolutePath($buildDirectory . '/' . $chunk['file']);
 
         if (!is_file($path) || !file_exists($path)) {
             throw new Exception("Unable to locate file from Vite manifest: {$path}.");
         }
 
         return file_get_contents($path);
+    }
+
+    /**
+     * Get the directory used in place of a dedicated public docroot when this
+     * app has none of its own (shared front controller / multi-tenant
+     * deployment, i.e. `CF::publicPath()` is null).
+     *
+     * CF already serves anything under an app's "default/media" directory
+     * directly by URL (see `c::media()`), so builds can land there instead of
+     * requiring a separate "public" folder.
+     *
+     * @return string
+     */
+    protected function basePath() {
+        return CF::publicPath() ?: CF::appDir() . DS . 'default' . DS . 'media';
+    }
+
+    /**
+     * Resolve the given Vite-relative path to an absolute filesystem path.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    protected function absolutePath($path) {
+        if (CF::publicPath()) {
+            return CF::publicPath($path);
+        }
+
+        return $this->basePath() . DS . ltrim($path, '/');
     }
 
     /**
@@ -687,19 +717,24 @@ class CBase_Vite implements CInterface_Htmlable {
      * @return string
      */
     protected function assetPath($path, $secure = null) {
-        $path = CF::publicPath($path);
-        if (cstr::startsWith($path, CF::publicPath())) {
-            $path = str_replace(CF::publicPath() . '/', '', $path);
-        }
         $urlGenerator = CRouting::urlGenerator();
         $root = $urlGenerator->formatRoot($urlGenerator->formatScheme($secure));
         $i = 'index.php';
 
         $root = cstr::contains($root, $i) ? str_replace('/' . $i, '', $root) : $root;
 
-        return $root . '/' . trim($path, '/');
+        if (CF::publicPath()) {
+            return $root . '/' . trim($path, '/');
+        }
 
-        // return c::media($path, $secure);
+        // No dedicated docroot for this app — resolve to the real file location
+        // under "default/media" and build a DOCROOT-relative URL. CF's rewrite
+        // rules serve any existing file directly, so no public folder is needed.
+        $absolute = str_replace('\\', '/', $this->absolutePath($path));
+        $docroot = rtrim(str_replace('\\', '/', DOCROOT), '/');
+        $relative = ltrim(str_replace($docroot, '', $absolute), '/');
+
+        return $root . '/' . $relative;
     }
 
     /**
@@ -733,11 +768,7 @@ class CBase_Vite implements CInterface_Htmlable {
      * @return string
      */
     protected function manifestPath($buildDirectory) {
-        // $relativeIndex = str_replace(DOCROOT, '', CFINDEX);
-
-        // return strpos($relativeIndex, 'application/') !== false;
-        // cdbg::dd(CFINDEX, CF::isIndexInApp(), CF::publicPath($buildDirectory . '/' . $this->manifestFilename), $buildDirectory . '/' . $this->manifestFilename);
-        return CF::publicPath($buildDirectory . '/' . $this->manifestFilename);
+        return $this->absolutePath($buildDirectory . '/' . $this->manifestFilename);
     }
 
     /**
