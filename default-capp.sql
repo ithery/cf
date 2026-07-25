@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `org` (
 -- Dumping data for table torsb2c.org: ~0 rows (approximately)
 /*!40000 ALTER TABLE `org` DISABLE KEYS */;
 INSERT INTO `org` (`org_id`, `code`, `name`, `address`, `city`,  `email`, `phone`,  `contact_person`, `created`, `createdby`, `updated`, `updatedby`, `status`) VALUES
-	(1, 'ittron', 'Ittron', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1);
+	(1, 'cresenity', 'Cresenity', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1);
 /*!40000 ALTER TABLE `org` ENABLE KEYS */;
 
 
