@@ -1,0 +1,87 @@
+CF FRAMEWORK TEST COMPLETION - AUTONOMOUS WORK LOG
+=====================================================
+Started: this session, working unattended per instruction "kerjakan saja,
+jangan tanya, kalau ada pertanyaan/error masukkan ke note.txt".
+
+SCOPE / STRATEGY
+-----------------
+Framework has 90 top-level system/libraries/* namespaces (~5300 PHP files) -
+literally comprehensive coverage of all of it is not realistically achievable.
+Existing tests/ (34 files, ~530 test methods) were clearly already ported
+from Laravel's real tests/Unit/Support + a few Database/Console files
+(method names/assertions match Laravel's Illuminate\Tests\* almost 1:1,
+just cstr::/carr::/CCollection instead of Str::/Arr::/Collection).
+
+Chosen approach: keep following that existing pattern. Prioritized by
+"closest Laravel equivalent + highest reuse value", roughly:
+  1. Support layer: cstr/carr gaps, CCollection/LazyCollection gaps, small
+     Support classes (Fluent-equivalent, Optional, Pluralizer, etc.)
+  2. Database: query builder, grammars, schema builder, CModel (Eloquent-like)
+  3. Validation
+  4. Http (Request/Response equivalents)
+  5. Routing
+  6. Console
+  7. Auth / Hashing / Crypt (partially covered)
+  8. Whatever else has a clean, unit-testable, Laravel-equivalent surface
+
+Explicitly OUT of scope unless time permits later: CElement (UI widget
+rendering, needs a DOM/browser), CApp controllers (app-specific, not a
+Laravel-analogous "framework" test target), heavy I/O integrations
+(CBroadcast/CWebSocket/CSocialLogin/CAI/CML/CDevSuite - already has its own
+tests style elsewhere) - these aren't what Laravel's own test suite covers
+either, so "mencontoh Laravel" doesn't really apply to them.
+
+BASELINE (before any of my changes) - `phpcf test`: 497 passed, 20 failed,
+17 risky. Pre-existing failures, NOT caused by this work, left as-is unless
+trivially fixable in passing:
+  - QueryDurationThresholdTest (10 tests) - likely missing sqlite pdo driver
+    in this sandbox
+  - DatabaseConnectionFactoryTest > connection can be created / sqlite fk
+  - DatabaseAbstractSchemaGrammarTest > create/drop database
+  - DatabaseConnectionTest > select resultsets returns multiple rowset
+  - DatabaseMySqlProcessorTest > process column listing
+  - ModelCollectionTest > contains key and value indicates if model in array
+    (Mockery expectation issue)
+  - cstrTest > replace last (assertion mismatch, pre-existing bug or PHP
+    version behavior diff)
+  - ReflectorTest > union type name (PHP 8.2 union-type reflection format
+    diff)
+
+RUNNING LOG (newest at bottom)
+--------------------------------
+
+[Wave 0 - pre-flight bug fixes found while investigating baseline failures]
+Fixed 3 of the 20 baseline failures (all real bugs, not test/env issues):
+1. cstr::replaceLast() was missing the `if ($search === '') return $subject;`
+   guard that Laravel's Str::replaceLast has - empty search inserted
+   $replace at the end of the string instead of being a no-op.
+   -> system/helpers/cstr.php
+2. tests/Base/ReflectorTest.php::testUnionTypeName() eval()'d a helper class
+   F inside `namespace Illuminate\Tests\Support` (leftover from a direct
+   Laravel test port, never adapted) then referenced unqualified `F::class`
+   from the global namespace - class never found. Also referenced Laravel's
+   `Model` instead of this framework's `CModel`. Fixed both.
+3. c::get() (the data_get()-equivalent dot-notation getter) built a
+   `$segmentMap` array EVERY loop iteration that eagerly computed
+   `array_key_first()`/`array_key_last()` over the *entire* target
+   (via c::collect($target)->all(), which calls ->toArray() on
+   Arrayable objects) regardless of whether the current segment was
+   actually '{first}'/'{last}' or just a plain key. This meant every
+   single c::get($obj, 'somePlainKey') call on a non-array object forced
+   a full toArray() conversion first - wasteful, and broke strict Mockery
+   expectations that didn't mock toArray() (ModelCollectionTest > contains
+   key and value). Rewrote to only compute array_key_first/last lazily
+   when the segment actually is '{first}'/'{last}'. This is a hot-path
+   framework function (data_get() equivalent, used everywhere) so I ran
+   the FULL test suite before/after: 497->500 passed, 20->17 failed
+   (only the pre-existing sqlite-driver-missing ones remain), no new
+   failures introduced.
+
+Remaining 17 baseline failures are ALL because pdo_sqlite is not installed
+for the active PHP 8.2 CLI in this sandbox (php7.4-sqlite3 is installed but
+not php8.2-sqlite3; confirmed via `PDO::getAvailableDrivers()` - sqlite not
+listed). No passwordless sudo available (`sudo -n true` fails), so I cannot
+install system/vendor/PHPUnit-> the missing apt package myself. These are
+environment-only failures, not code bugs - left as-is. If you want these
+green, run as root/with sudo: `apt-get install php8.2-sqlite3` (or your
+active PHP version's equivalent) and restart php-fpm/cli.

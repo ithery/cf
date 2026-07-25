@@ -1201,14 +1201,17 @@ class c {
 
                 return in_array('*', $key) ? carr::collapse($result) : $result;
             }
-            $segmentMap = [
-                '\*' => '*',
-                '\{first}' => '{first}',
-                '{first}' => array_key_first(is_array($target) ? $target : c::collect($target)->all()),
-                '\{last}' => '{last}',
-                '{last}' => array_key_last(is_array($target) ? $target : c::collect($target)->all()),
-            ];
-            $segment = carr::get($segmentMap, $segment, $segment);
+            if ($segment === '{first}') {
+                $segment = array_key_first(is_array($target) ? $target : c::collect($target)->all());
+            } elseif ($segment === '{last}') {
+                $segment = array_key_last(is_array($target) ? $target : c::collect($target)->all());
+            } elseif ($segment === '\*') {
+                $segment = '*';
+            } elseif ($segment === '\{first}') {
+                $segment = '{first}';
+            } elseif ($segment === '\{last}') {
+                $segment = '{last}';
+            }
 
             if (carr::accessible($target) && carr::exists($target, $segment)) {
                 $target = $target[$segment];
