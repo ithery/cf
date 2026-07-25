@@ -38,8 +38,8 @@ class CApp_Navigation_Helper {
                 return null;
             }
 
-            foreach ($navs as $nav) {
-                $res = self::nav($nav, $controller, $method);
+            foreach ($navs as $navItem) {
+                $res = self::nav($navItem, $controller, $method);
                 if ($res !== false) {
                     return $res;
                 }

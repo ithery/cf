@@ -10,7 +10,7 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
      * @return void
      */
     public function uninstall() {
-        if ($this->files->isDir(CDevSuite::homePath(), CDevSuite::user())) {
+        if ($this->files->isDir(CDevSuite::homePath())) {
             $this->files->remove(CDevSuite::homePath());
         }
     }

@@ -17,6 +17,17 @@ abstract class CDevSuite_Deploy_RemoteProcessor {
     abstract public function run(CDevSuite_Deploy_Task $task, Closure $callback = null);
 
     /**
+     * Get the configured server from the SSH config. Implemented by
+     * CDevSuite_Deploy_Trait_ConfigurationParserTrait, which every concrete
+     * subclass uses.
+     *
+     * @param string $host
+     *
+     * @return null|string
+     */
+    abstract protected function getConfiguredServer($host);
+
+    /**
      * Run the given script on the given host.
      *
      * @param string                $host
