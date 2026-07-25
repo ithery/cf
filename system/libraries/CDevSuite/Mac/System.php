@@ -4,6 +4,9 @@
  * Description of System.
  */
 class CDevSuite_Mac_System extends CDevSuite_System {
+    /**
+     * @var string
+     */
     public $devSuiteBin = '/usr/local/bin/devsuite';
 
     /**

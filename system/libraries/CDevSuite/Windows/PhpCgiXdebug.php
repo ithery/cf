@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Description of PhpCgiXdebug.
+ */
 class CDevSuite_Windows_PhpCgiXdebug extends CDevSuite_Windows_PhpCgi {
     const PORT = 9002;
 

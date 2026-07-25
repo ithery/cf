@@ -28,8 +28,15 @@ class CConsole_Command_DevSuite_DevSuiteDeployInitCommand extends CConsole_Comma
      * @var string
      */
     protected $devSuiteCommandClass = CDevSuite_Command_DeployInitCommand::class;
+
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:deploy:init';
 
+    /**
+     * @var string
+     */
     protected $description = 'Create a new deployment file in the project directory.';
 
     /**

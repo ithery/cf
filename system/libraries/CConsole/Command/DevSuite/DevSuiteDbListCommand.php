@@ -10,5 +10,9 @@ class CConsole_Command_DevSuite_DevSuiteDbListCommand extends CConsole_Command_D
      * @var string
      */
     protected $devSuiteCommandClass = CDevSuite_Command_DbListCommand::class;
+
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:db:list';
 }

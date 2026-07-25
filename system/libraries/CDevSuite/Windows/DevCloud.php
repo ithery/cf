@@ -4,6 +4,9 @@
  * Description of DevCloud.
  */
 class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
+    /**
+     * @var array
+     */
     protected $requiredFiles = [
         'winsw.exe',
         'php.ps1',
@@ -52,11 +55,17 @@ class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
         'winsw/WinSW.NET4.exe',
     ];
 
+    /**
+     * @var array
+     */
     protected $requiredFolders = [
         'nginx/logs',
         'nginx/temp',
     ];
 
+    /**
+     * @var array
+     */
     protected $requiredMariaDBFiles = [
         'mariadb/bin/mysql.exe',
         'mariadb/bin/mysqld.exe',
@@ -155,6 +164,11 @@ class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
         'mariadb/share/english/errmsg.sys',
     ];
 
+    /**
+     * Create a new DevCloud instance.
+     *
+     * @return void
+     */
     public function __construct() {
         parent::__construct();
         $this->requiredSSHFiles = [

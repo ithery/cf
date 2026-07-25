@@ -2,6 +2,9 @@
 
 use Symfony\Component\Process\PhpExecutableFinder;
 
+/**
+ * Description of PhpCgi.
+ */
 class CDevSuite_Windows_PhpCgi {
     const PORT = 9001;
 

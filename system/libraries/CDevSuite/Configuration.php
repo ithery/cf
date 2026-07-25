@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Description of Configuration.
+ */
 abstract class CDevSuite_Configuration {
     /**
      * @var CDevSuite_Filesystem
@@ -30,6 +33,11 @@ abstract class CDevSuite_Configuration {
         $this->files->chown($this->path(), CDevSuite::user());
     }
 
+    /**
+     * Uninstall the DevSuite configuration folder.
+     *
+     * @return void
+     */
     abstract public function uninstall();
 
     /**
@@ -159,6 +167,8 @@ abstract class CDevSuite_Configuration {
 
     /**
      * Write the base, initial configuration for DevSuite.
+     *
+     * @return void
      */
     public function writeBaseConfiguration() {
         if (!$this->files->exists($this->path())) {

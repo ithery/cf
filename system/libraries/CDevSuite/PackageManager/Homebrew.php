@@ -17,6 +17,9 @@ class CDevSuite_PackageManager_Homebrew extends CDevSuite_PackageManager {
         'php70',
     ];
 
+    /**
+     * @var CDevSuite_CommandLine
+     */
     public $cli;
 
     /**
@@ -98,7 +101,9 @@ class CDevSuite_PackageManager_Homebrew extends CDevSuite_PackageManager {
     /**
      * Restart dnsmasq in Ubuntu.
      *
-     * @param mixed $sm
+     * @param CDevSuite_ServiceManager $sm
+     *
+     * @return void
      */
     public function nmRestart($sm) {
         $sm->restart('NetworkManager');
@@ -121,6 +126,11 @@ class CDevSuite_PackageManager_Homebrew extends CDevSuite_PackageManager {
         }
     }
 
+    /**
+     * Get the list of PHP versions supported by this package manager.
+     *
+     * @return CCollection
+     */
     public function supportedPhpVersions() {
         return c::collect(static::SUPPORTED_PHP_VERSIONS);
     }

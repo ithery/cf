@@ -27,6 +27,10 @@ class CConsole_Command_DevSuite_DevSuiteDeployRunCommand extends CConsole_Comman
      * @var string
      */
     protected $devSuiteCommandClass = CDevSuite_Command_DeployRunCommand::class;
+
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:deploy:run';
 
     /**

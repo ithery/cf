@@ -2,6 +2,9 @@
 
 use Httpful\Request;
 
+/**
+ * Description of Ngrok.
+ */
 class CDevSuite_Windows_Ngrok {
     /**
      * @var CDevSuite_Windows_CommandLine
@@ -17,7 +20,7 @@ class CDevSuite_Windows_Ngrok {
     ];
 
     /**
-     * Create a new Nginx instance.
+     * Create a new Ngrok instance.
      *
      * @return void
      */
@@ -26,6 +29,8 @@ class CDevSuite_Windows_Ngrok {
     }
 
     /**
+     * Run the given ngrok command.
+     *
      * @param string $command
      *
      * @return void
@@ -38,6 +43,8 @@ class CDevSuite_Windows_Ngrok {
     }
 
     /**
+     * Start an ngrok tunnel for the given domain and port.
+     *
      * @param string $domain
      * @param int    $port
      * @param array  $options
@@ -63,6 +70,8 @@ Then use: valet ngrok authtoken my-token');
 
     /**
      * Get the current tunnel URL from the Ngrok API.
+     *
+     * @param null|string $domain
      *
      * @return string
      */
@@ -90,7 +99,8 @@ Then use: valet ngrok authtoken my-token');
     /**
      * Find the HTTP tunnel URL from the list of tunnels.
      *
-     * @param array $tunnels
+     * @param array       $tunnels
+     * @param null|string $domain
      *
      * @return null|void|string
      */
@@ -106,6 +116,8 @@ Then use: valet ngrok authtoken my-token');
     }
 
     /**
+     * Determine if an ngrok auth token has been configured.
+     *
      * @return bool
      */
     protected function hasAuthToken(): bool {

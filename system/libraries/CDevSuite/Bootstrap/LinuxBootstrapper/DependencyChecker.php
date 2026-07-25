@@ -1,6 +1,14 @@
 <?php
 
+/**
+ * Description of DependencyChecker.
+ */
 class CDevSuite_Bootstrap_LinuxBootstrapper_DependencyChecker extends CDevSuite_Bootstrap_Bootstrapper {
+    /**
+     * Check Linux/PHP version compatibility.
+     *
+     * @return void
+     */
     public function bootstrap() {
         /**
          * Check the system's compatibility with DevSuite.

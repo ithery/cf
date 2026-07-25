@@ -11,5 +11,8 @@ class CConsole_Command_DevSuite_DevSuiteDbStartCommand extends CConsole_Command_
      */
     protected $devSuiteCommandClass = CDevSuite_Command_DbStartCommand::class;
 
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:db:start';
 }

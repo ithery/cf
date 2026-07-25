@@ -4,12 +4,24 @@
  * Description of DnsMasq.
  */
 class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
+    /**
+     * @var CDevSuite_Brew
+     */
     public $brew;
 
+    /**
+     * @var string
+     */
     public $dnsmasqMasterConfigFile = BREW_PREFIX . '/etc/dnsmasq.conf';
 
+    /**
+     * @var string
+     */
     public $dnsmasqSystemConfDir = BREW_PREFIX . '/etc/dnsmasq.d';
 
+    /**
+     * @var string
+     */
     public $resolverPath = '/etc/resolver';
 
     /**

@@ -1,13 +1,25 @@
 <?php
 
 /**
- * Description of ServerCreateCommand
+ * Description of SshCreateCommand
  */
 class CDevSuite_Command_SshCreateCommand extends CDevSuite_CommandAbstract {
+    /**
+     * Get the signature arguments string for the command.
+     *
+     * @return string
+     */
     public function getSignatureArguments() {
         return '{name}';
     }
 
+    /**
+     * Interactively prompt for connection details and create a new SSH server configuration.
+     *
+     * @param CConsole_Command $cfCommand
+     *
+     * @return int|void Exit code when the private key file cannot be found.
+     */
     public function run(CConsole_Command $cfCommand) {
         $name = $cfCommand->argument('name');
 

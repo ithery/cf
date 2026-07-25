@@ -1,6 +1,14 @@
 <?php
 
+/**
+ * Description of InstallCommand.
+ */
 class CDevSuite_Command_InstallCommand extends CDevSuite_CommandAbstract {
+    /**
+     * Get the signature arguments string for the command.
+     *
+     * @return string
+     */
     public function getSignatureArguments() {
         switch (CServer::getOS()) {
             case CServer::OS_LINUX:
@@ -10,6 +18,13 @@ class CDevSuite_Command_InstallCommand extends CDevSuite_CommandAbstract {
         }
     }
 
+    /**
+     * Install DevSuite (nginx, PHP-FPM, DNS resolver, etc) for the current OS.
+     *
+     * @param CConsole_Command $cfCommand
+     *
+     * @return void
+     */
     public function run(CConsole_Command $cfCommand) {
         CDevSuite::devCloud()->install();
 

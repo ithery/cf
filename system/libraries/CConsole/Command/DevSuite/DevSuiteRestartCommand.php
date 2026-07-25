@@ -10,5 +10,9 @@ class CConsole_Command_DevSuite_DevSuiteRestartCommand extends CConsole_Command_
      * @var string
      */
     protected $devSuiteCommandClass = CDevSuite_Command_StartCommand::class;
+
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:restart';
 }

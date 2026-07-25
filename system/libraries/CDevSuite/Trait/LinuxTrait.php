@@ -10,6 +10,8 @@ trait CDevSuite_Trait_LinuxTrait {
     protected static $linuxRequirements;
 
     /**
+     * Get the LinuxRequirements instance, creating it if necessary.
+     *
      * @return CDevSuite_LinuxRequirements
      */
     public static function linuxRequirements() {

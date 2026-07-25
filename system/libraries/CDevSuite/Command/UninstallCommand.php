@@ -6,6 +6,13 @@
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class CDevSuite_Command_UninstallCommand extends CDevSuite_CommandAbstract {
+    /**
+     * Uninstall nginx, PHP, Dnsmasq/Acrylic, and all DevSuite configs and logs for the current OS.
+     *
+     * @param CConsole_Command $cfCommand
+     *
+     * @return void
+     */
     public function run(CConsole_Command $cfCommand) {
         CDevSuite::warning('YOU ARE ABOUT TO UNINSTALL Nginx, PHP, Dnsmasq and all DevSuite configs and logs.');
         if (CServer::getOS() == CServer::OS_WINNT) {

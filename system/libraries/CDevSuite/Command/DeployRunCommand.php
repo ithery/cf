@@ -4,10 +4,22 @@
  * Description of DeployRunCommand.
  */
 class CDevSuite_Command_DeployRunCommand extends CDevSuite_CommandAbstract {
+    /**
+     * Get the signature arguments string for the command.
+     *
+     * @return string
+     */
     public function getSignatureArguments() {
         return '{task} {--continue} {--pretend} {--path= : The path to the deploy.blade.php file} {--conf=deploy.blade.php : The name of the Envoy file}';
     }
 
+    /**
+     * Run the given deploy task defined in the deploy file.
+     *
+     * @param CConsole_Command $cfCommand
+     *
+     * @return void
+     */
     public function run(CConsole_Command $cfCommand) {
         $task = $cfCommand->argument('task');
         $continue = $cfCommand->option('continue');

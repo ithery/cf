@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Description of Helper.
+ */
 class CDevSuite_Helper {
     /**
      * Search and replace using associative array.

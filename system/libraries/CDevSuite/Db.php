@@ -4,12 +4,18 @@
  * Description of Db.
  */
 class CDevSuite_Db {
+    /**
+     * @var CDevSuite_Filesystem
+     */
     public $files;
 
+    /**
+     * @var CDevSuite_Db_MariaDb
+     */
     protected $mariaDb;
 
     /**
-     * Create a new Nginx instance.
+     * Create a new Db instance.
      *
      * @return void
      */
@@ -26,12 +32,25 @@ class CDevSuite_Db {
         return CDevSuite::homePath() . '/db.json';
     }
 
+    /**
+     * Create the database configuration file if it does not already exist.
+     *
+     * @return void
+     */
     public function ensureFileExists() {
         if (!$this->files->exists($this->path())) {
             $this->write([]);
         }
     }
 
+    /**
+     * Store a new database connection configuration under the given name, after verifying it can connect.
+     *
+     * @param string $name
+     * @param array  $configuration
+     *
+     * @return bool
+     */
     public function create($name, $configuration) {
         if (!$this->isCanConnect($configuration)) {
             CDevSuite::info('Error when connecting to:' . $name . ', please check your configuration');
@@ -71,6 +90,11 @@ class CDevSuite_Db {
         return json_decode($this->files->get($this->path()), true);
     }
 
+    /**
+     * Get the stored database connections formatted as table rows.
+     *
+     * @return \CCollection
+     */
     public function getTableData() {
         $data = $this->read();
 
@@ -85,6 +109,13 @@ class CDevSuite_Db {
         });
     }
 
+    /**
+     * Build a CDatabase connection config array from a stored config key or a raw config array.
+     *
+     * @param string|array $keyFile
+     *
+     * @return array
+     */
     public function toDbConfig($keyFile) {
         $configArray = $keyFile;
         if (!is_array($configArray)) {
@@ -147,6 +178,13 @@ class CDevSuite_Db {
         return c::db($host . '-' . $database);
     }
 
+    /**
+     * Determine whether a connection can be established for the given config key or raw config array.
+     *
+     * @param string|array $key
+     *
+     * @return bool
+     */
     public function isCanConnect($key) {
         try {
             $db = $this->getDatabase($key);
@@ -161,6 +199,14 @@ class CDevSuite_Db {
         return true;
     }
 
+    /**
+     * Compare the schemas of two stored database connections and print the migration SQL diff.
+     *
+     * @param string $from
+     * @param string $to
+     *
+     * @return void
+     */
     public function compare($from, $to) {
         $fromDB = $this->getDatabase($from);
         $toDB = $this->getDatabase($to);
@@ -188,6 +234,14 @@ class CDevSuite_Db {
         CDevSuite::info($sqlString);
     }
 
+    /**
+     * Synchronize the schema of the "to" database with the "from" database schema, inside a transaction.
+     *
+     * @param string $from
+     * @param string $to
+     *
+     * @return void
+     */
     public function sync($from, $to) {
         $fromDB = $this->getDatabase($from);
         $toDB = $this->getDatabase($to);
@@ -240,10 +294,24 @@ class CDevSuite_Db {
         }
     }
 
+    /**
+     * Determine if a database configuration exists for the given key.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
     public function exists($key) {
         return is_array(carr::get($this->read(), $key));
     }
 
+    /**
+     * Exit the process with an error if no database configuration exists for the given key.
+     *
+     * @param string $key
+     *
+     * @return void
+     */
     public function existsOrExit($key) {
         if (!$this->exists($key)) {
             CDevSuite::error('Database configuration: ' . $key . ' not exists');
@@ -277,10 +345,22 @@ class CDevSuite_Db {
         return $this->mariaDb;
     }
 
+    /**
+     * Install and start the MariaDb service.
+     *
+     * @return void
+     */
     public function start() {
         $this->mariaDb()->install();
     }
 
+    /**
+     * Remove a database configuration by key.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
     public function delete($key) {
         $data = $this->read();
         if (isset($data[$key])) {
@@ -293,6 +373,14 @@ class CDevSuite_Db {
         return false;
     }
 
+    /**
+     * Dump the "from" database and restore it into the "to" database.
+     *
+     * @param string $from
+     * @param string $to
+     *
+     * @return void
+     */
     public function cloneDatabase($from, $to) {
         $fromConfig = $this->toDbConfig($from);
         $toConfig = $this->toDbConfig($to);

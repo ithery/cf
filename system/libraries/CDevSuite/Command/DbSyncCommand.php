@@ -4,10 +4,22 @@
  * Description of DbSyncCommand.
  */
 class CDevSuite_Command_DbSyncCommand extends CDevSuite_CommandAbstract {
+    /**
+     * Get the signature arguments string for the command.
+     *
+     * @return string
+     */
     public function getSignatureArguments() {
         return '{--from=} {--to=} {--force=}';
     }
 
+    /**
+     * Compare the "from" and "to" databases and, after confirmation (unless forced), sync the schema.
+     *
+     * @param CConsole_Command $cfCommand
+     *
+     * @return void
+     */
     public function run(CConsole_Command $cfCommand) {
         $from = $cfCommand->option('from');
         $to = $cfCommand->option('to');

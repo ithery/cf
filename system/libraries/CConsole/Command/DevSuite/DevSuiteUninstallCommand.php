@@ -12,5 +12,8 @@ class CConsole_Command_DevSuite_DevSuiteUninstallCommand extends CConsole_Comman
      */
     protected $devSuiteCommandClass = CDevSuite_Command_UninstallCommand::class;
 
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:uninstall';
 }

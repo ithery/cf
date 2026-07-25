@@ -11,5 +11,9 @@ class CConsole_Command_DevSuite_DevSuiteDbCloneCommand extends CConsole_Command_
      * @var string
      */
     protected $devSuiteCommandClass = CDevSuite_Command_DbCloneCommand::class;
+
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:db:clone';
 }

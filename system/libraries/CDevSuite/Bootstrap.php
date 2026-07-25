@@ -4,10 +4,19 @@
  * Description of Bootstrap.
  */
 class CDevSuite_Bootstrap {
+    /**
+     * @var bool
+     */
     protected $booted = false;
 
+    /**
+     * @var CCollection
+     */
     protected $bootstrapper;
 
+    /**
+     * @var CDevSuite_Bootstrap
+     */
     protected static $instance;
 
     /**
@@ -46,6 +55,11 @@ class CDevSuite_Bootstrap {
         return $bootstrapper;
     }
 
+    /**
+     * Run all registered bootstrappers once.
+     *
+     * @return void
+     */
     public function bootstrap() {
         if (!$this->booted) {
             $this->bootstrapper = c::collect($this->getBootstrapperClass())->map(function ($class) {

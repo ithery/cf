@@ -1,10 +1,18 @@
 <?php
 
+/**
+ * Description of LinuxService.
+ */
 class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
+    /**
+     * @var CDevSuite_CommandLine
+     */
     public $cli;
 
     /**
-     * Create a new Brew instance.
+     * Create a new LinuxService instance.
+     *
+     * @return void
      */
     public function __construct() {
         $this->cli = CDevSuite::commandLine();
@@ -222,7 +230,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
     }
 
     /**
-     * Determine real service name
+     * Determine real service name.
      *
      * @param mixed $service Service name
      *
@@ -265,7 +273,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
     /**
      * Install DevSuite DNS services.
      *
-     * @param Filesystem $files Filesystem object
+     * @param CDevSuite_Filesystem $files Filesystem object
      *
      * @return void
      */

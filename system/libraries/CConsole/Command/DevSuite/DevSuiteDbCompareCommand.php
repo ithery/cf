@@ -10,5 +10,9 @@ class CConsole_Command_DevSuite_DevSuiteDbCompareCommand extends CConsole_Comman
      * @var string
      */
     protected $devSuiteCommandClass = CDevSuite_Command_DbCompareCommand::class;
+
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:db:compare';
 }

@@ -1,6 +1,18 @@
 <?php
 
+/**
+ * Description of Filesystem.
+ */
 class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
+    /**
+     * Remove the given directory as root.
+     *
+     * @param string $file
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
     protected function removeDirectoryAsRoot($file) {
         $command = sprintf('sudo rm %s -rf', $file);
         CDevSuite::commandLine()->run($command);
@@ -10,6 +22,15 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
         }
     }
 
+    /**
+     * Remove the given file as root.
+     *
+     * @param string $file
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
     protected function removeFileAsRoot($file) {
         $command = sprintf('sudo rm %s -f', $file);
         CDevSuite::commandLine()->run($command);

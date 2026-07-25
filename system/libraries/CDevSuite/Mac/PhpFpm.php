@@ -4,12 +4,24 @@
  * Description of PhpFpm.
  */
 class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
+    /**
+     * @var CDevSuite_CommandLine
+     */
     public $cli;
 
+    /**
+     * @var CDevSuite_Filesystem
+     */
     public $files;
 
+    /**
+     * @var CDevSuite_Brew
+     */
     public $brew;
 
+    /**
+     * @var array
+     */
     public $taps = [
         'homebrew/homebrew-core'
     ];
@@ -139,6 +151,8 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
 
     /**
      * Only stop running php services.
+     *
+     * @return void
      */
     public function stopRunning() {
         $this->brew->stopService(
@@ -153,7 +167,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
     /**
      * Use a specific version of php.
      *
-     * @param $version
+     * @param string $version
      *
      * @return string
      */
@@ -181,7 +195,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
     /**
      * Validate the requested version to be sure we can support it.
      *
-     * @param $version
+     * @param string $version
      *
      * @return string
      */

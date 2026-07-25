@@ -19,6 +19,11 @@ abstract class CDevSuite_Nginx {
      */
     public $configuration;
 
+    /**
+     * Create a new Nginx instance.
+     *
+     * @return void
+     */
     public function __construct() {
         $this->cli = CDevSuite::commandLine();
         $this->configuration = CDevSuite::configuration();

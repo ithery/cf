@@ -10,5 +10,9 @@ class CConsole_Command_DevSuite_DevSuiteSshListCommand extends CConsole_Command_
      * @var string
      */
     protected $devSuiteCommandClass = CDevSuite_Command_SshListCommand::class;
+
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:ssh:list';
 }

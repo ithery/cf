@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Description of Filesystem.
+ */
 class CDevSuite_Filesystem {
     /**
      * Determine if the given path is a directory.
@@ -33,6 +36,13 @@ class CDevSuite_Filesystem {
         return true;
     }
 
+    /**
+     * Create a directory as root.
+     *
+     * @param string $path
+     *
+     * @return void
+     */
     public function mkdirAsRoot($path) {
         $command = sprintf('sudo mkdir "%s"', $path);
         CDevSuite::commandLine()->run($command);
@@ -55,10 +65,26 @@ class CDevSuite_Filesystem {
         return false;
     }
 
+    /**
+     * Rename the given file or directory.
+     *
+     * @param string $oldname
+     * @param string $newname
+     *
+     * @return void
+     */
     public function rename($oldname, $newname) {
         rename($oldname, $newname);
     }
 
+    /**
+     * Rename the given file or directory as root.
+     *
+     * @param string $oldname
+     * @param string $newname
+     *
+     * @return void
+     */
     public function renameAsRoot($oldname, $newname) {
         $command = sprintf('sudo mv %s %s', $oldname, $newname);
         CDevSuite::commandLine()->run($command);
@@ -173,6 +199,14 @@ class CDevSuite_Filesystem {
         $this->put($path, $contents, CDevSuite::user());
     }
 
+    /**
+     * Write to the given file as root, via a temporary file copied into place.
+     *
+     * @param string $path
+     * @param string $contents
+     *
+     * @return void
+     */
     public function putAsRoot($path, $contents) {
         $tmp = tempnam(sys_get_temp_dir(), 'devsuite_');
         file_put_contents($tmp, $contents);
@@ -342,6 +376,8 @@ class CDevSuite_Filesystem {
      *
      * @param string $path
      * @param string $user
+     *
+     * @return void
      */
     public function chown($path, $user) {
         chown($path, $user);
@@ -352,6 +388,8 @@ class CDevSuite_Filesystem {
      *
      * @param string $path
      * @param string $group
+     *
+     * @return void
      */
     public function chgrp($path, $group) {
         chgrp($path, $group);
@@ -430,6 +468,13 @@ class CDevSuite_Filesystem {
             })->values()->all();
     }
 
+    /**
+     * Delete the given directory and its contents.
+     *
+     * @param string $directory
+     *
+     * @return bool
+     */
     public function deleteDirectory($directory) {
         return CFile::deleteDirectory($directory);
     }
@@ -470,6 +515,13 @@ class CDevSuite_Filesystem {
         }
     }
 
+    /**
+     * Convert the given argument into a Traversable of file paths.
+     *
+     * @param mixed $files
+     *
+     * @return \Traversable
+     */
     protected function toIterator($files) {
         if (!$files instanceof \Traversable) {
             $files = new \ArrayObject(is_array($files) ? $files : [$files]);

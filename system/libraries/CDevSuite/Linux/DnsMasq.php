@@ -4,10 +4,19 @@
  * Description of DnsMasq
  */
 class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
+    /**
+     * @var CDevSuite_PackageManager
+     */
     public $pm;
 
+    /**
+     * @var CDevSuite_ServiceManager
+     */
     public $sm;
 
+    /**
+     * @var string
+     */
     public $rclocal;
 
     /**

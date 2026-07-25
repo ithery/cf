@@ -1,10 +1,25 @@
 <?php
 
+/**
+ * Description of UnsecureCommand.
+ */
 class CDevSuite_Command_UnsecureCommand extends CDevSuite_CommandAbstract {
+    /**
+     * Get the signature arguments string for the command.
+     *
+     * @return string
+     */
     public function getSignatureArguments() {
         return '{name?} {--all}';
     }
 
+    /**
+     * Remove the TLS certificate for the given site, or all secured sites when --all is passed.
+     *
+     * @param CConsole_Command $cfCommand
+     *
+     * @return void
+     */
     public function run(CConsole_Command $cfCommand) {
         $domain = $cfCommand->argument('name') ?: CF::appCode();
         $all = $cfCommand->option('all');

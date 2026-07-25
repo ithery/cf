@@ -28,6 +28,11 @@ abstract class CDevSuite_Site {
         $this->config = CDevSuite::configuration();
     }
 
+    /**
+     * Get the DevSuite home path.
+     *
+     * @return string
+     */
     public function devSuiteHomePath() {
         return CDevSuite::homePath();
     }
@@ -73,6 +78,8 @@ abstract class CDevSuite_Site {
      * Get the path to Nginx site configuration files.
      *
      * @param null|mixed $additionalPath
+     *
+     * @return string
      */
     public function nginxPath($additionalPath = null) {
         return $this->devSuiteHomePath() . 'Nginx' . ($additionalPath ? '/' . $additionalPath : '');
@@ -283,6 +290,14 @@ abstract class CDevSuite_Site {
         return $host;
     }
 
+    /**
+     * Get the contents of the Nginx configuration file for the given site.
+     *
+     * @param string      $site
+     * @param null|string $suffix
+     *
+     * @return null|string
+     */
     public function getSiteConfigFileContents($site, $suffix = null) {
         $config = $this->config->read();
         $suffix = $suffix ?: '.' . $config['tld'];
@@ -307,8 +322,8 @@ abstract class CDevSuite_Site {
      * Get list of sites and return them formatted
      * Will work for symlink and normal site paths.
      *
-     * @param $path
-     * @param $certs
+     * @param string      $path
+     * @param CCollection $certs
      *
      * @return CCollection
      */
@@ -492,6 +507,11 @@ abstract class CDevSuite_Site {
         ));
     }
 
+    /**
+     * Unsecure all currently secured sites (parked and linked).
+     *
+     * @return void
+     */
     public function unsecureAll() {
         $tld = $this->config->read()['tld'];
 

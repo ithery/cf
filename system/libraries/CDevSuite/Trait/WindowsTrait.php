@@ -15,6 +15,8 @@ trait CDevSuite_Trait_WindowsTrait {
     protected static $acrylic;
 
     /**
+     * Get the Winsw instance, creating it if necessary.
+     *
      * @return CDevSuite_Winsw
      */
     public static function winsw() {
@@ -25,6 +27,8 @@ trait CDevSuite_Trait_WindowsTrait {
     }
 
     /**
+     * Get the Acrylic instance, creating it if necessary.
+     *
      * @return CDevSuite_Acrylic
      */
     public static function acrylic() {

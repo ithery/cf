@@ -11,5 +11,9 @@ class CConsole_Command_DevSuite_DevSuiteDbSyncCommand extends CConsole_Command_D
      * @var string
      */
     protected $devSuiteCommandClass = CDevSuite_Command_DbSyncCommand::class;
+
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:db:sync';
 }

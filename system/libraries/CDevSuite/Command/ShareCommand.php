@@ -4,10 +4,22 @@
  * Description of ShareCommand
  */
 class CDevSuite_Command_ShareCommand extends CDevSuite_CommandAbstract {
+    /**
+     * Get the signature arguments string for the command.
+     *
+     * @return string
+     */
     public function getSignatureArguments() {
         return '{name}';
     }
 
+    /**
+     * Share the given site publicly via ngrok.
+     *
+     * @param CConsole_Command $cfCommand
+     *
+     * @return void
+     */
     public function run(CConsole_Command $cfCommand) {
         $host = $cfCommand->argument('name');
         $tld = CDevSuite::tld();

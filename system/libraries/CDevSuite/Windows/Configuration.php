@@ -81,6 +81,11 @@ class CDevSuite_Windows_Configuration extends CDevSuite_Configuration {
         $this->updateKey('php_xdebug_port', $config['php_xdebug_port'] ?? CDevSuite_Windows_PhpCgiXdebug::PORT);
     }
 
+    /**
+     * Uninstall the DevSuite configuration folder.
+     *
+     * @return void
+     */
     public function uninstall() {
         //do nothing on windows
     }

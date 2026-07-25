@@ -11,16 +11,31 @@ class CDevSuite_Windows_Db_MariaDb extends CDevSuite_Db_MariaDb {
      */
     public $winsw;
 
+    /**
+     * Create a new MariaDb instance.
+     *
+     * @return void
+     */
     public function __construct() {
         parent::__construct();
         $this->winsw = CDevSuite::winsw();
     }
 
+    /**
+     * Install the configuration files for MariaDb.
+     *
+     * @return void
+     */
     public function install() {
         $this->installMariaDbDirectory();
         $this->installService();
     }
 
+    /**
+     * Stop the MariaDb service.
+     *
+     * @return void
+     */
     public function stop() {
         CDevSuite::info('Stopping mariadb...');
 
@@ -29,12 +44,22 @@ class CDevSuite_Windows_Db_MariaDb extends CDevSuite_Db_MariaDb {
         //$this->cli->run('cmd "/C taskkill /IM mysqld.exe /F"');
     }
 
+    /**
+     * Stop and start the MariaDb service.
+     *
+     * @return void
+     */
     public function start() {
         $this->stop();
         CDevSuite::info('Starting mariadb...');
         $this->winsw->restart(static::SERVICE);
     }
 
+    /**
+     * Restart the MariaDb service.
+     *
+     * @return void
+     */
     public function restart() {
         $this->start();
     }
@@ -77,6 +102,11 @@ class CDevSuite_Windows_Db_MariaDb extends CDevSuite_Db_MariaDb {
         return $path;
     }
 
+    /**
+     * Get socket path.
+     *
+     * @return string
+     */
     public function getSocketPath() {
         return realpath(CDevSuite::binPath() . 'mariadb') . '/devsuite/mariadb/mariadb.sock';
     }

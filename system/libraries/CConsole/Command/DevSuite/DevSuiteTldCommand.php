@@ -11,5 +11,9 @@ class CConsole_Command_DevSuite_DevSuiteTldCommand extends CConsole_Command_DevS
      * @var string
      */
     protected $devSuiteCommandClass = CDevSuite_Command_TldCommand::class;
+
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:tld';
 }

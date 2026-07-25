@@ -4,10 +4,22 @@
  * Description of DbCreateCommand.
  */
 class CDevSuite_Command_DbCreateCommand extends CDevSuite_CommandAbstract {
+    /**
+     * Get the signature arguments string for the command.
+     *
+     * @return string
+     */
     public function getSignatureArguments() {
         return '{name}';
     }
 
+    /**
+     * Interactively prompt for connection details and create a new database configuration.
+     *
+     * @param CConsole_Command $cfCommand
+     *
+     * @return void
+     */
     public function run(CConsole_Command $cfCommand) {
         $name = $cfCommand->argument('name');
         if (CDevSuite::db()->exists($name)) {

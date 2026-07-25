@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Description of Configuration.
+ */
 class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
     /**
      * Uninstall the DevSuite configuration folder.
@@ -14,6 +17,8 @@ class CDevSuite_Linux_Configuration extends CDevSuite_Configuration {
 
     /**
      * Write the base, initial configuration for DevSuite.
+     *
+     * @return void
      */
     public function writeBaseConfiguration() {
         if (!$this->files->exists($this->path())) {

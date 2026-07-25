@@ -4,8 +4,14 @@
  * Description of MariaDb
  */
 class CDevSuite_Linux_Db_MariaDB extends CDevSuite_Db_MariaDb {
+    /**
+     * @var CDevSuite_PackageManager
+     */
     public $pm;
 
+    /**
+     * @var CDevSuite_ServiceManager
+     */
     public $sm;
 
     /**
@@ -25,7 +31,7 @@ class CDevSuite_Linux_Db_MariaDB extends CDevSuite_Db_MariaDb {
     }
 
     /**
-     * Install the configuration files for Nginx.
+     * Install the configuration files for MariaDB.
      *
      * @return void
      */
@@ -56,7 +62,7 @@ class CDevSuite_Linux_Db_MariaDB extends CDevSuite_Db_MariaDb {
     }
 
     /**
-     * Nginx service status.
+     * MariaDB service status.
      *
      * @return void
      */

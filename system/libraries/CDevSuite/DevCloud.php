@@ -4,18 +4,44 @@
  * Description of DevCloud.
  */
 abstract class CDevSuite_DevCloud {
+    /**
+     * @var string
+     */
     protected $baseDownloadUrl;
 
+    /**
+     * @var string
+     */
     protected $baseBinPath;
 
+    /**
+     * List of binary files to download/delete on install/uninstall.
+     *
+     * @var array
+     */
     protected $requiredFiles = [
     ];
 
+    /**
+     * List of folders to ensure exist on install.
+     *
+     * @var array
+     */
     protected $requiredFolders = [
     ];
 
+    /**
+     * List of MariaDB files to download on installMariaDB.
+     *
+     * @var array
+     */
     protected $requiredMariaDBFiles = [];
 
+    /**
+     * List of SSH files to download/delete on installSSH/uninstallSSH.
+     *
+     * @var array
+     */
     protected $requiredSSHFiles = [];
 
     /**
@@ -23,6 +49,11 @@ abstract class CDevSuite_DevCloud {
      */
     protected $files;
 
+    /**
+     * Create a new DevCloud instance.
+     *
+     * @return void
+     */
     public function __construct() {
         $downloadUrl = 'http://cpanel.ittron.co.id/application/devcloud/default/data/bin/devsuite/' . CDevSuite::osFolder() . '/';
         $this->baseDownloadUrl = $downloadUrl;
@@ -30,6 +61,11 @@ abstract class CDevSuite_DevCloud {
         $this->files = CDevSuite::filesystem();
     }
 
+    /**
+     * Download all required files and create all required folders.
+     *
+     * @return void
+     */
     public function install() {
         foreach ($this->requiredFiles as $file) {
             $this->downloadIfNotExists($file);
@@ -48,30 +84,55 @@ abstract class CDevSuite_DevCloud {
         }
     }
 
+    /**
+     * Download all required SSH files that are not already present.
+     *
+     * @return void
+     */
     public function installSSH() {
         foreach ($this->requiredSSHFiles as $file) {
             $this->downloadIfNotExists($file);
         }
     }
 
+    /**
+     * Delete all required SSH files.
+     *
+     * @return void
+     */
     public function uninstallSSH() {
         foreach ($this->requiredSSHFiles as $file) {
             $this->binDelete($file);
         }
     }
 
+    /**
+     * Download all required MariaDB files that are not already present.
+     *
+     * @return void
+     */
     public function installMariaDB() {
         foreach ($this->requiredMariaDBFiles as $file) {
             $this->downloadIfNotExists($file);
         }
     }
 
+    /**
+     * Delete all required files.
+     *
+     * @return void
+     */
     public function uninstall() {
         foreach ($this->requiredFiles as $file) {
             $this->binDelete($file);
         }
     }
 
+    /**
+     * Delete the MariaDB directory.
+     *
+     * @return void
+     */
     public function uninstallMariaDB() {
         $mariaDBPath = c::fixPath($this->baseBinPath) . 'mariadb';
         $this->files->deleteDirectory($mariaDBPath);
@@ -80,7 +141,9 @@ abstract class CDevSuite_DevCloud {
     /**
      * Download from devcloud.
      *
-     * @param mixed $file
+     * @param string $file
+     *
+     * @return bool
      */
     public function download($file) {
         CDevSuite::info('Downloading ' . $file . '');
@@ -98,8 +161,10 @@ abstract class CDevSuite_DevCloud {
     /**
      * Copy remote file over HTTP one small chunk at a time.
      *
-     * @param $infile The full URL to the remote file
-     * @param $outfile The path where to save the file
+     * @param string $infile  the full URL to the remote file
+     * @param string $outfile the path where to save the file
+     *
+     * @return int|bool the number of bytes written, or false on failure
      */
     protected function downloadChunked($infile, $outfile) {
         $chunksize = 10 * (1024 * 1024); // 10 Megs
@@ -190,7 +255,9 @@ abstract class CDevSuite_DevCloud {
     /**
      * Download from devcloud.
      *
-     * @param mixed $file
+     * @param string $file
+     *
+     * @return bool
      */
     public function downloadIfNotExists($file) {
         $targetPath = $this->baseBinPath . $file;
@@ -226,14 +293,35 @@ abstract class CDevSuite_DevCloud {
         return file_get_contents($url, false, $streamContext);
     }
 
+    /**
+     * Get the full path to the given file inside the bin directory.
+     *
+     * @param string $file
+     *
+     * @return string
+     */
     public function binPath($file) {
         return $this->baseBinPath . $file;
     }
 
+    /**
+     * Determine if the given file exists inside the bin directory.
+     *
+     * @param string $file
+     *
+     * @return bool
+     */
     public function binExists($file) {
         return $this->files->exists($this->binPath($file));
     }
 
+    /**
+     * Delete the given file from the bin directory.
+     *
+     * @param string $file
+     *
+     * @return bool
+     */
     public function binDelete($file) {
         CDevSuite::info('Deleting ' . $file);
 

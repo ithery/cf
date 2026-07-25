@@ -19,20 +19,40 @@ class CDevSuite_Deploy {
      */
     protected $files;
 
+    /**
+     * Create a new Deploy instance.
+     *
+     * @return void
+     */
     public function __construct() {
         $this->files = CDevSuite::filesystem();
     }
 
+    /**
+     * Get the current application directory.
+     *
+     * @return string
+     */
     public function path() {
         $dir = CF::appDir();
 
         return $dir;
     }
 
+    /**
+     * Get the full path to the deploy.blade.php file.
+     *
+     * @return string
+     */
     public function deployFile() {
         return c::fixPath($this->path()) . 'deploy.blade.php';
     }
 
+    /**
+     * Exit with an error if the deploy file does not exist.
+     *
+     * @return void
+     */
     public function deployFileExistsOrExit() {
         if (!$this->files->exists($this->deployFile())) {
             CDevSuite::error("{$this->deployFile()} not found.\n");
@@ -41,6 +61,13 @@ class CDevSuite_Deploy {
         }
     }
 
+    /**
+     * Create a starter deploy.blade.php file for the given host, if none exists.
+     *
+     * @param string $host
+     *
+     * @return void
+     */
     public function init($host) {
         if (!$this->files->exists($this->deployFile())) {
             $this->files->putAsUser($this->deployFile(), "@servers(['web' => '" . $host . "'])
@@ -52,6 +79,15 @@ class CDevSuite_Deploy {
         }
     }
 
+    /**
+     * Run the given task (or macro) and return the overall exit code.
+     *
+     * @param string $taskName
+     * @param bool   $continue
+     * @param bool   $pretending
+     *
+     * @return int
+     */
     public function run($taskName, $continue, $pretending) {
         $container = $this->loadTaskContainer();
 

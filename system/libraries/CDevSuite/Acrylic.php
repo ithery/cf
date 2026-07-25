@@ -9,6 +9,9 @@ class CDevSuite_Acrylic {
      */
     protected $cli;
 
+    /**
+     * @var CDevSuite_Windows_Filesystem
+     */
     protected $files;
 
     /**

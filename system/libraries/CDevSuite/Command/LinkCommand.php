@@ -4,10 +4,22 @@
  * Description of LinkCommand.
  */
 class CDevSuite_Command_LinkCommand extends CDevSuite_CommandAbstract {
+    /**
+     * Get the signature arguments string for the command.
+     *
+     * @return string
+     */
     public function getSignatureArguments() {
         return '{name?} {--secure}';
     }
 
+    /**
+     * Create a symbolic link from the current directory to the DevSuite sites path.
+     *
+     * @param CConsole_Command $cfCommand
+     *
+     * @return void
+     */
     public function run(CConsole_Command $cfCommand) {
         $name = $cfCommand->argument('name') ?: CF::appCode();
         $secure = $cfCommand->option('secure');

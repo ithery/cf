@@ -4,6 +4,9 @@
  * Description of MariaDb
  */
 class CDevSuite_Mac_Db_MariaDB extends CDevSuite_Db_MariaDb {
+    /**
+     * @var CDevSuite_Brew
+     */
     public $brew;
 
     const NGINX_CONF = '/usr/local/etc/nginx/nginx.conf';
@@ -65,10 +68,20 @@ class CDevSuite_Mac_Db_MariaDB extends CDevSuite_Db_MariaDb {
         $this->brew->restartService($this->brew->mariaDbServiceName());
     }
 
+    /**
+     * Get the path to the mysqldump binary.
+     *
+     * @return string
+     */
     protected function getDumperBinaryPath() {
         return '';
     }
 
+    /**
+     * Get the path to the mysql client binary.
+     *
+     * @return string
+     */
     protected function getClientBinaryPath() {
         return '';
     }

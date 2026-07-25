@@ -13,5 +13,8 @@ class CConsole_Command_DevSuite_DevSuiteInstallCommand extends CConsole_Command_
      */
     protected $devSuiteCommandClass = CDevSuite_Command_InstallCommand::class;
 
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:install';
 }
