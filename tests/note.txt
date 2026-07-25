@@ -358,3 +358,58 @@ install system/vendor/PHPUnit-> the missing apt package myself. These are
 environment-only failures, not code bugs - left as-is. If you want these
 green, run as root/with sudo: `apt-get install php8.2-sqlite3` (or your
 active PHP version's equivalent) and restart php-fpm/cli.
+
+[Wave 5b - CHTTP Response/JsonResponse/RedirectResponse/Cookie/UploadedFile - DONE]
+5 new files under tests/Http/ (HttpResponseTest.php 20, HttpJsonResponseTest.php
+17, HttpRedirectResponseTest.php 19, CookieTest.php 16, UploadedFileTest.php 17),
+89 tests all green. UploadedFile store() tests use a throwaway disk injected
+into CStorage's cache via reflection to avoid writing into the real docroot -
+smart approach, worth remembering as a pattern for future file-storage tests.
+Real bug found and DOCUMENTED (not fixed, intentionally - genuinely
+ambiguous/non-trivial fix, not a "small safe" one): CHTTP_Cookie::queued($key,
+$default, $path) throws a TypeError instead of returning $default when the key
+isn't queued and $default is a non-array (e.g. queued('missing', 'fallback')).
+Root cause: carr::get() returns $default verbatim, then carr::last() calls
+PHP's end() on it expecting an array. Covered by a test that documents the bug
+explicitly (testQueuedWithNonArrayDefaultThrowsTypeErrorBug) rather than
+silently patching carr::last()/Cookie::queued's calling convention.
+
+[Wave 6 - CRouting Route/RouteCollection tests - DONE]
+tests/Routing/RouteTest.php (70) + RouteCollectionTest.php (30), 100
+tests all green, zero source bugs, but ONE REAL FRAMEWORK QUIRK worth
+flagging to the team even though it wasn't "fixed": CRouting_RouteCollection
+::match()'s no-match/fallback path (via CRouting_RouteFinder::find())
+resolves its URI from c::url()->getRequest()->path() - the app's globally
+bound "current request" singleton - INSTEAD OF the $request argument
+actually passed into match(), whenever CF::isTesting() is true (which it
+is under this repo's own phpunit.xml, APP_ENV=testing). Practical impact:
+naive `$routeCollection->match($someRequest)` calls could silently
+mis-route to whatever URI happens to be globally bound (defaults to '/')
+instead of the request you actually passed in, specifically under test
+conditions - could mask real routing bugs in application-level tests
+elsewhere in this codebase (or any app built on this framework) without
+anyone noticing, since it fails "successfully" rather than throwing.
+Worked around in the new tests via `c::url()->setRequest($request)`
+before every match() call.
+FOLLOW-UP (I investigated this myself): confirmed intentional, not a
+bug. Root cause is CRouting_UrlFinder::getUri() (system/libraries/
+CRouting/UrlFinder.php:10): `if (CF::isTesting()) { return
+ltrim(c::url()->getRequest()->path(), '/'); }`. Under plain CLI (which
+is what all PHPUnit runs use, PHP_SAPI==='cli'), there's no real HTTP
+request to derive a URI from, so this branch exists specifically so
+tests can control "the current URI" by calling
+`c::url()->setRequest($request)` first - basically this framework's
+equivalent of Laravel's test-helper request binding. Not a defect, just
+undocumented/non-obvious - worth a PHPDoc note on getUri() someday, but
+not touching it now since it's out of scope and working as designed.
+
+[Wave 5a - CHTTP Request tests - DONE]
+tests/Http/HttpRequestTest.php, 79 tests all green, no source bugs found.
+Worth knowing: Request::getSession()/session() don't respect Symfony's
+hasSession() flag - unconditionally boot a real session via CBase::session(),
+which actually writes real session files under temp/session/ as a side
+effect of merely constructing a request and calling session(). Not a bug
+in Request.php's own scope, but explains why flash()/flashInput()-family
+methods were deliberately skipped in this wave (would pollute global
+session state across the test suite) - if anyone tests those later, be
+aware of this.
