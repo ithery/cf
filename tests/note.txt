@@ -3,6 +3,9 @@ CF FRAMEWORK TEST COMPLETION - AUTONOMOUS WORK LOG
 Started: this session, working unattended per instruction "kerjakan saja,
 jangan tanya, kalau ada pertanyaan/error masukkan ke note.txt".
 
+*** STATUS AT END OF THIS SESSION: see "SESSION SUMMARY / WHAT'S NEXT" at
+*** the very bottom of this file for the short version. ***
+
 SCOPE / STRATEGY
 -----------------
 Framework has 90 top-level system/libraries/* namespaces (~5300 PHP files) -
@@ -359,6 +362,17 @@ environment-only failures, not code bugs - left as-is. If you want these
 green, run as root/with sudo: `apt-get install php8.2-sqlite3` (or your
 active PHP version's equivalent) and restart php-fpm/cli.
 
+[Wave 7 - CCrypt Encrypter + CCache Repository/RateLimiter - DONE]
+3 new files: tests/Crypt/EncrypterTest.php (28), tests/Cache/
+CacheRepositoryTest.php (52), tests/Cache/CacheRateLimiterTest.php (15).
+95 tests all green, zero source bugs. Notable: this framework's
+CCache_RateLimiter does NOT implement attempt()/remaining() (Laravel has
+both) - only aliasFor/limiter/tooManyAttempts/hit/attempts/resetAttempts/
+retriesLeft (CF-only, Laravel doesn't have this)/clear/availableIn. If
+anyone's porting rate-limiting code from a Laravel app to this framework,
+they'll need to hand-roll attempt()/remaining() equivalents using
+tooManyAttempts()+hit() themselves.
+
 [Wave 5b - CHTTP Response/JsonResponse/RedirectResponse/Cookie/UploadedFile - DONE]
 5 new files under tests/Http/ (HttpResponseTest.php 20, HttpJsonResponseTest.php
 17, HttpRedirectResponseTest.php 19, CookieTest.php 16, UploadedFileTest.php 17),
@@ -413,3 +427,104 @@ in Request.php's own scope, but explains why flash()/flashInput()-family
 methods were deliberately skipped in this wave (would pollute global
 session state across the test suite) - if anyone tests those later, be
 aware of this.
+
+========================================================================
+SESSION SUMMARY / WHAT'S NEXT (written at the end of this session)
+========================================================================
+
+WHAT GOT DONE:
+`phpcf test`: 497 passed / 20 failed  ->  2220 passed / 17 failed.
+(All 17 remaining failures are the same pre-existing sqlite-pdo-driver
+environment issue from the very start - see BASELINE section up top -
+not code bugs, not something I introduced.)
+
+Pushed to git.cresenity.com:root/CApp.git development as 4 checkpoint
+commits (in order): f13090a18, 2b592a3a4, 44fa45b38, and whatever the
+final one ends up being once this note is committed - `git log` on this
+branch for the exact hashes/messages, each has a detailed summary.
+
+Areas with substantial new coverage (roughly in the order Laravel's own
+test suite would prioritize them):
+- Support layer: cstr (109 tests), carr (80), CCollection/LazyCollection
+  (~650+ combined, including reviving 150 previously-dead test methods),
+  CBase_Fluent (17, was 0), COptional (16), CPeriod (42)
+- CDatabase: Query Builder SQL generation across all 4 dialects (152),
+  Schema Builder + all 4 schema grammars (195)
+- CModel: core attributes/casting/events (64), every relation type -
+  HasOne/HasMany/HasManyThrough/BelongsToMany/MorphOne/MorphMany/MorphTo/
+  MorphToMany/Pivot (~330 combined)
+- CValidation: Validator mechanics + 85 of 96 individual rules (162)
+- CHTTP: Request + full Response family (168)
+- CRouting: Route/RouteCollection (100)
+- CCrypt/CCache: Encrypter + Repository/RateLimiter (95)
+
+REAL BUGS FOUND AND FIXED (not just test additions) - grep this file for
+full details on each, searching for the bolded/bracketed headers above:
+- cstr::replaceLast() missing empty-search guard
+- cstr::haveUpper() returning int instead of bool
+- carr::implodes() swapped recursive-call argument order
+- carr::reduce() double-processing the first element when no accumulator given
+- c::get() eagerly computing array_key_first/last on every path segment
+  (forced unwanted ->toArray() calls, hot-path performance issue too)
+- CModel_Trait_Attributes resolving the WRONG Attribute class (PHP's
+  built-in one, not CModel_Casts_Attribute) - silently disabled the
+  entire Attribute::make() accessor/mutator feature framework-wide
+- CModel_Casts_Attribute missing $withCaching property
+- CModel_Collection::contains() argument-forwarding bug that broke
+  CCollection's operatorForWhere() dispatch downstream
+- CDatabase SqlServer QUERY grammar: wrapTable() signature incompatible
+  with parent -> HARD FATAL on instantiation, dialect completely unusable
+- CDatabase Postgres AND SqlServer SCHEMA grammars: multiple compile*()
+  signatures incompatible with parent -> HARD FATAL on instantiation,
+  both dialects completely unloadable
+- CDatabase_Query_Grammar compileBasicHaving/compileHavingBetween:
+  duplicated boolean prefix -> invalid SQL for any HAVING clause
+- CDatabase_Schema_Blueprint::removeColumn() always threw
+- CValidation::factory() loose `!= null` check silently misbehaving on
+  empty-array data
+
+REAL BUGS FOUND BUT DELIBERATELY NOT FIXED (documented via tests/comments
+instead, either because the right fix was ambiguous, out of the assigned
+file's scope, or genuinely low-risk-to-leave / higher-risk-to-touch):
+- CPeriod: start()/end() read wrong property names (always throws),
+  overlap() has a misaligned extra argument (always throws), gap()-family
+  mutate the original period's dates as a side effect
+- CHTTP_Cookie::queued() throws TypeError on non-array $default
+- CModel_Relation_HasOneOrManyThrough is fully dead code (nothing extends it)
+- CDatabase_Schema_Blueprint::dropTimestamps()/timestampsTz() still use
+  Laravel's created_at/updated_at column names while timestamps() uses
+  this framework's actual created/updated convention - so dropTimestamps()
+  never drops what timestamps() created
+- CDatabase_Schema_Grammar_SqlServerGrammar never overrides wrapValue(),
+  so it quotes identifiers with "double quotes" instead of real SQL
+  Server [square brackets] (inconsistent with the Query-side SqlServer
+  grammar, which does it correctly)
+- CDatabase_Query_Builder's constructor accepts but ignores its own
+  $grammar/$processor arguments (always pulls from $connection instead)
+
+WHAT'S STILL NOT COVERED (deliberately out of scope this session, in
+rough priority order if this work continues later):
+- CAuth (Manager/GenericUser/OTP) - zero coverage, would need session/
+  guard context to test meaningfully, more effort than the areas above
+- CConsole beyond the pre-existing CommandTest/ConsoleParserTest
+- CQueue, CMail/CEmail, CBroadcast, CWebSocket - all need heavy I/O
+  mocking, lower value-per-effort
+- CElement (~223 files) - UI widget rendering, would need a
+  DOM/browser-level test approach entirely different from everything
+  above, not really "mencontoh dari Laravel" since Laravel doesn't have
+  a server-rendered UI-widget-tree layer like this at all
+- CApp (~207 files) controllers - app-specific, not framework-generic
+- Everything else in the ~90 top-level namespaces not mentioned by name
+  anywhere in this file (CManager, CDocs, CBackup, CDaemon, CSocialLogin,
+  CAI, CML, CGeo, CImage, CMedia, CReport, CTracker, CQC, etc.) - these
+  mostly don't have a direct Laravel equivalent to "mencontoh" from, so
+  they'd need a from-scratch testing strategy rather than the
+  port-and-adapt approach used throughout this session
+
+If resuming this work: `phpcf test --filter=<ClassName>` for fast
+iteration, `phpcf test` (~45-50s) for the full sweep before every commit.
+Follow the same pattern as every wave above - read the real source first,
+don't trust Laravel's exact behavior, fix small/clear bugs directly,
+document everything else here.
+========================================================================
+
