@@ -1082,7 +1082,7 @@ class CHTTP_Client_PendingRequest {
     protected function sendRequest(string $method, string $url, array $options = []) {
         $clientMethod = $this->async ? 'requestAsync' : 'request';
 
-        $laravelData = $this->parseRequestData($method, $url, $options);
+        $cfData = $this->parseRequestData($method, $url, $options);
         $onStats = function ($transferStats) {
             if (($callback = ($this->options['on_stats'] ?? false)) instanceof Closure) {
                 $transferStats = $callback($transferStats) ?: $transferStats;
@@ -1092,7 +1092,7 @@ class CHTTP_Client_PendingRequest {
         };
 
         $mergedOptions = $this->normalizeRequestOptions($this->mergeOptions([
-            'laravel_data' => $laravelData,
+            'cf_data' => $cfData,
             'on_stats' => $onStats,
         ], $options));
 
@@ -1112,25 +1112,25 @@ class CHTTP_Client_PendingRequest {
         if ($this->bodyFormat === 'body') {
             return [];
         }
-        $laravelData = $options[$this->bodyFormat] ?? $options['query'] ?? [];
+        $cfData = $options[$this->bodyFormat] ?? $options['query'] ?? [];
 
         $urlString = cstr::of($url);
 
-        if (empty($laravelData) && $method === 'GET' && $urlString->contains('?')) {
-            $laravelData = (string) $urlString->after('?');
+        if (empty($cfData) && $method === 'GET' && $urlString->contains('?')) {
+            $cfData = (string) $urlString->after('?');
         }
 
-        if (is_string($laravelData)) {
-            parse_str($laravelData, $parsedData);
+        if (is_string($cfData)) {
+            parse_str($cfData, $parsedData);
 
-            $laravelData = is_array($parsedData) ? $parsedData : [];
+            $cfData = is_array($parsedData) ? $parsedData : [];
         }
 
-        if ($laravelData instanceof JsonSerializable) {
-            $laravelData = $laravelData->jsonSerialize();
+        if ($cfData instanceof JsonSerializable) {
+            $cfData = $cfData->jsonSerialize();
         }
 
-        return is_array($laravelData) ? $laravelData : [];
+        return is_array($cfData) ? $cfData : [];
     }
 
     /**
@@ -1261,7 +1261,7 @@ class CHTTP_Client_PendingRequest {
 
                 return $promise->then(function ($response) use ($request, $options) {
                     c::optional($this->factory)->recordRequestResponsePair(
-                        (new CHTTP_Client_Request($request))->withData($options['laravel_data']),
+                        (new CHTTP_Client_Request($request))->withData($options['cf_data']),
                         $this->newResponse($response)
                     );
 
@@ -1281,7 +1281,7 @@ class CHTTP_Client_PendingRequest {
             return function ($request, $options) use ($handler) {
                 $response = ($this->stubCallbacks ?: c::collect())
                     ->map
-                    ->__invoke((new CHTTP_Client_Request($request))->withData($options['laravel_data']), $options)
+                    ->__invoke((new CHTTP_Client_Request($request))->withData($options['cf_data']), $options)
                     ->filter()
                     ->first();
 
@@ -1341,7 +1341,7 @@ class CHTTP_Client_PendingRequest {
             $this->beforeSendingCallbacks->each(function ($callback) use (&$request, $options) {
                 $callbackResult = call_user_func(
                     $callback,
-                    (new CHTTP_Client_Request($request))->withData($options['laravel_data']),
+                    (new CHTTP_Client_Request($request))->withData($options['cf_data']),
                     $options,
                     $this
                 );

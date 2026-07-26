@@ -5,7 +5,7 @@ class CFunction_SerializableClosure_Support_ClosureStream {
     /**
      * The stream protocol.
      */
-    const STREAM_PROTO = 'laravel-serializable-closure';
+    const STREAM_PROTO = 'cf-serializable-closure';
 
     /**
      * Checks if this stream is registered.

@@ -430,10 +430,10 @@ class CDatabase_Query_Grammar_SqlServerGrammar extends CDatabase_Query_Grammar {
             return '(' . $this->parameterize($record) . ')';
         })->implode(', ');
 
-        $sql .= 'using (values ' . $parameters . ') ' . $this->wrapTable('laravel_source') . ' (' . $columns . ') ';
+        $sql .= 'using (values ' . $parameters . ') ' . $this->wrapTable('cf_source') . ' (' . $columns . ') ';
 
         $on = c::collect($uniqueBy)->map(function ($column) use ($query) {
-            return $this->wrap('laravel_source.' . $column) . ' = ' . $this->wrap($query->from . '.' . $column);
+            return $this->wrap('cf_source.' . $column) . ' = ' . $this->wrap($query->from . '.' . $column);
         })->implode(' and ');
 
         $sql .= 'on ' . $on . ' ';
@@ -441,7 +441,7 @@ class CDatabase_Query_Grammar_SqlServerGrammar extends CDatabase_Query_Grammar {
         if ($update) {
             $update = c::collect($update)->map(function ($value, $key) {
                 return is_numeric($key)
-                    ? $this->wrap($value) . ' = ' . $this->wrap('laravel_source.' . $value)
+                    ? $this->wrap($value) . ' = ' . $this->wrap('cf_source.' . $value)
                     : $this->wrap($key) . ' = ' . $this->parameter($value);
             })->implode(', ');
 

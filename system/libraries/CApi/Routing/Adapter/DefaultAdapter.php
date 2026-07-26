@@ -2,7 +2,7 @@
 
 class CApi_Routing_Adapter_DefaultAdapter implements CApi_Contract_Routing_AdapterInterface {
     /**
-     * Laravel router instance.
+     * Router instance.
      *
      * @var \CRouting_Router
      */
@@ -37,7 +37,7 @@ class CApi_Routing_Adapter_DefaultAdapter implements CApi_Contract_Routing_Adapt
     protected $patterns = [];
 
     /**
-     * Create a new laravel routing adapter instance.
+     * Create a new routing adapter instance.
      *
      * @param \CRouting_Router $router
      *
@@ -131,7 +131,7 @@ class CApi_Routing_Adapter_DefaultAdapter implements CApi_Contract_Routing_Adapt
     public function addRoute(array $methods, array $versions, $uri, $action) {
         $this->createRouteCollections($versions);
 
-        // Add where-patterns from original laravel router
+        // Add where-patterns from original router
         $action['where'] = array_merge($this->router->getPatterns(), isset($action['where']) ? $action['where'] : []);
 
         $route = new CRouting_Route($methods, $uri, $action);

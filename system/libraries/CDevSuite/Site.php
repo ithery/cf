@@ -503,7 +503,7 @@ abstract class CDevSuite_Site {
         $this->cli->run(sprintf(
             'sudo security find-certificate -e "%s%s" -a -Z | grep SHA-1 | sudo awk \'{system("security delete-certificate -Z \'$NF\' /Library/Keychains/System.keychain")}\'',
             $url,
-            '@laravel.valet'
+            '@cf.valet'
         ));
     }
 
