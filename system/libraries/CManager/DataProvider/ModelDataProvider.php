@@ -1,7 +1,5 @@
 <?php
 
-use Opis\Closure\SerializableClosure;
-
 class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
     /**
      * @var string
@@ -9,7 +7,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
     protected $modelClass;
 
     /**
-     * @var SerializableClosure
+     * @var CFunction_SerializableClosure
      */
     protected $queryCallback;
 
@@ -19,7 +17,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
      */
     public function __construct($modelClass, $queryCallback = null) {
         $this->modelClass = $modelClass;
-        $this->queryCallback = $queryCallback != null ? new SerializableClosure($queryCallback) : null;
+        $this->queryCallback = $queryCallback != null ? new CFunction_SerializableClosure($queryCallback) : null;
     }
 
     /**
@@ -60,7 +58,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         $query = $modelClass::query();
         /** @var CModel_Query $query */
         if ($this->queryCallback) {
-            if ($this->queryCallback instanceof SerializableClosure) {
+            if ($this->queryCallback instanceof CFunction_SerializableClosure) {
                 $this->queryCallback->__invoke($query);
             } else {
                 call_user_func_array($this->queryCallback, [$query]);
@@ -68,7 +66,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         }
 
         if ($callback) {
-            if ($callback instanceof SerializableClosure) {
+            if ($callback instanceof CFunction_SerializableClosure) {
                 $callback->__invoke($query);
             } else {
                 call_user_func_array($callback, [$query]);
