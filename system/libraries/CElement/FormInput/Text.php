@@ -12,20 +12,13 @@ class CElement_FormInput_Text extends CElement_FormInput {
     protected $inputStyle;
 
     /**
-     * @var null|mixed
-     */
-    protected $buttonPosition;
-
-    /**
-     * @var null|CElement_Component_Action
-     */
-    protected $action;
-
-    /**
      * @var string
      */
     protected $icon;
 
+    /**
+     * @var string
+     */
     protected $themeType = 'text';
 
     /**
@@ -39,8 +32,6 @@ class CElement_FormInput_Text extends CElement_FormInput {
         $this->placeholder = '';
 
         $this->inputStyle = 'default';
-        $this->buttonPosition = null;
-        $this->action = null;
 
         $this->addClass('form-control');
     }
@@ -69,60 +60,43 @@ class CElement_FormInput_Text extends CElement_FormInput {
         return $this;
     }
 
-    public function html($indent = 0) {
-        $html = new CStringBuilder();
-        $html->setIndent($indent);
-        $disabled = '';
-        if ($this->disabled) {
-            $disabled = ' disabled="disabled"';
-        }
+    /**
+     * @return void
+     */
+    protected function build() {
+        parent::build();
 
-        if ($this->readonly) {
-            $disabled = ' readonly="readonly"';
+        $this->setAttr('type', $this->type);
+        $this->setAttr('placeholder', $this->placeholder);
+        $this->addClass('input-unstyled');
+        $validationClass = trim($this->validation->validationClass());
+        if (strlen($validationClass) > 0) {
+            $this->addClass($validationClass);
         }
-
-        $classes = $this->classes;
-        $classes = implode(' ', $classes);
-        if (strlen($classes) > 0) {
-            $classes = ' ' . $classes;
-        }
-
-        $custom_css = $this->custom_css;
-        $custom_css = $this->renderStyle($custom_css);
-        if (strlen($custom_css) > 0) {
-            $custom_css = ' style="' . $custom_css . '"';
-        }
-        $addition_attribute = '';
-        foreach ($this->attr as $k => $v) {
-            $addition_attribute .= ' ' . $k . '="' . $v . '"';
-        }
-        $inputHtml = '<input type="text" placeholder="' . c::e($this->placeholder) . '" name="' . $this->name . '" id="' . $this->id . '" class="form-control input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . c::e($this->value) . '"' . $disabled . $custom_css . $addition_attribute . '/>';
-
-        if ($this->icon !== null && strlen($this->icon) > 0) {
-            $html->appendln('<div class="input-group">')
-                ->incIndent()
-                ->appendln('<span class="input-group-text"><i class="' . c::e($this->icon) . '"></i></span>')
-                ->appendln($inputHtml)
-                ->decIndent()
-                ->appendln('</div>')
-                ->br();
-        } else {
-            $html->appendln($inputHtml)->br();
-        }
-
-        return $html->text();
     }
 
-    public function js($indent = 0) {
-        $js = new CStringBuilder();
-        $js->setIndent($indent);
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
+    public function html($indent = 0) {
+        $inputHtml = parent::html($indent);
 
-        if ($this->action != null) {
-            $js->appendln($this->action->js());
+        if ($this->icon === null || strlen($this->icon) === 0) {
+            return $inputHtml;
         }
 
-        $js->append(parent::js());
+        $html = new CStringBuilder();
+        $html->setIndent($indent);
+        $html->appendln('<div class="input-group">')
+            ->incIndent()
+            ->appendln('<span class="input-group-text"><i class="' . c::e($this->icon) . '"></i></span>')
+            ->append($inputHtml)
+            ->decIndent()
+            ->appendln('</div>')
+            ->br();
 
-        return $js->text();
+        return $html->text();
     }
 }
