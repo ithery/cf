@@ -192,7 +192,7 @@ class CElement_FormInput_File extends CElement_FormInput {
      * @return $this
      */
     public function setMultiple($bool) {
-        $this->multiple = true;
+        $this->multiple = $bool;
 
         return $this;
     }

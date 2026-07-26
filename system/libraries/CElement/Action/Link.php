@@ -17,6 +17,7 @@ class CElement_Component_Action_Link extends CElement_Element_A implements CElem
      * @return void
      */
     public function __construct($id = '') {
+        parent::__construct($id);
         $this->classes = [
             'btn',
             'btn-link'

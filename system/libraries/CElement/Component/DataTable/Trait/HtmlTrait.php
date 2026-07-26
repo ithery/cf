@@ -421,7 +421,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $fval = $footerField->getValue();
                 if ($fval instanceof CRenderable) {
                     $html->incIndent()->appendln('<td class="' . $class . '">')->br();
-                    list($html, $js) = $this->getHtmlJsCell($fval);
+                    list($cellHtml, $cellJs) = $this->getHtmlJsCell($fval);
                     $html->appendln($fval->html($indent))->br();
                     $html->decIndent()->appendln('</td>')->br();
                 } elseif (is_array($fval)) {

@@ -32,7 +32,7 @@ class CElement_Component_Chart_Morris extends CElement_Component_Chart {
         $js->append("
 	    	new Chart($('#" . $this->id . "'), {
 	    		type: '" . $this->type . "',
-	    		data: " . $this->data . ',
+	    		data: " . json_encode($this->data) . ',
 	    		options: {},
     		})
 	    ')->br();

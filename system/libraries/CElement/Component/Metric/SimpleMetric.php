@@ -2,7 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CElement_Component_Metric_ValueMetric extends CElement_Component {
+class CElement_Component_Metric_SimpleMetric extends CElement_Component {
     use CElement_Trait_UseViewTrait;
     use CTrait_Element_Property_Icon;
     use CTrait_Element_Property_Label;

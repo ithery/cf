@@ -570,6 +570,8 @@ class CElement_Component_DataTable extends CElement_Component {
      * @return $this
      */
     public function setDomain($domain) {
+        $this->domain = $domain;
+
         return $this;
     }
 
@@ -981,7 +983,10 @@ class CElement_Component_DataTable extends CElement_Component {
                 return c::db($dbName);
             }
 
-            return c::db($dbName, $dbConfig);
+            $generatedDbName = 'db-datatable-' . $this->id;
+            CDatabase::manager()->addConnection($dbConfig, $generatedDbName);
+
+            return c::db($generatedDbName);
         });
 
         return $this;

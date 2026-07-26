@@ -165,6 +165,6 @@ class CElement_Factory {
      * @return \CElement_PseudoElement
      */
     public static function createPseudoElement($id = null) {
-        return new CElement_PseudoElement();
+        return new CElement_PseudoElement($id);
     }
 }

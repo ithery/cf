@@ -50,7 +50,7 @@ class CElement_Component_Blockly_CategoryHelper {
                 return $output;
             }
         }, '');
-        $categoryName = ucwords(str_replace('_', '_', cstr::snake($category)));
+        $categoryName = ucwords(str_replace('_', ' ', cstr::snake($category)));
         $categoryHue = carr::get(static::$categoryHue, strtolower($category), '230');
         $categoryOpen = '<category name="' . $categoryName . '" colour="' . $categoryHue . '">';
         $categoryClose = '</category>';

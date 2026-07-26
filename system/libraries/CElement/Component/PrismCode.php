@@ -75,7 +75,6 @@ class CElement_Component_PrismCode extends CElement_Component {
      */
     protected function build() {
         c::manager()->registerJs('plugins/prism/prism.min.js');
-        c::manager()->registerJs('plugins/prism/prism.min.js');
         c::manager()->registerJs('plugins/prism/plugins/prism-toolbar.js');
         c::manager()->registerJs('plugins/prism/components/prism-' . $this->prismLanguage . '.js');
         c::manager()->registerCss('plugins/prism/themes/prism-' . $this->prismTheme . '.css');

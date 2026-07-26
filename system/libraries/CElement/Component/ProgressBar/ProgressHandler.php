@@ -49,6 +49,8 @@ class CElement_Component_ProgressBar_ProgressHandler {
      */
     public function __construct(CElement_Component_ProgressBar_ProcessHandler $process, array $config) {
         $this->value = carr::get($config, 'value');
+        $this->maxValue = carr::get($config, 'maxValue');
+        $this->minValue = carr::get($config, 'minValue');
         $this->updateMethod = carr::get($config, 'updateMethod');
         $this->process = $process;
     }

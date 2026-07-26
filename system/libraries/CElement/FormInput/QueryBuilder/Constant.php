@@ -23,7 +23,7 @@ final class CElement_FormInput_QueryBuilder_Constant {
 
     const FILTER_INPUT_RADIO = 'radio';
 
-    const FILTER_INPUT_CHECKBOX = 'number';
+    const FILTER_INPUT_CHECKBOX = 'checkbox';
 
     const FILTER_INPUT_SELECT = 'select';
 

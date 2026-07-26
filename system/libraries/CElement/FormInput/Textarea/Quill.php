@@ -27,7 +27,7 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
         parent::__construct($id);
         CManager::registerModule('quill');
         $this->theme = 'snow';
-        $this->toolbar = $this->setToolbar('full');
+        $this->setToolbar('full');
     }
 
     /**

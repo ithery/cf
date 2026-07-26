@@ -115,9 +115,9 @@ class CElement_FormInput_DateRange extends CElement_FormInput {
         }
 
         $html->appendln('<div class="input-daterange input-group" id="' . $this->id . '">')->br();
-        $html->appendln('<input type="text" name="' . $this->name . '[start]"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '-start" class="datepicker input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
+        $html->appendln('<input type="text" name="' . $this->name . '[start]"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '-start" class="datepicker input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . $this->dateStart . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
         $html->appendln('<div class="input-group-prepend"><span class="input-group-text">to</span></div>');
-        $html->appendln('<input type="text" name="' . $this->name . '[end]"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '-end" class="datepicker input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
+        $html->appendln('<input type="text" name="' . $this->name . '[end]"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '-end" class="datepicker input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . $this->dateEnd . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
         $html->appendln('</div>');
 
         return $html->text();

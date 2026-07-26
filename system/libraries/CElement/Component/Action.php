@@ -199,7 +199,7 @@ class CElement_Component_Action extends CElement_Component {
      * @return $this
      */
     public function setActive($bool = true) {
-        $this->isActive = true;
+        $this->isActive = $bool;
 
         return $this;
     }

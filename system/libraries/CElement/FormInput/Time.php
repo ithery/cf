@@ -121,7 +121,6 @@ class CElement_FormInput_Time extends CElement_FormInput {
             $js->appendln('	showMeridian: false,');
         }
 
-        $js->appendln("	template: 'dropdown',");
         $js->appendln('	disableFocus: true');
         $js->appendln('});');
 

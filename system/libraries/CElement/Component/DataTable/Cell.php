@@ -116,7 +116,7 @@ class CElement_Component_DataTable_Cell {
 
         if (!is_string($html)) {
             list($html, $jsCell) = $this->getHtmlJsCell($html);
-            $js .= $js;
+            $js .= $jsCell;
         }
 
         $this->html = $html;

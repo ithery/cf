@@ -59,7 +59,7 @@ class CElement_Component_DataTable_DataRow implements Arrayable {
             return carr::exists($this->row, $field);
         }
 
-        return $field;
+        return false;
     }
 
     /**

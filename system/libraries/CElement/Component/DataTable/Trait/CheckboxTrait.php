@@ -30,6 +30,8 @@ trait CElement_Component_DataTable_Trait_CheckboxTrait {
      */
     public function setCheckboxColumnWidth($width) {
         $this->checkboxColumnWidth = $width;
+
+        return $this;
     }
 
     /**

@@ -70,7 +70,7 @@ class CElement_Component_ListGroup extends CElement_Component {
      * @return $this
      */
     public function setAjax($boolean = true) {
-        $this->setTableDataIsAjax(true);
+        $this->setTableDataIsAjax($boolean);
 
         return $this;
     }

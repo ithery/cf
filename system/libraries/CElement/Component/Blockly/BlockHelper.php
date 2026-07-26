@@ -323,8 +323,9 @@ class CElement_Component_Blockly_BlockHelper {
      * @return string
      */
     public static function renderMathRound($num = 3.1) {
-        return '<block type="math_number_property">
-        <value name="NUMBER_TO_CHECK">
+        return '<block type="math_round">
+        <field name="OP">ROUND</field>
+        <value name="NUM">
           <shadow type="math_number">
             <field name="NUM">' . $num . '</field>
           </shadow>

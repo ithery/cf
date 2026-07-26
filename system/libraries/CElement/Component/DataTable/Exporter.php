@@ -21,7 +21,7 @@ class CElement_Component_DataTable_Exporter {
      * @return CElement_Component_DataTable_Exporter_AbstractEngine
      */
     public function createEngine($engine) {
-        $engineClassName = 'CElement_Component_DataTable_Engine_' . $engine . 'Engine';
+        $engineClassName = 'CElement_Component_DataTable_Exporter_Engine_' . $engine . 'Engine';
         $engineClass = new $engineClassName($this->dataTable);
 
         return $engineClass;
