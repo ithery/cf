@@ -107,6 +107,50 @@ class CDevSuite_DevCloud_Api {
     }
 
     /**
+     * Call an authenticated Devcloud API method (e.g. "app/getInfo"), using
+     * the cached (and auto-refreshed) access token. Returns the "data" key
+     * of the {errCode, errMessage, data} envelope, or throws on failure.
+     *
+     * @param string $path
+     * @param array  $params
+     * @param string $method "get" for reads, "post" for state-changing calls
+     *
+     * @return mixed
+     */
+    public function request($path, array $params = [], $method = 'get') {
+        $token = $this->accessToken();
+
+        if (empty($token)) {
+            throw new Exception('Not logged in to DevCloud, run `phpcf devcloud:login` first.');
+        }
+
+        try {
+            $pending = CHTTP::client()
+                ->withToken($token)
+                ->acceptJson()
+                ->timeout(15);
+
+            $url = static::BASE_URL . '/api/devcloud/' . ltrim($path, '/');
+
+            $response = strtolower($method) === 'post' ? $pending->post($url, $params) : $pending->get($url, $params);
+        } catch (Exception $e) {
+            throw new Exception('Unable to reach DevCloud API: ' . $e->getMessage());
+        }
+
+        $data = $response->json();
+
+        if ($response->failed() || !is_array($data)) {
+            throw new Exception('Request to ' . $path . ' failed.');
+        }
+
+        if ((int) carr::get($data, 'errCode', 0) !== 0) {
+            throw new Exception(carr::get($data, 'errMessage', 'Request to ' . $path . ' failed.'));
+        }
+
+        return carr::get($data, 'data');
+    }
+
+    /**
      * Forget the cached token pair.
      *
      * @return void
