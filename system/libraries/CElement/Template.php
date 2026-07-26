@@ -12,6 +12,8 @@ class CElement_Template extends CElement {
      * @param string $id
      * @param string $templateName
      * @param array  $data
+     *
+     * @return void
      */
     public function __construct($id, $templateName = '', $data = []) {
         parent::__construct($id);

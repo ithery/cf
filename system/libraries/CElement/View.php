@@ -11,7 +11,7 @@ class CElement_View extends CElement {
     /**
      * Keyed cache of CElement_PseudoElement instances, lazily created by viewElement().
      *
-     * @var array
+     * @var CElement_PseudoElement[]
      */
     protected $viewElement;
 

@@ -19,9 +19,11 @@ class CElement_ViewComponent extends CElement {
     /**
      * @phpstan-ignore-next-line
      *
-     * @param mixed $id
-     * @param mixed $component
-     * @param mixed $options
+     * @param null|string $id
+     * @param string      $component
+     * @param array       $options
+     *
+     * @return void
      */
     public function __construct($id, $component, $options = []) {
         parent::__construct($id);
