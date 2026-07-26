@@ -69,10 +69,21 @@ class CElement_FormInput_Text extends CElement_FormInput {
         $this->setAttr('type', $this->type);
         $this->setAttr('placeholder', $this->placeholder);
         $this->addClass('input-unstyled');
-        $validationClass = trim($this->validation->validationClass());
-        if (strlen($validationClass) > 0) {
-            $this->addClass($validationClass);
-        }
+        $this->addClass('cres:element:control:Text');
+        $this->setAttr('cres-element', 'control:Text');
+        $this->setAttr('cres-config', c::json($this->buildControlConfig()));
+    }
+
+    /**
+     * No options yet -- this hook exists so CElement_FormInput_Text is a
+     * recognized cres-element (auto-init observer, Repeater clone
+     * re-init) the same way every other control is, ready for whatever
+     * client-side behavior it picks up next.
+     *
+     * @return array
+     */
+    protected function buildControlConfig() {
+        return [];
     }
 
     /**

@@ -4,6 +4,7 @@ import { initColorPicker, ColorPicker } from "./ColorPicker";
 import { initAutoNumeric, AutoNumeric } from "./AutoNumeric";
 import { initSortable, Sortable} from "./Sortable";
 import { initSelectTwo, SelectTwo } from "./SelectTwo";
+import { initText, Text } from "./Text";
 
 const initControl = (control) => {
     const controlName  = control.getAttribute('cres-element');
@@ -25,6 +26,9 @@ const initControl = (control) => {
     if(controlName == 'control:SelectTwo') {
         initSelectTwo(control);
     }
+    if(controlName == 'control:Text') {
+        initText(control);
+    }
 }
 const control = {
     EditorJs,
@@ -32,7 +36,8 @@ const control = {
     ColorPicker,
     AutoNumeric,
     Sortable,
-    SelectTwo
+    SelectTwo,
+    Text
 }
 export {
     control,
