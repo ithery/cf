@@ -31,7 +31,7 @@ class CElement_FormInput_Checkbox_Switcher extends CElement_FormInput_Checkbox {
         $html = '<div class="switcher">';
 
         // $html .= parent::html();
-        $html .= '<input type="checkbox" name="' . $this->name . '" id="' . $this->id . '" class="switcher-control ' . $this->validation->validationClass() . '"' . $checked . ' style="display:none">';
+        $html .= '<input type="checkbox" name="' . $this->name . '" id="' . $this->id . '" class="switcher-control ' . '"' . $checked . ' style="display:none">';
 
         $html .= '
             <label class="switcher-label" for="' . $this->id . '">

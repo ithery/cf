@@ -229,7 +229,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
             $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
         $html
-            ->appendln('<select name="' . $name . '" id="' . $this->id . '" class="' . $classes . $this->validation->validationClass() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')
+            ->appendln('<select name="' . $name . '" id="' . $this->id . '" class="' . $classes . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')
             ->incIndent()
             ->br();
         if (count($this->groupList) > 0) {

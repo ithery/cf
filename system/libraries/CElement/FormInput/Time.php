@@ -79,7 +79,7 @@ class CElement_FormInput_Time extends CElement_FormInput {
         }
 
         $html->appendln('<div class="bootstrap-timepicker">');
-        $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
+        $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
         $html->appendln('</div>');
 
         return $html->text();

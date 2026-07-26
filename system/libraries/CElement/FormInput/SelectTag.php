@@ -58,7 +58,7 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
             foreach ($this->attr as $k => $v) {
                 $addition_attribute .= ' ' . $k . '="' . $v . '"';
             }
-            $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="form-control select' . $classes . $this->validation->validationClass() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')
+            $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="form-control select' . $classes . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')
                 ->incIndent()->br();
 
             if ($this->list != null) {
