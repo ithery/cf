@@ -71,6 +71,11 @@ class CDevSuite {
      */
     protected static $ssh;
 
+    /**
+     * @var CDevSuite_DevCloud_Api
+     */
+    protected static $devCloudApi;
+
     public static function bootstrap() {
         CDevSuite_Bootstrap::instance()->bootstrap();
     }
@@ -134,6 +139,17 @@ class CDevSuite {
         }
 
         return static::$ssh;
+    }
+
+    /**
+     * @return CDevSuite_DevCloud_Api
+     */
+    public static function devCloudApi() {
+        if (static::$devCloudApi == null) {
+            static::$devCloudApi = new CDevSuite_DevCloud_Api();
+        }
+
+        return static::$devCloudApi;
     }
 
     public static function configuration() {
