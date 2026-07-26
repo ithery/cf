@@ -12,7 +12,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
     protected $config;
 
     /**
-     * @var \Opis\Closure\SerializableClosure|string
+     * @var \CFunction_SerializableClosure|string
      */
     protected $messageHandler = null;
 
@@ -31,7 +31,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
      */
     public function setMessageHandler($messageHandler) {
         if ($messageHandler instanceof Closure) {
-            $messageHandler = new \Opis\Closure\SerializableClosure($messageHandler);
+            $messageHandler = new CFunction_SerializableClosure($messageHandler);
         }
         $this->messageHandler = $messageHandler;
 

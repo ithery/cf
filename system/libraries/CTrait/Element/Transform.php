@@ -23,7 +23,7 @@ trait CTrait_Element_Transform {
         //serialize when closure
         foreach ($transform as $key => $t) {
             if ($t instanceof Closure) {
-                $transform[$key] = new \Opis\Closure\SerializableClosure($t);
+                $transform[$key] = new CFunction_SerializableClosure($t);
             }
         }
         $this->transforms = array_merge(

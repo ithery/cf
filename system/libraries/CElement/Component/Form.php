@@ -335,12 +335,12 @@ class CElement_Component_Form extends CElement_Component {
                 if (is_array($rules)) {
                     foreach ($rules as $ruleIndex => $ruleValue) {
                         if ($ruleValue instanceof Closure) {
-                            $validationData[$key][$ruleIndex] = new \Opis\Closure\SerializableClosure($ruleValue);
+                            $validationData[$key][$ruleIndex] = new CFunction_SerializableClosure($ruleValue);
                         }
 
                         if (is_object($ruleValue) && property_exists($ruleValue, 'condition')) {
                             if ($ruleValue->condition instanceof Closure) {
-                                $ruleValue->condition = new \Opis\Closure\SerializableClosure($ruleValue->condition);
+                                $ruleValue->condition = new CFunction_SerializableClosure($ruleValue->condition);
                                 $validationData[$key][$ruleIndex] = $ruleValue;
                             }
                         }

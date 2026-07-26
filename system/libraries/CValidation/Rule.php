@@ -169,7 +169,7 @@ class CValidation_Rule {
      */
     public static function closure($callback) {
         if ($callback instanceof Closure) {
-            $callback = new \Opis\Closure\SerializableClosure($callback);
+            $callback = new CFunction_SerializableClosure($callback);
         }
 
         return new CValidation_ClosureValidationRule($callback);

@@ -147,7 +147,7 @@ abstract class CException_ContextAbstract {
         //serialize all variables
         return c::collect($variables)->map(function ($item) {
             if ($item instanceof Closure) {
-                $item = new \Opis\Closure\SerializableClosure($item);
+                $item = new CFunction_SerializableClosure($item);
             }
 
             return serialize($item);

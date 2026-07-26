@@ -106,7 +106,18 @@ class CFunction_SerializableClosure_Serializer_NativeSerializer implements CFunc
             static::wrapClosures($object, $this->scope);
         }
 
-        if ($scope = $reflector->getClosureScopeClass()) {
+        try {
+            $scopeClass = $reflector->getClosureScopeClass();
+        } catch (\Throwable $ex) {
+            // PHP's reflection engine can fail to introspect a closure's scope class in some
+            // edge cases ("Failed to retrieve the reflection object"). The scope is only needed
+            // to rebind the closure to its declaring class on unserialize (for private/protected
+            // member access) - falling back to no scope is safe for closures that don't need it,
+            // and beats a hard crash for ones that don't have a real fallback.
+            $scopeClass = null;
+        }
+
+        if ($scope = $scopeClass) {
             $scope = $scope->name;
         }
 
