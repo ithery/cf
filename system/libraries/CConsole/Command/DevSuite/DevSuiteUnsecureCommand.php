@@ -9,7 +9,7 @@ class CConsole_Command_DevSuite_DevSuiteUnsecureCommand extends CConsole_Command
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_UnsecureCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Secure_UnsecureCommand::class;
 
     /**
      * @var string

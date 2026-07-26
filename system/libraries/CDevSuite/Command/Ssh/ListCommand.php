@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Description of SshListCommand
+ * Description of ListCommand
  */
-class CDevSuite_Command_SshListCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Ssh_ListCommand extends CDevSuite_CommandAbstract {
     /**
      * Display a table listing all configured SSH server connections.
      *

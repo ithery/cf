@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Description of DbListCommand.
+ * Description of ListCommand.
  */
-class CDevSuite_Command_DbListCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Db_ListCommand extends CDevSuite_CommandAbstract {
     /**
      * Display a table listing all configured database connections.
      *

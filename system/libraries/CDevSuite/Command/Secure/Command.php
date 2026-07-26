@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Description of SecureCommand.
+ * Description of Command.
  */
-class CDevSuite_Command_SecureCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Secure_Command extends CDevSuite_CommandAbstract {
     /**
      * Get the signature arguments string for the command.
      *

@@ -3,7 +3,7 @@
 /**
  * Description of UnlinkCommand.
  */
-class CDevSuite_Command_UnlinkCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Link_UnlinkCommand extends CDevSuite_CommandAbstract {
     /**
      * Get the signature arguments string for the command.
      *

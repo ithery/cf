@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Description of DbCloneCommand.
+ * Description of CloneCommand.
  */
-class CDevSuite_Command_DbCloneCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Db_CloneCommand extends CDevSuite_CommandAbstract {
     /**
      * Get the signature arguments string for the command.
      *

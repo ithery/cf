@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Description of DbCreateCommand.
+ * Description of CreateCommand.
  */
-class CDevSuite_Command_DbCreateCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Db_CreateCommand extends CDevSuite_CommandAbstract {
     /**
      * Get the signature arguments string for the command.
      *

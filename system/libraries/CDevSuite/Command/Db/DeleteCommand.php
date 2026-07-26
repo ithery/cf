@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Description of DbDeleteCommand.
+ * Description of DeleteCommand.
  */
-class CDevSuite_Command_DbDeleteCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Db_DeleteCommand extends CDevSuite_CommandAbstract {
     /**
      * Get the signature arguments string for the command.
      *

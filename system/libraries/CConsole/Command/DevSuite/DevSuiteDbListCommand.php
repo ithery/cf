@@ -9,7 +9,7 @@ class CConsole_Command_DevSuite_DevSuiteDbListCommand extends CConsole_Command_D
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_DbListCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Db_ListCommand::class;
 
     /**
      * @var string

@@ -5,7 +5,7 @@
  */
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
-class CDevSuite_Command_UninstallCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Install_UninstallCommand extends CDevSuite_CommandAbstract {
     /**
      * Uninstall nginx, PHP, Dnsmasq/Acrylic, and all DevSuite configs and logs for the current OS.
      *

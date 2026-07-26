@@ -9,7 +9,7 @@ class CConsole_Command_DevSuite_DevSuiteDbDeleteCommand extends CConsole_Command
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_DbDeleteCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Db_DeleteCommand::class;
 
     /**
      * @var string

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Description of DbCompareCommand.
+ * Description of CompareCommand.
  */
-class CDevSuite_Command_DbCompareCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Db_CompareCommand extends CDevSuite_CommandAbstract {
     /**
      * Get the signature arguments string for the command.
      *

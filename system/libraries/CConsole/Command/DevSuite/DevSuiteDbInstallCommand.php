@@ -9,7 +9,7 @@ class CConsole_Command_DevSuite_DevSuiteDbInstallCommand extends CConsole_Comman
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_DbInstallCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Db_InstallCommand::class;
 
     /**
      * @var string

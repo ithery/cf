@@ -3,7 +3,7 @@
 /**
  * Description of LinksCommand
  */
-class CDevSuite_Command_LinksCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Link_LinksCommand extends CDevSuite_CommandAbstract {
     /**
      * Display a table listing all linked sites.
      *

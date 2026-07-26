@@ -9,7 +9,7 @@ class CConsole_Command_DevSuite_DevSuiteDbCompareCommand extends CConsole_Comman
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_DbCompareCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Db_CompareCommand::class;
 
     /**
      * @var string

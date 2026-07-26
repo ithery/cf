@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Description of DbSyncCommand.
+ * Description of SyncCommand.
  */
-class CDevSuite_Command_DbSyncCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Db_SyncCommand extends CDevSuite_CommandAbstract {
     /**
      * Get the signature arguments string for the command.
      *

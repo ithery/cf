@@ -11,7 +11,7 @@ class CConsole_Command_DevSuite_DevSuiteInstallCommand extends CConsole_Command_
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_InstallCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Install_Command::class;
 
     /**
      * @var string

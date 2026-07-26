@@ -9,7 +9,7 @@ class CConsole_Command_DevSuite_DevSuiteLinkCommand extends CConsole_Command_Dev
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_LinkCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Link_Command::class;
 
     /**
      * @var string

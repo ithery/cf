@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Description of DbStartCommand.
+ * Description of UninstallCommand.
  */
-class CDevSuite_Command_DbStartCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Db_UninstallCommand extends CDevSuite_CommandAbstract {
     /**
      * Get the signature arguments string for the command.
      *
@@ -14,13 +14,16 @@ class CDevSuite_Command_DbStartCommand extends CDevSuite_CommandAbstract {
     }
 
     /**
-     * Restart the MariaDB service.
+     * Stop and uninstall MariaDB.
      *
      * @param CConsole_Command $cfCommand
      *
      * @return void
      */
     public function run(CConsole_Command $cfCommand) {
-        CDevSuite::db()->mariaDb()->restart();
+        CDevSuite::db()->mariaDb()->stop();
+        CDevSuite::db()->mariaDb()->uninstall();
+
+        CDevSuite::output(PHP_EOL . '<info>Dev Suite MariaDb uninstalled successfully!</info>');
     }
 }

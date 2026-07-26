@@ -1,9 +1,9 @@
 <?php
 
 /**
- * CDevSuite_Command_SshCommand
+ * CDevSuite_Command_Ssh_Command
  */
-class CDevSuite_Command_SshCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Ssh_Command extends CDevSuite_CommandAbstract {
     /**
      * Get the signature arguments string for the command.
      *

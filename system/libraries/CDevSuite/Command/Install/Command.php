@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Description of InstallCommand.
+ * Description of Command.
  */
-class CDevSuite_Command_InstallCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Install_Command extends CDevSuite_CommandAbstract {
     /**
      * Get the signature arguments string for the command.
      *

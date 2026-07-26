@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Description of LinkCommand.
+ * Description of Command.
  */
-class CDevSuite_Command_LinkCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Link_Command extends CDevSuite_CommandAbstract {
     /**
      * Get the signature arguments string for the command.
      *

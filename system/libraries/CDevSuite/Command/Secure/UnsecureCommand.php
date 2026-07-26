@@ -3,7 +3,7 @@
 /**
  * Description of UnsecureCommand.
  */
-class CDevSuite_Command_UnsecureCommand extends CDevSuite_CommandAbstract {
+class CDevSuite_Command_Secure_UnsecureCommand extends CDevSuite_CommandAbstract {
     /**
      * Get the signature arguments string for the command.
      *

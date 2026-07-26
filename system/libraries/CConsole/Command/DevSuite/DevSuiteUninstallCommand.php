@@ -10,7 +10,7 @@ class CConsole_Command_DevSuite_DevSuiteUninstallCommand extends CConsole_Comman
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_UninstallCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Install_UninstallCommand::class;
 
     /**
      * @var string
