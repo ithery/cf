@@ -164,7 +164,7 @@ class CDatabase_Connection_MongoDBConnection extends CDatabase_Connection {
         }
 
         $driverOptions['driver'] = [
-            'name' => 'laravel-mongodb',
+            'name' => 'cf-mongodb',
             'version' => self::getVersion(),
         ];
 
