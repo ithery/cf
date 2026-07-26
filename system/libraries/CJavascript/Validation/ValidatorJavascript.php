@@ -69,7 +69,7 @@ class CJavascript_Validation_ValidatorJavascript implements Arrayable {
     /**
      * Set default parameters.
      *
-     * @param $options
+     * @param array $options
      *
      * @return void
      */

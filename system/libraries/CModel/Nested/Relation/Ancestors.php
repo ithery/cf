@@ -16,7 +16,7 @@ class CModel_Nested_Relation_Ancestors extends CModel_Nested_Relation {
     }
 
     /**
-     * @param Model $model
+     * @param CModel $model
      * @param $related
      *
      * @return bool
@@ -26,8 +26,8 @@ class CModel_Nested_Relation_Ancestors extends CModel_Nested_Relation {
     }
 
     /**
-     * @param QueryBuilder $query
-     * @param Model        $model
+     * @param CModel_Nested_Query $query
+     * @param CModel              $model
      *
      * @return void
      */

@@ -1377,14 +1377,14 @@ class CHTTP_Client_PendingRequest {
      * @return CHTTP_Client_Response
      */
     protected function newResponse($response) {
-        return c::tap(new CHTTP_Client_Response($response), function (CHTTP_Client_Response $laravelResponse) {
+        return c::tap(new CHTTP_Client_Response($response), function (CHTTP_Client_Response $cfResponse) {
             if ($this->truncateExceptionsAt === null) {
                 return;
             }
 
             $this->truncateExceptionsAt === false
-                ? $laravelResponse->dontTruncateExceptions()
-                : $laravelResponse->truncateExceptionsAt($this->truncateExceptionsAt);
+                ? $cfResponse->dontTruncateExceptions()
+                : $cfResponse->truncateExceptionsAt($this->truncateExceptionsAt);
         });
     }
 

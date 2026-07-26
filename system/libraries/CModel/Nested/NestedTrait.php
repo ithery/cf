@@ -8,9 +8,31 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @property CModel_Collection<static> $getChildren
  * @property CModel_Collection<static> $descendants
  * @property CModel_Collection<static> $ancestors
+ * @property bool                      $forceDeleting Only present when the model also uses CModel_SoftDelete_SoftDeleteTrait.
+ * @property array                     $attributes
+ * @property array                     $original
+ * @property bool                      $exists
  *
  * @method static bool isBroken()                                    Get whether the tree is broken.
  * @method static int fixTree(null|CModel_Nested_Trait|CModel $root) Fixes the tree based on parentage info. Nodes with invalid parent are saved as roots.
+ * @method mixed                       getAttribute(string $key)
+ * @method mixed                       getAttributeValue(string $key)
+ * @method mixed                       getRelationValue(string $key)
+ * @method $this                       setAttribute(string $key, mixed $value)
+ * @method $this                       setRawAttributes(array $attributes, bool $sync = false)
+ * @method $this                       setRelation(string $relation, mixed $value)
+ * @method bool                        save(array $options = [])
+ * @method CModel_Query                newQuery()
+ * @method string                      getTable()
+ * @method string                      getKeyName()
+ * @method mixed                       getKey()
+ * @method static bool                 usesSoftDelete()
+ * @method string                      getStatusColumn()                                                                       Only present when the model also uses CModel_SoftDelete_SoftDeleteTrait.
+ * @method string                      getDeletedAtColumn()                                                                    Only present when the model also uses CModel_Deleted_DeletedTrait.
+ * @method CModel_Relation_BelongsTo   belongsTo(string $related, string $foreignKey = null, string $ownerKey = null, string $relation = null)
+ * @method CModel_Relation_HasMany     hasMany(string $related, string $foreignKey = null, string $localKey = null)
+ *
+ * @mixin CModel
  */
 trait CModel_Nested_NestedTrait {
     /**
@@ -40,6 +62,17 @@ trait CModel_Nested_NestedTrait {
     protected $moved = false;
 
     /**
+     * The node's own depth immediately before the currently pending move,
+     * captured by setParent() before it overwrites the depth attribute with
+     * the new value. setDepthWithSubtree() needs this to compute how far to
+     * shift descendants by - by the time it runs, $this->getDepth() already
+     * reflects the new depth, not the old one.
+     *
+     * @var null|int
+     */
+    protected $depthBeforeMove;
+
+    /**
      * Sign on model events.
      */
     public static function bootNestedTrait() {
@@ -53,10 +86,16 @@ trait CModel_Nested_NestedTrait {
             // We will need fresh data to delete node safely
             $model->refreshNode();
         });
+        static::deleted(function ($model) {
+            $model->deleteDescendants();
+        });
 
         if (static::usesSoftDelete()) {
             static::restoring(function ($model) {
                 static::$deletedAt = $model->{$model->getStatusColumn()};
+            });
+            static::restored(function ($model) {
+                $model->restoreDescendants(static::$deletedAt);
             });
         }
     }
@@ -112,7 +151,12 @@ trait CModel_Nested_NestedTrait {
             return true;
         }
 
-        return $this->insertAt($this->getLowerBound() + 1);
+        if (!$this->insertAt($this->getLowerBound() + 1)) {
+            return false;
+        }
+        $this->setDepthWithSubtree();
+
+        return true;
     }
 
     /**
@@ -153,6 +197,7 @@ trait CModel_Nested_NestedTrait {
      * @return $this
      */
     protected function setParent($value) {
+        $this->depthBeforeMove = $this->getDepth();
         $this->setParentId($value ? $value->getKey() : null)
             ->setRelation('parent', $value);
         $this->setDepth($value ? $value->getDepth() + 1 : 0);
@@ -171,7 +216,12 @@ trait CModel_Nested_NestedTrait {
     protected function actionBeforeOrAfter(self $node, $after = false) {
         $node->refreshNode();
 
-        return $this->insertAt($after ? $node->getRgt() + 1 : $node->getLft());
+        if (!$this->insertAt($after ? $node->getRgt() + 1 : $node->getLft())) {
+            return false;
+        }
+        $this->setDepthWithSubtree();
+
+        return true;
     }
 
     /**
@@ -181,7 +231,17 @@ trait CModel_Nested_NestedTrait {
         if (!$this->exists || static::$actionsPerformed === 0) {
             return $this;
         }
-        $attributes = $this->newNestedSetQuery()->getNodeData($this->getKey());
+        // Deliberately not CModel_Nested_Query::getNodeData() here: that
+        // method's 2-column (lft, rgt) shape is relied on elsewhere (e.g.
+        // whereDescendantOf() feeds it straight into a BETWEEN clause), so
+        // it can't grow a 3rd column without breaking those callers. depth
+        // can change on an already-loaded node as a side effect of another
+        // node's move cascading via setDepthWithSubtree()'s increment() -
+        // refresh it here too, or callers holding a stale in-memory
+        // reference would never see it even after calling refreshNode().
+        $attributes = (array) $this->newNestedSetQuery()->toBase()
+            ->where($this->getKeyName(), '=', $this->getKey())
+            ->first([$this->getLftName(), $this->getRgtName(), $this->getDepthName()]);
         $this->attributes = array_merge($this->attributes, $attributes);
 
         return $this;
@@ -229,7 +289,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * Get query for siblings of the node.
      *
-     * @return QueryBuilder
+     * @return CModel_Nested_Query
      */
     public function siblings() {
         return $this->newScopedQuery()
@@ -240,7 +300,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * Get the node siblings and the node itself.
      *
-     * @return \Kalnoy\Nestedset\QueryBuilder
+     * @return CModel_Nested_Query
      */
     public function siblingsAndSelf() {
         return $this->newScopedQuery()
@@ -261,7 +321,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * Get query for siblings after the node.
      *
-     * @return QueryBuilder
+     * @return CModel_Nested_Query
      */
     public function nextSiblings() {
         return $this->nextNodes()
@@ -271,7 +331,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * Get query for siblings before the node.
      *
-     * @return QueryBuilder
+     * @return CModel_Nested_Query
      */
     public function prevSiblings() {
         return $this->prevNodes()
@@ -281,7 +341,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * Get query for nodes after current node.
      *
-     * @return QueryBuilder
+     * @return CModel_Nested_Query
      */
     public function nextNodes() {
         return $this->newScopedQuery()
@@ -291,7 +351,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * Get query for nodes before current node in reversed order.
      *
-     * @return QueryBuilder
+     * @return CModel_Nested_Query
      */
     public function prevNodes() {
         return $this->newScopedQuery()
@@ -334,7 +394,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * Append and save a node.
      *
-     * @param self $node
+     * @param CModel_Nested_Trait|CModel $node
      *
      * @return bool
      */
@@ -345,7 +405,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * Prepend and save a node.
      *
-     * @param self $node
+     * @param CModel_Nested_Trait|CModel $node
      *
      * @return bool
      */
@@ -467,7 +527,7 @@ trait CModel_Nested_NestedTrait {
      * @return $this
      */
     public function rawNode($lft, $rgt, $parentId, $depth = null) {
-        if ($depth == null) {
+        if ($depth === null) {
             $depth = 0;
             $parentModel = static::find($parentId);
             if ($parentModel != null) {
@@ -596,6 +656,20 @@ trait CModel_Nested_NestedTrait {
      * @param $deletedAt
      */
     protected function restoreDescendants($deletedAt) {
+        // getDeletedAtColumn() only exists on CModel_Deleted_DeletedTrait's
+        // timestamp-based soft deletes (matching upstream lazychaser, which
+        // targets Laravel's classic deleted_at SoftDeletes). usesSoftDelete()
+        // - the check bootNestedTrait() actually gates this call on - detects
+        // CModel_SoftDelete_SoftDeleteTrait instead, whose status column has
+        // no timestamp to compare against, so there's no equivalent of
+        // "only restore descendants deleted at/after the parent" - just
+        // restore every currently soft-deleted descendant.
+        if (!method_exists($this, 'getDeletedAtColumn')) {
+            $this->descendants()->onlyTrashed()->restore();
+
+            return;
+        }
+
         $this->descendants()
             ->where($this->getDeletedAtColumn(), '>=', $deletedAt)
             ->restore();
@@ -617,7 +691,7 @@ trait CModel_Nested_NestedTrait {
      *
      * @since 1.1
      *
-     * @return QueryBuilder
+     * @return CModel_Nested_Query
      */
     public function newNestedSetQuery($table = null) {
         $builder = $this->usesSoftDelete() ? $this->withTrashed() : $this->newQuery();
@@ -882,7 +956,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * @param array $columns
      *
-     * @return Collection
+     * @return CModel_Nested_Collection
      */
     public function getAncestors(array $columns = ['*']) {
         return $this->ancestors()->get($columns);
@@ -891,7 +965,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * @param array $columns
      *
-     * @return Collection|self[]
+     * @return CModel_Nested_Collection|self[]
      */
     public function getDescendants(array $columns = ['*']) {
         return $this->descendants()->get($columns);
@@ -900,7 +974,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * @param array $columns
      *
-     * @return Collection|self[]
+     * @return CModel_Nested_Collection|self[]
      */
     public function getSiblings(array $columns = ['*']) {
         return $this->siblings()->get($columns);
@@ -909,7 +983,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * @param array $columns
      *
-     * @return Collection|self[]
+     * @return CModel_Nested_Collection|self[]
      */
     public function getNextSiblings(array $columns = ['*']) {
         return $this->nextSiblings()->get($columns);
@@ -918,7 +992,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * @param array $columns
      *
-     * @return Collection|self[]
+     * @return CModel_Nested_Collection|self[]
      */
     public function getPrevSiblings(array $columns = ['*']) {
         return $this->prevSiblings()->get($columns);
@@ -1201,8 +1275,8 @@ trait CModel_Nested_NestedTrait {
     /**
      * Return an array with the last node we could reach and its nesting level.
      *
-     * @param Baum\Node $node
-     * @param int       $nesting
+     * @param self $node
+     * @param int  $nesting
      *
      * @return array
      */
@@ -1240,7 +1314,10 @@ trait CModel_Nested_NestedTrait {
 
         $self->descendantsAndSelf()->select($self->getKeyName())->lockForUpdate()->get();
 
-        $oldDepth = !is_null($self->getDepth()) ? $self->getDepth() : 0;
+        $oldDepth = !is_null($self->depthBeforeMove)
+            ? $self->depthBeforeMove
+            : (!is_null($self->getDepth()) ? $self->getDepth() : 0);
+        $self->depthBeforeMove = null;
 
         $newDepth = $self->getLevel();
 

@@ -77,6 +77,6 @@ class CModel_Nested_NestedSet {
      * @return bool
      */
     public static function isNode($node) {
-        return is_object($node) && in_array(CModel_Nested_Trait::class, (array) $node);
+        return is_object($node) && c::hasTrait($node, CModel_Nested_Trait::class);
     }
 }

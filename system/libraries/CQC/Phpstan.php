@@ -1,6 +1,13 @@
 <?php
 
+/**
+ * @see https://github.com/larastan/larastan
+ * @see CQC
+ */
 class CQC_Phpstan {
+    /**
+     * @var CQC_Phpstan
+     */
     private static $instance;
 
     public static function instance() {

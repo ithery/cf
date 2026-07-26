@@ -602,5 +602,164 @@ iteration, `phpcf test` (~45-50s) for the full sweep before every commit.
 Follow the same pattern as every wave above - read the real source first,
 don't trust Laravel's exact behavior, fix small/clear bugs directly,
 document everything else here.
+
+[Follow-up 3 - full audit + test suite for CModel/Nested (nested set) - DONE]
+Requested directly by Hery: audit system/libraries/CModel/Nested/* (his own
+hand-port of lazychaser/laravel-nestedset, with a `depth` column he added
+that doesn't exist upstream) for bugs, propose feature ideas, and build a
+real test suite. Used a background research agent (fetched real upstream
+source from GitHub and diffed line-by-line) IN PARALLEL with my own direct
+reading of all 12 files, then cross-verified everything empirically against
+a REAL sqlite in-memory database (this sandbox's default `php` is 8.2,
+which has no pdo_sqlite, but `php7.4` - already installed - does; the
+framework's own minimum supported version is 7.4, so running tests there is
+fully representative, not a workaround). New file:
+tests/Model/NestedSetTest.php (26 tests, self-skips with a clear message if
+pdo_sqlite isn't loaded rather than polluting `phpcf test`'s failure count -
+run via `php7.4 vendor/bin/phpcf test --filter=NestedSetTest`).
+
+REAL BUGS FOUND AND FIXED (all confirmed via the new test suite, several
+only surfaced by writing the tests - reasoning alone said the fix was
+sufficient in two cases where it demonstrably wasn't, see below):
+- CModel_Nested_NestedSet::isNode(): was `in_array(CModel_Nested_Trait::class,
+  (array) $node)` - casting an object to array gives its PROPERTY VALUES,
+  never trait names, so this was always false in real usage. This is
+  actually a verified, still-open upstream bug (lazychaser/laravel-nestedset
+  #538, unmerged fix PR #368 since 2019) faithfully inherited by the port,
+  not introduced by it - but it still bites this codebase: every
+  ->ancestors()/->descendants() relation access throws
+  InvalidArgumentException('Model must be node.') via
+  CModel_Nested_Relation's constructor, and whereAncestorOf()/
+  whereDescendantOf() silently fall through to the "treat as raw id" branch
+  when given an actual node instance. Fixed using the framework's own
+  c::hasTrait() helper (which is, ironically, exactly what the dead
+  Move.php file below already uses correctly).
+- bootNestedTrait() never registered `deleted`/`restored` model events -
+  only saving/saved/deleting/restoring were wired. deleteDescendants() and
+  restoreDescendants() (both fully, correctly implemented) were therefore
+  unreachable dead code: deleting a node with children left every
+  descendant row orphaned in the database and never closed the lft/rgt gap
+  for the rest of the tree - silent, permanent data corruption with no
+  error. This is the most severe finding of the whole audit. Fixed by
+  registering both events in bootNestedTrait().
+- actionBeforeOrAfter() and actionRoot() never called setDepthWithSubtree()
+  after moving an existing node (unlike actionAppendOrPrepend(), which
+  always did) - moving a subtree via beforeNode()/afterNode()/up()/down()/
+  saveAsRoot() left every descendant's `depth` column stale after a level
+  change. Fixed by adding the same setDepthWithSubtree() call to both.
+- setDepthWithSubtree() itself was broken for ALL three action paths
+  (including the "already working" append/prepend one) in a way pure
+  reasoning didn't catch - only the new tests did: it computes a depth
+  DIFF (oldDepth vs newDepth) and applies it to descendants via
+  ->increment(), but by the time it runs, setParent() (called earlier in
+  the same operation) had ALREADY overwritten the node's own depth
+  attribute to the new value - so oldDepth always read back as
+  already-new, diff was always 0, and the descendant cascade never fired
+  for ANY move, ever. Fixed by adding a $depthBeforeMove property that
+  setParent() stashes the true prior depth into before overwriting it,
+  which setDepthWithSubtree() now consumes instead of re-reading the
+  (already-mutated) live attribute.
+- refreshNode() only ever re-fetches lft/rgt (faithful to upstream, which
+  has no depth column at all) - so even after the fix above correctly
+  cascades a descendant's depth in the database, any already-loaded
+  in-memory reference to that descendant stayed stale forever, since
+  calling refreshNode() on it wouldn't pick up the new depth. Fixed by
+  having refreshNode() additionally select+merge the depth column
+  (deliberately NOT by changing CModel_Nested_Query::getNodeData()/
+  getPlainNodeData(), whose 2-column [lft,rgt] shape other callers like
+  whereDescendantOf() rely on feeding straight into a BETWEEN clause -
+  changing that shape would have broken those. refreshNode() now runs its
+  own 3-column select directly instead).
+- rawNode()'s depth fallback used loose `$depth == null` instead of
+  `=== null` - `0 == null` is true in PHP, so an explicitly-passed depth of
+  0 (a legitimate depth for a root) would have been silently discarded and
+  recomputed from the parent instead. No internal call site actually hits
+  this today (all pass either an explicit non-zero depth or omit it
+  entirely), so purely a defensive fix for a latent trap.
+- fixTree()/rebuildTree() (fixNodes()/reorderNodes() in Query.php): each
+  node's depth was derived via `rawNode()`'s fallback calling
+  `static::find($parentId)->getDepth()` - a FRESH, separate query against
+  whatever the parent's depth CURRENTLY is in the database. Since
+  reorderNodes() is post-order (recurses into all of a node's children
+  before touching the node's own row) and nothing is ->save()'d until the
+  entire recursive pass finishes, a parent's freshly-recomputed depth was
+  never visible to its own children's lookup - they inherited the parent's
+  STALE PRE-FIX depth instead, compounding at every generation. This is
+  exactly the scenario fixTree() exists to repair (a tree whose depth no
+  longer matches its structure), so it could fail at the one thing it's
+  for. Fixed by threading the freshly-computed depth down through the
+  recursion as an explicit parameter instead of re-querying mid-fix.
+- restoreDescendants() called getDeletedAtColumn() - a method that only
+  exists on CModel_Deleted_DeletedTrait (Laravel's classic deleted_at
+  timestamp convention, matching what upstream lazychaser itself targets).
+  But bootNestedTrait()'s own usesSoftDelete() check - the thing that
+  actually gates whether restoreDescendants() ever runs - specifically
+  detects CModel_SoftDelete_SoftDeleteTrait (this framework's real/primary
+  soft-delete convention, a `status` int column, no timestamp at all). So
+  the one soft-delete flavor this trait actually detects is exactly the
+  one flavor restoreDescendants() couldn't work with - a
+  BadMethodCallException on every restore of a node with descendants.
+  Fixed with a method_exists() branch: models using the timestamp-based
+  trait keep the original "only restore descendants deleted at/after the
+  parent" semantics; models using the status-column trait (no timestamp to
+  compare against) just restore every currently-trashed descendant
+  unconditionally - a documented behavior adaptation, not a bug once
+  flagged, since there's no way to express "deleted at/after" with a
+  binary flag.
+
+DEAD CODE FOUND (documented, not deleted - Hery's call whether to remove):
+- Move.php (CModel_Nested_Move) is not a port of lazychaser at all - it's
+  \Baum\Move from an entirely different, older nested-set package ("Baum"),
+  calling methods that don't exist anywhere in this codebase
+  (getLeftColumnName(), getRight(), insideSubtree(), inSameScope(),
+  reload(), etc.). Confirmed via grep: CModel_Nested_Move is referenced
+  nowhere else - unreachable, and would fatal instantly if ever
+  instantiated. CModel_Nested_Exception_MoveNotPossibleException is only
+  ever thrown from inside this dead file. Also explains where
+  getLevel()/computeLevel()/determineDepth() (NestedTrait.php) and the
+  correct c::hasTrait()-based isNode() pattern actually came from - Hery
+  was pulling ideas from Baum (which has a native depth/level column) while
+  grafting them onto the lazychaser port.
+- Builder.php (CModel_Nested_Builder, extends CDatabase_Query_Builder) is
+  also unreferenced anywhere else in the Nested directory - dead scaffolding.
+
+PHPDoc completed across all 12 files (return/param types corrected from
+stale Laravel-side references - QueryBuilder/Collection/Model/Baum\Node -
+to the actual CF class names; added explicit @property/@method annotations
+to CModel_Nested_NestedTrait and CModel_SoftDelete_SoftDeleteTrait so
+intelephense can resolve $this-/self-typed calls into CModel members -
+@mixin alone was confirmed NOT to reliably do this for this intelephense
+version, explicit @method tags are what actually works, per Hery's own
+testing).
+
+FEATURE IDEAS PROPOSED TO HERY (not implemented - his call):
+1. whereDepth($n) scope - trivial given depth already exists as a real
+   column; upstream has no cheap way to do this at all (would need a
+   correlated subquery per row via withDepth()), this port already has the
+   one thing needed to make "get all nodes at exactly depth N" a plain
+   indexed WHERE.
+2. A depth-aware flat/indented list builder (toSelectOptions()-style: label
+   prefixed with the right number of spaces/dashes per depth) for the very
+   common "indented <select> for picking a parent category" admin UI case -
+   again something this depth column makes nearly free that upstream can't
+   do without a per-row subquery.
+3. Add a 5th integrity check to countErrors()/isBroken() specifically for
+   depth mismatches (none of the existing 4 checks - oddness, duplicates,
+   wrong_parent, missing_parent - can detect a corrupted depth column at
+   all right now; nothing would tell you depth is wrong until something
+   built on it visibly misrenders).
+4. getBreadcrumb()/getPath() convenience wrapping ancestorsAndSelf() into a
+   ready-to-render array or "A > B > C" string - a near-universal need for
+   anything admin-facing built on a category tree.
+5. Officially support + document the CModel_Nested_Trait +
+   CModel_SoftDelete_SoftDeleteTrait combo now that restoreDescendants()
+   actually works with it (it looks intended - the framework's own default
+   soft-delete flavor - but had the latent incompatibility above).
+
+Full suite after all fixes: 2226 passed (unchanged - Nested has no prior
+test file, so 0 tests moved from fail to pass in the default php8.2 run;
+the 26 new tests report as "skipped" there and "passed" under php7.4),
+still the same 17 pre-existing sqlite-driver environment failures, zero
+regressions.
 ========================================================================
 

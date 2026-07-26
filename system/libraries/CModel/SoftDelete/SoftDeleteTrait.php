@@ -9,6 +9,23 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static \CModel_Query<static>|static onlyTrashed()
  * @method static \CModel_Query<static>|static withoutTrashed()
  * @method static bool                         restore()
+ * @method bool|null       delete()
+ * @method CModel_Query    newQueryWithoutScopes()
+ * @method string          getKeyName()
+ * @method mixed           getKey()
+ * @method string          getTable()
+ * @method \Carbon\Carbon  freshTimestamp()
+ * @method static bool     usesDeleted()
+ * @method string          getDeletedAtColumn()                            Only present when the model also uses CModel_Deleted_DeletedTrait.
+ * @method string          getUpdatedAtColumn()
+ * @method mixed           fromDateTime(mixed $value)
+ * @method void            syncOriginalAttributes(array|string $attributes)
+ * @method bool            save(array $options = [])
+ * @method mixed           fireModelEvent(string $event, bool $halt = true)
+ * @method static void     registerModelEvent(string $event, \Closure|string $callback)
+ * @method static void     addGlobalScope(\CModel_Interface_Scope|\Closure|string $scope, \Closure $implementation = null)
+ *
+ * @mixin CModel
  */
 trait CModel_SoftDelete_SoftDeleteTrait {
     /**

@@ -43,7 +43,7 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
 
     /**
      * @param CModel_Nested_Query $query
-     * @param Model               $model
+     * @param CModel               $model
      *
      * @return void
      */
