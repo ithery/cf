@@ -883,23 +883,19 @@ final class CF {
         return isset($data['app_id']) ? $data['app_id'] : null;
     }
 
+    /**
+     * Whether the current request entrypoint lives inside an app's own
+     * folder (`application/{app}/...`) rather than the shared front
+     * controller. Used by {@see appCode()} to resolve app identity when
+     * there's no domain/Host header to look up (e.g. CLI, or an app-embedded
+     * entrypoint).
+     *
+     * @return bool
+     */
     public static function isIndexInApp() {
         $relativeIndex = str_replace(DOCROOT, '', CFINDEX);
 
         return strpos($relativeIndex, 'application/') !== false;
-    }
-
-    public static function publicPath($path = null) {
-        if (self::isIndexInApp()) {
-            $publicPath = dirname(CFINDEX);
-            if ($path) {
-                $publicPath .= '/' . ltrim($path, '/');
-            }
-
-            return $publicPath;
-        }
-
-        return null;
     }
 
     /**

@@ -679,18 +679,14 @@ class CBase_Vite implements CInterface_Htmlable {
     }
 
     /**
-     * Get the directory used in place of a dedicated public docroot when this
-     * app has none of its own (shared front controller / multi-tenant
-     * deployment, i.e. `CF::publicPath()` is null).
-     *
-     * CF already serves anything under an app's "default/media" directory
-     * directly by URL (see `c::media()`), so builds can land there instead of
-     * requiring a separate "public" folder.
+     * Get the directory Vite builds land in. CF serves anything under an
+     * app's "default/media" directory directly by URL (see `c::media()`),
+     * so builds go there instead of requiring a separate "public" folder.
      *
      * @return string
      */
     protected function basePath() {
-        return CF::publicPath() ?: CF::appDir() . DS . 'default' . DS . 'media';
+        return CF::appDir() . DS . 'default' . DS . 'media';
     }
 
     /**
@@ -701,10 +697,6 @@ class CBase_Vite implements CInterface_Htmlable {
      * @return string
      */
     protected function absolutePath($path) {
-        if (CF::publicPath()) {
-            return CF::publicPath($path);
-        }
-
         return $this->basePath() . DS . ltrim($path, '/');
     }
 
@@ -723,13 +715,9 @@ class CBase_Vite implements CInterface_Htmlable {
 
         $root = cstr::contains($root, $i) ? str_replace('/' . $i, '', $root) : $root;
 
-        if (CF::publicPath()) {
-            return $root . '/' . trim($path, '/');
-        }
-
-        // No dedicated docroot for this app — resolve to the real file location
-        // under "default/media" and build a DOCROOT-relative URL. CF's rewrite
-        // rules serve any existing file directly, so no public folder is needed.
+        // Resolve the real file location under "default/media" and build a
+        // DOCROOT-relative URL. CF's rewrite rules serve any existing file
+        // directly, so no dedicated public folder is needed.
         $absolute = str_replace('\\', '/', $this->absolutePath($path));
         $docroot = rtrim(str_replace('\\', '/', DOCROOT), '/');
         $relative = ltrim(str_replace($docroot, '', $absolute), '/');

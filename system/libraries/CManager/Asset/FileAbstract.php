@@ -103,9 +103,6 @@ abstract class CManager_Asset_FileAbstract {
         $dirs = CF::getDirs('media');
 
         $dirs = array_merge($this->mediaPaths, $dirs);
-        if (CF::publicPath()) {
-            $dirs = array_merge([CF::publicPath() . DS . 'media' . '/'], $dirs);
-        }
 
         return $dirs;
     }

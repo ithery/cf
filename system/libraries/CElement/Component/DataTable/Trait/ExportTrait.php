@@ -455,18 +455,18 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 $additionColumn++;
             }
 
-            foreach ($this->footer_field as $f) {
+            foreach ($this->footerFields as $f) {
                 echo '<tr>';
 
-                $colspan = $f['labelcolspan'];
+                $colspan = $f->getLabelColSpan();
                 if ($colspan == 0) {
                     $colspan = $totalColumn + $additionColumn - 1;
                 }
                 echo '<td class="tfoot" colspan="' . ($colspan) . '">';
-                echo $f['label'];
+                echo $f->getLabel();
                 echo '</td>';
                 $class = '';
-                switch ($f['align']) {
+                switch ($f->getAlign()) {
                     case 'left':
                         $class .= ' align-left';
 
@@ -481,7 +481,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                         break;
                 }
 
-                $fval = $f['value'];
+                $fval = $f->getValue();
 
                 if (is_array($fval)) {
                     $skip_column = 0;
@@ -691,15 +691,15 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
             if ($totalColumn < 2) {
                 $totalColumn = 2;
             }
-            foreach ($this->footer_field as $f) {
-                $colspan = $f['labelcolspan'];
+            foreach ($this->footerFields as $f) {
+                $colspan = $f->getLabelColSpan();
                 if ($colspan == 0) {
                     $colspan = $totalColumn + $additionColumn - 1;
                 }
 
-                $excel->writeByIndex($colStart, $j, $f['label'] . $colspan);
+                $excel->writeByIndex($colStart, $j, $f->getLabel() . $colspan);
                 $excel->setAlignByIndex($colStart, $j, 'left');
-                $fval = $f['value'];
+                $fval = $f->getValue();
 
                 if (is_array($fval)) {
                     $skip_column = 0;
@@ -739,7 +739,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                     }
                 } else {
                     $excel->writeByIndex($totalColumn, $j, $fval);
-                    $excel->setAlignByIndex($totalColumn, $j, $f['align']);
+                    $excel->setAlignByIndex($totalColumn, $j, $f->getAlign());
                 }
                 if ($colspan > 1) {
                     $excel->mergeCell($colStart, $j, $colspan - 1, $j);

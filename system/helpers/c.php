@@ -1636,22 +1636,6 @@ class c {
     }
 
     /**
-     * Get Public Path.
-     *
-     * @param string $path
-     *
-     * @return string
-     */
-    public static function publicPath($path = null) {
-        $publicPath = DOCROOT . 'public';
-        if ($path != null && strlen($path) > 0) {
-            $publicPath .= ltrim($path, '/');
-        }
-
-        return $publicPath;
-    }
-
-    /**
      * Get the prompt facade, used for interactive console prompts.
      *
      * @return \CConsole_Prompt_Facade

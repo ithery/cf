@@ -397,7 +397,6 @@ class Controller_Cresenity extends CController {
 
     public function clear() {
         CView::blade()->clearCompiled();
-        CHTTP_FileServeDriver::clearPublic();
     }
 
     public function broadcast($method = null) {

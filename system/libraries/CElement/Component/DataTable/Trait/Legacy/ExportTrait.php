@@ -234,18 +234,18 @@ trait CElement_Component_DataTable_Trait_Legacy_ExportTrait {
                 $additionColumn++;
             }
 
-            foreach ($table->footer_field as $f) {
+            foreach ($table->footerFields as $f) {
                 echo '<tr>';
 
-                $colspan = $f['labelcolspan'];
+                $colspan = $f->getLabelColSpan();
                 if ($colspan == 0) {
                     $colspan = $totalColumn + $additionColumn - 1;
                 }
                 echo '<td class="tfoot" colspan="' . ($colspan) . '">';
-                echo $f['label'];
+                echo $f->getLabel();
                 echo '</td>';
                 $class = '';
-                switch ($f['align']) {
+                switch ($f->getAlign()) {
                     case 'left':
                         $class .= ' align-left';
 
@@ -260,7 +260,7 @@ trait CElement_Component_DataTable_Trait_Legacy_ExportTrait {
                         break;
                 }
 
-                $fval = $f['value'];
+                $fval = $f->getValue();
 
                 if (is_array($fval)) {
                     $skip_column = 0;

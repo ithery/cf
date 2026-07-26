@@ -21,7 +21,7 @@ class CManager_Asset_File_CssFile extends CManager_Asset_FileAbstract {
         $path = $file;
         $path = carr::first(explode('?', $file));
 
-        $docroot = str_replace(DS, '/', CF::publicPath() ? CF::publicPath() . '/' : DOCROOT);
+        $docroot = str_replace(DS, '/', DOCROOT);
         $file = str_replace(DS, '/', $file);
         $base_url = curl::base();
         if ($withHttp) {

@@ -2,5 +2,12 @@
 
 Tracks upgrade/refactor tasks for CF 1.9. Remove an item once it's done.
 
-- `CElement_FormInput_EditorJs_Tool_ImageTool` fatals on every instantiation: `DefaultConfig::get('toolSettings.image.services')` reads a config key that doesn't exist (only `toolSettings.embed.services` exists), and `DefaultConfig::get()` calls `cdbg::dd($key)` on any null lookup. `CElement_FormInput_EditorJs::__construct()` unconditionally instantiates `ImageTool`, so using the EditorJS input at all currently crashes the request.
-- `CElement_Component_DataTable`'s export traits (`ExportTrait.php` and `Legacy/ExportTrait.php`) read a `$footer_field`/`$this->footer_field` property that doesn't exist. The real property (from `CElement_Component_DataTable_Trait_FooterTrait`) is `$footerFields`, an array of `CElement_Component_DataTable_FooterField` objects (getters like `getLabel()`/`getValue()`), not raw arrays. Any DataTable export with the footer enabled hits a null/undefined access.
+## High Priority
+
+(none currently)
+
+## Low Priority
+
+- `modules/cresenity/config/client_modules.php`'s `blockly` module definition (`js`: `blockly_compressed.js`, `blocks_compressed.js`, `php_compressed.js`, `msg/js/en.js`, `element/blockly/blockly.js`) lives under the deprecated `modules/` folder — check whether it should move into `system/data/assets-module.php` so `modules/` can eventually be retired. It's not there yet — currently only defined in the deprecated location.
+- `CTrait_Compat_Element_DataTable::export_excelxml_static()` (`system/libraries/CTrait/Compat/Element/DataTable.php:194`) declares optional `$sheet_name` before required `$table` — triggers a PHP deprecation warning on every call (implicit-required-after-optional is deprecated).
+- `CDatabase_Query_Grammar` uses deprecated `${var}` string interpolation instead of `{$var}` — `system/libraries/CDatabase/Query/Grammar.php` lines 501, 1088, 1128.

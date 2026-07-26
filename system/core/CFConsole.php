@@ -86,7 +86,6 @@ class CFConsole {
         CConsole_Command_Model_ModelShowCommand::class,
         CConsole_Command_Model_ModelTablesCommand::class,
         CConsole_Command_Model_ModelUpdateCommand::class,
-        CConsole_Command_Asset_AssetInstallCommand::class,
         CConsole_Command_Asset_GoogleFontsFetchCommand::class,
         CConsole_Command_App_AppInitCommand::class,
         CConsole_Command_App_AppCodeCommand::class,

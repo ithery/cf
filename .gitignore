@@ -62,8 +62,6 @@ mobile/*
 /certificate
 /upload/*
 /payment_log/
-/public/files/
-/public/files/*
 /compiled
 
 #ignore netbeans ide config
@@ -125,10 +123,6 @@ composer.lock
 # Node Dependency directories
 node_modules/
 jspm_packages/
-
-# Public folder
-public/*
-!public/index.php.sample
 
 # Deployment file
 deploy.blade.php

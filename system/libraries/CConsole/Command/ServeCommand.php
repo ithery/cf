@@ -111,9 +111,6 @@ class CConsole_Command_ServeCommand extends CConsole_Command {
      */
     protected function serverCommand() {
         $docroot = DOCROOT;
-        if (CF::isIndexInApp()) {
-            $docroot = CF::publicPath();
-        }
 
         return [
             (new PhpExecutableFinder())->find(false),
