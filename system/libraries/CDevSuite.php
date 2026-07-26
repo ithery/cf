@@ -71,11 +71,6 @@ class CDevSuite {
      */
     protected static $ssh;
 
-    /**
-     * @var CDevSuite_Deploy
-     */
-    protected static $deploy;
-
     public static function bootstrap() {
         CDevSuite_Bootstrap::instance()->bootstrap();
     }
@@ -139,17 +134,6 @@ class CDevSuite {
         }
 
         return static::$ssh;
-    }
-
-    /**
-     * @return CDevSuite_Deploy
-     */
-    public static function deploy() {
-        if (static::$deploy == null) {
-            static::$deploy = new CDevSuite_Deploy();
-        }
-
-        return static::$deploy;
     }
 
     public static function configuration() {

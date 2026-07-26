@@ -57,13 +57,6 @@ phpcf devsuite:ssh:list
 phpcf devsuite:ssh:create
 ```
 
-### Deploy
-
-```
-phpcf devsuite:deploy:init
-phpcf devsuite:deploy:run
-```
-
 ### Database
 
 ```
