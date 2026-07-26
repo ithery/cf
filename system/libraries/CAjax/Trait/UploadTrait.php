@@ -14,15 +14,15 @@ trait CAjax_Trait_UploadTrait {
 
     public function checkExtension($ext, $allowedExtension = null) {
         if (in_array($ext, $this->getBlacklistedExtension())) {
-            throw new CAjax_Exception_UploadNotAllowedException('Not Allowed X_X');
+            throw new CAjax_Exception_UploadNotAllowedException(c::__('element/upload.errorMessageUploadNotAllowed'));
         }
         if (cstr::startsWith($ext, $this->getBlacklistedExtension())) {
-            throw new CAjax_Exception_UploadNotAllowedException('Not Allowed X_X');
+            throw new CAjax_Exception_UploadNotAllowedException(c::__('element/upload.errorMessageUploadNotAllowed'));
         }
 
         if ($allowedExtension) {
             if (!in_array(strtolower($ext), $allowedExtension)) {
-                throw new CAjax_Exception_UploadNotAllowedException('Extension not allowed, allowed extension: ' . implode(', ', $allowedExtension));
+                throw new CAjax_Exception_UploadNotAllowedException(c::__('element/upload.errorMessageExtensionNotAllowed', ['extensions' => implode(', ', $allowedExtension)]));
             }
         }
     }

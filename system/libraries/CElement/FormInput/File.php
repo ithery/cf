@@ -16,6 +16,15 @@ class CElement_FormInput_File extends CElement_FormInput {
     protected $applyjs;
 
     /**
+     * Comma-separated file extensions/mime types/mime-group wildcards (eg.
+     * `.pdf,.docx`, `image/*`) -- rendered as the native `accept` attribute
+     * and enforced client-side via the `control:File` cres.js module.
+     *
+     * @var string
+     */
+    protected $acceptFile = '';
+
+    /**
      * @param string|null $id
      *
      * @return void
@@ -87,7 +96,17 @@ class CElement_FormInput_File extends CElement_FormInput {
             $html->appendln('		<div class="uneditable-input span3"><i class="icon-file fileupload-exists"></i> <span class="fileupload-preview">' . $this->value . '</span></div>');
             $html->appendln('		<span class="btn btn-file"><span class="fileupload-new">' . c::__('Select file') . '</span><span class="fileupload-exists">' . c::__('Change') . '</span>');
         }
-        $html->appendln('			<input type="file" name="' . $name . '" id="' . $this->id . '" class="file' . $classes . $this->validation->validationClass() . '"' . $custom_css . $disabled . $multiple . ' />')->incIndent()->br();
+        $accept = '';
+        if (strlen($this->acceptFile) > 0) {
+            $accept = ' accept="' . c::e($this->acceptFile) . '"';
+        }
+        $cresConfig = ' cres-element="control:File" cres-config="' . c::e(c::json([
+            'acceptFile' => $this->acceptFile,
+            'messages' => [
+                'acceptFileNotAllowed' => c::__('element/file.errorMessageAcceptFileNotAllowed'),
+            ],
+        ])) . '"';
+        $html->appendln('			<input type="file" name="' . $name . '" id="' . $this->id . '" class="file' . $classes . '"' . $custom_css . $disabled . $multiple . $accept . $cresConfig . ' />')->incIndent()->br();
         if ($this->applyjs == 'file-upload') {
             $html->appendln('		</span><a href="#" class="btn remove fileupload-exists" data-dismiss="fileupload">' . c::__('Remove') . '</a>');
             $html->appendln('	</div>');
@@ -204,6 +223,17 @@ class CElement_FormInput_File extends CElement_FormInput {
      */
     public function setApplyJs($applyjs) {
         $this->applyjs = $applyjs;
+
+        return $this;
+    }
+
+    /**
+     * @param string $acceptFile
+     *
+     * @return $this
+     */
+    public function setAcceptFile($acceptFile) {
+        $this->acceptFile = $acceptFile;
 
         return $this;
     }

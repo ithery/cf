@@ -1,17 +1,12 @@
 <?php
 
-class CElement_FormInput_FileAjax extends CElement_FormInput {
+class CElement_FormInput_FileAjax extends CElement_FormInput_File {
     use CElement_Trait_UseViewTrait;
 
     /**
      * @var string
      */
     protected $fileName;
-
-    /**
-     * @var string
-     */
-    protected $acceptFile;
 
     /**
      * @var int
@@ -82,6 +77,18 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
             $view->with('value', $this->value);
             $view->with('ajaxName', $ajaxName);
             $view->with('ajaxUrl', $ajaxUrl);
+            $view->with('cresConfig', c::json([
+                'id' => $this->id,
+                'ajaxName' => $ajaxName,
+                'ajaxUrl' => $ajaxUrl,
+                'maxUploadSize' => $this->maxUploadSize,
+                'acceptFile' => $this->acceptFile,
+                'messages' => [
+                    'acceptFileNotAllowed' => c::__('element/file.errorMessageAcceptFileNotAllowed'),
+                    'maxUploadSize' => c::__('element/file.errorMessageMaxUploadSize'),
+                    'uploadFailed' => c::__('element/upload.errorMessageUploadFailed'),
+                ],
+            ]));
         });
     }
 
@@ -92,17 +99,6 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
      */
     public function setFileName($fileName) {
         $this->fileName = $fileName;
-
-        return $this;
-    }
-
-    /**
-     * @param string $accept
-     *
-     * @return $this
-     */
-    public function setAcceptFile($accept) {
-        $this->acceptFile = $accept;
 
         return $this;
     }

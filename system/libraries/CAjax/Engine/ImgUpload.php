@@ -39,8 +39,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                         CLogger::channel()->error('Error on ImgUpload', (array) $_FILES);
                     }
                     if (!$disk->put($fullfilename, file_get_contents($_FILES[$inputName]['tmp_name'][$i]))) {
-                        throw new CAjax_Exception_UploadFailedException('Upload failed');
-                        // die('fail upload from ' . $_FILES[$inputName]['tmp_name'][$i] . ' to ' . $fullfilename);
+                        throw new CAjax_Exception_UploadFailedException(c::__('element/upload.errorMessageUploadFailed'));
                     }
                     if ($withInfo) {
                         $infoData['filename'] = $fileName;

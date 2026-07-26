@@ -39,7 +39,7 @@ class CAjax_Engine_FileUpload extends CAjax_Engine {
                     $fullfilename = CTemporary::getPath(static::FOLDER, $fileId);
 
                     if (!$disk->put($fullfilename, file_get_contents($_FILES[$inputName]['tmp_name'][$i]))) {
-                        throw new CAjax_Exception_UploadFailedException('Upload failed');
+                        throw new CAjax_Exception_UploadFailedException(c::__('element/upload.errorMessageUploadFailed'));
                     }
 
                     if ($withInfo) {

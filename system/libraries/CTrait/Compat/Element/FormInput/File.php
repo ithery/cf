@@ -5,11 +5,14 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @see CElement_FormInput_File
  *
- * None of these properties are read anywhere in CElement_FormInput_File
- * itself (which renders via cres.js's own upload widget) -- they're legacy
- * config knobs for an older jQuery File Upload plugin, kept only so these
- * deprecated setters/getters round-trip a value without raising an undefined
- * property notice.
+ * $input_help is read unconditionally by CElement_FormInput_File::html().
+ * Every other property here is read too, but only inside html()/js()'s
+ * `$applyjs == 'jquery-fileupload'` branch -- legacy config knobs for an
+ * older jQuery File Upload plugin that only render when a theme opts into
+ * that mode via `c::theme('fileupload')` (the default is the plain
+ * 'file-upload' bootstrap widget, where these are inert). Kept so these
+ * deprecated setters/getters round-trip a value without raising an
+ * undefined property notice.
  */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_FormInput_File {

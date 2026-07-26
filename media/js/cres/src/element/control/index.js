@@ -5,6 +5,8 @@ import { initAutoNumeric, AutoNumeric } from "./AutoNumeric";
 import { initSortable, Sortable} from "./Sortable";
 import { initSelectTwo, SelectTwo } from "./SelectTwo";
 import { initText, Text } from "./Text";
+import { initFile, File } from "./File";
+import { initFileAjax, FileAjax } from "./FileAjax";
 
 const initControl = (control) => {
     const controlName  = control.getAttribute('cres-element');
@@ -29,6 +31,12 @@ const initControl = (control) => {
     if(controlName == 'control:Text') {
         initText(control);
     }
+    if(controlName == 'control:File') {
+        initFile(control);
+    }
+    if(controlName == 'control:FileAjax') {
+        initFileAjax(control);
+    }
 }
 const control = {
     EditorJs,
@@ -37,7 +45,9 @@ const control = {
     AutoNumeric,
     Sortable,
     SelectTwo,
-    Text
+    Text,
+    File,
+    FileAjax
 }
 export {
     control,
