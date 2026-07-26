@@ -61,7 +61,7 @@ class CConsole_Command_Docs_PhpDoc_InstallCommand extends CConsole_Command {
                 if (!CFile::isDirectory(dirname($pharPath))) {
                     CFile::makeDirectory(dirname($pharPath), 0755, true);
                 }
-                copy('http://cpanel.ittron.co.id/application/devcloud/default/data/bin/phpDocumentor/phpDocumentor.phar', $pharPath);
+                copy('https://devcloud.cresenity.com/application/devcloud/default/data/bin/phpDocumentor/phpDocumentor.phar', $pharPath);
                 $this->info($pharPath . ' downloaded');
             } catch (Exception $ex) {
                 $errCode++;

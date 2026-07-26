@@ -55,7 +55,7 @@ abstract class CDevSuite_DevCloud {
      * @return void
      */
     public function __construct() {
-        $downloadUrl = 'http://cpanel.ittron.co.id/application/devcloud/default/data/bin/devsuite/' . CDevSuite::osFolder() . '/';
+        $downloadUrl = 'https://devcloud.cresenity.com/application/devcloud/default/data/bin/devsuite/' . CDevSuite::osFolder() . '/';
         $this->baseDownloadUrl = $downloadUrl;
         $this->baseBinPath = CDevSuite::binPath();
         $this->files = CDevSuite::filesystem();

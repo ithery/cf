@@ -61,7 +61,7 @@ class CConsole_Command_Phpstan_InstallCommand extends CConsole_Command {
                 if (!CFile::isDirectory(dirname($binPath))) {
                     CFile::makeDirectory(dirname($binPath), 0755, true);
                 }
-                copy('http://cpanel.ittron.co.id/application/devcloud/default/data/bin/phpstan/phpstan', $binPath);
+                copy('https://devcloud.cresenity.com/application/devcloud/default/data/bin/phpstan/phpstan', $binPath);
                 $this->info($binPath . ' downloaded');
             } catch (Exception $ex) {
                 $errCode++;
@@ -89,7 +89,7 @@ class CConsole_Command_Phpstan_InstallCommand extends CConsole_Command {
                 if (!CFile::isDirectory(dirname($pharPath))) {
                     CFile::makeDirectory(dirname($pharPath), 0755, true);
                 }
-                copy('http://cpanel.ittron.co.id/application/devcloud/default/data/bin/phpstan/phpstan.phar', $pharPath);
+                copy('https://devcloud.cresenity.com/application/devcloud/default/data/bin/phpstan/phpstan.phar', $pharPath);
                 $this->info($pharPath . ' downloaded');
             } catch (Exception $ex) {
                 $errCode++;

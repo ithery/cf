@@ -60,7 +60,7 @@ class CConsole_Command_Phpcs_InstallCommand extends CConsole_Command {
                 if (!CFile::isDirectory(dirname($pharPath))) {
                     CFile::makeDirectory(dirname($pharPath), 0755, true);
                 }
-                copy('http://cpanel.ittron.co.id/application/devcloud/default/data/bin/phpcs/phpcs.phar', $pharPath);
+                copy('https://devcloud.cresenity.com/application/devcloud/default/data/bin/phpcs/phpcs.phar', $pharPath);
                 $this->info($pharPath . ' downloaded');
             } catch (Exception $ex) {
                 $errCode++;
@@ -90,7 +90,7 @@ class CConsole_Command_Phpcs_InstallCommand extends CConsole_Command {
                 if (!CFile::isDirectory(dirname($pharPath))) {
                     CFile::makeDirectory(dirname($pharPath), 0755, true);
                 }
-                copy('http://cpanel.ittron.co.id/application/devcloud/default/data/bin/phpcs/phpcbf.phar', $pharPath);
+                copy('https://devcloud.cresenity.com/application/devcloud/default/data/bin/phpcs/phpcbf.phar', $pharPath);
                 $this->info($pharPath . ' downloaded');
             } catch (Exception $ex) {
                 $errCode++;

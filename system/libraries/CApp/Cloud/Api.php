@@ -6,7 +6,7 @@ class CApp_Cloud_Api {
     /**
      * @var string
      */
-    const ENDPOINT = 'https://cpanel.ittron.co.id/api';
+    const ENDPOINT = 'https://devcloud.cresenity.com/api';
 
     /**
      * @var CApp_Cloud_AdapterInterface

@@ -57,7 +57,7 @@ class CConsole_Command_Phpcsfixer_InstallCommand extends CConsole_Command {
                 if (!CFile::isDirectory(dirname($pharPath))) {
                     CFile::makeDirectory(dirname($pharPath), 0755, true);
                 }
-                copy('http://cpanel.ittron.co.id/application/devcloud/default/data/bin/php-cs-fixer/php-cs-fixer.phar', $pharPath);
+                copy('https://devcloud.cresenity.com/application/devcloud/default/data/bin/php-cs-fixer/php-cs-fixer.phar', $pharPath);
                 $this->info($pharPath . ' downloaded');
             } catch (Exception $ex) {
                 $errCode++;
