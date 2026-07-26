@@ -29,3 +29,4 @@ Framework tests in `tests/`, app tests in `application/{app}/default/tests/`.
 - Controller files lowercase; `return $app` from controllers (not `echo $app->render()`)
 - `modules/` DEPRECATED — use `system/libraries`
 - For bulk repetitive edits (e.g. converting 100+ entries), write a bash script instead of editing one-by-one to save quota/tokens
+- `TODO.md` (root) tracks CF 1.9 upgrade/refactor tasks — remove an item once it's done; blocked in `.htaccess` like `CLAUDE.md`
