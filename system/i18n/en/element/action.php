@@ -1,4 +1,0 @@
-<?php
-return  [
-    'action' => 'Action',
-];
