@@ -428,12 +428,95 @@ methods were deliberately skipped in this wave (would pollute global
 session state across the test suite) - if anyone tests those later, be
 aware of this.
 
+[Follow-up - user asked to fix 3 previously-documented-not-fixed bugs - DONE]
+Requested directly by Hery after reviewing this file's "found but not
+fixed" list. All 3 fixed, verified via targeted + full-suite runs, zero
+regressions (`phpcf test`: 2226 passed, same 17 pre-existing sqlite
+failures as always):
+- CPeriod (system/libraries/CPeriod/Trait/GetterTrait.php,
+  OperationTrait.php, ComparisonTrait.php): start()/end() now read
+  $this->startDate/$endDate (were reading undefined $this->start/$end).
+  overlap() no longer passes a stray leading `static::class` arg to
+  CPeriod_Factory::makeWithBoundaries() (was shifting every argument by
+  one). gap()/subtract()/renew()/touchesWith()/getIterator() (the last one
+  in CPeriod.php itself) now ->copy() before calling ->add()/->sub() on an
+  included start/end - CCarbon (unlike CarbonImmutable) mutates in place,
+  so every one of these was silently corrupting the original period's
+  own dates (or, for getIterator(), corrupting it a little further on
+  every re-iteration/length() call) as a side effect of a read-only-looking
+  operation. Also completed missing PHPDoc across CPeriod.php + the 3
+  traits along the way (return/param types, @property/@method tags on the
+  traits so intelephense can resolve $this->boundaries/precision/etc and
+  ensurePrecisionMatches()/make() through the @mixin). tests/PeriodTest.php:
+  the 2 tests that documented start()/end()/overlap() as throwing were
+  rewritten as normal passing assertions; the gap-mutation test now
+  asserts NON-mutation; added new tests for subtract()/renew()/
+  touchesWith() non-mutation. 45 -> 48 tests, all green.
+- CHTTP_Cookie::queued() (system/libraries/CHTTP/Cookie.php): wrapped the
+  $queued lookup in carr::wrap() before calling carr::last() on it, same
+  fix Laravel's own Illuminate\Cookie\CookieJar uses (Arr::wrap()) - when
+  the key isn't queued, carr::get() returns $default verbatim, and if
+  $default was a non-array scalar, carr::last() called PHP's end() on it
+  directly and fataled with a TypeError instead of returning $default.
+  Also fixed the $queued property's docblock (was documented as a flat
+  Cookie[], is actually array<name, array<path, Cookie>>). Old
+  bug-reproduction test replaced with a normal assertion. 16/16 green.
+- CDatabase_Schema_Blueprint::dropTimestamps()/timestampsTz()
+  (system/libraries/CDatabase/Schema/Blueprint.php): both now use this
+  framework's actual 'created'/'updated' column convention (matching
+  timestamps(), matching CModel::CREATED/CModel::UPDATED) instead of
+  Laravel's leftover 'created_at'/'updated_at' - dropTimestamps() now
+  actually drops what timestamps() creates. Did NOT touch softDeletes()/
+  dropSoftDeletes() (both already agree on 'deleted_at', no bug there,
+  just a different-from-CModel::DELETED default - out of scope, not
+  asked). Updated the 2 tests in DatabaseSchemaBuilderTest.php that
+  documented the mismatch as a bug into normal passing assertions.
+  31/31 green in that file.
+Still open from the original "found but not fixed" list (not asked about
+this round): CModel_Relation_HasOneOrManyThrough dead code,
+CDatabase_Query_Builder ignoring its own $grammar/$processor ctor args.
+
+[Follow-up 2 - user asked to fix wrapValue() bracket-quoting - DONE]
+- CDatabase_Schema_Grammar_SqlServerGrammar (system/libraries/CDatabase/
+  Schema/Grammar/SqlServerGrammar.php): added the missing wrapValue()
+  override (square brackets, e.g. [users]) - was falling back to the base
+  CDatabase_Grammar's double-quote wrapping ("users"), inconsistent with
+  the Query-side SqlServerGrammar which already did this correctly.
+  Rewrote every identifier-quoting assertion in
+  tests/Database/DatabaseSqlServerSchemaGrammarTest.php (34 assertions
+  across the file) from "double quotes" to [brackets] to match; confirmed
+  each new expected string against the grammar's actual real output
+  first, not guessed. One case deliberately NOT bracket-quoted: the enum
+  check-constraint's `check ("b" in (...))` clause - that's built with a
+  hardcoded double-quote in the enum-type compiler, not through
+  wrapValue(), so it's unaffected by this fix and correctly still uses
+  double quotes; left as-is (separate, smaller inconsistency, not what
+  was asked). 35/35 green.
+- While in the area: found and fixed `parent::compileRenameColumn($blueprint,
+  $command, $connection)` / `parent::compileChange($blueprint, $command,
+  $connection)` calls in both SqlServerGrammar and PostgresGrammar passing
+  a 3rd $connection argument that the base CDatabase_Schema_Grammar's
+  2-param compileRenameColumn()/compileChange() don't declare (PHP
+  silently ignores extra args to non-variadic calls, so this was never a
+  runtime crash - a static-analysis-only correctness issue - but fixed
+  for consistency since it's the same call site). MariaDbGrammar's own
+  3-arg parent:: call was NOT touched - its parent is MySqlGrammar, whose
+  compileRenameColumn() legitimately takes 3 params, so that one was
+  already correct. Also fixed a misplaced @var docblock in MariaDbGrammar
+  (annotated the wrong variable, making intelephense mistype $column) and
+  a docblock typo `\CBase)Fluent` -> `\CBase_Fluent` in MySqlGrammar. Full
+  suite re-verified after all of the above: no regressions in
+  DatabasePostgresSchemaGrammarTest (41/41) or DatabaseMySqlSchemaGrammarTest
+  (53/53).
+
 ========================================================================
 SESSION SUMMARY / WHAT'S NEXT (written at the end of this session)
 ========================================================================
 
 WHAT GOT DONE:
-`phpcf test`: 497 passed / 20 failed  ->  2220 passed / 17 failed.
+`phpcf test`: 497 passed / 20 failed  ->  2220 passed / 17 failed, then
+2226 passed / 17 failed after the follow-up session above (+6 tests from
+the CPeriod/Cookie/Blueprint bug fixes and their updated assertions).
 (All 17 remaining failures are the same pre-existing sqlite-pdo-driver
 environment issue from the very start - see BASELINE section up top -
 not code bugs, not something I introduced.)
@@ -486,19 +569,12 @@ full details on each, searching for the bolded/bracketed headers above:
 REAL BUGS FOUND BUT DELIBERATELY NOT FIXED (documented via tests/comments
 instead, either because the right fix was ambiguous, out of the assigned
 file's scope, or genuinely low-risk-to-leave / higher-risk-to-touch):
-- CPeriod: start()/end() read wrong property names (always throws),
-  overlap() has a misaligned extra argument (always throws), gap()-family
-  mutate the original period's dates as a side effect
-- CHTTP_Cookie::queued() throws TypeError on non-array $default
+(CPeriod's start()/end()/overlap()/gap()-family bugs, CHTTP_Cookie::queued(),
+CDatabase_Schema_Blueprint::dropTimestamps()/timestampsTz(), and
+CDatabase_Schema_Grammar_SqlServerGrammar's missing wrapValue() - all
+originally listed here - were fixed in the two follow-up sessions above,
+see "[Follow-up - ...]" / "[Follow-up 2 - ...]".)
 - CModel_Relation_HasOneOrManyThrough is fully dead code (nothing extends it)
-- CDatabase_Schema_Blueprint::dropTimestamps()/timestampsTz() still use
-  Laravel's created_at/updated_at column names while timestamps() uses
-  this framework's actual created/updated convention - so dropTimestamps()
-  never drops what timestamps() created
-- CDatabase_Schema_Grammar_SqlServerGrammar never overrides wrapValue(),
-  so it quotes identifiers with "double quotes" instead of real SQL
-  Server [square brackets] (inconsistent with the Query-side SqlServer
-  grammar, which does it correctly)
 - CDatabase_Query_Builder's constructor accepts but ignores its own
   $grammar/$processor arguments (always pulls from $connection instead)
 

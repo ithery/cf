@@ -127,7 +127,7 @@ class CDatabase_Schema_Grammar_SqlServerGrammar extends CDatabase_Schema_Grammar
                 $this->wrap($blueprint->getTable() . '.' . $command->from),
                 $this->wrap($command->to)
             )
-            : parent::compileRenameColumn($blueprint, $command, $connection);
+            : parent::compileRenameColumn($blueprint, $command);
     }
 
     /**
@@ -143,7 +143,7 @@ class CDatabase_Schema_Grammar_SqlServerGrammar extends CDatabase_Schema_Grammar
      */
     public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection = null) {
         if (!$connection->usingNativeSchemaOperations()) {
-            return parent::compileChange($blueprint, $command, $connection);
+            return parent::compileChange($blueprint, $command);
         }
 
         $changes = [$this->compileDropDefaultConstraint($blueprint, $command)];
@@ -1043,5 +1043,16 @@ class CDatabase_Schema_Grammar_SqlServerGrammar extends CDatabase_Schema_Grammar
         }
 
         return "N'$value'";
+    }
+
+    /**
+     * Wrap a single string in keyword identifiers.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    protected function wrapValue($value) {
+        return $value === '*' ? $value : '[' . str_replace(']', ']]', $value) . ']';
     }
 }

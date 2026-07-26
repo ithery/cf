@@ -42,7 +42,7 @@ class CHTTP_Cookie implements CHTTP_Contract_CookieInterface {
     /**
      * All of the cookies queued for sending.
      *
-     * @var \Symfony\Component\HttpFoundation\Cookie[]
+     * @var array<string, array<string, \Symfony\Component\HttpFoundation\Cookie>>
      */
     protected $queued = [];
 
@@ -125,7 +125,7 @@ class CHTTP_Cookie implements CHTTP_Contract_CookieInterface {
         $queued = carr::get($this->queued, $key, $default);
 
         if ($path === null) {
-            return carr::last($queued, null, $default);
+            return carr::last(carr::wrap($queued), null, $default);
         }
 
         return carr::get($queued, $path, $default);

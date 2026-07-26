@@ -304,10 +304,10 @@ class CDatabase_Schema_MongoDB_Blueprint extends CDatabase_Schema_Blueprint {
     /**
      * Allows the use of unsupported schema methods.
      *
-     * @param $method
-     * @param $args
+     * @param string $method
+     * @param array  $args
      *
-     * @return Blueprint
+     * @return $this
      */
     public function __call($method, $args) {
         // Dummy.

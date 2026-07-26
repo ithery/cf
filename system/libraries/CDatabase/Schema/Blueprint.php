@@ -14,11 +14,15 @@ class CDatabase_Schema_Blueprint {
 
     /**
      * The default character set that should be used for the table.
+     *
+     * @var string
      */
     public $charset;
 
     /**
      * The collation that should be used for the table.
+     *
+     * @var string
      */
     public $collation;
 
@@ -297,7 +301,7 @@ class CDatabase_Schema_Blueprint {
      * @return void
      */
     public function dropTimestamps() {
-        $this->dropColumn('created_at', 'updated_at');
+        $this->dropColumn('created', 'updated');
     }
 
     /**
@@ -898,9 +902,9 @@ class CDatabase_Schema_Blueprint {
      * @return void
      */
     public function timestampsTz($precision = 0) {
-        $this->timestampTz('created_at', $precision)->nullable();
+        $this->timestampTz('created', $precision)->nullable();
 
-        $this->timestampTz('updated_at', $precision)->nullable();
+        $this->timestampTz('updated', $precision)->nullable();
     }
 
     /**

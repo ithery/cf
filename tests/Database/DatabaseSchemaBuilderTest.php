@@ -160,32 +160,23 @@ class DatabaseSchemaBuilderTest extends TestCase {
         $this->assertSame('updated', $columns[1]->name);
     }
 
-    public function testTimestampsTzUsesCreatedAtUpdatedAtNaming() {
-        // BUG (pre-existing, not fixed here): unlike timestamps(), which follows CF's
-        // 'created'/'updated' convention, timestampsTz() still uses Laravel's
-        // 'created_at'/'updated_at' naming - this looks like a leftover from the
-        // Laravel port that was not updated to match CModel::CREATED / CModel::UPDATED.
+    public function testTimestampsTzUsesCreatedUpdatedNaming() {
         $blueprint = new CDatabase_Schema_Blueprint('users');
         $blueprint->timestampsTz();
 
         $columns = $blueprint->getColumns();
-        $this->assertSame('created_at', $columns[0]->name);
+        $this->assertSame('created', $columns[0]->name);
         $this->assertSame('timestampTz', $columns[0]->type);
-        $this->assertSame('updated_at', $columns[1]->name);
+        $this->assertSame('updated', $columns[1]->name);
     }
 
-    public function testDropTimestampsColumnNamesDoNotMatchTimestamps() {
-        // BUG (pre-existing, not fixed here): timestamps() creates columns named
-        // 'created' / 'updated' (see testTimestampsAddsNullableCreatedAndUpdatedColumns
-        // above), but dropTimestamps() tries to drop 'created_at' / 'updated_at'. Calling
-        // dropTimestamps() after timestamps() therefore will NOT drop the columns that
-        // timestamps() actually created.
+    public function testDropTimestampsColumnNamesMatchTimestamps() {
         $blueprint = new CDatabase_Schema_Blueprint('users');
         $blueprint->dropTimestamps();
 
         $command = $blueprint->getCommands()[0];
         $this->assertSame('dropColumn', $command->name);
-        $this->assertSame(['created_at', 'updated_at'], $command->columns);
+        $this->assertSame(['created', 'updated'], $command->columns);
     }
 
     public function testSoftDeletesDefaultColumnMatchesDropSoftDeletes() {

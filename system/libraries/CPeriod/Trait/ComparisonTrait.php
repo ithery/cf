@@ -1,6 +1,18 @@
 <?php
 
-/** @mixin CPeriod */
+/**
+ * @property CCarbon           $startDate
+ * @property CCarbon           $endDate
+ * @property CCarbon           $includedStart
+ * @property CCarbon           $includedEnd
+ * @property CPeriod_Precision $precision
+ * @property CPeriod_Boundaries $boundaries
+ * @property DateInterval      $interval
+ *
+ * @method void ensurePrecisionMatches(CPeriod $other)
+ *
+ * @mixin CPeriod
+ */
 trait CPeriod_Trait_ComparisonTrait {
     public function startsBefore(DateTimeInterface $date) {
         return $this->includedStart() < $date;
@@ -76,7 +88,7 @@ trait CPeriod_Trait_ComparisonTrait {
              * [=======]
              *          [======]
              */
-            $intervalBetween = $this->precision->roundDate($this->includedEnd()->add($this->interval))
+            $intervalBetween = $this->precision->roundDate($this->includedEnd()->copy()->add($this->interval))
                 ->diff(
                     $other->precision->roundDate($other->includedStart())
                 );
@@ -85,7 +97,7 @@ trait CPeriod_Trait_ComparisonTrait {
              *          [=====]
              *  [======]
              */
-            $intervalBetween = $other->precision->roundDate($other->includedEnd()->add($other->interval))
+            $intervalBetween = $other->precision->roundDate($other->includedEnd()->copy()->add($other->interval))
                 ->diff(
                     $this->precision->roundDate($this->includedStart())
                 );

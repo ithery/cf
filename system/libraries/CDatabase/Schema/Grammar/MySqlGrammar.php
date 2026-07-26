@@ -363,7 +363,7 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
      * Compile a fulltext index key command.
      *
      * @param CDatabase_Schema_Blueprint $blueprint
-     * @param \CBase)Fluent            $command
+     * @param \CBase_Fluent               $command
      *
      * @return string
      */

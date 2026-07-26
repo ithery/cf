@@ -164,16 +164,15 @@ class PeriodTest extends TestCase {
     }
 
     /**
-     * Documents a pre-existing bug: CPeriod's constructor aliases `$includedEnd`
-     * to the very same object instance as `$endDate` whenever the end boundary
-     * is included (the default). Since CCarbon's add()/sub() mutate in place
-     * (unlike CarbonImmutable), gap()'s `$this->includedEnd()->add($this->interval)`
-     * silently mutates the original period's own end date as a side effect of
-     * merely computing a gap. Out of scope to fix here (not a CCollection*
-     * file) - see system/libraries/CPeriod.php's constructor and
-     * system/libraries/CPeriod/Trait/OperationTrait.php::gap().
+     * CPeriod's constructor aliases `$includedEnd` to the very same object
+     * instance as `$endDate` whenever the end boundary is included (the
+     * default), and CCarbon's add()/sub() mutate in place (unlike
+     * CarbonImmutable). gap()/subtract()/renew()/touchesWith() all now
+     * clone via ->copy() before calling add()/sub() on an included
+     * start/end so this no longer leaks - see
+     * system/libraries/CPeriod/Trait/OperationTrait.php.
      */
-    public function testGapMutatesTheOriginalPeriodsEndDateAsASideEffect() {
+    public function testGapDoesNotMutateTheOriginalPeriodsEndDate() {
         $period = CPeriod::create(CCarbon::parse('2024-01-01'), CCarbon::parse('2024-01-10'));
         $other = CPeriod::create(CCarbon::parse('2024-02-01'), CCarbon::parse('2024-02-10'));
 
@@ -181,7 +180,8 @@ class PeriodTest extends TestCase {
 
         $period->gap($other);
 
-        $this->assertNotSame('2024-01-10', $period->getEndDate()->format('Y-m-d'));
+        $this->assertSame('2024-01-10', $period->getEndDate()->format('Y-m-d'));
+        $this->assertSame('2024-02-01', $other->getStartDate()->format('Y-m-d'));
     }
 
     public function testGapReturnsNullWhenPeriodsOverlap() {
@@ -227,6 +227,18 @@ class PeriodTest extends TestCase {
         $this->assertCount(1, $result);
     }
 
+    public function testSubtractDoesNotMutateEitherPeriod() {
+        $period = CPeriod::create(CCarbon::parse('2024-01-01'), CCarbon::parse('2024-01-10'));
+        $other = CPeriod::create(CCarbon::parse('2024-01-05'), CCarbon::parse('2024-01-15'));
+
+        $period->subtract($other);
+
+        $this->assertSame('2024-01-01', $period->getStartDate()->format('Y-m-d'));
+        $this->assertSame('2024-01-10', $period->getEndDate()->format('Y-m-d'));
+        $this->assertSame('2024-01-05', $other->getStartDate()->format('Y-m-d'));
+        $this->assertSame('2024-01-15', $other->getEndDate()->format('Y-m-d'));
+    }
+
     public function testRenew() {
         $period = CPeriod::create(CCarbon::parse('2024-01-01'), CCarbon::parse('2024-01-10'));
         $originalPeriodEnd = $period->getEndDate()->format('Y-m-d');
@@ -235,6 +247,26 @@ class PeriodTest extends TestCase {
 
         $this->assertInstanceOf(CPeriod::class, $renewed);
         $this->assertGreaterThan($originalPeriodEnd, $renewed->getStartDate()->format('Y-m-d'));
+        $this->assertNotSame($renewed->getStartDate(), $renewed->getEndDate());
+    }
+
+    public function testRenewDoesNotMutateTheOriginalPeriod() {
+        $period = CPeriod::create(CCarbon::parse('2024-01-01'), CCarbon::parse('2024-01-10'));
+
+        $period->renew();
+
+        $this->assertSame('2024-01-01', $period->getStartDate()->format('Y-m-d'));
+        $this->assertSame('2024-01-10', $period->getEndDate()->format('Y-m-d'));
+    }
+
+    public function testTouchesWithDoesNotMutateEitherPeriod() {
+        $period = CPeriod::create(CCarbon::parse('2024-01-01'), CCarbon::parse('2024-01-10'));
+        $touching = CPeriod::create(CCarbon::parse('2024-01-11'), CCarbon::parse('2024-01-20'));
+
+        $this->assertTrue($period->touchesWith($touching));
+
+        $this->assertSame('2024-01-10', $period->getEndDate()->format('Y-m-d'));
+        $this->assertSame('2024-01-11', $touching->getStartDate()->format('Y-m-d'));
     }
 
     public function testDaysFactory() {
@@ -333,39 +365,46 @@ class PeriodTest extends TestCase {
         $this->assertSame('2024-01-06', $period->getEndDate()->format('Y-m-d'));
     }
 
-    /**
-     * Documents a pre-existing bug: CPeriod_Trait_GetterTrait::start()/end() read
-     * an undefined `$this->start` / `$this->end` property (the real property on
-     * CPeriod is `$startDate` / `$endDate`), so both throw instead of returning
-     * the start/end date. This also breaks asString(), which calls start()/end()
-     * internally. Out of scope to fix here (not a CCollection* file) - see
-     * system/libraries/CPeriod/Trait/GetterTrait.php.
-     */
-    public function testStartAndEndGettersAreBrokenDueToUndefinedProperty() {
+    public function testStartAndEndGetters() {
         $period = CPeriod::create(CCarbon::parse('2024-01-01'), CCarbon::parse('2024-01-10'));
 
-        $this->expectException(\ErrorException::class);
-        $this->expectExceptionMessage('Undefined property: CPeriod::$start');
-
-        $period->start();
+        $this->assertSame('2024-01-01', $period->start()->format('Y-m-d'));
+        $this->assertSame('2024-01-10', $period->end()->format('Y-m-d'));
     }
 
-    /**
-     * Documents a pre-existing bug: CPeriod_Trait_OperationTrait::overlap() calls
-     * CPeriod_Factory::makeWithBoundaries() with an extra leading `static::class`
-     * argument that doesn't match makeWithBoundaries()'s 4-parameter signature
-     * ($includedStart, $includedEnd, $precision, $boundaries), shifting every
-     * argument by one and causing it to try to parse the class name string as a
-     * date. This also breaks overlapAny() and diffSymmetric(), which call
-     * overlap() internally. Out of scope to fix here (not a CCollection* file) -
-     * see system/libraries/CPeriod/Trait/OperationTrait.php.
-     */
-    public function testOverlapIsBrokenDueToArgumentMismatch() {
+    public function testAsString() {
+        $period = CPeriod::create(CCarbon::parse('2024-01-01'), CCarbon::parse('2024-01-10'));
+
+        $this->assertSame('[2024-01-01,2024-01-10]', $period->asString());
+    }
+
+    public function testOverlap() {
         $period = CPeriod::create(CCarbon::parse('2024-01-01'), CCarbon::parse('2024-01-10'));
         $other = CPeriod::create(CCarbon::parse('2024-01-05'), CCarbon::parse('2024-01-15'));
 
-        $this->expectException(CPeriod_Exception_InvalidDateException::class);
+        $overlap = $period->overlap($other);
 
-        $period->overlap($other);
+        $this->assertInstanceOf(CPeriod::class, $overlap);
+        $this->assertSame('2024-01-05', $overlap->getStartDate()->format('Y-m-d'));
+        $this->assertSame('2024-01-10', $overlap->getEndDate()->format('Y-m-d'));
+    }
+
+    public function testOverlapReturnsNullWhenPeriodsDoNotOverlap() {
+        $period = CPeriod::create(CCarbon::parse('2024-01-01'), CCarbon::parse('2024-01-10'));
+        $other = CPeriod::create(CCarbon::parse('2024-02-01'), CCarbon::parse('2024-02-10'));
+
+        $this->assertNull($period->overlap($other));
+    }
+
+    public function testOverlapWithMultiplePeriods() {
+        $period = CPeriod::create(CCarbon::parse('2024-01-01'), CCarbon::parse('2024-01-31'));
+        $second = CPeriod::create(CCarbon::parse('2024-01-05'), CCarbon::parse('2024-01-20'));
+        $third = CPeriod::create(CCarbon::parse('2024-01-10'), CCarbon::parse('2024-01-15'));
+
+        $overlap = $period->overlap($second, $third);
+
+        $this->assertInstanceOf(CPeriod::class, $overlap);
+        $this->assertSame('2024-01-10', $overlap->getStartDate()->format('Y-m-d'));
+        $this->assertSame('2024-01-15', $overlap->getEndDate()->format('Y-m-d'));
     }
 }

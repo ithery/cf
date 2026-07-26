@@ -9,13 +9,9 @@ use PHPUnit\Framework\TestCase;
  * grammar. No real database/PDO connection is used - the CDatabase_Connection is mocked
  * with Mockery.
  *
- * NB: unlike CDatabase_Query_Grammar_SqlServerGrammar (which wraps identifiers in square
- * brackets, e.g. [users]), CDatabase_Schema_Grammar_SqlServerGrammar does not override
- * wrapValue() at all, so it inherits the base CDatabase_Grammar double-quote wrapping
- * ("users") instead of real SQL Server's square-bracket convention. That is a real
- * inconsistency between the query and schema grammars for the same dialect - documented
- * here, not fixed, since correcting it would require auditing every expected string in
- * this dialect and is outside a minimal/low-risk fix.
+ * NB: matching CDatabase_Query_Grammar_SqlServerGrammar, wrapValue() wraps identifiers in
+ * square brackets (e.g. [users]) rather than the base CDatabase_Grammar's double-quote
+ * convention.
  */
 class DatabaseSqlServerSchemaGrammarTest extends TestCase {
     protected function tearDown(): void {
@@ -49,7 +45,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
 
         $this->assertCount(1, $statements);
         $this->assertSame(
-            'create table "users" ("id" int not null identity primary key, "email" nvarchar(255) not null)',
+            'create table [users] ([id] int not null identity primary key, [email] nvarchar(255) not null)',
             $statements[0]
         );
     }
@@ -63,7 +59,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
         $this->assertSame(
-            'alter table "users" add "name" nvarchar(255) not null, "votes" int not null',
+            'alter table [users] add [name] nvarchar(255) not null, [votes] int not null',
             $statements[0]
         );
     }
@@ -75,7 +71,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection();
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame('drop table "users"', $statements[0]);
+        $this->assertSame('drop table [users]', $statements[0]);
     }
 
     public function testDropTableIfExists() {
@@ -86,7 +82,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
         $this->assertSame(
-            "if exists (select * from sys.sysobjects where id = object_id('users', 'U')) drop table \"users\"",
+            "if exists (select * from sys.sysobjects where id = object_id('users', 'U')) drop table [users]",
             $statements[0]
         );
     }
@@ -98,7 +94,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection();
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame('sp_rename "users", "people"', $statements[0]);
+        $this->assertSame('sp_rename [users], [people]', $statements[0]);
     }
 
     public function testRenameColumnUsingNativeSchemaOperations() {
@@ -108,7 +104,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection(true);
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame("sp_rename '\"users\".\"from\"', \"to\", 'COLUMN'", $statements[0]);
+        $this->assertSame("sp_rename '[users].[from]', [to], 'COLUMN'", $statements[0]);
     }
 
     public function testRenameIndex() {
@@ -117,7 +113,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
 
         $sql = $this->getGrammar()->compileRenameIndex($blueprint, $command);
 
-        $this->assertSame("sp_rename N'\"users\".\"foo\"', \"bar\", N'INDEX'", $sql);
+        $this->assertSame("sp_rename N'[users].[foo]', [bar], N'INDEX'", $sql);
     }
 
     public function testAddingPrimaryKey() {
@@ -127,7 +123,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection();
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame('alter table "users" add constraint "bar" primary key ("foo")', $statements[0]);
+        $this->assertSame('alter table [users] add constraint [bar] primary key ([foo])', $statements[0]);
     }
 
     public function testAddingUniqueKey() {
@@ -137,7 +133,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection();
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame('create unique index "bar" on "users" ("foo")', $statements[0]);
+        $this->assertSame('create unique index [bar] on [users] ([foo])', $statements[0]);
     }
 
     public function testAddingIndex() {
@@ -147,7 +143,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection();
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame('create index "baz" on "users" ("foo", "bar")', $statements[0]);
+        $this->assertSame('create index [baz] on [users] ([foo], [bar])', $statements[0]);
     }
 
     public function testAddingSpatialIndex() {
@@ -157,7 +153,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection();
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame('create spatial index "baz" on "geo" ("coordinates")', $statements[0]);
+        $this->assertSame('create spatial index [baz] on [geo] ([coordinates])', $statements[0]);
     }
 
     public function testDropPrimary() {
@@ -167,7 +163,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection();
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame('alter table "users" drop constraint "users_id_primary"', $statements[0]);
+        $this->assertSame('alter table [users] drop constraint [users_id_primary]', $statements[0]);
     }
 
     public function testDropUnique() {
@@ -177,7 +173,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection();
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame('drop index "users_foo_unique" on "users"', $statements[0]);
+        $this->assertSame('drop index [users_foo_unique] on [users]', $statements[0]);
     }
 
     public function testDropIndex() {
@@ -187,7 +183,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection();
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame('drop index "users_foo_index" on "users"', $statements[0]);
+        $this->assertSame('drop index [users_foo_index] on [users]', $statements[0]);
     }
 
     public function testDropForeign() {
@@ -197,7 +193,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection();
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame('alter table "users" drop constraint "users_foo_id_foreign"', $statements[0]);
+        $this->assertSame('alter table [users] drop constraint [users_foo_id_foreign]', $statements[0]);
     }
 
     public function testEnableAndDisableForeignKeyConstraints() {
@@ -238,7 +234,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $commandWithDefault = new CBase_Fluent(['column' => $columnWithDefault]);
 
         $sql = $this->getGrammar()->compileDefault($blueprint, $commandWithDefault);
-        $this->assertSame("alter table \"users\" add default '0' for \"votes\"", $sql);
+        $this->assertSame("alter table [users] add default '0' for [votes]", $sql);
 
         $columnWithoutChange = new CBase_Fluent(['name' => 'votes', 'change' => false, 'default' => 0]);
         $commandWithoutChange = new CBase_Fluent(['column' => $columnWithoutChange]);
@@ -268,7 +264,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $this->assertCount(2, $statements);
         $this->assertStringContainsString('DECLARE @sql NVARCHAR(MAX)', $statements[0]);
         $this->assertStringContainsString("[name] in ('a')", $statements[0]);
-        $this->assertSame('alter table "users" alter column "a" nvarchar(255) null', $statements[1]);
+        $this->assertSame('alter table [users] alter column [a] nvarchar(255) null', $statements[1]);
     }
 
     public function testStringAndTextColumnTypes() {
@@ -284,8 +280,8 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
         $this->assertSame(
-            'create table "t" ("a" nchar(10) not null, "b" nvarchar(20) not null, "c" nvarchar(max) not null, '
-            . '"d" nvarchar(max) not null, "e" nvarchar(max) not null)',
+            'create table [t] ([a] nchar(10) not null, [b] nvarchar(20) not null, [c] nvarchar(max) not null, '
+            . '[d] nvarchar(max) not null, [e] nvarchar(max) not null)',
             $statements[0]
         );
     }
@@ -303,8 +299,8 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
         $this->assertSame(
-            'create table "t" ("a" tinyint not null, "b" smallint not null, "c" int not null, '
-            . '"d" int not null, "e" bigint not null)',
+            'create table [t] ([a] tinyint not null, [b] smallint not null, [c] int not null, '
+            . '[d] int not null, [e] bigint not null)',
             $statements[0]
         );
     }
@@ -320,7 +316,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
         $this->assertSame(
-            'create table "t" ("a" float not null, "b" float not null, "c" decimal(8, 2) not null)',
+            'create table [t] ([a] float not null, [b] float not null, [c] decimal(8, 2) not null)',
             $statements[0]
         );
     }
@@ -337,8 +333,8 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
         $this->assertSame(
-            "create table \"t\" (\"a\" bit not null, \"b\" nvarchar(255) check (\"b\" in (N'easy', N'hard')) not null, "
-            . '"c" nvarchar(max) not null, "d" nvarchar(max) not null)',
+            "create table [t] ([a] bit not null, [b] nvarchar(255) check (\"b\" in (N'easy', N'hard')) not null, "
+            . '[c] nvarchar(max) not null, [d] nvarchar(max) not null)',
             $statements[0]
         );
     }
@@ -355,7 +351,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
         $this->assertSame(
-            'create table "t" ("a" date not null, "b" datetime2(2) not null, "c" time(3) not null, "d" datetime2(1) not null)',
+            'create table [t] ([a] date not null, [b] datetime2(2) not null, [c] time(3) not null, [d] datetime2(1) not null)',
             $statements[0]
         );
     }
@@ -369,7 +365,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
         $this->assertSame(
-            'create table "t" ("a" datetime not null default CURRENT_TIMESTAMP)',
+            'create table [t] ([a] datetime not null default CURRENT_TIMESTAMP)',
             $statements[0]
         );
     }
@@ -386,8 +382,8 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
         $this->assertSame(
-            'create table "t" ("a" varbinary(max) not null, "b" uniqueidentifier not null, '
-            . '"c" nvarchar(45) not null, "d" nvarchar(17) not null)',
+            'create table [t] ([a] varbinary(max) not null, [b] uniqueidentifier not null, '
+            . '[c] nvarchar(45) not null, [d] nvarchar(17) not null)',
             $statements[0]
         );
     }
@@ -404,7 +400,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
         $this->assertSame(
-            'create table "t" ("a" geography not null, "b" geography not null, "c" geography not null, "d" geography not null)',
+            'create table [t] ([a] geography not null, [b] geography not null, [c] geography not null, [d] geography not null)',
             $statements[0]
         );
     }
@@ -419,7 +415,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection();
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame('create table "t" ("a" as (b + c))', $statements[0]);
+        $this->assertSame('create table [t] ([a] as (b + c))', $statements[0]);
     }
 
     public function testNullableAndDefaultModifiers() {
@@ -432,7 +428,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
         $this->assertSame(
-            "create table \"t\" (\"a\" nvarchar(255) null default 'foo', \"b\" int not null default '0')",
+            "create table [t] ([a] nvarchar(255) null default 'foo', [b] int not null default '0')",
             $statements[0]
         );
     }
@@ -446,7 +442,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
         $this->assertSame(
-            'create table "t" ("a" nvarchar(255) collate SQL_Latin1_General_CP1_CI_AS not null)',
+            'create table [t] ([a] nvarchar(255) collate SQL_Latin1_General_CP1_CI_AS not null)',
             $statements[0]
         );
     }
@@ -459,7 +455,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase {
         $connection = $this->getConnection();
         $statements = $blueprint->toSql($connection, $this->getGrammar($connection));
 
-        $this->assertSame('create table "t" ("a" as (b + c) persisted)', $statements[0]);
+        $this->assertSame('create table [t] ([a] as (b + c) persisted)', $statements[0]);
     }
 
     public function testQuoteStringUsesNPrefixedLiterals() {

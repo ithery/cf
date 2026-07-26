@@ -112,20 +112,8 @@ class CookieTest extends TestCase {
         $this->assertNull($this->jar->queued('missing'));
     }
 
-    /**
-     * BUG: CHTTP_Cookie::queued($key, $default, $path) with $path === null (the default)
-     * and the key not present in $this->queued: it does
-     *   $queued = carr::get($this->queued, $key, $default);   // returns $default verbatim (e.g. a string)
-     *   return carr::last($queued, null, $default);           // carr::last() calls end($queued)
-     * carr::last() expects an array and calls PHP's end() on it. When $default is a
-     * non-empty, non-array scalar (e.g. a string), end() throws a TypeError instead of
-     * simply returning $default. Reproduced here rather than fixed, per project convention
-     * of documenting found bugs instead of silently patching framework code.
-     */
-    public function testQueuedWithNonArrayDefaultThrowsTypeErrorBug() {
-        $this->expectException(TypeError::class);
-
-        $this->jar->queued('missing', 'fallback');
+    public function testQueuedWithNonArrayDefaultReturnsTheDefault() {
+        $this->assertSame('fallback', $this->jar->queued('missing', 'fallback'));
     }
 
     public function testHasQueuedIsFalseWhenNotQueued() {

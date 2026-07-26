@@ -238,7 +238,7 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
                 $this->wrap($command->from),
                 $this->wrap($command->to)
             )
-            : parent::compileRenameColumn($blueprint, $command, $connection);
+            : parent::compileRenameColumn($blueprint, $command);
     }
 
     /**
@@ -253,7 +253,7 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
      */
     public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection = null) {
         if (! $connection->usingNativeSchemaOperations()) {
-            return parent::compileChange($blueprint, $command, $connection);
+            return parent::compileChange($blueprint, $command);
         }
 
         $columns = [];

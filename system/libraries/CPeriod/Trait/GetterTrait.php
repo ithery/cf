@@ -1,6 +1,17 @@
 <?php
 
-/** @mixin CPeriod */
+/**
+ * @property CCarbon             $startDate
+ * @property CCarbon             $endDate
+ * @property CCarbon             $includedStart
+ * @property CCarbon             $includedEnd
+ * @property CPeriod_Precision   $precision
+ * @property CPeriod_Boundaries  $boundaries
+ * @property CPeriod_Duration    $duration
+ * @property DateInterval        $interval
+ *
+ * @mixin CPeriod
+ */
 trait CPeriod_Trait_GetterTrait {
     /**
      * @var string
@@ -36,28 +47,28 @@ trait CPeriod_Trait_GetterTrait {
     }
 
     /**
-     * @return DateTimeImmutable
+     * @return CCarbon
      */
     public function start() {
-        return $this->start;
+        return $this->startDate;
     }
 
     /**
-     * @return DateTimeImmutable
+     * @return CCarbon
      */
     public function includedStart() {
         return $this->includedStart;
     }
 
     /**
-     * @return DateTimeImmutable
+     * @return CCarbon
      */
     public function end() {
-        return $this->end;
+        return $this->endDate;
     }
 
     /**
-     * @return DateTimeImmutable
+     * @return CCarbon
      */
     public function includedEnd() {
         return $this->includedEnd;
