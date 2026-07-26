@@ -23,7 +23,8 @@ class CDatabase_Schema_MongoDB_Blueprint extends CDatabase_Schema_Blueprint {
     protected $columns = [];
 
     /**
-     * @inheritdoc
+     * @param \CDatabase_Connection_MongoDBConnection $connection
+     * @param string                                   $collection
      */
     public function __construct(CDatabase_Connection_MongoDBConnection $connection, $collection) {
         $this->connection = $connection;

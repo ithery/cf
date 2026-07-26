@@ -60,6 +60,11 @@ class CQC {
         return new CQC_Inspector($className);
     }
 
+    /**
+     * @param string $className
+     *
+     * @return mixed
+     */
     public static function createProcessor($className) {
         $inspector = new CQC_Inspector($className);
 

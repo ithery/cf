@@ -382,15 +382,15 @@ class CDatabase_Query_Builder {
     public function addSelect($column) {
         $columns = is_array($column) ? $column : func_get_args();
 
-        foreach ($columns as $as => $column) {
-            if (is_string($as) && $this->isQueryable($column)) {
+        foreach ($columns as $as => $col) {
+            if (is_string($as) && $this->isQueryable($col)) {
                 if (is_null($this->columns)) {
                     $this->select($this->from . '.*');
                 }
 
-                $this->selectSub($column, $as);
+                $this->selectSub($col, $as);
             } else {
-                $this->columns[] = $column;
+                $this->columns[] = $col;
             }
         }
 
@@ -1306,7 +1306,7 @@ class CDatabase_Query_Builder {
      * @param string   $pageName
      * @param null|int $page
      *
-     * @return \CPagination_Paginator\CPagination_LengthAwarePaginator
+     * @return \CPagination_LengthAwarePaginator
      */
     public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null) {
         $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
@@ -2448,6 +2448,8 @@ class CDatabase_Query_Builder {
 
     /**
      * Dump the current SQL and bindings.
+     *
+     * @param mixed ...$args
      *
      * @return $this
      */

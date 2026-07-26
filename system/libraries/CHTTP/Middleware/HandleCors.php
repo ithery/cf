@@ -6,6 +6,9 @@ use Symfony\Component\HttpFoundation\Response;
  * @see https://github.com/fruitcake/laravel-cors
  */
 class CHTTP_Middleware_HandleCors {
+    /**
+     * @var null|array
+     */
     protected $paths;
 
     public function __construct() {

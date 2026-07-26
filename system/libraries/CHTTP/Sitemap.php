@@ -30,10 +30,10 @@ class CHTTP_Sitemap {
      *
      * @param string|CHTTP_Sitemap_Tag_UrlTag|CHTTP_Sitemap_Contract_SitemapableInterface|iterable $tag
      *
-     * @return static
+     * @return self
      */
     public function add($tag): self {
-        if (is_object($tag) && array_key_exists(Sitemapable::class, class_implements($tag))) {
+        if (is_object($tag) && array_key_exists(CHTTP_Sitemap_Contract_SitemapableInterface::class, class_implements($tag))) {
             $tag = $tag->toSitemapTag();
         }
 

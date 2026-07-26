@@ -31,12 +31,26 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method string                      getDeletedAtColumn()                                                                    Only present when the model also uses CModel_Deleted_DeletedTrait.
  * @method CModel_Relation_BelongsTo   belongsTo(string $related, string $foreignKey = null, string $ownerKey = null, string $relation = null)
  * @method CModel_Relation_HasMany     hasMany(string $related, string $foreignKey = null, string $localKey = null)
+ * @method static void                 saving(\Closure|string $callback)
+ * @method static void                 saved(\Closure|string $callback)
+ * @method static void                 deleting(\Closure|string $callback)
+ * @method static void                 deleted(\Closure|string $callback)
+ * @method static void                 restoring(\Closure|string $callback)                                                    Only present when the model also uses CModel_SoftDelete_SoftDeleteTrait.
+ * @method static void                 restored(\Closure|string $callback)                                                     Only present when the model also uses CModel_SoftDelete_SoftDeleteTrait.
+ * @method static null|static          find(mixed $id, array $columns = [])
+ * @method CModel_Query                withTrashed(bool $withTrashed = true)                                                   Only present when the model also uses CModel_SoftDelete_SoftDeleteTrait.
  *
  * @mixin CModel
  */
 trait CModel_Nested_NestedTrait {
     /**
-     * @var \Carbon\Carbon
+     * The captured value of the "deleted" marker just before a restore, used
+     * by restoreDescendants() to decide which descendants to restore. A
+     * \Carbon\Carbon timestamp for CModel_Deleted_DeletedTrait-based models,
+     * or an int status value for CModel_SoftDelete_SoftDeleteTrait-based
+     * ones - see restoreDescendants().
+     *
+     * @var null|\Carbon\Carbon|int
      */
     public static $deletedAt;
 
@@ -519,10 +533,10 @@ trait CModel_Nested_NestedTrait {
     }
 
     /**
-     * @param $lft
-     * @param $rgt
-     * @param $parentId
-     * @param null|mixed $depth
+     * @param int      $lft
+     * @param int      $rgt
+     * @param null|int $parentId
+     * @param null|int $depth
      *
      * @return $this
      */
@@ -653,7 +667,7 @@ trait CModel_Nested_NestedTrait {
     /**
      * Restore the descendants.
      *
-     * @param $deletedAt
+     * @param \Carbon\Carbon|int $deletedAt
      */
     protected function restoreDescendants($deletedAt) {
         // getDeletedAtColumn() only exists on CModel_Deleted_DeletedTrait's
@@ -678,7 +692,11 @@ trait CModel_Nested_NestedTrait {
     /**
      * @inheritdoc
      *
+     * @param \CDatabase_Query_Builder $query
+     *
      * @since 2.0
+     *
+     * @return CModel_Nested_Query
      */
     public function newModelBuilder($query) {
         return new CModel_Nested_Query($query);
@@ -1121,7 +1139,7 @@ trait CModel_Nested_NestedTrait {
     }
 
     /**
-     * @param $value
+     * @param int $value
      *
      * @return $this
      */
@@ -1132,7 +1150,7 @@ trait CModel_Nested_NestedTrait {
     }
 
     /**
-     * @param $value
+     * @param int $value
      *
      * @return $this
      */
@@ -1143,7 +1161,7 @@ trait CModel_Nested_NestedTrait {
     }
 
     /**
-     * @param $value
+     * @param null|int $value
      *
      * @return $this
      */
@@ -1159,7 +1177,7 @@ trait CModel_Nested_NestedTrait {
     }
 
     /**
-     * @param $value
+     * @param null|int $value
      *
      * @return $this
      */

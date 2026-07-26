@@ -25,6 +25,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static void     registerModelEvent(string $event, \Closure|string $callback)
  * @method static void     addGlobalScope(\CModel_Interface_Scope|\Closure|string $scope, \Closure $implementation = null)
  *
+ * @property bool          $exists
+ * @property bool          $timestamps
+ *
  * @mixin CModel
  */
 trait CModel_SoftDelete_SoftDeleteTrait {

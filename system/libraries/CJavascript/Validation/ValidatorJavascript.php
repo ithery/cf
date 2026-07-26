@@ -132,7 +132,7 @@ class CJavascript_Validation_ValidatorJavascript implements Arrayable {
     /**
      * Gets value from view data.
      *
-     * @param $name
+     * @param string $name
      *
      * @throws \CJavascript_Validation_Exception_PropertyNotFoundException
      *

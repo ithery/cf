@@ -113,7 +113,7 @@ class CConsole_Command_AboutCommand extends CConsole_Command {
     /**
      * Display the application information as JSON.
      *
-     * @param \CCCollection $data
+     * @param \CCollection $data
      *
      * @return void
      */
