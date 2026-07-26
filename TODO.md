@@ -5,6 +5,8 @@ Tracks upgrade/refactor tasks for CF 1.9. Remove an item once it's done.
 ## High Priority
 
 - Build a test suite for `CConfig`.
+- Recurring: periodically review files under `modules/` and migrate/refactor them into `system/libraries` or `system/data`, or delete if dead. CF 1.9's target is for the `modules/` folder to disappear from the framework entirely — revisit this whenever touching code that references `modules/`.
+- Remove `system/libraries/CComponent` and its `media/js/cres/src/element/component` / `media/js/cres/src/ui/component` implementation. It's a copy of Laravel Livewire and is targeted for removal in CF 1.9.
 
 ## Low Priority
 

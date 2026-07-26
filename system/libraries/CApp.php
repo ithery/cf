@@ -269,15 +269,6 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
     }
 
     /**
-     * @param string $domain
-     *
-     * @return CApp_Api
-     */
-    public static function api($domain = null) {
-        return CApp_Api::instance($domain);
-    }
-
-    /**
      * @return CApp_SEO
      */
     public static function seo() {

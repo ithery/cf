@@ -1,6 +1,6 @@
 <?php
 
-class CApp_Administrator_Fixer_Database {
+class CDatabase_Fixer {
     /**
      * @param string               $table
      * @param CDatabase_Connection $db

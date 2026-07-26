@@ -78,21 +78,6 @@ class Controller_Cresenity extends CController {
         return $response;
     }
 
-    /**
-     * Handle dynamic method calls into the controller.
-     *
-     * @param string $methods
-     * @return \CApp
-     */
-    public function api(...$methods) {
-        if (c::blank($methods)) {
-            return c::response('CF API');
-        }
-        $data = CApp::api()->exec(...$methods);
-
-        return c::response()->json($data);
-    }
-
     public function captcha() {
         header('Content-type: image/jpeg');
 

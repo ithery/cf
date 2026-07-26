@@ -179,31 +179,6 @@ CException::exceptionHandler()->reportable(function (Exception $e) {
 
 ---
 
-### Administrator Navigation
-
-Add custom navigation items to the DevSuite administrator panel:
-
-```php
-<?php
-if (CF::isDevSuite()) {
-    CApp_Administrator::addNav([
-        'name' => 'administrator.myapp',
-        'label' => 'My App',
-        'icon' => 'lnr lnr-cog',
-        'subnav' => [
-            [
-                'name' => 'administrator.myapp.settings',
-                'label' => 'Settings',
-                'controller' => 'administrator/myapp/settings',
-                'method' => 'index',
-            ],
-        ],
-    ]);
-}
-```
-
----
-
 ### Full Example
 
 A typical `bootstrap.php` combining several features:
