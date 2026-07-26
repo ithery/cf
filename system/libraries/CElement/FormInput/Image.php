@@ -6,18 +6,41 @@ class CElement_FormInput_Image extends CElement_FormInput {
     use CElement_Trait_UseViewTrait,
         CTrait_Compat_Element_FormInput_Image;
 
+    /**
+     * @var string
+     */
     protected $imgSrc;
 
+    /**
+     * @var int|string
+     */
     protected $maxWidth;
 
+    /**
+     * @var int|string
+     */
     protected $maxHeight;
 
+    /**
+     * @var bool
+     */
     protected $disabledUpload;
 
+    /**
+     * @var string
+     */
     protected $accept;
 
+    /**
+     * @var array
+     */
     protected $labels = [];
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'image';
@@ -98,6 +121,11 @@ class CElement_FormInput_Image extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $templateHtml = $this->getViewHtml();
         $html = $templateHtml;
@@ -105,6 +133,11 @@ class CElement_FormInput_Image extends CElement_FormInput {
         return $html;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $templateJs = $this->getViewJs();
         $js = $templateJs;

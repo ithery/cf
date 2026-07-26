@@ -1,6 +1,9 @@
 <?php
 
 class CElement_Component_Chart_Chart extends CElement_Component_Chart {
+    /**
+     * @return void
+     */
     public function __construct() {
         parent::__construct();
         $this->wrapper = $this->addCanvas()->addClass('cchart cchart-chart');
@@ -8,6 +11,11 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         $this->options = [];
     }
 
+    /**
+     * @param CChart_ChartAbstract $chart
+     *
+     * @return $this
+     */
     public function setChart(CChart_ChartAbstract $chart) {
         parent::setChart($chart);
 
@@ -26,6 +34,11 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         return $this;
     }
 
+    /**
+     * @param CChart_ChartAbstract $chart
+     *
+     * @return string
+     */
     private function normalizeChartPosition(CChart_ChartAbstract $chart) {
         $posMap = [
             CChart::POSITION_BOTTOM => 'bottom',
@@ -37,12 +50,18 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         return carr::get($posMap, $chart->getLegendPosition(), 'bottom');
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         parent::build();
         $this->addClass('cchart-container');
         $this->buildData();
     }
 
+    /**
+     * @return void
+     */
     public function buildData() {
         $temp = $this->data;
         $this->data = [];
@@ -99,10 +118,18 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         }
     }
 
+    /**
+     * @return array
+     */
     public function buildOptions() {
         return $this->options;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

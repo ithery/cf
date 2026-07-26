@@ -5,6 +5,11 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_Email extends CElement_FormInput {
     use CTrait_Element_Property_Placeholder;
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'email';
@@ -12,6 +17,9 @@ class CElement_FormInput_Email extends CElement_FormInput {
         $this->addClass('form-control');
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);

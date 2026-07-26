@@ -2,12 +2,17 @@
 
 class CElement_FormInput_EditorJs_EditorHandler {
     /**
-     * @var array - blocks classes
+     * Decoded block data (each entry has `type`/`data`/optionally `tunes` keys)
+     * from the input JSON's `blocks` field.
+     *
+     * @var array
      */
     public $blocks = [];
 
     /**
-     * @var array - list for block's classes
+     * Unused; no code path in this class assigns it.
+     *
+     * @var null|array
      */
     public $config;
 
@@ -21,9 +26,9 @@ class CElement_FormInput_EditorJs_EditorHandler {
      * Splits JSON string to separate blocks.
      *
      * @param string $json
-     * @param mixed  $configuration
+     * @param string $configuration
      *
-     * @throws CElement_FormInput_EditorJs_EditorJsException()
+     * @throws CElement_FormInput_EditorJs_EditorJsException
      */
     public function __construct($json, $configuration) {
         $this->handler = new CElement_FormInput_EditorJs_BlockHandler($configuration);

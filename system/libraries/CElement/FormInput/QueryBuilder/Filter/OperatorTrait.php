@@ -3,8 +3,14 @@
 use CElement_FormInput_QueryBuilder_Constant as Constant;
 
 trait CElement_FormInput_QueryBuilder_Filter_OperatorTrait {
+    /**
+     * @var string[]
+     */
     protected $operators = [];
 
+    /**
+     * @var null|string
+     */
     protected $defaultOperator;
 
     /**
@@ -29,6 +35,11 @@ trait CElement_FormInput_QueryBuilder_Filter_OperatorTrait {
         return $this;
     }
 
+    /**
+     * Restrict the operators to those applicable to string values (and not multi-value operators).
+     *
+     * @return $this
+     */
     public function setOperatorForString() {
         $operatorData = Constant::getOperatorData();
         $operators = c::collect($operatorData)->filter(function ($operator) {
@@ -42,6 +53,11 @@ trait CElement_FormInput_QueryBuilder_Filter_OperatorTrait {
         return $this;
     }
 
+    /**
+     * Restrict the operators to those applicable to numeric values (and not multi-value operators).
+     *
+     * @return $this
+     */
     public function setOperatorForNumber() {
         $operatorData = Constant::getOperatorData();
         $operators = c::collect($operatorData)->filter(function ($operator) {
@@ -55,6 +71,11 @@ trait CElement_FormInput_QueryBuilder_Filter_OperatorTrait {
         return $this;
     }
 
+    /**
+     * Restrict the operators to those applicable to datetime values (and not multi-value operators).
+     *
+     * @return $this
+     */
     public function setOperatorForDatetime() {
         $operatorData = Constant::getOperatorData();
         $operators = c::collect($operatorData)->filter(function ($operator) {

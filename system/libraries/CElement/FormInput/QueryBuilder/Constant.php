@@ -67,6 +67,11 @@ final class CElement_FormInput_QueryBuilder_Constant {
 
     const FILTER_OPERATOR_IS_NOT_NULL = 'is_not_null';
 
+    /**
+     * Get the metadata (accepted value shape and applicable filter types) for every supported operator.
+     *
+     * @return array<string, array{accept_values: bool, apply_to: string[], multiple?: bool}>
+     */
     public static function getOperatorData() {
         return [
             self::FILTER_OPERATOR_EQUAL => [

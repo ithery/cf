@@ -5,14 +5,30 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Carbon\Carbon;
 
 trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
+    /**
+     * List of `['label' => string, 'dateStart' => Carbon, 'dateEnd' => Carbon]`
+     * entries offered as quick-pick date ranges.
+     *
+     * @var array
+     */
     protected $predefinedRanges;
 
+    /**
+     * @return $this
+     */
     public function resetRange() {
         $this->predefinedRanges = [];
 
         return $this;
     }
 
+    /**
+     * @param string $label
+     * @param Carbon $dateStart
+     * @param Carbon $dateEnd
+     *
+     * @return $this
+     */
     public function addRange($label, $dateStart, $dateEnd) {
         $this->predefinedRanges[] = [
             'label' => $label,
@@ -23,6 +39,12 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         return $this;
     }
 
+    /**
+     * @param string $label
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function addRangeLifeTime($label = 'element/date.daterange:lifetime', $lang = true) {
         $labelTranslated = $label;
         if ($lang) {
@@ -36,6 +58,12 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         return $this;
     }
 
+    /**
+     * @param string $label
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function addRangeToday($label = 'element/date.daterange:today', $lang = true) {
         $labelTranslated = $label;
         if ($lang) {
@@ -49,6 +77,12 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         return $this;
     }
 
+    /**
+     * @param string $label
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function addRangeYesterday($label = 'element/date.daterange:yesterday', $lang = true) {
         $labelTranslated = $label;
         if ($lang) {
@@ -61,18 +95,43 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         return $this;
     }
 
+    /**
+     * @param string $label
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function addRange7Days($label = 'element/date.daterange:lastNDays', $lang = true) {
         return $this->addRangeNDays(7, $label, $lang);
     }
 
+    /**
+     * @param string $label
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function addRange14Days($label = 'element/date.daterange:lastNDays', $lang = true) {
         return $this->addRangeNDays(14, $label, $lang);
     }
 
+    /**
+     * @param string $label
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function addRange30Days($label = 'element/date.daterange:lastNDays', $lang = true) {
         return $this->addRangeNDays(30, $label, $lang);
     }
 
+    /**
+     * @param int    $n
+     * @param string $label
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function addRangeNDays($n, $label = 'element/date.daterange:lastNDays', $lang = true) {
         $labelTranslated = $label;
         if ($lang) {
@@ -85,6 +144,12 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         return $this;
     }
 
+    /**
+     * @param string $label
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function addRangeThisWeek($label = 'element/date.daterange:thisWeek', $lang = true) {
         $labelTranslated = $label;
         if ($lang) {
@@ -97,6 +162,12 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         return $this;
     }
 
+    /**
+     * @param string $label
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function addRangeLastWeek($label = 'element/date.daterange:lastWeek', $lang = true) {
         $labelTranslated = $label;
         if ($lang) {
@@ -109,6 +180,12 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         return $this;
     }
 
+    /**
+     * @param string $label
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function addRangeThisMonth($label = 'element/date.daterange:thisMonth', $lang = true) {
         $labelTranslated = $label;
         if ($lang) {
@@ -121,6 +198,12 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         return $this;
     }
 
+    /**
+     * @param string $label
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function addRangeLastMonth($label = 'element/date.daterange:lastMonth', $lang = true) {
         $labelTranslated = $label;
         if ($lang) {
@@ -133,6 +216,9 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function addDefaultRange() {
         $this->resetRange();
         $this->addRangeLifeTime();

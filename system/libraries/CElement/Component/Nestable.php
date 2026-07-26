@@ -12,12 +12,12 @@ class CElement_Component_Nestable extends CElement_Component {
     protected $data;
 
     /**
-     * @var string
+     * @var null|string
      */
     protected $idKey;
 
     /**
-     * @var string
+     * @var null|string
      */
     protected $valueKey;
 
@@ -32,7 +32,7 @@ class CElement_Component_Nestable extends CElement_Component {
     protected $input;
 
     /**
-     * @var bool|callable
+     * @var bool|callable|string
      */
     protected $displayCallback;
 
@@ -67,12 +67,14 @@ class CElement_Component_Nestable extends CElement_Component {
     protected $isCollapsed = false;
 
     /**
-     * @var CManager_DataProviderAbstract
+     * @var null|CManager_DataProviderAbstract
      */
     protected $query;
 
     /**
      * @param string $id
+     *
+     * @return void
      */
     public function __construct($id) {
         parent::__construct($id);

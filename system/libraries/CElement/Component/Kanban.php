@@ -3,16 +3,32 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_Component_Kanban extends CElement_Component {
+    /**
+     * @var null|callable|CFunction_SerializableClosure
+     */
     protected $saveCallback;
 
+    /**
+     * @var null|string
+     */
     protected $saveCallbackRequire;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->addClass('form-row')->addClass('kanban');
         CManager::registerModule('dragula');
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CElement_Component_Kanban_List
+     */
     public function addList($id = '') {
         $wrapperList = $this->addDiv()->addClass('col-md');
         $list = CElement_Factory::createComponent('Kanban_List', $id);
@@ -22,6 +38,12 @@ class CElement_Component_Kanban extends CElement_Component {
         return $list;
     }
 
+    /**
+     * @param callable $callback
+     * @param string   $require
+     *
+     * @return $this
+     */
     public function setSaveCallback($callback, $require = '') {
         $this->saveCallback = c::toSerializableClosure($callback);
         $this->saveCallbackRequire = $require;
@@ -29,9 +51,17 @@ class CElement_Component_Kanban extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function build() {
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $saveUrl = '';
         if ($this->saveCallback != null) {

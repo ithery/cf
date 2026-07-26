@@ -18,21 +18,21 @@ class CElement_Component_Metric_Results_ValueResult implements JsonSerializable 
     /**
      * The previous value label.
      *
-     * @var string
+     * @var null|string
      */
     public $previousLabel;
 
     /**
      * The metric value prefix.
      *
-     * @var string
+     * @var null|string
      */
     public $prefix;
 
     /**
      * The metric value suffix.
      *
-     * @var string
+     * @var null|string
      */
     public $suffix;
 

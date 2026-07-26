@@ -3,18 +3,42 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_Component_PrismCode extends CElement_Component {
+    /**
+     * @var string
+     */
     protected $prismLanguage = 'php';
 
+    /**
+     * @var string
+     */
     protected $prismTheme = 'okaidia';
 
+    /**
+     * @var CElement_Element_Code
+     */
     protected $codeElement;
 
+    /**
+     * @var bool|null
+     */
     protected $haveCopyToClipboard;
 
+    /**
+     * @var bool|null
+     */
     protected $haveSelectCode;
 
+    /**
+     * @var bool
+     */
     protected $isWrap;
 
+    /**
+     * @param string $id
+     * @param string $tag
+     *
+     * @return void
+     */
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
         $this->tag = 'pre';
@@ -24,18 +48,31 @@ class CElement_Component_PrismCode extends CElement_Component {
         $this->isWrap = false;
     }
 
+    /**
+     * @param string $lang
+     *
+     * @return $this
+     */
     public function setLanguage($lang) {
         $this->prismLanguage = $lang;
 
         return $this;
     }
 
+    /**
+     * @param string $theme
+     *
+     * @return $this
+     */
     public function setTheme($theme) {
         $this->prismTheme = $theme;
 
         return $this;
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         c::manager()->registerJs('plugins/prism/prism.min.js');
         c::manager()->registerJs('plugins/prism/prism.min.js');
@@ -49,24 +86,44 @@ class CElement_Component_PrismCode extends CElement_Component {
         }
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setHaveCopyToClipboard($bool = true) {
         $this->haveCopyToClipboard = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setHaveSelectCode($bool = true) {
         $this->haveSelectCode = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setWrap($bool = true) {
         $this->isWrap = $bool;
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = '';
 

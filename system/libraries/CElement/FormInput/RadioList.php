@@ -3,6 +3,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_FormInput_RadioList extends CElement_FormInput {
+    /**
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -10,6 +13,12 @@ class CElement_FormInput_RadioList extends CElement_FormInput {
         $this->addClass('checkbox-list');
     }
 
+    /**
+     * Builds one `CElement_FormInput_Radio` child control per `$this->list`
+     * entry, checking the one matching `$this->value`.
+     *
+     * @return void
+     */
     protected function build() {
         parent::build();
         foreach ($this->list as $key => $value) {

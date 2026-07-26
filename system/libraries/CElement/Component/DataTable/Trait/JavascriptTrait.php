@@ -1,6 +1,11 @@
 <?php
 
 trait CElement_Component_DataTable_Trait_JavascriptTrait {
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'" . c::__('element/datatable.search') . " ' + title";
 

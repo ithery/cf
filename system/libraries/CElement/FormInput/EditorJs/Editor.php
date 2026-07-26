@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * EditorJS editor instance value object (holder, config and block data).
+ */
 class CElement_FormInput_EditorJs_Editor {
     /**
      * @var string
@@ -7,7 +10,7 @@ class CElement_FormInput_EditorJs_Editor {
     private $holder = '';
 
     /**
-     * @var null|EditorConfig
+     * @var null|CElement_FormInput_EditorJs_EditorConfig
      */
     private $config;
 
@@ -21,6 +24,13 @@ class CElement_FormInput_EditorJs_Editor {
      */
     private $data = [];
 
+    /**
+     * Constructor.
+     *
+     * @param string                                       $holder
+     * @param null|CElement_FormInput_EditorJs_EditorConfig $config
+     * @param array                                        $data
+     */
     public function __construct(
         string $holder = '',
         ?CElement_FormInput_EditorJs_EditorConfig $config = null,
@@ -37,10 +47,22 @@ class CElement_FormInput_EditorJs_Editor {
         $this->data = $data;
     }
 
+    /**
+     * Get the holder element ID the editor attaches to.
+     *
+     * @return string
+     */
     public function getHolder(): string {
         return $this->holder;
     }
 
+    /**
+     * Set the holder element ID the editor attaches to.
+     *
+     * @param string $holder
+     *
+     * @return CElement_FormInput_EditorJs_Editor
+     */
     public function setHolder(string $holder): CElement_FormInput_EditorJs_Editor {
         $this->holder = $holder;
 
@@ -65,6 +87,11 @@ class CElement_FormInput_EditorJs_Editor {
         return $this;
     }
 
+    /**
+     * Get the raw block data.
+     *
+     * @return array
+     */
     public function getData(): array {
         return $this->data;
     }

@@ -4,22 +4,49 @@ use Illuminate\Contracts\Support\Arrayable;
 
 class CElement_FormInput_QueryBuilder extends CElement_FormInput {
     /**
-     * @var CElement_FormInput_QueryBuilder_FilterBuilder
+     * @var null|CElement_FormInput_QueryBuilder_FilterBuilder
      */
     protected $filters;
 
+    /**
+     * @var string
+     */
     protected $inputId;
 
+    /**
+     * @var CElement_FormInput_Hidden
+     */
     protected $input;
 
+    /**
+     * @var CElement_Element_Div
+     */
     protected $container;
 
+    /**
+     * @var string
+     */
     protected $containerId;
 
+    /**
+     * Whether to initialize select2 on the rule value `<select>` inputs rendered by the builder.
+     *
+     * @var null|bool
+     */
     protected $isApplySelect2;
 
+    /**
+     * Whether to show a toast when the rules can't be parsed.
+     *
+     * @var bool
+     */
     protected $isToastOnError;
 
+    /**
+     * @param null|string $id
+     *
+     * @return void
+     */
     public function __construct($id = null) {
         if ($id == null) {
             $id = spl_object_hash($this);
@@ -47,7 +74,7 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
      * @param string $rules
      * @param string $modelClass
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      */
     public static function parseToModelQuery($rules, $modelClass) {
         $parser = new CElement_FormInput_QueryBuilder_Parser($modelClass);
@@ -55,6 +82,13 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         return $parser->parse($rules);
     }
 
+    /**
+     * Create the filter builder and pass it to the given callback for configuration.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
     public function withFilterBuilder($callback) {
         $this->filters = c::tap(new CElement_FormInput_QueryBuilder_FilterBuilder(), $callback);
 
@@ -72,6 +106,11 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         return $this->filters;
     }
 
+    /**
+     * @param string $val
+     *
+     * @return $this
+     */
     public function setName($val) {
         $this->input->setName($val);
 
@@ -91,12 +130,22 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * Whether to initialize select2 on the rule value `<select>` inputs rendered by the builder.
+     *
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setApplySelect2($bool = true) {
         $this->isApplySelect2 = $bool;
 
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         parent::build();
         if ($this->readonly) {
@@ -107,6 +156,11 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         }
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $filters = $this->filters;
         if ($filters instanceof Arrayable) {

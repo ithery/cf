@@ -68,6 +68,8 @@ class CElement_List_TabList_Tab extends CElement_Element {
 
     /**
      * @param string $id
+     *
+     * @return void
      */
     public function __construct($id = '') {
         parent::__construct($id);

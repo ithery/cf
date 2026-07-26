@@ -7,16 +7,26 @@ class CElement_Component_Image extends CElement_Component {
     protected $img;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $progressiveThumbnail;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->img = $this->addImg();
         $this->wrapper = $this->img;
     }
 
+    /**
+     * @param string $progressiveThumbnail
+     *
+     * @return $this
+     */
     public function setProgressiveThumbnail($progressiveThumbnail) {
         $this->progressiveThumbnail = $progressiveThumbnail;
 
@@ -27,6 +37,8 @@ class CElement_Component_Image extends CElement_Component {
      * Set Attribute src.
      *
      * @param string $src
+     *
+     * @return $this
      */
     public function setSrc($src) {
         $this->img->setAttr('src', $src);
@@ -38,6 +50,8 @@ class CElement_Component_Image extends CElement_Component {
      * Set Attribute alt.
      *
      * @param string $alt
+     *
+     * @return $this
      */
     public function setAlt($alt) {
         $this->img->setAttr('alt', $alt);
@@ -45,6 +59,9 @@ class CElement_Component_Image extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         $this->addClass('cres:element:component:Image');
         $this->setAttr('cres-element', 'component:Image');

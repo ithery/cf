@@ -6,14 +6,31 @@ class CElement_FormInput_Time extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Time,
         CTrait_Element_Property_Placeholder;
 
+    /**
+     * @var bool
+     */
     protected $show_second;
 
+    /**
+     * bootstrap-timepicker `template` option (eg. `'dropdown'`|`'modal'`).
+     *
+     * @var string
+     */
     protected $template;
 
+    /**
+     * @var bool
+     */
     protected $show_meridian;
 
+    /**
+     * @var int
+     */
     protected $minute_step;
 
+    /**
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -28,6 +45,11 @@ class CElement_FormInput_Time extends CElement_FormInput {
         CManager::instance()->registerModule('timepicker');
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -63,6 +85,11 @@ class CElement_FormInput_Time extends CElement_FormInput {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

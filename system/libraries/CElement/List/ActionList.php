@@ -34,6 +34,11 @@ class CElement_List_ActionList extends CElement_List {
      */
     protected $withCaret;
 
+    /**
+     * @param null|string $listId
+     *
+     * @return void
+     */
     public function __construct($listId = null) {
         parent::__construct($listId);
 

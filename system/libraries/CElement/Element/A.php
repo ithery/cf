@@ -3,10 +3,21 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_Element_A extends CElement_Element {
+    /**
+     * @var string
+     */
     protected $href;
 
+    /**
+     * @var string
+     */
     protected $target;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id = '') {
         parent::__construct($id);
         $this->tag = 'a';
@@ -37,7 +48,7 @@ class CElement_Element_A extends CElement_Element {
     }
 
     /**
-     * @param mixed $target
+     * @param string $target
      *
      * @return $this
      */
@@ -54,6 +65,9 @@ class CElement_Element_A extends CElement_Element {
         return $this->setTarget('_blank');
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         parent::build();
         if (strlen($this->href) > 0) {

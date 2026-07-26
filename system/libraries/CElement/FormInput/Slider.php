@@ -3,24 +3,64 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_FormInput_Slider extends CElement_FormInput {
+    /**
+     * @var int
+     */
     protected $minValue;
 
+    /**
+     * @var int
+     */
     protected $maxValue;
 
+    /**
+     * @var int
+     */
     protected $value;
 
+    /**
+     * @var int
+     */
     protected $step;
 
+    /**
+     * jQuery UI slider `orientation` option (`'horizontal'`|`'vertical'`).
+     *
+     * @var string
+     */
     protected $orientation;
 
+    /**
+     * jQuery UI slider `tooltip` option (eg. `'show'`|`'hide'`).
+     *
+     * @var string
+     */
     protected $tooltip;
 
+    /**
+     * Raw JS body executed inside the `slide` event handler.
+     *
+     * @var null|string
+     */
     protected $onSlide;
 
+    /**
+     * Declared but never assigned or wired into {@see js()}.
+     *
+     * @var null|string
+     */
     protected $onSlideStart;
 
+    /**
+     * Raw JS body executed inside the `slideStop` event handler.
+     *
+     * @var null|string
+     */
     protected $onSlideStop;
 
+    /**
+     * @param string $id
+     */
     public function __construct($id = '') {
         parent::__construct($id);
 
@@ -32,10 +72,20 @@ class CElement_FormInput_Slider extends CElement_FormInput {
         $this->tooltip = 'show';
     }
 
+    /**
+     * @param string $id
+     *
+     * @return static
+     */
     public static function factory($id = '') {
         return new CElement_FormInput_Slider($id);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
 
@@ -53,6 +103,11 @@ class CElement_FormInput_Slider extends CElement_FormInput {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
 
@@ -83,30 +138,55 @@ class CElement_FormInput_Slider extends CElement_FormInput {
         return $js->text();
     }
 
+    /**
+     * @param int $minValue
+     *
+     * @return $this
+     */
     public function setMinValue($minValue) {
         $this->minValue = $minValue;
 
         return $this;
     }
 
+    /**
+     * @param int $maxValue
+     *
+     * @return $this
+     */
     public function setMaxValue($maxValue) {
         $this->maxValue = $maxValue;
 
         return $this;
     }
 
+    /**
+     * @param int $value
+     *
+     * @return $this
+     */
     public function setValue($value) {
         $this->value = $value;
 
         return $this;
     }
 
+    /**
+     * @param string $tooltip
+     *
+     * @return $this
+     */
     public function setTooltip($tooltip) {
         $this->tooltip = $tooltip;
 
         return $this;
     }
 
+    /**
+     * @param int $step
+     *
+     * @return $this
+     */
     public function setStep($step) {
         $this->step = $step;
 

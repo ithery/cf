@@ -5,18 +5,35 @@ use CElement_Component_Blockly_ToolboxHelper as ToolboxHelper;
 use CElement_Component_Blockly_CategoryHelper as CategoryHelper;
 
 class CElement_Component_Blockly_Toolbox extends CElement_Element {
+    /**
+     * @var array
+     */
     protected $categories = [];
 
+    /**
+     * @param string $id
+     * @param string $tag
+     *
+     * @return void
+     */
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
         $this->tag = 'xml';
         $this->categories = [];
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         $this->categories = ToolboxHelper::getAllCategoryData();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $this->buildOnce();
         $xmlOpen = '<xml id="' . $this->id . '" style="display: none">';

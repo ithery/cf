@@ -39,7 +39,7 @@ class CElement_Component_Form_Field extends CElement_Component {
     /**
      * One of 'small', 'medium', 'large', 'none', or a numeric value.
      *
-     * @var string
+     * @var int|string
      */
     protected $labelSize = [];
 

@@ -3,14 +3,36 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_FormInput_Textarea_CKEditor extends CElement_FormInput_Textarea {
+    /**
+     * Declared but never read -- the current `html()`/`js()` overrides
+     * don't reference it.
+     *
+     * @var array
+     */
     protected $toolbar_item = [];
 
+    /**
+     * @var int
+     */
     protected $col;
 
+    /**
+     * @var int
+     */
     protected $row;
 
+    /**
+     * Toolbar preset name (`'standard'`|`'basic'`|`'full'`). Declared but
+     * not currently applied by {@see js()}, which always initializes
+     * CKEditor without a `toolbar` option.
+     *
+     * @var string
+     */
     protected $toolbar;
 
+    /**
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -24,28 +46,47 @@ class CElement_FormInput_Textarea_CKEditor extends CElement_FormInput_Textarea {
         CManager::instance()->registerModule('ckeditor-4');
     }
 
+    /**
+     * @param string $id
+     *
+     * @return static
+     */
     public static function factory($id) {
         return new CElement_FormInput_Textarea_CKEditor($id);
     }
 
+    /**
+     * @return $this
+     */
     public function toolbarFull() {
         $this->toolbar = 'full';
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function toolbarBasic() {
         $this->toolbar = 'basic';
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function toolbarStandard() {
         $this->toolbar = 'standard';
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -76,6 +117,11 @@ class CElement_FormInput_Textarea_CKEditor extends CElement_FormInput_Textarea {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

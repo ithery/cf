@@ -5,14 +5,31 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
     use CElement_Trait_MomentJsTrait;
 
+    /**
+     * @var string
+     */
     protected $dateFormat;
 
+    /**
+     * @var string
+     */
     protected $momentFormat;
 
+    /**
+     * @var mixed
+     */
     protected $dateStart;
 
+    /**
+     * @var mixed
+     */
     protected $dateEnd;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -27,6 +44,12 @@ class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
         $this->momentFormat = $this->convertPHPToMomentFormat($dateFormat);
     }
 
+    /**
+     * @param mixed $value A {@see CPeriod} (its start/end are used) or a single
+     *                      date value applied to both the start and end
+     *
+     * @return $this
+     */
     public function setValue($value) {
         if ($value instanceof CPeriod) {
             $this->setValueStart($value->startDate);
@@ -39,22 +62,40 @@ class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param mixed $dateStart
+     *
+     * @return $this
+     */
     public function setValueStart($dateStart) {
         $this->dateStart = $dateStart;
 
         return $this;
     }
 
+    /**
+     * @param mixed $dateEnd
+     *
+     * @return $this
+     */
     public function setValueEnd($dateEnd) {
         $this->dateEnd = $dateEnd;
 
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         $this->addClass('form-control');
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = '';
         $js .= "

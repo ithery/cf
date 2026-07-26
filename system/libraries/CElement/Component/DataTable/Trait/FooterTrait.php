@@ -3,10 +3,19 @@
  * @see CElement_Component_DataTable
  */
 trait CElement_Component_DataTable_Trait_FooterTrait {
+    /**
+     * @var null|string
+     */
     public $footerTitle;
 
+    /**
+     * @var null|bool
+     */
     public $footer;
 
+    /**
+     * @var null|CElement_Component_DataTable_FooterField[]
+     */
     public $footerFields;
 
     /**
@@ -31,6 +40,14 @@ trait CElement_Component_DataTable_Trait_FooterTrait {
         return $this;
     }
 
+    /**
+     * @param null|string $label
+     * @param mixed       $value
+     * @param string      $align
+     * @param int         $labelColSpan
+     *
+     * @return $this
+     */
     public function addFooterField($label = null, $value = null, $align = 'left', $labelColSpan = 0) {
         $footerField = new CElement_Component_DataTable_FooterField();
 

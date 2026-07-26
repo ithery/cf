@@ -5,24 +5,64 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_DateRange_Dropdown {
     use CElement_FormInput_Trait_PredefinedDateRangeTrait;
 
+    /**
+     * @var mixed
+     */
     protected $start;
 
+    /**
+     * @var mixed
+     */
     protected $end;
 
+    /**
+     * `false` to allow yesterday, `true` to disable it from today, or a date
+     * string used as the picker's `minDate`.
+     *
+     * @var bool|string
+     */
     protected $disableYesterday;
 
+    /**
+     * `false` to allow tomorrow, `true` to disable it from today, or a date
+     * string used as the picker's `maxDate`.
+     *
+     * @var bool|string
+     */
     protected $disableTomorrow;
 
+    /**
+     * @var string
+     */
     protected $openDirection = 'left';
 
+    /**
+     * @var bool
+     */
     protected $disableCustomRange = false;
 
+    /**
+     * Maximum span (in days) selectable in the picker.
+     *
+     * @var null|int
+     */
     protected $maxSpan;
 
+    /**
+     * @var string
+     */
     protected $previewFormat;
 
+    /**
+     * @var string
+     */
     protected $previewMomentFormat;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->tag = 'button';
@@ -47,12 +87,22 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
         return $this;
     }
 
+    /**
+     * @param bool|string $bool `true`/`false`, or a date string used as the minimum
+     *
+     * @return $this
+     */
     public function setDisableYesterday($bool = true) {
         $this->disableYesterday = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool|string $bool `true`/`false`, or a date string used as the maximum
+     *
+     * @return $this
+     */
     public function setDisableTomorrow($bool = true) {
         $this->disableTomorrow = $bool;
 
@@ -70,22 +120,40 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setDisableCustomRange($bool = true) {
         $this->disableCustomRange = $bool;
 
         return $this;
     }
 
+    /**
+     * @param int $span
+     *
+     * @return $this
+     */
     public function setMaxSpan($span) {
         $this->maxSpan = $span;
 
         return $this;
     }
 
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
     protected function getTranslation($key) {
         return c::__('element/date.daterangepicker.' . $key);
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         $this->addClass('btn dropdown-toggle md-btn-flat daterange-dropdownbutton uninit');
         $this->setAttr('type', 'button');
@@ -94,6 +162,11 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
         $this->after()->addControl($this->id . '-end', 'hidden')->setName($this->name . '[end]')->setValue($this->dateEnd);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = '';
         //make sure this element is builded

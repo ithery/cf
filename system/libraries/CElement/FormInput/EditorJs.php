@@ -9,7 +9,7 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
     use CElement_FormInput_EditorJs_Trait_EditorJsToolTrait;
 
     /**
-     * @var CManager_EditorJs
+     * @var null|CManager_EditorJs
      */
     protected $editor;
 
@@ -67,6 +67,7 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
      * Set the endpoint URL for uploading images by file.
      *
      * @param string $url
+     *
      * @return $this
      */
     public function setUploadImageByFileEndpoint($url) {
@@ -76,7 +77,10 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
     }
 
     /**
+     * Set the endpoint URL for uploading images by URL.
+     *
      * @param string $url
+     *
      * @return $this
      */
     public function setUploadImageByUrlEndpoint($url) {
@@ -89,6 +93,7 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
      * Set the initial block type for the editor.
      *
      * @param string $block
+     *
      * @return $this
      */
     public function setInitialBlock($block) {

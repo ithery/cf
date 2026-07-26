@@ -7,6 +7,9 @@ class CElement_FormInput_QueryBuilder_Filter implements Arrayable {
     use CElement_FormInput_QueryBuilder_Filter_OperatorTrait;
     use CElement_FormInput_QueryBuilder_Filter_InputTrait;
 
+    /**
+     * @var null|string
+     */
     protected $id;
 
     /**
@@ -14,16 +17,40 @@ class CElement_FormInput_QueryBuilder_Filter implements Arrayable {
      */
     protected $label;
 
+    /**
+     * One of the `CElement_FormInput_QueryBuilder_Constant::FILTER_TYPE_*` constants.
+     *
+     * @var string
+     */
     protected $type;
 
+    /**
+     * The list of selectable values, for select/radio/checkbox inputs.
+     *
+     * @var null|array
+     */
     protected $values;
 
+    /**
+     * @var null|array
+     */
     protected $validation;
 
+    /**
+     * @var null|string
+     */
     protected $placeholder;
 
+    /**
+     * @var null|bool
+     */
     protected $multiple;
 
+    /**
+     * @param null|string $id
+     *
+     * @return void
+     */
     public function __construct($id = null) {
         $this->id = $id;
         $this->label = 'Name';
@@ -36,6 +63,11 @@ class CElement_FormInput_QueryBuilder_Filter implements Arrayable {
         $this->multiple = null;
     }
 
+    /**
+     * @param string $id
+     *
+     * @return $this
+     */
     public function setId($id) {
         $this->id = $id;
 
@@ -53,54 +85,85 @@ class CElement_FormInput_QueryBuilder_Filter implements Arrayable {
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setTypeString() {
         $this->type = Constant::FILTER_TYPE_STRING;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setTypeInteger() {
         $this->type = Constant::FILTER_TYPE_INTEGER;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setTypeDouble() {
         $this->type = Constant::FILTER_TYPE_DOUBLE;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setTypeDate() {
         $this->type = Constant::FILTER_TYPE_DATE;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setTypeTime() {
         $this->type = Constant::FILTER_TYPE_TIME;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setTypeDatetime() {
         $this->type = Constant::FILTER_TYPE_DATETIME;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setTypeBoolean() {
         $this->type = Constant::FILTER_TYPE_BOOLEAN;
 
         return $this;
     }
 
+    /**
+     * @param string $type one of the `CElement_FormInput_QueryBuilder_Constant::FILTER_TYPE_*` constants
+     *
+     * @return $this
+     */
     public function setType($type) {
         $this->type = $type;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setMultiple($bool = true) {
         $this->multiple = $bool;
 
@@ -129,6 +192,11 @@ class CElement_FormInput_QueryBuilder_Filter implements Arrayable {
         return $this;
     }
 
+    /**
+     * Convert this filter into the array shape expected by the jQuery QueryBuilder `filters` option.
+     *
+     * @return array
+     */
     public function toArray() {
         $result = [];
         $result['id'] = $this->id;

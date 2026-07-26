@@ -5,18 +5,44 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_Date extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Date;
 
+    /**
+     * @var string
+     */
     protected $dateFormat;
 
+    /**
+     * @var bool
+     */
     protected $haveButton;
 
+    /**
+     * @var string
+     */
     protected $startDate;
 
+    /**
+     * @var string
+     */
     protected $endDate;
 
+    /**
+     * Days of week disabled in the picker, as lowercase day names or their
+     * numeric (`0`-`6`, Sunday-Saturday) equivalents.
+     *
+     * @var array
+     */
     protected $disableDay;
 
+    /**
+     * @var bool
+     */
     protected $inline;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -39,17 +65,32 @@ class CElement_FormInput_Date extends CElement_FormInput {
         $this->addClass('form-control');
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         /** @phpstan-ignore-next-line */
         return new static($id);
     }
 
+    /**
+     * @param string $str
+     *
+     * @return $this
+     */
     public function setStartDate($str) {
         $this->startDate = $str;
 
         return $this;
     }
 
+    /**
+     * @param string $str
+     *
+     * @return $this
+     */
     public function setEndDate($str) {
         $this->endDate = $str;
 
@@ -74,12 +115,22 @@ class CElement_FormInput_Date extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param string $str
+     *
+     * @return $this
+     */
     public function setDateFormat($str) {
         $this->dateFormat = $str;
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -121,10 +172,20 @@ class CElement_FormInput_Date extends CElement_FormInput {
         return $html->text();
     }
 
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
     protected function getTranslation($key) {
         return c::__('element/date.datepicker.' . $key);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $jsLanguages = "$.fn.datepicker.dates['custom'] = {
             days: [

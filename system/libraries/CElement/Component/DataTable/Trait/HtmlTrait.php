@@ -1,9 +1,17 @@
 <?php
 
 trait CElement_Component_DataTable_Trait_HtmlTrait {
+    /**
+     * @return void
+     */
     protected function htmlGetTableClass() {
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
@@ -112,6 +120,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     protected function rawTBody($indent = 0) {
         /** @var CElement_Component_DataTable $this */
         $html = new CStringBuilder();
@@ -266,6 +279,13 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $html->text();
     }
 
+    /**
+     * @param CStringBuilder                       $html
+     * @param CElement_Component_DataTable_DataRow $row
+     * @param int|string                           $key
+     *
+     * @return string
+     */
     protected function drawActionAndGetJs(CStringBuilder $html, CElement_Component_DataTable_DataRow $row, $key) {
         $js = '';
         if ($this->haveRowAction()) {
@@ -312,6 +332,12 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $js;
     }
 
+    /**
+     * @param int  $indent
+     * @param bool $wrapped
+     *
+     * @return string
+     */
     protected function rawHtml($indent = 0, $wrapped = false) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -446,6 +472,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $html->text();
     }
 
+    /**
+     * @return string
+     */
     public function htmlTHead() {
         $thClass = '';
         /** @var CElement_Component_DataTable $this */
@@ -499,6 +528,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $html->text();
     }
 
+    /**
+     * @return string
+     */
     public function htmlActionTh() {
         $thClass = '';
         if ($this->headerNoLineBreak) {
@@ -516,6 +548,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $html;
     }
 
+    /**
+     * @param mixed $cell
+     *
+     * @return array
+     */
     protected function getHtmlJsCell($cell) {
         $html = '';
         $js = '';

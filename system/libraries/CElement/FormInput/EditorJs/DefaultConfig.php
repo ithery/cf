@@ -1,5 +1,11 @@
 <?php
+/**
+ * Default configuration values for the EditorJS form input and its tools.
+ */
 class CElement_FormInput_EditorJs_DefaultConfig {
+    /**
+     * @var array
+     */
     protected static $defaultConfig = [
 
         /**
@@ -310,6 +316,14 @@ class CElement_FormInput_EditorJs_DefaultConfig {
         ]
     ];
 
+    /**
+     * Get a default config value by dot-notated key.
+     *
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
     public static function get($key, $default = null) {
         $result = carr::get(static::$defaultConfig, $key, $default);
         if ($result === null) {
@@ -319,6 +333,11 @@ class CElement_FormInput_EditorJs_DefaultConfig {
         return $result;
     }
 
+    /**
+     * Get the full default configuration array.
+     *
+     * @return array
+     */
     public static function data() {
         return static::$defaultConfig;
     }

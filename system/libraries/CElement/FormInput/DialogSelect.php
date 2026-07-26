@@ -5,36 +5,92 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_DialogSelect extends CElement_FormInput {
     use CElement_Trait_Template;
 
+    /**
+     * Field(s) whose values are shown/searched, passed through to the ajax
+     * lookup endpoint.
+     *
+     * @var mixed
+     */
     protected $fields;
 
+    /**
+     * @var string
+     */
     protected $format;
 
+    /**
+     * @var string
+     */
     protected $keyField;
 
+    /**
+     * @var array|string
+     */
     protected $searchField;
 
+    /**
+     * @var int
+     */
     protected $limit;
 
+    /**
+     * @var string
+     */
     protected $title;
 
+    /**
+     * @var string
+     */
     protected $itemName;
 
+    /**
+     * @var string
+     */
     protected $imgSrc;
 
+    /**
+     * @var int|string
+     */
     protected $minWidth;
 
+    /**
+     * @var int|string
+     */
     protected $minHeight;
 
+    /**
+     * @var string
+     */
     protected $buttonLabel;
 
+    /**
+     * @var string
+     */
     protected $placeholder;
 
+    /**
+     * @var string
+     */
     protected $itemTemplateName;
 
+    /**
+     * @var array
+     */
     protected $itemTemplateVariables;
 
+    /**
+     * Debounce delay (in milliseconds) before the search input triggers an
+     * ajax lookup.
+     *
+     * @var int|string
+     */
     protected $delay;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -75,40 +131,76 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
         });
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return self
+     */
     public static function factory($id = null) {
         return new CElement_FormInput_DialogSelect($id);
     }
 
+    /**
+     * @param mixed $fields
+     *
+     * @return $this
+     */
     public function setFields($fields) {
         $this->fields = $fields;
 
         return $this;
     }
 
+    /**
+     * @param string $format
+     *
+     * @return $this
+     */
     public function setFormat($format) {
         $this->format = $format;
 
         return $this;
     }
 
+    /**
+     * @param string $key
+     *
+     * @return $this
+     */
     public function setKeyField($key) {
         $this->keyField = $key;
 
         return $this;
     }
 
+    /**
+     * @param array $fields
+     *
+     * @return $this
+     */
     public function setSearchField(array $fields) {
         $this->searchField = $fields;
 
         return $this;
     }
 
+    /**
+     * @param int $total
+     *
+     * @return $this
+     */
     public function setLimit($total) {
         $this->limit = $total;
 
         return $this;
     }
 
+    /**
+     * @param string $title
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function setTitle($title, $lang = true) {
         if ($lang) {
             $title = c::__($title);
@@ -118,30 +210,56 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param string $itemName
+     *
+     * @return $this
+     */
     public function setItemName($itemName) {
         $this->itemName = $itemName;
 
         return $this;
     }
 
+    /**
+     * @param string $imgsrc
+     *
+     * @return $this
+     */
     public function setImgSrc($imgsrc) {
         $this->imgSrc = $imgsrc;
 
         return $this;
     }
 
+    /**
+     * @param int|string $minWidth
+     *
+     * @return $this
+     */
     public function setMinWidth($minWidth) {
         $this->minWidth = $minWidth;
 
         return $this;
     }
 
+    /**
+     * @param int|string $minHeight
+     *
+     * @return $this
+     */
     public function setMinHeight($minHeight) {
         $this->minHeight = $minHeight;
 
         return $this;
     }
 
+    /**
+     * @param string $label
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function setButtonLabel($label, $lang = true) {
         if ($lang) {
             $label = c::__($label);
@@ -151,6 +269,12 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param string $placeholder
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function setPlaceholder($placeholder, $lang = true) {
         if ($lang) {
             $placeholder = c::__($placeholder);
@@ -160,24 +284,42 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param string $templateName
+     *
+     * @return $this
+     */
     public function setItemTemplateName($templateName) {
         $this->itemTemplateName = $templateName;
 
         return $this;
     }
 
+    /**
+     * @param array $vars
+     *
+     * @return $this
+     */
     public function setItemTemplateVariables(array $vars) {
         $this->itemTemplateVariables = $vars;
 
         return $this;
     }
 
+    /**
+     * @param int|string $delay
+     *
+     * @return $this
+     */
     public function setDelay($delay) {
         $this->delay = $delay;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function createAjaxName() {
         $ajaxName = $this->name;
         $ajaxName = str_replace('[', '-', $this->name);
@@ -186,6 +328,9 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
         return $ajaxName;
     }
 
+    /**
+     * @return string
+     */
     public function createAjaxUrl() {
         return CAjax::createMethod()
             ->setType('DialogSelect')
@@ -199,6 +344,11 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
             ->makeurl();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $templateHtml = $this->getTemplateHtml();
         $html = $templateHtml;
@@ -206,6 +356,11 @@ class CElement_FormInput_DialogSelect extends CElement_FormInput {
         return $html;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $templateJs = $this->getTemplateJs();
         $js = $templateJs;

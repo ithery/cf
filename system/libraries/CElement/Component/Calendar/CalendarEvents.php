@@ -7,10 +7,11 @@ use Illuminate\Contracts\Support\Arrayable;
 /**
  * Mutable collection of CElement_Component_Calendar_CalendarEvent, used both ways a
  * CElement_Component_Calendar populates events:
- * - directly by the developer, via CElement_Component_Calendar::createEvents() before render,
+ * - directly by the developer, via CElement_Component_Calendar::getEvents() before render,
  *   for a fixed (non-ajax) event list.
- * - by the CElement_Component_Calendar::setCallback() callback, which CAjax_Engine_Calendar
- *   invokes with a fresh instance per ajax request and reads back via getData().
+ * - by the callable passed to CElement_Component_Calendar::setEvents(), which
+ *   CAjax_Engine_Calendar invokes with a fresh instance per ajax request and reads back
+ *   via getData().
  */
 class CElement_Component_Calendar_CalendarEvents implements Arrayable {
     /**

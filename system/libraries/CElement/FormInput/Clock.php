@@ -6,12 +6,26 @@ class CElement_FormInput_Clock extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Clock,
         CTrait_Element_Property_Placeholder;
 
+    /**
+     * @var bool
+     */
     protected $show_second;
 
+    /**
+     * @var bool
+     */
     protected $show_meridian;
 
+    /**
+     * @var int
+     */
     protected $minute_step;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -35,11 +49,19 @@ class CElement_FormInput_Clock extends CElement_FormInput {
         CManager::registerModule('clockpicker', $dataModule);
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

@@ -5,16 +5,42 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_AutoNumeric extends CElement_FormInput {
     use CTrait_Element_Property_Placeholder;
 
+    /**
+     * Number of decimal digits kept (autoNumeric's `mDec` option).
+     *
+     * @var int
+     */
     protected $decimalDigit = 0;
 
+    /**
+     * Thousands separator character (autoNumeric's `aSep` option).
+     *
+     * @var string
+     */
     protected $thousandSeparator = ',';
 
+    /**
+     * Decimal point character (autoNumeric's `aDec` option).
+     *
+     * @var string
+     */
     protected $decimalSeparator = '.';
 
+    /**
+     * @var null|float
+     */
     protected $minValue = null;
 
+    /**
+     * @var null|float
+     */
     protected $maxValue = null;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -31,22 +57,42 @@ class CElement_FormInput_AutoNumeric extends CElement_FormInput {
         }
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return self
+     */
     public static function factory($id = null) {
         return new CElement_FormInput_AutoNumeric($id);
     }
 
+    /**
+     * @param int $digit
+     *
+     * @return $this
+     */
     public function setDecimalDigit($digit) {
         $this->decimalDigit = $digit;
 
         return $this;
     }
 
+    /**
+     * @param string $separator
+     *
+     * @return $this
+     */
     public function setThousandSeparator($separator) {
         $this->thousandSeparator = $separator;
 
         return $this;
     }
 
+    /**
+     * @param string $separator
+     *
+     * @return $this
+     */
     public function setDecimalSeparator($separator) {
         $this->decimalSeparator = $separator;
 
@@ -75,6 +121,9 @@ class CElement_FormInput_AutoNumeric extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
@@ -108,6 +157,9 @@ class CElement_FormInput_AutoNumeric extends CElement_FormInput {
         $this->setAttr('cres-config', c::json($this->buildControlConfig()));
     }
 
+    /**
+     * @return array
+     */
     protected function buildControlConfig() {
         $config = [
             'applyJs' => 'autoNumeric',

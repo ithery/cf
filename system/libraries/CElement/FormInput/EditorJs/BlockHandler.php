@@ -10,14 +10,14 @@ class CElement_FormInput_EditorJs_BlockHandler {
     const DEFAULT_ARRAY_KEY = '-';
 
     /**
-     * @var null|CElement_FormInput_EditorJs_EditorConfig
+     * @var null|CElement_FormInput_EditorJs_ConfigLoader
      */
     private $rules = null;
 
     /**
      * BlockHandler constructor.
      *
-     * @param string $configuration
+     * @param null|string $configuration
      *
      * @throws CElement_FormInput_EditorJs_EditorJsException
      */
@@ -58,7 +58,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
      *
      * @throws CElement_FormInput_EditorJs_EditorJsException
      *
-     * @return array|bool
+     * @return array
      */
     public function sanitizeBlock($blockType, $blockData, $blockTunes = []) {
         $rule = $this->rules->tools[$blockType];
@@ -230,7 +230,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
     /**
      * Create and return new default purifier.
      *
-     * @param $allowedTags
+     * @param string $allowedTags
      *
      * @return \HTMLPurifier
      */
@@ -253,6 +253,8 @@ class CElement_FormInput_EditorJs_BlockHandler {
 
     /**
      * Initialize HTML Purifier with default settings.
+     *
+     * @return \HTMLPurifier_Config
      */
     private function getDefaultPurifier() {
         $sanitizer = \HTMLPurifier_Config::createDefault();
@@ -290,7 +292,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
     /**
      * Expand shortified tool settings.
      *
-     * @param $rule – tool settings
+     * @param array|string $rule – tool settings
      *
      * @throws CElement_FormInput_EditorJs_EditorJsException
      *

@@ -1,12 +1,25 @@
 <?php
 
 class CElement_Component_ProgressBar_Process {
+    /**
+     * @var callable|CFunction_SerializableClosure
+     */
     protected $callable;
 
+    /**
+     * @param callable|Closure $callback
+     *
+     * @return void
+     */
     public function __construct($callback) {
         $this->callable = c::toSerializableClosure($callback);
     }
 
+    /**
+     * @param array $config
+     *
+     * @return string
+     */
     public function createIframeProcess(array $config) {
         $ajaxMethod = CAjax::createMethod();
         $ajaxMethod->setType('ProgressBarProcess');

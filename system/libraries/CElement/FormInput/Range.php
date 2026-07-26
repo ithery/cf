@@ -6,14 +6,32 @@ class CElement_FormInput_Range extends CElement_FormInput {
     use CTrait_Element_Property_Placeholder;
     use CTrait_Element_Property_ApplyJs;
 
+    /**
+     * @var int
+     */
     protected $min;
 
+    /**
+     * @var int
+     */
     protected $max;
 
+    /**
+     * @var int
+     */
     protected $step;
 
+    /**
+     * CSS selector (or `CRenderable` resolved to `#id`) of the element that
+     * mirrors this range's current value on change.
+     *
+     * @var null|string
+     */
     protected $valueContainerSelector;
 
+    /**
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'range';
@@ -25,24 +43,44 @@ class CElement_FormInput_Range extends CElement_FormInput {
         $this->step = 1;
     }
 
+    /**
+     * @param int $min
+     *
+     * @return $this
+     */
     public function setMin($min) {
         $this->min = $min;
 
         return $this;
     }
 
+    /**
+     * @param int $max
+     *
+     * @return $this
+     */
     public function setMax($max) {
         $this->max = $max;
 
         return $this;
     }
 
+    /**
+     * @param int $step
+     *
+     * @return $this
+     */
     public function setStep($step) {
         $this->step = $step;
 
         return $this;
     }
 
+    /**
+     * @param string|CRenderable $selector
+     *
+     * @return $this
+     */
     public function setValueContainerSelector($selector) {
         if ($selector instanceof CRenderable) {
             $selector = '#' . $selector->id();
@@ -52,6 +90,9 @@ class CElement_FormInput_Range extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
@@ -67,6 +108,11 @@ class CElement_FormInput_Range extends CElement_FormInput {
         }
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = '';
         if ($this->applyJs == 'ion-rangeslider') {

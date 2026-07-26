@@ -5,6 +5,11 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_MiniColor extends CElement_FormInput {
     use CTrait_Element_Property_Placeholder;
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'text';
@@ -13,6 +18,9 @@ class CElement_FormInput_MiniColor extends CElement_FormInput {
         CManager::registerModule('minicolors');
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         $this->setAttr('placeholder', $this->placeholder);
         $this->setAttr('value', $this->value);
@@ -21,6 +29,9 @@ class CElement_FormInput_MiniColor extends CElement_FormInput {
         $this->setAttr('cres-config', c::json($this->buildControlConfig()));
     }
 
+    /**
+     * @return array
+     */
     protected function buildControlConfig() {
         $config = [
             'applyJs' => 'minicolor',

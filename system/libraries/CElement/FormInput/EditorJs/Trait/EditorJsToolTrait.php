@@ -1,12 +1,20 @@
 <?php
 
 /**
- * Class BlockHandler.
+ * Fluent accessors for the EditorJS tool instances registered on
+ * {@see CElement_FormInput_EditorJs}.
  */
 trait CElement_FormInput_EditorJs_Trait_EditorJsToolTrait {
+    /**
+     * Tool instances keyed by tool name.
+     *
+     * @var CElement_FormInput_EditorJs_ToolAbstract[]
+     */
     protected $tools;
 
     /**
+     * Get the header tool instance.
+     *
      * @return CElement_FormInput_EditorJs_Tool_HeaderTool
      */
     public function headerTool() {
@@ -14,6 +22,8 @@ trait CElement_FormInput_EditorJs_Trait_EditorJsToolTrait {
     }
 
     /**
+     * Configure the header tool via a callback.
+     *
      * @param Closure $callback
      *
      * @return CElement_FormInput_EditorJs
@@ -25,6 +35,8 @@ trait CElement_FormInput_EditorJs_Trait_EditorJsToolTrait {
     }
 
     /**
+     * Get the checklist tool instance.
+     *
      * @return CElement_FormInput_EditorJs_Tool_ChecklistTool
      */
     public function checklistTool() {
@@ -32,6 +44,8 @@ trait CElement_FormInput_EditorJs_Trait_EditorJsToolTrait {
     }
 
     /**
+     * Configure the checklist tool via a callback.
+     *
      * @param Closure $callback
      *
      * @return CElement_FormInput_EditorJs
@@ -43,6 +57,8 @@ trait CElement_FormInput_EditorJs_Trait_EditorJsToolTrait {
     }
 
     /**
+     * Get the link tool instance.
+     *
      * @return CElement_FormInput_EditorJs_Tool_LinkTool
      */
     public function linkTool() {
@@ -50,6 +66,8 @@ trait CElement_FormInput_EditorJs_Trait_EditorJsToolTrait {
     }
 
     /**
+     * Configure the link tool via a callback.
+     *
      * @param Closure $callback
      *
      * @return CElement_FormInput_EditorJs
@@ -61,6 +79,8 @@ trait CElement_FormInput_EditorJs_Trait_EditorJsToolTrait {
     }
 
     /**
+     * Get the image tool instance.
+     *
      * @return CElement_FormInput_EditorJs_Tool_ImageTool
      */
     public function imageTool() {
@@ -68,6 +88,8 @@ trait CElement_FormInput_EditorJs_Trait_EditorJsToolTrait {
     }
 
     /**
+     * Configure the image tool via a callback.
+     *
      * @param Closure $callback
      *
      * @return CElement_FormInput_EditorJs
@@ -79,6 +101,8 @@ trait CElement_FormInput_EditorJs_Trait_EditorJsToolTrait {
     }
 
     /**
+     * Get the raw HTML tool instance.
+     *
      * @return CElement_FormInput_EditorJs_Tool_RawTool
      */
     public function rawTool() {
@@ -86,6 +110,8 @@ trait CElement_FormInput_EditorJs_Trait_EditorJsToolTrait {
     }
 
     /**
+     * Configure the raw HTML tool via a callback.
+     *
      * @param Closure $callback
      *
      * @return CElement_FormInput_EditorJs

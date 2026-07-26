@@ -8,10 +8,19 @@ class CElement_Component_Alert extends CElement_Component {
      */
     protected $header;
 
+    /**
+     * @var CElement_Element_Div
+     */
     protected $content;
 
+    /**
+     * @var string|null
+     */
     protected $type;
 
+    /**
+     * @var bool
+     */
     protected $isDismissable;
 
     /**
@@ -19,6 +28,12 @@ class CElement_Component_Alert extends CElement_Component {
      */
     protected $dismissableButton;
 
+    /**
+     * @param string $id
+     * @param string $tag
+     *
+     * @return void
+     */
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
         $this->dismissableButton = $this->addButton()->addClass('btn-close close')->setAttr([
@@ -91,6 +106,9 @@ class CElement_Component_Alert extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         if (strlen($this->title) == 0) {
             $this->header->setVisibility(false);

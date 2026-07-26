@@ -3,23 +3,46 @@
 class CElement_Component_TableRow extends CElement_Component {
     use CTrait_Compat_Element_TableRow;
 
+    /**
+     * @var array
+     */
     protected $columns = [];
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id = '') {
         parent::__construct($id);
     }
 
+    /**
+     * @param string|null $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         // @phpstan-ignore-next-line
         return new static($id);
     }
 
+    /**
+     * @param mixed $content
+     *
+     * @return $this
+     */
     public function addColumn($content) {
         $this->columns[] = $content;
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -43,6 +66,11 @@ class CElement_Component_TableRow extends CElement_Component {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

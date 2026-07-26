@@ -1,6 +1,13 @@
 <?php
 
 trait CElement_Component_DataTable_Trait_Legacy_ExportTrait {
+    /**
+     * @param string                             $filename
+     * @param null|string                        $sheet_name
+     * @param null|CElement_Component_DataTable  $table
+     *
+     * @return void
+     */
     private static function exportExcelxmlStatic($filename, $sheet_name = null, $table = null) {
         header('Cache-Control: no-cache, no-store, must-revalidate');
         header('Content-Type: application/vnd.ms-excel');

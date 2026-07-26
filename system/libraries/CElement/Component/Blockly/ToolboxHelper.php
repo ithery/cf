@@ -4,6 +4,9 @@ use CElement_Component_Blockly_BlockHelper as BlockHelper;
 use CElement_Component_Blockly_CategoryHelper as CategoryHelper;
 
 class CElement_Component_Blockly_ToolboxHelper {
+    /**
+     * @return array
+     */
     public static function getAllCategoryData() {
         $cats = [];
         //LOGIC

@@ -93,7 +93,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public $headerSortable;
 
     /**
-     * @var string|Closure|\Opis\Closure\SerializableClosure
+     * @var string|Closure|CFunction_SerializableClosure
      */
     public $cellCallbackFunc;
 
@@ -288,7 +288,7 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $domElements = [];
 
     /**
-     * @var null|Closure|\Opis\Closure\SerializableClosure
+     * @var null|Closure|CFunction_SerializableClosure
      */
     protected $rowClassCallbackFunction = null;
 
@@ -301,6 +301,11 @@ class CElement_Component_DataTable extends CElement_Component {
      * @var string
      */
     protected $themeType = 'table';
+
+    /**
+     * @var null|string
+     */
+    protected $domain;
 
     /**
      * @param string $id
@@ -1094,7 +1099,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @return string
+     * @return null|string
      */
     public function getDomain() {
         return $this->domain;
@@ -1121,7 +1126,7 @@ class CElement_Component_DataTable extends CElement_Component {
     /**
      * @param mixed $index
      *
-     * @return CElement_Component_DataTable_Column
+     * @return null|CElement_Component_DataTable_Column
      */
     public function getColumn($index) {
         return carr::get($this->columns, $index);
@@ -1339,8 +1344,8 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param string         $key
-     * @param mixed|Closure  $value
+     * @param string $key
+     * @param mixed  $value
      *
      * @return $this
      */
@@ -1371,7 +1376,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @return null|Closure|\Opis\Closure\SerializableClosure
+     * @return null|Closure|CFunction_SerializableClosure
      */
     public function getRowClassCallbackFunction() {
         return $this->rowClassCallbackFunction;

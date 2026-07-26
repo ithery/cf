@@ -1,14 +1,33 @@
 <?php
 
 class CElement_FormInput_Sortable extends CElement_FormInput {
+    /**
+     * @var string
+     */
     protected $containerId;
 
+    /**
+     * @var string
+     */
     protected $inputId;
 
+    /**
+     * Hidden input that carries the sorted list of keys as its value.
+     *
+     * @var CElement_FormInput_Hidden
+     */
     protected $input;
 
+    /**
+     * Div wrapping the sortable list items.
+     *
+     * @var CElement_Element_Div
+     */
     protected $container;
 
+    /**
+     * @param null|string $id
+     */
     public function __construct($id = null) {
         if ($id == null) {
             $id = spl_object_hash($this);
@@ -28,6 +47,9 @@ class CElement_FormInput_Sortable extends CElement_FormInput {
         $this->add($this->input);
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         parent::build();
         $this->addClass('cres:element:control:Sortable');
@@ -35,6 +57,9 @@ class CElement_FormInput_Sortable extends CElement_FormInput {
         $this->setAttr('cres-config', c::json($this->buildControlConfig()));
     }
 
+    /**
+     * @return array
+     */
     protected function buildControlConfig() {
         $listData = $this->list;
         $keys = $this->value;

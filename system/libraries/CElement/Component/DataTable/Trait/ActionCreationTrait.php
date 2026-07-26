@@ -3,6 +3,11 @@
  * @see CElement_Component_DataTable
  */
 trait CElement_Component_DataTable_Trait_ActionCreationTrait {
+    /**
+     * @param array $options
+     *
+     * @return CElement_Component_Action
+     */
     public function createAutoRefreshToogleAction($options) {
         $label = carr::get($options, 'label');
         $labelStart = 'Start Live';
@@ -57,6 +62,11 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         return $act;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return CElement_Component_Action
+     */
     public function createExportAction($options) {
         $id = carr::get($options, 'id');
         $options['action'] = CExporter::ACTION_STORE;
@@ -74,6 +84,11 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         return $act;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function createDownloadUrl($options) {
         /** @var CElement_Component_DataTable $this */
         $exportable = $this->toExportable();
@@ -93,6 +108,11 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         return $downloadUrl;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return CElement_Component_Action
+     */
     public function createDownloadAction($options = []) {
         $id = carr::get($options, 'id');
 
@@ -105,6 +125,11 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         return $act;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return CElement_Component_Action
+     */
     public function createDownloadProgressAction($options = []) {
         $id = carr::get($options, 'id');
 

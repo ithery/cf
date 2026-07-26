@@ -3,6 +3,11 @@
 use CElement_FormInput_QueryBuilder_Constant as Constant;
 
 trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
+    /**
+     * Maps each jQuery QueryBuilder operator to its SQL operator, plus optional `append`/`prepend` wildcards.
+     *
+     * @var array
+     */
     protected $operator_sql = [
         Constant::FILTER_OPERATOR_EQUAL => ['operator' => '='],
         'not_equal' => ['operator' => '!='],
@@ -26,19 +31,26 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
         'is_not_null' => ['operator' => 'NOT NULL']
     ];
 
+    /**
+     * SQL operators that require their value to be an array.
+     *
+     * @var string[]
+     */
     protected $needs_array = [
         'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN',
     ];
 
     /**
      * @param stdClass $rule
+     *
+     * @return bool
      */
     abstract protected function checkRuleCorrect(stdClass $rule);
 
     /**
      * Determine if an operator (LIKE/IN) requires an array.
      *
-     * @param $operator
+     * @param string $operator
      *
      * @return bool
      */
@@ -49,7 +61,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Determine if an operator is NULL/NOT NULL.
      *
-     * @param $operator
+     * @param string $operator
      *
      * @return bool
      */
@@ -60,7 +72,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Make sure that a condition is either 'or' or 'and'.
      *
-     * @param $condition
+     * @param string $condition
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
@@ -100,13 +112,15 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Ensure that a given field is an array if required.
      *
-     * @param bool $requireArray
-     * @param $value
+     * @param bool   $requireArray
+     * @param mixed  $value
      * @param string $field
      *
      * @see enforceArrayOrString
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
+     *
+     * @return void
      */
     protected function checkFieldIsAnArray($requireArray, $value, $field) {
         if ($requireArray && !is_array($value)) {
@@ -120,7 +134,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      * In some instances, and array may be given when we want a string.
      *
      * @param string $field
-     * @param $value
+     * @param array  $value
      *
      * @see enforceArrayOrString
      *
@@ -139,7 +153,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Convert a Datetime field to Carbon items to be used for comparisons.
      *
-     * @param $value
+     * @param array|string $value
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
@@ -211,6 +225,8 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      * @param stdClass $rule
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_RuleException
+     *
+     * @return mixed
      */
     private function getRuleValue(stdClass $rule) {
         if (!$this->checkRuleCorrect($rule)) {
@@ -223,10 +239,12 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Check that a given field is in the allowed list if set.
      *
-     * @param $fields
-     * @param $field
+     * @param null|array $fields
+     * @param string     $field
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
+     *
+     * @return void
      */
     private function ensureFieldIsAllowed($fields, $field) {
         if (is_array($fields) && !in_array($field, $fields)) {

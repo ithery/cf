@@ -23,6 +23,8 @@ class CElement_Depends_DependsOn {
      * @param CRenderable|string|array $selector
      * @param callable                 $resolver
      * @param array                    $options
+     *
+     * @return void
      */
     public function __construct($selector, $resolver, $options = []) {
         $this->options = $options;

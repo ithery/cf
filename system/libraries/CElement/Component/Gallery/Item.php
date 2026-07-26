@@ -3,16 +3,37 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_Component_Gallery_Item extends CElement_Component {
+    /**
+     * @var string
+     */
     protected $type;
 
+    /**
+     * @var null|string
+     */
     protected $src;
 
+    /**
+     * @var null|string
+     */
     protected $thumbnail;
 
+    /**
+     * @var null|callable|CFunction_SerializableClosure
+     */
     protected $imageCallback;
 
+    /**
+     * @var CElement_Element_A
+     */
     protected $link;
 
+    /**
+     * @param string $id
+     * @param string $tag
+     *
+     * @return void
+     */
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
         $this->tag = 'div';
@@ -53,6 +74,11 @@ class CElement_Component_Gallery_Item extends CElement_Component {
         }
     }
 
+    /**
+     * @param callable $callback
+     *
+     * @return $this
+     */
     public function withImageCallback($callback) {
         $this->imageCallback = c::toSerializableClosure($callback);
 

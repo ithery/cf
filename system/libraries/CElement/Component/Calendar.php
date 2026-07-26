@@ -83,9 +83,9 @@ class CElement_Component_Calendar extends CElement_Component {
     }
 
     /**
-     * @param string $id
+     * @param null|string $id
      *
-     * @return \CElement_Component_Calendar
+     * @return static
      */
     public static function factory($id = null) {
         return new static($id);

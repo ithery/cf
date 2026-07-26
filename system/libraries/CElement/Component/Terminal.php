@@ -7,14 +7,31 @@ class CElement_Component_Terminal extends CElement_Component {
     use CApp_Trait_Template,
         CTrait_Element_Property_Height;
 
+    /**
+     * @var string|null
+     */
     protected $ajaxUrl;
 
+    /**
+     * @var string
+     */
     protected $ajaxMethod;
 
+    /**
+     * @var string
+     */
     protected $greetings = '';
 
+    /**
+     * @var string
+     */
     protected $prompt = '';
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id = null) {
         parent::__construct($id);
         $this->templateData = [];
@@ -37,26 +54,56 @@ class CElement_Component_Terminal extends CElement_Component {
         });
     }
 
+    /**
+     * @param string $url
+     *
+     * @return void
+     */
     public function setAjaxUrl($url) {
         $this->ajaxUrl = $url;
     }
 
+    /**
+     * @param string $method
+     *
+     * @return void
+     */
     public function setAjaxMethod($method) {
         $this->ajaxMethod = $method;
     }
 
+    /**
+     * @param string $greetings
+     *
+     * @return void
+     */
     public function setGreetings($greetings) {
         $this->greetings = $greetings;
     }
 
+    /**
+     * @param string $prompt
+     *
+     * @return void
+     */
     public function setPrompt($prompt) {
         $this->prompt = $prompt;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         return $this->getTemplateHtml();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         return $this->getTemplateJs();
     }

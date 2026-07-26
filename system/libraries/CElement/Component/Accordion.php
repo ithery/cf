@@ -3,13 +3,18 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_Component_Accordion extends CElement_Component {
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->addClass('component-accordion');
     }
 
     /**
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_Component_Accordion_Item
      */

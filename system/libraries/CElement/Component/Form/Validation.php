@@ -20,8 +20,10 @@ class CElement_Component_Form_Validation {
     /**
      * Create a new Validator factory instance.
      *
+     * @param array $rules
      * @param array $options
-     * @param mixed $rules
+     *
+     * @return void
      */
     public function __construct($rules, array $options = []) {
         $this->setOptions($options);
@@ -29,7 +31,7 @@ class CElement_Component_Form_Validation {
     }
 
     /**
-     * @param $options
+     * @param array $options
      *
      * @return void
      */

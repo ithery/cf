@@ -3,8 +3,16 @@
 use CElement_FormInput_QueryBuilder_Constant as Constant;
 
 trait CElement_FormInput_QueryBuilder_Filter_InputTrait {
+    /**
+     * One of the `CElement_FormInput_QueryBuilder_Constant::FILTER_INPUT_*` constants.
+     *
+     * @var null|string
+     */
     protected $input;
 
+    /**
+     * @return $this
+     */
     public function setInputText() {
         $this->input = Constant::FILTER_INPUT_TEXT;
         $this->values = null;
@@ -12,6 +20,9 @@ trait CElement_FormInput_QueryBuilder_Filter_InputTrait {
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setInputTextarea() {
         $this->input = Constant::FILTER_INPUT_TEXTAREA;
         $this->values = null;
@@ -19,6 +30,11 @@ trait CElement_FormInput_QueryBuilder_Filter_InputTrait {
         return $this;
     }
 
+    /**
+     * @param array $list the selectable `value => label` options
+     *
+     * @return $this
+     */
     public function setInputSelect($list) {
         $this->input = Constant::FILTER_INPUT_SELECT;
         $this->values = $list;
@@ -26,6 +42,11 @@ trait CElement_FormInput_QueryBuilder_Filter_InputTrait {
         return $this;
     }
 
+    /**
+     * @param array $list the selectable `value => label` options
+     *
+     * @return $this
+     */
     public function setInputRadio($list) {
         $this->input = Constant::FILTER_INPUT_RADIO;
         $this->values = $list;
@@ -33,6 +54,11 @@ trait CElement_FormInput_QueryBuilder_Filter_InputTrait {
         return $this;
     }
 
+    /**
+     * @param array $list the selectable `value => label` options
+     *
+     * @return $this
+     */
     public function setInputCheckbox($list) {
         $this->input = Constant::FILTER_INPUT_CHECKBOX;
         $this->values = $list;

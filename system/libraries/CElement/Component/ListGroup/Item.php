@@ -6,7 +6,7 @@ class CElement_Component_ListGroup_Item extends CElement_Element {
     /**
      *  Callback for this item, when not defined will use default renderer.
      *
-     * @var callable
+     * @var null|callable|CFunction_SerializableClosure
      */
     protected $callback;
 
@@ -27,14 +27,25 @@ class CElement_Component_ListGroup_Item extends CElement_Element {
     /**
      *  Path of file to need to be require manually.
      *
-     * @var string
+     * @var null|string
      */
     protected $callbackRequire;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
     }
 
+    /**
+     * @param callable $callback
+     * @param string   $require
+     *
+     * @return $this
+     */
     public function setCallback($callback, $require = '') {
         $this->callback = c::toSerializableClosure($callback);
         if (strlen($require) > 0) {
@@ -44,18 +55,31 @@ class CElement_Component_ListGroup_Item extends CElement_Element {
         return $this;
     }
 
+    /**
+     * @param int $index
+     *
+     * @return $this
+     */
     public function setIndex($index) {
         $this->index = $index;
 
         return $this;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return $this
+     */
     public function setData($data) {
         $this->data = $data;
 
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         $this->addClass('list-group-item');
         $js = '';

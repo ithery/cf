@@ -1,18 +1,27 @@
 <?php
 
 class CElement_Component_Chart_Chartist extends CElement_Component_Chart {
+    /**
+     * @return void
+     */
     public function __construct() {
         parent::__construct();
         $this->wrapper = $this->addDiv('div-' . $this->id);
         CManager::instance()->registerModule('chartist');
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         parent::build();
         $this->addClass('cchart cchart-chartist');
         $this->buildData();
     }
 
+    /**
+     * @return void
+     */
     public function buildData() {
         $temp = $this->data;
         $this->data = [];
@@ -22,6 +31,11 @@ class CElement_Component_Chart_Chartist extends CElement_Component_Chart {
         }
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

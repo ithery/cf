@@ -172,7 +172,7 @@ class CElement_Component_Widget extends CElement_Component {
     }
 
     /**
-     * @param null|string $id
+     * @param string $id
      *
      * @return CElement_FormInput_Checkbox_Switcher
      */

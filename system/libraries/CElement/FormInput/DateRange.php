@@ -3,14 +3,31 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_FormInput_DateRange extends CElement_FormInput {
+    /**
+     * @var string
+     */
     protected $dateFormat;
 
+    /**
+     * @var null|string
+     */
     protected $dateStart;
 
+    /**
+     * @var null|string
+     */
     protected $dateEnd;
 
+    /**
+     * @var bool
+     */
     protected $haveButton;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -35,24 +52,44 @@ class CElement_FormInput_DateRange extends CElement_FormInput {
         $this->addClass('form-control');
     }
 
+    /**
+     * @param bool $boolean
+     *
+     * @return $this
+     */
     public function setHaveButton($boolean) {
         $this->haveButton = $boolean;
 
         return $this;
     }
 
+    /**
+     * @param string $dateStart
+     *
+     * @return $this
+     */
     public function setValueStart($dateStart) {
         $this->dateStart = $dateStart;
 
         return $this;
     }
 
+    /**
+     * @param string $dateEnd
+     *
+     * @return $this
+     */
     public function setValueEnd($dateEnd) {
         $this->dateEnd = $dateEnd;
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -86,6 +123,11 @@ class CElement_FormInput_DateRange extends CElement_FormInput {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $option = '';
 

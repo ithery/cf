@@ -1,12 +1,25 @@
 <?php
 
 class CElement_Depends_Selector {
+    /**
+     * @var array
+     */
     protected $selectors = [];
 
+    /**
+     * @param array $selectors
+     *
+     * @return void
+     */
     public function __construct(array $selectors = []) {
         $this->setSelectors($selectors);
     }
 
+    /**
+     * @param CRenderable|string|array $selector
+     *
+     * @return $this
+     */
     public function addSelector($selector) {
         if (is_array($selector)) {
             foreach ($selector as $selectorItem) {
@@ -22,6 +35,11 @@ class CElement_Depends_Selector {
         return $this;
     }
 
+    /**
+     * @param CRenderable|string|array $selectors
+     *
+     * @return $this
+     */
     public function setSelectors($selectors) {
         $this->selectors = [];
         $this->addSelector($selectors);
@@ -36,6 +54,9 @@ class CElement_Depends_Selector {
         return implode(', ', $this->selectors);
     }
 
+    /**
+     * @return string
+     */
     public function getScriptForValue() {
         $valueScripts = [];
         foreach ($this->selectors as $dependsOnSelector) {

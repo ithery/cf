@@ -44,7 +44,7 @@ class CElement_Component_Form extends CElement_Component {
     protected $enctype;
 
     /**
-     * @var null|CElement_Component_Form_Validation
+     * @var bool|CElement_Component_Form_Validation|null
      */
     protected $validation;
 
@@ -283,7 +283,7 @@ class CElement_Component_Form extends CElement_Component {
     /**
      * Set enctype attribute value of form element.
      *
-     * @param mixed $encType
+     * @param string $encType
      *
      * @return CElement_Component_Form
      */
@@ -316,7 +316,7 @@ class CElement_Component_Form extends CElement_Component {
     }
 
     /**
-     * @param mixed $validationData
+     * @param bool|array $validationData
      *
      * @return $this
      */

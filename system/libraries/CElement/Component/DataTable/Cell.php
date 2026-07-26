@@ -12,12 +12,28 @@ class CElement_Component_DataTable_Cell {
      */
     protected $column;
 
+    /**
+     * @var mixed
+     */
     protected $row;
 
+    /**
+     * @var string
+     */
     protected $html;
 
+    /**
+     * @var string
+     */
     protected $js;
 
+    /**
+     * @param CElement_Component_DataTable        $table
+     * @param CElement_Component_DataTable_Column $column
+     * @param mixed                               $row
+     *
+     * @return void
+     */
     public function __construct(CElement_Component_DataTable $table, CElement_Component_DataTable_Column $column, $row) {
         $this->table = $table;
         $this->column = $column;
@@ -26,6 +42,9 @@ class CElement_Component_DataTable_Cell {
         $this->processHtmlJs();
     }
 
+    /**
+     * @return void
+     */
     protected function processHtmlJs() {
         $html = null;
         $js = '';
@@ -104,6 +123,11 @@ class CElement_Component_DataTable_Cell {
         $this->js = $js;
     }
 
+    /**
+     * @param mixed $cell
+     *
+     * @return array
+     */
     public static function getHtmlJsCell($cell) {
         $html = '';
         $js = '';
@@ -127,10 +151,16 @@ class CElement_Component_DataTable_Cell {
         return [$html, $js];
     }
 
+    /**
+     * @return string
+     */
     public function html() {
         return $this->html;
     }
 
+    /**
+     * @return string
+     */
     public function js() {
         return $this->js;
     }

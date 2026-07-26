@@ -1,6 +1,6 @@
 <?php
 /**
- * Class EditorJSException.
+ * Class EditorJsException.
  *
  * Custom Exception which allows Editor errors catching
  */

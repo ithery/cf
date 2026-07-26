@@ -1,55 +1,111 @@
 <?php
 
 class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea {
+    /**
+     * One of the presets handled by {@see getToolbarJson()} (`'default'`
+     * leaves summernote's built-in toolbar untouched).
+     *
+     * @var string
+     */
     protected $toolbarType = 'default';
 
+    /**
+     * Raw toolbar JSON used when `$toolbarType` is `'custom'`.
+     *
+     * @var string
+     */
     protected $customToolbarJson = '[]';
 
+    /**
+     * @var bool
+     */
     protected $haveDragDrop = false;
 
+    /**
+     * @var null|string
+     */
     protected $uploadUrl;
 
+    /**
+     * @var bool
+     */
     protected $sanitizePaste = false;
 
+    /**
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
         CManager::registerModule('summernote');
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         $this->addClass('summernote-control');
     }
 
+    /**
+     * @param string $toolbarType
+     *
+     * @return $this
+     */
     public function setToolbarType($toolbarType) {
         $this->toolbarType = $toolbarType;
 
         return $this;
     }
 
+    /**
+     * @param string $json
+     *
+     * @return $this
+     */
     public function setCustomToolbarJson($json) {
         $this->customToolbarJson = $json;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setDragDrop($bool = true) {
         $this->haveDragDrop = $bool;
 
         return $this;
     }
 
+    /**
+     * @param string $url
+     *
+     * @return $this
+     */
     public function setUploadUrl($url) {
         $this->uploadUrl = $url;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setSanitizePaste($bool = true) {
         $this->sanitizePaste = $bool;
 
         return $this;
     }
 
+    /**
+     * @param null|string $toolbarType
+     *
+     * @return string
+     */
     protected function getToolbarJson($toolbarType = null) {
         if ($toolbarType == null) {
             $toolbarType = $this->toolbarType;
@@ -138,7 +194,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['link', ['link']],
                     ]
                 ";
-                // no break
+
             case 'text-link':
                 $json = "
                     [
@@ -157,6 +213,11 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
         return $json;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $placeholder = '';
         if ($this->placeholder) {

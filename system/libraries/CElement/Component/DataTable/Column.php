@@ -6,50 +6,121 @@ class CElement_Component_DataTable_Column extends CObject {
     use CTrait_Element_Responsive;
     use CTrait_Element_Transform;
 
+    /**
+     * @var string
+     */
     public $fieldname;
 
+    /**
+     * @var string
+     */
     public $width;
 
+    /**
+     * @var string
+     */
     public $align;
 
+    /**
+     * @var string
+     */
     public $format;
 
+    /**
+     * @var bool
+     */
     public $sortable;
 
+    /**
+     * @var bool
+     */
     public $searchable;
 
+    /**
+     * @var bool
+     */
     public $editable;
 
+    /**
+     * @var bool
+     */
     public $visible;
 
+    /**
+     * @var string
+     */
     public $input_type;
 
+    /**
+     * @var bool
+     */
     public $noLineBreak;
 
+    /**
+     * @var null|callable|CFunction_SerializableClosure
+     */
     public $callback;
 
+    /**
+     * @var null|array|string
+     */
     public $callbackRequire;
 
+    /**
+     * @var string[]
+     */
     public $class;
 
+    /**
+     * @var string
+     */
     public $searchType = 'text';
 
+    /**
+     * @var array
+     */
     public $searchOptions = [];
 
+    /**
+     * @var null|string
+     */
     protected $exportLabel;
 
+    /**
+     * @var null|callable|CFunction_SerializableClosure
+     */
     protected $exportCallback;
 
+    /**
+     * @var null|array|string
+     */
     protected $exportCallbackRequire;
 
+    /**
+     * @var null|string
+     */
     protected $dataType = null;
 
+    /**
+     * @var array
+     */
     protected $customCss = [];
 
+    /**
+     * @var null|callable|CFunction_SerializableClosure
+     */
     protected $searchCallback = null;
 
+    /**
+     * @var null|callable|CFunction_SerializableClosure
+     */
     protected $sortCallback = null;
 
+    /**
+     * @param string $fieldname
+     *
+     * @return void
+     */
     public function __construct($fieldname) {
         parent::__construct();
 
@@ -90,58 +161,106 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getCssStyle() {
         return CRenderable::renderStyle($this->customCss);
     }
 
+    /**
+     * @param string $fieldname
+     *
+     * @return CElement_Component_DataTable_Column
+     */
     public static function factory($fieldname) {
         return new CElement_Component_DataTable_Column($fieldname);
     }
 
+    /**
+     * @return string
+     */
     public function getFieldname() {
         return $this->fieldname;
     }
 
+    /**
+     * @return string
+     */
     public function getAlign() {
         return $this->align;
     }
 
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
     public function setInputType($type) {
         $this->input_type = $type;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function getNoLineBreak() {
         return $this->noLineBreak;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setNoLineBreak($bool = true) {
         return $this->setNoWrap($bool);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setNoWrap($bool = true) {
         $this->noLineBreak = $bool;
 
         return $this;
     }
 
+    /**
+     * @param null|string $dataType
+     *
+     * @return $this
+     */
     public function setDataType($dataType) {
         $this->dataType = $dataType;
 
         return $this;
     }
 
+    /**
+     * @return null|string
+     */
     public function getDataType() {
         return $this->dataType;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setVisible($bool = true) {
         $this->visible = $bool;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function setInvisible() {
         return $this->setVisible(false);
     }
@@ -166,24 +285,44 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setSearchable($bool) {
         $this->searchable = $bool;
 
         return $this;
     }
 
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
     public function setSearchType($type) {
         $this->searchType = $type;
 
         return $this;
     }
 
+    /**
+     * @param array $option
+     *
+     * @return $this
+     */
     public function setSearchOptions($option) {
         $this->searchOptions = $option;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setEditable($bool) {
         $this->editable = $bool;
 
@@ -193,7 +332,7 @@ class CElement_Component_DataTable_Column extends CObject {
     /**
      * Set width of column.
      *
-     * @param int $w
+     * @param string $w
      *
      * @return $this
      */
@@ -234,6 +373,12 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this->setAlign('center');
     }
 
+    /**
+     * @param callable|Closure $callback
+     * @param string           $require
+     *
+     * @return $this
+     */
     public function setCallback($callback, $require = '') {
         //$this->callback = c::toSerializableClosure($callback);
         $this->callback = c::toSerializableClosure($callback);
@@ -242,6 +387,11 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this;
     }
 
+    /**
+     * @param callable|Closure $callback
+     *
+     * @return $this
+     */
     public function setSearchCallback($callback) {
         $this->searchCallback = c::toSerializableClosure($callback);
 
@@ -249,20 +399,37 @@ class CElement_Component_DataTable_Column extends CObject {
     }
 
 
+    /**
+     * @param callable|Closure $callback
+     *
+     * @return $this
+     */
     public function setSortCallback($callback) {
         $this->sortCallback = c::toSerializableClosure($callback);
 
         return $this;
     }
 
+    /**
+     * @return null|callable|CFunction_SerializableClosure
+     */
     public function getSearchCallback() {
         return $this->searchCallback;
     }
 
+    /**
+     * @return null|callable|CFunction_SerializableClosure
+     */
     public function getSortCallback() {
         return $this->sortCallback;
     }
 
+    /**
+     * @param callable|Closure $callback
+     * @param string           $require
+     *
+     * @return $this
+     */
     public function setExportCallback($callback, $require = '') {
         $this->exportCallback = c::toSerializableClosure($callback);
         $this->exportCallbackRequire = $require;
@@ -270,22 +437,42 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this;
     }
 
+    /**
+     * @param string $label
+     *
+     * @return $this
+     */
     public function setExportLabel($label) {
         $this->exportLabel = $label;
 
         return $this;
     }
 
+    /**
+     * @param string $s
+     *
+     * @return $this
+     */
     public function setFormat($s) {
         $this->format = $s;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getFormat() {
         return $this->format;
     }
 
+    /**
+     * @param bool   $exportPdf
+     * @param string $thClass
+     * @param int    $indent
+     *
+     * @return string
+     */
     public function renderHeaderHtml($exportPdf, $thClass = '', $indent = 0) {
         $pdfTHeadTdAttr = '';
         if ($exportPdf) {
@@ -356,24 +543,41 @@ class CElement_Component_DataTable_Column extends CObject {
         return $html->text();
     }
 
+    /**
+     * @param string $class
+     *
+     * @return $this
+     */
     public function addClass($class) {
         $this->class[] = $class;
 
         return $this;
     }
 
+    /**
+     * @return null|callable|CFunction_SerializableClosure
+     */
     public function determineExportCallback() {
         return $this->exportCallback ?: $this->callback;
     }
 
+    /**
+     * @return null|array|string
+     */
     public function determineExportCallbackRequire() {
         return $this->exportCallbackRequire ?: $this->callbackRequire;
     }
 
+    /**
+     * @return string
+     */
     public function determineExportLabel() {
         return $this->exportLabel ?: $this->label;
     }
 
+    /**
+     * @return string
+     */
     public function getClassAttribute() {
         return implode(' ', $this->class);
     }

@@ -16,10 +16,16 @@ class CElement_Component_Form_FieldValidation {
      */
     private $rules;
 
+    /**
+     * @return void
+     */
     public function __construct() {
         $this->rules = [];
     }
 
+    /**
+     * @return static
+     */
     public static function factory() {
         return new CElement_Component_Form_FieldValidation();
     }
@@ -53,10 +59,10 @@ class CElement_Component_Form_FieldValidation {
      * addValidation('min:5'), and the legacy two-argument style,
      * eg. addValidation('min', 5), addValidation('condrequired', 'other_field').
      *
-     * @param mixed $name
-     * @param mixed $param
+     * @param null|string $name
+     * @param mixed       $param
      *
-     * @return string|null
+     * @return null|string
      */
     private function normalizeRule($name, $param) {
         if ($name === null || $name === '') {

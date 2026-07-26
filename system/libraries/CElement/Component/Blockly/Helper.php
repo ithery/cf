@@ -1,6 +1,13 @@
 <?php
 
 class CElement_Component_Blockly_Helper {
+    /**
+     * @param string $functionName
+     * @param array  $arguments
+     * @param array  $options     shape: ['x' => int, 'y' => int]
+     *
+     * @return string
+     */
     public static function buildDefaultXmlForFunction($functionName, $arguments = [], $options = []) {
         $x = carr::get($options, 'x', 70);
         $y = carr::get($options, 'y', 70);

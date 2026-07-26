@@ -19,6 +19,8 @@ class CElement_FormInput_Password extends CElement_FormInput {
 
     /**
      * @param null|string $id
+     *
+     * @return void
      */
     public function __construct($id) {
         parent::__construct($id);

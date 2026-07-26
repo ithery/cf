@@ -3,10 +3,23 @@
 class CElement_FormInput_File extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_File;
 
+    /**
+     * @var bool
+     */
     protected $multiple;
 
+    /**
+     * Which upload widget to render: `file-upload` (bootstrap fileupload) or `jquery-fileupload`.
+     *
+     * @var string
+     */
     protected $applyjs;
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -19,11 +32,21 @@ class CElement_FormInput_File extends CElement_FormInput {
         $this->applyjs = c::theme('fileupload', 'file-upload');
     }
 
+    /**
+     * @param string|null $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         /** @phpstan-ignore-next-line */
         return new static($id);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         if ($this->applyjs == 'jquery-fileupload') {
             c::manager()->registerModule('jquery-fileupload');
@@ -79,6 +102,11 @@ class CElement_FormInput_File extends CElement_FormInput {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);
@@ -158,12 +186,22 @@ class CElement_FormInput_File extends CElement_FormInput {
         return $js->text();
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setMultiple($bool) {
         $this->multiple = true;
 
         return $this;
     }
 
+    /**
+     * @param string $applyjs
+     *
+     * @return $this
+     */
     public function setApplyJs($applyjs) {
         $this->applyjs = $applyjs;
 

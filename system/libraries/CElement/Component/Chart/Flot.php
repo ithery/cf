@@ -1,11 +1,17 @@
 <?php
 
 class CElement_Component_Chart_Flot extends CElement_Component_Chart {
+    /**
+     * @return void
+     */
     public function __construct() {
         parent::__construct();
         CManager::instance()->registerModule('flot');
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         parent::build();
         $this->addClass('cchart cchart-flot');
@@ -19,6 +25,9 @@ class CElement_Component_Chart_Flot extends CElement_Component_Chart {
         $this->buildData();
     }
 
+    /**
+     * @return void
+     */
     public function buildData() {
         $temp = $this->data;
         $this->data = [];
@@ -36,6 +45,11 @@ class CElement_Component_Chart_Flot extends CElement_Component_Chart {
         }
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

@@ -3,6 +3,12 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_Component_Gallery extends CElement_Component {
+    /**
+     * @param string $id
+     * @param string $tag
+     *
+     * @return void
+     */
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
 
@@ -19,6 +25,9 @@ class CElement_Component_Gallery extends CElement_Component {
         return $item;
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         $this->addClass('cres:element:component:Gallery');
         $this->setAttr('cres-element', 'component:Gallery');

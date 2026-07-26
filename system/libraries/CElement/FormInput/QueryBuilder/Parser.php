@@ -5,12 +5,31 @@
 class CElement_FormInput_QueryBuilder_Parser {
     use CElement_FormInput_QueryBuilder_Parser_FunctionTrait;
 
+    /**
+     * @var CModel_Query|CDatabase_Query_Builder
+     */
     protected $modelQuery;
 
+    /**
+     * The allowed list of fields, used by `ensureFieldIsAllowed()`.
+     *
+     * @var array
+     */
     protected $fields;
 
+    /**
+     * Per-field callbacks (`field => callable`) that override the default rule-to-query conversion.
+     *
+     * @var array
+     */
     protected $ruleCallbacks;
 
+    /**
+     * @param string|CModel_Query|CDatabase_Query_Builder $modelQuery a `CModel` class name, or an existing query instance
+     * @param array                                        $fields
+     *
+     * @return void
+     */
     public function __construct($modelQuery, $fields = []) {
         if (is_string($modelQuery) && class_exists($modelQuery)) {
             $modelQuery = $modelQuery::query();
@@ -20,6 +39,12 @@ class CElement_FormInput_QueryBuilder_Parser {
         $this->ruleCallbacks = [];
     }
 
+    /**
+     * @param string   $field
+     * @param callable $callback
+     *
+     * @return $this
+     */
     public function addRuleCallback($field, $callback) {
         $this->ruleCallbacks[$field] = $callback;
 
@@ -79,7 +104,7 @@ class CElement_FormInput_QueryBuilder_Parser {
     /**
      * Determine if a particular rule is actually a group of other rules.
      *
-     * @param $rule
+     * @param stdClass $rule
      *
      * @return bool
      */
@@ -146,7 +171,7 @@ class CElement_FormInput_QueryBuilder_Parser {
     /**
      * Give back the correct value when we don't accept one.
      *
-     * @param $rule
+     * @param stdClass $rule
      *
      * @return null|string
      */
@@ -163,13 +188,13 @@ class CElement_FormInput_QueryBuilder_Parser {
      *
      * Append/Prepend values for SQL statements, etc.
      *
-     * @param $operator
+     * @param string   $operator
      * @param stdClass $rule
-     * @param $value
+     * @param mixed    $value
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
-     * @return string
+     * @return mixed
      */
     protected function getCorrectValue($operator, stdClass $rule, $value) {
         $field = $rule->field;
@@ -195,13 +220,13 @@ class CElement_FormInput_QueryBuilder_Parser {
      * the query that was given by the user to the QueryBuilder.
      * makeQuery: The money maker!
      *
-     * @param CModel_Query $query
-     * @param stdClass     $rule
-     * @param string       $queryCondition and/or...
+     * @param CModel_Query|CDatabase_Query_Builder $query
+     * @param stdClass                             $rule
+     * @param string                               $queryCondition and/or...
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      */
     protected function makeQuery($query, stdClass $rule, $queryCondition = 'AND') {
         /*
@@ -222,12 +247,12 @@ class CElement_FormInput_QueryBuilder_Parser {
      * (This used to be part of makeQuery, where the name made sense, but I pulled it
      * out to reduce some duplicated code inside JoinSupportingQueryBuilder)
      *
-     * @param CModel_Query $query
-     * @param stdClass     $rule
-     * @param mixed        $value          the value that needs to be queried in the database
-     * @param string       $queryCondition and/or...
+     * @param CModel_Query|CDatabase_Query_Builder $query
+     * @param stdClass                             $rule
+     * @param mixed                                $value          the value that needs to be queried in the database
+     * @param string                               $queryCondition and/or...
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      */
     protected function convertIncomingQBtoQuery($query, stdClass $rule, $value, $queryCondition = 'AND') {
         /*

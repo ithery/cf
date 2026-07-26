@@ -4,10 +4,27 @@
  * @see CElement_FormInput_SelectSearch
  */
 trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
+    /**
+     * Legacy select2 v2.3 markup: a plain `<input type="text">` that
+     * select2 v2.3's ajax-driven autocomplete attaches to.
+     *
+     * @param int $indent
+     *
+     * @return string
+     */
     public function htmlSelect2v23($indent = 0) {
         return '<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled validate[]" value="' . $this->value . '">';
     }
 
+    /**
+     * Initializes select2 v2.3 (the `formatResult`/`formatSelection`
+     * ajax-select API, as opposed to the newer `templateResult`/
+     * `templateSelection` used by {@see CElement_FormInput_SelectSearch::js()}).
+     *
+     * @param int $indent
+     *
+     * @return string
+     */
     public function jsSelect2v23($indent = 0) {
         if ($this->value > 0) {
             $this->autoSelect = true;

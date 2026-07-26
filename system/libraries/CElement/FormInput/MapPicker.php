@@ -1,44 +1,106 @@
 <?php
 
 class CElement_FormInput_MapPicker extends CElement_FormInput {
+    /**
+     * @var string
+     */
     protected $lat;
 
+    /**
+     * @var string
+     */
     protected $lng;
 
+    /**
+     * @var CElement_Element_Div|null
+     */
     protected $mapContainer;
 
+    /**
+     * @var CElement_Element_Div
+     */
     protected $wrapperContainer;
 
+    /**
+     * @var CElement_Element_Div|null
+     */
     protected $searchContainer;
 
+    /**
+     * @var CElement_FormInput|null
+     */
     protected $searchControl;
 
+    /**
+     * @var bool
+     */
     protected $haveSearch;
 
+    /**
+     * @var string
+     */
     protected $searchPlaceholder;
 
+    /**
+     * @var int
+     */
     protected $radius;
 
+    /**
+     * @var bool
+     */
     protected $draggable;
 
+    /**
+     * @var bool
+     */
     protected $scrollwheel;
 
+    /**
+     * @var bool
+     */
     protected $markerDraggable;
 
+    /**
+     * @var bool
+     */
     protected $markerInCenter;
 
+    /**
+     * @var string
+     */
     protected $geoCodingApiKey;
 
+    /**
+     * @var string|null
+     */
     protected $searchSelector;
 
+    /**
+     * @var string|null
+     */
     protected $latitudeSelector;
 
+    /**
+     * @var string|null
+     */
     protected $longitudeSelector;
 
+    /**
+     * @var string|null
+     */
     protected $radiusSelector;
 
+    /**
+     * @var string
+     */
     protected $rawJsOnChanged;
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'text';
@@ -69,6 +131,11 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         CManager::registerModule('locationpicker');
     }
 
+    /**
+     * @param string $val "lat,lng" formatted string
+     *
+     * @return $this
+     */
     public function setValue($val) {
         parent::setValue($val);
         $latlngArray = explode(',', $val);
@@ -78,16 +145,33 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * Alias of setRadius().
+     *
+     * @param int $val
+     *
+     * @return $this
+     */
     public function radius($val) {
         return $this->setRadius($val);
     }
 
+    /**
+     * @param int $val
+     *
+     * @return $this
+     */
     public function setRadius($val) {
         $this->radius = $val;
 
         return $this;
     }
 
+    /**
+     * @param CRenderable|string $latitude
+     *
+     * @return $this
+     */
     public function setLatitudeSelector($latitude) {
         if ($latitude instanceof CRenderable) {
             $latitude = '#' . $latitude->id();
@@ -97,6 +181,11 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param CRenderable|string $longitude
+     *
+     * @return $this
+     */
     public function setLongitudeSelector($longitude) {
         if ($longitude instanceof CRenderable) {
             $longitude = '#' . $longitude->id();
@@ -106,6 +195,11 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param CRenderable|string $selector
+     *
+     * @return $this
+     */
     public function setRadiusSelector($selector) {
         if ($selector instanceof CRenderable) {
             $selector = '#' . $selector->id();
@@ -115,6 +209,11 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param CRenderable|string $selector
+     *
+     * @return $this
+     */
     public function setSearchSelector($selector) {
         if ($selector instanceof CRenderable) {
             $selector = '#' . $selector->id();
@@ -124,36 +223,64 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setDraggable($bool = true) {
         $this->draggable = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setScrollwheel($bool = true) {
         $this->scrollwheel = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function markerDraggable($bool = true) {
         $this->markerDraggable = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function markerInCenter($bool = true) {
         $this->markerInCenter = $bool;
 
         return $this;
     }
 
+    /**
+     * @param string $js
+     *
+     * @return $this
+     */
     public function setJsOnChanged($js) {
         $this->rawJsOnChanged = $js;
 
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         //$this->wrapperContainer->add('<script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=' . $this->geoCodingApiKey . '" type="text/javascript"></script>');
 
@@ -182,6 +309,11 @@ class CElement_FormInput_MapPicker extends CElement_FormInput {
             ->add('Loading...');
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

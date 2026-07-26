@@ -8,6 +8,11 @@ class CElement_Component_Metric_Params_BaseParam {
      */
     protected $name;
 
+    /**
+     * @param string $name
+     *
+     * @return void
+     */
     public function __construct($name) {
         $this->name = $name;
     }
@@ -42,7 +47,7 @@ class CElement_Component_Metric_Params_BaseParam {
     /**
      * Get the appropriate cache key for the metric.
      *
-     * @param array $request
+     * @param mixed $request
      *
      * @return string
      */
@@ -66,6 +71,9 @@ class CElement_Component_Metric_Params_BaseParam {
         return cstr::slug($this->getName(), '-', null);
     }
 
+    /**
+     * @return string
+     */
     public function getName() {
         return $this->name;
     }
@@ -73,7 +81,7 @@ class CElement_Component_Metric_Params_BaseParam {
     /**
      * Determine for how many minutes the metric should be cached.
      *
-     * @return \DateTimeInterface|\DateInterval|float|int
+     * @return null|\DateTimeInterface|\DateInterval|float|int
      */
     public function cacheFor() {
     }

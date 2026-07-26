@@ -6,17 +6,40 @@ class CElement_FormInput_Radio extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Radio,
         CTrait_Element_Property_Label;
 
+    /**
+     * Whether the radio input renders as `checked`.
+     *
+     * @var bool
+     */
     protected $checked;
 
     // protected $label;
+    /**
+     * Which JS widget library decorates this radio (`'uniform'`, `'switch'`,
+     * `'icheck'`), or empty for a plain `<input type="radio">`.
+     *
+     * @var string
+     */
     protected $applyjs;
 
+    /**
+     * @var bool
+     */
     protected $label_wrap;
 
+    /**
+     * @var bool
+     */
     protected $inline;
 
+    /**
+     * @var string
+     */
     protected $themeType = 'radio';
 
+    /**
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -32,33 +55,61 @@ class CElement_FormInput_Radio extends CElement_FormInput {
         }
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         /** @phpstan-ignore-next-line */
         return new static($id);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setChecked($bool = true) {
         $this->checked = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setLabelWrap($bool) {
         $this->label_wrap = $bool;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function getInline() {
         return $this->inline;
     }
 
+    /**
+     * @param bool $inline
+     *
+     * @return $this
+     */
     public function setInline($inline) {
         $this->inline = $inline;
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -108,6 +159,11 @@ class CElement_FormInput_Radio extends CElement_FormInput {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

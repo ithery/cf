@@ -4,10 +4,13 @@ use Illuminate\Contracts\Support\Arrayable;
 
 class CElement_FormInput_QueryBuilder_FilterBuilder implements Arrayable {
     /**
-     * @var array
+     * @var CElement_FormInput_QueryBuilder_Filter[]
      */
     protected $filters;
 
+    /**
+     * @return void
+     */
     public function __construct() {
         $this->filters = [];
     }

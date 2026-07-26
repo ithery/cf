@@ -6,12 +6,24 @@ trait CElement_Trait_UseViewTrait {
      */
     protected $view;
 
+    /**
+     * @var array|null
+     */
     protected $htmlJs;
 
+    /**
+     * @var array|null
+     */
     protected $viewData;
 
+    /**
+     * @var callable|null
+     */
     protected $onBeforeParse;
 
+    /**
+     * @return CView_View|string|null
+     */
     protected function resolveView() {
         $view = $this->view;
         if ($view != null) {
@@ -31,6 +43,12 @@ trait CElement_Trait_UseViewTrait {
         return $view;
     }
 
+    /**
+     * @param CView_View|string $view
+     * @param array|null        $viewData
+     *
+     * @return void
+     */
     protected function setView($view, $viewData = null) {
         $this->view = $view;
         $this->viewData = $viewData;
@@ -49,16 +67,30 @@ trait CElement_Trait_UseViewTrait {
         return $this;
     }
 
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
     public function getVar($key) {
         return carr::get($this->viewData, $key);
     }
 
+    /**
+     * @param string $key
+     * @param mixed  $val
+     *
+     * @return $this
+     */
     public function setVar($key, $val) {
         $this->viewData[$key] = $val;
 
         return $this;
     }
 
+    /**
+     * @return array
+     */
     private function collectHtmlJsOnce() {
         if ($this->htmlJs == null) {
             $view = $this->resolveView();
@@ -91,20 +123,40 @@ trait CElement_Trait_UseViewTrait {
         return $this->htmlJs;
     }
 
+    /**
+     * @param callable $callable
+     *
+     * @return $this
+     */
     protected function onBeforeParse(callable $callable) {
         $this->onBeforeParse = $callable;
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function getViewHtml($indent = 0) {
         return carr::get($this->collectHtmlJsOnce(), 'html');
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function getViewJs($indent = 0) {
         return carr::get($this->collectHtmlJsOnce(), 'js');
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         if (method_exists($this, 'buildOnce')) {
             $this->buildOnce();
@@ -113,6 +165,11 @@ trait CElement_Trait_UseViewTrait {
         return $this->getViewHtml();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         if (method_exists($this, 'buildOnce')) {
             $this->buildOnce();

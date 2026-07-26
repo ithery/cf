@@ -1,6 +1,15 @@
 <?php
 
 trait CElement_FormInput_SelectSearch_Trait_SelectSearchUtilsTrait {
+    /**
+     * Replaces `{field}` placeholders in a select2 template string with
+     * the corresponding value looked up from `$data`.
+     *
+     * @param string $template
+     * @param mixed  $data
+     *
+     * @return string
+     */
     protected function generateSelect2TemplateWithData($template, $data) {
         //escape the character
         $template = str_replace("'", "\'", $template);
@@ -20,6 +29,18 @@ trait CElement_FormInput_SelectSearch_Trait_SelectSearchUtilsTrait {
         return $template;
     }
 
+    /**
+     * Resolves `$format` (a `CFunction_SerializableClosure` or a select2
+     * template string) against `$row` and stashes the rendered result into
+     * `$data['cappFormat' . ucfirst($type)]` / the matching `...IsHtml` flag.
+     *
+     * @param mixed  $format
+     * @param array  $data
+     * @param mixed  $row
+     * @param string $type
+     *
+     * @return array
+     */
     public function addCAppFormatToData($format, $data, $row, $type = 'result') {
         $type = ucfirst($type);
         if ($format instanceof CFunction_SerializableClosure) {
@@ -40,6 +61,11 @@ trait CElement_FormInput_SelectSearch_Trait_SelectSearchUtilsTrait {
         return $data;
     }
 
+    /**
+     * @param CModel $model
+     *
+     * @return array
+     */
     public function modelToSelect2Array(CModel $model) {
         $itemArray = $model->toArray();
         $itemArray['id'] = $model->getKey();

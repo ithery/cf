@@ -1,6 +1,11 @@
 <?php
 
 trait CElement_Trait_MomentJsTrait {
+    /**
+     * @param string $format
+     *
+     * @return string
+     */
     public function convertPHPToMomentFormat($format) {
         $replacements = [
             'd' => 'DD',
@@ -46,6 +51,11 @@ trait CElement_Trait_MomentJsTrait {
         return $momentFormat;
     }
 
+    /**
+     * @param string $format
+     *
+     * @return string
+     */
     public function convertMomentToPhpFormat($format) {
         $replacements = [
             'DD' => 'd',
