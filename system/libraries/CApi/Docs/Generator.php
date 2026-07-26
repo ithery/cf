@@ -194,15 +194,15 @@ class CApi_Docs_Generator {
      */
     protected function setProcessors(OpenApiGenerator $generator): void {
         $processorClasses = carr::get($this->scanOptions, self::SCAN_OPTION_PROCESSORS, []);
-        $processors = [];
+        $processors = $generator->getProcessors();
 
-        foreach ($generator->getProcessors() as $processor) {
-            $processors[] = $processor;
-            if ($processor instanceof \OpenApi\Processors\BuildPaths) {
-                foreach ($processorClasses as $customProcessor) {
-                    $processors[] = new $customProcessor();
-                }
-            }
+        // Appended after all built-in processors (including MergeJsonContent),
+        // so a custom processor sees fully-normalized paths/responses/schemas
+        // instead of raw @OA\JsonContent shorthand - avoids creating a
+        // duplicate MediaType when it needs to read/augment an existing
+        // response's JSON schema.
+        foreach ($processorClasses as $customProcessor) {
+            $processors[] = new $customProcessor();
         }
 
         if (!empty($processors)) {
