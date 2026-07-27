@@ -191,8 +191,8 @@ trait CTrait_Compat_Element_DataTable {
      *
      * @deprecated since version 1.2, please use exportExcelxmlStatic
      */
-    private static function export_excelxml_static($filename, $sheet_name = null, $table) {
-        return static::exportExcelxmlStatic($filename, $sheet_name = null, $table);
+    private static function export_excelxml_static($filename, $sheet_name = null, $table = null) {
+        return static::exportExcelxmlStatic($filename, $sheet_name, $table);
     }
 
     /**

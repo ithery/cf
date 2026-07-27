@@ -70,17 +70,13 @@ class CConfigTest extends TestCase {
     }
 
     public function testHasReflectsWhetherTheKeyWasSet() {
-        // Unlike get()/set(), has() does not prefix the key with the group
-        // name (see the dedicated bug-documentation test below) - so the
-        // caller must pass the fully-qualified "group.key" here themselves.
-        $group = $this->group();
-        $config = CConfig::instance($group);
+        $config = CConfig::instance($this->group());
 
-        $this->assertFalse($config->has($group . '.foo'));
+        $this->assertFalse($config->has('foo'));
 
         $config->set('foo', 'bar');
 
-        $this->assertTrue($config->has($group . '.foo'));
+        $this->assertTrue($config->has('foo'));
     }
 
     public function testPrependAddsToTheStartOfAnArrayValue() {
@@ -101,33 +97,25 @@ class CConfigTest extends TestCase {
         $this->assertSame(['a', 'b', 'c'], $config->get('list'));
     }
 
-    public function testArrayAccessGetAndUnsetDelegateThroughTheGroupPrefix() {
+    public function testArrayAccessDelegatesToGetSetHasAndUnsetThroughTheGroupPrefix() {
+        // Regression coverage for a real bug fixed 2026-07-27: has() (and by
+        // extension offsetExists()) used to forward the bare key straight to
+        // repository()->has() with no group prefix, unlike get()/set(), so
+        // isset() right after a set() was always false. See TODO.md history.
         $config = CConfig::instance($this->group());
 
+        $this->assertFalse(isset($config['foo']));
+
         $config['foo'] = 'bar';
+
+        $this->assertTrue(isset($config['foo']));
         $this->assertSame('bar', $config['foo']);
 
+        // offsetUnset() only nulls the value out (set($key, null)), it doesn't
+        // remove the key from the repository, so has()/isset() stays true -
+        // only the value itself goes away.
         unset($config['foo']);
         $this->assertNull($config['foo']);
-    }
-
-    /**
-     * Documents a real inconsistency in CConfig rather than silently
-     * asserting it away: get()/set()/offsetGet()/offsetSet() all prefix the
-     * key with "$this->group." before touching the repository, but has()
-     * (system/libraries/CConfig.php:144-146) forwards the bare key straight
-     * to repository()->has() with no group prefix. So offsetExists()
-     * ("isset($config[...])") checks a completely different, unprefixed key
-     * than offsetSet() just wrote - isset() on a key you just set() is
-     * expected to be true and currently is not. Not fixed here since this
-     * suite was scoped to test-writing, not behavior changes - see TODO.md.
-     */
-    public function testIssetIsInconsistentWithSetBecauseHasDoesNotPrefixTheGroup() {
-        $config = CConfig::instance($this->group());
-
-        $config['foo'] = 'bar';
-
-        $this->assertFalse(isset($config['foo']), 'this documents the bug: expected isset() to be true here');
     }
 
     public function testSetAcceptsAnArrayOfKeyValuePairs() {

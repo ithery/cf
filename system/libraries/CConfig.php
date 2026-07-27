@@ -142,7 +142,9 @@ class CConfig implements Arrayable, ArrayAccess {
      * @return bool
      */
     public function has($key) {
-        return $this->repository()->has($key);
+        $configKey = $key ? $this->group . '.' . $key : $this->group;
+
+        return $this->repository()->has($configKey);
     }
 
     #[\ReturnTypeWillChange]

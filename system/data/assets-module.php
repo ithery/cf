@@ -837,5 +837,14 @@ return [
         ],
 
     ],
+    'blockly' => [
+        'js' => [
+            'blockly' . DS . 'blockly_compressed.js',
+            'blockly' . DS . 'blocks_compressed.js',
+            'blockly' . DS . 'php_compressed.js',
+            'blockly' . DS . 'msg' . DS . 'js' . DS . 'en.js',
+            'element' . DS . 'blockly' . DS . 'blockly.js',
+        ],
+    ],
 
 ];

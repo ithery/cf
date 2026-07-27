@@ -498,7 +498,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     protected function whereSub(CDatabase_Query_Builder $query, $where) {
         $select = $this->compileSelect($where['query']);
 
-        return $this->wrap($where['column']) . ' ' . $where['operator'] . " (${select})";
+        return $this->wrap($where['column']) . ' ' . $where['operator'] . " ({$select})";
     }
 
     /**
@@ -1085,7 +1085,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
             return '(' . $this->parameterize($record) . ')';
         })->implode(', ');
 
-        return "insert into ${table} (${columns}) values ${parameters}";
+        return "insert into {$table} ({$columns}) values {$parameters}";
     }
 
     /**
@@ -1125,7 +1125,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @return string
      */
     public function compileInsertUsing(CDatabase_Query_Builder $query, array $columns, string $sql) {
-        return "insert into {$this->wrapTable($query->from)} ({$this->columnize($columns)}) ${sql}";
+        return "insert into {$this->wrapTable($query->from)} ({$this->columnize($columns)}) {$sql}";
     }
 
     /**

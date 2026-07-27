@@ -168,6 +168,6 @@ class CSession_Factory {
             }
         }
 
-        throw new InvalidArgumentException("Driver [${driver}] not supported.");
+        throw new InvalidArgumentException("Driver [{$driver}] not supported.");
     }
 }
