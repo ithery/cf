@@ -120,7 +120,7 @@ trait CView_Trait_ManageEventTrait {
         // the instance out of the IoC container and call the method on it with the
         // given arguments that are passed to the Closure as the composer's data.
         return function () use ($class, $method) {
-            return $this->container->make($class)->{$method}(...func_get_args());
+            return $this->getContainer()->make($class)->{$method}(...func_get_args());
         };
     }
 
