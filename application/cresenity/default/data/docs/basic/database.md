@@ -184,3 +184,68 @@ class NWModel_Character extends CModel {
 ### org_id Column
 
 Multi-tenant applications use `org_id` (`bigint unsigned NOT NULL DEFAULT 0`) to scope data per organization. This is not enforced by the framework but is a strong convention — include it in every table that stores tenant-specific data.
+
+---
+
+### Array-Backed Models (No Database Required)
+
+`CModel_ArrayDriver_ArrayDriverTrait` lets a `CModel` run against a real,
+queryable SQLite database that's created and cached automatically - no
+`config/database.php` connection, no manual migration, no real database
+server needed at all. Useful for demo/seed data, fixtures, and small
+reference/lookup tables that don't deserve a spot in the app's main schema.
+
+Give it either seed rows or just a column schema:
+
+```php
+class MyApp_Model_Country extends CModel {
+    use CModel_ArrayDriver_ArrayDriverTrait;
+
+    protected $rows = [
+        ['country_id' => 1, 'name' => 'Indonesia', 'code' => 'ID'],
+        ['country_id' => 2, 'name' => 'Singapore', 'code' => 'SG'],
+    ];
+}
+```
+
+or, if you don't have fixed data to seed (the table is meant to be written to
+at runtime, e.g. by a demo/example feature):
+
+```php
+class MyApp_Model_Widget extends CModel {
+    use CModel_ArrayDriver_ArrayDriverTrait;
+
+    protected $schema = [
+        'name' => 'string',
+        'quantity' => 'integer',
+        'is_active' => 'boolean',
+    ];
+}
+```
+
+Column types map directly to `CDatabase_Schema_Blueprint` method names
+(`string`, `integer`, `boolean`, `dateTime`, `text`, ...). The primary key
+(`{table}_id`, per the convention above) is added automatically and does not
+need to appear in `$rows`/`$schema`.
+
+Behind the scenes (`CModel_ArrayDriver_ArrayDriverTrait::bootArrayDriverTrait()`):
+
+- On boot, it builds/reuses a per-model SQLite file at
+  `DOCROOT/temp/model/array/cache/{kebab-class-name}.sqlite`.
+- The cache is keyed by the **source file's modification time** - edit
+  `$rows`/`$schema` and the cache is detected as stale and rebuilt
+  automatically on the next request. No manual cache-busting needed.
+- If the cache directory isn't writable, it transparently falls back to an
+  in-memory SQLite connection (`:memory:`) instead - still fully functional,
+  just not persisted/shared across requests.
+- Relations (`belongsTo`/`hasMany`/etc.) work normally even between two
+  different array-backed models, since each resolves its own isolated
+  connection independently (`getConnectionName()` returns the model's own
+  class name) - CF just issues separate queries per model, same as it would
+  for models on genuinely different database connections.
+
+This is exactly how the framework's own docs examples stay runnable without
+a real database - see `application/cresenity/default/libraries/Cresenity/Demo/Model/Item.php`
+for a `$rows`-seeded example, and `Cresenity/Demo/Api/Model/*` (covered in
+[API - OAuth2](/docs/api/oauth)) for a `$schema`-only example backing a full
+OAuth2 authorization server.

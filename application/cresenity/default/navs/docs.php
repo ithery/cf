@@ -39,6 +39,11 @@ return [
         'subnav' => include dirname(__FILE__) . '/docs/module.php',
     ],
     [
+        'name' => 'api',
+        'label' => c::__('API (CApi)'),
+        'subnav' => include dirname(__FILE__) . '/docs/api.php',
+    ],
+    [
         'name' => 'cresjs',
         'label' => c::__('Cres JS'),
         'subnav' => include dirname(__FILE__) . '/docs/cresjs.php',
