@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-class CView_Engine_FileEngine implements CView_EngineAbstract {
+class CView_Engine_FileEngine extends CView_EngineAbstract {
     /**
      * Create a new file engine instance.
      *
