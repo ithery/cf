@@ -1,7 +1,5 @@
 <?php
 
-use Opis\Closure\SerializableClosure;
-
 defined('SYSPATH') or die('No direct access allowed.');
 
 trait CApp_Concern_BreadcrumbTrait {

@@ -1,7 +1,5 @@
 <?php
 
-use Opis\Closure\SerializableClosure;
-
 class CManager_DataProvider_CollectionDataProvider extends CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
     /**
      * @var CCollection

@@ -352,7 +352,7 @@ class c {
      * @return mixed
      */
     public static function value($value, ...$args) {
-        if ($value instanceof SerializableClosure) {
+        if ($value instanceof SerializableClosure || $value instanceof CFunction_SerializableClosure) {
             return $value->__invoke(...$args);
         }
 

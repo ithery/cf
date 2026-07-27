@@ -209,7 +209,7 @@ class CJavascript {
     }
 
     public static function closureToJs(Closure $closure) {
-        $serializedClosure = new \Opis\Closure\SerializableClosure($closure);
+        $serializedClosure = new CFunction_SerializableClosure($closure);
         $serialized = serialize($serializedClosure);
         $regex = "#\:\"(function\s*+\(.+?})\";#ims";
         if (preg_match($regex, $serialized, $matches)) {

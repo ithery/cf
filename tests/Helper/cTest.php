@@ -33,6 +33,26 @@ class cTest extends TestCase {
         }, 'foo'));
     }
 
+    /**
+     * Regression test: c::value() used to only unwrap-and-invoke
+     * \Opis\Closure\SerializableClosure, not CFunction_SerializableClosure
+     * (the framework's own, now-preferred wrapper) - a CFunction_SerializableClosure
+     * passed to c::value() silently came back unchanged (the wrapper object
+     * itself, never invoked) since it isn't a \Closure instance either.
+     */
+    public function testValueInvokesBothSerializableClosureWrapperTypes() {
+        $this->assertSame('foo', c::value(new CFunction_SerializableClosure(function () {
+            return 'foo';
+        })));
+        $this->assertSame('foo', c::value(new CFunction_SerializableClosure(function ($arg) {
+            return $arg;
+        }), 'foo'));
+
+        $this->assertSame('foo', c::value(new \Opis\Closure\SerializableClosure(function () {
+            return 'foo';
+        })));
+    }
+
     public function testObjectGet() {
         $class = new stdClass();
         $class->name = new stdClass();

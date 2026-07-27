@@ -5,7 +5,6 @@
  *
  * @author Hery
  */
-use Opis\Closure\SerializableClosure;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class CRouting_Route {
@@ -1147,7 +1146,7 @@ class CRouting_Route {
      */
     public function prepareForSerialization() {
         if ($this->action['uses'] instanceof Closure) {
-            $this->action['uses'] = serialize(new SerializableClosure($this->action['uses']));
+            $this->action['uses'] = serialize(new CFunction_SerializableClosure($this->action['uses']));
 
             // throw new LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
         }

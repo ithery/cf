@@ -234,7 +234,7 @@ class CObservable_Javascript {
     }
 
     public function createFunction($funcName, $callback) {
-        $serializedClosure = new \Opis\Closure\SerializableClosure($callback);
+        $serializedClosure = new CFunction_SerializableClosure($callback);
         $serialized = serialize($serializedClosure);
         $regex = "#\:\"(function\s*+\(.+?})\";#ims";
         if (preg_match($regex, $serialized, $matches)) {

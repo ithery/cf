@@ -1,7 +1,5 @@
 <?php
 
-use Opis\Closure\SerializableClosure;
-
 class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
     protected $connection = '';
 
@@ -23,12 +21,12 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
     }
 
     public function setConnection($connection) {
-        $this->connection = $connection instanceof Closure ? new SerializableClosure($connection) : $connection;
+        $this->connection = $connection instanceof Closure ? new CFunction_SerializableClosure($connection) : $connection;
     }
 
     public function getConnection() {
         $connection = c::value($this->connection) ?: 'default';
-        if ($connection instanceof SerializableClosure) {
+        if ($connection instanceof CFunction_SerializableClosure) {
             $connection = $connection->__invoke();
         }
 

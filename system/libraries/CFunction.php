@@ -20,7 +20,7 @@ class CFunction {
 
     private function __construct($func) {
         if ($func instanceof Closure) {
-            $func = new OpisSerializableClosure($func);
+            $func = new CFunction_SerializableClosure($func);
         }
         $this->func = $func;
     }

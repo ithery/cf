@@ -34,11 +34,11 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
         $strSelection = $this->formatSelection;
         $strResult = $this->formatResult;
 
-        if ($strSelection instanceof \Opis\Closure\SerializableClosure) {
+        if ($strSelection instanceof CFunction_SerializableClosure || $strSelection instanceof \Opis\Closure\SerializableClosure) {
             $strSelection = '';
         }
 
-        if ($strResult instanceof \Opis\Closure\SerializableClosure) {
+        if ($strResult instanceof CFunction_SerializableClosure || $strResult instanceof \Opis\Closure\SerializableClosure) {
             $strResult = '';
         }
 
@@ -90,7 +90,7 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
                         }
                     }
                     $formatResult = $this->formatResult;
-                    if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
+                    if ($formatResult instanceof CFunction_SerializableClosure || $formatResult instanceof \Opis\Closure\SerializableClosure) {
                         $formatResult = $formatResult->__invoke($model ?: $row);
                         if ($formatResult instanceof CRenderable) {
                             $data['cappFormatResult'] = $formatResult->html();
@@ -101,7 +101,7 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
                         }
                     }
                     $formatSelection = $this->formatSelection;
-                    if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
+                    if ($formatSelection instanceof CFunction_SerializableClosure || $formatSelection instanceof \Opis\Closure\SerializableClosure) {
                         $formatSelection = $formatSelection->__invoke($model ?: $row);
                         if ($formatSelection instanceof CRenderable) {
                             $row['cappFormatSelection'] = $formatSelection->html();

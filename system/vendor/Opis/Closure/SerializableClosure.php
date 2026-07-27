@@ -125,13 +125,20 @@ class SerializableClosure implements Serializable {
         if ($reflector->isBindingRequired()) {
             $object = $reflector->getClosureThis();
             static::wrapClosures($object, $this->scope);
-            if ($scope = $reflector->getClosureScopeClass()) {
-                $scope = $scope->name;
-            }
-        } else {
-            if ($scope = $reflector->getClosureScopeClass()) {
-                $scope = $scope->name;
-            }
+        }
+
+        try {
+            $scope = $reflector->getClosureScopeClass();
+        } catch (\Throwable $ex) {
+            // PHP's reflection engine can fail to introspect a closure's scope class in some
+            // edge cases ("Failed to retrieve the reflection object"). The scope is only needed
+            // to rebind the closure to its declaring class on unserialize (for private/protected
+            // member access) - falling back to no scope is safe for closures that don't need it,
+            // and beats a hard crash for ones that don't have a real fallback.
+            $scope = null;
+        }
+        if ($scope) {
+            $scope = $scope->name;
         }
 
         $this->reference = spl_object_hash($this->closure);

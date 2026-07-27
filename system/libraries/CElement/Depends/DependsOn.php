@@ -1,5 +1,4 @@
 <?php
-use Opis\Closure\SerializableClosure;
 
 /**
  * @see CElement_Element_Div
@@ -15,7 +14,7 @@ class CElement_Depends_DependsOn {
     protected $selector;
 
     /**
-     * @var SerializableClosure
+     * @var CFunction_SerializableClosure
      */
     protected $resolver;
 
@@ -61,7 +60,7 @@ class CElement_Depends_DependsOn {
      * @return $this
      */
     public function setResolver($resolver) {
-        $this->resolver = new SerializableClosure($resolver);
+        $this->resolver = new CFunction_SerializableClosure($resolver);
 
         return $this;
     }
@@ -74,7 +73,7 @@ class CElement_Depends_DependsOn {
     }
 
     /**
-     * @return SerializableClosure
+     * @return CFunction_SerializableClosure
      */
     public function getResolver() {
         return $this->resolver;

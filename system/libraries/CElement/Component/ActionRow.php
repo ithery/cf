@@ -1,11 +1,10 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
-use Opis\Closure\SerializableClosure;
 
 class CElement_Component_ActionRow extends CElement_Component_Action {
     /**
-     * @var null|SerializableClosure
+     * @var null|CFunction_SerializableClosure
      */
     protected $rowCallback;
 
@@ -35,7 +34,7 @@ class CElement_Component_ActionRow extends CElement_Component_Action {
      * @return $this
      */
     public function withRowCallback($callback) {
-        $this->rowCallback = new SerializableClosure($callback);
+        $this->rowCallback = new CFunction_SerializableClosure($callback);
 
         return $this;
     }
@@ -46,7 +45,7 @@ class CElement_Component_ActionRow extends CElement_Component_Action {
      * @return $this
      */
     public function applyRowCallback($row) {
-        if ($this->rowCallback && $this->rowCallback instanceof SerializableClosure) {
+        if ($this->rowCallback && $this->rowCallback instanceof CFunction_SerializableClosure) {
             $this->rowCallback->__invoke($this, $row);
         }
 

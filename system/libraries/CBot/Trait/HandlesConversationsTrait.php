@@ -1,7 +1,5 @@
 <?php
 
-use Opis\Closure\SerializableClosure;
-
 trait CBot_Trait_HandlesConversationsTrait {
     /**
      * @param \CBot_Message_ConversationAbstract $instance
@@ -110,7 +108,7 @@ trait CBot_Trait_HandlesConversationsTrait {
      */
     public function serializeClosure(Closure $closure) {
         if ($this->getDriver()->serializesCallbacks() && !$this->runsOnSocket) {
-            return serialize(new SerializableClosure($closure, true));
+            return serialize(new CFunction_SerializableClosure($closure));
         }
 
         return $closure;
@@ -284,7 +282,7 @@ trait CBot_Trait_HandlesConversationsTrait {
      * @param array                             $parameters
      */
     protected function prepareConversationClosure($next, CBot_Message_ConversationAbstract $conversation, array $parameters) {
-        if ($next instanceof SerializableClosure) {
+        if ($next instanceof CFunction_SerializableClosure || $next instanceof \Opis\Closure\SerializableClosure) {
             $next = $next->getClosure()->bindTo($conversation, $conversation);
         } elseif ($next instanceof Closure) {
             $next = $next->bindTo($conversation, $conversation);

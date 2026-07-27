@@ -66,7 +66,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
                     $ext = pathinfo($fileName, PATHINFO_EXTENSION);
 
                     $this->checkExtension($ext, $allowedExtension);
-                    if ($validationCallback && $validationCallback instanceof Opis\Closure\SerializableClosure) {
+                    if ($validationCallback && ($validationCallback instanceof CFunction_SerializableClosure || $validationCallback instanceof Opis\Closure\SerializableClosure)) {
                         $validationCallback->__invoke($fileName, $imageData);
                     }
 

@@ -52,7 +52,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     }
 
     public function getPdo() {
-        if ($this->pdo instanceof Closure || $this->pdo instanceof \Opis\Closure\SerializableClosure) {
+        if ($this->pdo instanceof Closure || $this->pdo instanceof CFunction_SerializableClosure || $this->pdo instanceof \Opis\Closure\SerializableClosure) {
             $this->pdo = c::value($this->pdo);
         }
 

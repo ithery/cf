@@ -89,7 +89,16 @@ class ReflectionClosure extends ReflectionFunction {
 
         $className = null;
 
-        if (null !== $className = $this->getClosureScopeClass()) {
+        try {
+            $className = $this->getClosureScopeClass();
+        } catch (\Throwable $ex) {
+            // PHP's reflection engine can fail to introspect a closure's scope class in some
+            // edge cases ("Failed to retrieve the reflection object"); falling back to no
+            // scope beats a hard crash for closures that don't need it.
+            $className = null;
+        }
+
+        if (null !== $className) {
             $className = '\\' . trim($className->getName(), '\\');
         }
 

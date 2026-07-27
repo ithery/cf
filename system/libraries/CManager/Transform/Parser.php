@@ -67,7 +67,7 @@ class CManager_Transform_Parser {
      * @return mixed
      */
     protected static function prepareMethod($method) {
-        if ($method instanceof Closure || $method instanceof \Opis\Closure\SerializableClosure) {
+        if ($method instanceof Closure || $method instanceof CFunction_SerializableClosure || $method instanceof \Opis\Closure\SerializableClosure) {
             $method = new CManager_Transform_Method_ClosureMethod($method);
         }
 

@@ -1,19 +1,17 @@
 <?php
 
-use Opis\Closure\SerializableClosure;
-
 class CManager_DataProvider_ClosureDataProvider extends CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
     protected $connection = '';
 
     /**
-     * @var SerializableClosure
+     * @var CFunction_SerializableClosure
      */
     protected $closure;
 
     protected $requires;
 
     public function __construct($closure, array $requires = []) {
-        $this->closure = new SerializableClosure($closure);
+        $this->closure = new CFunction_SerializableClosure($closure);
         $this->requires = $requires;
     }
 

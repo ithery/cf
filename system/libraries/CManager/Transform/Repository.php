@@ -33,7 +33,7 @@ class CManager_Transform_Repository {
         if ($method instanceof CManager_Transform_Contract_TransformMethodInterface) {
             return null;
         }
-        if ($method instanceof Closure || $method instanceof \Opis\Closure\SerializableClosure) {
+        if ($method instanceof Closure || $method instanceof CFunction_SerializableClosure || $method instanceof \Opis\Closure\SerializableClosure) {
             return null;
         }
 
