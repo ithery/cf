@@ -558,6 +558,28 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     }
 
     /**
+     * Unwrap the generic HttpException that prepareResponse() creates around a
+     * non-HTTP exception.
+     *
+     * The wrapper is instantiated inside this class, so its getFile(), getLine()
+     * and getTrace() point at ExceptionHandler instead of the code that actually
+     * threw. Rendering the original keeps the reported location useful. Only the
+     * exact CHTTP_Exception_HttpException class is unwrapped, so purpose-built
+     * subclasses such as NotFoundHttpException still render as themselves.
+     *
+     * @param \Throwable $e
+     *
+     * @return \Throwable
+     */
+    protected function unwrapWrappedException($e) {
+        while (get_class($e) === CHTTP_Exception_HttpException::class && $e->getPrevious() != null) {
+            $e = $e->getPrevious();
+        }
+
+        return $e;
+    }
+
+    /**
      * Get the response content for the given exception.
      *
      * @param \Exception $e
@@ -568,6 +590,8 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         if (CF::isCli()) {
             return $this->renderForConsole(new Symfony\Component\Console\Output\ConsoleOutput(), $e);
         }
+
+        $e = $this->unwrapWrappedException($e);
 
         try {
             return CException_LegacyExceptionHandler::getContent($e);
