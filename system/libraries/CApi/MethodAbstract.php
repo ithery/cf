@@ -245,4 +245,15 @@ abstract class CApi_MethodAbstract implements Arrayable {
     protected function auth() {
         return $this->manager()->auth();
     }
+
+    /**
+     * @param string   $message
+     * @param null|int $errCode when null, increments the current errCode
+     *
+     * @return void
+     */
+    protected function fail($message, $errCode = null) {
+        $this->errCode = $errCode !== null ? $errCode : $this->errCode + 1;
+        $this->errMessage = $message;
+    }
 }
