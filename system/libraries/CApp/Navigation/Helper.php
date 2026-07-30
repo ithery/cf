@@ -54,15 +54,50 @@ class CApp_Navigation_Helper {
             $navUri = carr::get($nav, 'uri', '');
             $routerUri = $path . $controller . '/' . $method;
 
+            //$routerUri is rebuilt from route data, so it stops at the method and
+            //drops any route parameter. A nav entry pointing at a parameterised
+            //URL (eg. 'cloud/account/do/dashboard/4') could therefore never be
+            //detected as active. Compare against the real request path as well.
+            $requestUri = null;
+            if (!CF::isCli()) {
+                $requestUri = trim((string) c::request()->path(), '/');
+            }
+
+            //`uri` is the actual link target, so it is compared literally.
+            //`aliases` are patterns and may use `*` wildcards, which lets one
+            //entry cover a family of URLs — 'manager/project/*' instead of
+            //listing every sub-page, or 'cloud/account/do/*/4' to stay active
+            //across any action of one particular record.
+            $uriMatches = function ($candidate, $allowWildcard = false) use ($routerUri, $requestUri) {
+                $candidate = trim((string) $candidate, '/');
+                if (strlen($candidate) == 0) {
+                    return false;
+                }
+                $targets = [trim($routerUri, '/')];
+                if ($requestUri !== null) {
+                    $targets[] = $requestUri;
+                }
+
+                foreach ($targets as $target) {
+                    if ($allowWildcard ? cstr::is($candidate, $target) : $candidate == $target) {
+                        return true;
+                    }
+                }
+
+                return false;
+            };
+
             if ($navUri != null) {
-                if (trim($navUri, '/') == trim($routerUri, '/')) {
+                if ($uriMatches($navUri)) {
                     return $nav;
                 }
             }
 
             if (is_array($navAliases)) {
-                if (in_array(trim($routerUri, '/'), $navAliases)) {
-                    return $nav;
+                foreach ($navAliases as $navAliasItem) {
+                    if ($uriMatches($navAliasItem, true)) {
+                        return $nav;
+                    }
                 }
             }
 
