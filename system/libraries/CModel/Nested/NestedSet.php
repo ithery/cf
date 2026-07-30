@@ -77,6 +77,13 @@ class CModel_Nested_NestedSet {
      * @return bool
      */
     public static function isNode($node) {
-        return is_object($node) && c::hasTrait($node, CModel_Nested_Trait::class);
+        //CModel_Nested_Trait is a thin alias whose whole body is
+        //`use CModel_Nested_NestedTrait;`, and nothing uses it — every nested
+        //model uses CModel_Nested_NestedTrait directly. Checking the alias made
+        //isNode() false for all of them, so any nested relation
+        //(descendants(), ancestors(), siblings(), ...) threw "Model must be
+        //node". Checking the real trait covers both spellings, since a model
+        //using the alias gets NestedTrait transitively.
+        return is_object($node) && c::hasTrait($node, CModel_Nested_NestedTrait::class);
     }
 }
