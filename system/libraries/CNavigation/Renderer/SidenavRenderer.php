@@ -42,8 +42,9 @@ class CNavigation_Renderer_SidenavRenderer extends CNavigation_RendererAbstract 
             }
             $childHtml = '';
 
-            if (isset($d['subnav']) && is_array($d['subnav'])) {
-                $childHtml .= $this->render(carr::get($d, 'subnav', []), $level + 1, $child);
+            $resolvedSubnav = CNavigation_Data::resolveSubnav($d);
+            if (count($resolvedSubnav) > 0) {
+                $childHtml .= $this->render($resolvedSubnav, $level + 1, $child);
             }
             $url = carr::get($d, 'uri');
             if ($url == null) {

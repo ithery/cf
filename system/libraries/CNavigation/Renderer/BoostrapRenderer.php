@@ -35,8 +35,9 @@ class CNavigation_Renderer_BootstrapRenderer extends CNavigation_RendererAbstrac
 
             $child_html = '';
 
-            if (isset($d['subnav'])) {
-                $child_html .= $this->render($d['subnav'], $level + 1, $child);
+            $resolvedSubnav = CNavigation_Data::resolveSubnav($d);
+            if (count($resolvedSubnav) > 0) {
+                $child_html .= $this->render($resolvedSubnav, $level + 1, $child);
             }
             $url = carr::get($d, 'uri');
             if ($url == null) {
