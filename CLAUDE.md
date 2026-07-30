@@ -24,6 +24,15 @@ Framework tests in `tests/`, app tests in `application/{app}/default/tests/`.
 
 **JS**: follow `.eslintrc`, `const`/`let` only (no `var`). **CSS**: follow `.stylelintrc`.
 
+**Alpine.js is bundled inside `cres.js`** — `media/js/cres/src/Cresenity.js` does
+`import Alpine from 'alpinejs'` (^3.9.5) and the build exposes `window.Alpine`. So Alpine
+directives (`x-data`, `x-show`, …) work on **any** page that loads cres.js; do **not**
+register an `alpine` asset module for them. `SupportAlpine()` in cres.js is the
+Cresenity↔Alpine bridge (re-scans after each cres request, morphdom integration) — it
+guards on `window.Alpine` because it runs alongside the bundle, not because Alpine is
+optional. A standalone `media/js/libs/alpine.js` module also exists; it is legacy and
+would double-load Alpine.
+
 ## Conventions
 
 - `system/vendor/` manually managed — no composer install
