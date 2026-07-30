@@ -84,12 +84,10 @@ class CApp_Navigation_Helper {
                     }
                 }
             }
-            if (isset($nav['subnav'])) {
-                foreach ($nav['subnav'] as $sn) {
-                    $res = self::nav($sn, $controller, $method);
-                    if ($res !== false) {
-                        return $res;
-                    }
+            foreach (CNavigation_Data::resolveSubnav($nav) as $sn) {
+                $res = self::nav($sn, $controller, $method);
+                if ($res !== false) {
+                    return $res;
                 }
             }
         }
@@ -260,8 +258,9 @@ class CApp_Navigation_Helper {
             $res['app_id'] = $appId;
             $res['domain'] = $domain;
             $subnav = [];
-            if (isset($d['subnav']) && is_array($d['subnav']) && count($d['subnav']) > 0) {
-                $subnav = self::asUserRightsArray($appId, $roleId, $d['subnav'], $appRoleId, $domain, $level + 1);
+            $resolvedSubnav = CNavigation_Data::resolveSubnav($d);
+            if (count($resolvedSubnav) > 0) {
+                $subnav = self::asUserRightsArray($appId, $roleId, $resolvedSubnav, $appRoleId, $domain, $level + 1);
             }
 
             if (count($subnav) == 0 && ((!isset($d['controller']) || strlen($d['controller']) == 0))) {
@@ -282,13 +281,7 @@ class CApp_Navigation_Helper {
      * @return int
      */
     public static function childCount($nav) {
-        if (isset($nav['subnav'])) {
-            if (is_array($nav['subnav'])) {
-                return count($nav['subnav']);
-            }
-        }
-
-        return 0;
+        return count(CNavigation_Data::resolveSubnav($nav));
     }
 
     /**
@@ -306,7 +299,7 @@ class CApp_Navigation_Helper {
      * @return bool
      */
     public static function isLeaf($nav) {
-        return isset($nav['subnav']) && is_array($nav['subnav']);
+        return CNavigation_Data::hasSubnav($nav);
     }
 
     /**
@@ -386,7 +379,7 @@ class CApp_Navigation_Helper {
             if ($appRole != null && $appRole->parent_id == null) {
                 return true;
             }
-            if ($appRole != null && (!isset($nav['subnav']) || count($nav['subnav']) == 0)) {
+            if ($appRole != null && !CNavigation_Data::hasSubnav($nav)) {
                 $parentRoleId = $appRole->parent_id;
                 if ($parentRoleId != null) {
                     if (!self::haveAccess($nav, $appRoleId, $appId)) {
@@ -491,8 +484,9 @@ class CApp_Navigation_Helper {
 
             $child_html = '';
 
-            if (isset($d['subnav'])) {
-                $child_html .= self::render($d['subnav'], $level + 1, $child);
+            $resolvedSubnav = CNavigation_Data::resolveSubnav($d);
+            if (count($resolvedSubnav) > 0) {
+                $child_html .= self::render($resolvedSubnav, $level + 1, $child);
             }
 
             $url = self::url($d);

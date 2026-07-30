@@ -173,10 +173,11 @@ class CApp_Navigation {
                 }
             }
 
-            $haveSubnav = isset($d['subnav']) && is_array($d['subnav']);
+            $resolvedSubnav = CNavigation_Data::resolveSubnav($d);
+            $haveSubnav = count($resolvedSubnav) > 0;
             $subnavArray = [];
             if ($haveSubnav) {
-                $subnavArray = static::filterNavWithAccess(carr::get($d, 'subnav', []), $level + 1, $child);
+                $subnavArray = static::filterNavWithAccess($resolvedSubnav, $level + 1, $child);
                 $clonedNav['subnav'] = $subnavArray;
             }
 
