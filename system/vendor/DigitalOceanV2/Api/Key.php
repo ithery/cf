@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of the DigitalOceanV2 library.
+ * This file is part of the DigitalOcean API library.
  *
- * (c) Antoine Corcy <contact@sbin.dk>
+ * (c) Antoine Kirk <contact@sbin.dk>
+ * (c) Graham Campbell <hello@gjcampbell.co.uk>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,26 +15,24 @@
 namespace DigitalOceanV2\Api;
 
 use DigitalOceanV2\Entity\Key as KeyEntity;
-use DigitalOceanV2\Exception\HttpException;
+use DigitalOceanV2\Exception\ExceptionInterface;
 
 /**
- * @author Antoine Corcy <contact@sbin.dk>
- * @author Graham Campbell <graham@alt-three.com>
+ * @author Antoine Kirk <contact@sbin.dk>
+ * @author Graham Campbell <hello@gjcampbell.co.uk>
  */
 class Key extends AbstractApi
 {
     /**
+     * @throws ExceptionInterface
+     *
      * @return KeyEntity[]
      */
     public function getAll()
     {
-        $keys = $this->adapter->get(sprintf('%s/account/keys?per_page=%d', $this->endpoint, 200));
+        $keys = $this->get('account/keys');
 
-        $keys = json_decode($keys);
-
-        $this->extractMeta($keys);
-
-        return array_map(function ($key) {
+        return \array_map(function ($key) {
             return new KeyEntity($key);
         }, $keys->ssh_keys);
     }
@@ -39,13 +40,13 @@ class Key extends AbstractApi
     /**
      * @param int $id
      *
+     * @throws ExceptionInterface
+     *
      * @return KeyEntity
      */
-    public function getById($id)
+    public function getById(int $id)
     {
-        $key = $this->adapter->get(sprintf('%s/account/keys/%d', $this->endpoint, $id));
-
-        $key = json_decode($key);
+        $key = $this->get(\sprintf('account/keys/%d', $id));
 
         return new KeyEntity($key->ssh_key);
     }
@@ -53,13 +54,13 @@ class Key extends AbstractApi
     /**
      * @param string $fingerprint
      *
+     * @throws ExceptionInterface
+     *
      * @return KeyEntity
      */
-    public function getByFingerprint($fingerprint)
+    public function getByFingerprint(string $fingerprint)
     {
-        $key = $this->adapter->get(sprintf('%s/account/keys/%s', $this->endpoint, $fingerprint));
-
-        $key = json_decode($key);
+        $key = $this->get(\sprintf('account/keys/%s', $fingerprint));
 
         return new KeyEntity($key->ssh_key);
     }
@@ -68,15 +69,16 @@ class Key extends AbstractApi
      * @param string $name
      * @param string $publicKey
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return KeyEntity
      */
-    public function create($name, $publicKey)
+    public function create(string $name, string $publicKey)
     {
-        $key = $this->adapter->post(sprintf('%s/account/keys', $this->endpoint), ['name' => $name, 'public_key' => $publicKey]);
-
-        $key = json_decode($key);
+        $key = $this->post('account/keys', [
+            'name' => $name,
+            'public_key' => $publicKey,
+        ]);
 
         return new KeyEntity($key->ssh_key);
     }
@@ -85,15 +87,15 @@ class Key extends AbstractApi
      * @param string $id
      * @param string $name
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return KeyEntity
      */
-    public function update($id, $name)
+    public function update(string $id, string $name)
     {
-        $key = $this->adapter->put(sprintf('%s/account/keys/%s', $this->endpoint, $id), ['name' => $name]);
-
-        $key = json_decode($key);
+        $key = $this->put(\sprintf('account/keys/%s', $id), [
+            'name' => $name,
+        ]);
 
         return new KeyEntity($key->ssh_key);
     }
@@ -101,10 +103,12 @@ class Key extends AbstractApi
     /**
      * @param string $id
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
+     *
+     * @return void
      */
-    public function delete($id)
+    public function remove(string $id): void
     {
-        $this->adapter->delete(sprintf('%s/account/keys/%s', $this->endpoint, $id));
+        $this->delete(\sprintf('account/keys/%s', $id));
     }
 }

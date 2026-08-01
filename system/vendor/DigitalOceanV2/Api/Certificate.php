@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of the DigitalOceanV2 library.
+ * This file is part of the DigitalOcean API library.
  *
- * (c) Antoine Corcy <contact@sbin.dk>
+ * (c) Antoine Kirk <contact@sbin.dk>
+ * (c) Graham Campbell <hello@gjcampbell.co.uk>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,6 +15,7 @@
 namespace DigitalOceanV2\Api;
 
 use DigitalOceanV2\Entity\Certificate as CertificateEntity;
+use DigitalOceanV2\Exception\ExceptionInterface;
 
 /**
  * @author Jacob Holmes <jwh315@cox.net>
@@ -19,17 +23,15 @@ use DigitalOceanV2\Entity\Certificate as CertificateEntity;
 class Certificate extends AbstractApi
 {
     /**
+     * @throws ExceptionInterface
+     *
      * @return CertificateEntity[]
      */
     public function getAll()
     {
-        $certificates = $this->adapter->get(sprintf('%s/certificates', $this->endpoint, 200));
+        $certificates = $this->get('certificates');
 
-        $certificates = json_decode($certificates);
-
-        $this->extractMeta($certificates);
-
-        return array_map(function ($certificates) {
+        return \array_map(function ($certificates) {
             return new CertificateEntity($certificates);
         }, $certificates->certificates);
     }
@@ -37,41 +39,62 @@ class Certificate extends AbstractApi
     /**
      * @param string $id
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return CertificateEntity
      */
-    public function getById($id)
+    public function getById(string $id)
     {
-        $certificate = $this->adapter->get(sprintf('%s/certificates/%s', $this->endpoint, $id));
-
-        $certificate = json_decode($certificate);
+        $certificate = $this->get(\sprintf('certificates/%s', $id));
 
         return new CertificateEntity($certificate->certificate);
     }
 
     /**
-     * @param string $name
-     * @param string $privateKey
-     * @param string $leafCertificate
-     * @param string $certificateChain
+     * @param string      $name
+     * @param string      $privateKey
+     * @param string      $leafCertificate
+     * @param string|null $certificateChain
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return CertificateEntity
      */
-    public function create($name, $privateKey, $leafCertificate, $certificateChain)
+    public function create(string $name, string $privateKey, string $leafCertificate, ?string $certificateChain = null)
     {
-        $data = [
+        $params = [
+            'type' => 'custom',
             'name' => $name,
             'private_key' => $privateKey,
             'leaf_certificate' => $leafCertificate,
-            'certificate_chain' => $certificateChain,
         ];
 
-        $certificate = $this->adapter->post(sprintf('%s/certificates', $this->endpoint), $data);
+        if (null !== $certificateChain) {
+            $params['certificate_chain'] = $certificateChain;
+        }
 
-        $certificate = json_decode($certificate);
+        $certificate = $this->post('certificates', $params);
+
+        return new CertificateEntity($certificate->certificate);
+    }
+
+    /**
+     * @param string   $name
+     * @param string[] $dnsNames
+     *
+     * @throws ExceptionInterface
+     *
+     * @return CertificateEntity
+     */
+    public function createLetsEncrypt(string $name, array $dnsNames)
+    {
+        $params = [
+            'type' => 'lets_encrypt',
+            'name' => $name,
+            'dns_names' => $dnsNames,
+        ];
+
+        $certificate = $this->post('certificates', $params);
 
         return new CertificateEntity($certificate->certificate);
     }
@@ -79,10 +102,12 @@ class Certificate extends AbstractApi
     /**
      * @param string $id
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
+     *
+     * @return void
      */
-    public function delete($id)
+    public function remove(string $id): void
     {
-        $this->adapter->delete(sprintf('%s/certificates/%s', $this->endpoint, $id));
+        $this->delete(\sprintf('certificates/%s', $id));
     }
 }

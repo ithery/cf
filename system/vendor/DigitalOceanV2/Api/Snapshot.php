@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of the DigitalOceanV2 library.
+ * This file is part of the DigitalOcean API library.
  *
- * (c) Antoine Corcy <contact@sbin.dk>
+ * (c) Antoine Kirk <contact@sbin.dk>
+ * (c) Graham Campbell <hello@gjcampbell.co.uk>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,7 +15,7 @@
 namespace DigitalOceanV2\Api;
 
 use DigitalOceanV2\Entity\Snapshot as SnapshotEntity;
-use DigitalOceanV2\Exception\HttpException;
+use DigitalOceanV2\Exception\ExceptionInterface;
 
 /**
  * @author Yassir Hannoun <yassir.hannoun@gmail.com>
@@ -22,23 +25,21 @@ class Snapshot extends AbstractApi
     /**
      * @param array $criteria
      *
+     * @throws ExceptionInterface
+     *
      * @return SnapshotEntity[]
      */
     public function getAll(array $criteria = [])
     {
-        $query = sprintf('%s/snapshots?per_page=%d', $this->endpoint, 200);
+        $query = [];
 
-        if (isset($criteria['type']) && in_array($criteria['type'], ['droplet', 'volume'])) {
-            $query = sprintf('%s&resource_type=%s', $query, $criteria['type']);
+        if (isset($criteria['type']) && \in_array($criteria['type'], ['droplet', 'volume'], true)) {
+            $query['resource_type'] = $criteria['type'];
         }
 
-        $snapshots = $this->adapter->get($query);
+        $snapshots = $this->get('snapshots', $query);
 
-        $snapshots = json_decode($snapshots);
-
-        $this->extractMeta($snapshots);
-
-        return array_map(function ($snapshots) {
+        return \array_map(function ($snapshots) {
             return new SnapshotEntity($snapshots);
         }, $snapshots->snapshots);
     }
@@ -46,13 +47,13 @@ class Snapshot extends AbstractApi
     /**
      * @param string $id
      *
+     * @throws ExceptionInterface
+     *
      * @return SnapshotEntity
      */
-    public function getById($id)
+    public function getById(string $id)
     {
-        $snapshot = $this->adapter->get(sprintf('%s/snapshots/%s', $this->endpoint, $id));
-
-        $snapshot = json_decode($snapshot);
+        $snapshot = $this->get(\sprintf('snapshots/%s', $id));
 
         return new SnapshotEntity($snapshot->snapshot);
     }
@@ -60,10 +61,12 @@ class Snapshot extends AbstractApi
     /**
      * @param string $id
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
+     *
+     * @return void
      */
-    public function delete($id)
+    public function remove(string $id): void
     {
-        $this->adapter->delete(sprintf('%s/snapshots/%s', $this->endpoint, $id));
+        $this->delete(\sprintf('snapshots/%s', $id));
     }
 }

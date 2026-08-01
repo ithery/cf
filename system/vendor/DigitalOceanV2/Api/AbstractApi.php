@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of the DigitalOceanV2 library.
+ * This file is part of the DigitalOcean API library.
  *
- * (c) Antoine Corcy <contact@sbin.dk>
+ * (c) Antoine Kirk <contact@sbin.dk>
+ * (c) Graham Campbell <hello@gjcampbell.co.uk>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,64 +14,194 @@
 
 namespace DigitalOceanV2\Api;
 
-use DigitalOceanV2\Adapter\AdapterInterface;
-use DigitalOceanV2\Entity\Meta;
+use DigitalOceanV2\Client;
+use DigitalOceanV2\Exception\ExceptionInterface;
+use DigitalOceanV2\HttpClient\Message\ResponseMediator;
+use DigitalOceanV2\HttpClient\Util\JsonObject;
+use DigitalOceanV2\HttpClient\Util\QueryStringBuilder;
+use stdClass;
 
 /**
- * @author Antoine Corcy <contact@sbin.dk>
- * @author Graham Campbell <graham@alt-three.com>
+ * @author Antoine Kirk <contact@sbin.dk>
+ * @author Graham Campbell <hello@gjcampbell.co.uk>
  */
 abstract class AbstractApi
 {
     /**
+     * The URI prefix.
+     *
      * @var string
      */
-    const ENDPOINT = 'https://api.digitalocean.com/v2';
+    private const URI_PREFIX = '/v2/';
 
     /**
-     * @var AdapterInterface
+     * The client instance.
+     *
+     * @var Client
      */
-    protected $adapter;
+    private $client;
 
     /**
-     * @var string
+     * The per page parameter.
+     *
+     * @var int|null
      */
-    protected $endpoint;
+    private $perPage;
 
     /**
-     * @var Meta
+     * The page parameter.
+     *
+     * @var int|null
      */
-    protected $meta;
+    private $page;
 
     /**
-     * @param AdapterInterface $adapter
-     * @param string|null      $endpoint
+     * Create a new API instance.
+     *
+     * @param Client $client
+     *
+     * @return void
      */
-    public function __construct(AdapterInterface $adapter, $endpoint = null)
+    public function __construct(Client $client)
     {
-        $this->adapter = $adapter;
-        $this->endpoint = $endpoint ?: static::ENDPOINT;
+        $this->client = $client;
     }
 
     /**
-     * @param \stdClass $data
+     * Send a GET request with query params.
      *
-     * @return Meta|null
+     * @param string               $uri
+     * @param array                $params
+     * @param array<string,string> $headers
+     *
+     * @throws ExceptionInterface
+     *
+     * @return stdClass
      */
-    protected function extractMeta(\StdClass $data)
+    protected function get(string $uri, array $params = [], array $headers = []): stdClass
     {
-        if (isset($data->meta)) {
-            $this->meta = new Meta($data->meta);
+        if (null !== $this->perPage && !isset($params['per_page'])) {
+            $params = \array_merge(['per_page' => $this->perPage], $params);
         }
 
-        return $this->meta;
+        if (null !== $this->page && !isset($params['page'])) {
+            $params = \array_merge(['page' => $this->page], $params);
+        }
+
+        $response = $this->client->getHttpClient()->get(self::prepareUri($uri, $params), $headers);
+
+        return ResponseMediator::getContent($response);
     }
 
     /**
-     * @return Meta|null
+     * Send a POST request with JSON-encoded params.
+     *
+     * @param string               $uri
+     * @param array                $params
+     * @param array<string,string> $headers
+     *
+     * @throws ExceptionInterface
+     *
+     * @return stdClass
      */
-    public function getMeta()
+    protected function post(string $uri, array $params = [], array $headers = []): stdClass
     {
-        return $this->meta;
+        $body = self::prepareJsonBody($params);
+
+        if (null !== $body) {
+            $headers = self::addJsonContentType($headers);
+        }
+
+        $response = $this->client->getHttpClient()->post(self::prepareUri($uri), $headers, $body ?? '');
+
+        return ResponseMediator::getContent($response);
+    }
+
+    /**
+     * Send a PUT request with JSON-encoded params.
+     *
+     * @param string               $uri
+     * @param array                $params
+     * @param array<string,string> $headers
+     *
+     * @throws ExceptionInterface
+     *
+     * @return stdClass
+     */
+    protected function put(string $uri, array $params = [], array $headers = []): stdClass
+    {
+        $body = self::prepareJsonBody($params);
+
+        if (null !== $body) {
+            $headers = self::addJsonContentType($headers);
+        }
+
+        $response = $this->client->getHttpClient()->put(self::prepareUri($uri), $headers, $body ?? '');
+
+        return ResponseMediator::getContent($response);
+    }
+
+    /**
+     * Send a DELETE request with JSON-encoded params.
+     *
+     * @param string               $uri
+     * @param array                $params
+     * @param array<string,string> $headers
+     * @param array<string,string> $queryParams
+     *
+     * @throws ExceptionInterface
+     *
+     * @return void
+     */
+    protected function delete(string $uri, array $params = [], array $headers = [], array $queryParams = []): void
+    {
+        $body = self::prepareJsonBody($params);
+
+        if (null !== $body) {
+            $headers = self::addJsonContentType($headers);
+        }
+
+        $this->client->getHttpClient()->delete(self::prepareUri($uri, $queryParams), $headers, $body ?? '');
+    }
+
+    /**
+     * Prepare the request URI.
+     *
+     * @param string $uri
+     * @param array  $query
+     *
+     * @return string
+     */
+    private static function prepareUri(string $uri, array $query = []): string
+    {
+        return \sprintf('%s%s%s', self::URI_PREFIX, $uri, QueryStringBuilder::build($query));
+    }
+
+    /**
+     * Prepare the request JSON body.
+     *
+     * @param array $params
+     *
+     * @return string|null
+     */
+    private static function prepareJsonBody(array $params): ?string
+    {
+        if (0 === \count($params)) {
+            return null;
+        }
+
+        return JsonObject::encode($params);
+    }
+
+    /**
+     * Add the JSON content type to the headers if one is not already present.
+     *
+     * @param array<string,string> $headers
+     *
+     * @return array<string,string>
+     */
+    private static function addJsonContentType(array $headers): array
+    {
+        return \array_merge([ResponseMediator::CONTENT_TYPE_HEADER => ResponseMediator::JSON_CONTENT_TYPE], $headers);
     }
 }

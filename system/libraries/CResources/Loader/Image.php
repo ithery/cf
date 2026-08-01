@@ -1,7 +1,5 @@
 <?php
 
-use DigitalOceanV2\DigitalOceanV2;
-
 class CResources_Loader_Image extends CResources_LoaderAbstract {
     protected $appCode = '';
 

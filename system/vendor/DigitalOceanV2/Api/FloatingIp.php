@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of the DigitalOceanV2 library.
+ * This file is part of the DigitalOcean API library.
  *
- * (c) Antoine Corcy <contact@sbin.dk>
+ * (c) Antoine Kirk <contact@sbin.dk>
+ * (c) Graham Campbell <hello@gjcampbell.co.uk>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,41 +16,37 @@ namespace DigitalOceanV2\Api;
 
 use DigitalOceanV2\Entity\Action as ActionEntity;
 use DigitalOceanV2\Entity\FloatingIp as FloatingIpEntity;
-use DigitalOceanV2\Exception\HttpException;
+use DigitalOceanV2\Exception\ExceptionInterface;
 
 /**
- * @author Graham Campbell <graham@alt-three.com>
+ * @author Graham Campbell <hello@gjcampbell.co.uk>
  */
 class FloatingIp extends AbstractApi
 {
     /**
+     * @throws ExceptionInterface
+     *
      * @return FloatingIpEntity[]
      */
     public function getAll()
     {
-        $query = sprintf('%s/floating_ips?per_page=%d', $this->endpoint, 200);
+        $ips = $this->get('floating_ips');
 
-        $ips = $this->adapter->get($query);
-
-        $ips = json_decode($ips);
-
-        $this->extractMeta($ips);
-
-        return array_map(function ($ip) {
+        return \array_map(function ($ip) {
             return new FloatingIpEntity($ip);
         }, $ips->floating_ips);
     }
 
     /**
-     * @param int $id
+     * @param string $ipAddress
+     *
+     * @throws ExceptionInterface
      *
      * @return FloatingIpEntity
      */
-    public function getById($id)
+    public function getById(string $ipAddress)
     {
-        $ip = $this->adapter->get(sprintf('%s/floating_ips/%s', $this->endpoint, $id));
-
-        $ip = json_decode($ip);
+        $ip = $this->get(\sprintf('floating_ips/%s', $ipAddress));
 
         return new FloatingIpEntity($ip->floating_ip);
     }
@@ -55,15 +54,13 @@ class FloatingIp extends AbstractApi
     /**
      * @param int $dropletId
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return FloatingIpEntity
      */
-    public function createAssigned($dropletId)
+    public function createAssigned(int $dropletId)
     {
-        $ip = $this->adapter->post(sprintf('%s/floating_ips', $this->endpoint), ['droplet_id' => $dropletId]);
-
-        $ip = json_decode($ip);
+        $ip = $this->post('floating_ips', ['droplet_id' => $dropletId]);
 
         return new FloatingIpEntity($ip->floating_ip);
     }
@@ -71,100 +68,96 @@ class FloatingIp extends AbstractApi
     /**
      * @param string $regionSlug
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return FloatingIpEntity
      */
-    public function createReserved($regionSlug)
+    public function createReserved(string $regionSlug)
     {
-        $ip = $this->adapter->post(sprintf('%s/floating_ips', $this->endpoint), ['region' => $regionSlug]);
-
-        $ip = json_decode($ip);
+        $ip = $this->post('floating_ips', ['region' => $regionSlug]);
 
         return new FloatingIpEntity($ip->floating_ip);
     }
 
     /**
-     * @param int $id
+     * @param string $ipAddress
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
+     *
+     * @return void
      */
-    public function delete($id)
+    public function remove(string $ipAddress): void
     {
-        $this->adapter->delete(sprintf('%s/floating_ips/%s', $this->endpoint, $id));
+        $this->delete(\sprintf('floating_ips/%s', $ipAddress));
     }
 
     /**
-     * @param int $id
+     * @param string $ipAddress
+     *
+     * @throws ExceptionInterface
      *
      * @return ActionEntity[]
      */
-    public function getActions($id)
+    public function getActions(string $ipAddress)
     {
-        $actions = $this->adapter->get(sprintf('%s/floating_ips/%s/actions?per_page=%d', $this->endpoint, $id, 200));
+        $actions = $this->get(\sprintf('floating_ips/%s/actions', $ipAddress));
 
-        $actions = json_decode($actions);
-
-        $this->meta = $this->extractMeta($actions);
-
-        return array_map(function ($action) {
+        return \array_map(function ($action) {
             return new ActionEntity($action);
         }, $actions->actions);
     }
 
     /**
-     * @param int $id
-     * @param int $actionId
+     * @param string $ipAddress
+     * @param int    $actionId
+     *
+     * @throws ExceptionInterface
      *
      * @return ActionEntity
      */
-    public function getActionById($id, $actionId)
+    public function getActionById(string $ipAddress, int $actionId)
     {
-        $action = $this->adapter->get(sprintf('%s/floating_ips/%s/actions/%d', $this->endpoint, $id, $actionId));
-
-        $action = json_decode($action);
+        $action = $this->get(\sprintf('floating_ips/%s/actions/%d', $ipAddress, $actionId));
 
         return new ActionEntity($action->action);
     }
 
     /**
-     * @param int $id
-     * @param int $dropletId
+     * @param string $ipAddress
+     * @param int    $dropletId
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return ActionEntity
      */
-    public function assign($id, $dropletId)
+    public function assign(string $ipAddress, int $dropletId)
     {
-        return $this->executeAction($id, ['type' => 'assign', 'droplet_id' => $dropletId]);
+        return $this->executeAction($ipAddress, ['type' => 'assign', 'droplet_id' => $dropletId]);
     }
 
     /**
-     * @param int $id
+     * @param string $ipAddress
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return ActionEntity
      */
-    public function unassign($id)
+    public function unassign(string $ipAddress)
     {
-        return $this->executeAction($id, ['type' => 'unassign']);
+        return $this->executeAction($ipAddress, ['type' => 'unassign']);
     }
 
     /**
-     * @param int   $id
-     * @param array $options
+     * @param string $ipAddress
+     * @param array  $options
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return ActionEntity
      */
-    private function executeAction($id, array $options)
+    private function executeAction(string $ipAddress, array $options)
     {
-        $action = $this->adapter->post(sprintf('%s/floating_ips/%s/actions', $this->endpoint, $id), $options);
-
-        $action = json_decode($action);
+        $action = $this->post(\sprintf('floating_ips/%s/actions', $ipAddress), $options);
 
         return new ActionEntity($action->action);
     }

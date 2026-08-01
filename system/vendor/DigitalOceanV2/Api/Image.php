@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of the DigitalOceanV2 library.
+ * This file is part of the DigitalOcean API library.
  *
- * (c) Antoine Corcy <contact@sbin.dk>
+ * (c) Antoine Kirk <contact@sbin.dk>
+ * (c) Graham Campbell <hello@gjcampbell.co.uk>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,38 +16,36 @@ namespace DigitalOceanV2\Api;
 
 use DigitalOceanV2\Entity\Action as ActionEntity;
 use DigitalOceanV2\Entity\Image as ImageEntity;
-use DigitalOceanV2\Exception\HttpException;
+use DigitalOceanV2\Exception\ExceptionInterface;
 
 /**
  * @author Yassir Hannoun <yassir.hannoun@gmail.com>
- * @author Graham Campbell <graham@alt-three.com>
+ * @author Graham Campbell <hello@gjcampbell.co.uk>
  */
 class Image extends AbstractApi
 {
     /**
      * @param array $criteria
      *
+     * @throws ExceptionInterface
+     *
      * @return ImageEntity[]
      */
     public function getAll(array $criteria = [])
     {
-        $query = sprintf('%s/images?per_page=%d', $this->endpoint, 200);
+        $query = [];
 
-        if (isset($criteria['type']) && in_array($criteria['type'], ['distribution', 'application'])) {
-            $query = sprintf('%s&type=%s', $query, $criteria['type']);
+        if (isset($criteria['type']) && \in_array($criteria['type'], ['distribution', 'application'], true)) {
+            $query['type'] = $criteria['type'];
         }
 
-        if (isset($criteria['private']) && true === (bool) $criteria['private']) {
-            $query = sprintf('%s&private=true', $query);
+        if (isset($criteria['private']) && (bool) $criteria['private']) {
+            $query['private'] = 'true';
         }
 
-        $images = $this->adapter->get($query);
+        $images = $this->get('images', $query);
 
-        $images = json_decode($images);
-
-        $this->extractMeta($images);
-
-        return array_map(function ($image) {
+        return \array_map(function ($image) {
             return new ImageEntity($image);
         }, $images->images);
     }
@@ -52,13 +53,13 @@ class Image extends AbstractApi
     /**
      * @param int $id
      *
+     * @throws ExceptionInterface
+     *
      * @return ImageEntity
      */
-    public function getById($id)
+    public function getById(int $id)
     {
-        $image = $this->adapter->get(sprintf('%s/images/%d', $this->endpoint, $id));
-
-        $image = json_decode($image);
+        $image = $this->get(\sprintf('images/%d', $id));
 
         return new ImageEntity($image->image);
     }
@@ -66,13 +67,13 @@ class Image extends AbstractApi
     /**
      * @param string $slug
      *
+     * @throws ExceptionInterface
+     *
      * @return ImageEntity
      */
-    public function getBySlug($slug)
+    public function getBySlug(string $slug)
     {
-        $image = $this->adapter->get(sprintf('%s/images/%s', $this->endpoint, $slug));
-
-        $image = json_decode($image);
+        $image = $this->get(\sprintf('images/%s', $slug));
 
         return new ImageEntity($image->image);
     }
@@ -81,15 +82,13 @@ class Image extends AbstractApi
      * @param int    $id
      * @param string $name
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return ImageEntity
      */
-    public function update($id, $name)
+    public function update(int $id, string $name)
     {
-        $image = $this->adapter->put(sprintf('%s/images/%d', $this->endpoint, $id), ['name' => $name]);
-
-        $image = json_decode($image);
+        $image = $this->put(\sprintf('images/%d', $id), ['name' => $name]);
 
         return new ImageEntity($image->image);
     }
@@ -97,26 +96,26 @@ class Image extends AbstractApi
     /**
      * @param int $id
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
+     *
+     * @return void
      */
-    public function delete($id)
+    public function remove(int $id): void
     {
-        $this->adapter->delete(sprintf('%s/images/%d', $this->endpoint, $id));
+        $this->delete(\sprintf('images/%d', $id));
     }
 
     /**
      * @param int    $id
      * @param string $regionSlug
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return ActionEntity
      */
-    public function transfer($id, $regionSlug)
+    public function transfer(int $id, string $regionSlug)
     {
-        $action = $this->adapter->post(sprintf('%s/images/%d/actions', $this->endpoint, $id), ['type' => 'transfer', 'region' => $regionSlug]);
-
-        $action = json_decode($action);
+        $action = $this->post(\sprintf('images/%d/actions', $id), ['type' => 'transfer', 'region' => $regionSlug]);
 
         return new ActionEntity($action->action);
     }
@@ -124,15 +123,13 @@ class Image extends AbstractApi
     /**
      * @param int $id
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return ActionEntity
      */
-    public function convert($id)
+    public function convert(int $id)
     {
-        $action = $this->adapter->post(sprintf('%s/images/%d/actions', $this->endpoint, $id), ['type' => 'convert']);
-
-        $action = json_decode($action);
+        $action = $this->post(\sprintf('images/%d/actions', $id), ['type' => 'convert']);
 
         return new ActionEntity($action->action);
     }
@@ -141,13 +138,13 @@ class Image extends AbstractApi
      * @param int $id
      * @param int $actionId
      *
+     * @throws ExceptionInterface
+     *
      * @return ActionEntity
      */
-    public function getAction($id, $actionId)
+    public function getAction(int $id, int $actionId)
     {
-        $action = $this->adapter->get(sprintf('%s/images/%d/actions/%d', $this->endpoint, $id, $actionId));
-
-        $action = json_decode($action);
+        $action = $this->get(\sprintf('images/%d/actions/%d', $id, $actionId));
 
         return new ActionEntity($action->action);
     }

@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of the DigitalOceanV2 library.
+ * This file is part of the DigitalOcean API library.
  *
- * (c) Antoine Corcy <contact@sbin.dk>
+ * (c) Antoine Kirk <contact@sbin.dk>
+ * (c) Graham Campbell <hello@gjcampbell.co.uk>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,7 +18,8 @@ use DigitalOceanV2\Entity\AbstractEntity;
 use DigitalOceanV2\Entity\ForwardingRule as ForwardRuleEntity;
 use DigitalOceanV2\Entity\HealthCheck as HealthCheckEntity;
 use DigitalOceanV2\Entity\LoadBalancer as LoadBalancerEntity;
-use DigitalOceanV2\Exception\HttpException;
+use DigitalOceanV2\Entity\StickySession as StickySessionEntity;
+use DigitalOceanV2\Exception\ExceptionInterface;
 
 /**
  * @author Jacob Holmes <jwh315@cox.net>
@@ -23,17 +27,15 @@ use DigitalOceanV2\Exception\HttpException;
 class LoadBalancer extends AbstractApi
 {
     /**
+     * @throws ExceptionInterface
+     *
      * @return LoadBalancerEntity[]
      */
     public function getAll()
     {
-        $loadBalancers = $this->adapter->get(sprintf('%s/load_balancers', $this->endpoint));
+        $loadBalancers = $this->get('load_balancers');
 
-        $loadBalancers = json_decode($loadBalancers);
-
-        $this->extractMeta($loadBalancers);
-
-        return array_map(function ($key) {
+        return \array_map(function ($key) {
             return new LoadBalancerEntity($key);
         }, $loadBalancers->load_balancers);
     }
@@ -41,15 +43,13 @@ class LoadBalancer extends AbstractApi
     /**
      * @param string $id
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return LoadBalancerEntity
      */
-    public function getById($id)
+    public function getById(string $id)
     {
-        $loadBalancer = $this->adapter->get(sprintf('%s/load_balancers/%s', $this->endpoint, $id));
-
-        $loadBalancer = json_decode($loadBalancer);
+        $loadBalancer = $this->get(\sprintf('load_balancers/%s', $id));
 
         return new LoadBalancerEntity($loadBalancer->load_balancer);
     }
@@ -63,35 +63,34 @@ class LoadBalancer extends AbstractApi
      * @param array|StickySessionEntity[] $stickySessions
      * @param array                       $dropletIds
      * @param bool                        $httpsRedirect
+     * @param int<30, 600>                $httpIdleTimeoutSeconds
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return LoadBalancerEntity
      */
     public function create(
-        $name,
-        $region,
-        $forwardRules = null,
-        $algorithm = 'round_robin',
-        $healthCheck = [],
-        $stickySessions = [],
-        $dropletIds = [],
-        $httpsRedirect = false
+        string $name,
+        string $region,
+        array $forwardRules = null,
+        string $algorithm = 'round_robin',
+        array $healthCheck = [],
+        array $stickySessions = [],
+        array $dropletIds = [],
+        bool $httpsRedirect = false,
+        int $httpIdleTimeoutSeconds = 60
     ) {
-        $data = [
+        $loadBalancer = $this->post('load_balancers', [
             'name' => $name,
             'algorithm' => $algorithm,
             'region' => $region,
-            'forwarding_rules' => $this->formatForwardRules($forwardRules),
-            'health_check' => $this->formatConfigurationOptions($healthCheck),
-            'sticky_sessions' => $this->formatConfigurationOptions($stickySessions),
+            'forwarding_rules' => null === $forwardRules ? null : self::formatForwardRules($forwardRules),
+            'health_check' => self::formatConfigurationOptions($healthCheck),
+            'sticky_sessions' => self::formatConfigurationOptions($stickySessions),
             'droplet_ids' => $dropletIds,
             'redirect_http_to_https' => $httpsRedirect,
-        ];
-
-        $loadBalancer = $this->adapter->post(sprintf('%s/load_balancers', $this->endpoint), $data);
-
-        $loadBalancer = json_decode($loadBalancer);
+            'http_idle_timeout_seconds' => $httpIdleTimeoutSeconds,
+        ]);
 
         return new LoadBalancerEntity($loadBalancer->load_balancer);
     }
@@ -100,17 +99,15 @@ class LoadBalancer extends AbstractApi
      * @param string                   $id
      * @param array|LoadBalancerEntity $loadBalancerSpec
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return LoadBalancerEntity
      */
-    public function update($id, $loadBalancerSpec)
+    public function update(string $id, $loadBalancerSpec)
     {
-        $data = $this->formatConfigurationOptions($loadBalancerSpec);
+        $data = self::formatConfigurationOptions($loadBalancerSpec);
 
-        $loadBalancer = $this->adapter->put(sprintf('%s/load_balancers/%s', $this->endpoint, $id), $data);
-
-        $loadBalancer = json_decode($loadBalancer);
+        $loadBalancer = $this->put(\sprintf('load_balancers/%s', $id), $data);
 
         return new LoadBalancerEntity($loadBalancer->load_balancer);
     }
@@ -118,11 +115,13 @@ class LoadBalancer extends AbstractApi
     /**
      * @param string $id
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
+     *
+     * @return void
      */
-    public function delete($id)
+    public function remove(string $id): void
     {
-        $this->adapter->delete(sprintf('%s/load_balancers/%s', $this->endpoint, $id));
+        $this->delete(\sprintf('load_balancers/%s', $id));
     }
 
     /**
@@ -130,26 +129,26 @@ class LoadBalancer extends AbstractApi
      *
      * @return array
      */
-    private function formatForwardRules($forwardRules)
+    private static function formatForwardRules($forwardRules)
     {
-        if (isset($forwardRules)) {
-            return array_map(function ($rule) {
-                return $this->formatConfigurationOptions($rule);
+        if (\is_array($forwardRules)) {
+            return \array_map(function ($rule) {
+                return self::formatConfigurationOptions($rule);
             }, $forwardRules);
-        } else {
-            return [
-                (new ForwardRuleEntity())->setStandardHttpRules()->toArray(),
-                (new ForwardRuleEntity())->setStandardHttpsRules()->toArray(),
-            ];
         }
+
+        return [
+            (new ForwardRuleEntity())->setStandardHttpRules()->toArray(),
+            (new ForwardRuleEntity())->setStandardHttpsRules()->toArray(),
+        ];
     }
 
     /**
      * @param array|AbstractEntity $config
      *
-     * @return array|AbstractEntity
+     * @return array
      */
-    private function formatConfigurationOptions($config)
+    private static function formatConfigurationOptions($config)
     {
         return $config instanceof AbstractEntity ? $config->toArray() : $config;
     }

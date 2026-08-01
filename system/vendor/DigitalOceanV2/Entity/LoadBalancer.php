@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of the DigitalOceanV2 library.
+ * This file is part of the DigitalOcean API library.
  *
- * (c) Antoine Corcy <contact@sbin.dk>
+ * (c) Antoine Kirk <contact@sbin.dk>
+ * (c) Graham Campbell <hello@gjcampbell.co.uk>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -82,40 +85,50 @@ final class LoadBalancer extends AbstractEntity
     public $redirectHttpToHttps;
 
     /**
-     * @param array $parameters
+     * @var int<30, 600>
      */
-    public function build(array $parameters)
+    public $httpIdleTimeoutSeconds;
+
+    /**
+     * @param array $parameters
+     *
+     * @return void
+     */
+    public function build(array $parameters): void
     {
         foreach ($parameters as $property => $value) {
             switch ($property) {
                 case 'forwarding_rules':
-
                     foreach ($value as $forwardingRule) {
                         $this->forwardingRules[] = new ForwardingRule($forwardingRule);
                     }
 
                     unset($parameters[$property]);
+
                     break;
 
                 case 'health_check':
-                    if (is_object($value)) {
+                    if (\is_object($value)) {
                         $this->healthCheck = new HealthCheck($value);
                     }
                     unset($parameters[$property]);
+
                     break;
 
                 case 'sticky_sessions':
-                    if (is_object($value)) {
+                    if (\is_object($value)) {
                         $this->stickySessions = new StickySession($value);
                     }
                     unset($parameters[$property]);
+
                     break;
 
                 case 'region':
-                    if (is_object($value)) {
+                    if (\is_object($value)) {
                         $this->region = new Region($value);
                     }
                     unset($parameters[$property]);
+
                     break;
             }
         }
@@ -126,19 +139,20 @@ final class LoadBalancer extends AbstractEntity
     /**
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'name' => $this->name,
             'region' => $this->region->slug,
             'algorithm' => $this->algorithm,
-            'forwarding_rules' => array_map(function ($rule) {
+            'forwarding_rules' => \array_map(function ($rule): array {
                 return $rule->toArray();
             }, $this->forwardingRules),
             'health_check' => $this->healthCheck->toArray(),
             'sticky_sessions' => $this->stickySessions->toArray(),
             'droplet_ids' => $this->dropletIds,
             'redirect_http_to_https' => $this->redirectHttpToHttps,
+            'http_idle_timeout_seconds' => $this->httpIdleTimeoutSeconds,
         ];
     }
 }

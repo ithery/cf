@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of the DigitalOceanV2 library.
+ * This file is part of the DigitalOcean API library.
  *
- * (c) Antoine Corcy <contact@sbin.dk>
+ * (c) Antoine Kirk <contact@sbin.dk>
+ * (c) Graham Campbell <hello@gjcampbell.co.uk>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,29 +15,27 @@
 namespace DigitalOceanV2\Api;
 
 use DigitalOceanV2\Entity\DomainRecord as DomainRecordEntity;
-use DigitalOceanV2\Exception\HttpException;
+use DigitalOceanV2\Exception\ExceptionInterface;
 use DigitalOceanV2\Exception\InvalidRecordException;
 
 /**
  * @author Yassir Hannoun <yassir.hannoun@gmail.com>
- * @author Graham Campbell <graham@alt-three.com>
+ * @author Graham Campbell <hello@gjcampbell.co.uk>
  */
 class DomainRecord extends AbstractApi
 {
     /**
      * @param string $domainName
      *
+     * @throws ExceptionInterface
+     *
      * @return DomainRecordEntity[]
      */
-    public function getAll($domainName)
+    public function getAll(string $domainName)
     {
-        $domainRecords = $this->adapter->get(sprintf('%s/domains/%s/records?per_page=%d', $this->endpoint, $domainName, 200));
+        $domainRecords = $this->get(\sprintf('domains/%s/records', $domainName));
 
-        $domainRecords = json_decode($domainRecords);
-
-        $this->extractMeta($domainRecords);
-
-        return array_map(function ($domainRecord) {
+        return \array_map(function ($domainRecord) {
             return new DomainRecordEntity($domainRecord);
         }, $domainRecords->domain_records);
     }
@@ -43,13 +44,13 @@ class DomainRecord extends AbstractApi
      * @param string $domainName
      * @param int    $id
      *
+     * @throws ExceptionInterface
+     *
      * @return DomainRecordEntity
      */
-    public function getById($domainName, $id)
+    public function getById(string $domainName, int $id)
     {
-        $domainRecords = $this->adapter->get(sprintf('%s/domains/%s/records/%d', $this->endpoint, $domainName, $id));
-
-        $domainRecords = json_decode($domainRecords);
+        $domainRecords = $this->get(\sprintf('domains/%s/records/%d', $domainName, $id));
 
         return new DomainRecordEntity($domainRecords->domain_record);
     }
@@ -63,25 +64,23 @@ class DomainRecord extends AbstractApi
      * @param int    $port
      * @param int    $weight
      * @param int    $flags
-     * @param int    $tag
+     * @param string $tag
      * @param int    $ttl
      *
-     * @throws HttpException|InvalidRecordException
+     * @throws ExceptionInterface
      *
      * @return DomainRecordEntity
      */
-    public function create($domainName, $type, $name, $data, $priority = null, $port = null, $weight = null, $flags = null, $tag = null, $ttl = null)
+    public function create(string $domainName, string $type, string $name, string $data, int $priority = null, int $port = null, int $weight = null, int $flags = null, string $tag = null, int $ttl = null)
     {
-        switch ($type = strtoupper($type)) {
+        switch ($type = \strtoupper($type)) {
             case 'A':
             case 'AAAA':
             case 'CNAME':
             case 'TXT':
-                $content = ['name' => $name, 'type' => $type, 'data' => $data];
-                break;
-
             case 'NS':
-                $content = ['type' => $type, 'data' => $data];
+                $content = ['name' => $name, 'type' => $type, 'data' => $data];
+
                 break;
 
             case 'SRV':
@@ -93,14 +92,17 @@ class DomainRecord extends AbstractApi
                     'port' => (int) $port,
                     'weight' => (int) $weight,
                 ];
+
                 break;
 
             case 'MX':
                 $content = ['type' => $type, 'name' => $name, 'data' => $data, 'priority' => $priority];
+
                 break;
 
             case 'CAA':
                 $content = ['type' => $type, 'name' => $name, 'data' => $data, 'flags' => $flags, 'tag' => $tag];
+
                 break;
 
             default:
@@ -111,9 +113,7 @@ class DomainRecord extends AbstractApi
             $content['ttl'] = $ttl;
         }
 
-        $domainRecord = $this->adapter->post(sprintf('%s/domains/%s/records', $this->endpoint, $domainName), $content);
-
-        $domainRecord = json_decode($domainRecord);
+        $domainRecord = $this->post(\sprintf('domains/%s/records', $domainName), $content);
 
         return new DomainRecordEntity($domainRecord->domain_record);
     }
@@ -127,19 +127,28 @@ class DomainRecord extends AbstractApi
      * @param int|null    $port
      * @param int|null    $weight
      * @param int|null    $flags
-     * @param int|null    $tag
+     * @param string|null $tag
      * @param int|null    $ttl
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return DomainRecordEntity
      */
-    public function update($domainName, $recordId, $name = null, $data = null, $priority = null, $port = null, $weight = null, $flags = null, $tag = null, $ttl = null)
+    public function update(string $domainName, int $recordId, ?string $name = null, ?string $data = null, ?int $priority = null, ?int $port = null, ?int $weight = null, ?int $flags = null, ?string $tag = null, ?int $ttl = null)
     {
-        $content = compact('name', 'data', 'priority', 'port', 'weight', 'flags', 'tag', 'ttl');
+        $content = [
+            'name' => $name,
+            'data' => $data,
+            'priority' => $priority,
+            'port' => $port,
+            'weight' => $weight,
+            'flags' => $flags,
+            'tag' => $tag,
+            'ttl' => $ttl,
+        ];
 
-        $content = array_filter($content, function ($val) {
-            return $val !== null;
+        $content = \array_filter($content, function ($val) {
+            return null !== $val;
         });
 
         return $this->updateFields($domainName, $recordId, $content);
@@ -150,11 +159,11 @@ class DomainRecord extends AbstractApi
      * @param int    $recordId
      * @param string $data
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return DomainRecordEntity
      */
-    public function updateData($domainName, $recordId, $data)
+    public function updateData(string $domainName, int $recordId, string $data)
     {
         return $this->updateFields($domainName, $recordId, ['data' => $data]);
     }
@@ -164,15 +173,13 @@ class DomainRecord extends AbstractApi
      * @param int    $recordId
      * @param array  $fields
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return DomainRecordEntity
      */
-    public function updateFields($domainName, $recordId, $fields)
+    public function updateFields(string $domainName, int $recordId, array $fields)
     {
-        $domainRecord = $this->adapter->put(sprintf('%s/domains/%s/records/%d', $this->endpoint, $domainName, $recordId), $fields);
-
-        $domainRecord = json_decode($domainRecord);
+        $domainRecord = $this->put(\sprintf('domains/%s/records/%d', $domainName, $recordId), $fields);
 
         return new DomainRecordEntity($domainRecord->domain_record);
     }
@@ -180,9 +187,13 @@ class DomainRecord extends AbstractApi
     /**
      * @param string $domainName
      * @param int    $recordId
+     *
+     * @throws ExceptionInterface
+     *
+     * @return void
      */
-    public function delete($domainName, $recordId)
+    public function remove(string $domainName, int $recordId): void
     {
-        $this->adapter->delete(sprintf('%s/domains/%s/records/%d', $this->endpoint, $domainName, $recordId));
+        $this->delete(\sprintf('domains/%s/records/%d', $domainName, $recordId));
     }
 }

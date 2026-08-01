@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /*
- * This file is part of the DigitalOceanV2 library.
+ * This file is part of the DigitalOcean API library.
  *
- * (c) Antoine Corcy <contact@sbin.dk>
+ * (c) Antoine Kirk <contact@sbin.dk>
+ * (c) Graham Campbell <hello@gjcampbell.co.uk>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,26 +15,24 @@
 namespace DigitalOceanV2\Api;
 
 use DigitalOceanV2\Entity\Domain as DomainEntity;
-use DigitalOceanV2\Exception\HttpException;
+use DigitalOceanV2\Exception\ExceptionInterface;
 
 /**
  * @author Yassir Hannoun <yassir.hannoun@gmail.com>
- * @author Graham Campbell <graham@alt-three.com>
+ * @author Graham Campbell <hello@gjcampbell.co.uk>
  */
 class Domain extends AbstractApi
 {
     /**
+     * @throws ExceptionInterface
+     *
      * @return DomainEntity[]
      */
     public function getAll()
     {
-        $domains = $this->adapter->get(sprintf('%s/domains?per_page=%d', $this->endpoint, 200));
+        $domains = $this->get('domains');
 
-        $domains = json_decode($domains);
-
-        $this->extractMeta($domains);
-
-        return array_map(function ($domain) {
+        return \array_map(function ($domain) {
             return new DomainEntity($domain);
         }, $domains->domains);
     }
@@ -39,34 +40,36 @@ class Domain extends AbstractApi
     /**
      * @param string $domainName
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return DomainEntity
      */
-    public function getByName($domainName)
+    public function getByName(string $domainName)
     {
-        $domain = $this->adapter->get(sprintf('%s/domains/%s', $this->endpoint, $domainName));
-
-        $domain = json_decode($domain);
+        $domain = $this->get(\sprintf('domains/%s', $domainName));
 
         return new DomainEntity($domain->domain);
     }
 
     /**
-     * @param string $name
-     * @param string $ipAddress
+     * @param string      $name
+     * @param string|null $ipAddress
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
      *
      * @return DomainEntity
      */
-    public function create($name, $ipAddress)
+    public function create(string $name, ?string $ipAddress = null)
     {
-        $content = ['name' => $name, 'ip_address' => $ipAddress];
+        $data = [
+            'name' => $name,
+        ];
 
-        $domain = $this->adapter->post(sprintf('%s/domains', $this->endpoint), $content);
+        if (null !== $ipAddress) {
+            $data['ip_address'] = $ipAddress;
+        }
 
-        $domain = json_decode($domain);
+        $domain = $this->post('domains', $data);
 
         return new DomainEntity($domain->domain);
     }
@@ -74,10 +77,12 @@ class Domain extends AbstractApi
     /**
      * @param string $domain
      *
-     * @throws HttpException
+     * @throws ExceptionInterface
+     *
+     * @return void
      */
-    public function delete($domain)
+    public function remove(string $domain): void
     {
-        $this->adapter->delete(sprintf('%s/domains/%s', $this->endpoint, $domain));
+        $this->delete(\sprintf('domains/%s', $domain));
     }
 }
