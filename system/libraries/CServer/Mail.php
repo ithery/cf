@@ -681,16 +681,43 @@ class CServer_Mail {
      */
     public function getSenderDomainList($day = 7) {
         $day = max(1, (int) $day);
-        $output = (string) $this->run(
-            $this->sudo() . 'bash -c ' . escapeshellarg(
-                'find /var/log -maxdepth 1 \\( -name "mail.log*" -o -name "maillog*" \\)'
-                . ' -mtime -' . $day . ' 2>/dev/null'
-                . ' | head -20 | xargs -r zgrep -h "from=<" 2>/dev/null'
-                . ' | grep -oE "from=<[^>]+>" | sed "s/from=<//; s/>//"'
-                . ' | grep "@" | awk -F@ \'{print tolower($2)}\''
-                . ' | sort | uniq -c | sort -rn | head -50'
-            )
-        );
+
+        //hanya surat yang benar-benar dikirim keluar yang dihitung. `from=<>`
+        //muncul pada semua surat, termasuk yang masuk — mesin ini menerima
+        //surat juga — sehingga menghitungnya mentah-mentah membuat domain
+        //pengirim spam ikut terdaftar seolah kita yang mengirim atas namanya.
+        //Pembedanya: pengiriman keluar ditangani `postfix/smtp`, sedangkan
+        //surat masuk diserahkan ke kotak lewat lmtp atau local. Jadi alamat
+        //pengirim dikumpulkan per antrean dari baris qmgr, lalu hanya antrean
+        //yang punya baris smtp yang ikut dihitung.
+        $awk = <<<'AWK'
+/postfix\/qmgr\[/ && /from=</ {
+    if (match($0, /[A-F0-9]{8,}:/)) { qid = substr($0, RSTART, RLENGTH - 1) }
+    if (match($0, /from=<[^>]*>/)) { from[qid] = substr($0, RSTART + 6, RLENGTH - 7) }
+    next
+}
+/postfix\/smtp\[/ {
+    if (match($0, /[A-F0-9]{8,}:/)) { out[substr($0, RSTART, RLENGTH - 1)] = 1 }
+}
+END {
+    for (q in out) {
+        if (q in from) {
+            f = from[q]
+            p = index(f, "@")
+            if (p > 0) { c[tolower(substr(f, p + 1))]++ }
+        }
+    }
+    for (d in c) { print c[d], d }
+}
+AWK;
+
+        $script = 'find /var/log -maxdepth 1 \( -name "mail.log*" -o -name "maillog*" \)'
+            . ' -mtime -' . $day . ' 2>/dev/null | head -20'
+            . ' | xargs -r zgrep -h -E "postfix/(qmgr|smtp)\[" 2>/dev/null'
+            . ' | awk ' . escapeshellarg($awk)
+            . ' | sort -rn | head -50';
+
+        $output = (string) $this->run($this->sudo() . 'bash -c ' . escapeshellarg($script));
 
         $list = [];
         foreach (explode("\n", $output) as $line) {
