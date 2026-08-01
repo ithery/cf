@@ -22,12 +22,14 @@ export default class Password {
         const $el = $(this.element);
         //const $eye = $('<i class="fas fa-eye" aria-hidden="true"></i>');
 
-        if ($el.parent('div.input-group').length == 0) {
+        let $group = $el.parent('div.input-group');
+        if ($group.length == 0) {
             $el.wrap('<div class="input-group"></div>');
+            $group = $el.parent('div.input-group');
         }
         // kelas sendiri, supaya penataan tombolnya tidak bergantung pada arti
         // .input-group di aplikasi yang memakainya
-        $el.parent('div.input-group').addClass('cres-password-group');
+        $group.addClass('cres-password-group');
 
         // insert into DOM first, as wrap() only works on DOM attached nodes.
         //$el.after($eye);
