@@ -32,6 +32,26 @@ class CServer_Mail {
         993 => 'imaps',
     ];
 
+    /**
+     * Penyedia relai yang dikenali dari nama hostnya.
+     *
+     * @var array
+     */
+    protected static $relayProvider = [
+        'mailjet' => 'Mailjet',
+        'sendgrid' => 'SendGrid',
+        'amazonaws' => 'Amazon SES',
+        'mailgun' => 'Mailgun',
+        'postmark' => 'Postmark',
+        'sparkpost' => 'SparkPost',
+        'gmail' => 'Gmail',
+        'office365' => 'Microsoft 365',
+        'outlook' => 'Microsoft 365',
+        'zoho' => 'Zoho',
+        'brevo' => 'Brevo',
+        'sendinblue' => 'Brevo',
+    ];
+
     public function __construct(CServer_Server $server) {
         $this->server = $server;
     }
@@ -71,6 +91,13 @@ class CServer_Mail {
             . ' command -v $b >/dev/null 2>&1 && printf "%s," "$b"; done)";'
             //ss lebih umum tersedia daripada netstat pada distribusi baru,
             //tetapi netstat masih ada di yang lama — dua-duanya dicoba
+            //relayhost dibaca sekalian: penyedia cloud lazim memblokir porta 25
+            //keluar, sehingga server surel di sana harus merelai lewat pihak
+            //ketiga — dan tanpa keterangan ini halaman surel tampak seolah
+            //server mengirim sendiri
+            . ' echo "RELAY:$(postconf -h relayhost 2>/dev/null'
+            . ' || grep -m1 -E "^relayhost[[:space:]]*=" /etc/postfix/main.cf 2>/dev/null | cut -d= -f2)";'
+            . ' echo "RELAYAUTH:$(postconf -h smtp_sasl_auth_enable 2>/dev/null)";'
             . ' echo "LISTEN_START";'
             . ' (ss -ltnp 2>/dev/null || netstat -ltnp 2>/dev/null) | awk \'{print $4" "$NF}\';'
             . ' echo "LISTEN_END"'
@@ -78,12 +105,18 @@ class CServer_Mail {
 
         $mtaList = [];
         $imapList = [];
+        $relayRaw = '';
+        $relayAuth = false;
         foreach (explode("\n", $output) as $line) {
             $line = trim($line);
             if (strpos($line, 'MTA:') === 0) {
                 $mtaList = self::pisahDaftar(substr($line, 4));
             } elseif (strpos($line, 'IMAP:') === 0) {
                 $imapList = self::pisahDaftar(substr($line, 5));
+            } elseif (strpos($line, 'RELAY:') === 0) {
+                $relayRaw = trim(substr($line, 6));
+            } elseif (strpos($line, 'RELAYAUTH:') === 0) {
+                $relayAuth = strtolower(trim(substr($line, 10))) === 'yes';
             }
         }
         //postfix dan exim mendahului sendmail: keduanya menyediakan binari
@@ -106,7 +139,10 @@ class CServer_Mail {
             }
         }
 
+        $relay = self::parseRelay($relayRaw, $relayAuth);
+
         return [
+            'relay' => $relay,
             'mta' => $mta,
             'mta_list' => $mtaList,
             'imap' => $imap,
@@ -126,6 +162,48 @@ class CServer_Mail {
         $info = $this->inspect();
 
         return carr::get($info, 'isMailServer') === true;
+    }
+
+    /**
+     * Mengurai nilai relayhost Postfix.
+     *
+     * Bentuknya `[host]:port`, `host:port`, atau `host` saja; kurung siku
+     * berarti jangan cari MX, dan itu justru yang lazim untuk relai.
+     *
+     * @param string $nilai
+     * @param bool   $auth
+     *
+     * @return null|array host, port, provider, auth, raw
+     */
+    protected static function parseRelay($nilai, $auth) {
+        $nilai = trim((string) $nilai);
+        if (strlen($nilai) == 0) {
+            return null;
+        }
+
+        $host = $nilai;
+        $port = null;
+        if (preg_match('/^\[?([^\]:]+)\]?(?::(\d+))?$/', $nilai, $m)) {
+            $host = $m[1];
+            $port = isset($m[2]) ? (int) $m[2] : null;
+        }
+
+        $provider = null;
+        foreach (self::$relayProvider as $petunjuk => $nama) {
+            if (stripos($host, $petunjuk) !== false) {
+                $provider = $nama;
+
+                break;
+            }
+        }
+
+        return [
+            'host' => $host,
+            'port' => $port,
+            'provider' => $provider,
+            'auth' => (bool) $auth,
+            'raw' => $nilai,
+        ];
     }
 
     /**
