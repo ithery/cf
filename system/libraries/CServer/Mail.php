@@ -163,12 +163,12 @@ class CServer_Mail {
      * @return null|string
      */
     public function getRelayUsername() {
-        $baris = $this->readRelayCredentialLine();
-        if ($baris === null) {
+        $rows = $this->readRelayCredentialLine();
+        if ($rows === null) {
             return null;
         }
 
-        return carr::get($baris, 'username');
+        return carr::get($rows, 'username');
     }
 
     /**
@@ -178,12 +178,12 @@ class CServer_Mail {
      * @return null|string
      */
     public function getRelaySecret() {
-        $baris = $this->readRelayCredentialLine();
-        if ($baris === null) {
+        $rows = $this->readRelayCredentialLine();
+        if ($rows === null) {
             return null;
         }
 
-        return carr::get($baris, 'password');
+        return carr::get($rows, 'password');
     }
 
     /**
@@ -192,38 +192,38 @@ class CServer_Mail {
      * @return null|array username, password
      */
     protected function readRelayCredentialLine() {
-        $berkas = trim((string) $this->run(
+        $file = trim((string) $this->run(
             $this->sudo() . 'postconf -h smtp_sasl_password_maps 2>/dev/null'
         ));
         //nilainya berbentuk "hash:/etc/postfix/sasl_passwd"
-        if (strpos($berkas, ':') !== false) {
-            $berkas = trim(substr($berkas, strpos($berkas, ':') + 1));
+        if (strpos($file, ':') !== false) {
+            $file = trim(substr($file, strpos($file, ':') + 1));
         }
-        if (strlen($berkas) == 0) {
+        if (strlen($file) == 0) {
             return null;
         }
 
-        $isi = (string) $this->run($this->sudo() . 'cat ' . escapeshellarg($berkas) . ' 2>/dev/null');
-        foreach (explode("\n", $isi) as $line) {
+        $content = (string) $this->run($this->sudo() . 'cat ' . escapeshellarg($file) . ' 2>/dev/null');
+        foreach (explode("\n", $content) as $line) {
             $line = trim($line);
             if (strlen($line) == 0 || substr($line, 0, 1) == '#') {
                 continue;
             }
             //bentuknya "[host]:port user:pass"; pemisah pertama pada bagian
             //kredensial yang menentukan, karena kata sandi dapat memuat titik dua
-            $bagian = preg_split('/\s+/', $line, 2);
-            $kredensial = trim((string) carr::get($bagian, 1));
-            if (strlen($kredensial) == 0) {
+            $section = preg_split('/\s+/', $line, 2);
+            $credential = trim((string) carr::get($section, 1));
+            if (strlen($credential) == 0) {
                 continue;
             }
-            $pos = strpos($kredensial, ':');
+            $pos = strpos($credential, ':');
             if ($pos === false) {
                 continue;
             }
 
             return [
-                'username' => substr($kredensial, 0, $pos),
-                'password' => substr($kredensial, $pos + 1),
+                'username' => substr($credential, 0, $pos),
+                'password' => substr($credential, $pos + 1),
             ];
         }
 
@@ -305,11 +305,11 @@ class CServer_Mail {
 
         //hanya porta yang terikat ke antarmuka publik yang dihitung; 127.0.0.1
         //berarti MTA lokal untuk keperluan sistem, bukan layanan surel
-        $publik = [];
-        foreach ($listening as $port => $alamat) {
-            foreach ($alamat as $a) {
+        $publicMap = [];
+        foreach ($listening as $port => $address) {
+            foreach ($address as $a) {
                 if ($this->isPublicAddress($a)) {
-                    $publik[$port] = carr::get(self::$portRole, $port);
+                    $publicMap[$port] = carr::get(self::$portRole, $port);
 
                     break;
                 }
@@ -325,8 +325,8 @@ class CServer_Mail {
             'imap' => $imap,
             'imap_list' => $imapList,
             'listening' => $listening,
-            'public' => $publik,
-            'isMailServer' => count($publik) > 0,
+            'public' => $publicMap,
+            'isMailServer' => count($publicMap) > 0,
         ];
     }
 
@@ -387,16 +387,16 @@ class CServer_Mail {
         }
 
         //3 & 4. TLS lalu autentikasi SMTP
-        $hasil = $this->smtpAuthProbe($host, $port, $username, $password);
-        $steps[] = ['label' => 'TLS', 'ok' => carr::get($hasil, 'tls'),
-            'detail' => carr::get($hasil, 'tls') ? 'terbentuk' : 'gagal membentuk TLS'];
-        $steps[] = ['label' => 'Autentikasi SMTP', 'ok' => carr::get($hasil, 'auth'),
-            'detail' => carr::get($hasil, 'detail')];
+        $result = $this->smtpAuthProbe($host, $port, $username, $password);
+        $steps[] = ['label' => 'TLS', 'ok' => carr::get($result, 'tls'),
+            'detail' => carr::get($result, 'tls') ? 'terbentuk' : 'gagal membentuk TLS'];
+        $steps[] = ['label' => 'Autentikasi SMTP', 'ok' => carr::get($result, 'auth'),
+            'detail' => carr::get($result, 'detail')];
 
-        if (!carr::get($hasil, 'auth')) {
+        if (!carr::get($result, 'auth')) {
             return [
                 'errCode' => 1,
-                'errMessage' => 'Autentikasi ke relai ditolak: ' . carr::get($hasil, 'detail'),
+                'errMessage' => 'Autentikasi ke relai ditolak: ' . carr::get($result, 'detail'),
                 'steps' => $steps,
             ];
         }
@@ -416,20 +416,20 @@ class CServer_Mail {
      */
     protected function smtpAuthProbe($host, $port, $username, $password) {
         //porta 465 memakai TLS sejak awal; sisanya menaikkannya lewat STARTTLS
-        $opsiTls = ((int) $port === 465) ? '' : ' -starttls smtp';
+        $tlsOption = ((int) $port === 465) ? '' : ' -starttls smtp';
 
-        $skrip = "EHLO devcloud.local\r\nAUTH LOGIN\r\n"
+        $script = "EHLO devcloud.local\r\nAUTH LOGIN\r\n"
             . base64_encode((string) $username) . "\r\n"
             . base64_encode((string) $password) . "\r\nQUIT\r\n";
 
         //berkas sementara bermode 600 supaya kredensial tidak muncul di daftar proses
-        $berkas = '/tmp/.devcloud-smtp-' . bin2hex(random_bytes(6));
-        $perintah = 'umask 077; printf %s ' . escapeshellarg($skrip) . ' > ' . $berkas . '; '
-            . 'timeout 25 openssl s_client -quiet -crlf' . $opsiTls
-            . ' -connect ' . escapeshellarg($host . ':' . $port) . ' < ' . $berkas . ' 2>&1; '
-            . 'rm -f ' . $berkas;
+        $file = '/tmp/.devcloud-smtp-' . bin2hex(random_bytes(6));
+        $command = 'umask 077; printf %s ' . escapeshellarg($script) . ' > ' . $file . '; '
+            . 'timeout 25 openssl s_client -quiet -crlf' . $tlsOption
+            . ' -connect ' . escapeshellarg($host . ':' . $port) . ' < ' . $file . ' 2>&1; '
+            . 'rm -f ' . $file;
 
-        $output = (string) $this->run($perintah);
+        $output = (string) $this->run($command);
 
         $tls = stripos($output, 'CONNECTED') !== false
             || stripos($output, 'verify return') !== false
@@ -474,12 +474,12 @@ class CServer_Mail {
     public function applyRelay($host, $port, $username, $password, $skipTest = false) {
         $steps = [];
         if (!$skipTest) {
-            $uji = $this->testRelay($host, $port, $username, $password);
-            $steps = carr::get($uji, 'steps', []);
-            if (carr::get($uji, 'errCode') != 0) {
+            $test = $this->testRelay($host, $port, $username, $password);
+            $steps = carr::get($test, 'steps', []);
+            if (carr::get($test, 'errCode') != 0) {
                 return [
                     'errCode' => 1,
-                    'errMessage' => carr::get($uji, 'errMessage'),
+                    'errMessage' => carr::get($test, 'errMessage'),
                     'steps' => $steps,
                     'output' => '',
                 ];
@@ -487,44 +487,44 @@ class CServer_Mail {
         }
 
         $relayValue = '[' . trim((string) $host) . ']:' . (int) $port;
-        $barisKredensial = $relayValue . ' ' . $username . ':' . $password;
-        $berkas = '/etc/postfix/sasl_passwd';
-        $stempel = trim($this->run('date +%Y%m%d%H%M%S'));
+        $credentialLine = $relayValue . ' ' . $username . ':' . $password;
+        $file = '/etc/postfix/sasl_passwd';
+        $stamp = trim($this->run('date +%Y%m%d%H%M%S'));
 
         //umask 077 dipasang sebelum menulis: berkas ini memuat kredensial relai
         //dan tidak boleh terbaca pengguna lain walau sekejap
-        $perintah = $this->sudo() . 'bash -c ' . escapeshellarg(
+        $command = $this->sudo() . 'bash -c ' . escapeshellarg(
             'set -e; umask 077; '
-            . '[ -f ' . $berkas . ' ] && cp -a ' . $berkas . ' ' . $berkas . '.bak-' . $stempel . '; '
-            . 'printf %s\\n ' . escapeshellarg($barisKredensial) . ' > ' . $berkas . '; '
-            . 'chmod 600 ' . $berkas . '; '
-            . 'postmap ' . $berkas . '; '
+            . '[ -f ' . $file . ' ] && cp -a ' . $file . ' ' . $file . '.bak-' . $stamp . '; '
+            . 'printf %s\\n ' . escapeshellarg($credentialLine) . ' > ' . $file . '; '
+            . 'chmod 600 ' . $file . '; '
+            . 'postmap ' . $file . '; '
             . 'postconf -e ' . escapeshellarg('relayhost = ' . $relayValue) . '; '
             . 'postconf -e ' . escapeshellarg('smtp_sasl_auth_enable = yes') . '; '
-            . 'postconf -e ' . escapeshellarg('smtp_sasl_password_maps = hash:' . $berkas) . '; '
+            . 'postconf -e ' . escapeshellarg('smtp_sasl_password_maps = hash:' . $file) . '; '
             . 'postconf -e ' . escapeshellarg('smtp_sasl_security_options = noanonymous') . '; '
             . 'postconf -e ' . escapeshellarg('smtp_tls_security_level = may') . '; '
             . 'postfix reload'
         ) . ' 2>&1; echo "exit status $?"';
 
-        $output = (string) $this->run($perintah);
+        $output = (string) $this->run($command);
 
         if (strpos($output, 'exit status 0') === false) {
             return [
                 'errCode' => 1,
                 'errMessage' => 'Konfigurasi lulus uji tetapi gagal diterapkan. Berkas lama dicadangkan sebagai '
-                    . $berkas . '.bak-' . $stempel,
+                    . $file . '.bak-' . $stamp,
                 'steps' => $steps,
                 'output' => $output,
             ];
         }
 
         //dipastikan dari sisi Postfix sendiri, bukan sekadar dari kode keluar
-        $relaySekarang = trim($this->run($this->sudo() . 'postconf -h relayhost 2>/dev/null'));
-        if (strpos($relaySekarang, trim((string) $host)) === false) {
+        $currentRelay = trim($this->run($this->sudo() . 'postconf -h relayhost 2>/dev/null'));
+        if (strpos($currentRelay, trim((string) $host)) === false) {
             return [
                 'errCode' => 1,
-                'errMessage' => 'Perintah berhasil tetapi relayhost belum berubah (terbaca: ' . $relaySekarang . ')',
+                'errMessage' => 'Perintah berhasil tetapi relayhost belum berubah (terbaca: ' . $currentRelay . ')',
                 'steps' => $steps,
                 'output' => $output,
             ];
@@ -550,28 +550,28 @@ class CServer_Mail {
      * Bentuknya `[host]:port`, `host:port`, atau `host` saja; kurung siku
      * berarti jangan cari MX, dan itu justru yang lazim untuk relai.
      *
-     * @param string $nilai
+     * @param string $value
      * @param bool   $auth
      *
      * @return null|array host, port, provider, auth, raw
      */
-    protected static function parseRelay($nilai, $auth) {
-        $nilai = trim((string) $nilai);
-        if (strlen($nilai) == 0) {
+    protected static function parseRelay($value, $auth) {
+        $value = trim((string) $value);
+        if (strlen($value) == 0) {
             return null;
         }
 
-        $host = $nilai;
+        $host = $value;
         $port = null;
-        if (preg_match('/^\[?([^\]:]+)\]?(?::(\d+))?$/', $nilai, $m)) {
+        if (preg_match('/^\[?([^\]:]+)\]?(?::(\d+))?$/', $value, $m)) {
             $host = $m[1];
             $port = isset($m[2]) ? (int) $m[2] : null;
         }
 
         $provider = null;
-        foreach (self::$relayProvider as $petunjuk => $nama) {
-            if (stripos($host, $petunjuk) !== false) {
-                $provider = $nama;
+        foreach (self::$relayProvider as $hint => $certName) {
+            if (stripos($host, $hint) !== false) {
+                $provider = $certName;
 
                 break;
             }
@@ -582,25 +582,25 @@ class CServer_Mail {
             'port' => $port,
             'provider' => $provider,
             'auth' => (bool) $auth,
-            'raw' => $nilai,
+            'raw' => $value,
         ];
     }
 
     /**
-     * @param string $nilai
+     * @param string $value
      *
      * @return array
      */
-    protected static function pisahDaftar($nilai) {
-        $hasil = [];
-        foreach (explode(',', (string) $nilai) as $bagian) {
-            $bagian = trim($bagian);
-            if (strlen($bagian) > 0) {
-                $hasil[] = $bagian;
+    protected static function splitList($value) {
+        $result = [];
+        foreach (explode(',', (string) $value) as $section) {
+            $section = trim($section);
+            if (strlen($section) > 0) {
+                $result[] = $section;
             }
         }
 
-        return $hasil;
+        return $result;
     }
 
     /**
@@ -609,49 +609,49 @@ class CServer_Mail {
      * @return array porta => daftar alamat
      */
     protected function parseListening($output) {
-        $mulai = strpos($output, 'LISTEN_START');
-        $akhir = strpos($output, 'LISTEN_END');
-        if ($mulai === false || $akhir === false) {
+        $start = strpos($output, 'LISTEN_START');
+        $end = strpos($output, 'LISTEN_END');
+        if ($start === false || $end === false) {
             return [];
         }
-        $blok = substr($output, $mulai + strlen('LISTEN_START'), $akhir - $mulai - strlen('LISTEN_START'));
+        $block = substr($output, $start + strlen('LISTEN_START'), $end - $start - strlen('LISTEN_START'));
 
-        $hasil = [];
-        foreach (explode("\n", $blok) as $line) {
+        $result = [];
+        foreach (explode("\n", $block) as $line) {
             $line = trim($line);
             if (strlen($line) == 0) {
                 continue;
             }
-            $alamat = trim((string) carr::get(explode(' ', $line), 0));
+            $address = trim((string) carr::get(explode(' ', $line), 0));
             //bentuknya 0.0.0.0:25, [::]:25, atau *:25
-            $pos = strrpos($alamat, ':');
+            $pos = strrpos($address, ':');
             if ($pos === false) {
                 continue;
             }
-            $port = (int) substr($alamat, $pos + 1);
+            $port = (int) substr($address, $pos + 1);
             if (!isset(self::$portRole[$port])) {
                 continue;
             }
-            $host = substr($alamat, 0, $pos);
-            if (!isset($hasil[$port])) {
-                $hasil[$port] = [];
+            $host = substr($address, 0, $pos);
+            if (!isset($result[$port])) {
+                $result[$port] = [];
             }
-            if (!in_array($host, $hasil[$port])) {
-                $hasil[$port][] = $host;
+            if (!in_array($host, $result[$port])) {
+                $result[$port][] = $host;
             }
         }
 
-        return $hasil;
+        return $result;
     }
 
     /**
-     * @param string $alamat
+     * @param string $address
      *
      * @return bool
      */
-    protected function isPublicAddress($alamat) {
-        $alamat = trim($alamat, '[]');
+    protected function isPublicAddress($address) {
+        $address = trim($address, '[]');
 
-        return !in_array($alamat, ['127.0.0.1', '::1', 'localhost'], true);
+        return !in_array($address, ['127.0.0.1', '::1', 'localhost'], true);
     }
 }

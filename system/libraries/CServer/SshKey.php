@@ -131,9 +131,9 @@ class CServer_SshKey {
         if (preg_match('/(SHA256:[A-Za-z0-9+\/=]+)/', $info, $m)) {
             $fingerprint = $m[1];
         }
-        $bitsHasil = $bits;
-        if ($bitsHasil === null && preg_match('/^(\d+)\s/', $info, $m)) {
-            $bitsHasil = (int) $m[1];
+        $resultBits = $bits;
+        if ($resultBits === null && preg_match('/^(\d+)\s/', $info, $m)) {
+            $resultBits = (int) $m[1];
         }
 
         return [
@@ -141,7 +141,7 @@ class CServer_SshKey {
             'public' => $public,
             'fingerprint' => $fingerprint,
             'type' => $type,
-            'bits' => $bitsHasil !== null ? (int) $bitsHasil : null,
+            'bits' => $resultBits !== null ? (int) $resultBits : null,
             'comment' => (string) $comment,
         ];
     }

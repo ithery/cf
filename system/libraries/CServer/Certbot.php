@@ -229,8 +229,8 @@ class CServer_Certbot {
         //akses lewat pengguna non-root, tanpa awalan ini seluruh perintahnya
         //ditolak
         $prefix = $this->sudoPrefix();
-        $command = array_map(function ($baris) use ($prefix) {
-            return $prefix . $baris;
+        $command = array_map(function ($rows) use ($prefix) {
+            return $prefix . $rows;
         }, $command);
 
         try {
@@ -390,13 +390,13 @@ class CServer_Certbot {
             return ['errCode' => 1, 'errMessage' => $ex->getMessage(), 'output' => '', 'command' => $command, 'certificate' => null];
         }
 
-        $berhasil = $dryRun
+        $success = $dryRun
             ? (stripos($output, 'dry run') !== false && stripos($output, 'successful') !== false)
             : (stripos($output, 'Successfully received certificate') !== false
                 || stripos($output, 'Certificate not yet due for renewal') !== false
                 || stripos($output, 'Congratulations') !== false);
 
-        if (!$berhasil) {
+        if (!$success) {
             return [
                 'errCode' => 1,
                 'errMessage' => self::extractError($output),
@@ -408,9 +408,9 @@ class CServer_Certbot {
         //certbot memberi nama lineage-nya
         $certificate = null;
         if (!$dryRun) {
-            $nama = carr::get(self::normalizeDomainList($domainList), 0);
+            $certName = carr::get(self::normalizeDomainList($domainList), 0);
             foreach ($this->getCertificateList() as $item) {
-                if (carr::get($item, 'name') == $nama) {
+                if (carr::get($item, 'name') == $certName) {
                     $certificate = $item;
 
                     break;
@@ -432,7 +432,7 @@ class CServer_Certbot {
      * @return array
      */
     public static function normalizeDomainList(array $domainList) {
-        $hasil = [];
+        $result = [];
         foreach ($domainList as $domain) {
             $domain = strtolower(trim((string) $domain));
             $domain = preg_replace('/^https?:\/\//', '', $domain);
@@ -446,12 +446,12 @@ class CServer_Certbot {
             if (!preg_match('/^[a-z0-9]([a-z0-9\-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9\-]*[a-z0-9])?)+$/', $domain)) {
                 continue;
             }
-            if (!in_array($domain, $hasil)) {
-                $hasil[] = $domain;
+            if (!in_array($domain, $result)) {
+                $result[] = $domain;
             }
         }
 
-        return $hasil;
+        return $result;
     }
 
     /**
@@ -465,22 +465,22 @@ class CServer_Certbot {
      * @return string
      */
     protected static function extractError($output) {
-        $penting = [];
+        $important = [];
         foreach (explode("\n", (string) $output) as $line) {
             $line = trim($line);
             if (strlen($line) == 0) {
                 continue;
             }
             if (preg_match('/^(Domain:|Type:|Detail:|Error|.*(too many|rate limit|unauthorized|connection refused|timeout|NXDOMAIN|not a valid domain))/i', $line)) {
-                $penting[] = $line;
+                $important[] = $line;
             }
         }
 
-        if (count($penting) == 0) {
+        if (count($important) == 0) {
             return cstr::limit(trim((string) $output), 300) ?: 'certbot gagal tanpa keterangan.';
         }
 
-        return implode(' ', array_slice($penting, 0, 6));
+        return implode(' ', array_slice($important, 0, 6));
     }
 
     /**
