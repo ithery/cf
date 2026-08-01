@@ -96,8 +96,17 @@ class CServer_Redis {
         if ($this->configFile !== null) {
             return $this->configFile ?: null;
         }
+        //kandidat khas distribusi didahulukan, lalu lokasi umum sebagai
+        //jaring pengaman — pemasangan dari sumber sering tidak mengikuti
+        //konvensi distribusinya
+        $candidate = $this->server->distro()->getConfigPathList('redis');
+        foreach (['/etc/redis/redis.conf', '/etc/redis.conf', '/usr/local/etc/redis.conf', '/etc/redis/6379.conf'] as $extra) {
+            if (!in_array($extra, $candidate)) {
+                $candidate[] = $extra;
+            }
+        }
         $output = trim($this->run(
-            'for f in /etc/redis/redis.conf /etc/redis.conf /usr/local/etc/redis.conf /etc/redis/6379.conf; do'
+            'for f in ' . implode(' ', array_map('escapeshellarg', $candidate)) . '; do'
             . ' [ -f "$f" ] && echo "$f" && break; done'
         ));
         $this->configFile = $output;
@@ -229,7 +238,11 @@ class CServer_Redis {
      * @return array unit => status
      */
     public function getServiceStatus() {
-        $output = $this->run('for u in redis redis-server; do'
+        //nama unit berbeda antar distribusi (redis-server di Debian, redis di
+        //RHEL); yang khas distronya didahulukan, keduanya tetap diperiksa
+        $unit = [$this->server->distro()->getServiceUnit('redis'), 'redis', 'redis-server'];
+        $unit = array_values(array_unique(array_filter($unit)));
+        $output = $this->run('for u in ' . implode(' ', $unit) . '; do'
             . ' s=$(systemctl is-active $u 2>/dev/null); [ -n "$s" ] && echo "$u|$s"; done');
         $status = [];
         foreach (explode("\n", (string) $output) as $line) {

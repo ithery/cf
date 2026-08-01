@@ -37,6 +37,11 @@ class CServer_Server {
     private $redisInstance;
 
     /**
+     * @var null|CServer_OSAbstract
+     */
+    private $distroInstance;
+
+    /**
      * @var null|CServer_Memory
      */
     private $memoryInstance;
@@ -109,6 +114,22 @@ class CServer_Server {
         }
 
         return $this->phpInstances[$key];
+    }
+
+    /**
+     * Distribusi Linux server ini, dideteksi dari /etc/os-release.
+     *
+     * Berbeda dari getOS(), yang mengembalikan OS proses PHP yang sedang
+     * berjalan, bukan server tujuan.
+     *
+     * @return CServer_OSAbstract
+     */
+    public function distro() {
+        if ($this->distroInstance === null) {
+            $this->distroInstance = CServer_OSAbstract::detect($this);
+        }
+
+        return $this->distroInstance;
     }
 
     /**

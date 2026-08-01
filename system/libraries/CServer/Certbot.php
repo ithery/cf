@@ -99,10 +99,25 @@ class CServer_Certbot {
             'yum' => 'YUM (CentOS 7)',
         ];
 
+        //Urutan mengikuti distribusi server: pengelola paket bawaannya
+        //didahulukan setelah snap, supaya CentOS tidak ditawari apt hanya
+        //karena kebetulan ada. Probe di atas tetap menentukan — daftar ini
+        //hanya berisi yang benar-benar terpasang.
+        $preferred = $this->server->distro()->getPackageManager();
+        $order = ['snap'];
+        if ($preferred !== null) {
+            $order[] = $preferred;
+        }
+        foreach (array_keys($label) as $key) {
+            if (!in_array($key, $order)) {
+                $order[] = $key;
+            }
+        }
+
         $method = [];
-        foreach ($label as $key => $text) {
-            if (carr::get($available, $key)) {
-                $method[$key] = $text;
+        foreach ($order as $key) {
+            if (carr::get($available, $key) && isset($label[$key])) {
+                $method[$key] = $label[$key];
             }
         }
 
