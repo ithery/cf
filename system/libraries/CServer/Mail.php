@@ -287,9 +287,9 @@ class CServer_Mail {
         foreach (explode("\n", $output) as $line) {
             $line = trim($line);
             if (strpos($line, 'MTA:') === 0) {
-                $mtaList = self::pisahDaftar(substr($line, 4));
+                $mtaList = self::splitList(substr($line, 4));
             } elseif (strpos($line, 'IMAP:') === 0) {
-                $imapList = self::pisahDaftar(substr($line, 5));
+                $imapList = self::splitList(substr($line, 5));
             } elseif (strpos($line, 'RELAY:') === 0) {
                 $relayRaw = trim(substr($line, 6));
             } elseif (strpos($line, 'RELAYAUTH:') === 0) {
