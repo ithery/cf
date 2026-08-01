@@ -675,11 +675,18 @@ class CServer_Mail {
      * justru domain itulah yang ditolak penyedia bila belum divalidasi. Log
      * menjawab pertanyaan yang sebenarnya: atas nama siapa mesin ini mengirim.
      *
-     * @param int $day berapa hari ke belakang yang dihitung
+     * Penyaringnya bekerja pada **waktu ubah berkas log**, bukan pada tanggal
+     * tiap barisnya: berkas yang sudah diputar tidak lagi berubah, sehingga
+     * `mail.log.1` yang berhenti ditulis seminggu lalu ikut tersaring keluar
+     * walau isinya masih dalam rentang. Karena itu bawaannya lebar — dengan
+     * tujuh hari, pensiunq.com yang mengirim 12 surat sempat tidak terlihat
+     * sama sekali.
+     *
+     * @param int $day berapa hari ke belakang berkas lognya diambil
      *
      * @return array domain => jumlah surat, terurut dari yang terbanyak
      */
-    public function getSenderDomainList($day = 7) {
+    public function getSenderDomainList($day = 30) {
         $day = max(1, (int) $day);
 
         //hanya surat yang benar-benar dikirim keluar yang dihitung. `from=<>`
@@ -736,6 +743,50 @@ AWK;
         }
 
         return $list;
+    }
+
+    /**
+     * Domain yang kotak suratnya dilayani server ini.
+     *
+     * Berbeda dari getSenderDomainList(): yang ini menyebut domain yang
+     * *di-hosting*, sedangkan yang itu menyebut domain yang benar-benar pernah
+     * mengirim keluar. Keduanya kerap tidak sama — sebuah domain dapat menerima
+     * surat bertahun-tahun tanpa sekali pun mengirim, dan sebaliknya surat
+     * keluar dapat dikirim atas nama domain yang tidak di-hosting di sini.
+     *
+     * Petanya lazim berupa `mysql:` sehingga daftarnya harus ditanyakan ke
+     * basis data yang ditunjuk berkas konfigurasinya; bentuk `hash:` dan daftar
+     * harfiah dibaca langsung.
+     *
+     * @return array
+     */
+    public function getHostedDomainList() {
+        $script = 'v=$(postconf -h virtual_mailbox_domains 2>/dev/null);'
+            . ' case "$v" in'
+            . ' mysql:*) f=${v#mysql:};'
+            . ' u=$(grep -m1 -E "^user" "$f" | cut -d= -f2 | xargs);'
+            . ' p=$(grep -m1 -E "^password" "$f" | cut -d= -f2 | xargs);'
+            . ' d=$(grep -m1 -E "^dbname" "$f" | cut -d= -f2 | xargs);'
+            . ' q=$(grep -m1 -E "^query" "$f" | cut -d= -f2-);'
+            . ' t=$(echo "$q" | grep -oiE "from[[:space:]]+[a-z_]+" | awk "{print \$2}");'
+            . ' [ -n "$t" ] && mysql -u"$u" -p"$p" "$d" -N -e "SELECT name FROM $t" 2>/dev/null;;'
+            . ' hash:*|texthash:*|lmdb:*) f=${v#*:}; [ -f "$f" ] && awk "{print \$1}" "$f";;'
+            . ' *) echo "$v" | tr ", " "\\n\\n";;'
+            . ' esac';
+
+        $output = (string) $this->run($this->sudo() . 'bash -c ' . escapeshellarg($script));
+
+        $list = [];
+        foreach (explode("\n", $output) as $line) {
+            $line = strtolower(trim($line));
+            //baris kosong, komentar, dan pesan galat mysql diabaikan diam-diam
+            if (strlen($line) == 0 || strpos($line, ' ') !== false || strpos($line, '.') === false) {
+                continue;
+            }
+            $list[] = $line;
+        }
+
+        return array_values(array_unique($list));
     }
 
     /**
