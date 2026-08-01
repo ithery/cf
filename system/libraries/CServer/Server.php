@@ -27,6 +27,11 @@ class CServer_Server {
     private $certbotInstance;
 
     /**
+     * @var null|CServer_WebServer
+     */
+    private $webServerInstance;
+
+    /**
      * @var null|CServer_Memory
      */
     private $memoryInstance;
@@ -99,6 +104,17 @@ class CServer_Server {
         }
 
         return $this->phpInstances[$key];
+    }
+
+    /**
+     * @return CServer_WebServer
+     */
+    public function webServer() {
+        if ($this->webServerInstance === null) {
+            $this->webServerInstance = new CServer_WebServer($this);
+        }
+
+        return $this->webServerInstance;
     }
 
     /**
