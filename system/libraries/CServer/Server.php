@@ -32,6 +32,11 @@ class CServer_Server {
     private $webServerInstance;
 
     /**
+     * @var null|CServer_Redis
+     */
+    private $redisInstance;
+
+    /**
      * @var null|CServer_Memory
      */
     private $memoryInstance;
@@ -104,6 +109,21 @@ class CServer_Server {
         }
 
         return $this->phpInstances[$key];
+    }
+
+    /**
+     * @param null|string $password bila null, dibaca dari requirepass di konfigurasi
+     *
+     * @return CServer_Redis
+     */
+    public function redis($password = null) {
+        if ($this->redisInstance === null) {
+            $this->redisInstance = new CServer_Redis($this, $password);
+        } elseif ($password !== null) {
+            $this->redisInstance->setPassword($password);
+        }
+
+        return $this->redisInstance;
     }
 
     /**
