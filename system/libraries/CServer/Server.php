@@ -14,9 +14,17 @@ class CServer_Server {
     private $storageInstance;
 
     /**
-     * @var null|CServer_Php
+     * Di-cache per biner agar satu server dapat memegang beberapa versi PHP
+     * sekaligus tanpa saling menimpa.
+     *
+     * @var array
      */
-    private $phpInstance;
+    private $phpInstances = [];
+
+    /**
+     * @var null|CServer_Certbot
+     */
+    private $certbotInstance;
 
     /**
      * @var null|CServer_Memory
@@ -78,14 +86,30 @@ class CServer_Server {
     }
 
     /**
+     * @param null|string $phpBinary biner tertentu, mis. /usr/local/lsws/lsphp84/bin/php
+     *
      * @return CServer_Php
      */
-    public function php() {
-        if ($this->phpInstance === null) {
-            $this->phpInstance = new CServer_Php($this);
+    public function php($phpBinary = null) {
+        //instance di-cache per biner agar satu server dapat memegang beberapa
+        //versi PHP sekaligus tanpa saling menimpa
+        $key = $phpBinary ?: 'php';
+        if (!isset($this->phpInstances[$key])) {
+            $this->phpInstances[$key] = new CServer_Php($this, $phpBinary);
         }
 
-        return $this->phpInstance;
+        return $this->phpInstances[$key];
+    }
+
+    /**
+     * @return CServer_Certbot
+     */
+    public function certbot() {
+        if ($this->certbotInstance === null) {
+            $this->certbotInstance = new CServer_Certbot($this);
+        }
+
+        return $this->certbotInstance;
     }
 
     /**
