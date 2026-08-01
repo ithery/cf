@@ -16,6 +16,11 @@ class CServer_Certbot {
      */
     protected $server;
 
+    /**
+     * @var null|string
+     */
+    private $sudoPrefix;
+
     public function __construct(CServer_Server $server) {
         $this->server = $server;
     }
@@ -34,6 +39,60 @@ class CServer_Certbot {
      */
     protected function run($command) {
         return $this->server->runCommand($command);
+    }
+
+    /**
+     * Awalan perintah agar certbot berjalan dengan hak yang cukup.
+     *
+     * certbot menulis ke /etc/letsencrypt dan /var/log/letsencrypt, jadi ia
+     * menolak berjalan sebagai pengguna biasa. Banyak server cloud hanya
+     * memberi akses lewat pengguna non-root (ubuntu, centos, ec2-user) yang
+     * punya sudo tanpa kata sandi — di situlah awalan ini diperlukan.
+     *
+     * Sebelum ini certbot pada server semacam itu gagal dengan
+     * "Permission denied: '/var/log/letsencrypt/.certbot.lock'", dan karena
+     * getCertificateList() hanya mengurai teks, hasilnya terbaca sebagai
+     * "tidak ada sertifikat" — padahal sertifikatnya ada.
+     *
+     * @return string '' bila sudah root atau sudo tidak tersedia
+     */
+    protected function sudoPrefix() {
+        if ($this->sudoPrefix !== null) {
+            return $this->sudoPrefix;
+        }
+        $probe = trim($this->run(
+            'if [ "$(id -u)" = "0" ]; then echo ROOT;'
+            . ' elif sudo -n true >/dev/null 2>&1; then echo SUDO;'
+            . ' else echo NONE; fi'
+        ));
+        $this->sudoPrefix = strpos($probe, 'SUDO') !== false ? 'sudo -n ' : '';
+
+        return $this->sudoPrefix;
+    }
+
+    /**
+     * Menyusun perintah certbot beserta awalan haknya.
+     *
+     * @param string $arguments
+     *
+     * @return string
+     */
+    protected function certbotCommand($arguments) {
+        return $this->sudoPrefix() . 'certbot ' . $arguments;
+    }
+
+    /**
+     * Apakah keluaran certbot berupa penolakan karena hak akses.
+     *
+     * @param string $output
+     *
+     * @return bool
+     */
+    protected static function isPermissionError($output) {
+        $output = (string) $output;
+
+        return stripos($output, 'Permission denied') !== false
+            || stripos($output, 'Either run as root') !== false;
     }
 
     /**
@@ -166,6 +225,14 @@ class CServer_Certbot {
             return ['errCode' => 1, 'errMessage' => 'Unknown install method: ' . $method, 'output' => '', 'version' => null];
         }
 
+        //pemasangan paket juga menuntut root; pada server yang hanya memberi
+        //akses lewat pengguna non-root, tanpa awalan ini seluruh perintahnya
+        //ditolak
+        $prefix = $this->sudoPrefix();
+        $command = array_map(function ($baris) use ($prefix) {
+            return $prefix . $baris;
+        }, $command);
+
         try {
             $output = $this->run($command);
         } catch (Exception $ex) {
@@ -194,7 +261,17 @@ class CServer_Certbot {
      * @return array tiap entri: name, domains, expiry, days, path
      */
     public function getCertificateList() {
-        $output = $this->run('certbot certificates 2>&1');
+        $output = $this->run($this->certbotCommand('certificates 2>&1'));
+
+        //tanpa pemeriksaan ini penolakan hak akses terurai menjadi daftar
+        //kosong, dan pemanggil menyimpulkan server itu tidak punya sertifikat
+        if (self::isPermissionError($output)) {
+            throw new CServer_Exception(
+                'certbot menolak dijalankan: :pesan',
+                [':pesan' => cstr::limit(trim((string) $output), 200)]
+            );
+        }
+
         $list = [];
         $current = null;
 
@@ -262,7 +339,7 @@ class CServer_Certbot {
             );
         }
 
-        $command = 'certbot certonly --webroot -w ' . escapeshellarg(trim($webroot));
+        $command = $this->certbotCommand('certonly --webroot -w ' . escapeshellarg(trim($webroot)));
         foreach ($domainList as $domain) {
             $command .= ' -d ' . escapeshellarg($domain);
         }
@@ -432,7 +509,7 @@ class CServer_Certbot {
      * @return string
      */
     public function getRenewCommand($certName = null, $force = false, $dryRun = false) {
-        $command = 'certbot renew';
+        $command = $this->certbotCommand('renew');
         if (strlen((string) $certName) > 0) {
             $command .= ' --cert-name ' . escapeshellarg((string) $certName);
         }
@@ -479,8 +556,8 @@ class CServer_Certbot {
      * @return string
      */
     public function getDeleteCommand($certName) {
-        return 'certbot delete --cert-name ' . escapeshellarg((string) $certName)
-            . ' --non-interactive 2>&1; echo "exit status $?"';
+        return $this->certbotCommand('delete --cert-name ' . escapeshellarg((string) $certName)
+            . ' --non-interactive') . ' 2>&1; echo "exit status $?"';
     }
 
     /**
