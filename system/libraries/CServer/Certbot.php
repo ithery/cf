@@ -16,9 +16,6 @@ class CServer_Certbot {
      */
     protected $server;
 
-    /**
-     * @param CServer_Server $server
-     */
     public function __construct(CServer_Server $server) {
         $this->server = $server;
     }
@@ -233,6 +230,180 @@ class CServer_Certbot {
         }
 
         return $list;
+    }
+
+    /**
+     * Perintah penerbitan sertifikat lewat verifikasi HTTP-01.
+     *
+     * Dipisah dari issue() dengan alasan yang sama seperti getInstallCommand():
+     * perintah yang menyentuh server produksi sebaiknya bisa dibaca lebih dulu.
+     *
+     * Memakai --webroot, bukan --standalone, karena standalone perlu mengikat
+     * port 80 sehingga web server harus dihentikan sebentar — pada server yang
+     * sedang melayani itu berarti mati layanan hanya untuk menerbitkan
+     * sertifikat.
+     *
+     * @param string      $webroot
+     * @param null|string $email   null berarti --register-unsafely-without-email
+     * @param bool        $dryRun
+     *
+     * @throws CServer_Exception_InvalidDomainException
+     *
+     * @return string
+     */
+    public function getIssueCommand(array $domainList, $webroot, $email = null, $dryRun = false) {
+        $domainList = self::normalizeDomainList($domainList);
+        if (count($domainList) == 0) {
+            throw new CServer_Exception_InvalidDomainException('tidak ada domain yang diberikan');
+        }
+        if (strlen(trim((string) $webroot)) == 0) {
+            throw new CServer_Exception_InvalidDomainException(
+                'webroot tidak diketahui, verifikasi HTTP tidak dapat menaruh berkas tantangan'
+            );
+        }
+
+        $command = 'certbot certonly --webroot -w ' . escapeshellarg(trim($webroot));
+        foreach ($domainList as $domain) {
+            $command .= ' -d ' . escapeshellarg($domain);
+        }
+        $command .= ' --non-interactive --agree-tos --keep-until-expiring';
+        if (strlen((string) $email) > 0) {
+            $command .= ' -m ' . escapeshellarg($email);
+        } else {
+            $command .= ' --register-unsafely-without-email';
+        }
+        if ($dryRun) {
+            $command .= ' --dry-run';
+        }
+
+        return $command . ' 2>&1';
+    }
+
+    /**
+     * Menerbitkan sertifikat untuk sekumpulan domain.
+     *
+     * Dianjurkan menjalankan dryRun lebih dulu: Let's Encrypt membatasi lima
+     * kegagalan validasi per jam per domain, dan batas itu terpakai walau
+     * kegagalannya sepele seperti salah webroot.
+     *
+     * @param string      $webroot
+     * @param null|string $email
+     * @param bool        $dryRun
+     *
+     * @return array errCode, errMessage, output, command, certificate
+     */
+    public function issue(array $domainList, $webroot, $email = null, $dryRun = false) {
+        try {
+            $command = $this->getIssueCommand($domainList, $webroot, $email, $dryRun);
+        } catch (CServer_Exception $ex) {
+            return ['errCode' => 1, 'errMessage' => $ex->getMessage(), 'output' => '', 'command' => '', 'certificate' => null];
+        }
+
+        if (!$this->isInstalled()) {
+            return [
+                'errCode' => 1,
+                'errMessage' => 'certbot belum terpasang di server ini.',
+                'output' => '', 'command' => $command, 'certificate' => null,
+            ];
+        }
+
+        try {
+            $output = (string) $this->run($command);
+        } catch (Exception $ex) {
+            return ['errCode' => 1, 'errMessage' => $ex->getMessage(), 'output' => '', 'command' => $command, 'certificate' => null];
+        }
+
+        $berhasil = $dryRun
+            ? (stripos($output, 'dry run') !== false && stripos($output, 'successful') !== false)
+            : (stripos($output, 'Successfully received certificate') !== false
+                || stripos($output, 'Certificate not yet due for renewal') !== false
+                || stripos($output, 'Congratulations') !== false);
+
+        if (!$berhasil) {
+            return [
+                'errCode' => 1,
+                'errMessage' => self::extractError($output),
+                'output' => $output, 'command' => $command, 'certificate' => null,
+            ];
+        }
+
+        //sertifikat hasilnya dicari berdasar domain pertama, sama seperti cara
+        //certbot memberi nama lineage-nya
+        $certificate = null;
+        if (!$dryRun) {
+            $nama = carr::get(self::normalizeDomainList($domainList), 0);
+            foreach ($this->getCertificateList() as $item) {
+                if (carr::get($item, 'name') == $nama) {
+                    $certificate = $item;
+
+                    break;
+                }
+            }
+        }
+
+        return ['errCode' => 0, 'errMessage' => '', 'output' => $output, 'command' => $command, 'certificate' => $certificate];
+    }
+
+    /**
+     * Membersihkan dan memvalidasi daftar domain.
+     *
+     * Nilai seperti `*.contoh.com` dan `_` memang muncul di konfigurasi vhost
+     * tetapi tidak dapat diterbitkan lewat HTTP-01 — wildcard hanya bisa lewat
+     * DNS-01 — jadi disaring di sini alih-alih dibiarkan gagal di Let's Encrypt
+     * dan memakan jatah percobaan.
+     *
+     * @return array
+     */
+    public static function normalizeDomainList(array $domainList) {
+        $hasil = [];
+        foreach ($domainList as $domain) {
+            $domain = strtolower(trim((string) $domain));
+            $domain = preg_replace('/^https?:\/\//', '', $domain);
+            $domain = rtrim($domain, '/.');
+            if (strlen($domain) == 0 || $domain == '_' || $domain == 'localhost') {
+                continue;
+            }
+            if (strpos($domain, '*') !== false) {
+                continue;
+            }
+            if (!preg_match('/^[a-z0-9]([a-z0-9\-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9\-]*[a-z0-9])?)+$/', $domain)) {
+                continue;
+            }
+            if (!in_array($domain, $hasil)) {
+                $hasil[] = $domain;
+            }
+        }
+
+        return $hasil;
+    }
+
+    /**
+     * Mengambil baris yang menjelaskan sebab kegagalan dari keluaran certbot.
+     *
+     * Keluarannya panjang dan sebagian besar hanya derau; yang berguna bagi
+     * pengguna biasanya satu-dua baris.
+     *
+     * @param string $output
+     *
+     * @return string
+     */
+    protected static function extractError($output) {
+        $penting = [];
+        foreach (explode("\n", (string) $output) as $line) {
+            $line = trim($line);
+            if (strlen($line) == 0) {
+                continue;
+            }
+            if (preg_match('/^(Domain:|Type:|Detail:|Error|.*(too many|rate limit|unauthorized|connection refused|timeout|NXDOMAIN|not a valid domain))/i', $line)) {
+                $penting[] = $line;
+            }
+        }
+
+        if (count($penting) == 0) {
+            return cstr::limit(trim((string) $output), 300) ?: 'certbot gagal tanpa keterangan.';
+        }
+
+        return implode(' ', array_slice($penting, 0, 6));
     }
 
     /**
