@@ -103,8 +103,17 @@ class CApp_Log_Activity {
      */
     protected static function normalizeDataForJsonEncoding($data) {
         foreach ($data as $dataIndex => $record) {
-            $beforeData = carr::get($record, 'before');
-            $afterData = carr::get($record, 'after');
+            //bentuk before/after hanya ada pada pencatatan perubahan baris;
+            //peristiwa yang dicatat langsung berisi apa saja, dan dulu tiap
+            //baris seperti itu memicu dua peringatan foreach atas null
+            $beforeData = carr::get($record, 'before', []);
+            $afterData = carr::get($record, 'after', []);
+            if (!is_array($beforeData)) {
+                $beforeData = [];
+            }
+            if (!is_array($afterData)) {
+                $afterData = [];
+            }
             foreach ($beforeData as $beforeIndex => $value) {
                 if ($value instanceof CCarbon || $value instanceof CarbonLegacy\Carbon) {
                     $data[$dataIndex]['before'][$beforeIndex] = (string) $value;
