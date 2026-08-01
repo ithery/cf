@@ -443,6 +443,15 @@ class CServer_Certbot {
             $command .= ' --dry-run';
         }
 
+        //Tanpa ini certbot tidur acak sampai sekitar sepuluh menit sebelum
+        //bekerja — perilaku yang benar untuk cron, supaya tidak semua server di
+        //dunia menembak Let's Encrypt pada menit yang sama, tetapi salah untuk
+        //tombol yang ditekan manusia: yang terlihat hanyalah halaman yang
+        //menggantung lalu gagal karena batas waktu koneksi, padahal certbot
+        //belum melakukan apa-apa. Terlihat di log sebagai
+        //"Non-interactive renewal: random delay of 469 seconds".
+        $command .= ' --no-random-sleep-on-renew';
+
         return $command . ' --non-interactive 2>&1; echo "exit status $?"';
     }
 
