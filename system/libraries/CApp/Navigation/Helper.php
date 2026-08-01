@@ -20,16 +20,23 @@ class CApp_Navigation_Helper {
      * @return array|bool
      */
     public static function nav($nav = null, $controller = null, $method = null, $path = null) {
-        $routeData = c::router()->getCurrentRoute()->getRouteData();
-        // cdbg::dd($routeData);
-        if ($controller == null) {
-            $controller = $routeData->getController();
-        }
-        if ($method == null) {
-            $method = $routeData->getMethod();
-        }
-        if ($path == null) {
-            $path = $routeData->getControllerDir();
+        //Di luar konteks HTTP — CLI, tes, atau perintah konsol — tidak ada route
+        //yang sedang berjalan, sehingga getCurrentRoute() bernilai null. Data
+        //route hanya dipakai untuk menentukan menu mana yang aktif, jadi
+        //ketiadaannya cukup membuat tidak ada yang ditandai aktif, bukan
+        //menggagalkan seluruh perenderan navigasi.
+        $currentRoute = c::router()->getCurrentRoute();
+        $routeData = $currentRoute != null ? $currentRoute->getRouteData() : null;
+        if ($routeData != null) {
+            if ($controller == null) {
+                $controller = $routeData->getController();
+            }
+            if ($method == null) {
+                $method = $routeData->getMethod();
+            }
+            if ($path == null) {
+                $path = $routeData->getControllerDir();
+            }
         }
         if ($nav == null) {
             $navs = CApp_Navigation_Data::get();
