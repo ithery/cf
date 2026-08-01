@@ -61,12 +61,14 @@ class CServer_Mail {
      * @return array mta, imap, listening, public, isMailServer
      */
     public function inspect() {
+        //tiap kandidat dipisah koma, bukan ditempel: postfix memasang binari
+        //`sendmail` sebagai kompatibilitas, sehingga keduanya cocok sekaligus
+        //dan tanpa pemisah hasilnya terbaca "postfixsendmail"
         $output = (string) $this->run(
-            'echo "MTA:$(command -v postfix >/dev/null 2>&1 && echo postfix)'
-            . '$(command -v exim >/dev/null 2>&1 && echo exim)'
-            . '$(command -v sendmail >/dev/null 2>&1 && echo sendmail)";'
-            . ' echo "IMAP:$(command -v dovecot >/dev/null 2>&1 && echo dovecot)'
-            . '$(command -v cyrus-master >/dev/null 2>&1 && echo cyrus)";'
+            'echo "MTA:$(for b in postfix exim sendmail; do'
+            . ' command -v $b >/dev/null 2>&1 && printf "%s," "$b"; done)";'
+            . ' echo "IMAP:$(for b in dovecot cyrus-master; do'
+            . ' command -v $b >/dev/null 2>&1 && printf "%s," "$b"; done)";'
             //ss lebih umum tersedia daripada netstat pada distribusi baru,
             //tetapi netstat masih ada di yang lama — dua-duanya dicoba
             . ' echo "LISTEN_START";'
@@ -74,16 +76,20 @@ class CServer_Mail {
             . ' echo "LISTEN_END"'
         );
 
-        $mta = null;
-        $imap = null;
+        $mtaList = [];
+        $imapList = [];
         foreach (explode("\n", $output) as $line) {
             $line = trim($line);
             if (strpos($line, 'MTA:') === 0) {
-                $mta = trim(substr($line, 4)) ?: null;
+                $mtaList = self::pisahDaftar(substr($line, 4));
             } elseif (strpos($line, 'IMAP:') === 0) {
-                $imap = trim(substr($line, 5)) ?: null;
+                $imapList = self::pisahDaftar(substr($line, 5));
             }
         }
+        //postfix dan exim mendahului sendmail: keduanya menyediakan binari
+        //sendmail sendiri, jadi sendmail hanya berarti bila ia satu-satunya
+        $mta = carr::get($mtaList, 0);
+        $imap = carr::get($imapList, 0);
 
         $listening = $this->parseListening($output);
 
@@ -102,7 +108,9 @@ class CServer_Mail {
 
         return [
             'mta' => $mta,
+            'mta_list' => $mtaList,
             'imap' => $imap,
+            'imap_list' => $imapList,
             'listening' => $listening,
             'public' => $publik,
             'isMailServer' => count($publik) > 0,
@@ -118,6 +126,23 @@ class CServer_Mail {
         $info = $this->inspect();
 
         return carr::get($info, 'isMailServer') === true;
+    }
+
+    /**
+     * @param string $nilai
+     *
+     * @return array
+     */
+    protected static function pisahDaftar($nilai) {
+        $hasil = [];
+        foreach (explode(',', (string) $nilai) as $bagian) {
+            $bagian = trim($bagian);
+            if (strlen($bagian) > 0) {
+                $hasil[] = $bagian;
+            }
+        }
+
+        return $hasil;
     }
 
     /**
