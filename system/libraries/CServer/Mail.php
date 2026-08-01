@@ -338,7 +338,7 @@ class CServer_Mail {
         }
 
         $relay = self::parseRelay($relayRaw, $relayAuth);
-        $mda = self::parseDelivery($delivery);
+        $mda = self::parseDelivery($delivery, $mta);
 
         return [
             'relay' => $relay,
@@ -368,11 +368,12 @@ class CServer_Mail {
      * (`mydestination`) mengikuti `mailbox_transport`, lalu `mailbox_command`,
      * dan bila keduanya kosong ditangani `local(8)` bawaan postfix.
      *
-     * @param array $value keluaran postconf dan doveconf yang sudah dipilah
+     * @param array       $value keluaran postconf dan doveconf yang sudah dipilah
+     * @param null|string $mta   MTA yang terpasang, null bila tidak ada
      *
      * @return array name, transport, source, mailbox, protocolList
      */
-    protected static function parseDelivery(array $value) {
+    protected static function parseDelivery(array $value, $mta = null) {
         $virtualTransport = (string) carr::get($value, 'PF_virtual_transport');
         $virtualDomain = (string) carr::get($value, 'PF_virtual_mailbox_domains');
         $mailboxTransport = (string) carr::get($value, 'PF_mailbox_transport');
@@ -395,7 +396,10 @@ class CServer_Mail {
             $source = 'local_transport';
         }
 
-        $name = self::deliveryName($transport);
+        //tanpa MTA tidak ada yang menyerahkan surat sama sekali; menyebut
+        //"local(8)" di server seperti itu justru mengarang penyerahan yang
+        //tidak ada
+        $name = $mta === null ? null : self::deliveryName($transport);
         //kotak surat: doveconf bila Dovecot yang menyerahkannya, selain itu
         //home_mailbox postfix (Maildir/ atau nama berkas mbox)
         $mailbox = (string) carr::get($value, 'DOVE_mail_location');
