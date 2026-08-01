@@ -409,17 +409,125 @@ class CServer_Certbot {
     /**
      * Uji perpanjangan tanpa mengubah sertifikat apa pun.
      *
+     * @param null|string $certName null berarti seluruh sertifikat
+     *
      * @return string
      */
-    public function renewDryRun() {
-        return $this->run('certbot renew --dry-run 2>&1');
+    public function renewDryRun($certName = null) {
+        return $this->run($this->getRenewCommand($certName, false, true));
     }
 
     /**
+     * Perintah perpanjangan.
+     *
+     * --quiet sengaja tidak dipakai: keluarannya adalah satu-satunya cara
+     * pemanggil tahu apa yang sebenarnya terjadi, dan halaman hasil yang kosong
+     * membuat perpanjangan yang berhasil maupun yang tidak melakukan apa-apa
+     * tampak sama saja.
+     *
+     * @param null|string $certName null berarti seluruh sertifikat
+     * @param bool        $force
+     * @param bool        $dryRun
+     *
      * @return string
      */
-    public function renew() {
-        return $this->run('certbot renew --quiet 2>&1; echo "exit status $?"');
+    public function getRenewCommand($certName = null, $force = false, $dryRun = false) {
+        $command = 'certbot renew';
+        if (strlen((string) $certName) > 0) {
+            $command .= ' --cert-name ' . escapeshellarg((string) $certName);
+        }
+        if ($force) {
+            $command .= ' --force-renewal';
+        }
+        if ($dryRun) {
+            $command .= ' --dry-run';
+        }
+
+        return $command . ' --non-interactive 2>&1; echo "exit status $?"';
+    }
+
+    /**
+     * Memperpanjang sertifikat.
+     *
+     * Tanpa $force, certbot hanya menyentuh sertifikat yang tinggal kurang dari
+     * 30 hari — jadi memanggilnya untuk sertifikat yang masih lama memang tidak
+     * melakukan apa pun, dan itu perilaku yang benar. $force menerbitkan ulang
+     * apa pun keadaannya, tetapi memakan jatah Let's Encrypt: lima sertifikat
+     * duplikat per minggu untuk kumpulan domain yang sama.
+     *
+     * @param null|string $certName
+     * @param bool        $force
+     *
+     * @return string
+     */
+    public function renew($certName = null, $force = false) {
+        return $this->run($this->getRenewCommand($certName, $force, false));
+    }
+
+    /**
+     * @param string $certName
+     *
+     * @return string
+     */
+    public function getDeleteCommand($certName) {
+        return 'certbot delete --cert-name ' . escapeshellarg((string) $certName)
+            . ' --non-interactive 2>&1; echo "exit status $?"';
+    }
+
+    /**
+     * Menghapus sebuah sertifikat beserta konfigurasi perpanjangannya.
+     *
+     * Keberadaannya diperiksa lebih dulu — satu perjalanan SSH tambahan, tetapi
+     * penghapusan tidak dapat dibatalkan dan certbot sendiri hanya mengeluh
+     * samar bila namanya salah ketik.
+     *
+     * @param string $certName
+     *
+     * @return array errCode, errMessage, output, command
+     */
+    public function delete($certName) {
+        $certName = trim((string) $certName);
+        if (strlen($certName) == 0) {
+            return ['errCode' => 1, 'errMessage' => 'Nama sertifikat kosong.', 'output' => '', 'command' => ''];
+        }
+
+        $ada = false;
+        foreach ($this->getCertificateList() as $item) {
+            if (carr::get($item, 'name') === $certName) {
+                $ada = true;
+
+                break;
+            }
+        }
+        if (!$ada) {
+            return [
+                'errCode' => 1,
+                'errMessage' => 'Sertifikat ' . $certName . ' tidak ada pada certbot di server ini.',
+                'output' => '', 'command' => '',
+            ];
+        }
+
+        $command = $this->getDeleteCommand($certName);
+
+        try {
+            $output = (string) $this->run($command);
+        } catch (Exception $ex) {
+            return ['errCode' => 1, 'errMessage' => $ex->getMessage(), 'output' => '', 'command' => $command];
+        }
+
+        //certbot tidak selalu memberi kode keluar tidak nol saat gagal, jadi
+        //hasilnya dipastikan dengan membaca ulang daftarnya
+        foreach ($this->getCertificateList() as $item) {
+            if (carr::get($item, 'name') === $certName) {
+                return [
+                    'errCode' => 1,
+                    'errMessage' => 'Sertifikat ' . $certName . ' masih ada setelah perintah hapus dijalankan.',
+                    'output' => $output, 'command' => $command,
+                ];
+            }
+        }
+
+        return ['errCode' => 0, 'errMessage' => '', 'output' => $output, 'command' => $command];
     }
 
     /**
