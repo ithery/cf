@@ -47,6 +47,11 @@ class CServer_Server {
     private $sshKeyInstance;
 
     /**
+     * @var null|CServer_Mail
+     */
+    private $mailInstance;
+
+    /**
      * @var null|CServer_Memory
      */
     private $memoryInstance;
@@ -172,6 +177,19 @@ class CServer_Server {
         }
 
         return $this->certbotInstance;
+    }
+
+    /**
+     * Layanan surel pada server ini.
+     *
+     * @return CServer_Mail
+     */
+    public function mail() {
+        if ($this->mailInstance === null) {
+            $this->mailInstance = new CServer_Mail($this);
+        }
+
+        return $this->mailInstance;
     }
 
     /**
