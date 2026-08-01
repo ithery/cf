@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of RequestInfoTrait
+ * Description of RequestInfoTrait.
  *
  * @author Hery
  */
@@ -24,12 +24,18 @@ trait CTrait_RequestInfoTrait {
         if ($userAgent == null) {
             $userAgent = static::userAgent();
         }
+        //permintaan tanpa User-Agent itu lumrah — CLI, cron, klien API, curl
+        //polos — dan pengurainya menuntut string. Tanpa penjaga ini, mencatat
+        //aktivitas dari jalur seperti itu melempar TypeError dan menjatuhkan
+        //pekerjaan yang sedang berjalan, bukan sekadar gagal mencatat.
+        $userAgent = (string) $userAgent;
         if (static::$userAgentParser == null) {
             static::$userAgentParser = [];
         }
         if (!isset(static::$userAgentParser[$userAgent])) {
             static::$userAgentParser[$userAgent] = Parser::create()->parse($userAgent);
         }
+
         return static::$userAgentParser[$userAgent];
     }
 
@@ -48,6 +54,7 @@ trait CTrait_RequestInfoTrait {
     public static function platformName($userAgent = null) {
         $userAgentParser = static::getUserAgentParser($userAgent);
         $platformName = '';
+
         try {
             $platformName = $userAgentParser->os->family;
         } catch (Exception $ex) {
@@ -60,6 +67,7 @@ trait CTrait_RequestInfoTrait {
     public static function platformVersion($userAgent = null) {
         $userAgentParser = static::getUserAgentParser($userAgent);
         $platformVersion = '';
+
         try {
             $platformVersion = $userAgentParser->os->major
                     . ($userAgentParser->os->minor !== null ? '.' . $userAgentParser->os->minor : '')
@@ -67,6 +75,7 @@ trait CTrait_RequestInfoTrait {
         } catch (Exception $ex) {
             // do nothing
         }
+
         return $platformVersion;
     }
 
@@ -89,6 +98,7 @@ trait CTrait_RequestInfoTrait {
         if ($clientIp == null) {
             $clientIp = $request->getClientIp();
         }
+
         return $clientIp;
     }
 }
