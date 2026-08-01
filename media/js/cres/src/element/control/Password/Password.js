@@ -25,6 +25,9 @@ export default class Password {
         if ($el.parent('div.input-group').length == 0) {
             $el.wrap('<div class="input-group"></div>');
         }
+        // kelas sendiri, supaya penataan tombolnya tidak bergantung pada arti
+        // .input-group di aplikasi yang memakainya
+        $el.parent('div.input-group').addClass('cres-password-group');
 
         // insert into DOM first, as wrap() only works on DOM attached nodes.
         //$el.after($eye);
