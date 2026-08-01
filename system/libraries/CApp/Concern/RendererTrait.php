@@ -37,6 +37,15 @@ trait CApp_Concern_RendererTrait {
         if ($nav == null) {
             $nav = $this->nav;
         }
+        if ($nav == null) {
+            //Lewat CNavigation_Data::get() agar navigation callback ikut
+            //diterapkan. Sebelumnya jalur ini membaca $this->nav langsung,
+            //sehingga CNavigation_Data::setNavigationCallback() tidak pernah
+            //berpengaruh pada @CAppNav — yaitu cara hampir semua aplikasi
+            //merender sidenav-nya. Hasilnya di-memoisasi per domain, jadi
+            //tidak menambah pembacaan berkas.
+            $nav = CNavigation_Data::get();
+        }
 
         if (!$nav instanceof CNavigation_Nav) {
             /** @var CApp $this */
