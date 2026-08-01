@@ -7,12 +7,20 @@ use CApp_Navigation_Helper as NavHelper;
 
 class CApp_Log_Activity {
     /**
+     * Mencatat satu aktivitas.
+     *
+     * `$extra` disediakan supaya aplikasi dapat menambahkan kolomnya sendiri —
+     * devcloud memakainya untuk `team_id`, yang menentukan siapa boleh membaca
+     * catatan itu kembali. Modelnya dikembalikan agar pemanggil dapat
+     * menambahkan sesuatu tanpa membangun ulang seluruh isinya.
+     *
      * @param string $description
      * @param array  $data
+     * @param array  $extra       kolom tambahan milik aplikasi
      *
-     * @return void
+     * @return CModel
      */
-    public static function populate($description, $data) {
+    public static function populate($description, $data, array $extra = []) {
         $modelName = CF::config('app.model.log_activity', CApp_Model_LogActivity::class);
         $model = new $modelName();
         /** @var CModel $model */
@@ -77,13 +85,15 @@ class CApp_Log_Activity {
             'action' => $actionName,
             'action_label' => $actionLabel,
             'createdby' => $username,
-        ]);
+        ] + $extra);
         $data = static::normalizeDataForJsonEncoding($data);
         $model->data = json_encode($data);
 
         $model->activity_date = c::now();
         $model->description = $description;
         $model->save();
+
+        return $model;
     }
 
     /**
