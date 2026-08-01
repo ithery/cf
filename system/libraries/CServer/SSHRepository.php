@@ -56,8 +56,6 @@ class CServer_SSHRepository {
     }
 
     /**
-     * @param CRemote_SSH_Config $config
-     *
      * @return string
      */
     protected function resolveKey(CRemote_SSH_Config $config) {
@@ -65,6 +63,15 @@ class CServer_SSHRepository {
         $port = $config->getPort() ?: 22;
         $username = $config->getUsername() ?: 'root';
 
-        return $host . ':' . $port . ':' . $username;
+        //Batas waktu ikut menentukan identitas koneksi. Tanpa ini, koneksi
+        //pertama ke sebuah server menetapkan batas waktu untuk seluruh
+        //permintaan: pemeriksaan cepat yang berjalan lebih dulu (biasanya 10
+        //detik) akan dipakai ulang oleh perintah yang memang lama — memasang
+        //paket, menerbitkan sertifikat — dan yang terjadi bukan galat melainkan
+        //keluaran terpotong di tengah, sementara perintahnya tetap selesai di
+        //server. Hasilnya tampak gagal padahal berhasil.
+        $timeout = (int) $config->getTimeout();
+
+        return $host . ':' . $port . ':' . $username . ':' . $timeout;
     }
 }
