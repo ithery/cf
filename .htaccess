@@ -29,6 +29,14 @@ RewriteRule \.log$ - [R=404,L]
 RewriteRule (^|/)\.env(\..+)?$ - [R=404,L]
 RewriteRule \.sql$ - [R=404,L]
 RewriteRule \.(key|pem)$ - [R=404,L]
+# Kredensial service account Google: berkas .json tanpa pola nama khusus,
+# sehingga tidak tertangkap aturan ekstensi di atas. Ditemukan tersaji publik
+# di devcloud (2316 byte, memuat private_key RSA).
+RewriteRule ^(.*/)?service-account-credentials\.json$ - [R=404,L]
+RewriteRule ^application/[^/]+/default/data/vendor/ - [R=404,L]
+# Berkas kunci enkripsi aplikasi tidak berekstensi, jadi aturan .key/.pem
+# di atas tidak mengenainya
+RewriteRule ^application/[^/]+/default/data/key/ - [R=404,L]
 RewriteRule ^(.*/)?\.DS_Store - [R=404,L]
 RewriteRule ^(.*/)?\.php-cs-fixer\.cache - [R=404,L]
 RewriteRule ^(.*/)?\.phpunit\.result\.cache - [R=404,L]
