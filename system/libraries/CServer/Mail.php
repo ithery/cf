@@ -667,6 +667,51 @@ class CServer_Mail {
     }
 
     /**
+     * Domain yang benar-benar dipakai server ini sebagai pengirim.
+     *
+     * Diambil dari log, bukan dari konfigurasi. `virtual_mailbox_domains` hanya
+     * menyebut domain yang kotak suratnya dilayani di sini, sedangkan surat
+     * keluar kerap dikirim atas nama domain lain yang hanya direlai — dan
+     * justru domain itulah yang ditolak penyedia bila belum divalidasi. Log
+     * menjawab pertanyaan yang sebenarnya: atas nama siapa mesin ini mengirim.
+     *
+     * @param int $day berapa hari ke belakang yang dihitung
+     *
+     * @return array domain => jumlah surat, terurut dari yang terbanyak
+     */
+    public function getSenderDomainList($day = 7) {
+        $day = max(1, (int) $day);
+        $output = (string) $this->run(
+            $this->sudo() . 'bash -c ' . escapeshellarg(
+                'find /var/log -maxdepth 1 \\( -name "mail.log*" -o -name "maillog*" \\)'
+                . ' -mtime -' . $day . ' 2>/dev/null'
+                . ' | head -20 | xargs -r zgrep -h "from=<" 2>/dev/null'
+                . ' | grep -oE "from=<[^>]+>" | sed "s/from=<//; s/>//"'
+                . ' | grep "@" | awk -F@ \'{print tolower($2)}\''
+                . ' | sort | uniq -c | sort -rn | head -50'
+            )
+        );
+
+        $list = [];
+        foreach (explode("\n", $output) as $line) {
+            $line = trim($line);
+            if (strlen($line) == 0) {
+                continue;
+            }
+            $section = preg_split('/\s+/', $line, 2);
+            $count = (int) carr::get($section, 0);
+            $domain = trim((string) carr::get($section, 1));
+            //baris yang bukan hitungan domain diabaikan diam-diam: isi log
+            //berbeda antar distribusi dan tidak layak menggagalkan seluruhnya
+            if ($count > 0 && strlen($domain) > 0 && strpos($domain, ' ') === false) {
+                $list[$domain] = $count;
+            }
+        }
+
+        return $list;
+    }
+
+    /**
      * Ringkas: apakah server ini melayani surel ke luar.
      *
      * @return bool
