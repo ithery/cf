@@ -8,7 +8,7 @@ Branches: `master` (main), `development`. Docs: `application/cresenity/default/d
 
 ```bash
 phpcf test                               # Tests (from root=framework, from app dir=app tests)
-phpcf tinker --execute='...'             # REPL against real DB/models (from app dir); call {App}Bootstrap::boot() first
+phpcf tinker --execute='...'             # REPL against real DB/models (run from the app dir)
 ./system/vendor/PHPStan/phpstan analyse  # PHPStan level 4
 php-cs-fixer fix                         # Code format
 cd media/js/cres && npm run build        # JS build
@@ -16,7 +16,7 @@ cd media/js/cres && npm run build        # JS build
 
 Framework tests in `tests/`, app tests in `application/{app}/default/tests/`.
 
-`phpcf tinker`: run from the app dir (e.g. `application/ohayomart/`). Call `{App}Bootstrap::boot()` first or non-underscore classes throw "Class not found". Fake org context with `OH::setOrgIdResolver(fn() => $orgId)` (per-app helper name varies). Wrap anything that writes in `$db = c::db(); $db->begin(); ...; $db->rollback();` to explore/verify against live data without leaving traces — invaluable for validating a bug fix or test fixture against real framework behavior before writing it into a test file.
+`phpcf tinker`: run from the app dir (e.g. `application/ohayomart/`). **No manual bootstrap call is needed** — `CF::appCode()` derives the app from the working directory, so `CF::loadBootstrapFiles()` includes that app's `bootstrap.php` (and whatever it calls, e.g. `DBootstrap::boot()`) during boot. Verified 2026-08-02 from three different app dirs, each resolving to its own app. Fake org context with `OH::setOrgIdResolver(fn() => $orgId)` (per-app helper name varies). Wrap anything that writes in `$db = c::db(); $db->begin(); ...; $db->rollback();` to explore/verify against live data without leaving traces — invaluable for validating a bug fix or test fixture against real framework behavior before writing it into a test file.
 
 ## Code Style
 
