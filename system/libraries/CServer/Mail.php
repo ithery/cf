@@ -255,14 +255,20 @@ class CServer_Mail {
      * Seluruhnya diambil dalam satu perintah: tiap perjalanan SSH mahal, dan
      * pemeriksaan ini dijalankan untuk banyak server sekaligus.
      *
-     * @return array mta, imap, listening, public, isMailServer
+     * @return array mta, mda, imap, listening, public, isMailServer
      */
     public function inspect() {
         //tiap kandidat dipisah koma, bukan ditempel: postfix memasang binari
         //`sendmail` sebagai kompatibilitas, sehingga keduanya cocok sekaligus
         //dan tanpa pemisah hasilnya terbaca "postfixsendmail"
         $output = (string) $this->run(
-            'echo "MTA:$(for b in postfix exim sendmail; do'
+            //sudo diputuskan di dalam perintah yang sama, bukan lewat probe
+            //tersendiri: doveconf hanya dapat dibaca root, dan satu perjalanan
+            //SSH tambahan lebih mahal daripada tiga baris shell ini
+            'if [ "$(id -u)" = "0" ]; then S="";'
+            . ' elif sudo -n true >/dev/null 2>&1; then S="sudo -n";'
+            . ' else S=""; fi;'
+            . ' echo "MTA:$(for b in postfix exim sendmail; do'
             . ' command -v $b >/dev/null 2>&1 && printf "%s," "$b"; done)";'
             . ' echo "IMAP:$(for b in dovecot cyrus-master; do'
             . ' command -v $b >/dev/null 2>&1 && printf "%s," "$b"; done)";'
@@ -275,6 +281,15 @@ class CServer_Mail {
             . ' echo "RELAY:$(postconf -h relayhost 2>/dev/null'
             . ' || grep -m1 -E "^relayhost[[:space:]]*=" /etc/postfix/main.cf 2>/dev/null | cut -d= -f2)";'
             . ' echo "RELAYAUTH:$(postconf -h smtp_sasl_auth_enable 2>/dev/null)";'
+            //agen yang benar-benar menaruh surat ke kotaknya. -x meminta
+            //postconf memekarkan rujukan seperti `$virtual_transport`, yang
+            //lazim dipakai pada pemasangan mailbox virtual; postfix lama tidak
+            //mengenal -x sehingga nilainya dibaca apa adanya sebagai cadangan
+            . ' for p in virtual_transport mailbox_transport local_transport'
+            . ' mailbox_command home_mailbox virtual_mailbox_domains; do'
+            . ' echo "PF_$p:$(postconf -xh $p 2>/dev/null || postconf -h $p 2>/dev/null)"; done;'
+            . ' echo "DOVE_protocols:$($S doveconf -h protocols 2>/dev/null)";'
+            . ' echo "DOVE_mail_location:$($S doveconf -h mail_location 2>/dev/null)";'
             . ' echo "LISTEN_START";'
             . ' (ss -ltnp 2>/dev/null || netstat -ltnp 2>/dev/null) | awk \'{print $4" "$NF}\';'
             . ' echo "LISTEN_END"'
@@ -284,6 +299,7 @@ class CServer_Mail {
         $imapList = [];
         $relayRaw = '';
         $relayAuth = false;
+        $delivery = [];
         foreach (explode("\n", $output) as $line) {
             $line = trim($line);
             if (strpos($line, 'MTA:') === 0) {
@@ -294,6 +310,11 @@ class CServer_Mail {
                 $relayRaw = trim(substr($line, 6));
             } elseif (strpos($line, 'RELAYAUTH:') === 0) {
                 $relayAuth = strtolower(trim(substr($line, 10))) === 'yes';
+            } elseif (strpos($line, 'PF_') === 0 || strpos($line, 'DOVE_') === 0) {
+                $separator = strpos($line, ':');
+                if ($separator !== false) {
+                    $delivery[substr($line, 0, $separator)] = trim(substr($line, $separator + 1));
+                }
             }
         }
         //postfix dan exim mendahului sendmail: keduanya menyediakan binari
@@ -317,17 +338,125 @@ class CServer_Mail {
         }
 
         $relay = self::parseRelay($relayRaw, $relayAuth);
+        $mda = self::parseDelivery($delivery);
 
         return [
             'relay' => $relay,
             'mta' => $mta,
             'mta_list' => $mtaList,
+            'mda' => carr::get($mda, 'name'),
+            'mda_detail' => $mda,
             'imap' => $imap,
             'imap_list' => $imapList,
             'listening' => $listening,
             'public' => $publicMap,
             'isMailServer' => count($publicMap) > 0,
         ];
+    }
+
+    /**
+     * Agen yang menaruh surat ke kotaknya (MDA).
+     *
+     * MTA hanya mengangkut surat antar server; yang benar-benar menulisnya ke
+     * kotak surat adalah agen lain, dan itulah yang menentukan surat jatuh ke
+     * mana. Pada pemasangan mailbox virtual — yang lazim untuk melayani banyak
+     * domain — postfix menyerahkannya ke Dovecot lewat LMTP, sehingga baik
+     * "postfix" maupun "dovecot" pada halaman tidak menjawab pertanyaan itu.
+     *
+     * Urutannya mengikuti postfix sendiri: `virtual_transport` berlaku untuk
+     * domain di `virtual_mailbox_domains`, sedangkan surat untuk domain lokal
+     * (`mydestination`) mengikuti `mailbox_transport`, lalu `mailbox_command`,
+     * dan bila keduanya kosong ditangani `local(8)` bawaan postfix.
+     *
+     * @param array $value keluaran postconf dan doveconf yang sudah dipilah
+     *
+     * @return array name, transport, source, mailbox, protocolList
+     */
+    protected static function parseDelivery(array $value) {
+        $virtualTransport = (string) carr::get($value, 'PF_virtual_transport');
+        $virtualDomain = (string) carr::get($value, 'PF_virtual_mailbox_domains');
+        $mailboxTransport = (string) carr::get($value, 'PF_mailbox_transport');
+        $mailboxCommand = (string) carr::get($value, 'PF_mailbox_command');
+        $localTransport = (string) carr::get($value, 'PF_local_transport');
+
+        $transport = '';
+        $source = null;
+        if (strlen($virtualDomain) > 0 && strlen($virtualTransport) > 0) {
+            $transport = $virtualTransport;
+            $source = 'virtual_transport';
+        } elseif (strlen($mailboxTransport) > 0) {
+            $transport = $mailboxTransport;
+            $source = 'mailbox_transport';
+        } elseif (strlen($mailboxCommand) > 0) {
+            $transport = $mailboxCommand;
+            $source = 'mailbox_command';
+        } elseif (strlen($localTransport) > 0 && $localTransport != 'local') {
+            $transport = $localTransport;
+            $source = 'local_transport';
+        }
+
+        $name = self::deliveryName($transport);
+        //kotak surat: doveconf bila Dovecot yang menyerahkannya, selain itu
+        //home_mailbox postfix (Maildir/ atau nama berkas mbox)
+        $mailbox = (string) carr::get($value, 'DOVE_mail_location');
+        if (strlen($mailbox) == 0) {
+            $mailbox = (string) carr::get($value, 'PF_home_mailbox');
+        }
+
+        return [
+            'name' => $name,
+            'transport' => $transport,
+            'source' => $source,
+            'mailbox' => strlen($mailbox) > 0 ? $mailbox : null,
+            'protocolList' => self::splitList(str_replace(' ', ',', (string) carr::get($value, 'DOVE_protocols'))),
+            'isVirtual' => strlen($virtualDomain) > 0,
+        ];
+    }
+
+    /**
+     * Nama terbaca dari sebuah nilai transport atau perintah pengiriman.
+     *
+     * @param string $transport
+     *
+     * @return string
+     */
+    protected static function deliveryName($transport) {
+        $transport = trim((string) $transport);
+        if (strlen($transport) == 0) {
+            //postfix tetap mengirimkannya sendiri; ini bukan "tidak ada MDA"
+            return 'postfix local(8)';
+        }
+        if (stripos($transport, 'dovecot-lmtp') !== false
+            || (stripos($transport, 'lmtp') === 0 && stripos($transport, 'dovecot') !== false)
+        ) {
+            return 'Dovecot LMTP';
+        }
+        if (stripos($transport, 'dovecot-lda') !== false
+            || stripos($transport, 'dovecot/deliver') !== false
+            || $transport == 'dovecot'
+        ) {
+            return 'Dovecot LDA';
+        }
+        if (stripos($transport, 'lmtp') === 0) {
+            return 'LMTP';
+        }
+        if (stripos($transport, 'procmail') !== false) {
+            return 'procmail';
+        }
+        if (stripos($transport, 'maildrop') !== false) {
+            return 'maildrop';
+        }
+        if (stripos($transport, 'cyrus') !== false) {
+            return 'Cyrus';
+        }
+        if ($transport == 'virtual') {
+            return 'postfix virtual(8)';
+        }
+        if ($transport == 'local') {
+            return 'postfix local(8)';
+        }
+
+        return $transport;
     }
 
     /**
@@ -569,9 +698,9 @@ class CServer_Mail {
         }
 
         $provider = null;
-        foreach (self::$relayProvider as $hint => $certName) {
+        foreach (self::$relayProvider as $hint => $providerName) {
             if (stripos($host, $hint) !== false) {
-                $provider = $certName;
+                $provider = $providerName;
 
                 break;
             }
