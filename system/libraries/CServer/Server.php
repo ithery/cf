@@ -42,6 +42,11 @@ class CServer_Server {
     private $distroInstance;
 
     /**
+     * @var null|CServer_SshKey
+     */
+    private $sshKeyInstance;
+
+    /**
      * @var null|CServer_Memory
      */
     private $memoryInstance;
@@ -170,6 +175,19 @@ class CServer_Server {
     }
 
     /**
+     * Pembuatan pasangan kunci SSH pada server ini.
+     *
+     * @return CServer_SshKey
+     */
+    public function sshKey() {
+        if ($this->sshKeyInstance === null) {
+            $this->sshKeyInstance = new CServer_SshKey($this);
+        }
+
+        return $this->sshKeyInstance;
+    }
+
+    /**
      * @return CServer_Memory
      */
     public function memory() {
@@ -199,6 +217,8 @@ class CServer_Server {
     }
 
     /**
+     * @param null|mixed $docRoot
+     *
      * @return CServer_LetsEncrypt
      */
     public function letsEncrypt($docRoot = null) {
@@ -796,10 +816,9 @@ class CServer_Server {
     }
 
     /**
-     * @param CServer_Device_Disk $dev
-     * @param array               $mountParm
-     * @param string              $devName
-     * @param string              $mountPoint
+     * @param array  $mountParm
+     * @param string $devName
+     * @param string $mountPoint
      *
      * @return void
      */
