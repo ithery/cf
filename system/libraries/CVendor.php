@@ -158,11 +158,53 @@ class CVendor {
     }
 
     /**
-     * @param string $apiKey
-     * @param array  $options
+     * @param string     $apiKey
+     * @param array      $options
+     * @param null|mixed $apiSecret
      *
      * @return \CVendor_SendGrid
      */
+    /**
+     * Klien REST Mailjet.
+     *
+     * Autentikasinya sepasang nilai, sama dengan kredensial SMTP relainya:
+     * API Key sebagai nama pengguna dan Secret Key sebagai kata sandi.
+     *
+     * @param null|string $apiKey
+     * @param null|string $apiSecret
+     * @param array       $options
+     *
+     * @return \CVendor_Mailjet
+     */
+    public static function mailjet($apiKey = null, $apiSecret = null, $options = []) {
+        if ($apiKey == null) {
+            $apiKey = CF::config('vendor.mailjet.apiKey');
+        }
+        if ($apiSecret == null) {
+            $apiSecret = CF::config('vendor.mailjet.apiSecret');
+        }
+
+        return new CVendor_Mailjet($apiKey, $apiSecret, is_array($options) ? $options : []);
+    }
+
+    /**
+     * @param null|string $apiKey
+     * @param array       $options
+     *
+     * @return \CVendor_MailerSend
+     */
+    public static function mailerSend($apiKey = null, $options = []) {
+        if ($apiKey == null) {
+            $apiKey = CF::config('vendor.mailersend.apiKey');
+        }
+        if (!is_array($options)) {
+            $options = [];
+        }
+        $options['api_key'] = $apiKey;
+
+        return new CVendor_MailerSend($options);
+    }
+
     public static function sendGrid($apiKey = null, $options = []) {
         if ($apiKey == null) {
             $apiKey = CF::config('vendor.sendgrid.apiKey');

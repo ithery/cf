@@ -6,6 +6,13 @@ return [
     'sendgrid' => [
         'key' => c::env('SENDGRID_API_KEY'),
     ],
+    'mailjet' => [
+        'apiKey' => c::env('MAILJET_API_KEY'),
+        'apiSecret' => c::env('MAILJET_API_SECRET'),
+    ],
+    'mailersend' => [
+        'apiKey' => c::env('MAILERSEND_API_KEY'),
+    ],
     'google' => [
         'geocoding_api_key' => c::env('GEOCODING_API_KEY'),
         'recaptcha_v3_site_key' => c::env('RECAPTCHA_V3_SITE_KEY'),
