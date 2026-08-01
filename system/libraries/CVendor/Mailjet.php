@@ -45,7 +45,7 @@ class CVendor_Mailjet {
     /**
      * @param string $apiKey
      * @param string $apiSecret
-     * @param array  $options timeout, base_url
+     * @param array  $options   timeout, base_url
      */
     public function __construct($apiKey, $apiSecret, array $options = []) {
         $this->apiKey = (string) $apiKey;
@@ -92,8 +92,6 @@ class CVendor_Mailjet {
      *
      * @param string $method
      * @param string $path
-     * @param array  $payload
-     * @param array  $query
      *
      * @throws CVendor_Mailjet_Exception
      *
@@ -126,7 +124,7 @@ class CVendor_Mailjet {
         curl_close($ch);
 
         if (strlen((string) $error) > 0) {
-            throw new CVendor_Mailjet_Exception('Tidak dapat menghubungi Mailjet: ' . $error, 0, $code);
+            throw CVendor_Mailjet_Exception::fromStatus('Tidak dapat menghubungi Mailjet: ' . $error, $code);
         }
 
         $decoded = json_decode((string) $body, true);
@@ -136,7 +134,7 @@ class CVendor_Mailjet {
                 $message = cstr::limit((string) $body, 200);
             }
 
-            throw new CVendor_Mailjet_Exception('Mailjet menjawab HTTP ' . $code . ': ' . $message, 0, $code);
+            throw CVendor_Mailjet_Exception::fromStatus('Mailjet menjawab HTTP ' . $code . ': ' . $message, $code);
         }
 
         //sebagian sumber daya menjawab tanpa pembungkus Data, misalnya galat
