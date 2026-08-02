@@ -644,6 +644,19 @@ return [
         ],
     ],
 
+    //peta vektor. Berkas peta memuat data negaranya sendiri dan mendaftarkan
+    //diri sebagai 'world_mill' begitu $.fn.vectorMap ada, jadi urutannya wajib:
+    //pustaka dulu, peta menyusul
+    'jvectormap' => [
+        'css' => [
+            'plugins/jvectormap/jquery-jvectormap.css',
+        ],
+        'js' => [
+            'plugins/jvectormap/jquery-jvectormap.js',
+            'plugins/jvectormap/world-mill.js',
+        ],
+    ],
+
     'chartist' => [
         'css' => [
             'plugins/chartist/chartist.css',
