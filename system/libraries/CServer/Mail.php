@@ -834,6 +834,214 @@ class CServer_Mail {
     }
 
     /**
+     * Klien surel berbasis web yang terpasang di server ini.
+     *
+     * **Tidak** ikut di `inspect()`: penelusurannya memakan ~1,5 detik, dan
+     * pemeriksaan gabungan itu sudah nyaris menyentuh batas koneksi 10 detik —
+     * yang gagalnya tanpa suara, keluarannya sekadar terpotong.
+     *
+     * Yang dicari folder konfigurasi domainnya, bukan sekadar keberadaan
+     * foldernya. RainLoop menyimpan dua folder bernama `domains`: yang hidup di
+     * `data/_data_/_default_/domains`, dan satu lagi berisi contoh bawaan di
+     * `v/<versi>/app/domains` yang tidak berpengaruh apa pun. Menyunting yang
+     * kedua tidak akan mengubah perilaku, jadi yang ber-`/v/` dibuang.
+     *
+     * Roundcube tidak mengelola daftar domain seperti itu — ia tetap dilaporkan
+     * agar terlihat, hanya tanpa daftar domain.
+     *
+     * @return array tiap entri: type, path, version, domain_path, domain_list
+     */
+    public function getWebmailList() {
+        $output = (string) $this->run(
+            'for r in /var/www /usr/share /srv /opt /home/*/public_html; do'
+            . ' [ -d "$r" ] && find "$r" -maxdepth 3 -type d \\('
+            . ' -iname rainloop -o -iname snappymail -o -iname roundcube -o -iname roundcubemail'
+            . ' \\) 2>/dev/null; done | head -8'
+        );
+
+        //diurutkan dari path terpendek supaya folder induk diperiksa lebih dulu;
+        //folder di dalamnya kemudian dilewati sebagai bagian dari pemasangan
+        //yang sama — RainLoop punya `<akar>/rainloop` di dalam dirinya sendiri
+        $candidate = [];
+        foreach (explode("\n", $output) as $path) {
+            $path = trim($path);
+            if (strlen($path) > 0 && preg_match('#^/#', $path) === 1) {
+                $candidate[] = $path;
+            }
+        }
+        usort($candidate, function ($a, $b) {
+            return strlen($a) - strlen($b);
+        });
+
+        $list = [];
+        $seen = [];
+        $accepted = [];
+        foreach ($candidate as $path) {
+            foreach ($accepted as $parent) {
+                if (strpos($path, rtrim($parent, '/') . '/') === 0) {
+                    continue 2;
+                }
+            }
+
+            $name = strtolower(basename($path));
+            $type = strpos($name, 'roundcube') === 0 ? 'roundcube' : $name;
+
+            $domainPath = '';
+            if ($type != 'roundcube') {
+                $domainPath = trim($this->run(
+                    'find ' . escapeshellarg($path) . ' -maxdepth 4 -type d -name domains 2>/dev/null'
+                    . ' | grep -v "/v/" | head -1'
+                ));
+            }
+
+            //satu pemasangan dapat terdeteksi lewat dua path (folder induk dan
+            //folder aplikasinya); yang menentukan sama-tidaknya adalah folder
+            //konfigurasi domainnya
+            //RainLoop atau SnappyMail tanpa folder domain bukan pemasangan yang
+            //dapat dipakai — biasanya folder aplikasi di dalam pemasangan lain
+            if ($type != 'roundcube' && strlen($domainPath) == 0) {
+                continue;
+            }
+
+            $key = strlen($domainPath) > 0 ? $domainPath : $path;
+            if (isset($seen[$key])) {
+                continue;
+            }
+            $seen[$key] = true;
+            $accepted[] = $path;
+
+            $version = trim($this->run(
+                'cat ' . escapeshellarg($path) . '/data/VERSION 2>/dev/null'
+                . ' || ls ' . escapeshellarg($path) . '/rainloop 2>/dev/null | head -1'
+            ));
+
+            $domainList = [];
+            if (strlen($domainPath) > 0) {
+                $raw = (string) $this->run('ls -1 ' . escapeshellarg($domainPath) . ' 2>/dev/null');
+                foreach (explode("\n", $raw) as $file) {
+                    $file = trim($file);
+                    if (preg_match('/^(.+)\.(ini|alias)$/', $file, $match) === 1) {
+                        $domainList[$match[1]] = $match[2];
+                    }
+                }
+            }
+
+            $list[] = [
+                'type' => $type,
+                'path' => $path,
+                'version' => strlen($version) > 0 ? $version : null,
+                'domain_path' => strlen($domainPath) > 0 ? $domainPath : null,
+                'domain_list' => $domainList,
+            ];
+        }
+
+        return $list;
+    }
+
+    /**
+     * Mendaftarkan sebuah domain ke klien surel berbasis web.
+     *
+     * Menambah domain di basis data server surel membuatnya menerima surat,
+     * tetapi webmail punya daftar domainnya **sendiri** dan menolak login untuk
+     * domain yang tidak ada di sana — dengan pesan yang tidak menyebut-nyebut
+     * webmail sama sekali. Ditemukan di produksi 2026-08-02.
+     *
+     * Yang dibuat berkas `.alias`, bukan `.ini`: satu baris berisi nama domain
+     * acuan, sehingga seluruh pengaturan IMAP/SMTP-nya mengikuti domain itu dan
+     * tidak ada nilai yang perlu diduplikasi.
+     *
+     * Mengembalikan hasil per pemasangan; server tanpa webmail menghasilkan
+     * daftar kosong, bukan galat — tidak semua server surel punya webmail.
+     *
+     * @param string      $domain
+     * @param null|string $reference domain acuan; bila null dipilih otomatis
+     *
+     * @return array tiap entri: path, errCode, errMessage, reference
+     */
+    public function addWebmailDomain($domain, $reference = null) {
+        $domain = strtolower(trim((string) $domain));
+        $result = [];
+
+        if (preg_match('/^[a-z0-9.-]+$/', $domain) !== 1) {
+            return [['path' => null, 'errCode' => 1, 'reference' => null,
+                'errMessage' => 'Nama domain tidak sah', ]];
+        }
+
+        foreach ($this->getWebmailList() as $webmail) {
+            $domainPath = carr::get($webmail, 'domain_path');
+            if ($domainPath === null) {
+                continue;
+            }
+
+            $domainList = carr::get($webmail, 'domain_list', []);
+            if (array_key_exists($domain, $domainList)) {
+                $result[] = ['path' => $domainPath, 'errCode' => 0, 'reference' => null,
+                    'errMessage' => 'sudah terdaftar', ];
+
+                continue;
+            }
+
+            $target = $reference !== null ? $reference : static::pickWebmailReference($domainList);
+            if ($target === null) {
+                $result[] = ['path' => $domainPath, 'errCode' => 1, 'reference' => null,
+                    'errMessage' => 'Tidak ada domain acuan yang dapat dipakai; buat satu berkas .ini dulu', ];
+
+                continue;
+            }
+
+            $file = rtrim($domainPath, '/') . '/' . $domain . '.alias';
+            //pemilik dan modenya mengikuti folder tempatnya berada — webmail
+            //dijalankan sebagai pengguna web, dan berkas milik root di sana
+            //tidak akan terbaca
+            $owner = trim($this->run('stat -c %U:%G ' . escapeshellarg($domainPath) . ' 2>/dev/null'));
+            $command = $this->sudo() . 'bash -c ' . escapeshellarg(
+                'set -e; printf ' . escapeshellarg('%s\n') . ' ' . escapeshellarg($target)
+                . ' > ' . escapeshellarg($file) . '; '
+                . (strlen($owner) > 0 ? 'chown ' . escapeshellarg($owner) . ' ' . escapeshellarg($file) . '; ' : '')
+                . 'chmod 644 ' . escapeshellarg($file)
+            ) . ' 2>&1; echo "exit status $?"';
+
+            $output = (string) $this->run($command);
+            $ok = strpos($output, 'exit status 0') !== false;
+
+            $result[] = [
+                'path' => $file,
+                'errCode' => $ok ? 0 : 1,
+                'reference' => $target,
+                'errMessage' => $ok ? '' : cstr::limit(trim($output), 160),
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Memilih domain acuan untuk berkas `.alias`.
+     *
+     * Yang dipilih domain yang punya berkas `.ini` — hanya itu yang benar-benar
+     * memuat pengaturan IMAP dan SMTP. Menunjuk ke sesama `.alias` akan
+     * berantai dan tidak berujung pada konfigurasi mana pun.
+     *
+     * @param array $domainList domain => ini|alias
+     *
+     * @return null|string
+     */
+    protected static function pickWebmailReference(array $domainList) {
+        //penyedia surel umum ikut terdaftar di RainLoop bawaan (gmail.com,
+        //yahoo.com, …) dan itu bukan acuan yang benar untuk domain sendiri
+        $public = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'qq.com',
+            'yandex.ru', 'mail.ru', 'icloud.com', ];
+
+        foreach ($domainList as $name => $type) {
+            if ($type == 'ini' && !in_array($name, $public)) {
+                return $name;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Menyambungkan penyaring spam yang sudah terpasang ke MTA.
      *
      * Hanya menyambungkan; tidak memasang apa pun. Yang ditambahkan satu entri
