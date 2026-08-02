@@ -83,7 +83,7 @@ abstract class CController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function callAction($method, $parameters) {
-        if (!method_exists($this, $method) && !method_exists($this, '__call')) {
+        if (!$this->isCallableAction($method)) {
             throw new CHTTP_Exception_NotFoundHttpException();
         }
         if (method_exists($this, $method)) {
@@ -99,6 +99,61 @@ abstract class CController {
         }
 
         return $this->{$method}(...array_values($parameters));
+    }
+
+    /**
+     * Apakah sebuah nama method boleh dijalankan sebagai aksi dari URL.
+     *
+     * Sebelumnya callAction() hanya memeriksa keberadaan methodnya, tidak
+     * visibilitasnya. Karena CController adalah induk setiap controller,
+     * `$this->{$method}()` di dalamnya dapat menjangkau method `protected`
+     * milik turunannya — sehingga method yang sengaja tidak dipublikasikan
+     * tetap dapat dipanggil siapa pun lewat URL.
+     *
+     * Method `private` tidak pernah benar-benar terjangkau begitu (lingkupnya
+     * kelas, bukan pewarisan), tetapi pemanggilannya berakhir sebagai fatal
+     * error alih-alih 404, jadi keduanya ditolak di sini.
+     *
+     * @param string $method
+     *
+     * @return bool
+     */
+    protected function isCallableAction($method) {
+        // Block all magic methods
+        if (substr($method, 0, 2) === '__') {
+            return false;
+        }
+
+        if (in_array($method, static::getBlockedMethods(), true)) {
+            return false;
+        }
+
+        if (!method_exists($this, $method) && !method_exists($this, '__call')) {
+            return false;
+        }
+
+        // Ensure method is public
+        if (method_exists($this, $method)) {
+            $reflection = new ReflectionMethod($this, $method);
+            if (!$reflection->isPublic()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Method milik CController sendiri, bukan aksi.
+     *
+     * @return string[]
+     */
+    protected static function getBlockedMethods() {
+        return [
+            'callAction',
+            'middleware',
+            'getMiddleware',
+        ];
     }
 
     public static function controllerUrl() {
