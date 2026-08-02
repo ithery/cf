@@ -290,6 +290,19 @@ class CServer_Mail {
             . ' echo "PF_$p:$(postconf -xh $p 2>/dev/null || postconf -h $p 2>/dev/null)"; done;'
             . ' echo "DOVE_protocols:$($S doveconf -h protocols 2>/dev/null)";'
             . ' echo "DOVE_mail_location:$($S doveconf -h mail_location 2>/dev/null)";'
+            //penyaring spam dibaca dari tiga sisi sekaligus, karena terpasang
+            //belum tentu berarti dipakai: binarinya ada, layanannya berjalan,
+            //dan yang menentukan — apakah MTA benar-benar mengirim surat
+            //kepadanya lewat milter atau content_filter
+            . ' echo "SPAM_bin:$(for b in rspamd spamassassin spamd amavisd-new amavisd; do'
+            . ' command -v $b >/dev/null 2>&1 && printf "%s," "$b"; done)";'
+            . ' echo "SPAM_running:$(systemctl list-units --type=service --state=running'
+            . ' --no-pager --no-legend 2>/dev/null | awk \'{print $1}\''
+            . ' | grep -iE "rspamd|spamassassin|amavis" | tr "\\n" "," )";'
+            . ' echo "PF_smtpd_milters:$(postconf -h smtpd_milters 2>/dev/null)";'
+            . ' echo "PF_content_filter:$(postconf -h content_filter 2>/dev/null)";'
+            . ' echo "SPAM_scanned:$(rspamc stat 2>/dev/null'
+            . ' | sed -n "s/^Messages scanned: *//p" | head -1)";'
             . ' echo "LISTEN_START";'
             . ' (ss -ltnp 2>/dev/null || netstat -ltnp 2>/dev/null) | awk \'{print $4" "$NF}\';'
             . ' echo "LISTEN_END"'
@@ -300,6 +313,7 @@ class CServer_Mail {
         $relayRaw = '';
         $relayAuth = false;
         $delivery = [];
+        $spam = [];
         foreach (explode("\n", $output) as $line) {
             $line = trim($line);
             if (strpos($line, 'MTA:') === 0) {
@@ -310,6 +324,11 @@ class CServer_Mail {
                 $relayRaw = trim(substr($line, 6));
             } elseif (strpos($line, 'RELAYAUTH:') === 0) {
                 $relayAuth = strtolower(trim(substr($line, 10))) === 'yes';
+            } elseif (strpos($line, 'SPAM_') === 0) {
+                $separator = strpos($line, ':');
+                if ($separator !== false) {
+                    $spam[substr($line, 0, $separator)] = trim(substr($line, $separator + 1));
+                }
             } elseif (strpos($line, 'PF_') === 0 || strpos($line, 'DOVE_') === 0) {
                 $separator = strpos($line, ':');
                 if ($separator !== false) {
@@ -339,6 +358,7 @@ class CServer_Mail {
 
         $relay = self::parseRelay($relayRaw, $relayAuth);
         $mda = self::parseDelivery($delivery, $mta);
+        $spamFilter = self::parseSpamFilter($spam, $delivery);
 
         return [
             'relay' => $relay,
@@ -351,6 +371,106 @@ class CServer_Mail {
             'listening' => $listening,
             'public' => $publicMap,
             'isMailServer' => count($publicMap) > 0,
+            'spam' => carr::get($spamFilter, 'name'),
+            'spam_state' => carr::get($spamFilter, 'state'),
+            'spam_detail' => $spamFilter,
+        ];
+    }
+
+    /**
+     * Penyaring spam: ada, berjalan, dan — yang menentukan — benar-benar dipakai.
+     *
+     * Tiga keadaan dibedakan dengan sengaja, karena keadaan tengahnya yang
+     * paling menyesatkan: sebuah penyaring dapat terpasang dan layanannya
+     * berjalan, tetapi MTA tidak pernah mengirim surat kepadanya. Dari luar
+     * server itu tampak terlindungi; kenyataannya tidak ada satu surat pun yang
+     * diperiksa, sementara memorinya tetap terpakai. Persis itu yang ditemukan
+     * di `mail.cresenity.com` pada 2026-08-02 — rspamd berjalan, `smtpd_milters`
+     * hanya memuat opendkim, dan `rspamc stat` mencatat nol surat.
+     *
+     * Karena itu yang dijadikan penentu adalah `smtpd_milters`/`content_filter`,
+     * bukan keberadaan binari atau layanannya.
+     *
+     * @param array $value    keluaran SPAM_* yang sudah dipilah
+     * @param array $delivery keluaran PF_* yang sudah dipilah
+     *
+     * @return array name, state, installed, running, wired, scanned, hint
+     */
+    protected static function parseSpamFilter(array $value, array $delivery) {
+        $installed = self::splitList((string) carr::get($value, 'SPAM_bin'));
+        $running = self::splitList((string) carr::get($value, 'SPAM_running'));
+        $milter = (string) carr::get($delivery, 'PF_smtpd_milters');
+        $contentFilter = (string) carr::get($delivery, 'PF_content_filter');
+        $scannedRaw = trim((string) carr::get($value, 'SPAM_scanned'));
+
+        //nama layanan membawa akhiran .service; dibuang supaya sebanding dengan
+        //nama binarinya
+        $runningName = [];
+        foreach ($running as $service) {
+            $runningName[] = preg_replace('/\.service$/', '', $service);
+        }
+
+        //porta bawaan tiap penyaring, itulah yang dicari di daftar milter
+        $portMap = [
+            'rspamd' => ['11332', '11333'],
+            'spamassassin' => ['783'],
+            'spamd' => ['783'],
+            'amavisd-new' => ['10024'],
+            'amavisd' => ['10024'],
+        ];
+
+        $name = carr::get($installed, 0);
+        foreach ($installed as $candidate) {
+            //yang sedang berjalan lebih berarti daripada yang sekadar terpasang
+            if (in_array($candidate, $runningName) || in_array($candidate . 'd', $runningName)) {
+                $name = $candidate;
+
+                break;
+            }
+        }
+
+        $wired = false;
+        $haystack = strtolower($milter . ' ' . $contentFilter);
+        foreach ($installed as $candidate) {
+            if (strlen($haystack) == 0) {
+                break;
+            }
+            if (strpos($haystack, strtolower($candidate)) !== false) {
+                $wired = true;
+
+                break;
+            }
+            foreach (carr::get($portMap, $candidate, []) as $port) {
+                if (strpos($haystack, ':' . $port) !== false) {
+                    $wired = true;
+
+                    break 2;
+                }
+            }
+        }
+
+        $state = 'none';
+        $hint = null;
+        if (count($installed) == 0) {
+            $hint = 'Tidak ada penyaring spam sama sekali. Surat masuk diterima apa adanya.';
+        } elseif (!$wired) {
+            $state = 'idle';
+            $hint = 'Terpasang dan berjalan, tetapi MTA tidak pernah mengirim surat kepadanya —'
+                . ' tidak ada satu pun surat yang diperiksa. Sambungkan lewat smtpd_milters.';
+        } else {
+            $state = 'active';
+        }
+
+        return [
+            'name' => $name,
+            'state' => $state,
+            'installed' => $installed,
+            'running' => $runningName,
+            'wired' => $wired,
+            'milter' => $milter,
+            'content_filter' => $contentFilter,
+            'scanned' => strlen($scannedRaw) > 0 ? (int) $scannedRaw : null,
+            'hint' => $hint,
         ];
     }
 
@@ -664,6 +784,68 @@ class CServer_Mail {
         }
 
         return ['errCode' => 0, 'errMessage' => '', 'steps' => $steps, 'output' => $output];
+    }
+
+    /**
+     * Menyambungkan penyaring spam yang sudah terpasang ke MTA.
+     *
+     * Hanya menyambungkan; tidak memasang apa pun. Yang ditambahkan satu entri
+     * milter ke `smtpd_milters`, **di samping** entri yang sudah ada — opendkim
+     * lazim sudah duduk di sana, dan menimpanya berarti seluruh surat keluar
+     * berhenti ditandatangani.
+     *
+     * `milter_default_action` ikut dipastikan `accept`, sehingga bila penyaring
+     * mati suatu saat, surat tetap lewat alih-alih menumpuk di antrean.
+     * Bawaan Postfix untuk nilai itu adalah `tempfail`.
+     *
+     * @param null|string $port porta milter penyaringnya; bawaannya rspamd
+     *
+     * @return array errCode, errMessage, before, after, output
+     */
+    public function attachSpamFilter($port = '11332') {
+        $port = trim((string) $port);
+        if (preg_match('/^\d{2,5}$/', $port) !== 1) {
+            return ['errCode' => 1, 'errMessage' => 'Porta milter tidak sah', 'before' => '',
+                'after' => '', 'output' => '', ];
+        }
+
+        $entry = 'inet:127.0.0.1:' . $port;
+        $before = trim($this->run($this->sudo() . 'postconf -h smtpd_milters 2>/dev/null'));
+
+        if (strpos($before, ':' . $port) !== false) {
+            return ['errCode' => 0, 'errMessage' => '', 'before' => $before,
+                'after' => $before, 'output' => 'sudah tersambung, tidak ada yang diubah', ];
+        }
+
+        $value = strlen($before) > 0 ? $before . ', ' . $entry : $entry;
+        $stamp = trim($this->run('date +%Y%m%d%H%M%S'));
+
+        $command = $this->sudo() . 'bash -c ' . escapeshellarg(
+            'set -e; '
+            . 'cp -a /etc/postfix/main.cf /etc/postfix/main.cf.bak-' . $stamp . '; '
+            . 'postconf -e ' . escapeshellarg('smtpd_milters = ' . $value) . '; '
+            . 'postconf -e ' . escapeshellarg('non_smtpd_milters = $smtpd_milters') . '; '
+            . 'postconf -e ' . escapeshellarg('milter_default_action = accept') . '; '
+            . 'postfix reload'
+        ) . ' 2>&1; echo "exit status $?"';
+
+        $output = (string) $this->run($command);
+
+        if (strpos($output, 'exit status 0') === false) {
+            return ['errCode' => 1, 'before' => $before, 'after' => $before, 'output' => $output,
+                'errMessage' => 'Gagal menerapkan. main.cf lama dicadangkan sebagai'
+                    . ' /etc/postfix/main.cf.bak-' . $stamp, ];
+        }
+
+        //dipastikan dari sisi Postfix sendiri, bukan dari kode keluar
+        $after = trim($this->run($this->sudo() . 'postconf -h smtpd_milters 2>/dev/null'));
+        if (strpos($after, ':' . $port) === false) {
+            return ['errCode' => 1, 'before' => $before, 'after' => $after, 'output' => $output,
+                'errMessage' => 'Perintah berhasil tetapi smtpd_milters belum memuat porta ' . $port, ];
+        }
+
+        return ['errCode' => 0, 'errMessage' => '', 'before' => $before, 'after' => $after,
+            'output' => $output, ];
     }
 
     /**
