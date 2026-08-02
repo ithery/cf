@@ -764,7 +764,15 @@ class CServer_Mail {
         $command = $this->sudo() . 'bash -c ' . escapeshellarg(
             'set -e; umask 077; '
             . '[ -f ' . $file . ' ] && cp -a ' . $file . ' ' . $file . '.bak-' . $stamp . '; '
-            . 'printf %s\\n ' . escapeshellarg($credentialLine) . ' > ' . $file . '; '
+            //format printf **wajib dikutip**. Tanpa kutip, shell membaca `\n`
+            //sebagai huruf `n` yang di-escape, sehingga formatnya menjadi `%sn`
+            //dan setiap kata sandi tertulis dengan huruf `n` menempel di
+            //belakangnya — juga tanpa baris baru. Postfix lalu memakai kata
+            //sandi yang salah satu karakter, dan penyedia menolaknya dengan 535
+            //yang tidak menyebutkan sebab apa pun. Terjadi di produksi
+            //2026-08-02 dan makan waktu lama untuk ditemukan, karena uji
+            //kredensialnya berjalan **sebelum** penulisan sehingga selalu lulus.
+            . 'printf ' . escapeshellarg('%s\n') . ' ' . escapeshellarg($credentialLine) . ' > ' . $file . '; '
             . 'chmod 600 ' . $file . '; '
             . 'postmap ' . $file . '; '
             . 'postconf -e ' . escapeshellarg('relayhost = ' . $relayValue) . '; '
@@ -795,6 +803,30 @@ class CServer_Mail {
                 'errMessage' => 'Perintah berhasil tetapi relayhost belum berubah (terbaca: ' . $currentRelay . ')',
                 'steps' => $steps,
                 'output' => $output,
+            ];
+        }
+
+        //Kredensial yang benar-benar tertulis diperiksa ulang, bukan dianggap
+        //sama dengan yang diuji. Ujinya berjalan sebelum penulisan, jadi ia
+        //tidak dapat menangkap kerusakan yang terjadi **saat** menulis — dan
+        //satu karakter yang menempel karena kesalahan kutip pernah lolos persis
+        //lewat celah itu. Yang dibandingkan sidik jarinya, dihitung di server,
+        //sehingga kata sandinya tidak perlu melintas balik.
+        $expected = sha1($credentialLine);
+        $written = trim($this->run(
+            $this->sudo() . 'sha1sum ' . $file . ' 2>/dev/null | cut -d" " -f1'
+        ));
+        $writtenLine = trim($this->run(
+            $this->sudo() . 'tr -d "\\n" < ' . $file . ' | sha1sum | cut -d" " -f1'
+        ));
+
+        if (strlen($writtenLine) > 0 && $writtenLine !== $expected) {
+            return [
+                'errCode' => 1,
+                'errMessage' => 'Kredensial tertulis tetapi isinya tidak sama dengan yang diuji.'
+                    . ' Berkas lama dicadangkan sebagai ' . $file . '.bak-' . $stamp,
+                'steps' => $steps,
+                'output' => $output . "\n" . 'sha1 berkas: ' . $written,
             ];
         }
 
