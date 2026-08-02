@@ -14,14 +14,18 @@ class CAnalytics_Google_ClientGA4 {
     protected $cache;
 
     /**
+     * Dalam detik, bukan menit — setter-nya yang mengalikan 60.
+     *
      * @var int
      */
-    protected $cacheLifeTimeInMinutes = 0;
+    protected $cacheLifeTimeInSeconds = 0;
 
     /**
+     * Dalam detik, bukan menit — setter-nya yang mengalikan 60.
+     *
      * @var int
      */
-    protected $cacheRealtimeLifeTimeInMinutes = 0;
+    protected $cacheRealtimeLifeTimeInSeconds = 0;
 
     public function __construct(BetaAnalyticsDataClient $service, CCache_RepositoryInterface $cache) {
         $this->service = $service;
@@ -37,7 +41,7 @@ class CAnalytics_Google_ClientGA4 {
      * @return self
      */
     public function setCacheLifeTimeInMinutes($cacheLifeTimeInMinutes) {
-        $this->cacheLifeTimeInMinutes = $cacheLifeTimeInMinutes * 60;
+        $this->cacheLifeTimeInSeconds = $cacheLifeTimeInMinutes * 60;
 
         return $this;
     }
@@ -50,7 +54,7 @@ class CAnalytics_Google_ClientGA4 {
      * @return self
      */
     public function setCacheRealtimeLifeTimeInMinutes($cacheLifeTimeInMinutes) {
-        $this->cacheRealtimeLifeTimeInMinutes = $cacheLifeTimeInMinutes * 60;
+        $this->cacheRealtimeLifeTimeInSeconds = $cacheLifeTimeInMinutes * 60;
 
         return $this;
     }
@@ -65,18 +69,30 @@ class CAnalytics_Google_ClientGA4 {
      * @return null|array|\Google\Analytics\Data\V1beta\RunReportResponse
      */
     public function runReport($reportData, $realtime = false, $cacheInMinutes = null) {
-        $cacheName = $this->determineCacheName(func_get_args());
+        //kuncinya disusun dari laporan yang diminta saja, bukan dari
+        //func_get_args(). Lama waktu cache bukan bagian dari jati diri sebuah
+        //laporan: dua pemanggil yang meminta laporan yang sama dengan lama
+        //cache berbeda dulu mendapat dua entri berbeda, jadi dua panggilan ke
+        //Google. func_get_args() juga berubah panjang mengikuti berapa argumen
+        //yang benar-benar dituliskan pemanggil, sehingga runReport($data) dan
+        //runReport($data, false) menghasilkan kunci yang berlainan.
+        $cacheName = $this->determineCacheName([$reportData, $realtime]);
 
-        if ($cacheInMinutes === null) {
-            $cacheInMinutes = $realtime ? $this->cacheRealtimeLifeTimeInMinutes : $this->cacheLifeTimeInMinutes;
-        }
-        if ($cacheInMinutes === 0) {
+        //remember() menghitung detik. Properti di atas sudah disimpan dalam
+        //detik oleh setter-nya, tetapi argumen $cacheInMinutes dulu diteruskan
+        //apa adanya — sehingga setiap pemanggil yang meminta "cache 1 menit"
+        //sebenarnya hanya mendapat 1 detik, dan praktis tidak pernah kena cache.
+        $cacheInSeconds = $cacheInMinutes === null
+            ? ($realtime ? $this->cacheRealtimeLifeTimeInSeconds : $this->cacheLifeTimeInSeconds)
+            : (int) $cacheInMinutes * 60;
+
+        if ($cacheInSeconds === 0) {
             $this->cache->forget($cacheName);
         }
 
         return $this->cache->remember(
             $cacheName,
-            $cacheInMinutes,
+            $cacheInSeconds,
             function () use ($reportData, $realtime) {
                 return $realtime ? $this->service->runRealtimeReport($reportData) : $this->service->runReport($reportData);
             }
