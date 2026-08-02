@@ -84,6 +84,71 @@ class CAnalytics_Google_AnalyticGA4_PredefinedReport {
     }
 
     /**
+     * Peringkat sebuah dimensi sepanjang satu periode, terurut dari yang terbanyak.
+     *
+     * Kembaran berperiode dari [[getTopRealtimeList]], dan alasannya sama:
+     * bentuk permintaannya seragam, hanya nama dimensi dan metriknya yang
+     * berganti. Dipisah dan tidak digabung dengan yang realtime karena
+     * keduanya memanggil endpoint Google yang berbeda dan menerima kumpulan
+     * dimensi yang berbeda pula — `sessionSourceMedium` misalnya hanya ada di
+     * sini, `minutesAgo` hanya ada di sana.
+     *
+     * @param string      $dimension      nama dimensi GA4, mis. `unifiedScreenName`, `sessionSourceMedium`
+     * @param string      $metric         nama metrik, mis. `activeUsers`, `sessions`, `screenPageViews`
+     * @param null|CPeriod $period        bila null, tujuh hari terakhir
+     * @param int         $limit          banyaknya baris teratas
+     * @param null|int    $cacheInMinutes
+     *
+     * @return array tiap entri: label, value
+     */
+    public function getTopList($dimension, $metric = 'activeUsers', $period = null, $limit = 10, $cacheInMinutes = null) {
+        $analytic = $this->analytic;
+        if ($period == null) {
+            $period = CPeriod::days(7);
+        }
+
+        $data = $analytic->createReport()
+            ->setPeriod($period)
+            ->setDimensions([$dimension])
+            ->setMetrics([$metric])
+            ->runReport($cacheInMinutes)
+            ->toArray();
+
+        return $this->rankList($data, $dimension, $metric, $limit);
+    }
+
+    /**
+     * Bentuk baris laporan menjadi daftar label/value terurut menurun.
+     *
+     * Google mengembalikannya sudah terurut, tetapi urutannya dipastikan lagi
+     * di sini: yang dipakai pemanggil adalah "sepuluh teratas", dan itu tidak
+     * boleh bergantung pada janji yang tidak tertulis.
+     *
+     * @param array  $data
+     * @param string $dimension
+     * @param string $metric
+     * @param int    $limit
+     *
+     * @return array
+     */
+    protected function rankList($data, $dimension, $metric, $limit) {
+        $result = [];
+        foreach ($data as $row) {
+            $label = (string) carr::get($row, 'dimensions.' . $dimension . '.value');
+            if (strlen($label) == 0) {
+                $label = '(tidak disebutkan)';
+            }
+            $result[] = ['label' => $label, 'value' => (int) carr::get($row, 'metrics.' . $metric . '.value')];
+        }
+
+        usort($result, function ($a, $b) {
+            return carr::get($b, 'value') - carr::get($a, 'value');
+        });
+
+        return array_slice($result, 0, (int) $limit);
+    }
+
+    /**
      * Peringkat sebuah dimensi realtime, terurut dari yang terbanyak.
      *
      * Satu pintu untuk seluruh rincian yang ditampilkan dashboard realtime —
@@ -113,20 +178,7 @@ class CAnalytics_Google_AnalyticGA4_PredefinedReport {
             ->runReportRealtime($cacheInMinutes)
             ->toArray();
 
-        $result = [];
-        foreach ($data as $row) {
-            $label = (string) carr::get($row, 'dimensions.' . $dimension . '.value');
-            if (strlen($label) == 0) {
-                $label = '(tidak disebutkan)';
-            }
-            $result[] = ['label' => $label, 'value' => (int) carr::get($row, 'metrics.' . $metric . '.value')];
-        }
-
-        usort($result, function ($a, $b) {
-            return carr::get($b, 'value') - carr::get($a, 'value');
-        });
-
-        return array_slice($result, 0, (int) $limit);
+        return $this->rankList($data, $dimension, $metric, $limit);
     }
 
     public function getUserIdActiveRealtimeList($customUserPropertyId = 'app_user_id', $minutes = 5, $cacheInMinutes = null) {
