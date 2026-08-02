@@ -5,6 +5,9 @@ use Illuminate\Contracts\Support\Arrayable;
 class CException_Config implements Arrayable {
     use CTrait_HasOptions;
 
+    /**
+     * @var CException_Config
+     */
     private static $instance;
 
     public static function instance() {

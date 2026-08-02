@@ -18,6 +18,9 @@ class CException extends Exception {
         E_DEPRECATED => 'Deprecated',
     ];
 
+    /**
+     * @var CException_ExceptionHandler
+     */
     protected static $exceptionHandler;
 
     /**
@@ -92,6 +95,7 @@ class CException extends Exception {
     public static function exceptionHandler() {
         if (static::$exceptionHandler == null) {
             $exceptionHandlerClass = CF::config('app.classes.exception_handler', CException_ExceptionHandler::class);
+            /** @var class-string<CException_ExceptionHandler> $exceptionHandlerClass */
             static::$exceptionHandler = new $exceptionHandlerClass();
         }
 
