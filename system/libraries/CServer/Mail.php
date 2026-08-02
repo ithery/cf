@@ -291,18 +291,22 @@ class CServer_Mail {
             . ' echo "DOVE_protocols:$($S doveconf -h protocols 2>/dev/null)";'
             . ' echo "DOVE_mail_location:$($S doveconf -h mail_location 2>/dev/null)";'
             //penyaring spam dibaca dari tiga sisi sekaligus, karena terpasang
-            //belum tentu berarti dipakai: binarinya ada, layanannya berjalan,
+            //belum tentu berarti dipakai: binarinya ada, prosesnya berjalan,
             //dan yang menentukan — apakah MTA benar-benar mengirim surat
-            //kepadanya lewat milter atau content_filter
+            //kepadanya lewat milter atau content_filter.
+            //
+            //Jumlah surat yang sudah diperiksa **tidak** ikut di sini: `rspamc
+            //stat` menunggu dua detik penuh sebelum menjawab, dan itu saja
+            //cukup mendorong seluruh pemeriksaan ini melewati batas koneksi 10
+            //detik — yang gagalnya tanpa suara, keluarannya sekadar terpotong
+            //sehingga MTA dan MDA pun ikut terbaca kosong. Ambil terpisah lewat
+            //getSpamScannedCount() bila memang dibutuhkan.
             . ' echo "SPAM_bin:$(for b in rspamd spamassassin spamd amavisd-new amavisd; do'
             . ' command -v $b >/dev/null 2>&1 && printf "%s," "$b"; done)";'
-            . ' echo "SPAM_running:$(systemctl list-units --type=service --state=running'
-            . ' --no-pager --no-legend 2>/dev/null | awk \'{print $1}\''
-            . ' | grep -iE "rspamd|spamassassin|amavis" | tr "\\n" "," )";'
+            . ' echo "SPAM_running:$(for b in rspamd spamd amavisd; do'
+            . ' pgrep -x $b >/dev/null 2>&1 && printf "%s," "$b"; done)";'
             . ' echo "PF_smtpd_milters:$(postconf -h smtpd_milters 2>/dev/null)";'
             . ' echo "PF_content_filter:$(postconf -h content_filter 2>/dev/null)";'
-            . ' echo "SPAM_scanned:$(rspamc stat 2>/dev/null'
-            . ' | sed -n "s/^Messages scanned: *//p" | head -1)";'
             . ' echo "LISTEN_START";'
             . ' (ss -ltnp 2>/dev/null || netstat -ltnp 2>/dev/null) | awk \'{print $4" "$NF}\';'
             . ' echo "LISTEN_END"'
@@ -398,17 +402,9 @@ class CServer_Mail {
      */
     protected static function parseSpamFilter(array $value, array $delivery) {
         $installed = self::splitList((string) carr::get($value, 'SPAM_bin'));
-        $running = self::splitList((string) carr::get($value, 'SPAM_running'));
+        $runningName = self::splitList((string) carr::get($value, 'SPAM_running'));
         $milter = (string) carr::get($delivery, 'PF_smtpd_milters');
         $contentFilter = (string) carr::get($delivery, 'PF_content_filter');
-        $scannedRaw = trim((string) carr::get($value, 'SPAM_scanned'));
-
-        //nama layanan membawa akhiran .service; dibuang supaya sebanding dengan
-        //nama binarinya
-        $runningName = [];
-        foreach ($running as $service) {
-            $runningName[] = preg_replace('/\.service$/', '', $service);
-        }
 
         //porta bawaan tiap penyaring, itulah yang dicari di daftar milter
         $portMap = [
@@ -469,9 +465,28 @@ class CServer_Mail {
             'wired' => $wired,
             'milter' => $milter,
             'content_filter' => $contentFilter,
-            'scanned' => strlen($scannedRaw) > 0 ? (int) $scannedRaw : null,
             'hint' => $hint,
         ];
+    }
+
+    /**
+     * Berapa surat yang sudah diperiksa penyaring spam.
+     *
+     * Dipisah dari `inspect()` dengan sengaja: `rspamc stat` menunggu dua detik
+     * penuh sebelum menjawab, dan menyelipkannya ke dalam pemeriksaan gabungan
+     * membuat seluruhnya melewati batas koneksi 10 detik.
+     *
+     * Angka nol adalah jawaban yang paling berarti di sini — penyaring yang
+     * berjalan tetapi tidak pernah dikirimi surat.
+     *
+     * @return null|int null bila tidak dapat dibaca
+     */
+    public function getSpamScannedCount() {
+        $output = trim((string) $this->run(
+            'rspamc stat 2>/dev/null | sed -n "s/^Messages scanned: *//p" | head -1'
+        ));
+
+        return preg_match('/^\d+$/', $output) === 1 ? (int) $output : null;
     }
 
     /**
