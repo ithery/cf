@@ -834,6 +834,102 @@ class CServer_Mail {
     }
 
     /**
+     * Penyaring baku untuk log surat, dari yang paling sering ditanyakan.
+     *
+     * @return array kunci => [label, pattern]
+     */
+    public static function logFilterList() {
+        return [
+            'sent' => ['label' => 'Terkirim', 'pattern' => 'status=sent'],
+            'deferred' => ['label' => 'Tertahan', 'pattern' => 'status=deferred'],
+            'bounced' => ['label' => 'Dikembalikan', 'pattern' => 'status=bounced'],
+            'reject' => ['label' => 'Ditolak', 'pattern' => 'NOQUEUE: reject'],
+            'auth' => ['label' => 'Autentikasi gagal', 'pattern' => 'authentication failed'],
+            'dkim' => ['label' => 'DKIM', 'pattern' => 'opendkim'],
+            'spam' => ['label' => 'Penyaring spam', 'pattern' => 'rspamd\\|spamd\\|milter'],
+        ];
+    }
+
+    /**
+     * Baris terakhir log surat, disaring.
+     *
+     * Log surat adalah satu-satunya tempat yang tahu apa yang **sungguh**
+     * terjadi pada sebuah surat: diterima, ditandatangani, diserahkan ke relai,
+     * ditolak, atau diam-diam tertahan. Tanpa ini jawabannya hanya dapat dicari
+     * lewat SSH.
+     *
+     * Kata kuncinya dilewatkan `escapeshellarg` dan `grep -F` — dicocokkan
+     * harfiah, bukan sebagai ekspresi reguler, sehingga tanda titik atau kurung
+     * pada nama domain tidak berubah arti dan tidak ada yang dapat disisipkan
+     * ke perintahnya.
+     *
+     * @param null|string $keyword kata kunci bebas, mis. nama domain atau queue id
+     * @param null|string $filter  kunci dari logFilterList()
+     * @param int         $limit   berapa baris terakhir yang diambil
+     *
+     * @return array baris log, terbaru di bawah
+     */
+    public function getLogTail($keyword = null, $filter = null, $limit = 200) {
+        $limit = (int) $limit;
+        if ($limit < 1 || $limit > 2000) {
+            $limit = 200;
+        }
+
+        $filterList = static::logFilterList();
+        $pattern = carr::get($filterList, (string) $filter . '.pattern');
+
+        //berkas yang diputar ikut dibaca, termasuk yang sudah dipadatkan —
+        //pertanyaan tentang surat kerap menyangkut beberapa hari lalu
+        $command = 'for f in /var/log/mail.log /var/log/maillog; do'
+            . ' [ -f "$f" ] && cat "$f"; [ -f "$f.1" ] && cat "$f.1";'
+            . ' for g in "$f".*.gz; do [ -f "$g" ] && zcat "$g" 2>/dev/null; done; done';
+
+        if ($pattern !== null) {
+            $command .= ' | grep -a ' . escapeshellarg($pattern);
+        }
+        if (strlen((string) $keyword) > 0) {
+            $command .= ' | grep -aiF ' . escapeshellarg((string) $keyword);
+        }
+        $command .= ' | tail -n ' . $limit;
+
+        $output = (string) $this->run($this->sudo() . 'bash -c ' . escapeshellarg($command));
+
+        $line = [];
+        foreach (explode("\n", $output) as $row) {
+            $row = rtrim($row, "\r");
+            if (strlen(trim($row)) > 0) {
+                $line[] = $row;
+            }
+        }
+
+        return $line;
+    }
+
+    /**
+     * Ringkasan jumlah baris per jenis, untuk log yang sedang dilihat.
+     *
+     * @param null|string $keyword
+     *
+     * @return array kunci => jumlah
+     */
+    public function getLogSummary($keyword = null) {
+        $summary = [];
+        foreach (static::logFilterList() as $key => $meta) {
+            $command = 'for f in /var/log/mail.log /var/log/maillog; do'
+                . ' [ -f "$f" ] && cat "$f"; [ -f "$f.1" ] && cat "$f.1"; done'
+                . ' | grep -a ' . escapeshellarg(carr::get($meta, 'pattern'));
+            if (strlen((string) $keyword) > 0) {
+                $command .= ' | grep -aiF ' . escapeshellarg((string) $keyword);
+            }
+            $command .= ' | wc -l';
+
+            $summary[$key] = (int) trim($this->run($this->sudo() . 'bash -c ' . escapeshellarg($command)));
+        }
+
+        return $summary;
+    }
+
+    /**
      * Klien surel berbasis web yang terpasang di server ini.
      *
      * **Tidak** ikut di `inspect()`: penelusurannya memakan ~1,5 detik, dan
