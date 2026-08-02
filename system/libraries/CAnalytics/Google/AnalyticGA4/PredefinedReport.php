@@ -83,6 +83,52 @@ class CAnalytics_Google_AnalyticGA4_PredefinedReport {
         ];
     }
 
+    /**
+     * Peringkat sebuah dimensi realtime, terurut dari yang terbanyak.
+     *
+     * Satu pintu untuk seluruh rincian yang ditampilkan dashboard realtime —
+     * halaman, negara, kota, peristiwa — karena bentuk permintaannya sama
+     * persis dan hanya nama dimensi dan metriknya yang berbeda. Menambah
+     * rincian baru berarti memanggil ini dengan nama lain, bukan menyalin satu
+     * method lagi.
+     *
+     * Google mengembalikannya sudah terurut menurun, tetapi urutannya
+     * dipastikan lagi di sini: yang dipakai pemanggil adalah "sepuluh
+     * teratas", dan itu tidak boleh bergantung pada janji yang tidak tertulis.
+     *
+     * @param string      $dimension      nama dimensi realtime GA4, mis. `unifiedScreenName`, `country`
+     * @param string      $metric         nama metrik realtime, mis. `activeUsers`, `screenPageViews`
+     * @param int         $limit          banyaknya baris teratas
+     * @param int         $minutes
+     * @param null|int    $cacheInMinutes
+     *
+     * @return array tiap entri: label, value
+     */
+    public function getTopRealtimeList($dimension, $metric = 'activeUsers', $limit = 10, $minutes = 29, $cacheInMinutes = null) {
+        $analytic = $this->analytic;
+        $data = $analytic->createReport()
+            ->setMinuteRange($minutes, 0)
+            ->setDimensions([$dimension])
+            ->setMetrics([$metric])
+            ->runReportRealtime($cacheInMinutes)
+            ->toArray();
+
+        $result = [];
+        foreach ($data as $row) {
+            $label = (string) carr::get($row, 'dimensions.' . $dimension . '.value');
+            if (strlen($label) == 0) {
+                $label = '(tidak disebutkan)';
+            }
+            $result[] = ['label' => $label, 'value' => (int) carr::get($row, 'metrics.' . $metric . '.value')];
+        }
+
+        usort($result, function ($a, $b) {
+            return carr::get($b, 'value') - carr::get($a, 'value');
+        });
+
+        return array_slice($result, 0, (int) $limit);
+    }
+
     public function getUserIdActiveRealtimeList($customUserPropertyId = 'app_user_id', $minutes = 5, $cacheInMinutes = null) {
         $analytic = $this->analytic;
         $data = $analytic->createReport()
