@@ -46,7 +46,7 @@ RewriteRule ^application/[^/]+/default/data/(vendor|key)/ - [R=404,L]
 RewriteRule ^(.*/)?\.(DS_Store|git.*|editorconfig|htaccess.*|php_cs.*|stylelintrc|prettierrc|eslintrc|eslintignore|php-cs-fixer\.cache|phpunit\.result\.cache)$ - [R=404,L]
 
 # Dokumen dan berkas proyek
-RewriteRule ^(.*/)?(CLAUDE|TODO|README|CHANGELOG)\.md$ - [R=404,L]
+RewriteRule ^(.*/)?(CLAUDE|TODO|BUG|README|CHANGELOG)\.md$ - [R=404,L]
 RewriteRule ^(.*/)?(package\.json|package-lock\.json|composer\.json|composer\.lock|phpcs\.xml|phpstan\.neon|cf-manifest\.json|Thumbs\.db|_ide_helper\.php|problem\.txt)$ - [R=404,L]
 
 # Berkas contoh, skrip, dan dump bawaan
