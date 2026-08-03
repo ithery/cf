@@ -161,7 +161,8 @@ class CImage_Avatar_Input_Initials {
         if ($this->hasQueryParameters) {
             return false;
         }
-        $requestUrl = ltrim($_SERVER['REQUEST_URI'], '/');
+        //REQUEST_URI tidak ada di luar permintaan HTTP — antrean, cron, konsol, dan test
+        $requestUrl = ltrim(carr::get($_SERVER, 'REQUEST_URI', ''), '/');
         $requestUrl = ltrim($requestUrl, 'api');
         $requestUrl = ltrim($requestUrl, '/');
         foreach (explode('/', $requestUrl) as $index => $value) {
