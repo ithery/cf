@@ -101,4 +101,16 @@
     <rule ref="Internal.NoCodeFound">
         <severity>0</severity>
     </rule>
+
+    <!--
+        Berkas test boleh memuat kelas boneka pendampingnya.
+
+        Controller atau model tiruan yang hanya dipakai satu berkas test lebih
+        jelas bila duduk di bawah test yang memakainya. Memisahkannya ke berkas
+        sendiri justru menjauhkan keduanya, dan kelas itu tidak pernah di-autoload
+        di luar test.
+    -->
+    <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
 </ruleset>
