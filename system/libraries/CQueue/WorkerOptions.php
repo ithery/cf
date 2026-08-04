@@ -81,6 +81,13 @@ class CQueue_WorkerOptions {
     public $maxTime;
 
     /**
+     * Stop once the queue has been empty for this many seconds.
+     *
+     * @var null|int
+     */
+    public $stopWhenEmptyFor;
+
+    /**
      * Create a new worker options instance.
      *
      * @param string $name
@@ -92,8 +99,9 @@ class CQueue_WorkerOptions {
      * @param bool   $force
      * @param bool   $stopWhenEmpty
      * @param int    $maxJobs
-     * @param int    $maxTime
-     * @param int    $rest
+     * @param int      $maxTime
+     * @param int      $rest
+     * @param null|int $stopWhenEmptyFor
      *
      * @return void
      */
@@ -108,8 +116,10 @@ class CQueue_WorkerOptions {
         $stopWhenEmpty = false,
         $maxJobs = 0,
         $maxTime = 0,
-        $rest = 0
+        $rest = 0,
+        $stopWhenEmptyFor = null
     ) {
+        $this->stopWhenEmptyFor = $stopWhenEmptyFor;
         $this->name = $name;
         $this->backoff = $backoff;
         $this->sleep = $sleep;

@@ -1,6 +1,11 @@
 <?php
 
-class CQueue_Event_JobPopping {
+defined('SYSPATH') or die('No direct access allowed.');
+
+/**
+ * Raised when a paused queue is resumed.
+ */
+class CQueue_Event_QueueResumed {
     /**
      * The connection name.
      *
@@ -11,19 +16,17 @@ class CQueue_Event_JobPopping {
     /**
      * The queue name.
      *
-     * @var null|string
+     * @var string
      */
     public $queue;
 
     /**
-     * Create a new event instance.
-     *
-     * @param string      $connectionName
-     * @param null|string $queue
+     * @param string $connectionName
+     * @param string $queue
      *
      * @return void
      */
-    public function __construct($connectionName, $queue = null) {
+    public function __construct($connectionName, $queue) {
         $this->connectionName = $connectionName;
         $this->queue = $queue;
     }

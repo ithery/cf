@@ -2,9 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CQueue_Exception_MaxAttemptsExceededException extends Exception {
+class CQueue_Exception_TimeoutExceededException extends CQueue_Exception_MaxAttemptsExceededException {
     /**
-     * The job that exceeded its attempts.
+     * The job that timed out.
      *
      * @var null|CQueue_JobInterface
      */
@@ -16,7 +16,7 @@ class CQueue_Exception_MaxAttemptsExceededException extends Exception {
      * @return static
      */
     public static function forJob($job) {
-        $exception = new static($job->resolveName() . ' has been attempted too many times.');
+        $exception = new static($job->resolveName() . ' has timed out.');
         $exception->job = $job;
 
         return $exception;

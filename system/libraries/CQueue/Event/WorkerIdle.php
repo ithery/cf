@@ -2,18 +2,21 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CQueue_Event_Looping {
+/**
+ * Raised on every loop iteration that found no job to run.
+ */
+class CQueue_Event_WorkerIdle {
     /**
      * The connection name.
      *
-     * @var string
+     * @var null|string
      */
     public $connectionName;
 
     /**
      * The queue name.
      *
-     * @var string
+     * @var null|string
      */
     public $queue;
 
@@ -25,17 +28,15 @@ class CQueue_Event_Looping {
     public $options;
 
     /**
-     * Create a new event instance.
-     *
-     * @param string                    $connectionName
-     * @param string                    $queue
+     * @param null|string               $connectionName
+     * @param null|string               $queue
      * @param null|CQueue_WorkerOptions $options
      *
      * @return void
      */
-    public function __construct($connectionName, $queue, $options = null) {
-        $this->queue = $queue;
+    public function __construct($connectionName = null, $queue = null, $options = null) {
         $this->connectionName = $connectionName;
+        $this->queue = $queue;
         $this->options = $options;
     }
 }

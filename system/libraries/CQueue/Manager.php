@@ -9,7 +9,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
     /**
      * The array of resolved queue connections.
      *
-     * @var array
+     * @var array<CQueue_QueueInterface>
      */
     protected $connections = [];
 
@@ -248,6 +248,94 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
      */
     public function getName($connection = null) {
         return $connection ?: $this->getDefaultDriver();
+    }
+
+    /**
+     * Cache key holding the paused state of one queue.
+     *
+     * @param string $connection
+     * @param string $queue
+     *
+     * @return string
+     */
+    protected function pausedCacheKey($connection, $queue) {
+        return 'cresenity:queue:paused:' . $connection . ':' . $queue;
+    }
+
+    /**
+     * Pause a queue by its connection and name.
+     *
+     * @param string $connection
+     * @param string $queue
+     *
+     * @return void
+     */
+    public function pause($connection, $queue) {
+        c::cache()->store()->forever($this->pausedCacheKey($connection, $queue), true);
+        $this->dispatcher->dispatch(new CQueue_Event_QueuePaused($connection, $queue));
+    }
+
+    /**
+     * Pause a queue by its connection and name for a given amount of time.
+     *
+     * @param string                      $connection
+     * @param string                      $queue
+     * @param DateInterval|DateTime|int $ttl
+     *
+     * @return void
+     */
+    public function pauseFor($connection, $queue, $ttl) {
+        c::cache()->store()->put($this->pausedCacheKey($connection, $queue), true, $ttl);
+        $this->dispatcher->dispatch(new CQueue_Event_QueuePaused($connection, $queue, $ttl));
+    }
+
+    /**
+     * Resume a paused queue by its connection and name.
+     *
+     * @param string $connection
+     * @param string $queue
+     *
+     * @return void
+     */
+    public function resume($connection, $queue) {
+        c::cache()->store()->forget($this->pausedCacheKey($connection, $queue));
+        $this->dispatcher->dispatch(new CQueue_Event_QueueResumed($connection, $queue));
+    }
+
+    /**
+     * Determine if a queue is paused.
+     *
+     * @param string $connection
+     * @param string $queue
+     *
+     * @return bool
+     */
+    public function isPaused($connection, $queue) {
+        return (bool) c::cache()->store()->get($this->pausedCacheKey($connection, $queue), false);
+    }
+
+    /**
+     * Determine which of the given queues are currently paused.
+     *
+     * @param string $connection
+     * @param array  $queueList
+     *
+     * @return array
+     */
+    public function getPausedQueues($connection, $queueList) {
+        $keyList = [];
+        foreach ($queueList as $queue) {
+            $keyList[$queue] = $this->pausedCacheKey($connection, $queue);
+        }
+        $stateList = c::cache()->store()->many(array_values($keyList));
+        $pausedList = [];
+        foreach ($keyList as $queue => $key) {
+            if (carr::get($stateList, $key, false)) {
+                $pausedList[] = $queue;
+            }
+        }
+
+        return $pausedList;
     }
 
     /**

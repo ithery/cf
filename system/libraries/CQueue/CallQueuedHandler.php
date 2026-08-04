@@ -18,6 +18,15 @@ class CQueue_CallQueuedHandler {
     protected $container;
 
     /**
+     * The command currently being run.
+     *
+     * Kept so the worker can pass an interrupt signal on to it.
+     *
+     * @var null|mixed
+     */
+    protected $runningCommand;
+
+    /**
      * Create a new handler instance.
      *
      * @return void
@@ -46,6 +55,7 @@ class CQueue_CallQueuedHandler {
         } catch (CModel_Exception_ModelNotFoundException $e) {
             return $this->handleModelNotFound($job, $e);
         }
+        $this->runningCommand = $command;
 
         $this->dispatchThroughMiddleware($job, $command);
 
@@ -63,6 +73,16 @@ class CQueue_CallQueuedHandler {
         if (!$job->isDeletedOrReleased()) {
             $job->delete();
         }
+        $this->runningCommand = null;
+    }
+
+    /**
+     * Get the command currently being run, if any.
+     *
+     * @return null|mixed
+     */
+    public function getRunningCommand() {
+        return $this->runningCommand;
     }
 
     /**
