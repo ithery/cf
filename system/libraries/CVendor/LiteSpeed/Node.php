@@ -515,7 +515,14 @@ class CVendor_LiteSpeed_Node {
 
         $source = $this->els;
         if (strlen((string) $key) > 0) {
+            //anak disimpan berkunci **ternormalisasi**, dan sebagian kunci
+            //berubah nama karenanya: `map` menjadi `vhmap`. Pemanggil tidak
+            //seharusnya perlu menghafal tabel aliasnya — kunci apa adanya
+            //dicoba lebih dulu, lalu bentuk ternormalisasinya.
             $key = strtolower($key);
+            if (!isset($this->els[$key])) {
+                $key = strtolower((string) CVendor_LiteSpeed_KeywordAlias::normalizedKey($key));
+            }
             if (!isset($this->els[$key])) {
                 return [];
             }

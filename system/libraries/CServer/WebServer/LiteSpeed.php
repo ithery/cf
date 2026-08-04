@@ -240,21 +240,32 @@ class CServer_WebServer_LiteSpeed {
 
         $list = [];
         foreach ($config->getRootNode()->getChildList('listener') as $node) {
+            //kunci `map` disimpan ternormalisasi sebagai `vhmap`, dan nilainya
+            //sudah berupa nama vhost saja — daftar domain di belakangnya tidak
+            //ikut disimpan pengurai
             $map = [];
             foreach ($node->getChildList('map') as $mapNode) {
                 $map[] = (string) $mapNode->getVal();
             }
 
-            //`address` berbentuk `ip:port`, dan ip-nya boleh `*`. Dipisah di sini
-            //karena port yang didengarkan adalah bagian yang paling sering dicari,
-            //sementara ip hampir selalu `*` dan tidak menambah keterangan
+            //`address` berbentuk `ip:port`. Pengurai juga memekarkannya menjadi
+            //anak `ip` dan `port` tersendiri, dan yang itu didahulukan karena
+            //sudah dinormalkan olehnya — `*` menjadi `ANY`. Pemisahan manual
+            //hanya dipakai bila keduanya tidak ada.
             $address = (string) $node->getChildVal('address');
-            $position = strrpos($address, ':');
+            $ip = (string) $node->getChildVal('ip');
+            $port = (string) $node->getChildVal('port');
+            if (strlen($ip) == 0 && strlen($port) == 0) {
+                $position = strrpos($address, ':');
+                $ip = $position === false ? $address : substr($address, 0, $position);
+                $port = $position === false ? '' : substr($address, $position + 1);
+            }
+
             $list[] = [
                 'name' => (string) $node->getVal(),
                 'address' => $address,
-                'ip' => $position === false ? $address : substr($address, 0, $position),
-                'port' => $position === false ? '' : substr($address, $position + 1),
+                'ip' => $ip,
+                'port' => $port,
                 'secure' => (string) $node->getChildVal('secure'),
                 'keyFile' => (string) $node->getChildVal('keyFile'),
                 'certFile' => (string) $node->getChildVal('certFile'),
@@ -314,6 +325,7 @@ class CServer_WebServer_LiteSpeed {
         $output = $this->server->runCommand(
             'for d in ' . $root . '/lsphp*/; do '
             . '  [ -d "$d" ] || continue; '
+            . '  d=${d%/}; '
             . '  n=$(basename "$d"); '
             . '  b=""; '
             . '  for c in "$d/bin/php" "$d/bin/lsphp"; do [ -x "$c" ] && b="$c" && break; done; '
