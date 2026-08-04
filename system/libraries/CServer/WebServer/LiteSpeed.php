@@ -244,11 +244,95 @@ class CServer_WebServer_LiteSpeed {
             foreach ($node->getChildList('map') as $mapNode) {
                 $map[] = (string) $mapNode->getVal();
             }
+
+            //`address` berbentuk `ip:port`, dan ip-nya boleh `*`. Dipisah di sini
+            //karena port yang didengarkan adalah bagian yang paling sering dicari,
+            //sementara ip hampir selalu `*` dan tidak menambah keterangan
+            $address = (string) $node->getChildVal('address');
+            $position = strrpos($address, ':');
             $list[] = [
                 'name' => (string) $node->getVal(),
-                'address' => (string) $node->getChildVal('address'),
+                'address' => $address,
+                'ip' => $position === false ? $address : substr($address, 0, $position),
+                'port' => $position === false ? '' : substr($address, $position + 1),
                 'secure' => (string) $node->getChildVal('secure'),
+                'keyFile' => (string) $node->getChildVal('keyFile'),
+                'certFile' => (string) $node->getChildVal('certFile'),
                 'map' => $map,
+            ];
+        }
+
+        return $list;
+    }
+
+    /**
+     * Aplikasi eksternal tingkat server — penerjemah PHP dan kawan-kawannya.
+     *
+     * Inilah yang sesungguhnya menyambungkan sebuah vhost ke penerjemah PHP,
+     * jadi ia menjawab pertanyaan yang tidak dijawab oleh daftar lsphp yang
+     * terpasang: mana yang benar-benar terpakai.
+     *
+     * @return array[]
+     */
+    public function getExternalAppList() {
+        $config = $this->getHttpdConfig();
+        if ($config == null) {
+            return [];
+        }
+
+        $list = [];
+        foreach ($config->getRootNode()->getChildList('extprocessor') as $node) {
+            $list[] = [
+                'name' => (string) $node->getVal(),
+                'type' => (string) $node->getChildVal('type'),
+                'address' => (string) $node->getChildVal('address'),
+                'path' => (string) $node->getChildVal('path'),
+                'maxConns' => (string) $node->getChildVal('maxConns'),
+                'instances' => (string) $node->getChildVal('instances'),
+            ];
+        }
+
+        return $list;
+    }
+
+    /**
+     * Penerjemah PHP yang terpasang, beserta versinya.
+     *
+     * Dibaca dari isi direktori dan bukan dari daftar versi yang diketahui
+     * kode, karena daftar semacam itu menua: LiteSpeed merilis lsphp baru dan
+     * daftar yang ditulis tangan akan melaporkan versi yang benar-benar
+     * terpasang sebagai "tidak ada".
+     *
+     * Versinya dipanggil dari binernya sendiri — nama direktori hanya menyebut
+     * versi mayor-minor, sementara yang menentukan saat menelusuri masalah
+     * justru versi tambalannya.
+     *
+     * @return array[] masing-masing ['name', 'version', 'binary']
+     */
+    public function getPhpList() {
+        $root = CVendor_LiteSpeed::serverRoot();
+        $output = $this->server->runCommand(
+            'for d in ' . $root . '/lsphp*/; do '
+            . '  [ -d "$d" ] || continue; '
+            . '  n=$(basename "$d"); '
+            . '  b=""; '
+            . '  for c in "$d/bin/php" "$d/bin/lsphp"; do [ -x "$c" ] && b="$c" && break; done; '
+            . '  v=""; [ -n "$b" ] && v=$("$b" -v 2>/dev/null | head -1); '
+            . '  echo "LSPHP|$n|$b|$v"; '
+            . 'done'
+        );
+
+        $list = [];
+        foreach (explode("\n", (string) $output) as $line) {
+            $line = trim($line);
+            if (substr($line, 0, 6) != 'LSPHP|') {
+                continue;
+            }
+            $part = explode('|', $line, 4);
+            $list[] = [
+                'name' => trim((string) carr::get($part, 1)),
+                'binary' => trim((string) carr::get($part, 2)),
+                'version' => trim((string) carr::get($part, 3)),
             ];
         }
 
