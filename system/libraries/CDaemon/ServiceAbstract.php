@@ -297,18 +297,18 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         }
         foreach ($this->plugins as $plugin) {
             foreach ($plugin->checkEnvironment() as $error) {
-                $errors[] = "[${plugin}] ${error}";
+                $errors[] = "[{$plugin}] {$error}";
             }
         }
         foreach ($this->workers as $worker) {
             foreach ($worker->checkEnvironment() as $error) {
-                $errors[] = "[${worker}] ${error}";
+                $errors[] = "[{$worker}] {$error}";
             }
         }
         if (count($errors)) {
             $errors = implode("\n  ", $errors);
 
-            throw new Exception("Checking Dependencies... Failed:\n  ${errors}");
+            throw new Exception("Checking Dependencies... Failed:\n  {$errors}");
         }
     }
 
@@ -660,7 +660,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $date = date('Y-m-d H:i:s');
         $pid = str_pad($this->pid, 5, ' ', STR_PAD_LEFT);
         $label = str_pad(substr($label, 0, 12), 13, ' ', STR_PAD_RIGHT);
-        $prefix = "[${date}] ${pid} ${label}" . str_repeat("\t", $indent);
+        $prefix = "[{$date}] {$pid} {$label}" . str_repeat("\t", $indent);
         $logFile = $this->logFile();
 
         $this->runner()->autoRotateLog($this->logSizeToRotate, $this->logKeepToRotate);

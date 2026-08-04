@@ -154,7 +154,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                     $max_id = $i;
                 }
             }
-            $this->mediator->log("Starting Job Numbering at ${max_id}.");
+            $this->mediator->log("Starting Job Numbering at {$max_id}.");
             $this->mediator->setCallCount($max_id);
         }
     }

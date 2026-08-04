@@ -28,7 +28,7 @@ class CDaemon_Helper {
      */
     public function releaseLock($lockFile) {
         if (!array_key_exists($lockFile, $this->lockHandles)) {
-            throw new Exception("Lock NOT held - bug? Lockfile: ${lockFile}");
+            throw new Exception("Lock NOT held - bug? Lockfile: {$lockFile}");
         }
         if ($this->lockHandles[$lockFile]) {
             ftruncate($this->lockHandles[$lockFile], 0);

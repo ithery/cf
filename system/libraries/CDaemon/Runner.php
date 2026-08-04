@@ -117,7 +117,7 @@ class CDaemon_Runner extends CDaemon_RunnerAbstract {
     public function logDump() {
         $pid = $this->getPid();
         if ($pid) {
-            exec("kill -10 ${pid}");
+            exec("kill -10 {$pid}");
         }
     }
 

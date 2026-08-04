@@ -183,7 +183,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
      */
     protected function getConnector($driver) {
         if (!isset($this->connectors[$driver])) {
-            throw new InvalidArgumentException("No connector for [${driver}]");
+            throw new InvalidArgumentException("No connector for [{$driver}]");
         }
 
         return call_user_func($this->connectors[$driver]);

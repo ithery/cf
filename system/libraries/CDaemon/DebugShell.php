@@ -360,12 +360,12 @@ class CDaemon_DebugShell {
         }
         if ($value === null) {
             if (isset($state[$key])) {
-                $this->service->log("State get ${key} = " . $state[$key]);
+                $this->service->log("State get {$key} = " . $state[$key]);
             } else {
-                $this->service->log("State get ${key} = [${default}]");
+                $this->service->log("State get {$key} = [{$default}]");
             }
         } else {
-            $this->service->log("State SET ${key}=${value}");
+            $this->service->log("State SET {$key}={$value}");
         }
         if ($value === null) {
             if (isset($state[$key])) {
@@ -394,7 +394,7 @@ class CDaemon_DebugShell {
     private function isBreakpointActive($method) {
         $a = !in_array($method, $this->blacklist);
         $b = $this->debugState('enabled');
-        $c = !$this->debugState("skip_${method}");
+        $c = !$this->debugState("skip_{$method}");
         $d = $this->debugState('skip__until') === null || $this->debugState('skip__until') < time();
 
         return $a && $b && $c && $d;
@@ -440,7 +440,7 @@ class CDaemon_DebugShell {
             $prompt = '[' . $prefixer($method, $args) . '] ' . $prompt;
         }
 
-        return "${prompt} > ";
+        return "{$prompt} > ";
     }
 
     /**
@@ -500,7 +500,7 @@ class CDaemon_DebugShell {
                 $message = substr($message, 0, $maxlen - 3) . '...';
             }
             $message = str_replace(PHP_EOL, PHP_EOL . ' ', $message);
-            echo " ${message}\n\n";
+            echo " {$message}\n\n";
         };
 
         try {
@@ -606,7 +606,7 @@ class CDaemon_DebugShell {
 
                         break;
                     case 'skip':
-                        $this->debugState("skip_${method}", true);
+                        $this->debugState("skip_{$method}", true);
                         $printer('Breakpoint "' . $method . '" Turned Off..');
                         $break = true;
                         $input = true;

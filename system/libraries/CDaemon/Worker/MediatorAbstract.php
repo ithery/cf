@@ -393,7 +393,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 $printer("Calling Function {$matches[1]}()...");
                 $return = call_user_func_array($function, $args);
                 if (is_scalar($return)) {
-                    $printer("Return: ${return}", 100);
+                    $printer("Return: {$return}", 100);
                 } else {
                     $printer('Return: [' . gettype($return) . ']');
                 }
@@ -459,7 +459,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                     $out[] = 'Processes:';
                     if ($processes) {
                         foreach ($processes as $pid => $process) {
-                            $out[] = "[${pid}] Runtime: " . $process->runtime();
+                            $out[] = "[{$pid}] Runtime: " . $process->runtime();
                         }
                     } else {
                         $out[] = 'None';
@@ -709,7 +709,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                         if (!$this->breakpoint("[{$this->alias} Call {$callId}] Enforcing timeout at runtime: " . $call->runtime(), $callId - 1)) {
                             continue;
                         }
-                        $this->log("Enforcing Timeout on Call ${callId} in pid " . $call->pid);
+                        $this->log("Enforcing Timeout on Call {$callId} in pid " . $call->pid);
                         if ($this->process($call->pid) instanceof CDaemon_Process) {
                             $this->process($call->pid)->kill();
                         }
@@ -940,7 +940,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     public function countError($type) {
         $this->errorCounts[$type]++;
         if ($this->errorCounts[$type] > $this->errorThresholds[$type][(int) $this->service->isParent()]) {
-            $this->fatalError("IPC '${type}' Error Threshold Reached");
+            $this->fatalError("IPC '{$type}' Error Threshold Reached");
         }
     }
 
@@ -1095,7 +1095,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return void
      */
     public function log($message, $indent = 0) {
-        $this->service->log("${message}", $this->alias, $indent);
+        $this->service->log("{$message}", $this->alias, $indent);
     }
 
     /**
@@ -1108,7 +1108,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return void
      */
     public function error($message) {
-        $this->service->error("${message}", $this->alias);
+        $this->service->error("{$message}", $this->alias);
     }
 
     /**
@@ -1122,9 +1122,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      */
     public function fatalError($message) {
         if ($this->service->isParent()) {
-            $this->service->fatalError("Fatal Error: ${message}", $this->alias);
+            $this->service->fatalError("Fatal Error: {$message}", $this->alias);
         } else {
-            $this->service->fatalError("Fatal Error: ${message}\nWorker process will restart", $this->alias);
+            $this->service->fatalError("Fatal Error: {$message}\nWorker process will restart", $this->alias);
         }
     }
 
