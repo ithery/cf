@@ -46,6 +46,7 @@ class Ducktype extends MatcherAbstract
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return '<Ducktype[' . implode(', ', $this->_expected) . ']>';

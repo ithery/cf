@@ -33,26 +33,32 @@ final class ExtensionCollectionIterator implements Countable, Iterator {
         $this->extensions = $extensions->asArray();
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return iterator_count($this);
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind() {
         $this->position = 0;
     }
 
+    #[\ReturnTypeWillChange]
     public function valid() {
         return $this->position < count($this->extensions);
     }
 
+    #[\ReturnTypeWillChange]
     public function key() {
         return $this->position;
     }
 
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->extensions[$this->position];
     }
 
+    #[\ReturnTypeWillChange]
     public function next() {
         $this->position++;
     }

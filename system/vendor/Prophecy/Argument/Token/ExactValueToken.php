@@ -107,6 +107,7 @@ class ExactValueToken implements TokenInterface
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         if (null === $this->string) {

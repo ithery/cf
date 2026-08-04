@@ -158,6 +158,7 @@ final class ExecutionOrderDependency {
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->getTarget();
     }

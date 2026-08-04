@@ -42,10 +42,12 @@ final class TestSuiteCollection implements Countable, IteratorAggregate {
         return $this->testSuites;
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->testSuites);
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new TestSuiteCollectionIterator($this);
     }

@@ -42,10 +42,12 @@ final class TestDirectoryCollection implements Countable, IteratorAggregate {
         return $this->directories;
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->directories);
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new TestDirectoryCollectionIterator($this);
     }

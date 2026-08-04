@@ -33,6 +33,7 @@ class AnyArgs extends MatcherAbstract implements ArgumentListMatcher
     /**
      * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return '<Any Arguments>';

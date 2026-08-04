@@ -57,6 +57,7 @@ class Exception extends RuntimeException implements \PHPUnit\Exception {
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $string = TestFailure::exceptionToString($this);
 

@@ -42,10 +42,12 @@ final class VariableCollection implements Countable, IteratorAggregate {
         return $this->variables;
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->variables);
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new VariableCollectionIterator($this);
     }

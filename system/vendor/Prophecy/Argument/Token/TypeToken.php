@@ -69,6 +69,7 @@ class TypeToken implements TokenInterface
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return sprintf('type(%s)', $this->type);

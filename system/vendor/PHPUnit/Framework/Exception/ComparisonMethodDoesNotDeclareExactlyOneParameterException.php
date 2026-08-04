@@ -30,6 +30,7 @@ final class ComparisonMethodDoesNotDeclareExactlyOneParameterException extends E
         );
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return $this->getMessage() . PHP_EOL;

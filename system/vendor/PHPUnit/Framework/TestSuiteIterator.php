@@ -33,22 +33,27 @@ final class TestSuiteIterator implements RecursiveIterator {
         $this->tests = $testSuite->tests();
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind() {
         $this->position = 0;
     }
 
+    #[\ReturnTypeWillChange]
     public function valid() {
         return $this->position < count($this->tests);
     }
 
+    #[\ReturnTypeWillChange]
     public function key() {
         return $this->position;
     }
 
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->tests[$this->position];
     }
 
+    #[\ReturnTypeWillChange]
     public function next() {
         $this->position++;
     }

@@ -42,10 +42,12 @@ final class IniSettingCollection implements Countable, IteratorAggregate {
         return $this->iniSettings;
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->iniSettings);
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new IniSettingCollectionIterator($this);
     }

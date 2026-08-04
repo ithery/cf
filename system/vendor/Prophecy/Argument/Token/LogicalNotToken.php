@@ -66,6 +66,7 @@ class LogicalNotToken implements TokenInterface
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return sprintf('not(%s)', $this->token);

@@ -141,6 +141,7 @@ class CompositeExpectation implements ExpectationInterface
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         $return = '[';

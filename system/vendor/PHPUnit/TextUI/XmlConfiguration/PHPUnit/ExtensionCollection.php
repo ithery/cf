@@ -40,6 +40,7 @@ final class ExtensionCollection implements IteratorAggregate {
         return $this->extensions;
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new ExtensionCollectionIterator($this);
     }

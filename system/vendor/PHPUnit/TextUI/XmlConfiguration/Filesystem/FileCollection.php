@@ -42,10 +42,12 @@ final class FileCollection implements Countable, IteratorAggregate {
         return $this->files;
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->files);
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new FileCollectionIterator($this);
     }

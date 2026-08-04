@@ -35,6 +35,7 @@ final class Iterator implements RecursiveIterator
     /**
      * Rewinds the Iterator to the first element.
      */
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         $this->position = 0;
@@ -43,6 +44,7 @@ final class Iterator implements RecursiveIterator
     /**
      * Checks if there is a current element after calls to rewind() or next().
      */
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return $this->position < count($this->nodes);
@@ -51,6 +53,7 @@ final class Iterator implements RecursiveIterator
     /**
      * Returns the key of the current element.
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->position;
@@ -59,6 +62,7 @@ final class Iterator implements RecursiveIterator
     /**
      * Returns the current element.
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->valid() ? $this->nodes[$this->position] : null;
@@ -67,6 +71,7 @@ final class Iterator implements RecursiveIterator
     /**
      * Moves forward to next element.
      */
+    #[\ReturnTypeWillChange]
     public function next()
     {
         $this->position++;

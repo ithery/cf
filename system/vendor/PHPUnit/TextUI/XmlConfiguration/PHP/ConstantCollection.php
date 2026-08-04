@@ -42,10 +42,12 @@ final class ConstantCollection implements Countable, IteratorAggregate {
         return $this->constants;
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->constants);
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new ConstantCollectionIterator($this);
     }

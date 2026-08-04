@@ -50,6 +50,7 @@ class Method
     /**
      * @return string|null
      */
+    #[\ReturnTypeWillChange]
     public function getReturnType()
     {
         return Reflector::getReturnType($this->method);

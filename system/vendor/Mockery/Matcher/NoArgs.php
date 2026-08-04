@@ -33,6 +33,7 @@ class NoArgs extends MatcherAbstract implements ArgumentListMatcher
     /**
      * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return '<No Arguments>';

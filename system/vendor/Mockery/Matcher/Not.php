@@ -39,6 +39,7 @@ class Not extends MatcherAbstract
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return '<Not>';

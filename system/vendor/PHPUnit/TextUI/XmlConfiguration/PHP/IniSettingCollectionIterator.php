@@ -33,26 +33,32 @@ final class IniSettingCollectionIterator implements Countable, Iterator {
         $this->iniSettings = $iniSettings->asArray();
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return iterator_count($this);
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind() {
         $this->position = 0;
     }
 
+    #[\ReturnTypeWillChange]
     public function valid() {
         return $this->position < count($this->iniSettings);
     }
 
+    #[\ReturnTypeWillChange]
     public function key() {
         return $this->position;
     }
 
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->iniSettings[$this->position];
     }
 
+    #[\ReturnTypeWillChange]
     public function next() {
         $this->position++;
     }

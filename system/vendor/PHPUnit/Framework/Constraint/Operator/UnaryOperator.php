@@ -66,6 +66,7 @@ abstract class UnaryOperator extends Operator {
     /**
      * Counts the number of constraint elements.
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->constraint);
     }

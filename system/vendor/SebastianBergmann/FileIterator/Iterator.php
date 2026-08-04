@@ -54,6 +54,7 @@ class Iterator extends FilterIterator {
         parent::__construct($iterator);
     }
 
+    #[\ReturnTypeWillChange]
     public function accept() {
         $current = $this->getInnerIterator()->current();
         $filename = $current->getFilename();

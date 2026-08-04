@@ -972,6 +972,7 @@ final class TestResult implements Countable {
     /**
      * Gets the number of run tests.
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return $this->runTests;
     }

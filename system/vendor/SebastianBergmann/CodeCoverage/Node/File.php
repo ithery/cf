@@ -137,6 +137,7 @@ final class File extends AbstractNode
         $this->calculateStatistics($classes, $traits, $functions);
     }
 
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return 1;

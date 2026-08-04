@@ -60,6 +60,7 @@ class StringContainsToken implements TokenInterface
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return sprintf('contains("%s")', $this->value);

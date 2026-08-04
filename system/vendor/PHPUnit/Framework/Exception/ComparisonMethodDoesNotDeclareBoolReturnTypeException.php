@@ -30,6 +30,7 @@ final class ComparisonMethodDoesNotDeclareBoolReturnTypeException extends Except
         );
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return $this->getMessage() . PHP_EOL;

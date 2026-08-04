@@ -47,6 +47,7 @@ final class ExceptionWrapper extends Exception {
         $this->setOriginalException($t);
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $string = TestFailure::exceptionToString($this);
 

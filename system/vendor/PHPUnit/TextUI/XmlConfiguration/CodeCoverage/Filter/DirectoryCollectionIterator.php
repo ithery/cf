@@ -34,31 +34,37 @@ final class DirectoryCollectionIterator implements Countable, Iterator
         $this->directories = $directories->asArray();
     }
 
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return iterator_count($this);
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         $this->position = 0;
     }
 
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return $this->position < count($this->directories);
     }
 
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->position;
     }
 
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return $this->directories[$this->position];
     }
 
+    #[\ReturnTypeWillChange]
     public function next()
     {
         $this->position++;
