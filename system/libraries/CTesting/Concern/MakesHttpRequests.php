@@ -465,13 +465,17 @@ trait CTesting_Concern_MakesHttpRequests {
      * @return CTesting_TestResponse
      */
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null) {
-        // CObserver is a process-wide singleton that tracks rendered element
-        // ids to catch duplicates within one page render; in production it's
-        // implicitly fresh every request (new PHP process), but this test
-        // process handles many simulated requests, so it must be reset here
-        // or the second request to render the same view (e.g. a table id
-        // like "divTable") throws "Object :id is exists" from leftover state.
+        // CObserver and CApp are process-wide singletons; in production
+        // they're implicitly fresh every request (new PHP process), but this
+        // test process handles many simulated requests, so both must be
+        // reset here. CObserver tracks rendered element ids to catch
+        // duplicates within one page render — leftover state throws "Object
+        // :id is exists". CApp::instance() caches one CApp per domain and
+        // accumulates widgets/breadcrumbs/title across requests to the same
+        // domain if not reset, silently serving stale content from a
+        // previous simulated request instead of running the new controller.
         CObserver::reset();
+        CApp::resetInstances();
 
         $kernel = new CHTTP_Kernel();
 

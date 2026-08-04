@@ -509,6 +509,25 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
     }
 
     /**
+     * Buang instance per-domain yang sudah dibuat.
+     *
+     * `instance()` di atas adalah singleton proses (bukan per-request) —
+     * di produksi itu aman karena tiap request PHP-FPM adalah proses baru,
+     * tapi test harness memproses banyak simulasi request dalam satu proses
+     * yang sama (lihat CTesting_Concern_MakesHttpRequests::call(), yang
+     * sudah reset CObserver dengan alasan yang sama). Tanpa reset ini,
+     * widget/breadcrumb/title dari satu simulasi request nempel ke request
+     * berikutnya kalau domain-nya sama. Nama beda dari method instance
+     * `reset()` di bawah (yang cuma bersihin satu instance) — ini buang
+     * semua instance per-domain sekaligus.
+     *
+     * @return void
+     */
+    public static function resetInstances() {
+        self::$instance = null;
+    }
+
+    /**
      * @param bool $bool
      *
      * @return CApp
