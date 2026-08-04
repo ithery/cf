@@ -96,12 +96,13 @@ class EventDispatcherTest extends TestCase {
     public function testAClosureListenerIsCalled() {
         $events = $this->makeDispatcher();
         $seen = [];
-        $events->listen('nama.peristiwa', function ($payload) use (&$seen) {
-            $seen[] = $payload;
+        //muatan disebar menjadi argumen, bukan dioper utuh sebagai larik
+        $events->listen('nama.peristiwa', function ($satu, $dua) use (&$seen) {
+            $seen[] = [$satu, $dua];
         });
-        $events->dispatch('nama.peristiwa', ['muatan']);
+        $events->dispatch('nama.peristiwa', ['muatan', 'kedua']);
 
-        $this->assertSame([['muatan']], $seen);
+        $this->assertSame([['muatan', 'kedua']], $seen);
     }
 
     public function testAnObjectEventIsPassedToItsListener() {
@@ -231,13 +232,20 @@ class EventDispatcherTest extends TestCase {
         $this->assertTrue($events->hasListeners('belum'));
     }
 
-    public function testHasWildcardListenersIsSeparateFromExactOnes() {
+    /**
+     * hasWildcardListeners() mencocokkan polanya, sedangkan hasListeners()
+     * hanya menengok kunci persisnya. Jadi sebuah pendengar `pesanan.*` tidak
+     * membuat hasListeners('pesanan.dibuat') menjawab true, walau peristiwanya
+     * benar-benar akan tersalurkan ke sana. Dicatat apa adanya.
+     */
+    public function testHasWildcardListenersMatchesThePatternButHasListenersDoesNot() {
         $events = $this->makeDispatcher();
         $events->listen('pesanan.*', function () {
         });
 
         $this->assertTrue($events->hasWildcardListeners('pesanan.dibuat'));
-        $this->assertTrue($events->hasListeners('pesanan.dibuat'));
+        $this->assertFalse($events->hasListeners('pesanan.dibuat'));
+        $this->assertTrue($events->hasListeners('pesanan.*'));
     }
 
     public function testAClassNameListenerIsResolvedAndCalled() {
@@ -290,31 +298,34 @@ class EventDispatcherTest extends TestCase {
     }
 
     /**
-     * A pushed listener waits for flush(), which is what lets a request defer
-     * work until a known point instead of firing it immediately.
+     * push() menunda **peristiwanya**, bukan mendaftarkan pendengar: ia
+     * menerima muatan, dan baru flush() yang menyalurkannya. Itu yang membuat
+     * sebuah permintaan dapat menahan pekerjaan sampai titik yang diketahui.
      */
-    public function testAPushedListenerOnlyRunsOnFlush() {
+    public function testAPushedEventOnlyFiresOnFlush() {
         $events = $this->makeDispatcher();
-        $fired = 0;
-        $events->push('tunda', function () use (&$fired) {
-            $fired++;
+        $seen = [];
+        $events->listen('tunda', function ($nilai) use (&$seen) {
+            $seen[] = $nilai;
         });
-        $this->assertSame(0, $fired);
+        $events->push('tunda', ['muatan']);
+        $this->assertSame([], $seen);
 
         $events->flush('tunda');
-        $this->assertSame(1, $fired);
+        $this->assertSame(['muatan'], $seen);
     }
 
-    public function testForgetPushedDropsThePendingListeners() {
+    public function testForgetPushedDropsThePendingEvents() {
         $events = $this->makeDispatcher();
-        $fired = 0;
-        $events->push('tunda', function () use (&$fired) {
-            $fired++;
+        $seen = [];
+        $events->listen('tunda', function ($nilai) use (&$seen) {
+            $seen[] = $nilai;
         });
+        $events->push('tunda', ['muatan']);
         $events->forgetPushed();
         $events->flush('tunda');
 
-        $this->assertSame(0, $fired);
+        $this->assertSame([], $seen);
     }
 
     public function testASubscriberRegistersItsOwnListeners() {
