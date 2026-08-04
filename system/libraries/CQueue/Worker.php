@@ -305,18 +305,36 @@ class CQueue_Worker {
      * @return void
      */
     public function runNextJob($connectionName, $queue, CQueue_WorkerOptions $options) {
+        // Async signals have to be enabled here too, not only in daemon(). Without them
+        // the alarm below is delivered but never dispatched, because dispatching would
+        // take a pcntl_signal_dispatch() call that a frozen job never reaches.
+        if ($supportsAsyncSignals = $this->supportsAsyncSignals()) {
+            pcntl_async_signals(true);
+        }
         $job = $this->getNextJob(
             $this->manager->connection($connectionName),
             $queue
         );
-
-        // If we're able to pull a job off of the stack, we will process it and then return
-        // from this method. If there is no job on the queue, we will "sleep" the worker
-        // for the specified number of seconds, then keep processing jobs after sleep.
-        if ($job) {
-            return $this->runJob($job, $connectionName, $options);
+        if ($supportsAsyncSignals) {
+            $this->registerTimeoutHandler($job, $options);
         }
-        $this->sleep($options->sleep);
+
+        try {
+            // If we're able to pull a job off of the stack, we will process it and then return
+            // from this method. If there is no job on the queue, we will "sleep" the worker
+            // for the specified number of seconds, then keep processing jobs after sleep.
+            if ($job) {
+                return $this->runJob($job, $connectionName, $options);
+            }
+            $this->sleep($options->sleep);
+        } finally {
+            // Unlike daemon(), this method returns to a caller that keeps running, so a
+            // pending alarm left behind would fire later during unrelated work and kill
+            // that process.
+            if ($supportsAsyncSignals) {
+                $this->resetTimeoutHandler();
+            }
+        }
     }
 
     /**
