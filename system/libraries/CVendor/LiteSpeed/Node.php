@@ -61,23 +61,69 @@ class CVendor_LiteSpeed_Node {
 
     const FLD_PRINTKEY = 11;
 
+    /**
+     * Salah satu konstanta `T_*`, dikombinasikan dengan bitmask `BM_*`.
+     *
+     * @var int
+     */
     private $type = self::T_KV;
 
+    /**
+     * Kunci ternormalisasi — huruf kecil, alias sudah disulih. Dipakai untuk
+     * pencocokan, bukan untuk ditampilkan.
+     *
+     * @var string
+     */
     private $k;
 
+    /**
+     * Kunci sebagaimana tertulis di berkas, sebelum penyulihan alias.
+     *
+     * @var null|string
+     */
     private $rawK;
 
+    /**
+     * Kunci yang dipakai saat menulis berkas kembali.
+     *
+     * @var null|string
+     */
     private $printK;
 
-    private $v = null; //value
+    /**
+     * Nilai simpul. Blok tanpa parameter bernilai kosong.
+     *
+     * @var null|string
+     */
+    private $v = null;
 
-    private $rawContent = null; // raw content
+    /**
+     * Isi mentah untuk simpul bertipe `T_RAW`.
+     *
+     * @var null|string
+     */
+    private $rawContent = null;
 
+    /**
+     * Penanda pembuka/penutup heredoc, mis. `END_rules`.
+     *
+     * @var null|string
+     */
     private $rawTag = null;
 
-    private $e = null; //err
+    /**
+     * Pesan galat penguraian, bila ada.
+     *
+     * @var null|string
+     */
+    private $e = null;
 
-    private $errLevel = 0; //  1-Warning, 2-fatal
+    /**
+     * 0 tanpa galat, 1 peringatan, 2 fatal.
+     *
+     * @var int
+     */
+    private $errLevel = 0;
 
     /**
      * @var null|CVendor_LiteSpeed_Node
@@ -85,16 +131,27 @@ class CVendor_LiteSpeed_Node {
     private $parent = null;
 
     /**
-     * @var CVendor_LiteSpeed_Node_FileLine
+     * Berkas dan rentang baris asal simpul ini.
+     *
+     * @var null|CVendor_LiteSpeed_Node_FileLine
      */
     private $fileline;
 
+    /**
+     * Apakah simpul berubah sejak dibaca dan perlu ditulis ulang.
+     *
+     * @var bool
+     */
     private $changed;
 
     /**
-     * @var CVendor_LiteSpeed_Node[]
+     * Anak langsung, berkunci nama ternormalisasi. Nilainya sebuah simpul bila
+     * kuncinya muncul sekali, dan **larik simpul** bila muncul lebih dari
+     * sekali — pakai `getChildList()` agar tidak perlu membedakannya.
+     *
+     * @var null|array<string, CVendor_LiteSpeed_Node|CVendor_LiteSpeed_Node[]>
      */
-    private $els;  // elements
+    private $els;
 
     public function __construct($key, $val, $type = self::T_KV) {
         $this->rawK = $key;
@@ -134,6 +191,29 @@ class CVendor_LiteSpeed_Node {
         return $this->get(self::FLD_KEY);
     }
 
+    /**
+     * Kunci sebagaimana tertulis di berkas, lengkap dengan kapitalisasinya.
+     *
+     * `getKey()` mengembalikan bentuk ternormalisasi — seluruhnya huruf kecil —
+     * yang benar untuk pencocokan tetapi salah untuk ditampilkan: pembaca
+     * mengenali `docRoot` dan `keyFile`, bukan `docroot` dan `keyfile`, dan
+     * dokumentasi LiteSpeed pun menulisnya begitu.
+     *
+     * @return string
+     */
+    public function getPrintKey() {
+        return $this->printK == null ? (string) $this->k : (string) $this->printK;
+    }
+
+    /**
+     * Kunci asli sebelum penyulihan alias.
+     *
+     * @return string
+     */
+    public function getRawKey() {
+        return $this->rawK == null ? (string) $this->k : (string) $this->rawK;
+    }
+
     public function get($field) {
         switch ($field) {
             case self::FLD_KEY:
@@ -150,8 +230,15 @@ class CVendor_LiteSpeed_Node {
                 return ($this->fileline == null) ? '' : $this->fileline->fline0;
             case self::FLD_FLTO:
                 return ($this->fileline == null) ? '' : $this->fileline->fline1;
+            case self::FLD_TYPE:
+                return $this->type;
+            case self::FLD_ELM:
+                return $this->els;
         }
-        die("field ${field} not supported");
+
+        //sebelumnya `die()` — sebuah pustaka yang menghentikan seluruh permintaan
+        //membuat kesalahan pemanggil tidak dapat ditangani maupun diuji
+        throw new InvalidArgumentException('field ' . $field . ' not supported');
     }
 
     public function set($field, $fieldval) {
@@ -392,6 +479,75 @@ class CVendor_LiteSpeed_Node {
         $child = $this->getChildren($key);
 
         return ($child == null || !($child instanceof CVendor_LiteSpeed_Node)) ? null : $child->v;
+    }
+
+    /**
+     * Kunci seluruh anak langsung.
+     *
+     * @return string[]
+     */
+    public function getChildKeyList() {
+        return $this->els == null ? [] : array_keys($this->els);
+    }
+
+    /**
+     * Seluruh anak langsung sebagai daftar rata.
+     *
+     * `getChildren()` mengembalikan satu simpul bila kuncinya muncul sekali dan
+     * **larik** bila muncul lebih dari sekali, sehingga setiap pemanggil harus
+     * memeriksa bentuknya sendiri — dan yang lupa memeriksa akan diam-diam
+     * kehilangan seluruh kemunculan kecuali yang pertama. Yang ini selalu
+     * mengembalikan daftar.
+     *
+     * Tanpa penelusur seperti ini, sebuah tampilan hanya dapat menyebut kunci
+     * yang sudah diketahui penulisnya lebih dulu, padahal berkas konfigurasi
+     * LiteSpeed ditulis oleh banyak panel berbeda dan kunci yang tidak terduga
+     * justru sering yang sedang dicari.
+     *
+     * @param string $key kosong berarti seluruh kunci
+     *
+     * @return CVendor_LiteSpeed_Node[]
+     */
+    public function getChildList($key = '') {
+        if ($this->els == null) {
+            return [];
+        }
+
+        $source = $this->els;
+        if (strlen((string) $key) > 0) {
+            $key = strtolower($key);
+            if (!isset($this->els[$key])) {
+                return [];
+            }
+            $source = [$key => $this->els[$key]];
+        }
+
+        $list = [];
+        foreach ($source as $element) {
+            if ($element instanceof CVendor_LiteSpeed_Node) {
+                $list[] = $element;
+
+                continue;
+            }
+            if (is_array($element)) {
+                foreach ($element as $child) {
+                    if ($child instanceof CVendor_LiteSpeed_Node) {
+                        $list[] = $child;
+                    }
+                }
+            }
+        }
+
+        return $list;
+    }
+
+    /**
+     * Apakah simpul ini sebuah blok — punya anak, bukan sekadar nilai.
+     *
+     * @return bool
+     */
+    public function isBlock() {
+        return $this->els != null && count($this->els) > 0;
     }
 
     public function setChildVal($key, $val) {

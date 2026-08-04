@@ -26,6 +26,11 @@ class CServer_WebServer {
     protected $server;
 
     /**
+     * @var null|CServer_WebServer_LiteSpeed
+     */
+    protected $liteSpeed;
+
+    /**
      * @param CServer_Server $server
      */
     public function __construct(CServer_Server $server) {
@@ -220,13 +225,13 @@ class CServer_WebServer {
      */
     public function getVirtualHostList($type) {
         if ($type == self::TYPE_LITESPEED) {
-            $output = $this->run('for d in /usr/local/lsws/conf/vhosts/*/; do '
-                . '  n=$(basename "$d"); '
-                . '  dom=$(grep -m1 "^vhDomain" "$d/vhconf.conf" 2>/dev/null | awk \'{print $2}\'); '
-                . '  root=$(grep -m1 "^docRoot" "$d/vhconf.conf" 2>/dev/null | awk \'{print $2}\'); '
-                . '  echo "$n|$dom|$root"; '
-                . 'done');
-        } elseif ($type == self::TYPE_NGINX) {
+            //dibaca dari httpd_config.conf, bukan dari isi direktori: `conf/vhosts/*`
+            //memuat juga vhost yang sudah dicabut dari konfigurasi, sekaligus
+            //melewatkan yang berkas konfigurasinya berada di luar direktori itu
+            return $this->liteSpeed()->getVirtualHostSummaryList();
+        }
+
+        if ($type == self::TYPE_NGINX) {
             $output = $this->run('for f in /etc/nginx/sites-enabled/* /etc/nginx/conf.d/*.conf; do '
                 . '  [ -f "$f" ] || continue; '
                 . '  n=$(basename "$f"); '
@@ -253,5 +258,96 @@ class CServer_WebServer {
         }
 
         return $list;
+    }
+
+    /**
+     * Nama vhost yang aman dipakai menyusun jalur berkas.
+     *
+     * Namanya datang dari segmen URL, sedangkan ia dipakai membentuk perintah
+     * shell — jadi penyaringannya daftar-putih, bukan daftar-hitam. Titik
+     * diizinkan karena nama vhost lazimnya sebuah domain, tetapi `..` ditolak
+     * tersendiri supaya izin itu tidak berubah menjadi jalan naik direktori.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public static function isValidVirtualHostName($name) {
+        $name = (string) $name;
+        if (strlen($name) == 0 || strlen($name) > 255) {
+            return false;
+        }
+        if (strpos($name, '..') !== false) {
+            return false;
+        }
+
+        return (bool) preg_match('/^[A-Za-z0-9._-]+$/', $name);
+    }
+
+    /**
+     * Pembantu khusus LiteSpeed.
+     *
+     * @return CServer_WebServer_LiteSpeed
+     */
+    public function liteSpeed() {
+        if ($this->liteSpeed === null) {
+            $this->liteSpeed = new CServer_WebServer_LiteSpeed($this->server);
+        }
+
+        return $this->liteSpeed;
+    }
+
+    /**
+     * Konfigurasi satu virtual host, mentah sekaligus terurai.
+     *
+     * Untuk LiteSpeed seluruhnya diserahkan ke `CServer_WebServer_LiteSpeed`,
+     * yang menemukan `configFile` sesungguhnya lewat `httpd_config.conf`
+     * alih-alih menebaknya dari nama vhost. Bedanya bukan kerapian: vhost yang
+     * berkas konfigurasinya berada di luar `conf/vhosts/<nama>/` — lazim pada
+     * pemasangan yang diatur panel — tidak akan pernah ketemu bila ditebak.
+     *
+     * @param string $type
+     * @param string $name
+     *
+     * @return null|array
+     */
+    public function getVirtualHost($type, $name) {
+        if (!self::isValidVirtualHostName($name)) {
+            return null;
+        }
+
+        if ($type == self::TYPE_LITESPEED) {
+            $vhost = $this->liteSpeed()->getVirtualHost($name);
+            if ($vhost == null) {
+                return null;
+            }
+
+            return carr::merge($vhost, [
+                'type' => (string) $type,
+                'path' => (string) carr::get($vhost, 'configPath'),
+                'readable' => carr::get($vhost, 'state') == 'ok',
+            ]);
+        }
+
+        if ($type != self::TYPE_NGINX) {
+            return null;
+        }
+
+        $path = '/etc/nginx/sites-enabled/' . $name;
+        $file = (new CServer_WebServer_LiteSpeed($this->server))->readFile($path);
+        $state = (string) carr::get($file, 'state');
+        if ($state == 'missing') {
+            return null;
+        }
+
+        return [
+            'name' => (string) $name,
+            'type' => (string) $type,
+            'path' => $path,
+            'state' => $state,
+            'readable' => $state == 'ok',
+            'raw' => (string) carr::get($file, 'content'),
+            'data' => null,
+        ];
     }
 }
