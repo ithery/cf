@@ -14,16 +14,15 @@ Create `default/data/down.php` in the application and return an array:
 return [
     'down' => true,
     'view' => 'system.maintenance',
-    'cookie' => 'bypass-maintenance',
+    'secret' => c::env('MAINTENANCE_SECRET', ''),
 ];
 ```
 
 Set `down` back to `false` to bring the application up again. The file may be left in place
 permanently — it is the `down` key that decides, not the presence of the file.
 
-> **A file that returns an array without a `down` key puts the application into maintenance
-> mode.** The key defaults to `true` when it is missing, so an incomplete file takes the site
-> offline rather than leaving it up. Always write the key explicitly.
+A file that is missing the `down` key, or that does not return an array at all, leaves the
+application **up**. A mistake in this file should not cost downtime.
 
 ## Configuration keys
 
@@ -35,7 +34,7 @@ Whether the application is offline.
 'down' => true,
 ```
 
-Defaults to `true` when the key is absent. When `false`, no other key is read.
+Defaults to `false` when the key is absent. When `false`, no other key is read.
 
 ### view
 
@@ -65,6 +64,37 @@ return [
 Point `view` at your own view, or override `system/views/system/maintenance.blade.php`, to
 change the page.
 
+### secret
+
+A random token that turns a URL into a bypass link, so a developer can check the application
+while it is closed to everyone else.
+
+```php
+'secret' => c::env('MAINTENANCE_SECRET', ''),
+```
+
+Opening `https://your-site/{secret}` once sets a cookie and redirects to the home page. That
+browser then sees the application normally for 12 hours; every other visitor keeps getting the
+maintenance page.
+
+```
+https://example.com/a7f3c9e21b4d5680
+```
+
+**The cookie's value is compared against the secret**, using a timing-safe comparison — unlike
+the legacy `cookie` key below, where only the presence of a cookie is checked.
+
+Read it from `env.php` rather than writing it into the file. It is a credential, and a
+credential committed to a repository stops being secret the moment someone reads the code.
+Generate a fresh one per incident:
+
+```
+php -r 'echo bin2hex(random_bytes(16)), "\n";'
+```
+
+Leave it empty when no bypass link should exist. An empty secret never matches a request path,
+so it cannot accidentally open the site.
+
 ### cookie
 
 The name of a cookie that bypasses maintenance mode, so the site stays reachable for whoever
@@ -74,11 +104,14 @@ is doing the work.
 'cookie' => 'bypass-maintenance',
 ```
 
-**Only the presence of the cookie is checked, not its value.** Any value — including an empty
-one — lets the request through, so treat the cookie name itself as the secret and pick
-something that cannot be guessed.
+> This is the older mechanism, kept so existing configurations keep working. Prefer `secret`.
 
-Omit the key entirely when no bypass should exist.
+**Only the presence of the cookie is checked, not its value.** Any value — including an empty
+one — lets the request through, so the cookie *name* is the secret. That is the weakness:
+a name cannot be rotated per incident, is usually identical across applications, and is
+normally committed to the repository.
+
+Omit the key entirely when no bypass should exist. Read it from `env.php` when it is used.
 
 Setting the bypass cookie in the browser console:
 
