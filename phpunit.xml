@@ -4,6 +4,9 @@
          bootstrap="./system/core/Bootstrap.php"
          colors="true"
 >
+    <extensions>
+        <extension class="AfterEachTestHook" file="./tests/AfterEachTestHook.php"/>
+    </extensions>
     <testsuites>
         <testsuite name="Framework">
             <directory suffix="Test.php">./tests</directory>

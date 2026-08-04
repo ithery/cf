@@ -2,10 +2,13 @@
 use Mockery as m;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 // @codingStandardsIgnoreStart
 class cTest extends TestCase {
     // @codingStandardsIgnoreEnd
+
+    use MockeryPHPUnitIntegration;
 
     /**
      * @return void
