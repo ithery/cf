@@ -96,18 +96,27 @@ class CServer_Cf {
             . '     | grep -oE "[0-9]+\\.[0-9]+(\\.[0-9]+)?"); '
             . 'echo "VERSION|$v"; '
             . 'echo "FINGERPRINT|$(md5sum "$root/system/core/CF.php" 2>/dev/null | cut -c1-12)"; '
+            //`safe.directory` wajib: sejak git 2.35 sebuah repo yang pemiliknya
+            //berbeda dari pengguna yang menjalankan git ditolak dengan
+            //"detected dubious ownership". Devcloud lazim menyambung sebagai
+            //root ke docroot milik pengguna aplikasi, jadi tanpa ini cabang dan
+            //commit **selalu** kosong — dan kosong terbaca sebagai "bukan repo",
+            //bukan sebagai "tidak boleh dibaca". Dikutip ganda supaya `*` tidak
+            //dimekarkan shell menjadi daftar berkas.
+            . 'g="git -c safe.directory=\"*\""; '
             . 'if [ -d "$root/.git" ]; then '
-            . '  echo "BRANCH|$(cd "$root" && git rev-parse --abbrev-ref HEAD 2>/dev/null)"; '
-            . '  echo "COMMIT|$(cd "$root" && git rev-parse --short HEAD 2>/dev/null)"; '
-            . '  echo "COMMITDATE|$(cd "$root" && git log -1 --format=%cd --date=short 2>/dev/null)"; '
+            . '  echo "BRANCH|$(cd "$root" && $g rev-parse --abbrev-ref HEAD 2>/dev/null)"; '
+            . '  echo "COMMIT|$(cd "$root" && $g rev-parse --short HEAD 2>/dev/null)"; '
+            . '  echo "COMMITDATE|$(cd "$root" && $g log -1 --format=%cd --date=short 2>/dev/null)"; '
             . 'fi; '
             . 'for d in "$root"/application/*/; do '
             . '  [ -d "$d" ] || continue; '
+            . '  d=${d%/}; '
             . '  n=$(basename "$d"); '
             . '  b=""; c=""; '
             . '  if [ -d "$d/.git" ]; then '
-            . '    b=$(cd "$d" && git rev-parse --abbrev-ref HEAD 2>/dev/null); '
-            . '    c=$(cd "$d" && git rev-parse --short HEAD 2>/dev/null); '
+            . '    b=$(cd "$d" && $g rev-parse --abbrev-ref HEAD 2>/dev/null); '
+            . '    c=$(cd "$d" && $g rev-parse --short HEAD 2>/dev/null); '
             . '  fi; '
             . '  echo "APP|$n|$([ -f "$d/bootstrap.php" ] && echo 1 || echo 0)|$b|$c"; '
             . 'done';
