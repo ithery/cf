@@ -3,7 +3,6 @@
 class CVendor_Kataai {
     public static function api($options = []) {
         $client = new CVendor_Kataai_Client($options);
-
         return new CVendor_Kataai_Api($client);
     }
 
