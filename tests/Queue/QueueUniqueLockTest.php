@@ -8,6 +8,12 @@ class QueueUniqueLockTestJob {
 class QueueUniqueLockTestOtherJob {
 }
 
+class QueueUniqueLockTestScopedA {
+}
+
+class QueueUniqueLockTestScopedB {
+}
+
 class QueueUniqueLockTestJobWithProperty {
     /**
      * @var string
@@ -48,10 +54,10 @@ class QueueUniqueLockTest extends TestCase {
     protected $cache;
 
     protected function setUp() {
-        //penyimpan array dipakai bersama sepanjang proses, jadi kunci yang
-        //ditinggalkan satu test akan menolak test berikutnya
+        //penyimpan array dipakai bersama sepanjang proses, dan flush() tidak
+        //melepas kunci -- lihat catatan di TODO framework. Karena itu tiap test
+        //memakai kelas job sendiri alih-alih mengandalkan penyiraman.
         $this->cache = CCache::manager()->driver('array');
-        $this->cache->flush();
     }
 
     /**
@@ -90,8 +96,8 @@ class QueueUniqueLockTest extends TestCase {
     public function testTwoDifferentJobClassesDoNotBlockEachOther() {
         $lock = $this->makeLock();
 
-        $this->assertTrue($lock->acquire(new QueueUniqueLockTestJob()));
-        $this->assertTrue($lock->acquire(new QueueUniqueLockTestOtherJob()));
+        $this->assertTrue($lock->acquire(new QueueUniqueLockTestScopedA()));
+        $this->assertTrue($lock->acquire(new QueueUniqueLockTestScopedB()));
     }
 
     /**
@@ -131,8 +137,8 @@ class QueueUniqueLockTest extends TestCase {
 
     public function testReleasingIsSafeEvenWhenNothingWasAcquired() {
         $lock = $this->makeLock();
-        $lock->release(new QueueUniqueLockTestJob());
+        $lock->release(new QueueUniqueLockTestOtherJob());
 
-        $this->assertTrue($lock->acquire(new QueueUniqueLockTestJob()));
+        $this->assertTrue($lock->acquire(new QueueUniqueLockTestOtherJob()));
     }
 }
