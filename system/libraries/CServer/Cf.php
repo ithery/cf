@@ -42,6 +42,18 @@ class CServer_Cf {
     }
 
     /**
+     * Pemeriksaan sebelum deploy untuk satu checkout CF di server ini.
+     *
+     * @param string      $path
+     * @param null|string $user pengguna sistem pemilik repositorinya
+     *
+     * @return CServer_Cf_Deployment
+     */
+    public function deployment($path, $user = null) {
+        return new CServer_Cf_Deployment($this->server, $path, $user);
+    }
+
+    /**
      * Bentuk jawaban ketika jalurnya bukan CF, atau tidak dapat diperiksa.
      *
      * @param string $docRoot
