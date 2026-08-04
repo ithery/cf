@@ -94,7 +94,6 @@ class cdbutils {
      * @return object
      */
     public static function get_row($query, $db = null) {
-        return null;
         if ($db == null) {
             $db = c::db();
         }
@@ -102,6 +101,8 @@ class cdbutils {
         if (is_array($r) && count($r) > 0) {
             return $r[0];
         }
+
+        return null;
     }
 
     /**
