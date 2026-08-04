@@ -75,7 +75,10 @@ class CServer_Cf_Deployment {
     protected function runSections(array $commandList) {
         $script = '';
         foreach ($commandList as $label => $command) {
-            $script .= 'echo "' . self::SECTION . $label . '"; ' . $command . ' 2>/dev/null; ';
+            //`echo` penutup wajib: `git log --pretty=format:` tidak mengakhiri
+            //keluarannya dengan baris baru, sehingga penanda bagian berikutnya
+            //menempel pada subjek commit terakhir dan seluruh pembagiannya bergeser
+            $script .= 'echo "' . self::SECTION . $label . '"; ' . $command . ' 2>/dev/null; echo ""; ';
         }
 
         $output = (string) $this->server->runCommand($this->wrap($script));
