@@ -224,6 +224,14 @@ final class CQueue {
         return CF::config('queue.' . $config, $default);
     }
 
+    /**
+     * Get the primary key for the queue.
+     *
+     * @param \CDatabase_Connection $database
+     * @param string                $table
+     *
+     * @return string
+     */
     public static function primaryKey(CDatabase_Connection $database, $table) {
         $driverName = $database->getConfig('driver');
 

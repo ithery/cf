@@ -125,6 +125,13 @@ class CDaemon {
         }
     }
 
+    /**
+     * Handle an exception that occurs within the daemon.
+     *
+     * @param Exception $e
+     *
+     * @return void
+     */
     public static function handleException($e) {
         CDaemon_ErrorHandler::daemonException($e);
     }

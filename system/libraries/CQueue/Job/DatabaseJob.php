@@ -28,12 +28,6 @@ class CQueue_Job_DatabaseJob extends CQueue_AbstractJob {
      *
      * @return void
      */
-
-    /**
-     * The database primary Key.
-     *
-     * @var \stdClass
-     */
     public function __construct(CContainer_Container $container, CQueue_Queue_DatabaseQueue $database, $job, $connectionName, $queue) {
         $this->job = $job;
         $this->queue = $queue;
