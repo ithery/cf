@@ -240,12 +240,26 @@ class CServer_WebServer_LiteSpeed {
 
         $list = [];
         foreach ($config->getRootNode()->getChildList('listener') as $node) {
-            //kunci `map` disimpan ternormalisasi sebagai `vhmap`, dan nilainya
-            //sudah berupa nama vhost saja — daftar domain di belakangnya tidak
-            //ikut disimpan pengurai
+            //`CVendor_LiteSpeed_Data::afterRead()` memekarkan tiap baris
+            //`map <vhost> <domain, domain>` menjadi simpul `vhmap` beranak
+            //`vhost` dan `domain`, lalu **membuang** simpul `map` aslinya —
+            //jadi mencari `map` di sini selalu berakhir kosong. Bentuk `map`
+            //tetap dicoba sebagai cadangan untuk konfigurasi yang belum
+            //melewati afterRead().
             $map = [];
+            foreach ($node->getChildList('vhmap') as $mapNode) {
+                $map[] = [
+                    'vhost' => (string) $mapNode->getChildVal('vhost') ?: (string) $mapNode->getVal(),
+                    'domain' => (string) $mapNode->getChildVal('domain'),
+                ];
+            }
             foreach ($node->getChildList('map') as $mapNode) {
-                $map[] = (string) $mapNode->getVal();
+                $value = (string) $mapNode->getVal();
+                $position = strpos($value, ' ');
+                $map[] = [
+                    'vhost' => $position === false ? $value : substr($value, 0, $position),
+                    'domain' => $position === false ? '' : trim(substr($value, $position + 1)),
+                ];
             }
 
             //`address` berbentuk `ip:port`. Pengurai juga memekarkannya menjadi
@@ -362,10 +376,8 @@ class CServer_WebServer_LiteSpeed {
         $list = [];
         foreach ($this->getListenerList() as $listener) {
             foreach (carr::get($listener, 'map', []) as $map) {
-                //bentuknya `namaVhost domain1, domain2`
-                $part = preg_split('/\s+/', trim((string) $map), 2);
-                if ((string) carr::get($part, 0) === (string) $name) {
-                    $listener['domain'] = trim((string) carr::get($part, 1, ''));
+                if ((string) carr::get($map, 'vhost') === (string) $name) {
+                    $listener['domain'] = (string) carr::get($map, 'domain');
                     $list[] = $listener;
 
                     break;
