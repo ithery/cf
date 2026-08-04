@@ -1212,49 +1212,18 @@ final class CF {
         static::$internalCache = [];
     }
 
-    /**
-     * Nama cookie yang menyimpan token bypass maintenance.
-     */
     const MAINTENANCE_COOKIE = 'cf_maintenance_bypass';
 
-    /**
-     * Aplikasi hidup; tidak ada yang perlu dilakukan.
-     */
     const MAINTENANCE_UP = 'up';
 
-    /**
-     * Aplikasi tutup dan pemanggilnya tidak berhak menembus.
-     */
     const MAINTENANCE_DOWN = 'down';
 
-    /**
-     * Pemanggilnya sudah memegang izin menembus.
-     */
     const MAINTENANCE_BYPASS = 'bypass';
 
-    /**
-     * Pemanggilnya membuka tautan rahasia dan harus diberi cookie izinnya.
-     */
     const MAINTENANCE_GRANT = 'grant';
 
     /**
-     * Apakah permintaan ini harus dijawab halaman maintenance.
-     *
-     * Mengembalikan `false` bila aplikasi hidup atau bila pemanggilnya berhak
-     * menembus; selain itu mengembalikan response yang harus dikirim apa adanya.
-     *
-     * Ada dua cara menembus, dan keduanya sengaja dipertahankan:
-     *
-     * 1. **Tautan rahasia.** `down.php` menyimpan `secret`; membuka
-     *    `https://situs/{secret}` memasang cookie lalu mengalihkan ke beranda,
-     *    dan sejak itu peramban tersebut melihat situs seperti biasa. Ini yang
-     *    dianjurkan — rahasianya acak per-insiden, dapat dikirim sebagai
-     *    tautan, dan **nilai** cookie-nya yang diperiksa.
-     * 2. **Kehadiran cookie bernama tertentu** lewat kunci `cookie`. Bentuk
-     *    lama, dipertahankan supaya konfigurasi yang sudah ada tidak patah.
-     *    Kelemahannya nyata: yang diperiksa hanya keberadaan cookie, sehingga
-     *    **nama** cookie itulah rahasianya — dan nama tidak berumur pendek,
-     *    tidak dapat diacak per-insiden, dan lazimnya sama di banyak aplikasi.
+     * Determine if the application is down for maintenance.
      *
      * @return false|CHTTP_Response
      */
@@ -1265,27 +1234,14 @@ final class CF {
         }
 
         $data = @include $file;
-        if (!is_array($data)) {
-            return false;
-        }
-
-        //bawaannya HIDUP. Berkas yang tidak lengkap atau salah ketik tidak boleh
-        //menjatuhkan aplikasi — kesalahan menulis konfigurasi seharusnya tidak
-        //berbiaya downtime
-        if (!carr::get($data, 'down', false)) {
-            return false;
-        }
-
         $request = CHTTP::request();
         $decision = self::maintenanceDecision($data, (string) $request->path(), (array) $request->cookie());
 
-        if ($decision == self::MAINTENANCE_BYPASS) {
+        if ($decision == self::MAINTENANCE_UP || $decision == self::MAINTENANCE_BYPASS) {
             return false;
         }
 
         if ($decision == self::MAINTENANCE_GRANT) {
-            //membuka tautan rahasianya memasang cookie lalu mengalihkan, supaya
-            //tautan itu cukup dibuka sekali dan tidak perlu diulang tiap halaman
             return c::redirect(curl::base())->withCookie(
                 CHTTP::cookie()->make(self::MAINTENANCE_COOKIE, (string) carr::get($data, 'secret'), 60 * 12)
             );
@@ -1295,18 +1251,13 @@ final class CF {
     }
 
     /**
-     * Keputusan maintenance, dipisahkan dari HTTP supaya dapat diuji.
+     * Resolve the maintenance decision from configuration and request values.
      *
-     * Yang masuk hanya nilai: konfigurasi, jalur permintaan, dan cookie. Tidak
-     * ada request, response, maupun berkas — sehingga seluruh cabangnya dapat
-     * diperiksa tanpa server, dan `isDownForMaintenance()` tinggal
-     * menerjemahkan hasilnya menjadi response.
+     * @param mixed  $data   contents of `down.php`
+     * @param string $path   request path
+     * @param array  $cookie request cookies
      *
-     * @param array  $data   isi `down.php`
-     * @param string $path   jalur permintaan, tanpa garis miring di ujung
-     * @param array  $cookie cookie permintaan, nama => nilai
-     *
-     * @return string salah satu konstanta `MAINTENANCE_*`
+     * @return string one of the `MAINTENANCE_*` constants
      */
     public static function maintenanceDecision($data, $path, array $cookie = []) {
         if (!is_array($data) || !carr::get($data, 'down', false)) {
@@ -1325,7 +1276,6 @@ final class CF {
             }
         }
 
-        //bentuk lama: keberadaan cookie bernama tertentu, nilainya tidak diperiksa
         $legacy = (string) carr::get($data, 'cookie', '');
         if (strlen($legacy) > 0 && array_key_exists($legacy, $cookie)) {
             return self::MAINTENANCE_BYPASS;
