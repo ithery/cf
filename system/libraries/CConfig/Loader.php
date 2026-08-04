@@ -11,7 +11,6 @@ class CConfig_Loader {
      * @deprecated since 1.7 Config is loaded all from bootstrap
      */
     public static function load($configName) {
-        cdbg::dd(cdbg::getTraceString());
         $items = [];
         $files = CF::findFile('config', $configName, $required = false, $ext = false, $refresh = true);
 

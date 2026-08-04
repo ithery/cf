@@ -42,6 +42,20 @@ class CConfig implements Arrayable, ArrayAccess {
         return $this;
     }
 
+    /**
+     * Reload this group from its files.
+     *
+     * Kept for applications carrying it over from 1.6, where configuration was
+     * read lazily per group. Here everything is already loaded at boot, so the
+     * call is a reload rather than a first read -- harmless, and no longer a
+     * fatal for an application that still asks for it.
+     *
+     * @return void
+     */
+    public function refresh() {
+        self::manager()->load($this->group);
+    }
+
     public function get($key = null, $default = null) {
         $configKey = $key ? $this->group . '.' . $key : $this->group;
 
