@@ -111,6 +111,17 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     protected $pidFile = null;
 
     /**
+     * Whether this process is the one registered in the pid file.
+     *
+     * Only the owner may remove it on shutdown. Without this, a start that
+     * failed after claiming the file deleted the registration of the daemon
+     * that was already running.
+     *
+     * @var bool
+     */
+    protected $pidFileOwned = false;
+
+    /**
      * @var bool
      */
     protected $stdout = false;
@@ -375,7 +386,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $this->fatalError(sprintf('Exception Thrown in Shutdown: %s [file] %s [line] %s%s%s', $e->getMessage(), $e->getFile(), $e->getLine(), PHP_EOL, $e->getTraceAsString()));
         }
         $this->callbacks = [];
-        if ($this->parent && $this->pidFile && file_exists($this->pidFile) && file_get_contents($this->pidFile) == $this->pid) {
+        if ($this->parent && $this->pidFileOwned && $this->pidFile && file_exists($this->pidFile) && file_get_contents($this->pidFile) == $this->pid) {
             $this->log('Unlink PID:' . $this->pidFile);
             unlink($this->pidFile);
         }
@@ -400,12 +411,26 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $this->pid(getmypid()); // We have a new pid now
             $pidFile = $this->pidFile;
 
+            // The pid file must not be taken from a daemon of the same class that
+            // is still running. It used to be claimed here before anything checked
+            // whether this process could run at all, so an instance that went on to
+            // fail -- a socket daemon whose port was already bound, say -- first
+            // overwrote the incumbent's registration and then deleted it on the way
+            // out. Its supervisor then read an empty pid file, concluded the daemon
+            // was down, and started another doomed instance, over and over.
+            if ($this->isPidFileHeldByLiveInstance()) {
+                $this->log('Already running with PID ' . $this->getPidFromPidFile() . ', not starting a second instance');
+
+                return;
+            }
+
             $handle = @fopen($pidFile, 'w');
             if (!$handle) {
                 $this->fatalError('Unable to write PID to ' . $this->pidFile);
             }
             fwrite($handle, $this->pid);
             fclose($handle);
+            $this->pidFileOwned = true;
             $this->setupPlugins();
             $this->setupWorkers();
             $this->checkEnvironment();
@@ -1356,6 +1381,26 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         }
 
         return false;
+    }
+
+    /**
+     * Determine if the pid file names a daemon of this class that is still alive.
+     *
+     * A pid on its own is not enough: pids are reused, so the process is matched
+     * on its service class as well before this process stands down for it.
+     *
+     * @return bool
+     */
+    protected function isPidFileHeldByLiveInstance() {
+        if (!$this->pidFile || !file_exists($this->pidFile)) {
+            return false;
+        }
+        $pid = trim((string) file_get_contents($this->pidFile));
+        if (strlen($pid) == 0 || (int) $pid == getmypid()) {
+            return false;
+        }
+
+        return CDaemon_Utils::daemonIsRunningWithPid($pid, get_called_class());
     }
 
     public function getServiceName() {

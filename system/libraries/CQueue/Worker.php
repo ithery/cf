@@ -105,7 +105,7 @@ class CQueue_Worker {
     /**
      * The queue manager instance.
      *
-     * @var CQueue_FactoryInterface
+     * @var CQueue_Manager
      */
     protected $manager;
 

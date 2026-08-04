@@ -50,8 +50,8 @@ class DaemonServiceTest extends TestCase {
     }
 
     /**
-     * statsMean() drops the longest and shortest 5% before averaging, so a
-     * single outlier iteration must not move the reported mean.
+     * Drops the longest and shortest 5% before averaging, so a single outlier
+     * iteration must not move the reported mean.
      */
     public function testStatsMeanIgnoresTheExtremes() {
         $service = $this->makeService();
@@ -162,8 +162,8 @@ class DaemonServiceTest extends TestCase {
     }
 
     /**
-     * isInvalidPid() is how a daemon notices the pid file no longer describes
-     * it -- typically because a second copy was started and overwrote it.
+     * How a daemon notices the pid file no longer describes it -- typically
+     * because a second copy was started and overwrote it.
      */
     public function testPidIsInvalidWhenTheFileNamesAnotherProcess() {
         $service = $this->makeService();
@@ -174,6 +174,64 @@ class DaemonServiceTest extends TestCase {
 
         file_put_contents($this->pidFile, '9999');
         $this->assertTrue($service->isInvalidPid());
+    }
+
+    /**
+     * A daemon that never owned the pid file must not delete it on shutdown.
+     *
+     * This is the regression that took devcloud's SSH socket daemon off the
+     * board: start() claimed the pid file before anything checked whether the
+     * process could run, the socket bind then failed because the incumbent
+     * already held the port, and the shutdown deleted the file it had just
+     * overwritten. The supervisor read an empty pid file, decided the daemon
+     * was down, and started another doomed instance every ten minutes.
+     */
+    public function testShutdownDoesNotRemoveAPidFileItDoesNotOwn() {
+        $service = $this->makeService();
+        $service->setProperty('parent', true);
+        $service->setProperty('pid', 4242);
+        // the incumbent's registration, which this process never wrote
+        file_put_contents($this->pidFile, '4242');
+
+        $service->__destruct();
+
+        $this->assertFileExists($this->pidFile, 'A failed start deleted another instance\'s pid file.');
+        $this->assertSame('4242', file_get_contents($this->pidFile));
+    }
+
+    public function testShutdownRemovesThePidFileItOwns() {
+        $service = $this->makeService();
+        $service->setProperty('parent', true);
+        $service->setProperty('pid', 4242);
+        $service->setProperty('pidFileOwned', true);
+        file_put_contents($this->pidFile, '4242');
+
+        $service->__destruct();
+
+        $this->assertFileDoesNotExist($this->pidFile);
+    }
+
+    /**
+     * The pid file is only respected when it names a live daemon of this class.
+     * Pids get reused, so a stale file must not keep a daemon from starting.
+     */
+    public function testAStalePidFileDoesNotCountAsALiveInstance() {
+        $service = $this->makeService();
+
+        // no file at all
+        $this->assertFalse($service->callProtected('isPidFileHeldByLiveInstance'));
+
+        // an empty file
+        file_put_contents($this->pidFile, '');
+        $this->assertFalse($service->callProtected('isPidFileHeldByLiveInstance'));
+
+        // a pid that is not a daemon of this class -- this very test process
+        file_put_contents($this->pidFile, (string) getmypid());
+        $this->assertFalse($service->callProtected('isPidFileHeldByLiveInstance'));
+
+        // a pid no process holds
+        file_put_contents($this->pidFile, '999999');
+        $this->assertFalse($service->callProtected('isPidFileHeldByLiveInstance'));
     }
 
     public function testRuntimeCountsFromTheStartTime() {
