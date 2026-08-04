@@ -4,9 +4,6 @@
          bootstrap="./system/core/Bootstrap.php"
          colors="true"
 >
-    <extensions>
-        <extension class="AfterEachTestHook" file="./tests/AfterEachTestHook.php"/>
-    </extensions>
     <testsuites>
         <testsuite name="Framework">
             <directory suffix="Test.php">./tests</directory>
@@ -27,4 +24,7 @@
         <server name="SESSION_DRIVER" value="array"/>
         <server name="TELESCOPE_ENABLED" value="false"/>
     </php>
+    <extensions>
+        <extension class="AfterEachTestHook" file="./tests/AfterEachTestHook.php"/>
+    </extensions>
 </phpunit>
