@@ -103,11 +103,14 @@ class CServer_Cf {
             //commit **selalu** kosong — dan kosong terbaca sebagai "bukan repo",
             //bukan sebagai "tidak boleh dibaca". Dikutip ganda supaya `*` tidak
             //dimekarkan shell menjadi daftar berkas.
-            . 'g="git -c safe.directory=\"*\""; '
+            //Flagnya ditulis **inline**, tidak lewat variabel shell. Variabel
+            //yang isinya memuat tanda kutip akan meneruskan kutip itu apa adanya
+            //saat dimekarkan, sehingga git menerima `safe.directory="*"` berikut
+            //kutipnya dan tidak pernah cocok — kosong lagi, diam-diam.
             . 'if [ -d "$root/.git" ]; then '
-            . '  echo "BRANCH|$(cd "$root" && $g rev-parse --abbrev-ref HEAD 2>/dev/null)"; '
-            . '  echo "COMMIT|$(cd "$root" && $g rev-parse --short HEAD 2>/dev/null)"; '
-            . '  echo "COMMITDATE|$(cd "$root" && $g log -1 --format=%cd --date=short 2>/dev/null)"; '
+            . '  echo "BRANCH|$(cd "$root" && git -c safe.directory=\'*\' rev-parse --abbrev-ref HEAD 2>/dev/null)"; '
+            . '  echo "COMMIT|$(cd "$root" && git -c safe.directory=\'*\' rev-parse --short HEAD 2>/dev/null)"; '
+            . '  echo "COMMITDATE|$(cd "$root" && git -c safe.directory=\'*\' log -1 --format=%cd --date=short 2>/dev/null)"; '
             . 'fi; '
             . 'for d in "$root"/application/*/; do '
             . '  [ -d "$d" ] || continue; '
@@ -115,8 +118,8 @@ class CServer_Cf {
             . '  n=$(basename "$d"); '
             . '  b=""; c=""; '
             . '  if [ -d "$d/.git" ]; then '
-            . '    b=$(cd "$d" && $g rev-parse --abbrev-ref HEAD 2>/dev/null); '
-            . '    c=$(cd "$d" && $g rev-parse --short HEAD 2>/dev/null); '
+            . '    b=$(cd "$d" && git -c safe.directory=\'*\' rev-parse --abbrev-ref HEAD 2>/dev/null); '
+            . '    c=$(cd "$d" && git -c safe.directory=\'*\' rev-parse --short HEAD 2>/dev/null); '
             . '  fi; '
             . '  echo "APP|$n|$([ -f "$d/bootstrap.php" ] && echo 1 || echo 0)|$b|$c"; '
             . 'done';
