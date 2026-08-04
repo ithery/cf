@@ -42,6 +42,17 @@ RewriteRule (^|/)\.env(\..+)?$ - [R=404,L]
 RewriteRule ^(.*/)?service-account-credentials\.json$ - [R=404,L]
 RewriteRule ^application/[^/]+/default/data/(vendor|key)/ - [R=404,L]
 
+# Dokumentasi dan catatan di bawah data/ aplikasi. Halaman dokumentasi dilayani
+# lewat rute `/docs/...`, jadi berkas sumbernya tidak perlu dapat diunduh
+# langsung — tanpa aturan ini seluruh isi `data/docs/` terbaca siapa saja.
+#
+# Sengaja TIDAK memblokir `data/` secara menyeluruh: sebagian aplikasi memang
+# menyajikan aset dari sana, mis. `MXPreset_Theme::baseUrl()` mengembalikan
+# `application/maxpage/default/data/preset/` sebagai URL publik. Yang diblokir
+# hanya direktori docs dan berkas markdown, yang tidak pernah menjadi aset.
+RewriteRule ^application/[^/]+/default/data/docs/ - [R=404,L]
+RewriteRule ^application/[^/]+/default/data/.*\.md$ - [R=404,L]
+
 # Berkas titik dan metadata editor/VCS
 RewriteRule ^(.*/)?\.(DS_Store|git.*|editorconfig|htaccess.*|php_cs.*|stylelintrc|prettierrc|eslintrc|eslintignore|php-cs-fixer\.cache|phpunit\.result\.cache)$ - [R=404,L]
 
