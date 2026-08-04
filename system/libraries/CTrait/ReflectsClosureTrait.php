@@ -85,7 +85,7 @@ trait CTrait_ReflectsClosureTrait {
                 return [$parameter->getName() => null];
             }
 
-            return [$parameter->getName() => $parameter->getClass()->getName()];
+            return [$parameter->getName() => CBase_Reflector::getParameterClassName($parameter)];
         })->all();
     }
 }
