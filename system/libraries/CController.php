@@ -100,6 +100,18 @@ abstract class CController {
     }
 
     /**
+     * Apakah sebuah nama method boleh dijalankan sebagai aksi dari URL.
+     *
+     * Sebelumnya callAction() hanya memeriksa keberadaan methodnya, tidak
+     * visibilitasnya. Karena CController adalah induk setiap controller,
+     * `$this->{$method}()` di dalamnya dapat menjangkau method `protected`
+     * milik turunannya — sehingga method yang sengaja tidak dipublikasikan
+     * tetap dapat dipanggil siapa pun lewat URL.
+     *
+     * Method `private` tidak pernah benar-benar terjangkau begitu (lingkupnya
+     * kelas, bukan pewarisan), tetapi pemanggilannya berakhir sebagai fatal
+     * error alih-alih 404, jadi keduanya ditolak di sini.
+     *
      * @param string $method
      *
      * @return bool
@@ -130,6 +142,8 @@ abstract class CController {
     }
 
     /**
+     * Method milik CController sendiri, bukan aksi.
+     *
      * @return string[]
      */
     protected static function getBlockedMethods() {

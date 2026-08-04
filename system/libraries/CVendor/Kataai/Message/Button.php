@@ -26,8 +26,22 @@ final class CVendor_Kataai_Message_Button {
 
     public function toArray(): array {
         return [
-            'type' => $this->getType(),
-            'value' => $this->getValue(),
-        ];
+            'type' => 'text',
+        ] + $this->buttonItem();
+    }
+
+    public function buttonItem(): array {
+        switch ($this->getType()) {
+            case 'payload':
+                return [
+                    'payload' => $this->getValue()
+                ];
+            case 'url':
+                return [
+                    'text' => $this->getValue(),
+                ];
+            default:
+                throw new InvalidArgumentException('Invalid button type: ' . $this->getType());
+        }
     }
 }

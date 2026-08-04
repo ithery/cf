@@ -223,6 +223,49 @@ class QueueWorkerTimeoutTest extends TestCase {
         $this->assertGreaterThan(0, $armedFor);
     }
 
+    /**
+     * A timeout of 0 means no timeout, and callers rely on it -- Tribelio's
+     * SqsExport passes `timeout => 0` on purpose. Those callers must keep
+     * behaving exactly as they did before timeout enforcement existed.
+     */
+    public function testATimeoutOfZeroDisablesTheAlarmEntirely() {
+        $armedFor = null;
+        $job = new QueueWorkerFakeJob('job-1', [], function () use (&$armedFor) {
+            $armedFor = pcntl_alarm(0);
+        });
+        $worker = $this->makeWorker([$job]);
+
+        $worker->runNextJob('test-connection', 'default', $this->makeOptions(0));
+
+        $this->assertTrue($job->fired);
+        $this->assertSame(0, $armedFor, 'A timeout of 0 must leave no alarm pending.');
+        $this->assertFalse($worker->killed);
+    }
+
+    /**
+     * The default is deliberately loose. Until the fix above, nothing on the
+     * `once` path was ever timed out, so a tight default would start killing
+     * jobs that are merely slow rather than frozen.
+     */
+    public function testTheRunnerDefaultTimeoutIsLooseEnoughNotToKillSlowJobs() {
+        $worker = $this->makeWorker();
+        $method = new ReflectionMethod(CQueue_Runner::class, 'gatherWorkerOptions');
+        $method->setAccessible(true);
+
+        $options = $method->invoke(new CQueue_Runner($worker, null, []));
+
+        $this->assertGreaterThanOrEqual(1800, $options->timeout);
+    }
+
+    public function testAnExplicitTimeoutStillWinsOverTheDefault() {
+        $worker = $this->makeWorker();
+        $method = new ReflectionMethod(CQueue_Runner::class, 'gatherWorkerOptions');
+        $method->setAccessible(true);
+
+        $this->assertSame(600, $method->invoke(new CQueue_Runner($worker, null, ['timeout' => 600]))->timeout);
+        $this->assertSame(0, $method->invoke(new CQueue_Runner($worker, null, ['timeout' => 0]))->timeout);
+    }
+
     public function testJobTimeoutTakesPrecedenceOverTheWorkerTimeout() {
         $worker = $this->makeWorker();
         $method = new ReflectionMethod(CQueue_Worker::class, 'timeoutForJob');
