@@ -1132,9 +1132,13 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
     {
         if ($column->change) {
             if (array_key_exists('virtualAs', $column->getAttributes())) {
-                return is_null($column->virtualAs)
-                    ? 'drop expression if exists'
-                    : throw new LogicException('This database driver does not support modifying generated columns.');
+                //throw sebagai ekspresi baru sah sejak PHP 8.0, sementara CF 1.9
+                //masih menopang 7.4
+                if (!is_null($column->virtualAs)) {
+                    throw new LogicException('This database driver does not support modifying generated columns.');
+                }
+
+                return 'drop expression if exists';
             }
 
             return null;
@@ -1155,9 +1159,13 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
     protected function modifyStoredAs(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $column) {
         if ($column->change) {
             if (array_key_exists('storedAs', $column->getAttributes())) {
-                return is_null($column->storedAs)
-                    ? 'drop expression if exists'
-                    : throw new LogicException('This database driver does not support modifying generated columns.');
+                //throw sebagai ekspresi baru sah sejak PHP 8.0, sementara CF 1.9
+                //masih menopang 7.4
+                if (!is_null($column->storedAs)) {
+                    throw new LogicException('This database driver does not support modifying generated columns.');
+                }
+
+                return 'drop expression if exists';
             }
 
             return null;

@@ -1212,7 +1212,9 @@ class carr {
                 $ret .= $item . $glue;
             }
         }
-        $ret = substr($ret, 0, 0 - strlen($glue));
+        //cast wajib: pada larik kosong ini menjadi substr('', 0, -1), yang di
+        //PHP 7.4 menjawab false dan baru menjawab '' sejak PHP 8.0
+        $ret = (string) substr($ret, 0, 0 - strlen($glue));
 
         return $ret;
     }
