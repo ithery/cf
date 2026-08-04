@@ -3,8 +3,21 @@
 The `cdbutils` helper class runs short queries and reads database schema information without
 going through a query builder or model.
 
-Several of its query methods are deprecated in favour of the equivalents on the connection
-object. Those are marked below.
+## Deprecated query methods
+
+Five methods on this class are deprecated in favour of the equivalents on the connection
+object:
+
+| Deprecated | Use instead |
+|---|---|
+| `cdbutils::get_value()` | `c::db()->getValue()` |
+| `cdbutils::get_row()` | `c::db()->getRow()` |
+| `cdbutils::get_array()` | `c::db()->getArray()` |
+| `cdbutils::get_list()` | `c::db()->getList()` |
+| `cdbutils::row_exists()` | — no replacement, build the query directly |
+
+They are documented below because existing code calls them, and their return shapes are not
+obvious from their names.
 
 ## Queries
 
@@ -46,12 +59,13 @@ $options = cdbutils::get_list('SELECT user_id, name FROM users ORDER BY name');
 
 ### cdbutils::get_row
 
-> **This method always returns `null`.** A `return null;` statement sits at the top of its
-> body, making the rest of the method unreachable. It was introduced on 31 August 2023 in
-> commit `25703be04`. Use `c::db()->getRow()` instead.
+The `cdbutils::get_row` method returns the first row of the result as an object, or `null`
+when the query matches nothing:
 
 ```php
-$row = c::db()->getRow('SELECT * FROM users WHERE user_id = 1');
+$user = cdbutils::get_row('SELECT * FROM users WHERE user_id = 1');
+
+// $user->name
 ```
 
 ### cdbutils::get_row_count_from_base_query
