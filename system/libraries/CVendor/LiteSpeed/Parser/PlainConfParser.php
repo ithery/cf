@@ -50,7 +50,7 @@ class CVendor_LiteSpeed_Parser_PlainConfParser {
 
         if ($rawlines == null) {
             $errlevel = ($root->Get(Node::FLD_KEY) == Node::K_ROOT) ? Node::E_FATAL : Node::E_WARN;
-            $errmsg = "Failed to read file ${filename}, abspath = ${fullpath}";
+            $errmsg = "Failed to read file {$filename}, abspath = {$fullpath}";
             $rawfiles->MarkError($root, $errlevel, $errmsg);
 
             return;
@@ -177,7 +177,7 @@ class CVendor_LiteSpeed_Parser_PlainConfParser {
                 $newnode->SetRawMap($fid, $from_line, $to_line, $cur_comment);
                 // validate key
                 if (!preg_match('/^([a-zA-Z_0-9:])+$/', $key)) {
-                    $rawfiles->MarkError($newnode, Node::E_WARN, "Invalid char in keyword ${key}");
+                    $rawfiles->MarkError($newnode, Node::E_WARN, "Invalid char in keyword {$key}");
                 }
 
                 $cur_node->AddChild($newnode);

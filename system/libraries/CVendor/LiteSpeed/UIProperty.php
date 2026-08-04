@@ -36,7 +36,7 @@ class CVendor_LiteSpeed_UIProperty {
             case self::FLD_SERVER_NAME:
                 return $this->servername;
             default:
-                die("illegal field ${field}");
+                die("illegal field {$field}");
         }
     }
 
@@ -63,7 +63,7 @@ class CVendor_LiteSpeed_UIProperty {
 
                 break;
             default:
-                die("illegal field ${field}");
+                die("illegal field {$field}");
         }
     }
 }

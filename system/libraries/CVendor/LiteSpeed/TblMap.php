@@ -44,7 +44,7 @@ class CVendor_LiteSpeed_TblMap {
             if ($m instanceof CVendor_LiteSpeed_TblMap) {
                 $nextloc = $m->findTblLoc($tid);
                 if ($nextloc != null) {
-                    return ($location == '') ? $nextloc : "{$location}:${nextloc}";
+                    return ($location == '') ? $nextloc : "{$location}:{$nextloc}";
                 }
             } elseif ($tid == $m) {
                 return $location;

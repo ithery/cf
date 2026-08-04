@@ -57,7 +57,7 @@ class CVendor_LiteSpeed_Parser_RawFiles {
         foreach ($this->errs as $e) {
             $errlevel = $level[$e[0]];
             $filename = $this->list[$e[2]]->filename;
-            $buf .= "${errlevel} ${filename} line {$e[3]}";
+            $buf .= "{$errlevel} {$filename} line {$e[3]}";
             if ($e[3] != $e[4]) {
                 $buf .= " ~ {$e[4]}";
             }

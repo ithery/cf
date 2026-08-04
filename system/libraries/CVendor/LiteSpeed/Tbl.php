@@ -143,7 +143,7 @@ class CVendor_LiteSpeed_Tbl {
             case self::FLD_SUBTBLS:
                 return $this->_subTbls;
         }
-        die("DTbl field ${field} not supported");
+        die("DTbl field {$field} not supported");
     }
 
     public function set($field, $fieldval) {
@@ -161,7 +161,7 @@ class CVendor_LiteSpeed_Tbl {
 
                 break;
             default:
-                die("field ${field} not supported");
+                die("field {$field} not supported");
         }
     }
 
@@ -408,7 +408,7 @@ class CVendor_LiteSpeed_Tbl {
         }
 
         $buf .= '</tbody></table></div>';
-        echo "${buf} \n";
+        echo "{$buf} \n";
     }
 
     private function print_edit($dlayer, $disp) {
@@ -438,7 +438,7 @@ class CVendor_LiteSpeed_Tbl {
         }
 
         $buf .= '</fieldset></div></div></div>';
-        echo "${buf} \n";
+        echo "{$buf} \n";
     }
 
     private function getPrintLine($node, $disp, $attr) {
@@ -486,7 +486,7 @@ class CVendor_LiteSpeed_Tbl {
             $buf .= ' class="xtbl_value_blocked"';
         }
         if ($valwid > 0) {
-            $buf .= " width=\"${valwid}\"";
+            $buf .= " width=\"{$valwid}\"";
         }
         $buf .= '>';
 

@@ -153,6 +153,11 @@ class CVendor_LiteSpeed_Node {
      */
     private $els;
 
+    /**
+     * @param string      $key  kunci apa adanya, dinormalkan lewat KeywordAlias
+     * @param null|string $val  nilai; blok tanpa parameter bernilai kosong
+     * @param int         $type salah satu konstanta T_*
+     */
     public function __construct($key, $val, $type = self::T_KV) {
         $this->rawK = $key;
         $this->k = CVendor_LiteSpeed_KeywordAlias::normalizedKey($key);
@@ -169,6 +174,12 @@ class CVendor_LiteSpeed_Node {
         }
     }
 
+    /**
+     * @param string $line
+     * @param string $current_comment dikosongkan setelah diserap
+     *
+     * @return void
+     */
     public function addRawContent($line, &$current_comment) {
         if ($current_comment != '') {
             $this->rawContent .= rtrim($current_comment) . "\n";
@@ -177,16 +188,27 @@ class CVendor_LiteSpeed_Node {
         $this->rawContent .= rtrim($line) . "\n";
     }
 
+    /**
+     * @param string $tag penanda heredoc, mis. `END_rules`
+     *
+     * @return void
+     */
     public function addRawTag($tag) {
         $this->type |= self::BM_HAS_RAW;
         $this->rawContent = '';
         $this->rawTag = $tag;
     }
 
+    /**
+     * @return null|string
+     */
     public function getVal() {
         return $this->get(self::FLD_VAL);
     }
 
+    /**
+     * @return string kunci ternormalisasi (huruf kecil)
+     */
     public function getKey() {
         return $this->get(self::FLD_KEY);
     }
@@ -214,6 +236,13 @@ class CVendor_LiteSpeed_Node {
         return $this->rawK == null ? (string) $this->k : (string) $this->rawK;
     }
 
+    /**
+     * @param int $field salah satu konstanta FLD_*
+     *
+     * @throws InvalidArgumentException bila fieldnya tidak dikenal
+     *
+     * @return mixed
+     */
     public function get($field) {
         switch ($field) {
             case self::FLD_KEY:
@@ -241,6 +270,12 @@ class CVendor_LiteSpeed_Node {
         throw new InvalidArgumentException('field ' . $field . ' not supported');
     }
 
+    /**
+     * @param int   $field salah satu konstanta FLD_*
+     * @param mixed $fieldval
+     *
+     * @return void
+     */
     public function set($field, $fieldval) {
         switch ($field) {
             case self::FLD_FLTO:
@@ -263,10 +298,15 @@ class CVendor_LiteSpeed_Node {
                 break;
 
             default:
-                die("field ${field} not supported");
+                die("field {$field} not supported");
         }
     }
 
+    /**
+     * @param null|string $v
+     *
+     * @return void
+     */
     public function setVal($v) {
         $this->v = $v;
         if ($v != null && ($this->type & self::BM_VAL == 0)) {
@@ -274,19 +314,38 @@ class CVendor_LiteSpeed_Node {
         }
     }
 
+    /**
+     * @param int $flag bitmask BM_*
+     *
+     * @return void
+     */
     public function addFlag($flag) {
         $this->type |= $flag;
     }
 
+    /**
+     * @param int $flag bitmask BM_*
+     *
+     * @return bool
+     */
     public function hasFlag($flag) {
         return ($this->type & $flag) != 0;
     }
 
+    /**
+     * @return bool nol dianggap bernilai; hanya null dan string kosong yang tidak
+     */
     public function hasVal() {
         // 0 is valid
         return $this->v !== null && $this->v !== '';
     }
 
+    /**
+     * @param null|string $errmsg pesan digabung, bukan ditimpa
+     * @param int         $level  1 peringatan, 2 fatal
+     *
+     * @return void
+     */
     public function setErr($errmsg, $level = 1) {
         if ($errmsg != '') {
             $this->e .= $errmsg;
@@ -296,22 +355,37 @@ class CVendor_LiteSpeed_Node {
         }
     }
 
+    /**
+     * @return bool
+     */
     public function hasErr() {
         return $this->e != null;
     }
 
+    /**
+     * @return null|string
+     */
     public function getErr() {
         return $this->e;
     }
 
+    /**
+     * @return bool
+     */
     public function hasFatalErr() {
         return $this->errLevel == self::E_FATAL;
     }
 
+    /**
+     * @return bool
+     */
     public function hasChanged() {
         return $this->changed;
     }
 
+    /**
+     * @return static simpul kosong bertipe sama, tanpa anak
+     */
     public function dupHolder() {
         // create an empty blk node
         $holder = new static($this->k, $this->v, $this->type);
@@ -325,6 +399,11 @@ class CVendor_LiteSpeed_Node {
         return $holder;
     }
 
+    /**
+     * @param CVendor_LiteSpeed_Node $node
+     *
+     * @return void
+     */
     public function mergeUnknown($node) {
         if ($this->type != self::T_ROOT && !($this->type & self::BM_BLK)) {
             echo "Err, should merge at parent level {$node->k} {$node->v} \n";
@@ -335,7 +414,7 @@ class CVendor_LiteSpeed_Node {
         foreach ($node->els as $k => $el) {
             if (isset($this->els[$k])) {
                 if (is_a($el, 'CNode')) {
-                    echo " k = ${k} \n";
+                    echo " k = {$k} \n";
                     $this->els[$k]->mergeUnknown($el);
                 } else {
                     foreach ($el as $id => $elm) {
@@ -356,11 +435,24 @@ class CVendor_LiteSpeed_Node {
         }
     }
 
+    /**
+     * @param int    $file_id
+     * @param int    $from_line berbasis satu
+     * @param int    $to_line   berbasis satu
+     * @param string $comment
+     *
+     * @return void
+     */
     public function setRawMap($file_id, $from_line, $to_line, $comment) {
         $this->fileline = new CVendor_LiteSpeed_Node_FileLine($file_id, $from_line, $to_line, $comment);
         $this->changed = false;
     }
 
+    /**
+     * @param string $cur_comment dikosongkan setelah diserap
+     *
+     * @return void
+     */
     public function endBlock(&$cur_comment) {
         if ($this->rawTag != '') {
             $this->rawContent .= $cur_comment;
@@ -380,6 +472,11 @@ class CVendor_LiteSpeed_Node {
         $cur_comment = '';
     }
 
+    /**
+     * @param CVendor_LiteSpeed_Node $child
+     *
+     * @return void
+     */
     public function addChild($child) {
         if ($this->type == self::T_KV) {
             $this->type = ($this->v == '') ? self::T_KB : self::T_KVB;
@@ -406,6 +503,11 @@ class CVendor_LiteSpeed_Node {
         }
     }
 
+    /**
+     * @param CVendor_LiteSpeed_Node $incroot akar berkas yang di-include
+     *
+     * @return void
+     */
     public function addIncludeChildren($incroot) {
         if (is_array($incroot->els)) {
             foreach ($incroot->els as $elm) {
@@ -422,12 +524,20 @@ class CVendor_LiteSpeed_Node {
         }
     }
 
+    /**
+     * @param string $key
+     *
+     * @return void
+     */
     public function removeChild($key) {
         // todo: key contains :
         $key = strtolower($key);
         unset($this->els[$key]);
     }
 
+    /**
+     * @return void
+     */
     public function removeFromParent() {
         if ($this->parent != null) {
             if (is_array($this->parent->els[$this->k])) {
@@ -445,6 +555,11 @@ class CVendor_LiteSpeed_Node {
         }
     }
 
+    /**
+     * @param string $key kosong berarti "punya anak apa pun"
+     *
+     * @return bool
+     */
     public function hasDirectChildren($key = '') {
         if ($key == '') {
             return $this->els != null && count($this->els) > 0;
@@ -453,6 +568,11 @@ class CVendor_LiteSpeed_Node {
         }
     }
 
+    /**
+     * @param string $key boleh bersarang dengan pemisah `:`
+     *
+     * @return null|CVendor_LiteSpeed_Node|CVendor_LiteSpeed_Node[] larik bila kuncinya muncul lebih dari sekali
+     */
     public function getChildren($key) {
         $key = strtolower($key);
         if (($pos = strpos($key, ':')) > 0) {
@@ -475,6 +595,11 @@ class CVendor_LiteSpeed_Node {
         }
     }
 
+    /**
+     * @param string $key
+     *
+     * @return null|string null bila anaknya berupa larik
+     */
     public function getChildVal($key) {
         $child = $this->getChildren($key);
 
@@ -550,6 +675,12 @@ class CVendor_LiteSpeed_Node {
         return $this->els != null && count($this->els) > 0;
     }
 
+    /**
+     * @param string      $key
+     * @param null|string $val
+     *
+     * @return bool false bila anaknya tidak ada
+     */
     public function setChildVal($key, $val) {
         $child = $this->getChildren($key);
         if ($child == null && !($child instanceof CVendor_LiteSpeed_Node)) {
@@ -560,6 +691,12 @@ class CVendor_LiteSpeed_Node {
         return true;
     }
 
+    /**
+     * @param string      $key
+     * @param null|string $err null untuk menghapus galat
+     *
+     * @return bool false bila anaknya tidak ada
+     */
     public function setChildErr($key, $err) {
         $child = $this->getChildren($key);
         if ($child == null && !($child instanceof CVendor_LiteSpeed_Node)) {
@@ -574,6 +711,12 @@ class CVendor_LiteSpeed_Node {
         return true;
     }
 
+    /**
+     * @param string $key
+     * @param string $id nilai simpul yang dicari
+     *
+     * @return null|CVendor_LiteSpeed_Node
+     */
     public function getChildNodeById($key, $id) {
         $layer = $this->getChildren($key);
         if ($layer != null) {
@@ -587,6 +730,11 @@ class CVendor_LiteSpeed_Node {
         return null;
     }
 
+    /**
+     * @param string $location dipisah `:`
+     *
+     * @return null|string
+     */
     private function getLastLayer($location) {
         $layers = explode(':', $location);
         $lastlayer = array_pop($layers);
@@ -600,6 +748,12 @@ class CVendor_LiteSpeed_Node {
         return $lastlayer;
     }
 
+    /**
+     * @param string $location dikonsumsi selama penelusuran
+     * @param string $ref      dikonsumsi selama penelusuran
+     *
+     * @return null|CVendor_LiteSpeed_Node|CVendor_LiteSpeed_Node[]
+     */
     public function getChildrenByLoc(&$location, &$ref) {
         $node = $this;
         if ($location == '') {
@@ -663,12 +817,25 @@ class CVendor_LiteSpeed_Node {
         return $node;
     }
 
+    /**
+     * @param string $location
+     * @param string $ref
+     *
+     * @return null|CVendor_LiteSpeed_Node null bila yang ditemukan berupa larik
+     */
     public function getChildNode(&$location, &$ref) {
         $node = $this->GetChildrenByLoc($location, $ref);
 
         return ($node instanceof CVendor_LiteSpeed_Node) ? $node : null;
     }
 
+    /**
+     * @param string $loc
+     * @param string $curref
+     * @param CVendor_LiteSpeed_Node $extractData
+     *
+     * @return void
+     */
     public function updateChildren($loc, $curref, $extractData) {
         $location = $loc;
         $ref = $curref;
@@ -705,6 +872,11 @@ class CVendor_LiteSpeed_Node {
         }
     }
 
+    /**
+     * @param null|string $val
+     *
+     * @return void
+     */
     private function updateHolderVal($val) {
         if ($this->parent != null) {
             $oldval = $this->v;
@@ -716,6 +888,9 @@ class CVendor_LiteSpeed_Node {
         }
     }
 
+    /**
+     * @return string
+     */
     public function debugStr() {
         $buf = '';
         $this->debugOut($buf);
@@ -723,6 +898,12 @@ class CVendor_LiteSpeed_Node {
         return $buf;
     }
 
+    /**
+     * @param string $buf   ditambahi, bukan ditimpa
+     * @param int    $level kedalaman indentasi
+     *
+     * @return void
+     */
     public function debugOut(&$buf, $level = 0) {
         $indent = str_pad('', $level * 2);
         $buf .= "key={$this->k} val= {$this->v} type={$this->type} ";
@@ -730,12 +911,12 @@ class CVendor_LiteSpeed_Node {
             $buf .= " {\n";
             $level++;
             foreach ($this->els as $k => $el) {
-                $buf .= "${indent}   [${k}] => ";
+                $buf .= "{$indent}   [{$k}] => ";
                 if (is_array($el)) {
                     $buf .= "\n";
                     $level++;
                     foreach ($el as $k0 => $child) {
-                        $buf .= "${indent}      [${k0}] => ";
+                        $buf .= "{$indent}      [{$k0}] => ";
                         if (!($child instanceof CVendor_LiteSpeed_Node)) {
                             $buf .= 'not cnode ';
                         }
@@ -745,12 +926,18 @@ class CVendor_LiteSpeed_Node {
                     $el->debugOut($buf, $level);
                 }
             }
-            $buf .= "${indent} }\n";
+            $buf .= "{$indent} }\n";
         } else {
             $buf .= "\n";
         }
     }
 
+    /**
+     * @param string $buf   ditambahi, bukan ditimpa
+     * @param int    $level kedalaman indentasi
+     *
+     * @return void
+     */
     public function printBuf(&$buf, $level = 0) {
         $note0 = ($this->fileline == null) ? '' : $this->fileline->note0;
         $note1 = ($this->fileline == null) ? '' : $this->fileline->note1;
@@ -759,7 +946,7 @@ class CVendor_LiteSpeed_Node {
         if (($key1 = CVendor_LiteSpeed_KeywordAlias::shortPrintKey($this->k)) != null) {
             $key = $key1;
             if ($note0 == '' && $key != $this->rawK) {
-                $alias_note = "# ${key} is shortened alias of {$this->printK} \n";
+                $alias_note = "# {$key} is shortened alias of {$this->printK} \n";
             }
         }
 
@@ -787,7 +974,7 @@ class CVendor_LiteSpeed_Node {
         $indent = str_pad('', $level * 2);
         $val = $this->v;
         if ($val != '' && strpos($val, "\n")) {
-            $val = "<<<END_{$key}\n${val}\n{$indent}END_{$key}\n";
+            $val = "<<<END_{$key}\n{$val}\n{$indent}END_{$key}\n";
         }
 
         if (($this->type & self::BM_VAL) && !($this->type & self::BM_BLK)) {
@@ -795,7 +982,7 @@ class CVendor_LiteSpeed_Node {
             if ($val != '' || $note0 != '' || $this->errLevel > 0) {
                 $width = self::KEY_WIDTH - $level * 2;
                 $buf .= $alias_note;
-                $buf .= $indent . str_pad($key, $width) . " ${val}\n";
+                $buf .= $indent . str_pad($key, $width) . " {$val}\n";
             }
         } else {
             $begin = '';
@@ -808,12 +995,12 @@ class CVendor_LiteSpeed_Node {
                     $buf1 .= "\n";
                 }
                 $buf1 .= $alias_note;
-                $buf1 .= "{$indent}$key ${val}";
+                $buf1 .= "{$indent}$key {$val}";
                 $begin = " {\n";
-                $end = "${indent}}\n";
+                $end = "{$indent}}\n";
                 $level++;
             } elseif ($this->type == self::T_INC) {
-                $buf1 .= "{$indent}$key ${val}\n";
+                $buf1 .= "{$indent}$key {$val}\n";
                 $buf1 .= "\n##__INC__\n";
                 $end = "\n##__ENDINC__\n";
             }
@@ -844,6 +1031,12 @@ class CVendor_LiteSpeed_Node {
         }
     }
 
+    /**
+     * @param string $buf   ditambahi, bukan ditimpa
+     * @param int    $level kedalaman indentasi
+     *
+     * @return void
+     */
     public function printXmlBuf(&$buf, $level = 0) {
         if ($this->type == self::T_ROOT) {
             $buf .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
@@ -851,18 +1044,21 @@ class CVendor_LiteSpeed_Node {
         $indent = str_pad('', $level * 2);
 
         $key = $this->printK;
-        $value = htmlspecialchars($this->v);
+        //blok tanpa parameter bernilai null, dan sejak PHP 8.1 meneruskan null
+        //ke htmlspecialchars() menghasilkan peringatan usang. Hasilnya sama —
+        //string kosong — jadi ini hanya menyatakan yang sudah terjadi
+        $value = htmlspecialchars((string) $this->v);
 
         if (($this->type & self::BM_VAL) && !($this->type & self::BM_BLK)) {
             if ($value !== '') {
-                $buf .= "${indent}<${key}>${value}</${key}>\n";
+                $buf .= "{$indent}<{$key}>{$value}</{$key}>\n";
             }
         } else {
             $buf1 = '';
             $buf2 = '';
 
             if ($this->type & self::BM_BLK) {
-                $buf1 .= "${indent}<${key}>\n";
+                $buf1 .= "{$indent}<{$key}>\n";
                 $level++;
             }
             foreach ($this->els as $el) {
@@ -879,12 +1075,17 @@ class CVendor_LiteSpeed_Node {
             if ($buf2 != '') {
                 $buf .= $buf1 . $buf2;
                 if ($this->type & self::BM_BLK) {
-                    $buf .= "${indent}</${key}>\n";
+                    $buf .= "{$indent}</{$key}>\n";
                 }
             }
         }
     }
 
+    /**
+     * @param string $location
+     *
+     * @return null|CVendor_LiteSpeed_Node|CVendor_LiteSpeed_Node[]
+     */
     public function locateLayer($location) {
         $node = $this;
         if ($location != '') {
@@ -911,6 +1112,11 @@ class CVendor_LiteSpeed_Node {
         return $node;
     }
 
+    /**
+     * @param string $location
+     *
+     * @return CVendor_LiteSpeed_Node simpul yang ada atau yang baru dibuat
+     */
     public function allocateLayerNode($location) {
         $node = $this;
         if ($location != '') {

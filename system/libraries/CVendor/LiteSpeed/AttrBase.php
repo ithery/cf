@@ -410,13 +410,13 @@ class CVendor_LiteSpeed_AttrBase {
                 $chval = array_keys($this->maxVal);
                 foreach ($chval as $chv) {
                     if ($chv == '0') {
-                        $js1 = "document.confform.${name}${chv}.checked=false;";
+                        $js1 = "document.confform.{$name}{$chv}.checked=false;";
                     } else {
-                        $js0 .= "document.confform.${name}${chv}.checked=false;";
+                        $js0 .= "document.confform.{$name}{$chv}.checked=false;";
                     }
                 }
-                $js1 = " onclick=\"${js1}\"";
-                $js0 = " onclick=\"${js0}\"";
+                $js1 = " onclick=\"{$js1}\"";
+                $js0 = " onclick=\"{$js0}\"";
             }
             foreach ($this->maxVal as $val => $disp) {
                 $id = $name . $val;
@@ -425,7 +425,7 @@ class CVendor_LiteSpeed_AttrBase {
                     $input .= $checked;
                 }
                 $input .= ($val == '0') ? $js0 : $js1;
-                $input .= "> <label for=\"{$id}\"> ${disp} </label> ${spacer}";
+                $input .= "> <label for=\"{$id}\"> {$disp} </label> {$spacer}";
             }
             $input .= '</div>';
         } elseif ($this->inputType == 'select') {

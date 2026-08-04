@@ -332,7 +332,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends TblDefBase {
         $hook = Msg::aLbl('l_hook');
         $priority = Msg::aLbl('l_priority');
         foreach ($tags as $tag) {
-            $attrs[] = self::newIntAttr($tag, "${hook} ${tag} ${priority}", true, -6000, 6000);
+            $attrs[] = self::newIntAttr($tag, "{$hook} {$tag} {$priority}", true, -6000, 6000);
         }
         $this->tblDef[$id] = Tbl::newIndexed($id, Msg::aLbl('l_servermoduledef'), $attrs, 'name', 'servModules');
     }
@@ -738,7 +738,7 @@ class CVendor_LiteSpeed_OWS_TblDef extends TblDefBase {
 
         $processes = isset($_SERVER['LSWS_CHILDREN']) ? $_SERVER['LSWS_CHILDREN'] : 1;
         for ($i = 1; $i <= $processes; ++$i) {
-            $bindoptions[1 << ($i - 1)] = "Process ${i}";
+            $bindoptions[1 << ($i - 1)] = "Process {$i}";
         }
 
         $attrs = [

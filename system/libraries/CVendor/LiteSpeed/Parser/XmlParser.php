@@ -14,7 +14,7 @@ class CVendor_LiteSpeed_Parser_XmlParser {
         $filename = $root->get(Node::FLD_VAL);
         $xmlstring = file_get_contents($filename);
         if ($xmlstring === false) {
-            $root->setErr("failed to read file ${filename}", Node::E_FATAL);
+            $root->setErr("failed to read file {$filename}", Node::E_FATAL);
 
             return $root;
         }
@@ -34,7 +34,7 @@ class CVendor_LiteSpeed_Parser_XmlParser {
         if (!$result) {
             $err = 'XML error: ' . xml_error_string(xml_get_error_code($parser))
             . ' at line ' . xml_get_current_line_number($parser);
-            $root->SetErr("failed to parse file ${filename}, ${err}", Node::E_FATAL);
+            $root->SetErr("failed to parse file {$filename}, {$err}", Node::E_FATAL);
         }
         xml_parser_free($parser);
 
@@ -75,7 +75,7 @@ class CVendor_LiteSpeed_Parser_XmlParser {
         // $filename = '/home/lsong/proj/temp/conf/register.xml';
         // //$filename = '/home/lsong/proj/temp/conf/templates/ccl.xml';
         // $confdata = new ConfData('vh', $filename);
-        // echo "Test file ${filename} \n";
+        // echo "Test file {$filename} \n";
         // $root = $this->LoadData($confdata);
 
         // $root = $xmlroot->DupHolder();

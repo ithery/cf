@@ -143,7 +143,7 @@ class CVendor_LiteSpeed_UIBase {
         $buf = '<div class="alert alert-success fade in"><ul>';
         foreach ($tips as $tip) {
             if ($tip != '') {
-                $buf .= "<li>${tip}</li>\n";
+                $buf .= "<li>{$tip}</li>\n";
             }
         }
         $buf .= "</ul></div>\n";
@@ -191,7 +191,7 @@ class CVendor_LiteSpeed_UIBase {
                         $o .= ' selected="selected"';
                     }
                 }
-                $o .= ">${value}</option>\n";
+                $o .= ">{$value}</option>\n";
             }
         }
 
