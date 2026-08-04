@@ -102,6 +102,57 @@ class CServer_Cf_Deployment {
     }
 
     /**
+     * @return string
+     */
+    public function pull() {
+        return (string) $this->server->runCommand($this->wrap('git pull 2>&1'));
+    }
+
+    /**
+     * Kembalikan berkas terlacak ke keadaan terakhir yang dicommit.
+     *
+     * Daftarnya disebutkan satu per satu, bukan `git checkout -- .`, supaya yang
+     * hilang persis yang ditunjukkan kepada pengguna. Berkas yang berubah antara
+     * pemeriksaan dan penekanan tombol tidak ikut terbuang.
+     *
+     * @param array $fileList kosong berarti seluruh berkas terlacak
+     *
+     * @return string
+     */
+    public function discard(array $fileList = []) {
+        if (count($fileList) == 0) {
+            return (string) $this->server->runCommand($this->wrap('git checkout -- . 2>&1'));
+        }
+
+        $argument = '';
+        foreach ($fileList as $file) {
+            $argument .= ' ' . escapeshellarg($file);
+        }
+
+        return (string) $this->server->runCommand($this->wrap('git checkout --' . $argument . ' 2>&1'));
+    }
+
+    /**
+     * Hapus berkas yang tidak dilacak git.
+     *
+     * @param array $fileList kosong berarti seluruh berkas tak terlacak
+     *
+     * @return string
+     */
+    public function clean(array $fileList = []) {
+        if (count($fileList) == 0) {
+            return (string) $this->server->runCommand($this->wrap('git clean -fd 2>&1'));
+        }
+
+        $argument = '';
+        foreach ($fileList as $file) {
+            $argument .= ' ' . escapeshellarg($file);
+        }
+
+        return (string) $this->server->runCommand($this->wrap('git clean -fd --' . $argument . ' 2>&1'));
+    }
+
+    /**
      * Kelompokkan berkas menurut tata letak CF, beserta apakah kelompoknya
      * menuntut langkah lain sesudah pull.
      *
