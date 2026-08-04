@@ -1,63 +1,66 @@
 # CF Command - Introduction
 
-### Membuat Command
+### Creating a command
 
-CF menyediakan fitur untuk membuat command console custom pada aplikasi. Command dibuat dengan meng-extend class `CConsole_Command`.
+CF lets an application define its own console commands. A command is created by extending the
+`CConsole_Command` class.
 
-### Struktur Command
+### Command structure
 
-Sebuah command class memiliki dua property utama dan satu method yang harus diimplementasikan:
+A command class has two main properties and one method that must be implemented:
 
 ```php
 class CConsole_Command_MyCommand extends CConsole_Command {
     protected $signature = 'my:command {argument} {--option=}';
 
-    protected $description = 'Deskripsi command';
+    protected $description = 'Command description';
 
     public function handle() {
         $argument = $this->argument('argument');
         $option = $this->option('option');
 
-        $this->info('Command berhasil dijalankan');
+        $this->info('Command completed');
     }
 }
 ```
 
 ### Signature
 
-Property `$signature` mendefinisikan nama command beserta argument dan option yang diterima:
+The `$signature` property defines the command name together with the arguments and options it
+accepts:
 
 ```php
-// Argument wajib
+// Required argument
 protected $signature = 'mail:send {user}';
 
-// Argument opsional
+// Optional argument
 protected $signature = 'mail:send {user?}';
 
-// Argument dengan default value
+// Argument with a default value
 protected $signature = 'mail:send {user=foo}';
 
-// Option dengan value
+// Option that takes a value
 protected $signature = 'mail:send {--queue=}';
 
-// Option boolean (flag)
+// Boolean option (flag)
 protected $signature = 'mail:send {--queue}';
 
 // Variadic argument
 protected $signature = 'mail:send {user*}';
 ```
 
-### Registrasi Command
+### Registering a command
 
-Semua default command didefinisikan pada `CFConsole` di `system/core/CFConsole.php` dalam property `$defaultCommands`.
+Every default command is defined in `CFConsole` at `system/core/CFConsole.php`, in the
+`$defaultCommands` property.
 
-Untuk mendaftarkan command custom pada aplikasi, gunakan method `addCommand`:
+To register a custom command from an application, use the `addCommand` method:
 
 ```php
 CFConsole::addCommand(MyCustomCommand::class);
 ```
 
-Atau beberapa command sekaligus:
+Or several at once:
 
 ```php
 CFConsole::addCommand([

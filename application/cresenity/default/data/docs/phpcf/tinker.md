@@ -2,57 +2,57 @@
 
 ### tinker
 
-REPL interaktif terhadap aplikasi yang sedang berjalan — model, koneksi basis data,
-konfigurasi, dan seluruh helper tersedia apa adanya. Dibangun di atas PsySH.
+An interactive REPL against the running application. Models, the database connection,
+configuration, and every helper are available as they are. Built on PsySH.
 
 ```
 phpcf tinker
 ```
 
-**Jalankan dari dalam folder aplikasinya.** Kode aplikasi diambil dari nama folder lewat
-`CF::appCode()`, dan dari situ `bootstrap.php` milik aplikasi tersebut ikut dimuat saat boot.
-Tidak perlu memanggil bootstrap secara manual.
+**Run it from inside the application folder.** The application code is derived from the folder
+name through `CF::appCode()`, and that is what causes the application's own `bootstrap.php` to
+be loaded during boot. No manual bootstrap call is needed.
 
 ```
 cd application/ohayomart
 phpcf tinker
 ```
 
-Dijalankan dari root framework, yang terbuka adalah konteks framework — tanpa model maupun
-konfigurasi aplikasi.
+Run from the framework root, the session opens in the framework context instead, without the
+application's models or configuration.
 
-### Menjalankan kode langsung
+### Executing code directly
 
-Opsi `--execute` menjalankan satu potong kode lalu keluar. Berguna untuk skrip dan
-pemeriksaan cepat:
+The `--execute` option runs a single piece of code and exits. Useful for scripts and quick
+checks:
 
 ```
 phpcf tinker --execute='echo CF::appCode();'
 ```
 
-### Memuat berkas lebih dulu
+### Including files first
 
-Argumen posisional memuat satu berkas atau lebih sebelum sesi dimulai:
+Positional arguments include one or more files before the session starts:
 
 ```
 phpcf tinker helper.php fixture.php
 ```
 
-### Menjalankan skrip panjang
+### Running longer scripts
 
-Pengutipan bersarang mudah rusak, terutama bila perintahnya melewati `ssh` atau `su -c`.
-Untuk apa pun yang lebih dari satu baris, tulis ke berkas lalu panggil dengan `require`:
+Nested quoting breaks easily, especially when the command passes through `ssh` or `su -c`.
+For anything longer than one line, write the code to a file and require it:
 
 ```
-phpcf tinker --execute='require "/tmp/periksa.php";'
+phpcf tinker --execute='require "/tmp/check.php";'
 ```
 
-Cara ini juga membuat skripnya dapat dijalankan ulang tanpa menyusun ulang kutipannya.
+This also makes the script re-runnable without reassembling the quoting.
 
-### Menjelajah data tanpa meninggalkan jejak
+### Exploring data without leaving traces
 
-Sesi tinker menyentuh basis data yang sesungguhnya. Bungkus apa pun yang menulis dalam
-transaksi yang dibatalkan, sehingga perubahannya berlaku selama pemeriksaan lalu hilang:
+A tinker session touches the real database. Wrap anything that writes in a transaction that is
+rolled back, so the changes apply during inspection and then disappear:
 
 ```php
 $db = c::db();
@@ -62,26 +62,26 @@ $model = OHModel_Product::find(1);
 $model->price = 5000;
 $model->save();
 
-// periksa akibatnya di sini
+// inspect the effects here
 
 $db->rollback();
 ```
 
-Ini cara paling andal memastikan sebuah perbaikan atau fixture benar-benar berperilaku sesuai
-dugaan terhadap data nyata sebelum ditulis menjadi test.
+This is the most reliable way to confirm that a fix or a fixture behaves as expected against
+real data before writing it into a test.
 
-### Keluaran yang diringkas
+### Summarised output
 
-Beberapa jenis nilai ditampilkan dalam bentuk ringkas alih-alih seluruh isi objeknya:
+Some types are displayed in a condensed form rather than as the full object:
 
-| Kelas | Yang ditampilkan |
+| Class | Displayed as |
 |---|---|
-| `CModel` | atribut, atribut yang berubah, dan relasi yang sudah dimuat |
-| `CCollection` | isi koleksinya |
-| `CBase_HtmlString` | string HTML-nya |
-| `CBase_String` | nilai stringnya |
+| `CModel` | attributes, changed attributes, and loaded relations |
+| `CCollection` | the collection contents |
+| `CBase_HtmlString` | the HTML string |
+| `CBase_String` | the string value |
 
-Tambahan dapat didaftarkan lewat konfigurasi `tinker.casters`:
+Additional casters may be registered through the `tinker.casters` configuration:
 
 ```php
 // config/tinker.php
@@ -92,20 +92,20 @@ return [
 ];
 ```
 
-### Batasan konteks CLI
+### CLI context limits
 
-Tinker berjalan tanpa permintaan HTTP, dan sebagian bagian framework bergantung padanya:
+Tinker runs without an HTTP request, and parts of the framework depend on one:
 
-- `CF::domain()` bernilai `{appCode}.test`, sehingga `CF::getFile('navs', ...)` dapat meleset
-  dan `CNavigation_Data::get()` mengembalikan objek alih-alih larik nav;
-- perender nav memerlukan data rute (`getRouteData()`), jadi keluaran sidenav tidak dapat
-  diuji dari sini — periksa di browser;
-- `$_SERVER['REQUEST_URI']` tidak ada, sehingga kode yang membacanya tanpa penjaga akan fatal.
+- `CF::domain()` returns `{appCode}.test`, so `CF::getFile('navs', ...)` may miss and
+  `CNavigation_Data::get()` returns an object instead of the nav array;
+- nav renderers require route data (`getRouteData()`), so sidenav output cannot be tested from
+  here — verify it in the browser;
+- `$_SERVER['REQUEST_URI']` is absent, so code that reads it without a guard will fatal.
 
-### Konteks organisasi
+### Organisation context
 
-Aplikasi yang bertenant memerlukan organisasi aktif, yang di HTTP ditentukan dari domain. Di
-CLI ia harus dipasang sendiri — nama helpernya berbeda tiap aplikasi:
+Multi-tenant applications need an active organisation, which is normally resolved from the
+domain. In CLI it has to be set explicitly. The helper name differs per application:
 
 ```php
 OH::setOrgIdResolver(function () {
@@ -113,10 +113,10 @@ OH::setOrgIdResolver(function () {
 });
 ```
 
-### Ekstensi PHP
+### PHP extensions
 
-Tinker memerlukan ekstensi `phar`. Bila `php` bawaan PATH tidak memilikinya, panggil biner
-yang lengkap secara eksplisit:
+Tinker requires the `phar` extension. When the `php` binary on `PATH` does not have it, call a
+complete binary explicitly:
 
 ```
 /usr/local/lsws/lsphp84/bin/php $(which phpcf) tinker

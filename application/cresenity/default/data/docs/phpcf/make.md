@@ -1,10 +1,10 @@
 # PHPCF - Make (Scaffolding)
 
-Command `make` digunakan untuk men-generate file baru pada aplikasi.
+The `make` commands generate new files in an application.
 
 ### make:controller
 
-Membuat controller baru.
+Creates a new controller.
 
 ```
 phpcf make:controller {controller}
@@ -12,7 +12,7 @@ phpcf make:controller {controller}
 
 ### make:model
 
-Membuat model class baru berdasarkan tabel database.
+Creates a new model class from a database table.
 
 ```
 phpcf make:model {table}
@@ -20,7 +20,7 @@ phpcf make:model {table}
 
 ### make:config
 
-Membuat file config baru.
+Creates a new config file.
 
 ```
 phpcf make:config {config} --value=
@@ -28,7 +28,7 @@ phpcf make:config {config} --value=
 
 ### make:nav
 
-Membuat file navigasi baru.
+Creates a new navigation file.
 
 ```
 phpcf make:nav {nav}
@@ -36,7 +36,7 @@ phpcf make:nav {nav}
 
 ### make:theme
 
-Membuat theme baru.
+Creates a new theme.
 
 ```
 phpcf make:theme {theme}
@@ -44,7 +44,7 @@ phpcf make:theme {theme}
 
 ### make:test
 
-Membuat test class baru.
+Creates a new test class.
 
 ```
 phpcf make:test

@@ -2,7 +2,7 @@
 
 ### db
 
-Membuka session CLI database.
+Opens a database CLI session.
 
 ```
 phpcf db {connection?}
@@ -10,7 +10,7 @@ phpcf db {connection?}
 
 ### db:explain
 
-Explain dan analisa query.
+Explains and analyses a query.
 
 ```
 phpcf db:explain
@@ -18,7 +18,7 @@ phpcf db:explain
 
 ### db:monitor
 
-Monitor jumlah koneksi pada database.
+Monitors the number of open database connections.
 
 ```
 phpcf db:monitor
@@ -26,7 +26,7 @@ phpcf db:monitor
 
 ### db:show
 
-Menampilkan informasi database.
+Displays database information.
 
 ```
 phpcf db:show --database=
@@ -34,7 +34,7 @@ phpcf db:show --database=
 
 ### db:schema
 
-Menampilkan schema untuk tabel tertentu.
+Displays the schema of a given table.
 
 ```
 phpcf db:schema {table}

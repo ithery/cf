@@ -2,84 +2,85 @@
 
 ### Output
 
-Beberapa method tersedia untuk menampilkan output pada console:
+Several methods are available for writing output to the console:
 
 ```php
-// Informasi (hijau)
-$this->info('Proses selesai');
+// Information (green)
+$this->info('Process finished');
 
-// Error (merah)
-$this->error('Terjadi kesalahan');
+// Error (red)
+$this->error('Something went wrong');
 
-// Warning (kuning)
-$this->warn('Perhatian');
+// Warning (yellow)
+$this->warn('Take note');
 
-// Teks biasa
-$this->line('Teks biasa');
+// Plain text
+$this->line('Plain text');
 
-// Tabel
+// Table
 $this->table(['Header 1', 'Header 2'], [
     ['Row 1 Col 1', 'Row 1 Col 2'],
     ['Row 2 Col 1', 'Row 2 Col 2'],
 ]);
 ```
 
-### Input Interaktif
+### Interactive input
 
 ```php
-// Pertanyaan
-$name = $this->ask('Siapa nama anda?');
+// Question
+$name = $this->ask('What is your name?');
 
-// Pertanyaan dengan default
-$name = $this->ask('Siapa nama anda?', 'Default');
+// Question with a default
+$name = $this->ask('What is your name?', 'Default');
 
-// Konfirmasi
-if ($this->confirm('Apakah anda yakin?')) {
+// Confirmation
+if ($this->confirm('Are you sure?')) {
     // ...
 }
 
-// Pilihan
-$option = $this->choice('Pilih warna', ['merah', 'biru', 'hijau']);
+// Choice
+$option = $this->choice('Pick a colour', ['red', 'blue', 'green']);
 ```
 
-### Mengakses Argument dan Option
+### Accessing arguments and options
 
 ```php
 public function handle() {
-    // Mendapatkan satu argument
+    // A single argument
     $user = $this->argument('user');
 
-    // Mendapatkan semua arguments
+    // Every argument
     $arguments = $this->arguments();
 
-    // Mendapatkan satu option
+    // A single option
     $queue = $this->option('queue');
 
-    // Mendapatkan semua options
+    // Every option
     $options = $this->options();
 }
 ```
 
-### Command Berbasis Aplikasi
+### Application-aware commands
 
-Untuk command yang memerlukan konteks aplikasi (database, config, dll), extend `CConsole_Command_AppCommand`:
+For commands that need the application context — database, configuration, and so on — extend
+`CConsole_Command_AppCommand`:
 
 ```php
 class CConsole_Command_MyAppCommand extends CConsole_Command_AppCommand {
     protected $signature = 'my:app-command';
 
-    protected $description = 'Command yang memerlukan konteks aplikasi';
+    protected $description = 'A command that requires the application context';
 
     public function handle() {
-        // Akses database, config, dll sudah tersedia
+        // Database, configuration, and the rest are already available
         $db = c::db();
     }
 }
 ```
 
-### Memanggil Command dari Code
+### Calling a command from code
 
 ```php
-// Dari controller atau code lain
+// From a controller or any other code
 CConsole::call('my:command', ['argument' => 'value', '--option' => 'value']);
 ```

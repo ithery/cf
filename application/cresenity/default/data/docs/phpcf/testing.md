@@ -1,15 +1,15 @@
 # PHPCF - Testing
 
-## Test Directories
+## Test directories
 
-- **Framework tests**: `tests/` di root directory framework
-- **Application tests**: `application/{appCode}/default/tests/` (Unit dan Feature)
+- **Framework tests**: `tests/` in the framework root directory
+- **Application tests**: `application/{appCode}/default/tests/` (Unit and Feature)
 
-## Perilaku `phpcf test` berdasarkan CWD
+## How `phpcf test` resolves context
 
-Command `phpcf test` secara otomatis mendeteksi context berdasarkan current working directory:
+The `phpcf test` command detects its context from the current working directory:
 
-| CWD | phpunit.xml | Tests Directory |
+| CWD | phpunit.xml | Tests directory |
 |-----|------------|-----------------|
 | Framework root (`htdocs/`) | `phpunit.xml` (root) | `tests/` |
 | App directory (`htdocs/application/nwo/`) | `application/nwo/phpunit.xml` | `application/nwo/default/tests/` |
@@ -18,7 +18,7 @@ Command `phpcf test` secara otomatis mendeteksi context berdasarkan current work
 
 ### test:install
 
-Install test dependencies (phpunit.xml dan folder tests) untuk aplikasi.
+Installs the test dependencies — `phpunit.xml` and the `tests` folder — for an application.
 
 ```
 cd application/myapp
@@ -27,28 +27,29 @@ phpcf test:install
 
 ### test
 
-Menjalankan tests sesuai context CWD.
+Runs the tests for the current working directory context.
 
 ```bash
-# Dari framework root — jalankan framework tests
+# From the framework root — run the framework tests
 cd htdocs/
 phpcf test
 
-# Dari app directory — jalankan app tests
+# From an app directory — run that application's tests
 cd htdocs/application/nwo/
 phpcf test
 
 # Disable TTY output
 phpcf test --without-tty
 
-# Jalankan test file/folder tertentu
+# Run a specific file or folder
 phpcf test Unit
 phpcf test Unit/MyTest.php
 ```
 
 ### cf:test
 
-Selalu menjalankan framework tests (dari root phpunit.xml), terlepas dari CWD.
+Always runs the framework tests, using the root `phpunit.xml`, regardless of the working
+directory.
 
 ```
 phpcf cf:test
@@ -56,7 +57,7 @@ phpcf cf:test
 
 ### test:chrome-driver
 
-Install ChromeDriver binary untuk browser testing.
+Installs the ChromeDriver binary used for browser testing.
 
 ```
 phpcf test:chrome-driver {version?}

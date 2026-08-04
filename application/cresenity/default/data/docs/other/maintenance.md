@@ -1,10 +1,11 @@
 # Maintenance
 
-### Maintenance Mode
+### Maintenance mode
 
-Anda dapat mengeset maintenance mode dengan menambahkan file `down.php` pada folder data
+Maintenance mode is enabled by adding a `down.php` file to the `data` folder.
 
-contoh file down.php
+An example `down.php`:
+
 ```php
 <?php
 
@@ -13,16 +14,19 @@ return [
     'view' => 'system.maintenance',
     'cookie' => 'bypass-maintenance',
 ];
-
 ```
 
-### Down Setting
-jika bernilai `true` akan menyatakan bahwa system down dan logic tidak akan dijalankan
-(untuk logic bootstrap.php akan tetap dijalankan)
+### The `down` setting
 
-### Cookie Setting
-isi cookie ini dengan suatu value untuk membypass system maintenance
-jangan set key cookie jika tidak ingin ada cookie untuk bypass
+When set to `true`, the system is considered down and application logic is not executed. The
+logic in `bootstrap.php` still runs.
 
-### View Setting
-default value `system.maintenance`, overwrite key ini atau override `views/system/maintenance.blade.php` untuk mengganti tampilan maintenance
+### The `cookie` setting
+
+Set this to a value that, when present as a cookie, bypasses maintenance mode. Omit the key
+entirely if no bypass cookie should exist.
+
+### The `view` setting
+
+Defaults to `system.maintenance`. Override this key, or override
+`views/system/maintenance.blade.php`, to change the maintenance page.

@@ -2,7 +2,7 @@
 
 ### cron:list
 
-Menampilkan daftar scheduled commands.
+Lists the scheduled commands.
 
 ```
 phpcf cron:list --timezone=
@@ -10,7 +10,7 @@ phpcf cron:list --timezone=
 
 ### cron:run
 
-Menjalankan semua scheduled commands yang sudah waktunya.
+Runs every scheduled command that is due.
 
 ```
 phpcf cron:run
@@ -18,7 +18,8 @@ phpcf cron:run
 
 ### cron:work
 
-Menjalankan schedule worker yang akan terus berjalan dan mengeksekusi scheduled commands.
+Runs the schedule worker, which stays running and executes scheduled commands as they fall
+due.
 
 ```
 phpcf cron:work
@@ -26,7 +27,7 @@ phpcf cron:work
 
 ### cron:test
 
-Menjalankan satu scheduled command untuk keperluan testing.
+Runs a single scheduled command, for testing purposes.
 
 ```
 phpcf cron:test
@@ -34,7 +35,7 @@ phpcf cron:test
 
 ### cron:finish
 
-Handle penyelesaian scheduled command.
+Handles the completion of a scheduled command.
 
 ```
 phpcf cron:finish {id} {code}

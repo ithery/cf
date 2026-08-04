@@ -2,36 +2,36 @@
 
 ### API
 
-| Command | Deskripsi |
+| Command | Description |
 |---------|-----------|
 | `phpcf api:jwt-secret` | Generate JWTAuth secret key |
-| `phpcf api:oauth:key` | Membuat encryption keys untuk API authentication |
-| `phpcf api:oauth:client` | Membuat OAuth client |
+| `phpcf api:oauth:key` | Create encryption keys for API authentication |
+| `phpcf api:oauth:client` | Create an OAuth client |
 
 ### Asset
 
-| Command | Deskripsi |
+| Command | Description |
 |---------|-----------|
-| `phpcf asset:install` | Install asset ke public folder |
+| `phpcf asset:install` | Install assets into the public folder |
 | `phpcf asset:google-fonts:fetch` | Download Google Fonts |
 
 ### Queue
 
-| Command | Deskripsi |
+| Command | Description |
 |---------|-----------|
-| `phpcf queue:clear` | Menghapus semua job dari queue |
-| `phpcf queue:failed` | Menampilkan daftar failed jobs |
-| `phpcf queue:prune-batches` | Membersihkan batch entries yang sudah lama |
+| `phpcf queue:clear` | Delete every job from the queue |
+| `phpcf queue:failed` | List the failed jobs |
+| `phpcf queue:prune-batches` | Prune stale batch entries |
 
 ### Translation
 
-| Command | Deskripsi |
+| Command | Description |
 |---------|-----------|
-| `phpcf translations:check` | Mengecek kelengkapan translations untuk semua bahasa |
+| `phpcf translations:check` | Check translation completeness across every language |
 
 ### Documentation
 
-| Command | Deskripsi |
+| Command | Description |
 |---------|-----------|
 | `phpcf docs:phpdoc:install` | Install phpDocumentor |
 | `phpcf docs:phpdoc:generate` | Generate source documentation |
@@ -40,12 +40,12 @@
 
 ### WebSocket
 
-| Command | Deskripsi |
+| Command | Description |
 |---------|-----------|
-| `phpcf websocket:serve` | Menjalankan WebSocket server |
+| `phpcf websocket:serve` | Run the WebSocket server |
 
 ### Server Monitor
 
-| Command | Deskripsi |
+| Command | Description |
 |---------|-----------|
-| `phpcf server:monitor:listen {resources?}` | Monitor memory, CPU, network, dan nginx status |
+| `phpcf server:monitor:listen {resources?}` | Monitor memory, CPU, network, and nginx status |

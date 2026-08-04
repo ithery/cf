@@ -1,12 +1,12 @@
 # PHPCF - Domain
 
-Karena CF bersifat multi aplikasi, domain adalah yang menentukan aplikasi mana yang dilayani
-sebuah permintaan. Command pada halaman ini mengelola pendaftaran domain dan berpindah
-antar-domain saat bekerja di CLI.
+Because CF serves multiple applications, the domain determines which application handles a
+request. The commands on this page manage domain registrations and switch between domains when
+working on the command line.
 
-## Bentuk pendaftarannya
+## Registration format
 
-Tiap domain adalah satu berkas PHP di `data/domain/{domain}.php` yang mengembalikan larik:
+Each domain is a PHP file at `data/domain/{domain}.php` that returns an array:
 
 ```php
 <?php
@@ -19,13 +19,13 @@ return [
 ];
 ```
 
-`app_code` inilah yang dibaca `CF::appCode()` saat menangani permintaan HTTP, sehingga domain
-menentukan aplikasi. `org_id` dan `org_code` mengikat domain ke satu organisasi pada aplikasi
-bertenant, dan dibiarkan kosong bila organisasinya ditentukan dengan cara lain.
+`app_code` is what `CF::appCode()` reads when handling an HTTP request, which is how a domain
+selects an application. `org_id` and `org_code` bind the domain to a single organisation in
+multi-tenant applications, and are left empty when the organisation is resolved another way.
 
 ### domain:list
 
-Menampilkan seluruh domain yang terdaftar.
+Lists every registered domain.
 
 ```
 phpcf domain:list
@@ -33,18 +33,18 @@ phpcf domain:list
 
 ### domain:create
 
-Mendaftarkan domain baru dengan menulis berkasnya ke `data/domain`.
+Registers a new domain by writing its file into `data/domain`.
 
 ```
 phpcf domain:create {domain}
 ```
 
-Opsi:
+Options:
 
-- `--appId=` — `app_id` untuk domain ini, bawaannya `1`
-- `--appCode=` — `app_code` untuk domain ini, bawaannya `cresenity`
-- `--orgId=` — `org_id`, bila domain terikat satu organisasi
-- `--orgCode=` — `org_code`, bila domain terikat satu organisasi
+- `--appId=` — `app_id` for this domain, defaults to `1`
+- `--appCode=` — `app_code` for this domain, defaults to `cresenity`
+- `--orgId=` — `org_id`, when the domain belongs to a single organisation
+- `--orgCode=` — `org_code`, when the domain belongs to a single organisation
 
 ```
 phpcf domain:create ohayomart.test --appId=2100 --appCode=ohayomart
@@ -52,36 +52,36 @@ phpcf domain:create ohayomart.test --appId=2100 --appCode=ohayomart
 
 ### domain:delete
 
-Menghapus pendaftaran sebuah domain.
+Removes a domain registration.
 
 ```
 phpcf domain:delete {domain}
 ```
 
-Yang dihapus hanya berkas pendaftarannya; berkas aplikasinya tidak disentuh.
+Only the registration file is deleted; the application files are left untouched.
 
 ### domain:switch
 
-Menetapkan domain aktif untuk pekerjaan di CLI. Command sesudahnya berjalan pada konteks
-domain tersebut.
+Sets the active domain for command line work. Subsequent commands run in that domain's
+context.
 
 ```
 phpcf domain:switch {domain}
 ```
 
-Pilihannya disimpan di `data/current-domain` dan **bertahan lintas sesi** — ia berlaku sampai
-diganti, bukan hanya selama terminal terbuka. Command menolak berpindah ke domain yang belum
-terdaftar, dan memberi tahu bila kamu sudah berada di domain itu.
+The choice is stored in `data/current-domain` and **persists across sessions** — it applies
+until changed, not only for the current terminal. The command refuses to switch to a domain
+that is not registered, and reports when you are already on the requested domain.
 
-## Hubungannya dengan folder kerja
+## Relationship with the working directory
 
-Ada dua cara konteks aplikasi ditentukan di CLI, dan keduanya perlu diketahui karena tidak
-selalu sepakat:
+Application context is resolved two different ways on the command line, and they do not always
+agree:
 
-| Cara | Dipakai oleh |
+| Mechanism | Used by |
 |---|---|
-| folder kerja — `application/{code}/` | `phpcf tinker`, `phpcf test` |
-| domain aktif — `data/current-domain` | command yang berjalan dari root framework |
+| working directory — `application/{code}/` | `phpcf tinker`, `phpcf test` |
+| active domain — `data/current-domain` | commands run from the framework root |
 
-Bila sebuah command tampak menjalankan aplikasi yang salah, periksa keduanya: berada di
-folder aplikasi yang benar, dan `domain:switch` menunjuk ke domain yang benar.
+When a command appears to run against the wrong application, check both: that you are in the
+correct application folder, and that `domain:switch` points at the correct domain.

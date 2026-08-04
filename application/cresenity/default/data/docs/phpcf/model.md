@@ -1,7 +1,7 @@
 # PHPCF - Model
 
-Command pada halaman ini membaca model beserta tabelnya. Seluruhnya dijalankan dari dalam
-folder aplikasi, karena model yang dibaca adalah milik aplikasi tersebut.
+The commands on this page inspect models and their tables. All of them are run from inside the
+application folder, since the models they read belong to that application.
 
 ```
 cd application/ohayomart
@@ -10,7 +10,7 @@ phpcf model:list
 
 ### model:list
 
-Menampilkan seluruh model yang terdaftar di aplikasi.
+Lists every model registered in the application.
 
 ```
 phpcf model:list
@@ -18,36 +18,37 @@ phpcf model:list
 
 ### model:show
 
-Menampilkan rincian sebuah model: nama tabel, koneksi, kolom beserta tipenya, dan relasi yang
-dideklarasikan.
+Shows the details of a model: its table name, connection, columns with their types, and the
+relations it declares.
 
 ```
 phpcf model:show {model}
 ```
 
-Nama model boleh ditulis tanpa prefix aplikasinya:
+The model name may be given with or without the application prefix:
 
 ```
 phpcf model:show Product
 phpcf model:show OHModel_Product
 ```
 
-Opsi:
+Options:
 
-- `--database=` — koneksi yang dipakai, bila modelnya tidak memakai koneksi bawaan
-- `--json` — keluarkan sebagai JSON alih-alih tabel, untuk diproses skrip lain
+- `--database=` — the connection to use, when the model does not use the default one
+- `--json` — output as JSON instead of a table, for consumption by other scripts
 
 ```
 phpcf model:show Product --json
 ```
 
-Relasi yang dikenali: `hasOne`, `hasMany`, `hasOneThrough`, `hasManyThrough`, `belongsTo`,
-`belongsToMany`, `morphOne`, `morphTo`, `morphMany`, `morphToMany`, dan `morphedByMany`.
+The recognised relations are `hasOne`, `hasMany`, `hasOneThrough`, `hasManyThrough`,
+`belongsTo`, `belongsToMany`, `morphOne`, `morphTo`, `morphMany`, `morphToMany`, and
+`morphedByMany`.
 
 ### model:tables
 
-Menampilkan tabel yang memiliki model. Berguna untuk menemukan tabel yang **belum** punya
-model — bandingkan keluarannya dengan daftar tabel dari command `database`.
+Lists the tables that have a model. Useful for finding tables that do **not** yet have one —
+compare its output against the table list from the database commands.
 
 ```
 phpcf model:tables
@@ -55,9 +56,9 @@ phpcf model:tables
 
 ### model:update
 
-Memperbarui anotasi properti pada berkas model agar sesuai dengan kolom tabelnya. Dipakai
-setelah skema berubah, sehingga docblock `@property` kembali mencerminkan basis data dan
-analisis statis maupun pelengkapan otomatis IDE tetap benar.
+Updates the property annotations in a model file so they match the columns of its table. Run
+it after a schema change, so the `@property` docblocks reflect the database again and static
+analysis and IDE completion stay correct.
 
 ```
 phpcf model:update {table}
@@ -67,15 +68,15 @@ phpcf model:update {table}
 phpcf model:update product
 ```
 
-Yang diubah hanya blok anotasi; kode di dalam kelasnya tidak disentuh.
+Only the annotation block is rewritten; the code inside the class is left untouched.
 
 ## Scout
 
-Tersedia bila aplikasi memakai pengindeksan pencarian.
+Available when the application uses search indexing.
 
 ### model:scout:flush
 
-Mengosongkan seluruh record sebuah model dari indeks pencarian.
+Removes every record of a model from the search index.
 
 ```
 phpcf model:scout:flush {model}
@@ -83,7 +84,7 @@ phpcf model:scout:flush {model}
 
 ### model:scout:delete-all-indexes
 
-Menghapus seluruh indeks.
+Deletes all indexes.
 
 ```
 phpcf model:scout:delete-all-indexes

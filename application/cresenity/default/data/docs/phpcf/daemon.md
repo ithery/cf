@@ -2,7 +2,7 @@
 
 ### daemon:list
 
-Menampilkan daftar daemon yang terdaftar.
+Lists the registered daemons.
 
 ```
 phpcf daemon:list
@@ -10,7 +10,7 @@ phpcf daemon:list
 
 ### daemon:start
 
-Menjalankan daemon.
+Starts a daemon.
 
 ```
 phpcf daemon:start {class}
@@ -18,7 +18,7 @@ phpcf daemon:start {class}
 
 ### daemon:status
 
-Mengecek status daemon.
+Reports the status of a daemon.
 
 ```
 phpcf daemon:status {class}
@@ -26,7 +26,7 @@ phpcf daemon:status {class}
 
 ### daemon:stop
 
-Menghentikan daemon.
+Stops a daemon.
 
 ```
 phpcf daemon:stop {class}
@@ -34,7 +34,7 @@ phpcf daemon:stop {class}
 
 ### daemon:supervisor:start
 
-Menjalankan supervisor baru.
+Starts a new supervisor.
 
 ```
 phpcf daemon:supervisor:start
@@ -42,7 +42,7 @@ phpcf daemon:supervisor:start
 
 ### daemon:supervisor:status
 
-Mengecek status supervisor.
+Reports the status of the supervisor.
 
 ```
 phpcf daemon:supervisor:status

@@ -17,7 +17,7 @@ phpcf devsuite:stop
 
 ### Link
 
-Menghubungkan direktori project ke DevSuite.
+Links a project directory into DevSuite.
 
 ```
 phpcf devsuite:link
@@ -27,7 +27,7 @@ phpcf devsuite:unlink
 
 ### SSL/TLS
 
-Mengamankan domain dengan trusted TLS certificate.
+Secures a domain with a trusted TLS certificate.
 
 ```
 phpcf devsuite:secure
@@ -36,7 +36,7 @@ phpcf devsuite:unsecure
 
 ### TLD
 
-Mengatur Top Level Domain untuk DevSuite.
+Sets the top level domain used by DevSuite.
 
 ```
 phpcf devsuite:tld
@@ -65,11 +65,11 @@ phpcf devsuite:db:start
 phpcf devsuite:db:uninstall
 ```
 
-| Command | Deskripsi |
+| Command | Description |
 |---------|-----------|
-| `phpcf devsuite:db:list` | Menampilkan daftar database |
-| `phpcf devsuite:db:create` | Membuat database baru |
-| `phpcf devsuite:db:delete` | Menghapus database |
-| `phpcf devsuite:db:compare` | Membandingkan database |
-| `phpcf devsuite:db:clone` | Clone database |
-| `phpcf devsuite:db:sync` | Sinkronisasi database |
+| `phpcf devsuite:db:list` | List the databases |
+| `phpcf devsuite:db:create` | Create a new database |
+| `phpcf devsuite:db:delete` | Delete a database |
+| `phpcf devsuite:db:compare` | Compare databases |
+| `phpcf devsuite:db:clone` | Clone a database |
+| `phpcf devsuite:db:sync` | Synchronise databases |

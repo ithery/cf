@@ -2,36 +2,39 @@
 
 ### Install With Composer
 
-PHPCF adalah command line tool untuk mengelola aplikasi Cresenity Framework. Install secara global melalui Composer:
+PHPCF is the command line tool for managing Cresenity Framework applications. Install it
+globally through Composer:
 
 ```
 composer global require cresenity/phpcf
 ```
 
-Pastikan direktori global composer `vendor/bin` sudah ada di `PATH` sistem anda.
+Make sure the global composer `vendor/bin` directory is on your system `PATH`.
 
-### Penggunaan
+### Usage
 
-Setelah terinstall, jalankan `phpcf` dari root directory project:
+Once installed, run `phpcf` from the project root directory:
 
 ```
 phpcf list
 ```
 
-### Multi Aplikasi
+### Multiple applications
 
-Karena CF bersifat multi aplikasi, command akan berjalan pada konteks satu domain/aplikasi. Cek domain aktif dengan:
+Because CF serves multiple applications, commands run in the context of a single
+domain/application. Check the active domain with:
 
 ```
 phpcf status
 ```
 
-Gunakan `domain:switch` untuk berpindah aplikasi:
+Use `domain:switch` to change application:
 
 ```
 phpcf domain:switch domain.name
 ```
 
-### Daftar Command
+### Command list
 
-Seluruh default command yang tersedia didefinisikan pada class `CFConsole` di `system/core/CFConsole.php`. Lihat menu di samping untuk daftar command per kategori.
+Every default command is defined in the `CFConsole` class at `system/core/CFConsole.php`. See
+the menu alongside for the commands grouped by category.

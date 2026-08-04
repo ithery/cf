@@ -2,7 +2,7 @@
 
 ### version
 
-Menampilkan versi CF yang sedang digunakan.
+Displays the CF version currently in use.
 
 ```
 phpcf version
@@ -10,13 +10,13 @@ phpcf version
 
 ### about
 
-Menampilkan informasi lengkap tentang aplikasi.
+Displays complete information about the application.
 
 ```
 phpcf about
 ```
 
-Untuk menampilkan section tertentu saja:
+To display a single section only:
 
 ```
 phpcf about --only=environment
@@ -24,7 +24,7 @@ phpcf about --only=environment
 
 ### environment
 
-Menampilkan environment framework yang aktif.
+Displays the active framework environment.
 
 ```
 phpcf environment
@@ -32,7 +32,7 @@ phpcf environment
 
 ### serve
 
-Menjalankan aplikasi pada PHP built-in development server.
+Runs the application on the PHP built-in development server.
 
 ```
 phpcf serve
@@ -40,7 +40,7 @@ phpcf serve
 
 ### key:generate
 
-Generate application key baru.
+Generates a new application key.
 
 ```
 phpcf key:generate
@@ -48,7 +48,7 @@ phpcf key:generate
 
 ### composer
 
-Menjalankan composer command melalui phpcf.
+Runs a composer command through phpcf.
 
 ```
 phpcf composer {args}
@@ -56,7 +56,7 @@ phpcf composer {args}
 
 ### npm
 
-Menjalankan npm command melalui phpcf.
+Runs an npm command through phpcf.
 
 ```
 phpcf npm {npmArgs}
