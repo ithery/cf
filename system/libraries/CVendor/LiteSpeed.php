@@ -98,17 +98,25 @@ class CVendor_LiteSpeed {
      * Menyulih variabel jalur LiteSpeed menjadi jalur mutlak.
      *
      * `configFile` sebuah virtual host lazim ditulis `$SERVER_ROOT/conf/...`
-     * atau relatif terhadap `conf/`, sehingga jalur sesungguhnya tidak dapat
-     * ditebak dari nama vhost-nya. Menebaknya — misalnya selalu
-     * `conf/vhosts/<nama>/vhconf.conf` — benar untuk pemasangan bawaan dan
-     * salah untuk yang disusun panel.
+     * atau relatif, sehingga jalur sesungguhnya tidak dapat ditebak dari nama
+     * vhost-nya. Menebaknya — misalnya selalu `conf/vhosts/<nama>/vhconf.conf`
+     * — benar untuk pemasangan bawaan dan salah untuk yang disusun panel:
+     * pada server ocanel, vhost `ocanel.com` berkasnya di `conf/vhosts/ocanel/`,
+     * dan `app.ocanel.com` di `conf/vhosts/app.ocanel/`.
+     *
+     * **Jalur relatif berpangkal pada `$SERVER_ROOT`, bukan pada `conf/`.**
+     * Perbedaannya menghasilkan `/usr/local/lsws/conf/conf/vhosts/…` yang
+     * tidak pernah ada. `CVendor_LiteSpeed_Parser_RawFiles` memang menambahkan
+     * `conf/`, tetapi itu untuk direktif `include` **di dalam** berkas
+     * konfigurasi, yang pangkalnya memang berbeda — jangan disamakan.
      *
      * @param string      $path
      * @param null|string $vhRoot
+     * @param null|string $base   pangkal jalur relatif, bawaannya `$SERVER_ROOT`
      *
      * @return string
      */
-    public static function expandPath($path, $vhRoot = null) {
+    public static function expandPath($path, $vhRoot = null, $base = null) {
         $path = trim((string) $path);
         if (strlen($path) == 0) {
             return '';
@@ -121,7 +129,8 @@ class CVendor_LiteSpeed {
         }
 
         if (substr($path, 0, 1) != '/') {
-            $path = $root . '/conf/' . ltrim($path, '/');
+            $base = strlen((string) $base) > 0 ? rtrim((string) $base, '/') : $root;
+            $path = $base . '/' . ltrim($path, '/');
         }
 
         return $path;
