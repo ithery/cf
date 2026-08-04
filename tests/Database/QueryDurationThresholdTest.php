@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonInterval;
+use Carbon\CarbonInterval;
 
 use PHPUnit\Framework\TestCase;
 
