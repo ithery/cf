@@ -198,7 +198,7 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
 
         //we load another configuration for this app
         //org configuration
-        if (strlen(CF::orgCode()) > 0) {
+        if (strlen((string) CF::orgCode()) > 0) {
             $orgBootFile = DOCROOT . 'application' . DS . $this->code() . DS . CF::orgCode() . DS . CF::orgCode() . EXT;
             if (file_exists($orgBootFile)) {
                 include $orgBootFile;

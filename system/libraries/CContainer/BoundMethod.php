@@ -148,14 +148,16 @@ class CContainer_BoundMethod {
      * @return void
      */
     protected static function addDependencyForCallParameter($container, $parameter, array &$parameters, &$dependencies) {
+        $className = CBase_Reflector::getParameterClassName($parameter);
+
         if (array_key_exists($parameter->name, $parameters)) {
             $dependencies[] = $parameters[$parameter->name];
             unset($parameters[$parameter->name]);
-        } elseif ($parameter->getClass() && array_key_exists($parameter->getClass()->name, $parameters)) {
-            $dependencies[] = $parameters[$parameter->getClass()->name];
-            unset($parameters[$parameter->getClass()->name]);
-        } elseif ($parameter->getClass()) {
-            $dependencies[] = $container->make($parameter->getClass()->name);
+        } elseif ($className && array_key_exists($className, $parameters)) {
+            $dependencies[] = $parameters[$className];
+            unset($parameters[$className]);
+        } elseif ($className) {
+            $dependencies[] = $container->make($className);
         } elseif ($parameter->isDefaultValueAvailable()) {
             $dependencies[] = $parameter->getDefaultValue();
         }

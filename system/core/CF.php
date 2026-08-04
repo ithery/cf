@@ -238,7 +238,7 @@ final class CF {
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_application_bootstrap');
 
         //try to locate bootstrap files for org
-        if (strlen(CF::orgCode()) > 0) {
+        if (strlen((string) CF::orgCode()) > 0) {
             $bootstrapPath .= CF::orgCode() . DS;
             if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
                 include $bootstrapPath . 'bootstrap' . EXT;

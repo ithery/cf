@@ -41,7 +41,7 @@ class CApp_Config {
      * @return mixed
      */
     public static function get($key, $domain = '') {
-        if (strlen($domain) == 0) {
+        if (strlen((string) $domain) == 0) {
             $domain = CF::domain();
         }
         $camelKey = cstr::camel($key);

@@ -38,7 +38,7 @@ class CRouting_RouteFinder {
 
         $route = null;
 
-        if (class_exists($className)) {
+        if ($className !== null && class_exists($className)) {
             $resolved = static::resolveMethodAndVerbs($className, $methodSegment);
 
             if ($resolved !== null) {
