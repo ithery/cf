@@ -66,6 +66,13 @@ final class CF {
     private static $sharedAppCode = [];
 
     /**
+     * Shared app code declared by each application, keyed by app code.
+     *
+     * @var array
+     */
+    private static $declaredSharedAppCode = [];
+
+    /**
      * Force appCode for CF.
      *
      * @var string
@@ -990,9 +997,48 @@ final class CF {
             $data['shared_app_code'] = [];
         }
 
-        $data['shared_app_code'] = array_merge($data['shared_app_code'], self::$sharedAppCode);
+        $data['shared_app_code'] = array_merge(
+            $data['shared_app_code'],
+            self::declaredSharedApp($domain),
+            self::$sharedAppCode
+        );
 
-        return isset($data['shared_app_code']) ? $data['shared_app_code'] : [];
+        return array_values(array_unique($data['shared_app_code']));
+    }
+
+    /**
+     * Get the shared application code declared by the application itself.
+     *
+     * The file is read before any configuration is loaded, so an application
+     * whose config refers to a class of the application it shares with can be
+     * resolved. Registering the same code with addSharedApp() from the
+     * application bootstrap is too late for that: by then every config file
+     * has already been evaluated.
+     *
+     * @param string $domain
+     *
+     * @return array
+     */
+    protected static function declaredSharedApp($domain = null) {
+        $appCode = self::appCode($domain);
+        if (strlen((string) $appCode) == 0) {
+            return [];
+        }
+
+        if (!isset(self::$declaredSharedAppCode[$appCode])) {
+            $declared = [];
+            $file = DOCROOT . 'application' . DS . $appCode . DS . 'shared' . EXT;
+            if (file_exists($file)) {
+                $declared = require $file;
+                if (!is_array($declared)) {
+                    $declared = [];
+                }
+            }
+
+            self::$declaredSharedAppCode[$appCode] = $declared;
+        }
+
+        return self::$declaredSharedAppCode[$appCode];
     }
 
     /**
