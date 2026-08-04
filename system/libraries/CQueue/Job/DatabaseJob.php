@@ -2,7 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInterface {
+class CQueue_Job_DatabaseJob extends CQueue_AbstractJob {
     /**
      * The database queue instance.
      *
