@@ -745,7 +745,15 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
         if ($concrete instanceof Closure) {
             return $concrete($this, $this->getLastParameterOverride());
         }
-        $reflector = new ReflectionClass($concrete);
+        // A missing class has to surface as a binding failure like every other
+        // resolution problem. Letting ReflectionException through means a caller
+        // guarding against CContainer_Exception_BindingResolutionException misses
+        // it entirely.
+        try {
+            $reflector = new ReflectionClass($concrete);
+        } catch (ReflectionException $e) {
+            throw new CContainer_Exception_BindingResolutionException("Target class [{$concrete}] does not exist.", 0, $e);
+        }
         // If the type is not instantiable, the developer is attempting to resolve
         // an abstract type such as an Interface of Abstract Class and there is
         // no binding registered for the abstractions so we need to bail out.
