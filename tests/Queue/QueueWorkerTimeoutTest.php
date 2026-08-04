@@ -243,18 +243,20 @@ class QueueWorkerTimeoutTest extends TestCase {
     }
 
     /**
-     * The default is deliberately loose. Until the fix above, nothing on the
-     * `once` path was ever timed out, so a tight default would start killing
-     * jobs that are merely slow rather than frozen.
+     * Bawaannya 300 detik di cabang ini. Cabang CF1.6 sengaja memakai 1800 --
+     * di sana jalur `once` belum pernah menegakkan timeout sama sekali sebelum
+     * backport, sehingga bawaan yang ketat akan mulai membunuh job yang sekadar
+     * lambat. Dikunci di sini supaya penyusulan CF1.6 ke depan tidak diam-diam
+     * ikut membawa angkanya.
      */
-    public function testTheRunnerDefaultTimeoutIsLooseEnoughNotToKillSlowJobs() {
+    public function testTheRunnerDefaultTimeoutStaysAtFiveMinutes() {
         $worker = $this->makeWorker();
         $method = new ReflectionMethod(CQueue_Runner::class, 'gatherWorkerOptions');
         $method->setAccessible(true);
 
         $options = $method->invoke(new CQueue_Runner($worker, null, []));
 
-        $this->assertGreaterThanOrEqual(1800, $options->timeout);
+        $this->assertSame(300, $options->timeout);
     }
 
     public function testAnExplicitTimeoutStillWinsOverTheDefault() {

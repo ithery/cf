@@ -246,14 +246,11 @@ class CQueue_Runner {
         //The memory limit in megabytes
         $defaultOptions['memory'] = 1024;
         //The number of seconds a child process can run
-        //Sengaja longgar pada cabang ini. Sampai perbaikan runNextJob() di atas,
-        //timeout tidak pernah ditegakkan sama sekali pada jalur `once`, sehingga
-        //tiap pemanggil yang tidak menuliskan timeout sendiri selama ini berjalan
-        //tanpa batas. Angka 300 akan mulai membunuh job yang wajar tetapi lambat.
-        //Job yang beku itu tak berhingga -- 90 hari dan 12 hari pada dua insiden
-        //Tribelio -- jadi ambang setengah jam menangkapnya sama pastinya tanpa
-        //menyentuh yang masih wajar.
-        $defaultOptions['timeout'] = 1800;
+        //Cabang CF1.6 sengaja memakai 1800 dan itu perbedaan yang dikehendaki:
+        //di sana jalur `once` tidak pernah menegakkan timeout sama sekali,
+        //sehingga bawaan yang ketat akan mulai membunuh job yang sekadar lambat.
+        //Di sini tetap 300. Jangan disamakan saat menyusulkan CF1.6 ke depan.
+        $defaultOptions['timeout'] = 300;
         //Force the worker to run even in maintenance mode
         $defaultOptions['force'] = false;
         //Number of seconds to sleep when no job is available
