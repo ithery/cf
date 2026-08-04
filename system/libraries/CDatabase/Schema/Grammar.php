@@ -30,9 +30,7 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      * @param string     $name
      * @param \CDatabase $connection
      *
-     * @throws \LogicException
-     *
-     * @return void
+     * @return string
      */
     public function compileCreateDatabase($name, $connection) {
         return sprintf('create database %s', $this->wrapValue($name));
@@ -43,9 +41,7 @@ abstract class CDatabase_Schema_Grammar extends CDatabase_Grammar {
      *
      * @param string $name
      *
-     * @throws \LogicException
-     *
-     * @return void
+     * @return string
      */
     public function compileDropDatabaseIfExists($name) {
         return sprintf('drop database if exists %s', $this->wrapValue($name));

@@ -34,24 +34,6 @@ class CDatabase_Schema_Builder_PostgresBuilder extends CDatabase_Schema_Builder 
     }
 
     /**
-     * Determine if the given table exists.
-     *
-     * @param string $table
-     *
-     * @return bool
-     */
-    public function hasTable($table) {
-        list($database, $schema, $table) = $this->parseSchemaAndTable($table);
-
-        $table = $this->connection->getTablePrefix() . $table;
-
-        return count($this->connection->selectFromWriteConnection(
-            $this->grammar->compileTableExists($schema, $table),
-            [$database, $schema, $table]
-        )) > 0;
-    }
-
-    /**
      * Drop all tables from the database.
      *
      * @return void
@@ -165,63 +147,6 @@ class CDatabase_Schema_Builder_PostgresBuilder extends CDatabase_Schema_Builder 
         return $this->connection->select(
             $this->grammar->compileGetAllTypes()
         );
-    }
-
-    /**
-     * Get the column listing for a given table.
-     *
-     * @param string $table
-     *
-     * @return array
-     */
-    public function getColumnListing($table) {
-        list($database, $schema, $table) = $this->parseSchemaAndTable($table);
-
-        $table = $this->connection->getTablePrefix() . $table;
-
-        $results = $this->connection->selectFromWriteConnection(
-            $this->grammar->compileColumnListing(),
-            [$database, $schema, $table]
-        );
-
-        return $this->connection->getPostProcessor()->processColumnListing($results);
-    }
-
-    /**
-     * Parse the database object reference and extract the database, schema, and table.
-     *
-     * @param string $reference
-     *
-     * @return array
-     */
-    protected function parseSchemaAndTable($reference) {
-        $searchPath = $this->parseSearchPath(
-            $this->connection->getConfig('search_path') ?: $this->connection->getConfig('schema') ?: 'public'
-        );
-
-        $parts = explode('.', $reference);
-
-        $database = $this->connection->getConfig('database');
-
-        // If the reference contains a database name, we will use that instead of the
-        // default database name for the connection. This allows the database name
-        // to be specified in the query instead of at the full connection level.
-        if (count($parts) === 3) {
-            $database = $parts[0];
-            array_shift($parts);
-        }
-
-        // We will use the default schema unless the schema has been specified in the
-        // query. If the schema has been specified in the query then we can use it
-        // instead of a default schema configured in the connection search path.
-        $schema = $searchPath[0];
-
-        if (count($parts) === 2) {
-            $schema = $parts[0];
-            array_shift($parts);
-        }
-
-        return [$database, $schema, $parts[0]];
     }
 
     /**
