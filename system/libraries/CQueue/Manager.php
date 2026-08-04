@@ -82,6 +82,17 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
     }
 
     /**
+     * Register an event listener for the daemon queue starting.
+     *
+     * @param mixed $callback
+     *
+     * @return void
+     */
+    public function starting($callback) {
+        $this->dispatcher->listen(CQueue_Event_WorkerStarting::class, $callback);
+    }
+
+    /**
      * Register an event listener for the daemon queue loop.
      *
      * @param mixed $callback

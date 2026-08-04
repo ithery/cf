@@ -4,6 +4,15 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 interface CQueue_Contract_MonitorInterface {
     /**
+     * Register a callback to be executed when a daemon queue is starting.
+     *
+     * @param mixed $callback
+     *
+     * @return void
+     */
+    public function starting($callback);
+
+    /**
      * Register a callback to be executed on every iteration through the queue loop.
      *
      * @param mixed $callback
