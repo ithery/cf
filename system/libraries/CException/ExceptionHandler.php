@@ -38,6 +38,20 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     protected $dontReport = [];
 
     /**
+     * A list of the exception types that a queued job should never be retried for.
+     *
+     * @var array
+     */
+    protected $dontRetry = [];
+
+    /**
+     * The callbacks that decide whether a queued job should stop being retried.
+     *
+     * @var callable[]
+     */
+    protected $dontRetryCallbacks = [];
+
+    /**
      * The callbacks that should be used during reporting.
      *
      * @var array
@@ -187,6 +201,53 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         $this->dontReport[] = $class;
 
         return $this;
+    }
+
+    /**
+     * Indicate that a queued job should not be retried when it fails with the
+     * given exception type, or when the given callback answers true.
+     *
+     * @param callable|class-string<\Throwable> $type
+     *
+     * @return $this
+     */
+    public function dontRetry($type) {
+        if (is_string($type)) {
+            $this->dontRetry[] = $type;
+        } else {
+            $this->dontRetryCallbacks[] = $type;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Determine whether a queued job that failed with this exception should stop
+     * being retried and be marked failed straight away.
+     *
+     * Read by CQueue_Worker::markJobAsFailedIfItShouldntBeRetried(). Retrying a
+     * job that failed on a malformed payload or a deleted record only burns
+     * attempts, so the answer belongs with the exception handler rather than
+     * with every job.
+     *
+     * @param Throwable $e
+     *
+     * @return bool
+     */
+    public function shouldStopRetries($e) {
+        $matched = carr::first($this->dontRetry, function ($type) use ($e) {
+            return $e instanceof $type;
+        });
+        if (!is_null($matched)) {
+            return true;
+        }
+        foreach ($this->dontRetryCallbacks as $dontRetryCallback) {
+            if (call_user_func($dontRetryCallback, $e) === true) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -35,7 +35,7 @@ class CQueue_Worker {
     /**
      * The job currently being processed.
      *
-     * @var null|CQueue_JobInterface
+     * @var null|CQueue_AbstractJob
      */
     public $currentJob;
 
@@ -677,7 +677,7 @@ class CQueue_Worker {
      * @return void
      */
     protected function markJobAsFailedIfItShouldntBeRetried($connectionName, $job, $e) {
-        if (method_exists($this->exceptions, 'shouldStopRetries') && $this->exceptions->shouldStopRetries($e)) {
+        if ($this->exceptions->shouldStopRetries($e)) {
             $this->failJob($job, $e);
         }
     }

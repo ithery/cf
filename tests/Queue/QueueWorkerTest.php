@@ -244,6 +244,64 @@ class QueueWorkerTest extends TestCase {
     }
 
     /**
+     * An exception type registered with `dontRetry()` must fail the job on the
+     * spot instead of burning its remaining attempts.
+     */
+    public function testAJobIsFailedWhenTheHandlerSaysItShouldNotBeRetried() {
+        $handler = new CException_ExceptionHandler();
+        $handler->dontRetry(RuntimeException::class);
+
+        $job = new QueueWorkerFakeJob('boom', [], function () {
+            throw new RuntimeException('malformed payload');
+        });
+        $worker = new QueueWorkerTestWorker(
+            new QueueWorkerFakeManager(new QueueWorkerFakeConnection([$job])),
+            new CEvent_Dispatcher(),
+            $handler,
+            function () {
+                return false;
+            }
+        );
+
+        $worker->runNextJob('test-connection', 'default', $this->makeOptions(['maxTries' => 5]));
+
+        $this->assertTrue($job->hasFailed(), 'A non-retryable exception did not fail the job.');
+        $this->assertFalse($job->isReleased(), 'A failed job must not go back on the queue.');
+    }
+
+    public function testAJobIsStillRetriedForAnExceptionTypeThatWasNotRegistered() {
+        $handler = new CException_ExceptionHandler();
+        $handler->dontRetry(LogicException::class);
+
+        $job = new QueueWorkerFakeJob('boom', [], function () {
+            throw new RuntimeException('transient');
+        });
+        $worker = new QueueWorkerTestWorker(
+            new QueueWorkerFakeManager(new QueueWorkerFakeConnection([$job])),
+            new CEvent_Dispatcher(),
+            $handler,
+            function () {
+                return false;
+            }
+        );
+
+        $worker->runNextJob('test-connection', 'default', $this->makeOptions(['maxTries' => 5]));
+
+        $this->assertFalse($job->hasFailed());
+        $this->assertTrue($job->isReleased(), 'A retryable job should go back on the queue.');
+    }
+
+    public function testDontRetryAlsoAcceptsACallback() {
+        $handler = new CException_ExceptionHandler();
+        $handler->dontRetry(function ($e) {
+            return strpos($e->getMessage(), 'malformed') !== false;
+        });
+
+        $this->assertTrue($handler->shouldStopRetries(new RuntimeException('malformed payload')));
+        $this->assertFalse($handler->shouldStopRetries(new RuntimeException('timed out')));
+    }
+
+    /**
      * `CQueue_Runner` defaults to `once => true`, so `CQueue::run()` without
      * options goes through `runNextJob()` and not `daemon()`. Every guarantee
      * tested in QueueWorkerTimeoutTest hangs on this default, so pin it here.
