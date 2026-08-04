@@ -565,7 +565,7 @@ class CView_Factory {
     public static function compiledPath() {
         $path = CF::config('view.compiled');
         $path = rtrim($path, '/');
-        $appCode = CF::appCode();
+        $appCode = (string) CF::appCode();
         if (strlen($appCode) > 0) {
             $path .= '/' . $appCode;
         }

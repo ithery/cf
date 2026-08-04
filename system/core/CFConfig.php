@@ -7,7 +7,7 @@ class CFConfig {
         $items = [];
         $cached = self::getCachedConfigPath();
         $loadedFromCache = false;
-        if (file_exists($cached)) {
+        if (strlen((string) $cached) > 0 && file_exists($cached)) {
             $items = require $cached;
             $loadedFromCache = true;
         }

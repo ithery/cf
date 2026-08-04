@@ -396,6 +396,10 @@ class cstr {
      * @return bool
      */
     public static function contains($haystack, $needles) {
+        //dipanggil dari mana-mana, termasuk dengan nilai null; PHP 8.1 mengeluh
+        //kalau null sampai ke mb_strpos, jadi dijinakkan di satu tempat ini
+        $haystack = (string) $haystack;
+
         foreach ((array) $needles as $needle) {
             if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
                 return true;
