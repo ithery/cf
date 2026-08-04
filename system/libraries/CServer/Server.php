@@ -32,6 +32,11 @@ class CServer_Server {
     private $webServerInstance;
 
     /**
+     * @var null|CServer_Cf
+     */
+    private $cfInstance;
+
+    /**
      * @var null|CServer_Redis
      */
     private $redisInstance;
@@ -166,6 +171,19 @@ class CServer_Server {
         }
 
         return $this->webServerInstance;
+    }
+
+    /**
+     * Pemeriksa pemasangan Cresenity Framework di server ini.
+     *
+     * @return CServer_Cf
+     */
+    public function cf() {
+        if ($this->cfInstance === null) {
+            $this->cfInstance = new CServer_Cf($this);
+        }
+
+        return $this->cfInstance;
     }
 
     /**
