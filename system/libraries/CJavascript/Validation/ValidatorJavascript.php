@@ -121,6 +121,7 @@ class CJavascript_Validation_ValidatorJavascript implements Arrayable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         try {
             return $this->render();

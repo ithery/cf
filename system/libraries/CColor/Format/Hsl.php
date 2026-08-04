@@ -90,6 +90,7 @@ class CColor_Format_Hsl extends CColor_FormatAbstract {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return 'hsl(' . implode(',', $this->values()) . ')';
     }

@@ -107,6 +107,7 @@ abstract class CManager_Asset_FileAbstract {
         return $dirs;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->getPath();
     }

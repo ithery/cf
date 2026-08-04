@@ -24,6 +24,7 @@ class CPeriod_Collection implements ArrayAccess, Iterator, Countable {
     /**
      * @return CPeriod
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->periods[$this->position];
     }

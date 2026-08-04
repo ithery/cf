@@ -707,6 +707,7 @@ abstract class CModel_Factory_Factory {
      *
      * @return static
      */
+    #[\ReturnTypeWillChange]
     public function count(?int $count) {
         return $this->newInstance(['count' => $count]);
     }

@@ -104,6 +104,7 @@ class CExporter_Row implements ArrayAccess {
         return $this->row->getRowIndex();
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return isset(($this->toArray())[$offset]);
     }
@@ -113,9 +114,11 @@ class CExporter_Row implements ArrayAccess {
         return ($this->toArray())[$offset];
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
     }
 

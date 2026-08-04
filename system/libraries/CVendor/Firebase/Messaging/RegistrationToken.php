@@ -18,10 +18,12 @@ class CVendor_Firebase_Messaging_RegistrationToken implements \JsonSerializable 
         return $this->value;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->value;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->value;
     }

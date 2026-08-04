@@ -85,6 +85,7 @@ class CStringBuilder {
         return $this->text;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->text;
     }

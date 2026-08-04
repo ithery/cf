@@ -51,6 +51,7 @@ final class CGeo_Model_Country {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->getName() ? $this->getName() : '';
     }

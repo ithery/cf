@@ -32,6 +32,7 @@ class CJavascript_Mock_Variable {
         return $var;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->getScript();
     }

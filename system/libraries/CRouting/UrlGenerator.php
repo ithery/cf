@@ -133,6 +133,7 @@ class CRouting_UrlGenerator {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->to($this->request->getPathInfo());
     }

@@ -63,6 +63,7 @@ class CBase_Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->toArray();
     }

@@ -558,6 +558,7 @@ class CRunner_Command {
     /**
      * @return string the current command string to execute
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->getExecCommand();
     }

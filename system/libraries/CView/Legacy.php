@@ -216,6 +216,7 @@ class CView_Legacy {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         try {
             return $this->render();

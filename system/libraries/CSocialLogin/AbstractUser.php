@@ -134,6 +134,7 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Co
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return array_key_exists($offset, $this->user);
     }
@@ -158,6 +159,7 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Co
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->user[$offset] = $value;
     }
@@ -169,6 +171,7 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Co
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         unset($this->user[$offset]);
     }

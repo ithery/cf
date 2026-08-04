@@ -1139,6 +1139,7 @@ class CBase_String implements Stringable, ArrayAccess {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->__toString();
     }
@@ -1208,6 +1209,7 @@ class CBase_String implements Stringable, ArrayAccess {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->value;
     }

@@ -130,6 +130,7 @@ class CColor_Format_Hsv extends CColor_FormatAbstract {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return 'hsv(' . implode(',', $this->values()) . ')';
     }

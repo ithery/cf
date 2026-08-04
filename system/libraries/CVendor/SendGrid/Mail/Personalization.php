@@ -276,6 +276,7 @@ class CVendor_SendGrid_Mail_Personalization implements \JsonSerializable {
      *
      * @return null|array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         if ($this->getHasDynamicTemplate() == true) {
             $dynamic_substitutions = $this->getSubstitutions();

@@ -40,6 +40,7 @@ final class CVendor_Firebase_Value_Url implements \JsonSerializable {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->value;
     }
@@ -47,6 +48,7 @@ final class CVendor_Firebase_Value_Url implements \JsonSerializable {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return (string) $this->value;
     }

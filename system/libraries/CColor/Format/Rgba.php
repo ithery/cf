@@ -126,6 +126,7 @@ class CColor_Format_Rgba extends CColor_FormatAbstract {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return 'rgba(' . implode(',', $this->values()) . ')';
     }

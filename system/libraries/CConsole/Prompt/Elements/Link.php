@@ -30,6 +30,7 @@ class CConsole_Prompt_Elements_Link implements CConsole_Prompt_Elements_ElementC
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $text = ($this->underline) ? "\e[4m{$this->label}\e[24m" : $this->label;
 

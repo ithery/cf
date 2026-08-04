@@ -18,6 +18,7 @@ final class CGeo_Model_AddressCollection implements CGeo_Interface_CollectionInt
     /**
      * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new \ArrayIterator($this->all());
     }
@@ -25,6 +26,7 @@ final class CGeo_Model_AddressCollection implements CGeo_Interface_CollectionInt
     /**
      * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->locations);
     }

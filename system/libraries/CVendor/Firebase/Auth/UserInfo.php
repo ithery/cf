@@ -57,6 +57,7 @@ class CVendor_Firebase_Auth_UserInfo implements \JsonSerializable {
     /**
      * @return array<string, null|string>
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return \get_object_vars($this);
     }

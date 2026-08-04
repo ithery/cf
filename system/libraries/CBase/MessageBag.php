@@ -359,6 +359,7 @@ class CBase_MessageBag implements Arrayable, Countable, Jsonable, JsonSerializab
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->toArray();
     }
@@ -379,6 +380,7 @@ class CBase_MessageBag implements Arrayable, Countable, Jsonable, JsonSerializab
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->toJson();
     }

@@ -1803,6 +1803,7 @@ abstract class CModel implements ArrayAccess, Arrayable, Jsonable, CQueue_Queuea
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->toArray();
     }
@@ -2381,6 +2382,7 @@ abstract class CModel implements ArrayAccess, Arrayable, Jsonable, CQueue_Queuea
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->escapeWhenCastingToString
             ? c::e($this->toJson())

@@ -53,6 +53,7 @@ class CBase_HtmlString implements Htmlable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->toHtml() ?? '';
     }

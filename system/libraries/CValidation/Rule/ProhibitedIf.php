@@ -30,6 +30,7 @@ class CValidation_Rule_ProhibitedIf {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         if (is_callable($this->condition)) {
             return call_user_func($this->condition) ? 'prohibited' : '';

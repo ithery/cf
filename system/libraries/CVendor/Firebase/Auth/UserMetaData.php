@@ -51,6 +51,7 @@ class CVendor_Firebase_Auth_UserMetaData implements \JsonSerializable {
     /**
      * @return array<string, mixed>
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         $data = \get_object_vars($this);
 

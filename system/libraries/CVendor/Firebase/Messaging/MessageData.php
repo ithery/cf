@@ -31,6 +31,7 @@ final class CVendor_Firebase_Messaging_MessageData implements \JsonSerializable 
         return $messageData;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->data;
     }

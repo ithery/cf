@@ -12,6 +12,7 @@ final class CVendor_Firebase_Messaging_RawMessageFromArray implements CVendor_Fi
         $this->data = $data;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return Json::decode(Json::encode($this->data), true);
     }

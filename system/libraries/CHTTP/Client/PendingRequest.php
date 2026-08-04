@@ -365,6 +365,7 @@ class CHTTP_Client_PendingRequest {
      *
      * @return $this
      */
+    #[\ReturnTypeWillChange]
     public function accept($contentType) {
         return $this->withHeaders(['Accept' => $contentType]);
     }

@@ -119,6 +119,7 @@ class CColor_Format_Rgb extends CColor_FormatAbstract {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return 'rgb(' . implode(',', $this->values()) . ')';
     }

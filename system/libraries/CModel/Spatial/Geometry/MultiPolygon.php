@@ -36,6 +36,7 @@ class CModel_Spatial_Geometry_MultiPolygon extends CModel_Spatial_Geometry_Geome
      *
      * @return string The string representation of the MultiPolygon
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return implode(',', array_map(function (CModel_Spatial_Geometry_Polygon $polygon) {
             return sprintf('(%s)', (string) $polygon);
@@ -140,6 +141,7 @@ class CModel_Spatial_Geometry_MultiPolygon extends CModel_Spatial_Geometry_Geome
      *
      * @return \GeoJson\Geometry\MultiPolygon
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         $polygons = [];
         foreach ($this->items as $polygon) {

@@ -141,6 +141,7 @@ class CDatabase_Driver_PDO_Sqlite_Result extends CDatabase_Result {
         return $field_names;
     }
 
+    #[\ReturnTypeWillChange]
     public function seek($offset) {
         // To request a scrollable cursor for your PDOStatement object, you must
         // set the PDO::ATTR_CURSOR attribute to PDO::CURSOR_SCROLL when you

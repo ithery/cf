@@ -93,6 +93,7 @@ class CBackup_Zip {
         return $this;
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return $this->fileCount;
     }

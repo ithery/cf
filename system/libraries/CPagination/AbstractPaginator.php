@@ -753,6 +753,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->render();
     }

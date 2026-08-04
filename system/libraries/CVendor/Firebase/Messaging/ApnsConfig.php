@@ -84,6 +84,7 @@ final class CVendor_Firebase_Messaging_ApnsConfig implements JsonSerializable {
     /**
      * @return array<string, mixed>
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return \array_filter($this->config, static function ($value) {
             return $value !== null;

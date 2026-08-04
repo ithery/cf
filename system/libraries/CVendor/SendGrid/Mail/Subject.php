@@ -51,6 +51,7 @@ class CVendor_SendGrid_Mail_Subject implements \JsonSerializable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->getSubject();
     }

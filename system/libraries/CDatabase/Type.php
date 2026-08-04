@@ -287,6 +287,7 @@ abstract class CDatabase_Type {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $e = explode('\\', get_class($this));
 

@@ -193,6 +193,7 @@ class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
      *
      * @return null|array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return array_filter(
             [

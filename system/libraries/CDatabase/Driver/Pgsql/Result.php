@@ -125,6 +125,7 @@ class CDatabase_Driver_Pgsql_Result extends CDatabase_Result {
         return $this->insert_id;
     }
 
+    #[\ReturnTypeWillChange]
     public function seek($offset) {
         if ($this->offsetExists($offset) and pg_result_seek($this->result, $offset)) {
             // Set the current row to the offset

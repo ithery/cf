@@ -50,6 +50,7 @@ class CBackup_Manifest implements Countable {
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         $file = new SplFileObject($this->manifestPath, 'r');
         $file->seek(PHP_INT_MAX);

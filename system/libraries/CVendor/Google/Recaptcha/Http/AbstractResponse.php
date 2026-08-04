@@ -178,6 +178,7 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements Arrayab
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->toArray();
     }

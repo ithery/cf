@@ -565,6 +565,7 @@ class CApi_Routing_Router {
      *
      * @return \CRouting_Route
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->getCurrentRoute();
     }

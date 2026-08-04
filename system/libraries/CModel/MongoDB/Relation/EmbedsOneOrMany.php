@@ -93,6 +93,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->getEmbedded());
     }

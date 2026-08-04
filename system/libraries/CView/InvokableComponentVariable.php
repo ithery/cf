@@ -77,6 +77,7 @@ class CView_InvokableComponentVariable implements CBase_DeferringDisplayableValu
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->__invoke();
     }

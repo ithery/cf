@@ -110,6 +110,7 @@ class CModel_Spatial_Geometry_Point extends CModel_Spatial_GeometryAbstract {
      *
      * @return string The string representation of the point
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->getLng() . ' ' . $this->getLat();
     }
@@ -138,6 +139,7 @@ class CModel_Spatial_Geometry_Point extends CModel_Spatial_GeometryAbstract {
      *
      * @return \GeoJson\Geometry\Point
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return new GeoJsonPoint([$this->getLng(), $this->getLat()]);
     }

@@ -48,6 +48,7 @@ class CModel_Spatial_Geometry_GeometryCollection extends CModel_Spatial_Geometry
         return sprintf('GEOMETRYCOLLECTION(%s)', (string) $this);
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return implode(',', array_map(function (CModel_Spatial_Contract_GeometryInterface $geometry) {
             return $geometry->toWKT();
@@ -133,6 +134,7 @@ class CModel_Spatial_Geometry_GeometryCollection extends CModel_Spatial_Geometry
      *
      * @return \GeoJson\Geometry\GeometryCollection
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         $geometries = [];
         foreach ($this->items as $geometry) {

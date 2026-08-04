@@ -64,6 +64,7 @@ class CImage_ManipulationSequence implements IteratorAggregate {
         return $this->sanitizeManipulationSets($this->groups);
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new ArrayIterator($this->toArray());
     }

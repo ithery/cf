@@ -64,6 +64,7 @@ class OpisSerializableClosureTest extends TestCase {
 }
 
 class OpisSerializableClosureTest_ThrowingScopeReflectionClosure extends \Opis\Closure\ReflectionClosure {
+    #[\ReturnTypeWillChange]
     public function getClosureScopeClass() {
         throw new Error('Failed to retrieve the reflection object');
     }

@@ -103,6 +103,7 @@ class CDocument_Pdf_Element_RectangleReadOnly extends CDocument_Pdf_Element_Rect
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $string = 'RectangleReadOnly: ';
         $string .= $this->getWidth();

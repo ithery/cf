@@ -132,6 +132,7 @@ class CBase_Js implements CInterface_Htmlable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->toHtml();
     }

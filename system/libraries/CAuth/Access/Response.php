@@ -135,6 +135,7 @@ class CAuth_Access_Response implements Arrayable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->message();
     }

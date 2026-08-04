@@ -35,6 +35,7 @@ class CDatabase_Query_Expression implements CDatabase_Contract_Query_ExpressionI
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->getValue(c::db()->getQueryGrammar());
     }

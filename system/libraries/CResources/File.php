@@ -28,6 +28,7 @@ class CResources_File {
         $this->mimeType = $mimeType;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return "name: {$this->name}, size: {$this->size}, mime: {$this->mimeType}";
     }

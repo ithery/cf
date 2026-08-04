@@ -145,6 +145,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     /**
      * Iterator: current.
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->offsetGet($this->current_row);
     }
@@ -152,6 +153,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     /**
      * Iterator: key.
      */
+    #[\ReturnTypeWillChange]
     public function key() {
         return $this->current_row;
     }

@@ -892,6 +892,7 @@ class CValidation_Validator implements CValidation_Contract_ValidatorInterface {
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function valid() {
         if (!$this->messages) {
             $this->passes();

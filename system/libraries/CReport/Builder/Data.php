@@ -73,6 +73,7 @@ class CReport_Builder_Data implements ArrayAccess, Iterator, Countable {
     /**
      * Iterator: current.
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->offsetGet($this->currentIndex);
     }
@@ -80,6 +81,7 @@ class CReport_Builder_Data implements ArrayAccess, Iterator, Countable {
     /**
      * Iterator: key.
      */
+    #[\ReturnTypeWillChange]
     public function key() {
         return $this->currentIndex;
     }

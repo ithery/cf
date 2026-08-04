@@ -34,6 +34,7 @@ class CModel_Spatial_Geometry_Polygon extends CModel_Spatial_Geometry_MultiLineS
      *
      * @return \GeoJson\Geometry\Polygon
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         $linearRings = [];
         foreach ($this->items as $lineString) {

@@ -173,6 +173,7 @@ class CElement_Component_Metric_Results_ValueResult implements JsonSerializable 
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return [
             'value' => $this->value,

@@ -109,6 +109,7 @@ class CColor_Format_Hsla extends CColor_FormatAbstract {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return 'hsla(' . implode(',', $this->values()) . ')';
     }

@@ -16,6 +16,7 @@ class CValidation_Rule_Exists {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return rtrim(sprintf('exists:%s,%s,%s', $this->table, $this->column, $this->formatWheres()), ',');
     }

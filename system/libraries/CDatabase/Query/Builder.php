@@ -1672,6 +1672,7 @@ class CDatabase_Query_Builder {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count($columns = '*') {
         return (int) $this->aggregate(__FUNCTION__, carr::wrap($columns));
     }

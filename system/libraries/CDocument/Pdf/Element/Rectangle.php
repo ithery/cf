@@ -881,6 +881,7 @@ class CDocument_Pdf_Element_Rectangle extends CDocument_Pdf_ElementAbstract {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $string = 'Rectangle: ';
         $string .= $this->getWidth();

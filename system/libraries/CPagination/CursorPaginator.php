@@ -124,6 +124,7 @@ class CPagination_CursorPaginator extends CPagination_CursorPaginatorAbstract im
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->toArray();
     }

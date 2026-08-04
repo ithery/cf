@@ -254,8 +254,8 @@ class CHTTP_Request extends SymfonyRequest implements Arrayable, ArrayAccess {
      * @return bool
      */
     public function prefetch() {
-        return strcasecmp($this->server->get('HTTP_X_MOZ'), 'prefetch') === 0
-                || strcasecmp($this->headers->get('Purpose'), 'prefetch') === 0;
+        return strcasecmp((string) $this->server->get('HTTP_X_MOZ'), 'prefetch') === 0
+                || strcasecmp((string) $this->headers->get('Purpose'), 'prefetch') === 0;
     }
 
     /**

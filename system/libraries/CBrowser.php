@@ -417,6 +417,7 @@ class CBrowser {
      *
      * @return string formatted string with a summary of the browser
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return "<strong>Browser Name:</strong> {$this->getBrowser()}<br/>\n"
                 . "<strong>Browser Version:</strong> {$this->getVersion()}<br/>\n"

@@ -19,6 +19,7 @@ class CString_PatternBuilder implements Stringable {
         return $this;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return implode('', $this->fragments);
     }

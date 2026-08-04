@@ -224,6 +224,7 @@ abstract class CRouting_RouteCollectionAbstract implements Countable, IteratorAg
      *
      * @return \ArrayIterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new ArrayIterator($this->getRoutes());
     }

@@ -430,6 +430,7 @@ class CLogger_Reader_LogReader {
     /**
      * @return null|CLogger_Reader_Log
      */
+    #[\ReturnTypeWillChange]
     public function next() {
         // We open it here to make we also check for possible need of index re-building.
         if ($this->isClosed()) {
@@ -463,6 +464,7 @@ class CLogger_Reader_LogReader {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return $this->total();
     }

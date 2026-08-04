@@ -95,6 +95,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count($group = null) {
         if ($group) {
             if (isset($this->processes[$group])) {

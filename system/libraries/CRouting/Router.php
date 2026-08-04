@@ -1030,6 +1030,7 @@ class CRouting_Router {
      *
      * @return null|CRouting_Route
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->current;
     }

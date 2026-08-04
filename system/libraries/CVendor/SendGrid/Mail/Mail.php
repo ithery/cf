@@ -1858,6 +1858,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      *
      * @return null|array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         // Detect if we are using the new dynamic templates
         $template_id = $this->getTemplateId();

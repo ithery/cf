@@ -99,6 +99,7 @@ class CTemporary_LocalFile {
     /**
      * @return string the full file name
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->getFileName();
     }

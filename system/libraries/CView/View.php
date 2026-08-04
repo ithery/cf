@@ -268,6 +268,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->render();
     }

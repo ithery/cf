@@ -54,6 +54,7 @@ class CModel_Spatial_Geometry_LineString extends CModel_Spatial_Geometry_PointCo
         return new static($points, $srid);
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->toPairList();
     }
@@ -85,6 +86,7 @@ class CModel_Spatial_Geometry_LineString extends CModel_Spatial_Geometry_PointCo
      *
      * @return \GeoJson\Geometry\LineString
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         $points = [];
         foreach ($this->items as $point) {

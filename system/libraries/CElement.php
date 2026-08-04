@@ -313,6 +313,7 @@ abstract class CElement extends CObservable {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $return = '<h3> HTML </h3>'
                 . '<pre>'

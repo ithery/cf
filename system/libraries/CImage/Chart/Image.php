@@ -131,6 +131,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
         return ob_get_clean();
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->toData();
     }

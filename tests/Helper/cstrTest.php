@@ -887,6 +887,7 @@ class StringableObjectStub {
         $this->value = $value;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->value;
     }

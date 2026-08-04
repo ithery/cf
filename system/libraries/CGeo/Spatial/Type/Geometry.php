@@ -16,6 +16,7 @@ abstract class CGeo_Spatial_Type_Geometry implements CModel_Contract_CastableInt
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->toWkt();
     }

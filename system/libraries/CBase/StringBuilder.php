@@ -85,6 +85,7 @@ class CBase_StringBuilder {
         return $this->text;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->text;
     }

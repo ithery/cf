@@ -420,6 +420,7 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $string = '';
 

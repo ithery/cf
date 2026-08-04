@@ -30,6 +30,7 @@ class CValidation_Rule_ArrayRule implements Stringable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         if (empty($this->keys)) {
             return 'array';

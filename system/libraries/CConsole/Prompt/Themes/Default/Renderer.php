@@ -114,6 +114,7 @@ abstract class CConsole_Prompt_Themes_Default_Renderer {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return str_repeat(PHP_EOL, max(2 - $this->prompt->newLinesWritten(), 0))
             . $this->output

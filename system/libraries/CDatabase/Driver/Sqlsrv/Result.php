@@ -155,6 +155,7 @@ class CDatabase_Driver_Sqlsrv_Result extends CDatabase_Result {
         return $field_names;
     }
 
+    #[\ReturnTypeWillChange]
     public function seek($offset) {
         $func = 'sqlsrv_' . $this->fetch_type;
 

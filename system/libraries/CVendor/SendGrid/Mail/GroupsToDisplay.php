@@ -63,6 +63,7 @@ class CVendor_SendGrid_Mail_GroupsToDisplay implements \JsonSerializable {
      *
      * @return null|array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->getGroupsToDisplay();
     }

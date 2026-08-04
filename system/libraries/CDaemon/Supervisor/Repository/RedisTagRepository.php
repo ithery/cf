@@ -101,6 +101,7 @@ class CDaemon_Supervisor_Repository_RedisTagRepository implements CDaemon_Superv
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count($tag) {
         return $this->connection()->zcard($tag);
     }

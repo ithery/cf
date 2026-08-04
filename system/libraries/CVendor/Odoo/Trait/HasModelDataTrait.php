@@ -40,6 +40,7 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
         return $this->get($name);
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->data;
     }
@@ -49,6 +50,7 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return $this->get($offset) !== null;
     }
@@ -69,6 +71,7 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
      * @param mixed $offset
      * @param mixed $value
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         carr::set($this->data, $offset, $value);
     }
@@ -78,6 +81,7 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         $this->offsetSet($offset, null);
     }

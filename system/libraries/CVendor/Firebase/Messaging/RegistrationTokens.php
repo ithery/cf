@@ -46,6 +46,7 @@ final class CVendor_Firebase_Messaging_RegistrationTokens implements Countable, 
      *
      * @return Generator|RegistrationToken[]
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new ArrayIterator($this->tokens);
     }
@@ -68,6 +69,7 @@ final class CVendor_Firebase_Messaging_RegistrationTokens implements Countable, 
         return \array_map('strval', $this->tokens);
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return \count($this->tokens);
     }

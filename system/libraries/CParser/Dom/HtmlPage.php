@@ -236,6 +236,7 @@ class CParser_Dom_HtmlPage {
         return new CParser_Dom_HtmlPageCrawler($this->getBodyNode());
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->dom->saveHTML();
     }

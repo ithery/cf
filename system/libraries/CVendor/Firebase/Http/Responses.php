@@ -17,6 +17,7 @@ final class CVendor_Firebase_Http_Responses implements IteratorAggregate {
      *
      * @return Generator|ResponseInterface[]
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new ArrayIterator($this->responses);
     }

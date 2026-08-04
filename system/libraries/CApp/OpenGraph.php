@@ -66,6 +66,7 @@ class CApp_OpenGraph {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function valid() {
         return $this->validate;
     }
@@ -631,6 +632,7 @@ class CApp_OpenGraph {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->renderTags();
     }

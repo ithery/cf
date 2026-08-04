@@ -77,6 +77,7 @@ class CTranslation_PotentiallyTranslatedString implements Stringable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->translation ?? $this->string;
     }

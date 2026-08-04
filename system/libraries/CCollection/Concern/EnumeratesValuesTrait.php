@@ -868,6 +868,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->escapeWhenCastingToString
                     ? c::e($this->toJson())

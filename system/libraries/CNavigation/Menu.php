@@ -30,6 +30,7 @@ class CNavigation_Menu {
     /**
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->items);
     }

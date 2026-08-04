@@ -106,6 +106,7 @@ class CDatabase_ResultData implements ArrayAccess, Iterator, Countable {
         //return carr::get($this->data, $offset);
     }
 
+    #[\ReturnTypeWillChange]
     public function seek($offset) {
         if ($this->offsetExists($offset)) {
             $this->currentRow = $offset;
@@ -144,6 +145,7 @@ class CDatabase_ResultData implements ArrayAccess, Iterator, Countable {
     /**
      * Iterator: current.
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->offsetGet($this->currentRow);
     }
@@ -151,6 +153,7 @@ class CDatabase_ResultData implements ArrayAccess, Iterator, Countable {
     /**
      * Iterator: key.
      */
+    #[\ReturnTypeWillChange]
     public function key() {
         return $this->currentRow;
     }

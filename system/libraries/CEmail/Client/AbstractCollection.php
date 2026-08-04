@@ -63,6 +63,7 @@ abstract class CEmail_Client_AbstractCollection {
     /**
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return \count($this->aItems);
     }

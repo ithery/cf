@@ -71,6 +71,7 @@ class CException extends Exception {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return self::text($this);
     }

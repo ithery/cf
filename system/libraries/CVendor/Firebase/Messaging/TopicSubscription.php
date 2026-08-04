@@ -46,6 +46,7 @@ final class CVendor_Firebase_Messaging_TopicSubscription implements JsonSerializ
     /**
      * @return array<string, string>
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return [
             'topic' => $this->topic->value(),

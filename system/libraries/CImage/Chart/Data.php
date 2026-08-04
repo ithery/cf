@@ -1246,6 +1246,7 @@ class CImage_Chart_Data {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return 'pData object.';
     }

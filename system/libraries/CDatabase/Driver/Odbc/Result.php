@@ -132,6 +132,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
         return $this->odbcFieldNames($this->result);
     }
 
+    #[\ReturnTypeWillChange]
     public function seek($offset) {
         throw new CDatabase_Exception('ODBC not supported Seek');
 
@@ -228,6 +229,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->offsetGet($this->current_row);
     }
@@ -237,6 +239,7 @@ class CDatabase_Driver_Odbc_Result extends CDatabase_Result {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function key() {
         return $this->current_row;
     }

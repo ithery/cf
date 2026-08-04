@@ -179,6 +179,7 @@ final class CVendor_Firebase_Request_UpdateUser implements CVendor_Firebase_Requ
     /**
      * @return array<string, mixed>
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         if (!$this->hasUid()) {
             throw new CVendor_Firebase_Exception_InvalidArgumentException('A uid is required to update an existing user.');

@@ -38,6 +38,7 @@ final class CVendor_Firebase_Messaging_Condition implements \JsonSerializable {
         return $this->value;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->value;
     }
@@ -45,6 +46,7 @@ final class CVendor_Firebase_Messaging_Condition implements \JsonSerializable {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->value;
     }

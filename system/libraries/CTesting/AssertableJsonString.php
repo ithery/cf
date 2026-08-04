@@ -331,6 +331,7 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->decoded);
     }
@@ -342,6 +343,7 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return isset($this->decoded[$offset]);
     }
@@ -366,6 +368,7 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->decoded[$offset] = $value;
     }
@@ -377,6 +380,7 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         unset($this->decoded[$offset]);
     }

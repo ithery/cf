@@ -73,6 +73,7 @@ class CReport_Jasper_Report_DataIterator implements ArrayAccess, Iterator, Count
     /**
      * Iterator: current.
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->offsetGet($this->currentIndex);
     }
@@ -80,6 +81,7 @@ class CReport_Jasper_Report_DataIterator implements ArrayAccess, Iterator, Count
     /**
      * Iterator: key.
      */
+    #[\ReturnTypeWillChange]
     public function key() {
         return $this->currentIndex;
     }

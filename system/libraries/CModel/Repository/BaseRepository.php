@@ -303,6 +303,7 @@ abstract class CModel_Repository_BaseRepository implements CModel_Repository_Con
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count(array $where = [], $columns = '*') {
         $this->applyCriteria();
         $this->applyScope();

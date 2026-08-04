@@ -164,6 +164,7 @@ final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return sprintf('GeocodeQuery: %s', json_encode([
             'text' => $this->getText(),

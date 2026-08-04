@@ -46,6 +46,7 @@ class CBase_StringParamable {
         return $this->string;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->get();
     }

@@ -523,6 +523,7 @@ class CHTTP_Client_Response implements ArrayAccess {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->body();
     }

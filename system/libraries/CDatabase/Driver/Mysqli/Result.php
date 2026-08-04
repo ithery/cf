@@ -133,6 +133,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
         return $field_names;
     }
 
+    #[\ReturnTypeWillChange]
     public function seek($offset) {
         if ($this->offsetExists($offset) and $this->result->data_seek($offset)) {
             // Set the current row to the offset

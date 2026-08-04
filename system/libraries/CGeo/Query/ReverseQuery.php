@@ -145,6 +145,7 @@ final class CGeo_Query_ReverseQuery implements CGeo_Interface_QueryInterface {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return sprintf('ReverseQuery: %s', json_encode([
             'lat' => $this->getCoordinates()->getLatitude(),

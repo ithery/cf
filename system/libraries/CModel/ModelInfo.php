@@ -126,6 +126,7 @@ class CModel_ModelInfo implements ArrayAccess {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return property_exists($this, $offset);
     }
@@ -150,6 +151,7 @@ class CModel_ModelInfo implements ArrayAccess {
      *
      * @throws LogicException
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         throw new LogicException(self::class . ' may not be mutated using array access.');
     }
@@ -159,6 +161,7 @@ class CModel_ModelInfo implements ArrayAccess {
      *
      * @throws LogicException
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         throw new LogicException(self::class . ' may not be mutated using array access.');
     }

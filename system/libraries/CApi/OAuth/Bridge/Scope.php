@@ -22,6 +22,7 @@ class CApi_OAuth_Bridge_Scope implements ScopeEntityInterface {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->getIdentifier();
     }

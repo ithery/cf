@@ -50,6 +50,7 @@ class CMetric_Flux_FluxQuery {
         return $this;
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         $this->limitRecords = PHP_EOL
             . '|> count() ';

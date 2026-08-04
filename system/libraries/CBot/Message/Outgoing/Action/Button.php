@@ -130,6 +130,7 @@ class CBot_Message_Outgoing_Action_Button implements JsonSerializable, CBot_Cont
     /**
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->toArray();
     }

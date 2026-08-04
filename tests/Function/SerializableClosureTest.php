@@ -124,6 +124,7 @@ class SerializableClosureTest_WithSecret {
 class SerializableClosureTest_ThrowingScopeReflectionClosure extends CFunction_SerializableClosure_Support_ReflectionClosure {
     protected $callCount = 0;
 
+    #[\ReturnTypeWillChange]
     public function getClosureScopeClass() {
         $this->callCount++;
         if ($this->callCount > 1) {
