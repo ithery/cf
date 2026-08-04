@@ -425,6 +425,138 @@ class CServer_WebServer_LiteSpeed {
      *
      * @return array[]
      */
+    /**
+     * Versi lsphp yang dikenali, terbaru lebih dulu.
+     *
+     * @return array
+     */
+    public static function supportedPhpVersionList() {
+        return [
+            'lsphp85', 'lsphp84', 'lsphp83', 'lsphp82', 'lsphp81', 'lsphp80',
+            'lsphp74', 'lsphp73', 'lsphp72', 'lsphp71', 'lsphp70', 'lsphp56',
+        ];
+    }
+
+    /**
+     * Versi yang dikenali digabung dengan yang benar-benar terpasang.
+     *
+     * Yang terpasang tetapi tidak ada dalam daftar ikut disertakan — mesin yang
+     * sebenarnya lebih berhak menentukan daripada daftar di dalam kode.
+     *
+     * @return array tiap entri: name, binary, version, installed
+     */
+    public function getPhpAvailabilityList() {
+        $installed = [];
+        foreach ($this->getPhpList() as $item) {
+            $installed[(string) carr::get($item, 'name')] = $item;
+        }
+
+        $nameList = static::supportedPhpVersionList();
+        foreach (array_keys($installed) as $name) {
+            if (!in_array($name, $nameList)) {
+                $nameList[] = $name;
+            }
+        }
+        rsort($nameList);
+
+        $list = [];
+        foreach ($nameList as $name) {
+            $item = carr::get($installed, $name, []);
+            $list[] = [
+                'name' => $name,
+                'binary' => (string) carr::get($item, 'binary'),
+                'version' => (string) carr::get($item, 'version'),
+                'installed' => array_key_exists($name, $installed) ? 1 : 0,
+            ];
+        }
+
+        return $list;
+    }
+
+    /**
+     * Nomor versi dari 'lsphp82' maupun '82'.
+     *
+     * @param string $version
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return string
+     */
+    protected static function normalizePhpVersion($version) {
+        $number = str_replace('lsphp', '', (string) $version);
+        if (!preg_match('/^\d{2}$/', $number)) {
+            throw new InvalidArgumentException('Versi lsphp tidak sah: ' . $version);
+        }
+
+        return $number;
+    }
+
+    /**
+     * Daftar paket lsphp beserta ekstensinya untuk satu keluarga distribusi.
+     *
+     * Namanya berbeda antar distribusi, bukan sekadar kata kerja pemasangnya:
+     * `mysqlnd` pada RHEL adalah `mysql` pada Debian, dan `pecl-redis` adalah
+     * `redis`. Beberapa yang ada di RHEL — `process`, `json`, `devel` — tidak
+     * dipaketkan terpisah di Debian.
+     *
+     * @param string $version boleh 'lsphp82' maupun '82'
+     * @param string $family  hasil CServer_OSAbstract::getFamily()
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return string paket yang dipisah spasi
+     */
+    public static function phpPackageList($version, $family) {
+        $number = static::normalizePhpVersion($version);
+
+        if ($family == 'debian') {
+            $extensionList = [
+                'common', 'mysql', 'opcache', 'curl', 'intl', 'imagick',
+                'redis', 'pgsql', 'sqlite3', 'igbinary', 'msgpack', 'memcached',
+            ];
+        } else {
+            $extensionList = [
+                'common', 'mysqlnd', 'process', 'gd', 'mbstring', 'opcache',
+                'bcmath', 'pdo', 'xml', 'json', 'pecl-redis', 'devel',
+            ];
+            if ((int) $number < 80) {
+                $extensionList[] = 'mcrypt';
+            }
+            if ((int) $number >= 74) {
+                $extensionList[] = 'redis';
+                $extensionList[] = 'pdo_pgsql';
+            }
+        }
+
+        $packageList = ['lsphp' . $number];
+        foreach ($extensionList as $extension) {
+            $packageList[] = 'lsphp' . $number . '-' . $extension;
+        }
+
+        return implode(' ', $packageList);
+    }
+
+    /**
+     * Pasang satu versi lsphp, memakai manajer paket distribusinya sendiri.
+     *
+     * @param string $version
+     *
+     * @throws InvalidArgumentException
+     *
+     * @return string keluaran perintahnya
+     */
+    public function installPhp($version) {
+        $distro = $this->server->distro();
+        $package = static::phpPackageList($version, $distro->getFamily());
+
+        $output = '';
+        foreach ($distro->getInstallCommand($package) as $command) {
+            $output .= (string) $this->server->runCommand('sudo ' . $command) . PHP_EOL;
+        }
+
+        return $output;
+    }
+
     public function getListenerListForVirtualHost($name) {
         $list = [];
         foreach ($this->getListenerList() as $listener) {
