@@ -298,6 +298,71 @@ class SessionStoreTest extends TestCase {
         $this->assertSame('lain', $session->getName());
     }
 
+    /**
+     * migrate() mengganti id tanpa menyentuh isinya, dan bila diminta sekalian
+     * membuang catatan lama di penangan -- itu bedanya dari regenerate biasa,
+     * yang meninggalkan berkas sesi lama tergeletak.
+     */
+    public function testMigrateWithDestroyRemovesTheOldRecordFromTheHandler() {
+        $handler = new CSession_Handler_ArraySessionHandler(10);
+        $id = str_repeat('c', 40);
+
+        $session = new CSession_Store('nama_sesi', $handler, $id);
+        $session->start();
+        $session->put('nama', 'nilai');
+        $session->save();
+
+        $this->assertNotSame('', $handler->read($id));
+
+        $session->migrate(true);
+
+        $this->assertNotSame($id, $session->getId());
+        $this->assertSame('', $handler->read($id));
+        $this->assertSame('nilai', $session->get('nama'));
+    }
+
+    public function testMigrateWithoutDestroyLeavesTheOldRecordBehind() {
+        $handler = new CSession_Handler_ArraySessionHandler(10);
+        $id = str_repeat('d', 40);
+
+        $session = new CSession_Store('nama_sesi', $handler, $id);
+        $session->start();
+        $session->put('nama', 'nilai');
+        $session->save();
+        $session->migrate();
+
+        $this->assertNotSame($id, $session->getId());
+        $this->assertNotSame('', $handler->read($id));
+    }
+
+    public function testReplaceOverwritesTheNamedKeysOnly() {
+        $session = $this->makeStore();
+        $session->put(['satu' => 'a', 'dua' => 'b']);
+        $session->replace(['dua' => 'baru']);
+
+        $this->assertSame('a', $session->get('satu'));
+        $this->assertSame('baru', $session->get('dua'));
+    }
+
+    public function testRemoveReturnsTheValueItTookOut() {
+        $session = $this->makeStore();
+        $session->put('nama', 'nilai');
+
+        $this->assertSame('nilai', $session->remove('nama'));
+        $this->assertFalse($session->exists('nama'));
+    }
+
+    /**
+     * Waktu konfirmasi sandi disimpan di kunci yang sudah disepakati, karena
+     * middleware "konfirmasi sandi" membacanya dari situ.
+     */
+    public function testPasswordConfirmedStampsTheAgreedKey() {
+        $session = $this->makeStore();
+        $session->passwordConfirmed();
+
+        $this->assertNotNull($session->get('auth.password_confirmed_at'));
+    }
+
     public function testGetHandlerHandsBackTheHandler() {
         $handler = new CSession_Handler_ArraySessionHandler(10);
         $session = new CSession_Store('nama_sesi', $handler);

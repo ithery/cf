@@ -163,11 +163,58 @@ class SupportMessageBagTest extends TestCase {
         $this->assertSame(['nama' => ['a']], $bag->toArray());
     }
 
+    /**
+     * Nilai berupa string tunggal dinormalkan menjadi larik saat masuk, jadi
+     * pemanggil tidak perlu selalu membungkusnya sendiri.
+     */
+    public function testASinglePlainStringIsNormalisedIntoAnArray() {
+        $bag = new CBase_MessageBag(['nama' => 'wajib diisi']);
+
+        $this->assertSame(['wajib diisi'], $bag->get('nama'));
+    }
+
+    public function testHasWithoutAKeyAsksWhetherThereIsAnythingAtAll() {
+        $this->assertFalse((new CBase_MessageBag())->has(null));
+        $this->assertTrue((new CBase_MessageBag(['nama' => ['a']]))->has(null));
+    }
+
+    public function testHasAnyWithNoKeysIsFalse() {
+        $this->assertFalse((new CBase_MessageBag(['nama' => ['a']]))->hasAny([]));
+    }
+
+    public function testFirstAlsoUnderstandsAWildcardKey() {
+        $bag = new CBase_MessageBag(['barang.0.nama' => ['wajib diisi']]);
+
+        $this->assertSame('wajib diisi', $bag->first('barang.*.nama'));
+    }
+
+    /**
+     * Selain :message, format mengenal :key -- itulah cara menandai galat
+     * dengan nama medannya tanpa menyusun pesannya sendiri.
+     */
+    public function testTheKeyPlaceholderIsReplacedToo() {
+        $bag = new CBase_MessageBag(['nama' => ['wajib diisi']]);
+
+        $this->assertSame(['nama: wajib diisi'], $bag->all(':key: :message'));
+    }
+
+    public function testTheBagCountsAsACountable() {
+        $bag = new CBase_MessageBag(['nama' => ['a', 'b'], 'email' => ['c']]);
+
+        $this->assertCount(3, $bag);
+    }
+
     public function testTheBagSerializesToJson() {
         $bag = new CBase_MessageBag(['nama' => ['a']]);
 
         $this->assertSame('{"nama":["a"]}', $bag->toJson());
         $this->assertSame('{"nama":["a"]}', (string) $bag);
         $this->assertSame(['nama' => ['a']], $bag->jsonSerialize());
+    }
+
+    public function testJsonFlagsArePassedThrough() {
+        $bag = new CBase_MessageBag(['nama' => ['a']]);
+
+        $this->assertSame("{\n    \"nama\": [\n        \"a\"\n    ]\n}", $bag->toJson(JSON_PRETTY_PRINT));
     }
 }

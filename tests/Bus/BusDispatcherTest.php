@@ -82,6 +82,16 @@ class BusDispatcherTestQueuedCommand implements CQueue_ShouldQueueInterface {
     }
 }
 
+class BusDispatcherTestQueueableCommand implements CQueue_ShouldQueueInterface {
+    use CQueue_Trait_QueueableTrait;
+
+    /**
+     * @return void
+     */
+    public function handle() {
+    }
+}
+
 class BusDispatcherTestSelfQueueingCommand implements CQueue_ShouldQueueInterface {
     /**
      * @var null|string
@@ -406,9 +416,61 @@ class BusDispatcherTest extends TestCase {
             return new BusDispatcherTestFakeQueue();
         });
 
+        $dispatcher->dispatchSync(new BusDispatcherTestQueueableCommand());
+
+        $this->assertSame('sync', $diminta);
+    }
+
+    /**
+     * Perintah yang tidak punya onConnection() tidak dapat dipaksa ke sambungan
+     * sync, jadi ia dijalankan langsung -- bukan diam-diam masuk antrean lain.
+     */
+    public function testDispatchSyncRunsInlineWhenTheCommandCannotBeRedirected() {
+        $diminta = null;
+        $dispatcher = $this->makeDispatcher(function ($connection) use (&$diminta) {
+            $diminta = $connection;
+
+            return new BusDispatcherTestFakeQueue();
+        });
+
         $dispatcher->dispatchSync(new BusDispatcherTestQueuedCommand());
 
-        $this->assertNull($diminta, 'perintah tanpa onConnection() dijalankan langsung, tidak lewat antrean');
+        $this->assertNull($diminta);
+    }
+
+    /**
+     * onConnection() dan onQueue() menulis pilihannya pada perintah, dan itulah
+     * yang kemudian dibaca saat penyaluran -- keduanya terpisah: sambungan
+     * menentukan pialangnya, antrean menentukan larasnya.
+     */
+    public function testOnConnectionAndOnQueueAreBothHonouredWhenDispatching() {
+        $diminta = null;
+        $queue = new BusDispatcherTestFakeQueue();
+        $dispatcher = $this->makeDispatcher(function ($connection) use (&$diminta, $queue) {
+            $diminta = $connection;
+
+            return $queue;
+        });
+
+        $command = new BusDispatcherTestQueueableCommand();
+        $command->onConnection('redis')->onQueue('lambat');
+        $dispatcher->dispatch($command);
+
+        $this->assertSame('redis', $diminta);
+        $this->assertSame([['pushOn', 'lambat', null]], $queue->panggilan);
+    }
+
+    public function testADelaySetThroughTheTraitBecomesALaterPush() {
+        $queue = new BusDispatcherTestFakeQueue();
+        $dispatcher = $this->makeDispatcher(function () use ($queue) {
+            return $queue;
+        });
+
+        $command = new BusDispatcherTestQueueableCommand();
+        $command->delay(90);
+        $dispatcher->dispatch($command);
+
+        $this->assertSame([['later', null, 90]], $queue->panggilan);
     }
 
     public function testDispatchNowAlwaysRunsInline() {
