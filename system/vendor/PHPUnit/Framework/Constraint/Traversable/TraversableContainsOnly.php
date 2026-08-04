@@ -13,6 +13,7 @@ use PHPUnit\Framework\Exception\ExpectationFailedException;
 use Traversable;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\Constraint\Type\IsType;
+use PHPUnit\Framework\Constraint\Type\IsInstanceOf;
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
