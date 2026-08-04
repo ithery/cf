@@ -32,7 +32,15 @@ final class CQueue {
      */
     protected static $failer;
 
+    /**
+     * @var CQueue_Runner
+     */
     protected static $runner;
+
+    /**
+     * @var CQueue_QueueRoutes
+     */
+    protected static $queueRoutes;
 
     /**
      * @return CQueue_Dispatcher
@@ -206,6 +214,12 @@ final class CQueue {
         return static::$runner;
     }
 
+    /**
+     * @param string $config
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
     public static function config($config, $default = null) {
         return CF::config('queue.' . $config, $default);
     }
@@ -322,5 +336,18 @@ final class CQueue {
      */
     public static function batch($jobs) {
         return static::dispatcher()->batch($jobs);
+    }
+
+    /**
+     * Tabel rute job: kelas ke pasangan (connection, queue).
+     *
+     * @return CQueue_QueueRoutes
+     */
+    public static function routes() {
+        if (self::$queueRoutes == null) {
+            self::$queueRoutes = new CQueue_QueueRoutes();
+        }
+
+        return self::$queueRoutes;
     }
 }

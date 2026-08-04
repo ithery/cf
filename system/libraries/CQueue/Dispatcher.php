@@ -212,7 +212,8 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      * @return mixed
      */
     public function dispatchToQueue($command) {
-        $connection = $command->connection ? $command->connection : null;
+        //apa yang ditulis job sendiri menang; rute hanya mengisi yang kosong
+        $connection = $command->connection ? $command->connection : CQueue::routes()->getConnection($command);
         $queue = call_user_func($this->queueResolver, $connection);
 
         if (!$queue instanceof CQueue_QueueInterface) {
@@ -234,11 +235,14 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      * @return mixed
      */
     protected function pushCommandToQueue($queue, $command) {
-        if (isset($command->queue, $command->delay)) {
-            return $queue->laterOn($command->queue, $command->delay, $command);
+        //sama seperti connection: yang ditulis job sendiri menang
+        $queueName = isset($command->queue) ? $command->queue : CQueue::routes()->getQueue($command);
+
+        if ($queueName !== null && isset($command->delay)) {
+            return $queue->laterOn($queueName, $command->delay, $command);
         }
-        if (isset($command->queue)) {
-            return $queue->pushOn($command->queue, $command);
+        if ($queueName !== null) {
+            return $queue->pushOn($queueName, $command);
         }
         if (isset($command->delay)) {
             return $queue->later($command->delay, $command);
