@@ -403,7 +403,7 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
     public function __call($name, $arguments) {
         // Make sure the name starts with 'is', otherwise
         if (strpos($name, 'is') !== 0) {
-            throw new BadMethodCallException("No such method exists: ${name}");
+            throw new BadMethodCallException("No such method exists: {$name}");
         }
         $this->setDetectionType(self::DETECTION_TYPE_EXTENDED);
         $key = substr($name, 2);

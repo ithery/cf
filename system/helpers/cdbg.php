@@ -454,7 +454,7 @@ class cdbg {
             if (empty($var)) {
                 // Do nothing
             } elseif (isset($var[$marker])) {
-                $output[] = "(\n${space}${s}*RECURSION*\n${space})";
+                $output[] = "(\n{$space}{$s}*RECURSION*\n{$space})";
             } elseif ($level < $limit) {
                 $output[] = '<span>(';
 
@@ -467,14 +467,14 @@ class cdbg {
                         $key = '"' . htmlspecialchars($key, ENT_NOQUOTES, CF::$charset) . '"';
                     }
 
-                    $output[] = "${space}${s}${key} => " . cdbg::dumpInternal($val, $length, $limit, $level + 1);
+                    $output[] = "{$space}{$s}{$key} => " . cdbg::dumpInternal($val, $length, $limit, $level + 1);
                 }
                 unset($var[$marker]);
 
-                $output[] = "${space})</span>";
+                $output[] = "{$space})</span>";
             } else {
                 // Depth too great
-                $output[] = "(\n${space}${s}...\n${space})";
+                $output[] = "(\n{$space}{$s}...\n{$space})";
             }
 
             return '<small>array</small><span>(' . count($var) . ')</span> ' . implode("\n", $output);
@@ -495,7 +495,7 @@ class cdbg {
             if (empty($var)) {
                 // Do nothing
             } elseif (isset($objects[$hash])) {
-                $output[] = "{\n${space}${s}*RECURSION*\n${space}}";
+                $output[] = "{\n{$space}{$s}*RECURSION*\n{$space}}";
             } elseif ($level < $limit) {
                 $output[] = '<code>{';
 
@@ -511,14 +511,14 @@ class cdbg {
                         $access = '<small>public</small>';
                     }
 
-                    $output[] = "${space}${s}${access} ${key} => " . cdbg::dumpInternal($val, $length, $limit, $level + 1);
+                    $output[] = "{$space}{$s}{$access} {$key} => " . cdbg::dumpInternal($val, $length, $limit, $level + 1);
                 }
                 unset($objects[$hash]);
 
-                $output[] = "${space}}</code>";
+                $output[] = "{$space}}</code>";
             } else {
                 // Depth too great
-                $output[] = "{\n${space}${s}...\n${space}}";
+                $output[] = "{\n{$space}{$s}...\n{$space}}";
             }
 
             return '<small>object</small> <span>' . get_class($var) . '(' . count($array) . ')</span> ' . implode("\n", $output);

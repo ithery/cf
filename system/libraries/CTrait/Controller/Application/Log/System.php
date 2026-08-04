@@ -13,7 +13,7 @@ trait CTrait_Controller_Application_Log_System {
         $reportTimes = [];
 
         foreach ($years as $year) {
-            $months = array_reverse($this->getSubdirectory("${path}/${year}"));
+            $months = array_reverse($this->getSubdirectory("{$path}/{$year}"));
             foreach ($months as $month) {
                 $reportTimes[] = [
                     'year' => $year,
@@ -27,10 +27,10 @@ trait CTrait_Controller_Application_Log_System {
             $year = carr::get($time, 'year');
             $month = carr::get($time, 'month');
             $tab = $tabList->addTab()
-                ->setLabel("${year} - ${month}")
+                ->setLabel("{$year} - {$month}")
                 ->addClass('p-0')
                 ->setNoPadding()
-                ->setAjaxUrl($this->currentUrl() . "tabDaily/${year}/${month}");
+                ->setAjaxUrl($this->currentUrl() . "tabDaily/{$year}/{$month}");
         }
 
         return $app;
@@ -81,7 +81,7 @@ trait CTrait_Controller_Application_Log_System {
                     ->setLabel($basename)
                     ->addClass('p-0')
                     ->setNoPadding()
-                    ->setAjaxUrl($this->currentUrl() . "systemTable/${year}/${month}?file=" . urlencode($basename));
+                    ->setAjaxUrl($this->currentUrl() . "systemTable/{$year}/{$month}?file=" . urlencode($basename));
             }
         }
 
@@ -100,7 +100,7 @@ trait CTrait_Controller_Application_Log_System {
         $table = $app->addTable();
         $table->addHeaderAction()->setLabel('Download')
             ->addClass('btn-primary')
-            ->setLink($this->currentUrl() . "systemTableDownload/${year}/${month}/${file}");
+            ->setLink($this->currentUrl() . "systemTableDownload/{$year}/{$month}/{$file}");
         $table->addColumn('time')->setLabel('Time');
         $table->addColumn('environment')->setLabel('Environment');
         $table->addColumn('level')->setLabel('Level')->setCallback(function ($row, $value) {

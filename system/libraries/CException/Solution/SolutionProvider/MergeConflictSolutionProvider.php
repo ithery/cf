@@ -31,13 +31,13 @@ class CException_Solution_SolutionProvider_MergeConflictSolutionProvider impleme
         $target = $this->getCurrentBranch(basename($throwable->getFile()));
 
         return [
-            CException::createSolution("Merge conflict from branch '${source}' into ${target}")
+            CException::createSolution("Merge conflict from branch '{$source}' into {$target}")
                 ->setSolutionDescription('You have a Git merge conflict. To undo your merge do `git reset --hard HEAD`'),
         ];
     }
 
     protected function getCurrentBranch($directory) {
-        $branch = "'" . trim(shell_exec("cd ${directory}; git branch | grep \\* | cut -d ' ' -f2")) . "'";
+        $branch = "'" . trim(shell_exec("cd {$directory}; git branch | grep \\* | cut -d ' ' -f2")) . "'";
 
         if (!isset($branch) || $branch === "''") {
             $branch = 'current branch';

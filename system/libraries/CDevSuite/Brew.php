@@ -82,7 +82,7 @@ class CDevSuite_Brew {
      * @return string
      */
     public function determineAliasedVersion($formula) {
-        $details = json_decode($this->cli->runAsUser("brew info ${formula} --json"));
+        $details = json_decode($this->cli->runAsUser("brew info {$formula} --json"));
 
         return $details[0]->aliases[0] ?: 'ERROR - NO BREW ALIAS FOUND';
     }
@@ -281,7 +281,7 @@ class CDevSuite_Brew {
                 return $resolvedVersionNormalized === $versionNormalized;
             },
             function () use ($resolvedPhpVersion) {
-                throw new DomainException("Unable to determine linked PHP when parsing '${resolvedPhpVersion}'");
+                throw new DomainException("Unable to determine linked PHP when parsing '{$resolvedPhpVersion}'");
             }
         );
     }

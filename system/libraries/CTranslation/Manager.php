@@ -37,7 +37,7 @@ class CTranslation_Manager {
         $method = "resolve{$driverResolver}Driver";
 
         if (!method_exists($this, $method)) {
-            throw new \InvalidArgumentException("Invalid driver [${driver}]");
+            throw new \InvalidArgumentException("Invalid driver [{$driver}]");
         }
 
         return $this->{$method}();

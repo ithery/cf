@@ -124,7 +124,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      */
     protected function checkFieldIsAnArray($requireArray, $value, $field) {
         if ($requireArray && !is_array($value)) {
-            throw new CElement_FormInput_QueryBuilder_Exception_ParseException("Field (${field}) should be an array, but it isn't.");
+            throw new CElement_FormInput_QueryBuilder_Exception_ParseException("Field ({$field}) should be an array, but it isn't.");
         }
     }
 
@@ -144,7 +144,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      */
     protected function convertArrayToFlatValue($field, $value) {
         if (count($value) !== 1) {
-            throw new CElement_FormInput_QueryBuilder_Exception_ParseException("Field (${field}) should not be an array, but it is.");
+            throw new CElement_FormInput_QueryBuilder_Exception_ParseException("Field ({$field}) should not be an array, but it is.");
         }
 
         return $value[0];

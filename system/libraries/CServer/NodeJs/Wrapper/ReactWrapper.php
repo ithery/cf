@@ -62,7 +62,7 @@ class CServer_NodeJs_Wrapper_ReactWrapper extends CServer_NodeJs_WrapperAbstract
         $output = $this->execModuleScript('babel-cli', 'bin/babel.js', $arguments);
 
         if (preg_match('/Exception|Error/i', $output)) {
-            throw new \ErrorException("Command error: ${output}", 2);
+            throw new \ErrorException("Command error: {$output}", 2);
         }
 
         return $outFile;

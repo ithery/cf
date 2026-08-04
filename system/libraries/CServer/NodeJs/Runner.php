@@ -103,7 +103,7 @@ class CServer_NodeJs_Runner {
         $module = $this->getNodeModule($module);
         $path = $module . DIRECTORY_SEPARATOR . $script;
         if (!file_exists($path)) {
-            throw new InvalidArgumentException("The ${script} was not found in the module path ${module}.", 3);
+            throw new InvalidArgumentException("The {$script} was not found in the module path {$module}.", 3);
         }
 
         return escapeshellarg(realpath($path));

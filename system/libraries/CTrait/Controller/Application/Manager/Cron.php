@@ -100,7 +100,7 @@ trait CTrait_Controller_Application_Manager_Cron {
         $logFile = $event->getLogFile();
 
         if ($rotation) {
-            $logFile .= ".${rotation}";
+            $logFile .= ".{$rotation}";
         }
 
         if (!file_exists($logFile)) {

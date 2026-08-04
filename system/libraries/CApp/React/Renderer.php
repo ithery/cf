@@ -78,8 +78,8 @@ class CApp_React_Renderer {
         $propsJson = json_encode($props);
         $html .= <<<JAVASCRIPT
         ;
-        var root = document.querySelector("#${domId}");
-        ;ReactDOM.render(React.createElement(${componentName}, ${propsJson}), root);
+        var root = document.querySelector("#{$domId}");
+        ;ReactDOM.render(React.createElement({$componentName}, {$propsJson}), root);
     JAVASCRIPT;
         $html .= '})()';
         $html .= '</script>';

@@ -133,7 +133,7 @@ class CVendor_OneSignal {
         $contentType = $response->getHeader('Content-Type')[0] ?? 'application/json';
 
         if (!preg_match('/\bjson\b/i', $contentType)) {
-            throw new CVendor_OneSignal_Exception_JsonException("Response content-type is '${contentType}' while a JSON-compatible one was expected.");
+            throw new CVendor_OneSignal_Exception_JsonException("Response content-type is '{$contentType}' while a JSON-compatible one was expected.");
         }
 
         $content = $response->getBody()->__toString();

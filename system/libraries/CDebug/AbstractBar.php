@@ -94,7 +94,7 @@ class CDebug_AbstractBar implements ArrayAccess {
      */
     public function getCollector($name) {
         if (!isset($this->collectors[$name])) {
-            throw new CDebug_DebugBar_Exception("'${name}' is not a registered collector");
+            throw new CDebug_DebugBar_Exception("'{$name}' is not a registered collector");
         }
 
         return $this->collectors[$name];
@@ -214,7 +214,7 @@ class CDebug_AbstractBar implements ArrayAccess {
         $chunks[] = $data;
         $headers = [];
         for ($i = 0, $c = count($chunks); $i < $c; $i++) {
-            $name = $headerName . ($i > 0 ? "-${i}" : '');
+            $name = $headerName . ($i > 0 ? "-{$i}" : '');
             $headers[$name] = $chunks[$i];
         }
 

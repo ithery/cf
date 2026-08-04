@@ -1571,15 +1571,15 @@ class CManager_Asset_SCSS_Parser {
         $line = $this->getLineNo($count);
 
         if (!empty($this->sourceName)) {
-            $loc = "{$this->sourceName} on line ${line}";
+            $loc = "{$this->sourceName} on line {$line}";
         } else {
-            $loc = "line: ${line}";
+            $loc = "line: {$line}";
         }
 
         if ($this->peek("(.*?)(\n|$)", $m, $count)) {
-            throw new Exception("${msg}: failed at `{$m[1]}` ${loc}");
+            throw new Exception("{$msg}: failed at `{$m[1]}` {$loc}");
         } else {
-            throw new Exception("${msg}: ${loc}");
+            throw new Exception("{$msg}: {$loc}");
         }
     }
 

@@ -441,7 +441,7 @@ trait CModel_Trait_QueriesRelationships {
             // the query builder. Then, we will return the builder instance back to the developer
             // for further constraint chaining that needs to take place on the query as needed.
             $alias = (isset($alias) && $alias !== null) ? $alias : cstr::snake(
-                preg_replace('/[^[:alnum:][:space:]_]/u', '', "${name} ${function} ${column}")
+                preg_replace('/[^[:alnum:][:space:]_]/u', '', "{$name} {$function} {$column}")
             );
 
             if ($function === 'exists') {

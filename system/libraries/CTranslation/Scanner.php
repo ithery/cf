@@ -34,7 +34,7 @@ class CTranslation_Scanner {
             . "[\),]";  // Close parentheses or new parameter
 
         foreach (CFile::allFiles($this->scanPaths) as $file) {
-            if (preg_match_all("/${matchingPattern}/siU", $file->getContents(), $matches)) {
+            if (preg_match_all("/{$matchingPattern}/siU", $file->getContents(), $matches)) {
                 foreach ($matches[2] as $key) {
                     if (preg_match("/(^[a-zA-Z0-9:_-]+([.][^\1)\ ]+)+$)/siU", $key, $arrayMatches)) {
                         list($file, $k) = explode('.', $arrayMatches[0], 2);

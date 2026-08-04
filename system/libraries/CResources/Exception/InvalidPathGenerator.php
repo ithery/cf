@@ -19,6 +19,6 @@ class CResources_Exception_InvalidPathGenerator extends CResources_Exception {
     public static function doesNotImplementPathGenerator($class) {
         $pathGeneratorClass = CResources_PathGeneratorInterface::class;
 
-        return new static("Path generator class `{$class}` must implement `${pathGeneratorClass}}`");
+        return new static("Path generator class `{$class}` must implement `{$pathGeneratorClass}}`");
     }
 }

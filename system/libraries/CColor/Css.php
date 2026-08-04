@@ -54,7 +54,7 @@ class CColor_Css {
 
         // Make sure we got a valid hex value
         if (!$this->isHex($bgHex)) {
-            $this->raiseError("background color '${bgHex}' is not a hex color value", 'FUNCTION', 'LINE');
+            $this->raiseError("background color '{$bgHex}' is not a hex color value", 'FUNCTION', 'LINE');
 
             return false;
         }
@@ -76,7 +76,7 @@ class CColor_Css {
 
         // Make sure we got a valid hex value
         if (!$this->isHex($fgHex)) {
-            $this->raiseError("background color '${bgHex}' is not a hex color value", 'FUNCTION', 'LINE');
+            $this->raiseError("background color '{$bgHex}' is not a hex color value", 'FUNCTION', 'LINE');
 
             return false;
         }
@@ -107,7 +107,7 @@ class CColor_Css {
         // Make sure inputs are valid
         if (!is_numeric($percent) || $percent < 0 || $percent > 1) {
             $this->raiseError(
-                "percent=${percent} is not valid",
+                "percent={$percent} is not valid",
                 'FUNCTION',
                 'LINE'
             );
@@ -116,7 +116,7 @@ class CColor_Css {
         }
 
         if (!is_int($mask) || $mask < 0 || $mask > 255) {
-            $this->raiseError("mask=${mask} is not valid", 'FUNCTION', 'LINE');
+            $this->raiseError("mask={$mask} is not valid", 'FUNCTION', 'LINE');
 
             return false;
         }
@@ -154,14 +154,14 @@ class CColor_Css {
         $d = '[a-fA-F0-9]';
 
         // Make sure $hex is valid
-        if (preg_match("/^(${d}${d})(${d}${d})(${d}${d})\$/", $hex, $rgb)) {
+        if (preg_match("/^({$d}{$d})({$d}{$d})({$d}{$d})\$/", $hex, $rgb)) {
             return [
                 hexdec($rgb[1]),
                 hexdec($rgb[2]),
                 hexdec($rgb[3])
             ];
         }
-        if (preg_match("/^(${d})(${d})(${d})$/", $hex, $rgb)) {
+        if (preg_match("/^({$d})({$d})({$d})$/", $hex, $rgb)) {
             return [
                 hexdec($rgb[1] . $rgb[1]),
                 hexdec($rgb[2] . $rgb[2]),
@@ -169,7 +169,7 @@ class CColor_Css {
             ];
         }
 
-        $this->raiseError("cannot convert hex '${hex}' to RGB", 'FUNCTION', 'LINE');
+        $this->raiseError("cannot convert hex '{$hex}' to RGB", 'FUNCTION', 'LINE');
 
         return false;
     }
@@ -216,8 +216,8 @@ class CColor_Css {
         $d = '[a-fA-F0-9]';
 
         // Make sure $hex is valid
-        if (preg_match("/^#?${d}${d}${d}${d}${d}${d}\$/", $hex)
-            || preg_match("/^#?${d}${d}${d}\$/", $hex)
+        if (preg_match("/^#?{$d}{$d}{$d}{$d}{$d}{$d}\$/", $hex)
+            || preg_match("/^#?{$d}{$d}{$d}\$/", $hex)
         ) {
             return true;
         }

@@ -105,7 +105,7 @@ trait CManager_Asset_SCSS_Trait_CompilerOperatorTrait {
                 case '!=':
                     return $this->opNeq($left, $right);
                 default:
-                    $this->throwError("color: unknown op ${op}");
+                    $this->throwError("color: unknown op {$op}");
             }
         }
 

@@ -844,9 +844,9 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
 
         $current = $column->precision ? "CURRENT_TIMESTAMP({$column->precision})" : 'CURRENT_TIMESTAMP';
 
-        $columnType = $column->useCurrent ? "${columnType} default ${current}" : $columnType;
+        $columnType = $column->useCurrent ? "{$columnType} default {$current}" : $columnType;
 
-        return $column->useCurrentOnUpdate ? "${columnType} on update ${current}" : $columnType;
+        return $column->useCurrentOnUpdate ? "{$columnType} on update {$current}" : $columnType;
     }
 
     /**
@@ -894,9 +894,9 @@ class CDatabase_Schema_Grammar_MySqlGrammar extends CDatabase_Schema_Grammar {
 
         $current = $column->precision ? "CURRENT_TIMESTAMP({$column->precision})" : 'CURRENT_TIMESTAMP';
 
-        $columnType = $column->useCurrent ? "${columnType} default ${current}" : $columnType;
+        $columnType = $column->useCurrent ? "{$columnType} default {$current}" : $columnType;
 
-        return $column->useCurrentOnUpdate ? "${columnType} on update ${current}" : $columnType;
+        return $column->useCurrentOnUpdate ? "{$columnType} on update {$current}" : $columnType;
     }
 
     /**

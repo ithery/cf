@@ -340,7 +340,7 @@ class CTesting_Browser {
     public function scrollIntoView($selector) {
         $selector = addslashes($this->resolver->format($selector));
 
-        $this->driver->executeScript("document.querySelector(\"${selector}\").scrollIntoView();");
+        $this->driver->executeScript("document.querySelector(\"{$selector}\").scrollIntoView();");
 
         return $this;
     }
@@ -357,7 +357,7 @@ class CTesting_Browser {
 
         $selector = addslashes($this->resolver->format($selector));
 
-        $this->driver->executeScript("jQuery(\"html, body\").animate({scrollTop: jQuery(\"${selector}\").offset().top}, 0);");
+        $this->driver->executeScript("jQuery(\"html, body\").animate({scrollTop: jQuery(\"{$selector}\").offset().top}, 0);");
 
         return $this;
     }

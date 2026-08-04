@@ -93,7 +93,7 @@ class CTranslation_Driver_FileDriver extends CTranslation_DriverAbstract impleme
             throw new CTranslation_Exception_LanguageExistsException(c::__('translation::errors.language_exists', ['language' => $language]));
         }
 
-        CFile::makeDirectory("{$this->languageFilesPath}" . DIRECTORY_SEPARATOR . "${language}");
+        CFile::makeDirectory("{$this->languageFilesPath}" . DIRECTORY_SEPARATOR . "{$language}");
         if (!CFile::exists("{$this->languageFilesPath}" . DIRECTORY_SEPARATOR . "{$language}.json")) {
             $this->saveSingleTranslations($language, c::collect(['single' => c::collect()]));
         }
@@ -275,7 +275,7 @@ class CTranslation_Driver_FileDriver extends CTranslation_DriverAbstract impleme
             CFile::makeDirectory($directory, 0755, true);
         }
 
-        CFile::put("${directory}" . DIRECTORY_SEPARATOR . "{$group}.php", "<?php\n\nreturn " . var_export($translations, true) . ';' . \PHP_EOL);
+        CFile::put("{$directory}" . DIRECTORY_SEPARATOR . "{$group}.php", "<?php\n\nreturn " . var_export($translations, true) . ';' . \PHP_EOL);
     }
 
     /**

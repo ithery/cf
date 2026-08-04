@@ -66,7 +66,7 @@ class CDebug_Storage_PdoStorage implements CDebug_Contract_StorageInterface {
         $where = [];
         $params = [];
         foreach ($filters as $key => $value) {
-            $where[] = "meta_${key} = ?";
+            $where[] = "meta_{$key} = ?";
             $params[] = $value;
         }
         if (count($where)) {
@@ -113,7 +113,7 @@ class CDebug_Storage_PdoStorage implements CDebug_Contract_StorageInterface {
         $sql = $this->sqlQueries[$name];
         $vars = array_merge(['tablename' => $this->tableName], $vars);
         foreach ($vars as $k => $v) {
-            $sql = str_replace("%${k}%", $v, $sql);
+            $sql = str_replace("%{$k}%", $v, $sql);
         }
 
         return $sql;

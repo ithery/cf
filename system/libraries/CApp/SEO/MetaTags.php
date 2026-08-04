@@ -156,7 +156,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
         $html = [];
 
         if ($title) {
-            $html[] = carr::get($this->config, 'add_notranslate_class', false) ? "<title class=\"notranslate\">${title}</title>" : "<title>${title}</title>";
+            $html[] = carr::get($this->config, 'add_notranslate_class', false) ? "<title class=\"notranslate\">{$title}</title>" : "<title>{$title}</title>";
         }
 
         if ($description) {

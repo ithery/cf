@@ -252,12 +252,12 @@ class CApp_Blade_Directive {
         }
 
         return <<<HTML
-<!-- Cres Preloader Start Here ${expression} -->
+<!-- Cres Preloader Start Here {$expression} -->
 <div id="cres-preloader">
     <div class="preloader-container">
         <div class="preloader-loader">
         </div>
-        <img src="<?php echo ${expression}; ?>" />
+        <img src="<?php echo {$expression}; ?>" />
     </div>
 </div>
 

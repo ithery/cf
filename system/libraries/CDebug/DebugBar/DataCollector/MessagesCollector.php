@@ -224,14 +224,14 @@ class CDebug_DebugBar_DataCollector_MessagesCollector extends AbstractLogger imp
         $name = $this->getName();
 
         return [
-            "${name}" => [
+            "{$name}" => [
                 'icon' => 'list-alt',
                 'widget' => 'PhpDebugBar.Widgets.MessagesWidget',
-                'map' => "${name}.messages",
+                'map' => "{$name}.messages",
                 'default' => '[]'
             ],
-            "${name}:badge" => [
-                'map' => "${name}.count",
+            "{$name}:badge" => [
+                'map' => "{$name}.count",
                 'default' => 'null'
             ]
         ];

@@ -73,7 +73,7 @@ class CCron_Runner {
             $event->log('Starting scheduled job : ' . $event->getSummaryForDisplay());
             $event->run();
             $runtime = round(microtime(true) - $start, 2);
-            $event->log('Ended scheduled job : ' . $event->getSummaryForDisplay() . " [${runtime}s]");
+            $event->log('Ended scheduled job : ' . $event->getSummaryForDisplay() . " [{$runtime}s]");
 
             CEvent::dispatch(new CCron_Event_ScheduledTaskFinished(
                 $event,

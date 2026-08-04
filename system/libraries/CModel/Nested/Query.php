@@ -329,7 +329,7 @@ class CModel_Nested_Query extends CModel_Query {
     public function whereIsLeaf() {
         list($lft, $rgt) = $this->wrappedColumns();
 
-        return $this->whereRaw("${lft} = ${rgt} - 1");
+        return $this->whereRaw("{$lft} = {$rgt} - 1");
     }
 
     /**
@@ -666,7 +666,7 @@ class CModel_Nested_Query extends CModel_Query {
         $query = $this->model
             ->newNestedSetQuery('c')
             ->toBase()
-            ->from($this->query->raw("{$table} as {$waChild}, {$table} as {$waParent}, ${table} as {$waInterm}"))
+            ->from($this->query->raw("{$table} as {$waChild}, {$table} as {$waParent}, {$table} as {$waInterm}"))
             ->whereRaw("{$waChild}.{$parentIdName}={$waParent}.{$keyName}")
             ->whereRaw("{$waInterm}.{$keyName} <> {$waParent}.{$keyName}")
             ->whereRaw("{$waInterm}.{$keyName} <> {$waChild}.{$keyName}")

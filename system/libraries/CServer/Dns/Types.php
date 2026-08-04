@@ -98,7 +98,7 @@ class CServer_Dns_Types {
         if (isset($this->typesByName[$name])) {
             return $this->typesByName[$name];
         } else {
-            throw new CServer_Dns_Exception("Invalid name ${name} specified on GetByName");
+            throw new CServer_Dns_Exception("Invalid name {$name} specified on GetByName");
         }
     }
 
@@ -106,7 +106,7 @@ class CServer_Dns_Types {
         if (isset($this->typesById[$id])) {
             return $this->typesById[$id];
         } else {
-            throw new CServer_Dns_Exception("Invalid id ${id} on GetById");
+            throw new CServer_Dns_Exception("Invalid id {$id} on GetById");
         }
     }
 }

@@ -4,7 +4,7 @@ abstract class CDebug_CollectorAbstract {
     public function put($data) {
         $type = $this->getType();
         if (!in_array($type, CDebug_CollectorManager::allCollectorType())) {
-            throw new Exception("Type ${type} is not found");
+            throw new Exception("Type {$type} is not found");
         }
 
         if (!is_string($data)) {

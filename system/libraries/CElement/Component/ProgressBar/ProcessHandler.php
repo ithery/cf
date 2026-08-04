@@ -51,7 +51,7 @@ class CElement_Component_ProgressBar_ProcessHandler {
         $updateMethod = $this->updateMethod;
         $json = json_encode($data);
         $js = <<<JAVASCRIPT
-            parent.${updateMethod}(${json});
+            parent.{$updateMethod}({$json});
         JAVASCRIPT;
         //echo $js;
         $script = '<script type="text/javascript">' . $js . '</script>' . "\n\n";

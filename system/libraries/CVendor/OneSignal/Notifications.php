@@ -21,7 +21,7 @@ class CVendor_OneSignal_Notifications extends CVendor_OneSignal_AbstractApi {
      * @return array
      */
     public function getOne($id) {
-        $request = $this->createRequest('GET', "/notifications/${id}?app_id={$this->client->getConfig()->getApplicationId()}");
+        $request = $this->createRequest('GET', "/notifications/{$id}?app_id={$this->client->getConfig()->getApplicationId()}");
         $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
 
         return $this->client->sendRequest($request);
@@ -87,7 +87,7 @@ class CVendor_OneSignal_Notifications extends CVendor_OneSignal_AbstractApi {
      * @return array
      */
     public function open($id) {
-        $request = $this->createRequest('PUT', "/notifications/${id}");
+        $request = $this->createRequest('PUT', "/notifications/{$id}");
         $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
         $request = $request->withHeader('Content-Type', 'application/json');
         $request = $request->withBody($this->createStream([
@@ -108,7 +108,7 @@ class CVendor_OneSignal_Notifications extends CVendor_OneSignal_AbstractApi {
      * @return array
      */
     public function cancel($id) {
-        $request = $this->createRequest('DELETE', "/notifications/${id}?app_id={$this->client->getConfig()->getApplicationId()}");
+        $request = $this->createRequest('DELETE', "/notifications/{$id}?app_id={$this->client->getConfig()->getApplicationId()}");
         $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
 
         return $this->client->sendRequest($request);
@@ -126,7 +126,7 @@ class CVendor_OneSignal_Notifications extends CVendor_OneSignal_AbstractApi {
     public function history($id, array $data) {
         $resolvedData = $this->resolverFactory->createNotificationHistoryResolver()->resolve($data);
 
-        $request = $this->createRequest('POST', "/notifications/${id}/history");
+        $request = $this->createRequest('POST', "/notifications/{$id}/history");
         $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
         $request = $request->withHeader('Cache-Control', 'no-cache');
         $request = $request->withHeader('Content-Type', 'application/json');

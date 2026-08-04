@@ -47,7 +47,7 @@ class CVendor_OneSignal_Devices extends CVendor_OneSignal_AbstractApi {
      * @return array
      */
     public function getOne($id) {
-        $request = $this->createRequest('GET', "/players/${id}?app_id={$this->client->getConfig()->getApplicationId()}");
+        $request = $this->createRequest('GET', "/players/{$id}?app_id={$this->client->getConfig()->getApplicationId()}");
 
         return $this->client->sendRequest($request);
     }
@@ -107,7 +107,7 @@ class CVendor_OneSignal_Devices extends CVendor_OneSignal_AbstractApi {
     public function update($id, array $data) {
         $resolvedData = $this->resolverFactory->createExistingDeviceResolver()->resolve($data);
 
-        $request = $this->createRequest('PUT', "/players/${id}");
+        $request = $this->createRequest('PUT', "/players/{$id}");
         $request = $request->withHeader('Content-Type', 'application/json');
         $request = $request->withBody($this->createStream($resolvedData));
 
@@ -127,7 +127,7 @@ class CVendor_OneSignal_Devices extends CVendor_OneSignal_AbstractApi {
      * @return array
      */
     public function delete($id) {
-        $request = $this->createRequest('DELETE', "/players/${id}?app_id={$this->client->getConfig()->getApplicationId()}");
+        $request = $this->createRequest('DELETE', "/players/{$id}?app_id={$this->client->getConfig()->getApplicationId()}");
         $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
 
         return $this->client->sendRequest($request);
@@ -144,7 +144,7 @@ class CVendor_OneSignal_Devices extends CVendor_OneSignal_AbstractApi {
     public function onSession($id, array $data) {
         $resolvedData = $this->resolverFactory->createDeviceSessionResolver()->resolve($data);
 
-        $request = $this->createRequest('POST', "/players/${id}/on_session");
+        $request = $this->createRequest('POST', "/players/{$id}/on_session");
         $request = $request->withHeader('Content-Type', 'application/json');
         $request = $request->withBody($this->createStream($resolvedData));
 
@@ -162,7 +162,7 @@ class CVendor_OneSignal_Devices extends CVendor_OneSignal_AbstractApi {
     public function onPurchase($id, array $data) {
         $resolvedData = $this->resolverFactory->createDevicePurchaseResolver()->resolve($data);
 
-        $request = $this->createRequest('POST', "/players/${id}/on_purchase");
+        $request = $this->createRequest('POST', "/players/{$id}/on_purchase");
         $request = $request->withHeader('Content-Type', 'application/json');
         $request = $request->withBody($this->createStream($resolvedData));
 
@@ -180,7 +180,7 @@ class CVendor_OneSignal_Devices extends CVendor_OneSignal_AbstractApi {
     public function onFocus($id, array $data) {
         $resolvedData = $this->resolverFactory->createDeviceFocusResolver()->resolve($data);
 
-        $request = $this->createRequest('POST', "/players/${id}/on_focus");
+        $request = $this->createRequest('POST', "/players/{$id}/on_focus");
         $request = $request->withHeader('Content-Type', 'application/json');
         $request = $request->withBody($this->createStream($resolvedData));
 
@@ -231,7 +231,7 @@ class CVendor_OneSignal_Devices extends CVendor_OneSignal_AbstractApi {
     public function editTags($externalUserId, array $data) {
         $resolvedData = $this->resolverFactory->createDeviceTagsResolver()->resolve($data);
 
-        $request = $this->createRequest('PUT', "/apps/{$this->client->getConfig()->getApplicationId()}/users/${externalUserId}");
+        $request = $this->createRequest('PUT', "/apps/{$this->client->getConfig()->getApplicationId()}/users/{$externalUserId}");
         $request = $request->withHeader('Content-Type', 'application/json');
         $request = $request->withBody($this->createStream($resolvedData));
 

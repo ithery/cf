@@ -76,7 +76,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
             // Make the connection and select the database
             if ($this->link = new mysqli($host, $user, $pass, $database, $port)) {
                 $this->pdo = function () use ($host, $user, $pass, $database, $port) {
-                    return new PDO("mysql:host=${host};dbname=${database}", $user, $pass);
+                    return new PDO("mysql:host={$host};dbname={$database}", $user, $pass);
                 };
 
                 if ($charset = $this->dbConfig['character_set']) {

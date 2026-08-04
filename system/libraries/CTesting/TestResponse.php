@@ -649,7 +649,7 @@ class CTesting_TestResponse implements ArrayAccess {
 
                 if (!$hasError) {
                     PHPUnit::fail(
-                        "Failed to find a validation error in the response for key and message: '${key}' => '${value}'" . PHP_EOL . PHP_EOL . $errorMessage
+                        "Failed to find a validation error in the response for key and message: '{$key}' => '{$value}'" . PHP_EOL . PHP_EOL . $errorMessage
                     );
                 }
             }
@@ -941,7 +941,7 @@ class CTesting_TestResponse implements ArrayAccess {
 
         foreach ($keys as $key => $value) {
             if (is_int($key)) {
-                PHPUnit::assertTrue($errors->has($value), "Session missing error: ${value}");
+                PHPUnit::assertTrue($errors->has($value), "Session missing error: {$value}");
             } else {
                 PHPUnit::assertContains(is_bool($value) ? (string) $value : $value, $errors->get($key, $format));
             }
@@ -976,7 +976,7 @@ class CTesting_TestResponse implements ArrayAccess {
 
         foreach ($keys as $key => $value) {
             if (is_int($key)) {
-                PHPUnit::assertFalse($errors->has($value), "Session has unexpected error: ${value}");
+                PHPUnit::assertFalse($errors->has($value), "Session has unexpected error: {$value}");
             } else {
                 PHPUnit::assertNotContains($value, $errors->get($key, $format));
             }

@@ -110,7 +110,7 @@ class CSocialLogin_OAuth2_Provider_InstagramProvider extends CSocialLogin_OAuth2
         $sig = $endpoint;
         ksort($params);
         foreach ($params as $key => $val) {
-            $sig .= "|${key}=${val}";
+            $sig .= "|{$key}={$val}";
         }
         $signing_key = $this->clientSecret;
 

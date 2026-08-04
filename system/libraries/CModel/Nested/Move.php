@@ -142,18 +142,18 @@ class CModel_Nested_Move {
         $wrappedId = $grammar->wrap($this->node->getKeyName());
 
         $lftSql = "CASE
-      WHEN ${wrappedLeft} BETWEEN ${a} AND ${b} THEN ${wrappedLeft} + ${d} - ${b}
-      WHEN ${wrappedLeft} BETWEEN ${c} AND ${d} THEN ${wrappedLeft} + ${a} - ${c}
-      ELSE ${wrappedLeft} END";
+      WHEN {$wrappedLeft} BETWEEN {$a} AND {$b} THEN {$wrappedLeft} + {$d} - {$b}
+      WHEN {$wrappedLeft} BETWEEN {$c} AND {$d} THEN {$wrappedLeft} + {$a} - {$c}
+      ELSE {$wrappedLeft} END";
 
         $rgtSql = "CASE
-      WHEN ${wrappedRight} BETWEEN ${a} AND ${b} THEN ${wrappedRight} + ${d} - ${b}
-      WHEN ${wrappedRight} BETWEEN ${c} AND ${d} THEN ${wrappedRight} + ${a} - ${c}
-      ELSE ${wrappedRight} END";
+      WHEN {$wrappedRight} BETWEEN {$a} AND {$b} THEN {$wrappedRight} + {$d} - {$b}
+      WHEN {$wrappedRight} BETWEEN {$c} AND {$d} THEN {$wrappedRight} + {$a} - {$c}
+      ELSE {$wrappedRight} END";
 
         $parentSql = "CASE
-      WHEN ${wrappedId} = ${currentId} THEN ${parentId}
-      ELSE ${wrappedParent} END";
+      WHEN {$wrappedId} = {$currentId} THEN {$parentId}
+      ELSE {$wrappedParent} END";
 
         $updateConditions = [
             $leftColumn => $connection->raw($lftSql),

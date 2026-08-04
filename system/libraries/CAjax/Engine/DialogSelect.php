@@ -32,9 +32,9 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
             if ($keyword) {
                 foreach ($searchField as $key => $field) {
                     if (!$key) {
-                        $model = $model->where($field, 'LIKE', "%${keyword}%");
+                        $model = $model->where($field, 'LIKE', "%{$keyword}%");
                     } else {
-                        $model = $model->orWhere($field, 'LIKE', "%${keyword}%");
+                        $model = $model->orWhere($field, 'LIKE', "%{$keyword}%");
                     }
                 }
             }

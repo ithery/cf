@@ -51,11 +51,11 @@ class CTracker_Cache extends CCache_Repository {
 
     public function makeCacheKey($attributes, $keys, $identifier) {
         $attributes = $this->extractAttributes($attributes);
-        $cacheKey = "className=${identifier};";
+        $cacheKey = "className={$identifier};";
         $keys = $this->extractKeys($attributes, $keys, $identifier);
         foreach ($keys as $key) {
             if (isset($attributes[$key])) {
-                $cacheKey .= "${key}={$attributes[$key]};";
+                $cacheKey .= "{$key}={$attributes[$key]};";
             }
         }
 

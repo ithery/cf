@@ -952,7 +952,7 @@ class CCron_Event {
     public function log($message = '') {
         $header = "\nDate                  Message\n";
         $date = date('Y-m-d H:i:s');
-        $prefix = "[${date}]" . str_repeat("\t", $indent = 0);
+        $prefix = "[{$date}]" . str_repeat("\t", $indent = 0);
         $logFile = $this->getLogFile();
         if (!file_exists($this->getLogDirectory())) {
             mkdir($this->getLogDirectory(), 0777, true);
@@ -961,7 +961,7 @@ class CCron_Event {
         if (!CFile::exists($logFile)) {
             CFile::put($logFile, $header);
         }
-        $line = $prefix . ' ' . str_replace("\n", "\n${prefix} ", trim($message)) . "\n";
+        $line = $prefix . ' ' . str_replace("\n", "\n{$prefix} ", trim($message)) . "\n";
         CFile::append($logFile, $line);
     }
 

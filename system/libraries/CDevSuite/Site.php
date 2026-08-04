@@ -388,7 +388,7 @@ abstract class CDevSuite_Site {
      * @return int
      */
     public function port($url) {
-        if ($this->files->exists($path = CDevSuite::homePath() . "/Nginx/${url}.conf")) {
+        if ($this->files->exists($path = CDevSuite::homePath() . "/Nginx/{$url}.conf")) {
             if (strpos($this->files->get($path), '443') !== false) {
                 return 443;
             }

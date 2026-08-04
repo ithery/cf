@@ -43,7 +43,7 @@ class CElement_FormInput_EditorJs_ConfigLoader {
 
         foreach ($config['tools'] as $toolName => $toolData) {
             if (isset($this->tools[$toolName])) {
-                throw new CElement_FormInput_EditorJs_EditorJsException("Duplicate tool ${toolName} in configuration");
+                throw new CElement_FormInput_EditorJs_EditorJsException("Duplicate tool {$toolName} in configuration");
             }
 
             $this->tools[$toolName] = $this->loadTool($toolData);

@@ -42,7 +42,7 @@ final class CHTTP_RobotsTxt {
      * @return $this
      */
     public function addSitemap($sitemap) {
-        return $this->addLine("Sitemap: ${sitemap}");
+        return $this->addLine("Sitemap: {$sitemap}");
     }
 
     /**
@@ -53,7 +53,7 @@ final class CHTTP_RobotsTxt {
      * @return $this
      */
     public function addUserAgent($userAgent) {
-        return $this->addLine("User-agent: ${userAgent}");
+        return $this->addLine("User-agent: {$userAgent}");
     }
 
     /**
@@ -64,7 +64,7 @@ final class CHTTP_RobotsTxt {
      * @return $this
      */
     public function addHost($host) {
-        return $this->addLine("Host: ${host}");
+        return $this->addLine("Host: {$host}");
     }
 
     /**
@@ -99,7 +99,7 @@ final class CHTTP_RobotsTxt {
      */
     public function addRuleLine($directories, $rule) {
         foreach ((array) $directories as $directory) {
-            $this->addLine("${rule}: ${directory}");
+            $this->addLine("{$rule}: {$directory}");
         }
 
         return $this;
@@ -113,7 +113,7 @@ final class CHTTP_RobotsTxt {
      * @return $this
      */
     public function addComment($comment) {
-        return $this->addLine("# ${comment}");
+        return $this->addLine("# {$comment}");
     }
 
     /**

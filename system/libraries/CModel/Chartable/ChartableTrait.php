@@ -46,7 +46,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_GroupCollection
      */
     public function scopeCountForGroup(CModel_Query $builder, $groupColumn) {
-        $group = $builder->select("${groupColumn} as label", CDatabase::raw('count(*) as value'))
+        $group = $builder->select("{$groupColumn} as label", CDatabase::raw('count(*) as value'))
             ->groupBy($groupColumn)
             ->orderBy('value', 'desc')
             ->get()
@@ -230,8 +230,8 @@ trait CModel_Chartable_ChartableTrait {
         $newQuery->from($builder, 'chartable_sub');
 
         $selects = [
-            CDatabase::raw("${value} as value"),
-            CDatabase::raw("${dateExpression} as label"),
+            CDatabase::raw("{$value} as value"),
+            CDatabase::raw("{$dateExpression} as label"),
         ];
 
         if ($groupColumn) {
@@ -301,7 +301,7 @@ trait CModel_Chartable_ChartableTrait {
 
         $newQuery->from($builder, 'chartable_sub');
         $selects = [
-            CDatabase::raw("${value} as value"),
+            CDatabase::raw("{$value} as value"),
             CDatabase::raw($dateExpression . ' as label'),
         ];
 
@@ -370,8 +370,8 @@ trait CModel_Chartable_ChartableTrait {
         $newQuery->from($builder, 'chartable_sub');
 
         $selects = [
-            CDatabase::raw("${value} as value"),
-            CDatabase::raw("${dateExpression} as label"),
+            CDatabase::raw("{$value} as value"),
+            CDatabase::raw("{$dateExpression} as label"),
         ];
 
         if ($groupColumn) {
@@ -438,8 +438,8 @@ trait CModel_Chartable_ChartableTrait {
         $dateExpr = new CModel_Chartable_DateExpression($builder->getConnection()->getDriverName());
         $dateExpression = $dateExpr->date($dateColumn);
         $selects = [
-            CDatabase::raw("${value} as value"),
-            CDatabase::raw("${dateExpression} as label"),
+            CDatabase::raw("{$value} as value"),
+            CDatabase::raw("{$dateExpression} as label"),
         ];
 
         if ($groupColumn) {
@@ -512,8 +512,8 @@ trait CModel_Chartable_ChartableTrait {
         $dateExpr = new CModel_Chartable_DateExpression($builder->getConnection()->getDriverName());
         $dateExpression = $dateExpr->dateHour($dateColumn);
         $selects = [
-            CDatabase::raw("${value} as value"),
-            CDatabase::raw("${dateExpression} as label"),
+            CDatabase::raw("{$value} as value"),
+            CDatabase::raw("{$dateExpression} as label"),
         ];
 
         if ($groupColumn) {
@@ -749,7 +749,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeSumByHours(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByHours($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByHours($builder, "SUM({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -764,7 +764,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeSumByDays(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByDays($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByDays($builder, "SUM({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -779,7 +779,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeSumByMonths(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByMonths($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByMonths($builder, "SUM({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -794,7 +794,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeSumByWeeks(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByWeeks($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByWeeks($builder, "SUM({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -809,7 +809,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeSumByYears(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByYears($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByYears($builder, "SUM({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -840,7 +840,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeAvgByHours(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByHours($builder, "AVG(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByHours($builder, "AVG({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -855,7 +855,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeAvgByDays(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByDays($builder, "AVG(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByDays($builder, "AVG({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -870,7 +870,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeAvgByMonths(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByMonths($builder, "AVG(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByMonths($builder, "AVG({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -885,7 +885,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeAvgByWeeks(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByWeeks($builder, "AVG(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByWeeks($builder, "AVG({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -900,7 +900,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeAvgByYears(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByYears($builder, "AVG(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByYears($builder, "AVG({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -935,10 +935,10 @@ trait CModel_Chartable_ChartableTrait {
     public function scopeAggregateGroupBy(CModel_Query $builder, $method, $groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
         $val = $value;
         if ($method == 'sum') {
-            $val = "SUM(${value})";
+            $val = "SUM({$value})";
         }
         if ($method == 'avg') {
-            $val = "AVG(${value})";
+            $val = "AVG({$value})";
         }
         if ($groupBy == 'month') {
             return $this->groupByMonths($builder, $val, $startDate, $stopDate, $dateColumn);

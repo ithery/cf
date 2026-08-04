@@ -306,7 +306,7 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
         foreach ($lines as $key => $value) {
             list($group, $item) = explode('.', $key, 2);
 
-            carr::set($this->loaded, "${namespace}.${group}.${locale}.${item}", $value);
+            carr::set($this->loaded, "{$namespace}.{$group}.{$locale}.{$item}", $value);
         }
     }
 

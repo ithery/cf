@@ -86,7 +86,7 @@ class CSocialLogin_ConfigRetriever implements CSocialLogin_Contract_ConfigRetrie
 
         // REQUIRED value is empty
         if (!$keyExists) {
-            throw new CSocialLogin_Exception_MissingConfigException("Missing services entry for {$this->providerName}.${key}");
+            throw new CSocialLogin_Exception_MissingConfigException("Missing services entry for {$this->providerName}.{$key}");
         }
 
         return $this->servicesArray[$key];
@@ -111,7 +111,7 @@ class CSocialLogin_ConfigRetriever implements CSocialLogin_Contract_ConfigRetrie
                     'redirect' => "{$this->providerIdentifier}_REDIRECT_URI",
                 ];
             } else {
-                throw new CSocialLogin_Exception_MissingConfigException("There is no services entry for ${providerName}");
+                throw new CSocialLogin_Exception_MissingConfigException("There is no services entry for {$providerName}");
             }
         }
 

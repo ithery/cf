@@ -146,7 +146,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
             $version === 'php' ? CDevSuite_Brew::LATEST_PHP_VERSION : $version
         );
 
-        return $versionNormalized === '5.6' ? BREW_PREFIX . '/etc/php/5.6/php-fpm.conf' : BREW_PREFIX . "/etc/php/${versionNormalized}/php-fpm.d/devsuite-fpm.conf";
+        return $versionNormalized === '5.6' ? BREW_PREFIX . '/etc/php/5.6/php-fpm.conf' : BREW_PREFIX . "/etc/php/{$versionNormalized}/php-fpm.d/devsuite-fpm.conf";
     }
 
     /**
