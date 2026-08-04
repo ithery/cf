@@ -169,4 +169,67 @@ class CookieTest extends TestCase {
 
         $this->assertStringContainsString('name=deleted', (string) $cookie);
     }
+
+    /**
+     * secure is only honoured when it really is a bool. null means "use the jar
+     * default", so a caller may skip the argument in the middle without
+     * silently turning the flag off.
+     */
+    public function testANullSecureFallsBackToTheJarDefault() {
+        $this->jar->setDefaultPathAndDomain('/', 'test.local', true, 'lax');
+
+        $this->assertTrue($this->jar->make('name', 'value', 0, null, null, null)->isSecure());
+        $this->assertFalse($this->jar->make('name', 'value', 0, null, null, false)->isSecure());
+    }
+
+    /**
+     * forget() has to carry the path and domain over, otherwise the browser
+     * expires a different cookie than the one that is actually set.
+     */
+    public function testForgetKeepsThePathAndDomain() {
+        $cookie = $this->jar->forget('name', '/app', 'test.local');
+
+        $this->assertSame('/app', $cookie->getPath());
+        $this->assertSame('test.local', $cookie->getDomain());
+    }
+
+    public function testNothingIsQueuedToBeginWith() {
+        $this->assertSame([], $this->jar->getQueuedCookies());
+    }
+
+    /**
+     * The queue is keyed by name and path, so the same name on two path
+     * branches is kept as two cookies instead of overwriting each other.
+     */
+    public function testTheSameNameOnTwoPathsIsKeptSeparately() {
+        $this->jar->queue('name', 'root', 0, '/');
+        $this->jar->queue('name', 'admin', 0, '/admin');
+
+        $this->assertSame('root', $this->jar->queued('name', null, '/')->getValue());
+        $this->assertSame('admin', $this->jar->queued('name', null, '/admin')->getValue());
+        $this->assertContainsOnlyInstancesOf(
+            Symfony\Component\HttpFoundation\Cookie::class,
+            $this->jar->getQueuedCookies()
+        );
+        $this->assertCount(2, $this->jar->getQueuedCookies());
+    }
+
+    public function testQueueingTheSameNameAndPathTwiceKeepsTheLastOne() {
+        $this->jar->queue('name', 'old');
+        $this->jar->queue('name', 'new');
+
+        $this->assertSame('new', $this->jar->queued('name')->getValue());
+        $this->assertCount(1, $this->jar->getQueuedCookies());
+    }
+
+    public function testQueuedWithAPathFallsBackToTheDefault() {
+        $this->assertSame('fallback', $this->jar->queued('missing', 'fallback', '/'));
+    }
+
+    public function testUnqueueingAnUnknownCookieIsHarmless() {
+        $this->jar->unqueue('missing');
+        $this->jar->unqueue('missing', '/');
+
+        $this->assertSame([], $this->jar->getQueuedCookies());
+    }
 }
