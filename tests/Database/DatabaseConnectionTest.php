@@ -1,9 +1,12 @@
 <?php
 
 use Mockery as m;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 
 class DatabaseConnectionTest extends TestCase {
+    use MockeryPHPUnitIntegration;
+
     protected function tearDown(): void {
         // properti statis, jadi wajib dikembalikan supaya tidak bocor ke test lain
         CDatabase_Connection::$compileQueryLog = true;

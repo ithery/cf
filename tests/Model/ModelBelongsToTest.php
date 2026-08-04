@@ -1,8 +1,11 @@
 <?php
 use Mockery as m;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 
 class ModelBelongsToTest extends TestCase {
+    use MockeryPHPUnitIntegration;
+
     protected $builder;
 
     protected $related;
