@@ -143,6 +143,18 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     protected $loggingQueries = false;
 
     /**
+     * Indicates whether the query log carries a `compiled` SQL string.
+     *
+     * Building it runs every binding through `PDO::quote()` on the write
+     * connection, so logging a read query can open a write connection for
+     * nothing at all. Set false where that cost is unwanted; the key stays in
+     * the log as null, and `lastQuery()` returns null with it.
+     *
+     * @var bool
+     */
+    public static $compileQueryLog = true;
+
+    /**
      * The duration of all executed queries in milliseconds.
      *
      * @var float
@@ -933,7 +945,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
                 'query' => $query,
                 'bindings' => $bindings,
                 'time' => $time,
-                'compiled' => $this->compileBinds($query, $bindings),
+                'compiled' => static::$compileQueryLog ? $this->compileBinds($query, $bindings) : null,
             ];
         }
     }
