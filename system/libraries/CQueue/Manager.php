@@ -166,6 +166,12 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
      */
     protected function resolve($name) {
         $config = $this->getConfig($name);
+        //tanpa penjagaan ini sebuah nama koneksi yang salah ketik berakhir
+        //sebagai "Trying to access array offset on value of type null", yang
+        //tidak menyebut nama koneksinya sama sekali
+        if (is_null($config)) {
+            throw new InvalidArgumentException("The [{$name}] queue connection has not been configured.");
+        }
 
         return $this->getConnector($config['driver'])
             ->connect($config)
