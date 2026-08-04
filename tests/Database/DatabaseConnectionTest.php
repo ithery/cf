@@ -74,8 +74,14 @@ class DatabaseConnectionTest extends TestCase {
 
     public function testSelectResultsetsReturnsMultipleRowset() {
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['prepare'])->getMock();
-        $writePdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['prepare'])->getMock();
+        // `quote` ikut di-mock: query log CF menyimpan kunci `compiled`, yang
+        // menyulih bind ke dalam SQL lewat PDO::quote pada koneksi tulis. Tanpa
+        // ini PDO tiruan yang konstruktornya sengaja kosong akan menolak.
+        $writePdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['prepare', 'quote'])->getMock();
         $writePdo->expects($this->never())->method('prepare');
+        $writePdo->method('quote')->willReturnCallback(function ($value) {
+            return "'" . $value . "'";
+        });
         $statement = $this->getMockBuilder('PDOStatement')
             ->onlyMethods(['setFetchMode', 'execute', 'fetchAll', 'bindValue', 'nextRowset'])
             ->getMock();

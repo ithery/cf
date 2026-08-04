@@ -9,14 +9,26 @@ class DatabaseConnectionFactoryTest extends TestCase {
      */
     protected $db;
 
+    /**
+     * @var null|string
+     */
+    protected $previousDefaultConnection;
+
     protected function setUp() {
         $this->db = CDatabase::manager();
+        // Manager-nya singleton milik aplikasi, dan koneksi bawaannya `mysql`
+        // dari config -- bukan sqlite yang didaftarkan di bawah. Tanpa ini
+        // getConnection() tanpa nama menuju server MySQL sungguhan.
+        // Nama `default` tidak bisa dipakai: Manager::configuration() memperlakukannya
+        // sebagai alias ke `database.default`, yang menunjuk mysql.
+        $this->previousDefaultConnection = $this->db->getDefaultConnection();
+        $this->db->setDefaultConnection('sqlite_memory');
 
         $this->db->addConnection([
             'type' => 'sqlite',
             'pdo' => true,
             'database' => ':memory:',
-        ]);
+        ], 'sqlite_memory');
 
         $this->db->addConnection([
             'url' => 'sqlite:///:memory:',
@@ -36,6 +48,8 @@ class DatabaseConnectionFactoryTest extends TestCase {
     }
 
     protected function tearDown(): void {
+        // dikembalikan karena manager-nya dipakai bersama seluruh test lain
+        $this->db->setDefaultConnection($this->previousDefaultConnection);
         m::close();
     }
 
