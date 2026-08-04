@@ -80,6 +80,59 @@ class CServer_WebServer_LiteSpeed {
     }
 
     /**
+     * Menulis berkas di server, dengan cadangan bertanggal lebih dulu.
+     *
+     * Isinya dikirim sebagai base64 alih-alih ditempel ke dalam perintah.
+     * Konfigurasi LiteSpeed memuat kutip, `$`, backtick, dan tanda kurung —
+     * seluruhnya berarti bagi shell — sehingga menempelkannya, betapapun
+     * hati-hati mengutipnya, adalah cara paling langsung merusak berkas yang
+     * sedang diperbaiki.
+     *
+     * Cadangannya dibuat **sebelum** menulis dan namanya memuat waktu, jadi
+     * beberapa kali penerapan tidak saling menimpa.
+     *
+     * @param string $path
+     * @param string $content
+     *
+     * @return array ['ok' => bool, 'backup' => string, 'output' => string]
+     */
+    public function writeFile($path, $content) {
+        $file = escapeshellarg($path);
+        $backup = $path . '.bak.' . date('YmdHis');
+        $backupArg = escapeshellarg($backup);
+        $encoded = base64_encode((string) $content);
+
+        //`sudo -n` dipakai sebagai cadangan pada tiap langkah, karena berkas
+        //konfigurasinya lazim hanya dapat ditulis root
+        $script = 'set -e; '
+            . 'cp -p ' . $file . ' ' . $backupArg . ' 2>/dev/null || sudo -n cp -p ' . $file . ' ' . $backupArg . '; '
+            . "printf '%s' " . escapeshellarg($encoded) . ' | base64 -d > /tmp/lsvh.$$ ; '
+            . 'cat /tmp/lsvh.$$ > ' . $file . ' 2>/dev/null || sudo -n cp /tmp/lsvh.$$ ' . $file . '; '
+            . 'rm -f /tmp/lsvh.$$; '
+            . 'echo "LSWRITE|ok"';
+
+        $output = (string) $this->server->runCommand($script);
+
+        return [
+            'ok' => strpos($output, 'LSWRITE|ok') !== false,
+            'backup' => $backup,
+            'output' => $output,
+        ];
+    }
+
+    /**
+     * Memuat ulang LiteSpeed tanpa memutus koneksi yang sedang berjalan.
+     *
+     * @return string
+     */
+    public function restart() {
+        return (string) $this->server->runCommand(
+            CVendor_LiteSpeed::serverRoot() . '/bin/lswsctrl restart 2>&1'
+            . ' || sudo -n ' . CVendor_LiteSpeed::serverRoot() . '/bin/lswsctrl restart 2>&1'
+        );
+    }
+
+    /**
      * Konfigurasi utama server (`httpd_config.conf`).
      *
      * @return null|CVendor_LiteSpeed_Data
