@@ -237,13 +237,13 @@ class ContainerTest extends TestCase {
         });
         $container->tag(['satu', 'dua'], 'huruf');
 
-        $this->assertSame(['a', 'b'], iterator_to_array($container->tagged('huruf')));
+        $this->assertSame(['a', 'b'], $container->tagged('huruf'));
     }
 
     public function testTaggedIsEmptyForAnUnknownTag() {
         $container = $this->makeContainer();
 
-        $this->assertSame([], iterator_to_array($container->tagged('tidak-ada')));
+        $this->assertSame([], $container->tagged('tidak-ada'));
     }
 
     public function testResolvingCallbacksFireOnEveryResolution() {

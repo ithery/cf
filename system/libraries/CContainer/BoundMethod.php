@@ -127,6 +127,11 @@ class CContainer_BoundMethod {
     protected static function getCallReflector($callback) {
         if (is_string($callback) && strpos($callback, '::') !== false) {
             $callback = explode('::', $callback);
+        } elseif (is_object($callback) && !$callback instanceof Closure) {
+            // Objek invokable: yang dipanggil sebenarnya __invoke miliknya, dan
+            // itu yang harus direfleksi. Tanpa cabang ini ReflectionFunction
+            // menerima objek dan menolaknya.
+            $callback = [$callback, '__invoke'];
         }
 
         return is_array($callback) ? new ReflectionMethod($callback[0], $callback[1]) : new ReflectionFunction($callback);

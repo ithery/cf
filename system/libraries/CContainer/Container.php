@@ -133,7 +133,12 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      * @return CContainer_ContextualBindingBuilderInterface
      */
     public function when($concrete) {
-        return new CContainer_ContextualBindingBuilder($this, $this->getAlias($concrete));
+        $aliases = [];
+        foreach (carr::wrap($concrete) as $c) {
+            $aliases[] = $this->getAlias($c);
+        }
+
+        return new CContainer_ContextualBindingBuilder($this, $aliases);
     }
 
     /**
