@@ -6,6 +6,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @mixin CQueue_QueueInterface
  */
 class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_MonitorInterface {
+    use CQueue_Trait_ResolvesQueueRoutesTrait;
+
     /**
      * The array of resolved queue connections.
      *

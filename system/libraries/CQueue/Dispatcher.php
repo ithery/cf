@@ -3,6 +3,8 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
+    use CQueue_Trait_ResolvesQueueRoutesTrait;
+
     /**
      * The container implementation.
      *
@@ -213,7 +215,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      */
     public function dispatchToQueue($command) {
         //apa yang ditulis job sendiri menang; rute hanya mengisi yang kosong
-        $connection = $command->connection ? $command->connection : CQueue::routes()->getConnection($command);
+        $connection = $command->connection ? $command->connection : $this->resolveConnectionFromQueueRoute($command);
         $queue = call_user_func($this->queueResolver, $connection);
 
         if (!$queue instanceof CQueue_QueueInterface) {
@@ -236,7 +238,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      */
     protected function pushCommandToQueue($queue, $command) {
         //sama seperti connection: yang ditulis job sendiri menang
-        $queueName = isset($command->queue) ? $command->queue : CQueue::routes()->getQueue($command);
+        $queueName = isset($command->queue) ? $command->queue : $this->resolveQueueFromQueueRoute($command);
 
         if ($queueName !== null && isset($command->delay)) {
             return $queue->laterOn($queueName, $command->delay, $command);
