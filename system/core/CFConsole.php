@@ -83,6 +83,8 @@ class CFConsole {
         CConsole_Command_DevCloud_App_DevCloudAppCreateCommand::class,
         CConsole_Command_DevCloud_Database_DevCloudDatabaseCreateDevCommand::class,
         CConsole_Command_DevCloud_App_DevCloudAppScaffoldCommand::class,
+        CConsole_Command_DevCloud_Server_Command_DevCloudServerCommandListCommand::class,
+        CConsole_Command_DevCloud_Server_Command_DevCloudServerCommandRunCommand::class,
         CConsole_Command_Make_MakeControllerCommand::class,
         CConsole_Command_Make_MakeModelCommand::class,
         CConsole_Command_Make_MakeConfigCommand::class,
