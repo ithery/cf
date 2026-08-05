@@ -88,6 +88,11 @@ return [
                 'label' => c::__('Maintenance'),
                 'uri' => 'docs/other/maintenance',
             ],
+            [
+                'name' => 'other.htaccess',
+                'label' => c::__('.htaccess Protection'),
+                'uri' => 'docs/other/htaccess',
+            ],
         ]
     ],
     [
