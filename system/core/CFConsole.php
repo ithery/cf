@@ -89,6 +89,7 @@ class CFConsole {
         CConsole_Command_DevCloud_Server_DevCloudServerStatusCommand::class,
         CConsole_Command_DevCloud_Server_DevCloudServerWebServerCommand::class,
         CConsole_Command_DevCloud_Server_Vhost_DevCloudServerVhostListCommand::class,
+        CConsole_Command_DevCloud_Server_Service_DevCloudServerServiceControlCommand::class,
         CConsole_Command_Make_MakeControllerCommand::class,
         CConsole_Command_Make_MakeModelCommand::class,
         CConsole_Command_Make_MakeConfigCommand::class,

@@ -47,13 +47,15 @@ class CDevSuite_Command_DevCloud_Server_StatusCommand extends CDevSuite_CommandA
         $rows = [];
         foreach (carr::get($data, 'services', []) as $service) {
             $rows[] = [
+                carr::get($service, 'serverRemoteServiceId'),
                 carr::get($service, 'service'),
                 carr::get($service, 'label'),
                 carr::get($service, 'status'),
                 carr::get($service, 'since'),
             ];
         }
-        $cfCommand->table(['Service', 'Label', 'Status', 'Since'], $rows);
+        $cfCommand->table(['ID', 'Service', 'Label', 'Status', 'Since'], $rows);
+        $cfCommand->line('Control a service: phpcf devcloud:server:service:control ' . carr::get($data, 'serverRemoteId') . ' <ID> start|stop|restart');
     }
 
     /**
