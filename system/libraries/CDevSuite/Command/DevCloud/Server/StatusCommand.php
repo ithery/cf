@@ -36,7 +36,7 @@ class CDevSuite_Command_DevCloud_Server_StatusCommand extends CDevSuite_CommandA
         $cfCommand->table(['Field', 'Value'], [
             ['Hostname', carr::get($system, 'hostname')],
             ['Distribution', carr::get($system, 'distribution')],
-            ['Kernel', carr::get($system, 'kernel')],
+            ['Kernel', preg_replace('/\s+/', ' ', trim((string) carr::get($system, 'kernel')))],
             ['Uptime', carr::get($system, 'uptime')],
             ['Load', is_array(carr::get($system, 'load')) ? implode(', ', carr::get($system, 'load')) : carr::get($system, 'load')],
             ['Memory used', static::bytesToHuman(carr::get($memory, 'used')) . ' / ' . static::bytesToHuman(carr::get($memory, 'total'))],
