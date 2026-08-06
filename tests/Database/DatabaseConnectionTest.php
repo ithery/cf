@@ -77,6 +77,58 @@ class DatabaseConnectionTest extends TestCase {
         $this->assertIsNumeric($log[0]['time']);
     }
 
+    /**
+     * escapeString() used to always quote the query-log 'compiled' entry's
+     * bindings through the write PDO (getPdo()), even for a select() that
+     * ran entirely on the read connection - so merely logging a read query
+     * could open a write connection just to format its log line. Now the
+     * compiled entry is quoted against whichever connection actually ran
+     * the query.
+     */
+    public function testSelectLogsItsCompiledEntryAgainstTheReadConnectionNotTheWriteOne() {
+        $readPdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['prepare', 'quote'])->getMock();
+        $writePdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['prepare', 'quote'])->getMock();
+        $writePdo->expects($this->never())->method('quote');
+        $readPdo->expects($this->once())->method('quote')->with('bar')->willReturn("'bar'");
+
+        $statement = $this->getMockBuilder('PDOStatement')
+            ->onlyMethods(['setFetchMode', 'execute', 'fetchAll', 'bindValue'])
+            ->getMock();
+        $readPdo->method('prepare')->willReturn($statement);
+
+        $mock = $this->getMockConnection(['prepareBindings'], $writePdo);
+        $mock->setReadPdo($readPdo);
+        $mock->method('prepareBindings')->willReturn(['bar']);
+
+        $mock->select('select * from tbl where x = ?', ['bar']);
+
+        $log = $mock->getQueryLog();
+        $this->assertSame("select * from tbl where x = 'bar'", $log[0]['compiled']);
+    }
+
+    /**
+     * A write query's compiled log entry must keep quoting against the
+     * write connection - only select()/query()/selectResultSets()/cursor()
+     * (the read-capable paths) pass $useReadPdo through.
+     */
+    public function testStatementStillLogsItsCompiledEntryAgainstTheWriteConnection() {
+        $writePdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['prepare', 'quote'])->getMock();
+        $writePdo->expects($this->once())->method('quote')->with('bar')->willReturn("'bar'");
+
+        $statement = $this->getMockBuilder('PDOStatement')
+            ->onlyMethods(['execute', 'bindValue'])
+            ->getMock();
+        $writePdo->method('prepare')->willReturn($statement);
+
+        $mock = $this->getMockConnection(['prepareBindings'], $writePdo);
+        $mock->method('prepareBindings')->willReturn(['bar']);
+
+        $mock->statement('update tbl set x = ?', ['bar']);
+
+        $log = $mock->getQueryLog();
+        $this->assertSame("update tbl set x = 'bar'", $log[0]['compiled']);
+    }
+
     public function testSelectResultsetsReturnsMultipleRowset() {
         $pdo = $this->getMockBuilder(DatabaseConnectionTestMockPDO::class)->onlyMethods(['prepare'])->getMock();
         // Kunci `compiled` di query log menyulih tiap bind lewat PDO::quote pada

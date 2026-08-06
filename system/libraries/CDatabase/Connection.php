@@ -381,7 +381,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
                 $statement->execute();
 
                 return $statement;
-            }));
+            }, $useReadPdo));
         }
 
         return $this->newQuery();
@@ -492,7 +492,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
             $statement->execute();
 
             return $statement->fetchAll();
-        });
+        }, $useReadPdo);
     }
 
     /**
@@ -525,7 +525,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
             } while ($statement->nextRowset());
 
             return $sets;
-        });
+        }, $useReadPdo);
     }
 
     /**
@@ -560,7 +560,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
             $statement->execute();
 
             return $statement;
-        });
+        }, $useReadPdo);
 
         while ($record = $statement->fetch()) {
             yield $record;
@@ -856,12 +856,15 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @param string   $query
      * @param array    $bindings
      * @param \Closure $callback
+     * @param bool     $useReadPdo the callback ran $query on the read connection - passed
+     *                             through to logQuery() so the query log doesn't open a
+     *                             write connection just to quote a read query's bindings
      *
      * @throws \CDatabase_Exception_QueryException
      *
      * @return mixed
      */
-    protected function run($query, $bindings, Closure $callback) {
+    protected function run($query, $bindings, Closure $callback, $useReadPdo = false) {
         foreach ($this->beforeExecutingCallbacks as $beforeExecutingCallback) {
             $beforeExecutingCallback($query, $bindings, $this);
         }
@@ -890,7 +893,8 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
         $this->logQuery(
             $query,
             $bindings,
-            $this->getElapsedTime($start)
+            $this->getElapsedTime($start),
+            $useReadPdo
         );
 
         return $result;
@@ -932,10 +936,13 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      * @param string     $query
      * @param array      $bindings
      * @param null|float $time
+     * @param bool       $useReadPdo the query ran on the read connection, so compile the
+     *                               'compiled' log entry against that connection too instead
+     *                               of opening the write one just to quote it
      *
      * @return void
      */
-    public function logQuery($query, $bindings, $time = null) {
+    public function logQuery($query, $bindings, $time = null, $useReadPdo = false) {
         $this->totalQueryDuration += $time ?? 0.0;
 
         $this->event(new CDatabase_Event_QueryExecuted($query, $bindings, $time, $this));
@@ -945,7 +952,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
                 'query' => $query,
                 'bindings' => $bindings,
                 'time' => $time,
-                'compiled' => static::$compileQueryLog ? $this->compileBinds($query, $bindings) : null,
+                'compiled' => static::$compileQueryLog ? $this->compileBinds($query, $bindings, $useReadPdo) : null,
             ];
         }
     }
@@ -1183,10 +1190,12 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      *
      * @param null|string|float|int|bool $value
      * @param bool                       $binary
+     * @param bool                       $useReadPdo quote against the read connection instead of
+     *                                               the write one (only compileBinds() sets this)
      *
      * @return string
      */
-    public function escape($value, $binary = false) {
+    public function escape($value, $binary = false, $useReadPdo = false) {
         if ($value === null) {
             return 'null';
         } elseif ($binary) {
@@ -1204,7 +1213,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
                 throw new RuntimeException('Strings with invalid UTF-8 byte sequences cannot be escaped.');
             }
 
-            return $this->escapeString($value);
+            return $this->escapeString($value, $useReadPdo);
         }
     }
 
@@ -1215,8 +1224,8 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
      *
      * @return string
      */
-    protected function escapeString($value) {
-        return $this->getPdo()->quote($value);
+    protected function escapeString($value, $useReadPdo = false) {
+        return $this->getPdoForSelect($useReadPdo)->quote($value);
     }
 
     /**
@@ -1816,12 +1825,15 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
     /**
      * Combine a SQL statement with the bind values. Used for safe queries.
      *
-     * @param string $sql   query to bind to the values
-     * @param array  $binds array of values to bind to the query
+     * @param string $sql        query to bind to the values
+     * @param array  $binds      array of values to bind to the query
+     * @param bool   $useReadPdo quote against the read connection instead of the write one -
+     *                           logQuery() sets this for a query that ran on the read
+     *                           connection, so merely logging it doesn't open a write one
      *
      * @return string
      */
-    public function compileBinds($sql, array $binds = []) {
+    public function compileBinds($sql, array $binds = [], $useReadPdo = false) {
         foreach ((array) $binds as $val) {
             // If the SQL contains no more bind marks ("?"), we're done.
             if (($nextBindPos = strpos($sql, '?')) === false) {
@@ -1831,7 +1843,7 @@ class CDatabase_Connection implements CDatabase_ConnectionInterface {
                 $val = (string) $val;
             }
             // Properly escape the bind value.
-            $val = $this->escape($val);
+            $val = $this->escape($val, false, $useReadPdo);
 
             // Temporarily replace possible bind marks ("?"), in the bind value itself, with a placeholder.
             $val = str_replace('?', '{%B%}', $val);

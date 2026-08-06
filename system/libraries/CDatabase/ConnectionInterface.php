@@ -211,10 +211,11 @@ interface CDatabase_ConnectionInterface {
     /**
      * Combine a SQL statement with the bind values. Used for safe queries.
      *
-     * @param string $sql   query to bind to the values
-     * @param array  $binds array of values to bind to the query
+     * @param string $sql        query to bind to the values
+     * @param array  $binds      array of values to bind to the query
+     * @param bool   $useReadPdo quote against the read connection instead of the write one
      *
      * @return string
      */
-    public function compileBinds($sql, array $binds = []);
+    public function compileBinds($sql, array $binds = [], $useReadPdo = false);
 }
