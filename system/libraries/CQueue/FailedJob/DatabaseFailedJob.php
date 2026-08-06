@@ -81,7 +81,7 @@ class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
      * @return bool
      */
     public function forget($id) {
-        return $this->getTable()->where('id', $id)->delete() > 0;
+        return $this->getTable()->where($this->table . '_id', $id)->delete() > 0;
     }
 
     /**

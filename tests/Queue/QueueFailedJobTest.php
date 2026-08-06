@@ -118,20 +118,36 @@ class QueueFailedJobTest extends TestCase {
     }
 
     /**
-     * forget() menyaring kolom `id`, sedangkan kunci primer tabel ini
-     * `queue_failed_id` -- sebagaimana dipakai all() dan find(). Jadi tidak ada
-     * baris yang cocok dan penghapusannya selalu gagal tanpa suara: membuang
-     * satu job yang gagal tidak pernah berhasil, dan yang tersisa cuma flush()
-     * yang membuang semuanya sekaligus.
-     *
-     * Dicatat apa adanya, belum diperbaiki, karena menunggu keputusan.
+     * forget() dulu menyaring kolom `id`, sedangkan kunci primer tabel ini
+     * `queue_failed_id` -- sebagaimana dipakai all() dan find(). Sudah
+     * diperbaiki supaya memakai kolom yang sama.
      */
-    public function testForgetNeverRemovesAnything() {
+    public function testForgetRemovesTheMatchingJob() {
         $provider = $this->makeProvider();
         $id = $provider->log('database', 'default', $this->payload(), new RuntimeException('meledak'));
 
-        $this->assertFalse($provider->forget($id));
-        $this->assertCount(1, $provider->all());
+        $this->assertTrue($provider->forget($id));
+        $this->assertSame([], $provider->all());
+    }
+
+    /**
+     * forget() cuma boleh menghapus baris yang id-nya cocok, bukan semuanya --
+     * itulah bedanya dengan flush().
+     */
+    public function testForgetLeavesOtherJobsAlone() {
+        $provider = $this->makeProvider();
+        $idPertama = $provider->log('database', 'default', $this->payload('SatuJob'), new RuntimeException('a'));
+        $provider->log('database', 'default', $this->payload('DuaJob'), new RuntimeException('b'));
+
+        $provider->forget($idPertama);
+
+        $sisa = $provider->all();
+        $this->assertCount(1, $sisa);
+        $this->assertSame($this->payload('DuaJob'), $sisa[0]->payload);
+    }
+
+    public function testForgetReturnsFalseForAnUnknownId() {
+        $this->assertFalse($this->makeProvider()->forget(404));
     }
 
     /**
