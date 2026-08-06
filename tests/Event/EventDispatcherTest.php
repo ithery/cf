@@ -233,19 +233,23 @@ class EventDispatcherTest extends TestCase {
     }
 
     /**
-     * hasWildcardListeners() mencocokkan polanya, sedangkan hasListeners()
-     * hanya menengok kunci persisnya. Jadi sebuah pendengar `pesanan.*` tidak
-     * membuat hasListeners('pesanan.dibuat') menjawab true, walau peristiwanya
-     * benar-benar akan tersalurkan ke sana. Dicatat apa adanya.
+     * hasListeners() dulu hanya menengok kunci persisnya, jadi sebuah
+     * pendengar `pesanan.*` tidak membuat hasListeners('pesanan.dibuat')
+     * menjawab true walau dispatch('pesanan.dibuat') benar-benar akan
+     * memanggil pendengar itu (lewat getWildcardListeners()'s cstr::is()
+     * matching, yang sudah benar dari awal). Sudah diperbaiki supaya
+     * hasListeners() memakai hasWildcardListeners() -- yang matching-nya
+     * sama persis dengan yang dipakai dispatch() -- bukan cek kunci persis.
      */
-    public function testHasWildcardListenersMatchesThePatternButHasListenersDoesNot() {
+    public function testHasListenersMatchesWildcardPatternsLikeDispatchDoes() {
         $events = $this->makeDispatcher();
         $events->listen('pesanan.*', function () {
         });
 
         $this->assertTrue($events->hasWildcardListeners('pesanan.dibuat'));
-        $this->assertFalse($events->hasListeners('pesanan.dibuat'));
+        $this->assertTrue($events->hasListeners('pesanan.dibuat'));
         $this->assertTrue($events->hasListeners('pesanan.*'));
+        $this->assertFalse($events->hasListeners('pengguna.dibuat'));
     }
 
     public function testAClassNameListenerIsResolvedAndCalled() {

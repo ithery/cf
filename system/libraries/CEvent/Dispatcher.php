@@ -111,7 +111,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      * @return bool
      */
     public function hasListeners($eventName) {
-        return isset($this->listeners[$eventName]) || isset($this->wildcards[$eventName]);
+        return isset($this->listeners[$eventName]) || $this->hasWildcardListeners($eventName);
     }
 
     /**
