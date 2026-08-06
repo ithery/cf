@@ -23,6 +23,8 @@ class CurlMultiHandler
     private $active;
     private $handles = [];
     private $delays = [];
+    /** @var resource */
+    private $_mh;
 
     /**
      * This handler accepts the following options:
@@ -39,6 +41,8 @@ class CurlMultiHandler
             ? $options['handle_factory'] : new CurlFactory(50);
         $this->selectTimeout = isset($options['select_timeout'])
             ? $options['select_timeout'] : 1;
+        // let __get() lazily create it, same as before $_mh was declared
+        unset($this->_mh);
     }
 
     public function __get($name)
