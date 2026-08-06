@@ -70,6 +70,26 @@ class CDaemon_ProcessMetrics {
     }
 
     /**
+     * Whether a Redis-registered CDaemon_Supervisor master/supervisor name
+     * belongs to this host. Names are "<hostname-slug>-<token>"
+     * (CDaemon_Supervisor_MasterSupervisor::name()); a supervisor's own
+     * "master" field is the same string minus its trailing segment. A pid
+     * registered by a different host is only meaningful read on that host -
+     * forPid() here would report whatever unrelated local process happens to
+     * have that pid - so callers gate forPid() on this first. Requires an
+     * exact "-" boundary after the hostname slug so a host named "web" does
+     * not match a name belonging to "web2".
+     *
+     * @param string $name         the master/supervisor name, or a supervisor's "master" field
+     * @param string $hostBasename CDaemon_Supervisor_MasterSupervisor::basename() for this host
+     *
+     * @return bool
+     */
+    public static function belongsToHost($name, $hostBasename) {
+        return cstr::startsWith($name, $hostBasename . '-');
+    }
+
+    /**
      * Human-readable summary used by both the sysadmin daemon table and
      * the CDaemon_Supervisor dashboard, so the two surfaces don't grow
      * two slightly different renderings of the same numbers.

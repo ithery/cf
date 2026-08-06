@@ -406,9 +406,29 @@ trait CTrait_Controller_Application_Manager_Daemon_Supervisor {
     }
 
     protected function ajaxWorkers() {
+        // A master/supervisor's pid is only meaningful read locally - Redis is
+        // what lets this dashboard list workers running on other hosts
+        // entirely, and reading /proc/<pid> for a pid registered by a
+        // different host would silently report whatever unrelated local
+        // process happens to have that pid. See
+        // CDaemon_ProcessMetrics::belongsToHost() for the name-matching rule.
+        $currentHost = CDaemon_Supervisor_MasterSupervisor::basename();
+
         $masters = c::collect(CDaemon::supervisor()->masterSupervisorRepository()->all())->keyBy('name')->sortBy('name');
+        $masters->each(function ($master) use ($currentHost) {
+            $master->processMetrics = CDaemon_ProcessMetrics::belongsToHost($master->name, $currentHost)
+                ? CDaemon_ProcessMetrics::format(CDaemon_ProcessMetrics::forPid($master->pid))
+                : null;
+        });
 
         $supervisors = c::collect(CDaemon::supervisor()->supervisorRepository()->all())->sortBy('name')->groupBy('master');
+        $supervisors->each(function ($group) use ($currentHost) {
+            c::collect($group)->each(function ($supervisor) use ($currentHost) {
+                $supervisor->processMetrics = CDaemon_ProcessMetrics::belongsToHost($supervisor->master, $currentHost)
+                    ? CDaemon_ProcessMetrics::format(CDaemon_ProcessMetrics::forPid($supervisor->pid))
+                    : null;
+            });
+        });
 
         $data = $masters->each(function ($master, $name) use ($supervisors) {
             $master->supervisors = $supervisors->get($name, []);

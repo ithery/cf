@@ -175,13 +175,22 @@
             <div class="card-header d-flex align-items-center justify-content-between">
                 <h2 class="h6 m-0" x-text="worker.name"></h2>
 
-                <svg x-show="worker.status == 'running'" xmlns="http://www.w3.org/2000/svg" class="text-success" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.5rem; height: 1.5rem;">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <div class="d-flex align-items-center">
+                    <small
+                        class="text-muted mr-3"
+                        x-show="worker.processMetrics"
+                        :title="worker.processMetrics ? 'File descriptors used / limit, process age, and CPU time (share of age)' : ''"
+                        x-text="worker.processMetrics ? ('fd ' + worker.processMetrics.fd + ' · age ' + worker.processMetrics.age + ' · cpu ' + worker.processMetrics.cpu) : ''"
+                    ></small>
 
-                <svg x-show="worker.status == 'paused'" xmlns="http://www.w3.org/2000/svg" class="text-warning" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.5rem; height: 1.5rem;">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9v6m-4.5 0V9M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                    <svg x-show="worker.status == 'running'" xmlns="http://www.w3.org/2000/svg" class="text-success" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.5rem; height: 1.5rem;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+
+                    <svg x-show="worker.status == 'paused'" xmlns="http://www.w3.org/2000/svg" class="text-warning" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.5rem; height: 1.5rem;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9v6m-4.5 0V9M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
             </div>
 
             <table class="table table-hover mb-0">
@@ -191,6 +200,7 @@
                     <th>Queues</th>
                     <th class="text-right" style="width: 120px;">Processes</th>
                     <th class="text-right" style="width: 180px;">Balancing</th>
+                    <th class="text-right" style="width: 220px;">Process</th>
                 </tr>
                 </thead>
 
@@ -214,6 +224,11 @@
                             <td class="text-right text-muted" x-show="!supervisor.options.balance" >
                                 Disabled
                             </td>
+                            <td
+                                class="text-right text-muted"
+                                :title="supervisor.processMetrics ? 'File descriptors used / limit, process age, and CPU time (share of age)' : 'Not running on this host'"
+                                x-text="supervisor.processMetrics ? ('fd ' + supervisor.processMetrics.fd + ' · age ' + supervisor.processMetrics.age + ' · cpu ' + supervisor.processMetrics.cpu) : '-'"
+                            ></td>
                         </tr>
                     </template>
 

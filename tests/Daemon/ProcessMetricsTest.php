@@ -121,4 +121,22 @@ class ProcessMetricsTest extends TestCase {
 
         $this->assertSame('90d 0h (100%)', $formatted['cpu']);
     }
+
+    public function testBelongsToHostMatchesANameRegisteredByThisHost() {
+        $this->assertTrue(CDaemon_ProcessMetrics::belongsToHost('web1-a1b2', 'web1'));
+    }
+
+    public function testBelongsToHostRejectsANameRegisteredByAnotherHost() {
+        $this->assertFalse(CDaemon_ProcessMetrics::belongsToHost('web2-c3d4', 'web1'));
+    }
+
+    /**
+     * A pid registered by host "web2" must never be read as if it belonged
+     * to "web" - a naive substring/prefix check without the "-" boundary
+     * would wrongly match here, silently reading an unrelated local process.
+     */
+    public function testBelongsToHostRequiresAnExactBoundaryAfterTheHostname() {
+        $this->assertFalse(CDaemon_ProcessMetrics::belongsToHost('web2-e5f6', 'web'));
+        $this->assertTrue(CDaemon_ProcessMetrics::belongsToHost('web-e5f6', 'web'));
+    }
 }
