@@ -148,6 +148,7 @@ class CCache_Driver_ArrayDriver extends CCache_DriverTaggableAbstract implements
      */
     public function flush() {
         $this->storage = [];
+        $this->locks = [];
 
         return true;
     }

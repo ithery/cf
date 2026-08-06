@@ -100,6 +100,21 @@ class CacheArrayDriverTest extends TestCase {
         $this->assertNull($store->get('baz'));
     }
 
+    /**
+     * flush() used to only clear $storage, leaving $locks behind - a lock
+     * acquired before flush() stayed stuck forever, since nothing else
+     * ever clears $locks.
+     */
+    public function testFlushAlsoReleasesOutstandingLocks() {
+        $store = new CCache_Driver_ArrayDriver();
+        $lock = $store->lock('foo', 10);
+        $lock->acquire();
+
+        $store->flush();
+
+        $this->assertTrue($store->lock('foo', 10)->acquire());
+    }
+
     public function testCacheKey() {
         $store = new CCache_Driver_ArrayDriver();
         $this->assertEmpty($store->getPrefix());
