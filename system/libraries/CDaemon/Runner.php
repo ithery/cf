@@ -203,4 +203,36 @@ class CDaemon_Runner extends CDaemon_RunnerAbstract {
             return null;
         }
     }
+
+    /**
+     * File descriptor usage, process age, and CPU time for the running
+     * daemon - a process leaking file descriptors (or spinning without
+     * making progress) still reports a normal memory footprint and a
+     * reassuring "Running" status, so neither shows up without reading
+     * these directly. Returns null when the daemon isn't running or on
+     * a platform where these aren't available. See
+     * CDaemon_ProcessMetrics::forPid() for the actual reading, kept as a
+     * plain function of a pid so it's testable against a real /proc entry
+     * without needing an actual daemon service running.
+     *
+     * @return null|array{fdUsed: null|int, fdLimit: null|int, ageSeconds: null|int, cpuSeconds: null|float, cpuRatio: null|float}
+     */
+    public function getProcessMetrics() {
+        $pid = $this->getPid();
+        if (!$pid) {
+            return null;
+        }
+
+        $pid = trim($pid);
+
+        if (CDaemon_Helper::getPlatform() !== CDaemon_Helper::UNIX) {
+            return null;
+        }
+
+        if (!CDaemon_Utils::daemonIsRunningWithPid($pid, $this->serviceClass)) {
+            return null;
+        }
+
+        return CDaemon_ProcessMetrics::forPid($pid);
+    }
 }

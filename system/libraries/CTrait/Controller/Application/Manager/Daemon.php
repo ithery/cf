@@ -104,6 +104,29 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
             return $div;
         });
+        // A leaking or spinning daemon still reports a normal memory
+        // footprint and a reassuring RUNNING status - this is the page
+        // people actually open when something seems wrong, so it's worth
+        // reading these directly rather than only in the CDaemon_Supervisor
+        // dashboard. One column (like Service Status above already stacks
+        // its badge + start time) rather than three, so getProcessMetrics()
+        // - a shell_exec("ps ...") plus a couple of /proc reads - runs once
+        // per row instead of three times.
+        $table->addColumn('service_class')->setLabel('Process')->setCallback(function ($row, $value) {
+            $isRunning = CManager::daemon()->isRunning($value);
+            if (!$isRunning) {
+                return '-';
+            }
+            $runner = CDaemon::createRunner($value);
+            $formatted = CDaemon_ProcessMetrics::format($runner->getProcessMetrics());
+
+            $div = c::div();
+            $div->addDiv()->add('<span title="File descriptors used / limit">fd: ' . c::e($formatted['fd']) . '</span>');
+            $div->addDiv()->add('<span title="Time since the process started">age: ' . c::e($formatted['age']) . '</span>');
+            $div->addDiv()->add('<span title="Cumulative CPU time and its share of the process\'s age">cpu: ' . c::e($formatted['cpu']) . '</span>');
+
+            return $div;
+        });
         $table->setTitle('Service List');
         $table->setApplyDataTable(false);
 
