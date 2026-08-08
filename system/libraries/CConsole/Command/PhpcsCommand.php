@@ -15,7 +15,7 @@ class CConsole_Command_PhpcsCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'phpcs {path?} {--format=table : format to display} {--debug} {--no-progress}';
+    protected $signature = 'phpcs {path?} {--format=full : phpcs --report value, e.g. full, json, checkstyle} {--debug} {--no-progress}';
 
     public function handle() {
         $isFramework = CF::appCode() == null;
@@ -46,7 +46,7 @@ class CConsole_Command_PhpcsCommand extends CConsole_Command {
 
         chdir($isFramework ? DOCROOT : c::appRoot());
         //$command = [$this->phpBinary(), $this->getPhpCsPhar(),$appDir];
-        $command = [$this->phpBinary(), $this->getPhpCsPhar(), '--standard=' . CQC::phpcs()->phpcsConfiguration()];
+        $command = [$this->phpBinary(), $this->getPhpCsPhar(), '--standard=' . CQC::phpcs()->phpcsConfiguration(), '--report=' . $format];
         $command[] = $scanPath;
         $process = Process::fromShellCommandline($command, c::appRoot());
         $process->setTimeout(60 * 60);
