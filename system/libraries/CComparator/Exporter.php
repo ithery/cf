@@ -29,7 +29,7 @@ class CComparator_Exporter {
      *
      * @return string
      */
-    public function shortenedRecursiveExport(&$data, CBase_RecursionContext $context = null) {
+    public function shortenedRecursiveExport(&$data, ?CBase_RecursionContext $context = null) {
         $result = [];
         $exporter = new self();
         if (!$context) {

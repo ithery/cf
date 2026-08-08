@@ -282,7 +282,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
      *
      * @return array|string
      */
-    public function render(callable $callback = null) {
+    public function render(?callable $callback = null) {
         try {
             $contents = $this->renderContents();
             $response = isset($callback) ? $callback($this, $contents) : null;

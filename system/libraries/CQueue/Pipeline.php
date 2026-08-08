@@ -38,7 +38,7 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
      *
      * @return void
      */
-    public function __construct(CContainer_ContainerInterface $container = null) {
+    public function __construct(?CContainer_ContainerInterface $container = null) {
         $this->container = $container;
     }
 

@@ -48,7 +48,7 @@ class CBot_DriverManager {
      *
      * @return mixed|CBot_DriverAbstract
      */
-    public static function loadFromName($name, array $config, CHTTP_Request $request = null) {
+    public static function loadFromName($name, array $config, ?CHTTP_Request $request = null) {
         /*
         * Use the driver class basename without "Driver" if we're dealing with a
         * DriverInterface object.
@@ -137,7 +137,7 @@ class CBot_DriverManager {
      *
      * @return bool
      */
-    public static function verifyServices(array $config, CHTTP_Request $request = null) {
+    public static function verifyServices(array $config, ?CHTTP_Request $request = null) {
         if ($request == null) {
             $request = c::request();
         }

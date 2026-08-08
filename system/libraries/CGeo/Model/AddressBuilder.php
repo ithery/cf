@@ -146,7 +146,7 @@ final class CGeo_Model_AddressBuilder {
      *
      * @return CGeo_Model_AddressBuilder
      */
-    public function addAdminLevel(int $level, string $name, string $code = null) {
+    public function addAdminLevel(int $level, string $name, ?string $code = null) {
         $this->adminLevels[] = new CGeo_Model_AdminLevel($level, $name, $code);
 
         return $this;

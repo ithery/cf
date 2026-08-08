@@ -16,7 +16,7 @@ final class CVendor_Qontak_Response {
      */
     private $data;
 
-    public function __construct(string $messageId = null, string $name = null, array $data = []) {
+    public function __construct(?string $messageId = null, ?string $name = null, array $data = []) {
         $this->messageId = $messageId;
         $this->name = $name;
         $this->data = $data;

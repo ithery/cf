@@ -212,7 +212,7 @@ class CApp_Visitor {
      *
      * @return mixed
      */
-    public function visit(CModel $model = null) {
+    public function visit(?CModel $model = null) {
         foreach ($this->except as $path) {
             if ($this->request->is($path)) {
                 return;

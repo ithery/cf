@@ -7,7 +7,7 @@ final class CAuth_OTP_HOTP extends CAuth_OTP_OTPAbstract implements CAuth_OTP_Co
     private const DEFAULT_WINDOW = 0;
 
     public static function create(
-        string $secret = null,
+        ?string $secret = null,
         int $counter = self::DEFAULT_COUNTER,
         string $digest = self::DEFAULT_DIGEST,
         int $digits = self::DEFAULT_DIGITS
@@ -53,7 +53,7 @@ final class CAuth_OTP_HOTP extends CAuth_OTP_OTPAbstract implements CAuth_OTP_Co
     /**
      * If the counter is not provided, the OTP is verified at the actual counter.
      */
-    public function verify(string $otp, int $counter = null, int $window = null): bool {
+    public function verify(string $otp, ?int $counter = null, ?int $window = null): bool {
         if ($counter < 0) {
             throw new InvalidArgumentException('The counter must be at least 0.');
         }

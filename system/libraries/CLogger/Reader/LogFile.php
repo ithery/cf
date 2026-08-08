@@ -125,7 +125,7 @@ class CLogger_Reader_LogFile {
         return $this->getMetadata('latest_timestamp') ?? $this->mtime();
     }
 
-    public function scan(int $maxBytesToScan = null, bool $force = false): void {
+    public function scan(?int $maxBytesToScan = null, bool $force = false): void {
         $this->logs()->scan($maxBytesToScan, $force);
     }
 

@@ -4,7 +4,7 @@ class CDaemon_Supervisor_View_Component_StackTraceComponent extends CView_Compon
 
     public $uniqid;
 
-    public function __construct(array $trace = null) {
+    public function __construct(?array $trace = null) {
         $this->trace = $trace;
         $this->uniqid = uniqid();
     }

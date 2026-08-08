@@ -43,7 +43,7 @@ class CDebug_DebugBar_DataCollector_QueryCollector extends PDOCollector implemen
     /**
      * @param TimeDataCollector $timeCollector
      */
-    public function __construct(TimeDataCollector $timeCollector = null) {
+    public function __construct(?TimeDataCollector $timeCollector = null) {
         $this->timeCollector = $timeCollector;
         $this->queryN1Detector = new CDebug_DebugBar_QueryN1Detector();
         $this->setDataFormatter(new CDebug_DebugBar_DataFormatter_QueryFormatter());

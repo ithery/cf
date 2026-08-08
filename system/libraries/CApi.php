@@ -79,7 +79,7 @@ class CApi {
         return static::$dispatcher;
     }
 
-    public static function setCurrentDispatcher(CApi_Dispatcher $dispatcher = null) {
+    public static function setCurrentDispatcher(?CApi_Dispatcher $dispatcher = null) {
         static::$dispatcher = $dispatcher;
     }
 

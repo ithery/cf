@@ -80,7 +80,7 @@ class CDatabase_Connection_Pdo_SqliteConnection extends CDatabase_Connection {
      *
      * @throws \RuntimeException
      */
-    public function getSchemaState(callable $processFactory = null) {
+    public function getSchemaState(?callable $processFactory = null) {
         return new CDatabase_Schema_SchemaState_SqliteSchemaState($this, $processFactory);
     }
 

@@ -17,7 +17,7 @@ final class CQC_Phpstan_Service_Property_SchemaColumn {
         string $readableType,
         bool $nullable = false,
         /** @var array<int, string> */
-        array $options = null
+        ?array $options = null
     ) {
         $this->name = $name;
         $this->readableType = $readableType;

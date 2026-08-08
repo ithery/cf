@@ -12,7 +12,7 @@ class CPrinter_EscPos_EscposImage_GdEscposImage extends CPrinter_EscPos_EscposIm
      * @throws Exception if the image format is not supported,
      *                   or the file cannot be opened
      */
-    protected function loadImageData(string $filename = null) {
+    protected function loadImageData(?string $filename = null) {
         if ($filename === null) {
             /* Set to blank image */
             return parent::loadImageData($filename);

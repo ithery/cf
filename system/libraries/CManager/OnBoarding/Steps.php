@@ -22,7 +22,7 @@ class CManager_OnBoarding_Steps {
      *
      * @return CManager_OnBoarding_Step
      */
-    public function addStep(string $title, string $model = null): CManager_OnBoarding_Step {
+    public function addStep(string $title, ?string $model = null): CManager_OnBoarding_Step {
         $step = new CManager_OnBoarding_Step($title);
 
         if ($model && new $model() instanceof CManager_OnBoarding_Contract_OnBoardableInterface) {

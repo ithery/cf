@@ -34,7 +34,7 @@ class CLogger_Logger implements LoggerInterface {
      *
      * @return void
      */
-    public function __construct(LoggerInterface $logger, CEvent_DispatcherInterface $dispatcher = null) {
+    public function __construct(LoggerInterface $logger, ?CEvent_DispatcherInterface $dispatcher = null) {
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
     }

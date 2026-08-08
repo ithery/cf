@@ -24,7 +24,7 @@ interface CRemote_SSH_ConnectionInterface {
      *
      * @return void
      */
-    public function task($task, Closure $callback = null);
+    public function task($task, ?Closure $callback = null);
 
     /**
      * Run a set of commands against the connection.
@@ -34,7 +34,7 @@ interface CRemote_SSH_ConnectionInterface {
      *
      * @return void
      */
-    public function run($commands, Closure $callback = null);
+    public function run($commands, ?Closure $callback = null);
 
     /**
      * Download the contents of a remote file.

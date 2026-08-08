@@ -179,7 +179,7 @@ trait CModel_Validating_ValidatingTrait {
      *
      * @return void
      */
-    public function setValidationAttributeNames(array $attributeNames = null) {
+    public function setValidationAttributeNames(?array $attributeNames = null) {
         $this->validationAttributeNames = $attributeNames;
     }
 
@@ -218,7 +218,7 @@ trait CModel_Validating_ValidatingTrait {
      *
      * @return void
      */
-    public function setRules(array $rules = null) {
+    public function setRules(?array $rules = null) {
         $this->rules = $rules;
     }
 

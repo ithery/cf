@@ -30,7 +30,7 @@ interface CPrinter_EscPos_Contract_PrintBufferInterface {
      *
      * @param null|CPrinter_EscPos_Printer $printer New printer
      */
-    public function setPrinter(CPrinter_EscPos_Printer $printer = null);
+    public function setPrinter(?CPrinter_EscPos_Printer $printer = null);
 
     /**
      * Accept UTF-8 text for printing.

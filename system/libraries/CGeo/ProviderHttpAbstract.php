@@ -20,7 +20,7 @@ abstract class CGeo_ProviderHttpAbstract extends CGeo_ProviderAbstract {
      * @param HttpClient          $client
      * @param null|MessageFactory $factory
      */
-    public function __construct(HttpClient $client, MessageFactory $factory = null) {
+    public function __construct(HttpClient $client, ?MessageFactory $factory = null) {
         $this->client = $client;
         $this->messageFactory = $factory ?: MessageFactoryDiscovery::find();
     }

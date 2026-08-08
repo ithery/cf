@@ -26,7 +26,7 @@ class CServer_Config {
     /**
      * @param CServer_Server $server
      */
-    public function __construct(CServer_Server $server = null) {
+    public function __construct(?CServer_Server $server = null) {
         if ($server === null) {
             $server = CServer::server();
         }
@@ -63,7 +63,7 @@ class CServer_Config {
      *
      * @return CServer_Config
      */
-    public static function instance(CServer_Server $server = null) {
+    public static function instance(?CServer_Server $server = null) {
         if ($server === null) {
             $server = CServer::server();
         }

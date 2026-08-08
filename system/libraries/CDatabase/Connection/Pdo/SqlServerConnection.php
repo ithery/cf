@@ -94,7 +94,7 @@ class CDatabase_Connection_Pdo_SqlServerConnection extends CDatabase_Connection 
      *
      * @throws \RuntimeException
      */
-    public function getSchemaState(callable $processFactory = null) {
+    public function getSchemaState(?callable $processFactory = null) {
         throw new RuntimeException('Schema dumping is not supported when using SQL Server.');
     }
 

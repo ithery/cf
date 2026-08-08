@@ -934,7 +934,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @return void
      */
-    public function resolving($abstract, Closure $callback = null) {
+    public function resolving($abstract, ?Closure $callback = null) {
         if (is_string($abstract)) {
             $abstract = $this->getAlias($abstract);
         }
@@ -953,7 +953,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @return void
      */
-    public function afterResolving($abstract, Closure $callback = null) {
+    public function afterResolving($abstract, ?Closure $callback = null) {
         if (is_string($abstract)) {
             $abstract = $this->getAlias($abstract);
         }
@@ -1151,7 +1151,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @return CContainer_ContainerInterface|static
      */
-    public static function setInstance(CContainer_ContainerInterface $container = null) {
+    public static function setInstance(?CContainer_ContainerInterface $container = null) {
         return static::$instance = $container;
     }
 

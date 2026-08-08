@@ -32,7 +32,7 @@ interface CWebSocket_Contract_StatisticStoreInterface {
      *
      * @return \CCollection
      */
-    public function getRawRecords(callable $processQuery = null);
+    public function getRawRecords(?callable $processQuery = null);
 
     /**
      * Get the results for a specific query.
@@ -42,7 +42,7 @@ interface CWebSocket_Contract_StatisticStoreInterface {
      *
      * @return array
      */
-    public function getRecords(callable $processQuery = null, callable $processCollection = null);
+    public function getRecords(?callable $processQuery = null, ?callable $processCollection = null);
 
     /**
      * Get the results for a specific query into a
@@ -53,5 +53,5 @@ interface CWebSocket_Contract_StatisticStoreInterface {
      *
      * @return array
      */
-    public function getForGraph(callable $processQuery = null, callable $processCollection = null);
+    public function getForGraph(?callable $processQuery = null, ?callable $processCollection = null);
 }

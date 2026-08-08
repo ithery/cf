@@ -436,7 +436,7 @@ class CServer_Browsershot {
         return $this;
     }
 
-    public function setScreenshotType(string $type, int $quality = null) {
+    public function setScreenshotType(string $type, ?int $quality = null) {
         $this->screenshotType = $type;
 
         if (!is_null($quality)) {

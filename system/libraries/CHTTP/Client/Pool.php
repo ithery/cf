@@ -34,7 +34,7 @@ class CHTTP_Client_Pool {
      *
      * @return void
      */
-    public function __construct(CHTTP_Client $factory = null) {
+    public function __construct(?CHTTP_Client $factory = null) {
         $this->factory = $factory ?: new CHTTP_Client();
 
         if (method_exists(Utils::class, 'chooseHandler')) {

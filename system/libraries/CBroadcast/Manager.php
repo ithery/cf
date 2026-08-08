@@ -43,7 +43,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      *
      * @return void
      */
-    public function routes(array $attributes = null) {
+    public function routes(?array $attributes = null) {
         $attributes = $attributes ?: ['middleware' => ['web']];
         CRouting::router()->group($attributes, function ($router) {
             $router->match(

@@ -13,7 +13,7 @@ final class CVendor_Qontak_ClientFactory {
      */
     private static $nullClient = null;
 
-    public static function makeFromArray(array $config, HttpClient $httpClient = null): CVendor_Qontak_ClientInterface {
+    public static function makeFromArray(array $config, ?HttpClient $httpClient = null): CVendor_Qontak_ClientInterface {
         if (!self::$client instanceof CVendor_Qontak_Client) {
             self::$client = new CVendor_Qontak_Client(
                 CVendor_Qontak_Credential::fromArray($config),

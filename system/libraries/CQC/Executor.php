@@ -23,7 +23,7 @@ class CQC_Executor {
      *
      * @return Process
      */
-    public function exec($command, $runDir = null, Closure $callback = null, $timeout = null) {
+    public function exec($command, $runDir = null, ?Closure $callback = null, $timeout = null) {
         $process = new Process($command, $runDir);
 
         $process->setTimeout($timeout);

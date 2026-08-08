@@ -86,7 +86,7 @@ class CVendor_Kataai_Api {
         return $this->handleResponse($response);
     }
 
-    protected function handleResponse($response, CVendor_Kataai_Message $message = null) {
+    protected function handleResponse($response, ?CVendor_Kataai_Message $message = null) {
         $json = json_decode($response, true);
         //check is json successfully decoded
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -96,7 +96,7 @@ class CVendor_Kataai_Api {
         return $json;
     }
 
-    protected function handleResponseMessage($response, CVendor_Kataai_Message $message = null) {
+    protected function handleResponseMessage($response, ?CVendor_Kataai_Message $message = null) {
         $json = json_decode($response, true);
         //check is json successfully decoded
         if (json_last_error() !== JSON_ERROR_NONE) {

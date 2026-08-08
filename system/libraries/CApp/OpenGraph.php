@@ -250,7 +250,7 @@ class CApp_OpenGraph {
      *
      * @return CApp_OpenGraph
      */
-    public function image($imageFile, array $attributes = null) {
+    public function image($imageFile, ?array $attributes = null) {
         if ($this->validate and !$imageFile) {
             throw new Exception('Open Graph: Invalid image URL (empty)');
         }
@@ -419,7 +419,7 @@ class CApp_OpenGraph {
      *
      * @return CApp_OpenGraph
      */
-    public function audio($audioFile, array $attributes = null) {
+    public function audio($audioFile, ?array $attributes = null) {
         if ($this->validate and !$audioFile) {
             throw new Exception('Open Graph: Invalid audio URL (empty)');
         }
@@ -484,7 +484,7 @@ class CApp_OpenGraph {
      *
      * @return CApp_OpenGraph
      */
-    public function video($videoFile, array $attributes = null) {
+    public function video($videoFile, ?array $attributes = null) {
         if ($this->validate and !$videoFile) {
             throw new Exception('Open Graph: Invalid video URL (empty)');
         }

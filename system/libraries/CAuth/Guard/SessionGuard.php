@@ -99,7 +99,7 @@ class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface,
         $name,
         CAuth_UserProviderInterface $provider,
         CSession_Store $session,
-        Request $request = null
+        ?Request $request = null
     ) {
         $this->name = $name;
         $this->session = $session;

@@ -23,7 +23,7 @@ class CPrinter_EscPos_Builder extends CPrinter_EscPos_Printer {
 
     private $driver = null;
 
-    public function __construct(CPrinter_EscPos_Contract_PrintConnectorInterface $connector = null, CPrinter_EscPos_CapabilityProfile $profile = null) {
+    public function __construct(?CPrinter_EscPos_Contract_PrintConnectorInterface $connector = null, ?CPrinter_EscPos_CapabilityProfile $profile = null) {
         if ($connector == null) {
             $connector = new CPrinter_EscPos_PrintConnector_DummyPrintConnector();
         }

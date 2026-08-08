@@ -23,7 +23,7 @@ class CDevSuite_Windows_CommandLine extends CDevSuite_CommandLine {
      *
      * @return ProcessOutput
      */
-    public function runAsUser($command, callable $onError = null) {
+    public function runAsUser($command, ?callable $onError = null) {
         return $this->runCommand($command, $onError);
     }
 
@@ -35,7 +35,7 @@ class CDevSuite_Windows_CommandLine extends CDevSuite_CommandLine {
      *
      * @return ProcessOutput
      */
-    public function powershell(string $command, callable $onError = null) {
+    public function powershell(string $command, ?callable $onError = null) {
         return $this->runCommand("powershell -command \"$command\"", $onError);
     }
 }

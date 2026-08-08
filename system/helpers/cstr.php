@@ -1478,7 +1478,7 @@ class cstr {
      *
      * @return void
      */
-    public static function createUuidsUsing(callable $factory = null) {
+    public static function createUuidsUsing(?callable $factory = null) {
         static::$uuidFactory = $factory;
     }
 
@@ -1522,7 +1522,7 @@ class cstr {
      *
      * @return \Ramsey\Uuid\UuidInterface
      */
-    public static function freezeUuids(Closure $callback = null) {
+    public static function freezeUuids(?Closure $callback = null) {
         $uuid = cstr::uuid();
 
         cstr::createUuidsUsing(function () use ($uuid) {

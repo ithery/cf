@@ -48,7 +48,7 @@ abstract class CDevSuite_CommandLine {
      *
      * @return string
      */
-    public function run($command, callable $onError = null) {
+    public function run($command, ?callable $onError = null) {
         return $this->runCommand($command, $onError);
     }
 
@@ -60,7 +60,7 @@ abstract class CDevSuite_CommandLine {
      *
      * @return string
      */
-    public function runAsUser($command, callable $onError = null) {
+    public function runAsUser($command, ?callable $onError = null) {
         return $this->runCommand('sudo -u "' . CDevSuite::user() . '" ' . $command, $onError);
     }
 
@@ -74,7 +74,7 @@ abstract class CDevSuite_CommandLine {
      *
      * @deprecated
      */
-    public function runOrDie($command, callable $onError = null) {
+    public function runOrDie($command, ?callable $onError = null) {
         return $this->runOrExit($command, $onError);
     }
 
@@ -86,7 +86,7 @@ abstract class CDevSuite_CommandLine {
      *
      * @return string
      */
-    public function runOrExit($command, callable $onError = null) {
+    public function runOrExit($command, ?callable $onError = null) {
         return $this->run($command, function ($code, $output) use ($onError) {
             if ($onError) {
                 $onError($code, $output);
@@ -104,7 +104,7 @@ abstract class CDevSuite_CommandLine {
      *
      * @return string
      */
-    public function runCommand($command, callable $onError = null) {
+    public function runCommand($command, ?callable $onError = null) {
         $onError = $onError ?: function () {
         };
 

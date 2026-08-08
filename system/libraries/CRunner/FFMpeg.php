@@ -39,7 +39,7 @@ class CRunner_FFMpeg {
      *
      * @param null|mixed $disk
      */
-    public function __construct($disk = null, CRunner_FFMpeg_Driver_PHPFFMpeg $driver = null, CRunner_FFMpeg_MediaCollection $mediaCollection = null) {
+    public function __construct($disk = null, ?CRunner_FFMpeg_Driver_PHPFFMpeg $driver = null, ?CRunner_FFMpeg_MediaCollection $mediaCollection = null) {
         $this->disk = CRunner_FFMpeg_Storage_Disk::make($disk ?: CF::config('storage.default'));
 
         $this->driver = $driver ?: new CRunner_FFMpeg_Driver_PHPFFMpeg();

@@ -179,7 +179,7 @@ class CLogger_Reader_LogReader {
         return $this->reset();
     }
 
-    public function setDirection(string $direction = null): self {
+    public function setDirection(?string $direction = null): self {
         $this->direction = $direction === CLogger_Reader_Direction::BACKWARD
             ? CLogger_Reader_Direction::BACKWARD
             : CLogger_Reader_Direction::FORWARD;
@@ -206,7 +206,7 @@ class CLogger_Reader_LogReader {
         return $this;
     }
 
-    public function setQuery(string $query = null): self {
+    public function setQuery(?string $query = null): self {
         $this->close();
 
         if (!empty($query) && cstr::startsWith($query, 'log-index:')) {
@@ -228,7 +228,7 @@ class CLogger_Reader_LogReader {
         return $this;
     }
 
-    public function search(string $query = null): self {
+    public function search(?string $query = null): self {
         return $this->setQuery($query);
     }
 
@@ -244,7 +244,7 @@ class CLogger_Reader_LogReader {
      *
      * @throws \Exception
      */
-    public function scan(int $maxBytesToScan = null, bool $force = false): self {
+    public function scan(?int $maxBytesToScan = null, bool $force = false): self {
         if ($this->isClosed()) {
             $this->open();
         }
@@ -394,7 +394,7 @@ class CLogger_Reader_LogReader {
     /**
      * @return array|CLogger_Reader_Log[]
      */
-    public function get(int $limit = null) {
+    public function get(?int $limit = null) {
         if (!is_null($limit)) {
             $this->limit($limit);
         }
@@ -476,7 +476,7 @@ class CLogger_Reader_LogReader {
      *
      * @return CPagination_LengthAwarePaginator
      */
-    public function paginate(int $perPage = 25, int $page = null, $itemCallback = null) {
+    public function paginate(int $perPage = 25, ?int $page = null, $itemCallback = null) {
         $page = $page ?: CPagination_Paginator::resolveCurrentPage('page');
 
         if (!is_null($this->onlyShowIndex)) {

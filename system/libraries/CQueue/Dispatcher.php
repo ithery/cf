@@ -55,7 +55,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      *
      * @return void
      */
-    public function __construct(CContainer_ContainerInterface $container, Closure $queueResolver = null) {
+    public function __construct(CContainer_ContainerInterface $container, ?Closure $queueResolver = null) {
         $this->container = $container;
         $this->queueResolver = $queueResolver;
         $this->pipeline = new CQueue_Pipeline($container);

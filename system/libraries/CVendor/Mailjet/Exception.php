@@ -23,7 +23,7 @@ class CVendor_Mailjet_Exception extends CException {
      * @param int    $code
      * @param int    $statusCode
      */
-    public function __construct($message = '', array $variables = null, $code = 0, Exception $previous = null, $statusCode = 0) {
+    public function __construct($message = '', ?array $variables = null, $code = 0, ?Exception $previous = null, $statusCode = 0) {
         parent::__construct($message, $variables, $code, $previous);
         $this->statusCode = (int) $statusCode;
     }

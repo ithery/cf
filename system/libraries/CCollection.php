@@ -332,7 +332,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      *
      * @return static
      */
-    public function filter(callable $callback = null) {
+    public function filter(?callable $callback = null) {
         if ($callback) {
             return new static(carr::where($this->items, $callback));
         }
@@ -348,7 +348,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      *
      * @return mixed
      */
-    public function first(callable $callback = null, $default = null) {
+    public function first(?callable $callback = null, $default = null) {
         return carr::first($this->items, $callback, $default);
     }
 
@@ -624,7 +624,7 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      *
      * @return mixed
      */
-    public function last(callable $callback = null, $default = null) {
+    public function last(?callable $callback = null, $default = null) {
         return carr::last($this->items, $callback, $default);
     }
 

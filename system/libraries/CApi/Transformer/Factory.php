@@ -43,7 +43,7 @@ class CApi_Transformer_Factory {
      *
      * @return \Dingo\Api\Transformer\Binding
      */
-    public function register($class, $resolver, array $parameters = [], Closure $after = null) {
+    public function register($class, $resolver, array $parameters = [], ?Closure $after = null) {
         return $this->bindings[$class] = $this->createBinding($resolver, $parameters, $after);
     }
 
@@ -114,7 +114,7 @@ class CApi_Transformer_Factory {
      *
      * @return \CApi_Transformer_Binding
      */
-    protected function createBinding($resolver, array $parameters = [], Closure $callback = null) {
+    protected function createBinding($resolver, array $parameters = [], ?Closure $callback = null) {
         return new CApi_Transformer_Binding($resolver, $parameters, $callback);
     }
 

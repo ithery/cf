@@ -50,7 +50,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      *
      * @return void
      */
-    public function __construct(CContainer_ContainerInterface $container = null) {
+    public function __construct(?CContainer_ContainerInterface $container = null) {
         $this->container = $container ?: CContainer::createContainer();
         $this->queueResolver = function () {
             return CQueue::queuer();

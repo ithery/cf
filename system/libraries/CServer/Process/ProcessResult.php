@@ -126,7 +126,7 @@ class CServer_Process_ProcessResult implements CServer_Process_Contract_ProcessR
      *
      * @return $this
      */
-    public function throwIf(bool $condition, callable $callback = null) {
+    public function throwIf(bool $condition, ?callable $callback = null) {
         if ($condition) {
             return $this->throw($callback);
         }

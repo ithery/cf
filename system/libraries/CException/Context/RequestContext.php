@@ -12,7 +12,7 @@ class CException_Context_RequestContext extends CException_ContextAbstract imple
      */
     protected $request;
 
-    public function __construct(CHTTP_Request $request = null) {
+    public function __construct(?CHTTP_Request $request = null) {
         $this->request = $request ?: CHTTP::request();
     }
 

@@ -396,7 +396,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      *
      * @return \Redis|array
      */
-    public function pipeline(callable $callback = null) {
+    public function pipeline(?callable $callback = null) {
         $pipeline = $this->client()->pipeline();
 
         return is_null($callback) ? $pipeline : c::tap($pipeline, $callback)->exec();
@@ -409,7 +409,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      *
      * @return \Redis|array
      */
-    public function transaction(callable $callback = null) {
+    public function transaction(?callable $callback = null) {
         $transaction = $this->client()->multi();
 
         return is_null($callback)

@@ -16,7 +16,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
      * @param Data $dataSet
      * @param bool $transparentBackground
      */
-    public function __construct($xSize, $ySize, Data $dataSet = null, $transparentBackground = false) {
+    public function __construct($xSize, $ySize, ?Data $dataSet = null, $transparentBackground = false) {
         parent::__construct();
         $this->transparentBackground = $transparentBackground;
         if ($dataSet) {

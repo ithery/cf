@@ -28,7 +28,7 @@ class CEmail_Transport_LogTransport implements TransportInterface {
     /**
      * @inheritdoc
      */
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage {
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage {
         $string = $message->toString();
 
         if (str_contains($string, 'Content-Transfer-Encoding: quoted-printable')) {

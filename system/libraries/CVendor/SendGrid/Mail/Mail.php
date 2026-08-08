@@ -132,7 +132,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
         $subject = null,
         $plainTextContent = null,
         $htmlContent = null,
-        array $globalSubstitutions = null
+        ?array $globalSubstitutions = null
     ) {
         if (!isset($from) && !isset($to) && !isset($subject) && !isset($plainTextContent) && !isset($htmlContent) && !isset($globalSubstitutions)
         ) {

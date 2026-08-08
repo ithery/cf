@@ -55,7 +55,7 @@ class CDaemon_Supervisor_ProcessPool implements Countable {
      *
      * @return void
      */
-    public function __construct(CDaemon_Supervisor_SupervisorOptions $options, Closure $output = null, $masterDaemonClass = null) {
+    public function __construct(CDaemon_Supervisor_SupervisorOptions $options, ?Closure $output = null, $masterDaemonClass = null) {
         $this->options = $options;
 
         $this->output = $output ?: function () {

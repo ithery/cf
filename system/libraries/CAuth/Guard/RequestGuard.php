@@ -26,7 +26,7 @@ class CAuth_Guard_RequestGuard implements CAuth_Contract_GuardInterface {
      *
      * @return void
      */
-    public function __construct(callable $callback, CHTTP_Request $request, CAuth_UserProviderInterface $provider = null) {
+    public function __construct(callable $callback, CHTTP_Request $request, ?CAuth_UserProviderInterface $provider = null) {
         $this->request = $request;
         $this->callback = $callback;
         $this->provider = $provider;

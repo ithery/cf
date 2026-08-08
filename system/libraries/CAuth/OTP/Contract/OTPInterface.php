@@ -42,7 +42,7 @@ interface CAuth_OTP_Contract_OTPInterface {
      * @param null|int $input
      * @param null|int $window
      */
-    public function verify(string $otp, int $input = null, int $window = null): bool;
+    public function verify(string $otp, ?int $input = null, ?int $window = null): bool;
 
     /**
      * @return non-empty-string The secret of the OTP

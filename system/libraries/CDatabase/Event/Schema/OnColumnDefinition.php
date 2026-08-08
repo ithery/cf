@@ -54,7 +54,7 @@ class CDatabase_Event_Schema_OnColumnDefinition extends CDatabase_Event_Schema {
      *
      * @return CDatabase_Event_Schema_OnColumnDefinition
      */
-    public function setColumn(CDatabase_Schema_Column $column = null) {
+    public function setColumn(?CDatabase_Schema_Column $column = null) {
         $this->column = $column;
 
         return $this;

@@ -28,7 +28,7 @@ class CBackup_BackupDestination {
      */
     protected $backupCollectionCache = null;
 
-    public function __construct(CStorage_Adapter $disk = null, $backupName, $diskName) {
+    public function __construct(?CStorage_Adapter $disk = null, $backupName, $diskName) {
         $this->disk = $disk;
         $this->diskName = $diskName;
         $this->backupName = preg_replace('/[^a-zA-Z0-9.]/', '-', $backupName);

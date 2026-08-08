@@ -21,7 +21,7 @@ interface CAuth_OTP_Contract_HOTPInterface extends CAuth_OTP_Contract_OTPInterfa
      * @deprecated Deprecated since v11.1, use ::createFromSecret or ::generate instead
      */
     public static function create(
-        string $secret = null,
+        ?string $secret = null,
         int $counter = 0,
         string $digest = 'sha1',
         int $digits = 6

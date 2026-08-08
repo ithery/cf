@@ -84,7 +84,7 @@ class CGeo_Location_Coordinate implements CGeo_Location_GeometryInterface {
      *
      * @return float
      */
-    public function getDistance(CGeo_Location_Coordinate $coordinate, CGeo_Location_Distance_DistanceInterface $calculator = null) {
+    public function getDistance(CGeo_Location_Coordinate $coordinate, ?CGeo_Location_Distance_DistanceInterface $calculator = null) {
         if ($calculator == null) {
             $calculator = new CGeo_Location_Distance_Haversine();
         }

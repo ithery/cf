@@ -16,7 +16,7 @@ trait CModel_Trait_GlobalScopes {
      *
      * @return mixed
      */
-    public static function addGlobalScope($scope, Closure $implementation = null) {
+    public static function addGlobalScope($scope, ?Closure $implementation = null) {
         /** @var CModel $this */
         if (is_string($scope) && !is_null($implementation)) {
             return static::$globalScopes[static::class][$scope] = $implementation;

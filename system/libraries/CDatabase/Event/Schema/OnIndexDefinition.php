@@ -46,7 +46,7 @@ class CDatabase_Event_Schema_OnIndexDefinition extends CDatabase_Event_Schema {
      *
      * @return CDatabase_Event_Schema_OnIndexDefinition
      */
-    public function setIndex(CDatabase_Schema_Index $index = null) {
+    public function setIndex(?CDatabase_Schema_Index $index = null) {
         $this->index = $index;
 
         return $this;

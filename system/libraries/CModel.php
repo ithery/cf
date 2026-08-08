@@ -1858,7 +1858,7 @@ abstract class CModel implements ArrayAccess, Arrayable, Jsonable, CQueue_Queuea
      *
      * @return static
      */
-    public function replicate(array $except = null) {
+    public function replicate(?array $except = null) {
         $defaults = [
             $this->getKeyName(),
             $this->getCreatedAtColumn(),
@@ -1886,7 +1886,7 @@ abstract class CModel implements ArrayAccess, Arrayable, Jsonable, CQueue_Queuea
      *
      * @return static
      */
-    public function replicateQuietly(array $except = null) {
+    public function replicateQuietly(?array $except = null) {
         return static::withoutEvents(function () use ($except) {
             return $this->replicate($except);
         });

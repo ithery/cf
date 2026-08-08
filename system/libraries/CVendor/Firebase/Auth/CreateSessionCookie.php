@@ -49,7 +49,7 @@ final class CVendor_Firebase_Auth_CreateSessionCookie {
      *
      * @return self
      */
-    public static function forIdToken($idToken, $tenantId, $ttl, ClockInterface $clock = null) {
+    public static function forIdToken($idToken, $tenantId, $ttl, ?ClockInterface $clock = null) {
         $clock ??= SystemClock::create();
 
         if ($idToken instanceof Token) {

@@ -20,7 +20,7 @@ final class CQC_Phpstan_Method_Extension implements MethodsClassReflectionExtens
      */
     private $methodReflections = [];
 
-    public function __construct(PhpMethodReflectionFactory $methodReflectionFactory, ReflectionProvider $reflectionProvider, CQC_Phpstan_Method_Kernel $kernel = null) {
+    public function __construct(PhpMethodReflectionFactory $methodReflectionFactory, ReflectionProvider $reflectionProvider, ?CQC_Phpstan_Method_Kernel $kernel = null) {
         $this->kernel = $kernel ?? new CQC_Phpstan_Method_Kernel($methodReflectionFactory, $reflectionProvider);
     }
 

@@ -55,7 +55,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      *
      * @return bool
      */
-    protected function hasDsnString(array $config = null) {
+    protected function hasDsnString(?array $config = null) {
         if ($config == null) {
             $config = $this->dbConfig;
         }
@@ -72,7 +72,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      *
      * @return string
      */
-    protected function getDsnString(array $config = null) {
+    protected function getDsnString(?array $config = null) {
         if ($config == null) {
             $config = $this->dbConfig;
         }
@@ -89,7 +89,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      *
      * @return string
      */
-    protected function getHostDsn(array $config = null) {
+    protected function getHostDsn(?array $config = null) {
         if ($config == null) {
             $config = $this->dbConfig;
         }
@@ -129,7 +129,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      *
      * @return string
      */
-    protected function getDsn(array $config = null) {
+    protected function getDsn(?array $config = null) {
         if ($config == null) {
             $config = $this->dbConfig;
         }

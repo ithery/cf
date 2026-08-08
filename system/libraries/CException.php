@@ -36,7 +36,7 @@ class CException extends Exception {
      *
      * @return void
      */
-    public function __construct($message = '', array $variables = null, $code = 0, Exception $previous = null) {
+    public function __construct($message = '', ?array $variables = null, $code = 0, ?Exception $previous = null) {
         if (is_array($variables)) {
             $message = strtr($message, $variables);
         } else {

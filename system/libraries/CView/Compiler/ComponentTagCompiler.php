@@ -37,7 +37,7 @@ class CView_Compiler_ComponentTagCompiler {
      *
      * @return void
      */
-    public function __construct(array $aliases = [], array $namespaces = [], CView_Compiler_BladeCompiler $blade = null) {
+    public function __construct(array $aliases = [], array $namespaces = [], ?CView_Compiler_BladeCompiler $blade = null) {
         $this->aliases = $aliases;
         $this->namespaces = $namespaces;
 

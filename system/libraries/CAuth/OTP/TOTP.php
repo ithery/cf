@@ -18,7 +18,7 @@ final class CAuth_OTP_TOTP extends CAuth_OTP_OTPAbstract implements CAuth_OTP_Co
     }
 
     public static function create(
-        string $secret = null,
+        ?string $secret = null,
         int $period = self::DEFAULT_PERIOD,
         string $digest = self::DEFAULT_DIGEST,
         int $digits = self::DEFAULT_DIGITS,
@@ -86,7 +86,7 @@ final class CAuth_OTP_TOTP extends CAuth_OTP_OTPAbstract implements CAuth_OTP_Co
      * If no timestamp is provided, the OTP is verified at the actual timestamp. When used, the leeway parameter will
      * allow time drift. The passed value is in seconds.
      */
-    public function verify(string $otp, int $timestamp = null, int $leeway = null): bool {
+    public function verify(string $otp, ?int $timestamp = null, ?int $leeway = null): bool {
         $timestamp ??= $this->clock->now()
             ->getTimestamp();
         if ($timestamp <= 0) {

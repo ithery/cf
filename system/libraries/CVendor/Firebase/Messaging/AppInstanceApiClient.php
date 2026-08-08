@@ -77,7 +77,7 @@ class CVendor_Firebase_Messaging_AppInstanceApiClient {
      * @throws FirebaseException
      * @throws MessagingException
      */
-    private function requestApi($method, $endpoint, array $options = null) {
+    private function requestApi($method, $endpoint, ?array $options = null) {
         try {
             return $this->client->request($method, $endpoint, $options != null ? $options : []);
         } catch (Throwable $e) {

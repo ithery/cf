@@ -231,7 +231,7 @@ class CServer_Runner_FFMpeg_Exporter_HLSExporter extends CRunner_FFMpeg_Exporter
      *
      * @return \Illuminate\Support\Collection
      */
-    private function prepareSaving(string $path = null): Collection {
+    private function prepareSaving(?string $path = null): Collection {
         if (!$this->pendingFormats) {
             throw new NoFormatException();
         }
@@ -272,7 +272,7 @@ class CServer_Runner_FFMpeg_Exporter_HLSExporter extends CRunner_FFMpeg_Exporter
      *
      * @return mixed
      */
-    public function getCommand(string $path = null) {
+    public function getCommand(?string $path = null) {
         $this->prepareSaving($path);
 
         return parent::getCommand(null);
@@ -286,7 +286,7 @@ class CServer_Runner_FFMpeg_Exporter_HLSExporter extends CRunner_FFMpeg_Exporter
      *
      * @return \ProtoneMedia\LaravelFFMpeg\MediaOpener
      */
-    public function save(string $mainPlaylistPath = null): MediaOpener {
+    public function save(?string $mainPlaylistPath = null): MediaOpener {
         return $this->prepareSaving($mainPlaylistPath)->pipe(function ($segmentPlaylists) use ($mainPlaylistPath) {
             $result = parent::save();
 
@@ -314,7 +314,7 @@ class CServer_Runner_FFMpeg_Exporter_HLSExporter extends CRunner_FFMpeg_Exporter
      *
      * @return self
      */
-    public function addFormat(FormatInterface $format, callable $filtersCallback = null): self {
+    public function addFormat(FormatInterface $format, ?callable $filtersCallback = null): self {
         if (!$this->pendingFormats) {
             $this->pendingFormats = new Collection();
         }

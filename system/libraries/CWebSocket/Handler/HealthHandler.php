@@ -14,7 +14,7 @@ class CWebSocket_Handler_HealthHandler implements HttpServerInterface {
      *
      * @return void
      */
-    public function onOpen(ConnectionInterface $connection, RequestInterface $request = null) {
+    public function onOpen(ConnectionInterface $connection, ?RequestInterface $request = null) {
         $response = new Response(
             200,
             ['Content-Type' => 'application/json'],

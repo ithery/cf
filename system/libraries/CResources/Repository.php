@@ -11,7 +11,7 @@ class CResources_Repository {
     /**
      * @param CModel_Resource_ResourceInterface $model
      */
-    public function __construct(CModel_Resource_ResourceInterface $model = null) {
+    public function __construct(?CModel_Resource_ResourceInterface $model = null) {
         if ($model == null) {
             $resourceModel = CF::config('resource.resource_model', CApp_Model_Resource::class);
             $model = new $resourceModel();

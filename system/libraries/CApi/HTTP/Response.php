@@ -72,7 +72,7 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @return void
      */
-    public function __construct($content, $status = 200, $headers = [], CApi_Transformer_Binding $binding = null) {
+    public function __construct($content, $status = 200, $headers = [], ?CApi_Transformer_Binding $binding = null) {
         parent::__construct($content, $status, $headers);
 
         $this->binding = $binding;

@@ -96,7 +96,7 @@ class CServer_Process_InvokedProcess implements CServer_Process_Contract_Invoked
      *
      * @return \CServer_Process_ProcessResult
      */
-    public function wait(callable $output = null) {
+    public function wait(?callable $output = null) {
         try {
             $this->process->wait($output);
 

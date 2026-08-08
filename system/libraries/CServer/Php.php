@@ -158,7 +158,7 @@ class CServer_Php {
      *
      * @return array default, versions, fpm
      */
-    public static function inspectAll(CServer_Server $server, array $iniList = null) {
+    public static function inspectAll(CServer_Server $server, ?array $iniList = null) {
         if ($iniList === null) {
             $iniList = [
                 'memory_limit', 'max_execution_time', 'upload_max_filesize',

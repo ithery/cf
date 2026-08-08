@@ -331,7 +331,7 @@ class CApi_OAuth {
      *
      * @return \DateInterval|static
      */
-    public function tokensExpireIn(DateTimeInterface $date = null) {
+    public function tokensExpireIn(?DateTimeInterface $date = null) {
         if (is_null($date)) {
             return $this->tokensExpireIn ?: new DateInterval('P1Y');
         }
@@ -348,7 +348,7 @@ class CApi_OAuth {
      *
      * @return \DateInterval|static
      */
-    public function refreshTokensExpireIn(DateTimeInterface $date = null) {
+    public function refreshTokensExpireIn(?DateTimeInterface $date = null) {
         if (is_null($date)) {
             return $this->refreshTokensExpireIn ?: new DateInterval('P1Y');
         }
@@ -365,7 +365,7 @@ class CApi_OAuth {
      *
      * @return \DateInterval|static
      */
-    public function personalAccessTokensExpireIn(DateTimeInterface $date = null) {
+    public function personalAccessTokensExpireIn(?DateTimeInterface $date = null) {
         if (is_null($date)) {
             return $this->personalAccessTokensExpireIn ?: new DateInterval('P1Y');
         }
@@ -382,7 +382,7 @@ class CApi_OAuth {
      *
      * @return \DateInterval|static
      */
-    public function socialAccessTokensExpireIn(DateTimeInterface $date = null) {
+    public function socialAccessTokensExpireIn(?DateTimeInterface $date = null) {
         if (is_null($date)) {
             return $this->socialAccessTokensExpireIn ?: $this->tokensExpireIn();
         }

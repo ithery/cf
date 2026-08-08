@@ -58,7 +58,7 @@ final class CGeo_Provider_Nominatim_Model_NominatimAddress extends CGeo_Model_Ad
      *
      * @return CGeo_Provider_Nominatim_Model_NominatimAddress
      */
-    public function withAttribution(string $attribution = null): self {
+    public function withAttribution(?string $attribution = null): self {
         $new = clone $this;
         $new->attribution = $attribution;
 
@@ -81,7 +81,7 @@ final class CGeo_Provider_Nominatim_Model_NominatimAddress extends CGeo_Model_Ad
      *
      * @return CGeo_Provider_Nominatim_Model_NominatimAddress
      */
-    public function withClass(string $category = null) {
+    public function withClass(?string $category = null) {
         return $this->withCategory($category);
     }
 
@@ -97,7 +97,7 @@ final class CGeo_Provider_Nominatim_Model_NominatimAddress extends CGeo_Model_Ad
      *
      * @return CGeo_Provider_Nominatim_Model_NominatimAddress
      */
-    public function withCategory(string $category = null): self {
+    public function withCategory(?string $category = null): self {
         $new = clone $this;
         $new->category = $category;
 
@@ -116,7 +116,7 @@ final class CGeo_Provider_Nominatim_Model_NominatimAddress extends CGeo_Model_Ad
      *
      * @return CGeo_Provider_Nominatim_Model_NominatimAddress
      */
-    public function withDisplayName(string $displayName = null): self {
+    public function withDisplayName(?string $displayName = null): self {
         $new = clone $this;
         $new->displayName = $displayName;
 
@@ -135,7 +135,7 @@ final class CGeo_Provider_Nominatim_Model_NominatimAddress extends CGeo_Model_Ad
      *
      * @return CGeo_Provider_Nominatim_Model_NominatimAddress
      */
-    public function withOSMId(int $osmId = null): self {
+    public function withOSMId(?int $osmId = null): self {
         $new = clone $this;
         $new->osmId = $osmId;
 
@@ -154,7 +154,7 @@ final class CGeo_Provider_Nominatim_Model_NominatimAddress extends CGeo_Model_Ad
      *
      * @return CGeo_Provider_Nominatim_Model_NominatimAddress
      */
-    public function withOSMType(string $osmType = null) {
+    public function withOSMType(?string $osmType = null) {
         $new = clone $this;
         $new->osmType = $osmType;
 
@@ -173,7 +173,7 @@ final class CGeo_Provider_Nominatim_Model_NominatimAddress extends CGeo_Model_Ad
      *
      * @return CGeo_Provider_Nominatim_Model_NominatimAddress
      */
-    public function withType(string $type = null) {
+    public function withType(?string $type = null) {
         $new = clone $this;
         $new->type = $type;
 
@@ -192,7 +192,7 @@ final class CGeo_Provider_Nominatim_Model_NominatimAddress extends CGeo_Model_Ad
      *
      * @return CGeo_Provider_Nominatim_Model_NominatimAddress
      */
-    public function withQuarter(string $quarter = null): self {
+    public function withQuarter(?string $quarter = null): self {
         $new = clone $this;
         $new->quarter = $quarter;
 
@@ -209,7 +209,7 @@ final class CGeo_Provider_Nominatim_Model_NominatimAddress extends CGeo_Model_Ad
     /**
      * @param null|array $details
      */
-    public function withDetails(array $details = null): self {
+    public function withDetails(?array $details = null): self {
         $new = clone $this;
         $new->details = $details;
 
@@ -226,7 +226,7 @@ final class CGeo_Provider_Nominatim_Model_NominatimAddress extends CGeo_Model_Ad
     /**
      * @param null|array $tags
      */
-    public function withTags(array $tags = null): self {
+    public function withTags(?array $tags = null): self {
         $new = clone $this;
         $new->tags = $tags;
 

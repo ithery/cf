@@ -20,7 +20,7 @@ final class CVendor_Firebase_Auth_Exception_FailedToCreateSessionCookieException
      * @param null|int                                  $code
      * @param null|Throwable                            $previous
      */
-    public function __construct(CVendor_Firebase_Auth_CreateSessionCookie $action, ResponseInterface $response = null, $message = null, $code = null, $previous = null) {
+    public function __construct(CVendor_Firebase_Auth_CreateSessionCookie $action, ?ResponseInterface $response = null, $message = null, $code = null, $previous = null) {
         $message ??= '';
         $code ??= 0;
 

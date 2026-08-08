@@ -25,7 +25,7 @@ class CEmail_Transport_ArrayTransport implements TransportInterface {
     /**
      * @inheritdoc
      */
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage {
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage {
         return $this->messages[] = new SentMessage($message, $envelope ?? Envelope::create($message));
     }
 

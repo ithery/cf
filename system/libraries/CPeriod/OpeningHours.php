@@ -448,7 +448,7 @@ class CPeriod_OpeningHours {
         );
     }
 
-    public function nextOpen(DateTimeInterface $dateTime = null): DateTimeInterface {
+    public function nextOpen(?DateTimeInterface $dateTime = null): DateTimeInterface {
         $outputTimezone = $this->getOutputTimezone($dateTime);
         $dateTime = $this->applyTimezone($dateTime ?? new $this->dateTimeClass());
         $dateTime = $this->copyDateTime($dateTime);
@@ -492,7 +492,7 @@ class CPeriod_OpeningHours {
         );
     }
 
-    public function nextClose(DateTimeInterface $dateTime = null): DateTimeInterface {
+    public function nextClose(?DateTimeInterface $dateTime = null): DateTimeInterface {
         $outputTimezone = $this->getOutputTimezone($dateTime);
         $dateTime = $this->applyTimezone($dateTime ?? new $this->dateTimeClass());
         $dateTime = $this->copyDateTime($dateTime);
@@ -933,7 +933,7 @@ class CPeriod_OpeningHours {
      *
      * @return null|DateTimeZone
      */
-    private function getOutputTimezone(DateTimeInterface $dateTime = null) {
+    private function getOutputTimezone(?DateTimeInterface $dateTime = null) {
         if ($this->outputTimezone !== null) {
             return $this->outputTimezone;
         }

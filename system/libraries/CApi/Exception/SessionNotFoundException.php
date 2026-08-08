@@ -12,7 +12,7 @@ class CApi_Exception_SessionNotFoundException extends HttpException {
      *
      * @return void
      */
-    public function __construct($message = null, Exception $previous = null, $code = 0) {
+    public function __construct($message = null, ?Exception $previous = null, $code = 0) {
         parent::__construct(403, $message ?: 'Session not found.', $previous, [], $code);
     }
 }

@@ -41,7 +41,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
      *
      * @return void
      */
-    public function __construct(CEvent_Dispatcher $dispatcher = null) {
+    public function __construct(?CEvent_Dispatcher $dispatcher = null) {
         if ($dispatcher == null) {
             $dispatcher = CEvent::dispatcher();
         }

@@ -17,7 +17,7 @@ class CBot_Message_Outgoing_OutgoingMessage {
      * @param string                          $message
      * @param CBot_Message_AttachmentAbstract $attachment
      */
-    public function __construct($message = null, CBot_Message_AttachmentAbstract $attachment = null) {
+    public function __construct($message = null, ?CBot_Message_AttachmentAbstract $attachment = null) {
         $this->message = $message;
         $this->attachment = $attachment;
     }
@@ -28,7 +28,7 @@ class CBot_Message_Outgoing_OutgoingMessage {
      *
      * @return CBot_Message_Outgoing_OutgoingMessage
      */
-    public static function create($message = null, CBot_Message_AttachmentAbstract $attachment = null) {
+    public static function create($message = null, ?CBot_Message_AttachmentAbstract $attachment = null) {
         return new static($message, $attachment);
     }
 

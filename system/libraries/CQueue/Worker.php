@@ -166,7 +166,7 @@ class CQueue_Worker {
      *
      * @return void
      */
-    public function __construct(CQueue_Manager $manager, CEvent_Dispatcher $events, CException_ExceptionHandler $exceptions, callable $isDownForMaintenance, callable $resetScope = null) {
+    public function __construct(CQueue_Manager $manager, CEvent_Dispatcher $events, CException_ExceptionHandler $exceptions, callable $isDownForMaintenance, ?callable $resetScope = null) {
         $this->events = $events;
         $this->manager = $manager;
         $this->exceptions = $exceptions;
@@ -1104,7 +1104,7 @@ class CQueue_Worker {
      *
      * @return $this
      */
-    public function setCache(CCache_Repository $cache = null) {
+    public function setCache(?CCache_Repository $cache = null) {
         $this->cache = $cache;
 
         return $this;

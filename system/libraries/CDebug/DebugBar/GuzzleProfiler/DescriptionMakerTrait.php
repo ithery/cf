@@ -10,7 +10,7 @@ trait CDebug_DebugBar_GuzzleProfiler_DescriptionMakerTrait {
      *
      * @return string
      */
-    protected function describe(RequestInterface $request, ResponseInterface $response = null): string {
+    protected function describe(RequestInterface $request, ?ResponseInterface $response = null): string {
         if (!$response) {
             return sprintf('%s %s failed', $request->getMethod(), $request->getUri());
         }

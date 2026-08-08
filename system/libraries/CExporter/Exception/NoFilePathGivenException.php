@@ -6,7 +6,7 @@ class CExporter_Exception_NoFilePathGivenException extends InvalidArgumentExcept
      * @param int            $code
      * @param null|Throwable $previous
      */
-    public function __construct($message = 'A filepath needs to be passed.', $code = 0, Throwable $previous = null) {
+    public function __construct($message = 'A filepath needs to be passed.', $code = 0, ?Throwable $previous = null) {
         parent::__construct($message, $code, $previous);
     }
 

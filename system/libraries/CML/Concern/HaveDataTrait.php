@@ -13,7 +13,7 @@ trait CML_Concern_HaveDataTrait {
         return $this->mixedToArray($this->data);
     }
 
-    private function mixedToArray($data, array $ignore_attrs = null) {
+    private function mixedToArray($data, ?array $ignore_attrs = null) {
         if (is_array($data)) {
             $rv = $data;
         } elseif ($data instanceof CModel) {

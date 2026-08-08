@@ -99,7 +99,7 @@ class CLogger_Reader_Log {
         $this->fullText = trim($text);
     }
 
-    public function fullTextMatches(string $query = null): bool {
+    public function fullTextMatches(?string $query = null): bool {
         if (empty($query)) {
             return true;
         }

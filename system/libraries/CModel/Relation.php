@@ -505,7 +505,7 @@ abstract class CModel_Relation {
      *
      * @return array
      */
-    public static function morphMap(array $map = null, $merge = true) {
+    public static function morphMap(?array $map = null, $merge = true) {
         $map = static::buildMorphMapFromModels($map);
 
         if (is_array($map)) {
@@ -522,7 +522,7 @@ abstract class CModel_Relation {
      *
      * @return null|array
      */
-    protected static function buildMorphMapFromModels(array $models = null) {
+    protected static function buildMorphMapFromModels(?array $models = null) {
         if (is_null($models) || carr::isAssoc($models)) {
             return $models;
         }

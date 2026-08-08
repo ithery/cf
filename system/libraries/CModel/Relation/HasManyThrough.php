@@ -110,7 +110,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      *
      * @return void
      */
-    protected function performJoin(CModel_Query $query = null) {
+    protected function performJoin(?CModel_Query $query = null) {
         $query = $query ?: $this->query;
 
         $farKey = $this->getQualifiedFarKeyName();
@@ -355,7 +355,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      *
      * @return \CModel|static|mixed
      */
-    public function firstOr($columns = ['*'], Closure $callback = null) {
+    public function firstOr($columns = ['*'], ?Closure $callback = null) {
         if ($columns instanceof Closure) {
             $callback = $columns;
 
@@ -443,7 +443,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      *
      * @return \CModel|\CModel_Collection|mixed
      */
-    public function findOr($id, $columns = ['*'], Closure $callback = null) {
+    public function findOr($id, $columns = ['*'], ?Closure $callback = null) {
         if ($columns instanceof Closure) {
             $callback = $columns;
 

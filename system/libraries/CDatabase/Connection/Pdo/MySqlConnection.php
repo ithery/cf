@@ -65,7 +65,7 @@ class CDatabase_Connection_Pdo_MySqlConnection extends CDatabase_Connection impl
      *
      * @return \CDatabase_Schema_SchemaState_MySqlSchemaState
      */
-    public function getSchemaState(callable $processFactory = null) {
+    public function getSchemaState(?callable $processFactory = null) {
         return new CDatabase_Schema_SchemaState_MySqlSchemaState($this, $processFactory);
     }
 

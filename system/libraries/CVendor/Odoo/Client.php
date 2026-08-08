@@ -599,7 +599,7 @@ class CVendor_Odoo_Client {
      *
      * @return mixed
      */
-    public function responseAsNative(Response $response = null) {
+    public function responseAsNative(?Response $response = null) {
         if ($response === null) {
             $response = $this->response;
         }

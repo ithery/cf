@@ -11,7 +11,7 @@ interface CResources_ImageGenerator_FileTypeInterface {
      *
      * @return string
      */
-    public function convert($path, CResources_Conversion $conversion = null);
+    public function convert($path, ?CResources_Conversion $conversion = null);
 
     /**
      * @param string $mime

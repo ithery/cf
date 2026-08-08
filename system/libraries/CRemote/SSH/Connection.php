@@ -39,7 +39,7 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
      * @param CRemote_SSH_Config           $config
      * @param CRemote_SSH_GatewayInterface $gateway
      */
-    public function __construct($name, CRemote_SSH_Config $config, CRemote_SSH_GatewayInterface $gateway = null) {
+    public function __construct($name, CRemote_SSH_Config $config, ?CRemote_SSH_GatewayInterface $gateway = null) {
         $this->name = $name;
         $this->config = $config;
         $this->gateway = $gateway ?: new CRemote_SSH_Gateway($config);
@@ -63,7 +63,7 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
      *
      * @return void
      */
-    public function task($task, Closure $callback = null) {
+    public function task($task, ?Closure $callback = null) {
         if (isset($this->tasks[$task])) {
             $this->run($this->tasks[$task], $callback);
         }
@@ -75,7 +75,7 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
      *
      * @return mixed
      */
-    public function run($commands, Closure $callback = null) {
+    public function run($commands, ?Closure $callback = null) {
         $gateway = $this->getGateway();
         $callback = $this->getCallback($callback);
 

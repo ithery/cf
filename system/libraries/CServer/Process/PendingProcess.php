@@ -226,7 +226,7 @@ class CServer_Process_PendingProcess {
      *
      * @return \CServer_Process_Contract_ProcessResultInterface
      */
-    public function run($command = null, callable $output = null) {
+    public function run($command = null, ?callable $output = null) {
         $this->command = $command ?: $this->command;
 
         try {
@@ -254,7 +254,7 @@ class CServer_Process_PendingProcess {
      *
      * @return \CServer_Process_InvokedProcess
      */
-    public function start($command = null, callable $output = null) {
+    public function start($command = null, ?callable $output = null) {
         $this->command = $command ?: $this->command;
 
         $process = $this->toSymfonyProcess($command);

@@ -74,7 +74,7 @@ class CModel_Relation_HasManyDeep extends CModel_Relation_HasManyThrough {
      *
      * @return void
      */
-    protected function performJoin(CModel_Query $query = null) {
+    protected function performJoin(?CModel_Query $query = null) {
         $query = $query ?: $this->query;
 
         $throughParents = array_reverse($this->throughParents);

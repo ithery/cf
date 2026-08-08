@@ -44,7 +44,7 @@ class CDaemon_Supervisor_SupervisorProcess extends CDaemon_WorkerProcess {
      *
      * @return void
      */
-    public function __construct(CDaemon_Supervisor_SupervisorOptions $options, $process, Closure $output = null) {
+    public function __construct(CDaemon_Supervisor_SupervisorOptions $options, $process, ?Closure $output = null) {
         $this->options = $options;
         $this->name = $options->name;
 

@@ -502,7 +502,7 @@ class CValidation_Validator implements CValidation_Contract_ValidatorInterface {
      *
      * @return \CBase_ValidatedInput|array
      */
-    public function safe(array $keys = null) {
+    public function safe(?array $keys = null) {
         return is_array($keys)
                 ? (new CBase_ValidatedInput($this->validated()))->only($keys)
                 : new CBase_ValidatedInput($this->validated());
@@ -1351,7 +1351,7 @@ class CValidation_Validator implements CValidation_Contract_ValidatorInterface {
      *
      * @return $this
      */
-    public function setImplicitAttributesFormatter(callable $formatter = null) {
+    public function setImplicitAttributesFormatter(?callable $formatter = null) {
         $this->implicitAttributesFormatter = $formatter;
 
         return $this;

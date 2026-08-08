@@ -12,10 +12,10 @@ class CVendor_MailerSend_Helpers_Builder_Attachment implements Arrayable, \JsonS
     protected ?string $id = null;
 
     public function __construct(
-        string $content = null,
-        string $filename = null,
-        string $disposition = null,
-        string $id = null
+        ?string $content = null,
+        ?string $filename = null,
+        ?string $disposition = null,
+        ?string $id = null
     ) {
         if ($content) {
             $this->setContent($content);

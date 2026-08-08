@@ -56,7 +56,7 @@ class CReport_Jasper_Report_Variable {
      */
     protected $isValueSet;
 
-    public function __construct($name, SimpleXMLElement $xmlElement = null) {
+    public function __construct($name, ?SimpleXMLElement $xmlElement = null) {
         $this->name = $name;
         $this->xmlElement = $xmlElement;
         $this->calculation = $xmlElement ? (string) $xmlElement['calculation'] : 'System';

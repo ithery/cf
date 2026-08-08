@@ -10,7 +10,7 @@ class CVendor_MailerSend_Endpoints_SmtpUser extends CVendor_MailerSend_Endpoints
      * @throws \JsonException
      * @throws CVendor_MailerSend_Exceptions_MailerSendAssertException
      */
-    public function getAll(string $domainId = null, ?int $limit = CVendor_MailerSend_Common_Constants::DEFAULT_LIMIT): array {
+    public function getAll(?string $domainId = null, ?int $limit = CVendor_MailerSend_Common_Constants::DEFAULT_LIMIT): array {
         if ($limit) {
             CVendor_MailerSend_Helpers_GeneralHelpers::assert(
                 fn () => Assertion::range(

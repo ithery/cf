@@ -61,7 +61,7 @@ class CParser_Css_Property_Processor {
      *
      * @return Property|null
      */
-    public function convertToObject($property, Specificity $specificity = null) {
+    public function convertToObject($property, ?Specificity $specificity = null) {
         if (strpos($property, ':') === false) {
             return null;
         }
@@ -85,7 +85,7 @@ class CParser_Css_Property_Processor {
      *
      * @return Property[]
      */
-    public function convertArrayToObjects(array $properties, Specificity $specificity = null) {
+    public function convertArrayToObjects(array $properties, ?Specificity $specificity = null) {
         $objects = [];
 
         foreach ($properties as $property) {

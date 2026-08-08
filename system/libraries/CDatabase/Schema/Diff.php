@@ -74,7 +74,7 @@ class CDatabase_Schema_Diff {
      * @param CDatabase_Schema_Table[]     $removedTables
      * @param null|CDatabase_Schema        $fromSchema
      */
-    public function __construct($newTables = [], $changedTables = [], $removedTables = [], CDatabase_Schema $fromSchema = null) {
+    public function __construct($newTables = [], $changedTables = [], $removedTables = [], ?CDatabase_Schema $fromSchema = null) {
         $this->newTables = $newTables;
         $this->changedTables = $changedTables;
         $this->removedTables = $removedTables;

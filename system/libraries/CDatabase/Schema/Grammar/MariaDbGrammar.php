@@ -10,7 +10,7 @@ class CDatabase_Schema_Grammar_MariaDbGrammar extends CDatabase_Schema_Grammar_M
      *
      * @return array|string
      */
-    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection = null) {
+    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, ?CDatabase_Connection $connection = null) {
         if (version_compare($connection->getServerVersion(), '10.5.2', '<')) {
             /** @var CDatabase_Schema_Builder_MariaDbBuilder $schemaBuilder */
             $schemaBuilder = $connection->getSchemaBuilder();

@@ -58,5 +58,5 @@ interface CServer_Process_Contract_InvokedProcessInterface
      * @param  callable|null  $output
      * @return \CConsole_Process_ProcessResult
      */
-    public function wait(callable $output = null);
+    public function wait(?callable $output = null);
 }

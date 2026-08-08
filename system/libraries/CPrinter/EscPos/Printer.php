@@ -36,7 +36,7 @@ class CPrinter_EscPos_Printer {
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(CPrinter_EscPos_Contract_PrintConnectorInterface $connector, CPrinter_EscPos_CapabilityProfile $profile = null) {
+    public function __construct(CPrinter_EscPos_Contract_PrintConnectorInterface $connector, ?CPrinter_EscPos_CapabilityProfile $profile = null) {
         /* Set connector */
         $this->connector = $connector;
 
@@ -643,7 +643,7 @@ class CPrinter_EscPos_Printer {
      *
      * @return $this
      */
-    public function setLineSpacing(int $height = null) {
+    public function setLineSpacing(?int $height = null) {
         if ($height === null) {
             // Reset to default
             $this->connector->write(CPrinter_EscPos::ESC . '2'); // Revert to default line spacing

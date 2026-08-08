@@ -41,7 +41,7 @@ class CDebug_DebugBar_GuzzleProfiler implements CDebug_DebugBar_GuzzleProfiler_P
      * @param \Psr\Http\Message\RequestInterface  $request
      * @param \Psr\Http\Message\ResponseInterface $response
      */
-    public function add(float $start, float $end, RequestInterface $request, ResponseInterface $response = null): void {
+    public function add(float $start, float $end, RequestInterface $request, ?ResponseInterface $response = null): void {
         $description = $this->describe($request, $response);
         $params = $this->getParameters($request, $response);
 
@@ -56,7 +56,7 @@ class CDebug_DebugBar_GuzzleProfiler implements CDebug_DebugBar_GuzzleProfiler_P
      *
      * @return array
      */
-    protected function getParameters(RequestInterface $request, ResponseInterface $response = null): array {
+    protected function getParameters(RequestInterface $request, ?ResponseInterface $response = null): array {
         $params = [];
         $result = '';
 

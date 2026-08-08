@@ -10,7 +10,7 @@ class CReport_Jasper_Report_ExpressionEvaluator {
         $this->variables = $variables;
     }
 
-    public function evaluateExpression(string $text, CReport_Jasper_Report_DataRow $row = null) {
+    public function evaluateExpression(string $text, ?CReport_Jasper_Report_DataRow $row = null) {
         preg_match_all("/P{(\w+)}/", $text, $matchesP);
         if ($matchesP) {
             foreach ($matchesP[1] as $macthP) {

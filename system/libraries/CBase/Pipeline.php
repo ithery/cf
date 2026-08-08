@@ -48,7 +48,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      *
      * @return void
      */
-    public function __construct(CContainer_Container $container = null) {
+    public function __construct(?CContainer_Container $container = null) {
         if ($container == null) {
             $container = c::container();
         }

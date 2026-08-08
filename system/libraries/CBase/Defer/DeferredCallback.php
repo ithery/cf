@@ -20,7 +20,7 @@ class CBase_Defer_DeferredCallback {
      *
      * @return void
      */
-    public function __construct($callback, string $name = null, bool $always = false) {
+    public function __construct($callback, ?string $name = null, bool $always = false) {
         $this->callback = $callback;
         $this->name = $name ?? (string) cstr::uuid();
         $this->always = $always;

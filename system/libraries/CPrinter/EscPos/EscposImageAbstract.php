@@ -173,7 +173,7 @@ abstract class CPrinter_EscPos_EscposImageAbstract {
      *
      * @param null|string $filename filename to load from
      */
-    protected function loadImageData(string $filename = null) {
+    protected function loadImageData(?string $filename = null) {
         // Load image in to string of 1's and 0's, also set width & height
         $this->setImgWidth(0);
         $this->setImgHeight(0);

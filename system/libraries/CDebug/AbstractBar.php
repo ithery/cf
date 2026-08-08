@@ -164,7 +164,7 @@ class CDebug_AbstractBar implements ArrayAccess {
      *
      * @return $this
      */
-    public function setStorage(CDebug_Contract_StorageInterface $storage = null) {
+    public function setStorage(?CDebug_Contract_StorageInterface $storage = null) {
         $this->storage = $storage;
 
         return $this;

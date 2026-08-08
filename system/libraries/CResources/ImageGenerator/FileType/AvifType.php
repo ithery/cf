@@ -7,7 +7,7 @@ class CResources_ImageGenerator_FileType_AvifType extends CResources_ImageGenera
      *
      * @return string
      */
-    public function convert($file, CResources_Conversion $conversion = null) {
+    public function convert($file, ?CResources_Conversion $conversion = null) {
         $pathToImageFile = pathinfo($file, PATHINFO_DIRNAME) . '/' . pathinfo($file, PATHINFO_FILENAME) . '.png';
 
         $image = imagecreatefromavif($file);

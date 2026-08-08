@@ -1112,7 +1112,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @return CDaemon_PluginAbstract Returns an instance of the plugin
      */
-    protected function addPlugin($alias, CDaemon_PluginAbstract $instance = null) {
+    protected function addPlugin($alias, ?CDaemon_PluginAbstract $instance = null) {
         $this->checkPluginAlias($alias);
         if ($instance === null) {
             // This if wouldn't be necessary if /Lock lived inside /Plugin.
@@ -1178,7 +1178,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @return CDaemon_Worker_MediatorAbstract
      */
-    protected function addWorker($alias, $worker, CDaemon_Worker_ViaInterface $via = null) {
+    protected function addWorker($alias, $worker, ?CDaemon_Worker_ViaInterface $via = null) {
         if (!$this->parent) {
             // While in theory there is nothing preventing you from creating workers in child processes, supporting it
             // would require changing a lot of error handling and process management code and I don't really see the value in it.

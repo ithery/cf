@@ -537,7 +537,7 @@ class cdbg {
      *
      * @return string
      */
-    public static function trace(array $trace = null) {
+    public static function trace(?array $trace = null) {
         if ($trace === null) {
             // Start a new trace
             $trace = debug_backtrace();

@@ -14,7 +14,7 @@ class CBackup_Event_HouseKeepingHasFailed {
     /** @var CBackup_BackupDestination|null */
     public $backupDestination;
 
-    public function __construct(Exception $exception, CBackup_BackupDestination $backupDestination = null) {
+    public function __construct(Exception $exception, ?CBackup_BackupDestination $backupDestination = null) {
         $this->exception = $exception;
 
         $this->backupDestination = $backupDestination;

@@ -19,7 +19,7 @@ class CVendor_MailerSend_Helpers_Builder_UserParams implements Arrayable, \JsonS
      * @param string $email
      * @param string $role
      */
-    public function __construct(string $email = null, string $role = null) {
+    public function __construct(?string $email = null, ?string $role = null) {
         $this->email = $email;
         $this->role = $role;
     }

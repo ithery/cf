@@ -63,7 +63,7 @@ class CVendor_BCA_Api {
      *
      * @return void
      */
-    public function __construct($options, CCache_Repository $cache = null) {
+    public function __construct($options, ?CCache_Repository $cache = null) {
         $this->apiUrl = carr::get($options, 'api_url', CF::config('vendor.bca.api_url', 'https://sandbox.bca.co.id:443'));
         $this->clientId = carr::get($options, 'client_id', CF::config('vendor.bca.client_id', '07594711-5ba6-460e-a36f-64ac63ade5c8'));
         $this->clientSecret = carr::get($options, 'client_secret', CF::config('vendor.bca.client_secret', '5df114de-8771-405d-af55-08a489f80a40'));

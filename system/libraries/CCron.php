@@ -51,7 +51,7 @@ class CCron {
      *
      * @return string
      */
-    public static function run(OutputInterface $output = null) {
+    public static function run(?OutputInterface $output = null) {
         return (new CCron_Runner())->run($output);
     }
 

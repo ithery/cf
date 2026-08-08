@@ -16,7 +16,7 @@ class CWebSocket_Client {
 
     protected $negotiator;
 
-    public function __construct(LoopInterface $loop = null, ConnectorInterface $connector = null) {
+    public function __construct(?LoopInterface $loop = null, ?ConnectorInterface $connector = null) {
         $this->loop = $loop ?: Loop::get();
 
         if (null === $connector) {

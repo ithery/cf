@@ -74,7 +74,7 @@ class CGeo_Model_Address implements CGeo_Interface_LocationInterface {
      * @param null|CGeo_Model_Country         $country
      * @param null|string                     $timezone
      */
-    public function __construct($providedBy, CGeo_Model_AdminLevelCollection $adminLevels, CGeo_Model_Coordinates $coordinates = null, CGeo_Model_Bounds $bounds = null, $streetNumber = null, $streetName = null, $postalCode = null, $locality = null, $subLocality = null, CGeo_Model_Country $country = null, $timezone = null) {
+    public function __construct($providedBy, CGeo_Model_AdminLevelCollection $adminLevels, ?CGeo_Model_Coordinates $coordinates = null, ?CGeo_Model_Bounds $bounds = null, $streetNumber = null, $streetName = null, $postalCode = null, $locality = null, $subLocality = null, ?CGeo_Model_Country $country = null, $timezone = null) {
         $this->providedBy = $providedBy;
         $this->adminLevels = $adminLevels;
         $this->coordinates = $coordinates;

@@ -104,7 +104,7 @@ class CLogger_Reader_LogIndex {
         return null;
     }
 
-    public function get(int $limit = null): array {
+    public function get(?int $limit = null): array {
         $results = [];
         $itemsAdded = 0;
         $limit = $limit ?? $this->limit;
@@ -185,7 +185,7 @@ class CLogger_Reader_LogIndex {
         return $results;
     }
 
-    public function getFlatIndex(int $limit = null): array {
+    public function getFlatIndex(?int $limit = null): array {
         $results = [];
         $itemsAdded = 0;
         $limit = $limit ?? $this->limit;

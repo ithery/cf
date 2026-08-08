@@ -97,7 +97,7 @@ class CApp_Visitor_Agent extends MobileDetect {
      *
      * @return array
      */
-    public function languages(string $acceptLanguage = null): array {
+    public function languages(?string $acceptLanguage = null): array {
         if ($acceptLanguage === null) {
             $acceptLanguage = $this->getHttpHeader('HTTP_ACCEPT_LANGUAGE');
         }

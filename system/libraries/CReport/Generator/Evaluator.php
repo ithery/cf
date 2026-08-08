@@ -7,7 +7,7 @@ class CReport_Generator_Evaluator {
         $this->generator = $generator;
     }
 
-    public function evaluatePrintWhenExpression(string $expression = null, string $evaluationTime = CREPORT::EVALUATION_TIME_REPORT) {
+    public function evaluatePrintWhenExpression(?string $expression = null, string $evaluationTime = CREPORT::EVALUATION_TIME_REPORT) {
         $originalExpression = $expression;
         if ($expression != '') {
             $expression = $this->getExpression($expression, $evaluationTime);
@@ -25,7 +25,7 @@ class CReport_Generator_Evaluator {
         return true;
     }
 
-    public function getExpression($expression, string $evaluationTime = CReport::EVALUATION_TIME_NOW, CReport_Builder_Row $row = null) {
+    public function getExpression($expression, string $evaluationTime = CReport::EVALUATION_TIME_NOW, ?CReport_Builder_Row $row = null) {
         $originalExpression = $expression;
 
         if (!$this->generator->isProcessingHook()) {

@@ -26,7 +26,7 @@ class CDevCloud_Inspector_Filters {
      *
      * @return bool
      */
-    public static function isApprovedArtisanCommand(string $command, array $notAllowed = null): bool {
+    public static function isApprovedArtisanCommand(string $command, ?array $notAllowed = null): bool {
         return is_null($notAllowed) || !in_array($command, $notAllowed);
     }
 
@@ -38,7 +38,7 @@ class CDevCloud_Inspector_Filters {
      *
      * @return bool
      */
-    public static function isApprovedJobClass(string $class, array $notAllowed = null) {
+    public static function isApprovedJobClass(string $class, ?array $notAllowed = null) {
         return !is_array($notAllowed) || !in_array($class, $notAllowed);
     }
 

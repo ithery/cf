@@ -96,7 +96,7 @@ class CRemote_SSH {
      *
      * @return $this
      */
-    public function run($commands, Closure $callback = null) {
+    public function run($commands, ?Closure $callback = null) {
         $this->connection->run($commands, $callback);
 
         return $this;

@@ -25,7 +25,7 @@ abstract class CDatabase_Schema_Manager {
      * @param CDatabase_Connection    $conn
      * @param null|CDatabase_Platform $platform
      */
-    public function __construct(CDatabase_Connection $conn, CDatabase_Platform $platform = null) {
+    public function __construct(CDatabase_Connection $conn, ?CDatabase_Platform $platform = null) {
         $this->db = $conn;
         $this->platform = $platform ? $platform : $this->db->getDatabasePlatform();
     }

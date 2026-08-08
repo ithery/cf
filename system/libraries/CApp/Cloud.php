@@ -30,7 +30,7 @@ class CApp_Cloud {
     /**
      * @param CApp_Cloud_AdapterInterface $adapter
      */
-    private function __construct(CApp_Cloud_AdapterInterface $adapter = null) {
+    private function __construct(?CApp_Cloud_AdapterInterface $adapter = null) {
         if ($adapter == null) {
             $adapter = new CApp_Cloud_Adapter_GuzzleAdapter();
         }

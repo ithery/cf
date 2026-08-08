@@ -33,7 +33,7 @@ abstract class CTemplate_CompilerAbstract {
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(CStorage_Adapter $files = null, $cachePath = null) {
+    public function __construct(?CStorage_Adapter $files = null, $cachePath = null) {
         if ($files == null) {
             $files = CStorage::instance()->disk('local');
         }

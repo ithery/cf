@@ -14,7 +14,7 @@ class CImage_Chart {
         return new CImage_Chart_Data();
     }
 
-    public static function createImage($xSize, $ySize, CImage_Chart_Data $dataSet = null, $transparentBackground = false) {
+    public static function createImage($xSize, $ySize, ?CImage_Chart_Data $dataSet = null, $transparentBackground = false) {
         return new CImage_Chart_Image($xSize, $ySize, $dataSet, $transparentBackground);
     }
 

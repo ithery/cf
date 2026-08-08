@@ -35,7 +35,7 @@ class CQueue_Runner {
      *
      * @return void
      */
-    public function __construct(CQueue_Worker $worker, CCache_Repository $cache = null, array $options = []) {
+    public function __construct(CQueue_Worker $worker, ?CCache_Repository $cache = null, array $options = []) {
         $this->cache = $cache;
         $this->worker = $worker;
         $this->options = $options;

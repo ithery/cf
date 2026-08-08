@@ -24,7 +24,7 @@ final class CVendor_Firebase_Http_ErrorResponseParser {
         return $responseBody;
     }
 
-    public function getErrorsFromResponse(ResponseInterface $response, RequestInterface $request = null) {
+    public function getErrorsFromResponse(ResponseInterface $response, ?RequestInterface $request = null) {
         $responseBody = null;
         if ($response) {
             $responseBody = json_decode((string) $response->getBody(), true);

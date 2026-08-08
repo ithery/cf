@@ -339,7 +339,7 @@ class CReport_Jasper_Report {
         }
     }
 
-    public function getExpression($text, CReport_Jasper_Report_DataRow $row = null, $writeHTML = null, $element = null) {
+    public function getExpression($text, ?CReport_Jasper_Report_DataRow $row = null, $writeHTML = null, $element = null) {
         preg_match_all("/P{(\w+)}/", $text, $matchesP);
         if ($matchesP) {
             foreach ($matchesP[1] as $macthP) {
@@ -384,7 +384,7 @@ class CReport_Jasper_Report {
         return $text;
     }
 
-    public function evaluateExpression(string $expression, CReport_Jasper_Report_DataRow $row = null) {
+    public function evaluateExpression(string $expression, ?CReport_Jasper_Report_DataRow $row = null) {
         $printExpressionResult = true;
         if ($expression != '') {
             $expression = $this->getExpression($expression, $row);

@@ -7,7 +7,7 @@ class CResources_ImageGenerator_FileType_PdfType extends CResources_ImageGenerat
      *
      * @return string
      */
-    public function convert($file, CResources_Conversion $conversion = null) {
+    public function convert($file, ?CResources_Conversion $conversion = null) {
         $imageFile = pathinfo($file, PATHINFO_DIRNAME) . '/' . pathinfo($file, PATHINFO_FILENAME) . '.jpg';
         $pageNumber = $conversion ? $conversion->getPdfPageNumber() : 1;
 

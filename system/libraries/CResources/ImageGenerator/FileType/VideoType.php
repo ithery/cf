@@ -10,7 +10,7 @@ class CResources_ImageGenerator_FileType_VideoType extends CResources_ImageGener
      *
      * @return string
      */
-    public function convert($file, CResources_Conversion $conversion = null) {
+    public function convert($file, ?CResources_Conversion $conversion = null) {
         $ffmpeg = FFMpeg::create([
             'ffmpeg.binaries' => CF::config('resource.ffmpeg_path'),
             'ffprobe.binaries' => CF::config('resource.ffprobe_path'),

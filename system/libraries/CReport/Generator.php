@@ -111,7 +111,7 @@ class CReport_Generator {
      * @param CReport_Builder_Dictionary                    $dictionary
      * @param null|CManager_Contract_DataProviderInterface $dataProvider
      */
-    public function __construct(CReport_Builder_Report $report, CReport_Builder_Dictionary $dictionary, CManager_Contract_DataProviderInterface $dataProvider = null) {
+    public function __construct(CReport_Builder_Report $report, CReport_Builder_Dictionary $dictionary, ?CManager_Contract_DataProviderInterface $dataProvider = null) {
         $this->report = $report;
         $this->dictionary = $dictionary;
         $this->dataProvider = $dataProvider;
@@ -378,7 +378,7 @@ class CReport_Generator {
      *
      * @return bool
      */
-    public function evaluatePrintWhenExpression(string $expression = null) {
+    public function evaluatePrintWhenExpression(?string $expression = null) {
         return $this->evaluator->evaluatePrintWhenExpression($expression);
     }
 

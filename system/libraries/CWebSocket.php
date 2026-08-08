@@ -118,7 +118,7 @@ class CWebSocket {
         return static::$statisticCollector;
     }
 
-    public static function client(LoopInterface $loop = null) {
+    public static function client(?LoopInterface $loop = null) {
         return new CWebSocket_Client($loop);
     }
 }

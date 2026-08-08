@@ -110,7 +110,7 @@ class CDatabase_Schema_Table_Diff {
      * @param CDatabase_Schema_Index[]      $removedIndexes
      * @param null|CDatabase_Schema_Table   $fromTable
      */
-    public function __construct($tableName, $addedColumns = [], $changedColumns = [], $removedColumns = [], $addedIndexes = [], $changedIndexes = [], $removedIndexes = [], CDatabase_Schema_Table $fromTable = null) {
+    public function __construct($tableName, $addedColumns = [], $changedColumns = [], $removedColumns = [], $addedIndexes = [], $changedIndexes = [], $removedIndexes = [], ?CDatabase_Schema_Table $fromTable = null) {
         $this->name = $tableName;
         $this->addedColumns = $addedColumns;
         $this->changedColumns = $changedColumns;

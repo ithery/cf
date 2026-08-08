@@ -37,7 +37,7 @@ class CVendor_MailerSend_Helpers_Builder_SmsWebhookParams implements Arrayable, 
      *
      * @throws MailerSendAssertException
      */
-    public function __construct(string $url = null, string $name = null, array $events = null, string $smsNumberId = null, ?bool $enabled = null) {
+    public function __construct(?string $url = null, ?string $name = null, ?array $events = null, ?string $smsNumberId = null, ?bool $enabled = null) {
         $this->setUrl($url)
             ->setName($name)
             ->setEvents($events)

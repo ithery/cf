@@ -17,7 +17,7 @@ class CQueue_Connector_DatabaseConnector extends CQueue_AbstractConnector {
      *
      * @return void
      */
-    public function __construct(CDatabase_Contract_ConnectionResolverInterface $connections = null) {
+    public function __construct(?CDatabase_Contract_ConnectionResolverInterface $connections = null) {
         if ($connections == null) {
             $connections = CDatabase_Manager::instance();
         }

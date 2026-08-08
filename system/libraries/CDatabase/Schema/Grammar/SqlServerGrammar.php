@@ -120,7 +120,7 @@ class CDatabase_Schema_Grammar_SqlServerGrammar extends CDatabase_Schema_Grammar
      *
      * @return array|string
      */
-    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection = null) {
+    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, ?CDatabase_Connection $connection = null) {
         return $connection->usingNativeSchemaOperations()
             ? sprintf(
                 "sp_rename '%s', %s, 'COLUMN'",
@@ -141,7 +141,7 @@ class CDatabase_Schema_Grammar_SqlServerGrammar extends CDatabase_Schema_Grammar
      *
      * @return array|string
      */
-    public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection = null) {
+    public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, ?CDatabase_Connection $connection = null) {
         if (!$connection->usingNativeSchemaOperations()) {
             return parent::compileChange($blueprint, $command);
         }

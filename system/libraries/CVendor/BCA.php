@@ -6,7 +6,7 @@ class CVendor_BCA {
      *
      * @return CVendor_BCA_Api
      */
-    public static function api($options = [], CCache_Repository $cache = null) {
+    public static function api($options = [], ?CCache_Repository $cache = null) {
         return new CVendor_BCA_Api($options, $cache);
     }
 }

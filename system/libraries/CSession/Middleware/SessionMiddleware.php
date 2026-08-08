@@ -251,7 +251,7 @@ class CSession_Middleware_SessionMiddleware {
      *
      * @return bool
      */
-    protected function sessionIsPersistent(array $config = null) {
+    protected function sessionIsPersistent(?array $config = null) {
         $config = $config ?: CSession::manager()->getSessionConfig();
 
         return !is_null(carr::get($config, 'driver'));

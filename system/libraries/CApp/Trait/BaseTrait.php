@@ -256,7 +256,7 @@ trait CApp_Trait_BaseTrait {
      *
      * @return CCarbon
      */
-    public static function travelTo($date, Closure $callback = null) {
+    public static function travelTo($date, ?Closure $callback = null) {
         CCarbon::setTestNow($date);
 
         if ($callback) {

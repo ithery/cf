@@ -25,7 +25,7 @@ class CDaemon_Worker_Call {
 
     public $time = [];
 
-    public function __construct($id, $method = null, array $args = null) {
+    public function __construct($id, $method = null, ?array $args = null) {
         $this->id = $id;
         $this->method = $method;
         $this->args = $args;

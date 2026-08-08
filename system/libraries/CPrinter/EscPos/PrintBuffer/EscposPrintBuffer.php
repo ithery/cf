@@ -52,7 +52,7 @@ class CPrinter_EscPos_PrintBuffer_EscposPrintBuffer implements CPrinter_EscPos_C
         return $this->printer;
     }
 
-    public function setPrinter(CPrinter_EscPos_Printer $printer = null) {
+    public function setPrinter(?CPrinter_EscPos_Printer $printer = null) {
         $this->printer = $printer;
         if ($printer != null) {
             $this->loadAvailableCharacters();

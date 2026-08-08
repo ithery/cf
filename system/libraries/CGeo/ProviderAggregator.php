@@ -29,7 +29,7 @@ class CGeo_ProviderAggregator implements CGeo_Interface_GeocoderInterface {
      * @param null|callable $decider
      * @param int           $limit
      */
-    public function __construct(callable $decider = null, $limit = CGeo_Interface_GeocoderInterface::DEFAULT_RESULT_LIMIT) {
+    public function __construct(?callable $decider = null, $limit = CGeo_Interface_GeocoderInterface::DEFAULT_RESULT_LIMIT) {
         $this->limit = $limit;
         $this->decider = $decider != null ? $decider : __CLASS__ . '::getProvider';
     }
@@ -164,7 +164,7 @@ class CGeo_ProviderAggregator implements CGeo_Interface_GeocoderInterface {
      *
      * @return CGeo_Interface_ProviderInterface
      */
-    private static function getProvider($query, array $providers, CGeo_Interface_ProviderInterface $currentProvider = null) {
+    private static function getProvider($query, array $providers, ?CGeo_Interface_ProviderInterface $currentProvider = null) {
         if (null !== $currentProvider) {
             return $currentProvider;
         }

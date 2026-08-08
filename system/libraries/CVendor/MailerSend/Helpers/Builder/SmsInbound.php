@@ -13,7 +13,7 @@ class CVendor_MailerSend_Helpers_Builder_SmsInbound implements Arrayable, \JsonS
 
     protected ?bool $enabled = true;
 
-    public function __construct(string $smsNumberId = null, string $name = null, string $forward_url = null, $filter = null, bool $enabled = null) {
+    public function __construct(?string $smsNumberId = null, ?string $name = null, ?string $forward_url = null, $filter = null, ?bool $enabled = null) {
         $this->smsNumberId = $smsNumberId;
         $this->name = $name;
         $this->forward_url = $forward_url;

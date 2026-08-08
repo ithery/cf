@@ -12,7 +12,7 @@ class CBot_Factory {
      *
      * @return \CBot_Bot
      */
-    public static function create(array $config, CBot_Contract_StorageInterface $storage = null, CCache_Repository $cache = null, CHTTP_Request $request = null) {
+    public static function create(array $config, ?CBot_Contract_StorageInterface $storage = null, ?CCache_Repository $cache = null, ?CHTTP_Request $request = null) {
         $request = $request ?: c::request();
         $driverManager = new CBot_DriverManager($config);
         $driver = null;
@@ -59,8 +59,8 @@ class CBot_Factory {
     public static function createForDiscord(
         array $config,
         LoopInterface $loop,
-        CCache_Repository $cache = null,
-        CBot_Contract_StorageInterface $storageDriver = null
+        ?CCache_Repository $cache = null,
+        ?CBot_Contract_StorageInterface $storageDriver = null
     ) {
         return CBot_Driver_DiscordDriver_Factory::createForDiscord($config, $loop, $cache, $storageDriver);
     }

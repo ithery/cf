@@ -32,7 +32,7 @@ class CReport_Jasper_Utils_ElementUtils {
      *
      * @return int[]|string[]|int[][]
      */
-    public static function formatPen(SimpleXMLElement $pen, SimpleXMLElement $box = null) {
+    public static function formatPen(SimpleXMLElement $pen, ?SimpleXMLElement $box = null) {
         $lineColor = $pen['lineColor'];
         if (!$lineColor && $box && $box->pen) {
             $lineColor = $box->pen['lineColor'];

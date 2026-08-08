@@ -41,8 +41,8 @@ class CML_Adapter_RubixAdapter extends CML_AdapterAbstract {
         $modelFilename,
         array $data,
         mixed $data_index_w_label = null,
-        Estimator $estimator_algorithm = null,
-        array $transformers = null,
+        ?Estimator $estimator_algorithm = null,
+        ?array $transformers = null,
         float $trainPartSize = 1
     ) {
         $is_testable = false;
@@ -104,8 +104,8 @@ class CML_Adapter_RubixAdapter extends CML_AdapterAbstract {
         $modelFilename,
         array $data,
         mixed $data_index_w_label = null,
-        Estimator $estimator_algorithm = null,
-        array $transformers = null
+        ?Estimator $estimator_algorithm = null,
+        ?array $transformers = null
     ) {
         ini_set('memory_limit', '-1');
 
@@ -203,7 +203,7 @@ class CML_Adapter_RubixAdapter extends CML_AdapterAbstract {
     public static function predict(
         string $modelFilename,
         array $input_data,
-        Estimator $estimator = null
+        ?Estimator $estimator = null
     ) {
         $is_single_dimensional_array = false;
         if (is_array($input_data) && !is_array($input_data[0] ?? null)) {

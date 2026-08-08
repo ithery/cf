@@ -7,7 +7,7 @@ class CCron_Runner {
 
     protected $startedAt;
 
-    public function run(OutputInterface $output = null) {
+    public function run(?OutputInterface $output = null) {
         $this->eventsRan = false;
         $this->startedAt = c::now();
         foreach (c::cron()->dueEvents() as $event) {
@@ -41,7 +41,7 @@ class CCron_Runner {
      *
      * @return void
      */
-    protected function runSingleServerEvent($event, OutputInterface $output = null) {
+    protected function runSingleServerEvent($event, ?OutputInterface $output = null) {
         if (c::cron()->serverShouldRun($event, $this->startedAt)) {
             $this->runEvent($event);
         } else {
@@ -60,7 +60,7 @@ class CCron_Runner {
      *
      * @return void
      */
-    protected function runEvent($event, OutputInterface $output = null) {
+    protected function runEvent($event, ?OutputInterface $output = null) {
         CCron::setEvent($event);
         if ($output) {
             $output->writeln('<info>[' . date('c') . '] Running scheduled command:</info> ' . $event->getSummaryForDisplay());

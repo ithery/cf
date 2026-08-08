@@ -8,7 +8,7 @@ abstract class CDocument_Pdf_ElementAbstract {
      *
      * @return bool
      */
-    abstract public function process(CEvent_Dispatcher $event = null);
+    abstract public function process(?CEvent_Dispatcher $event = null);
 
     /**
      * Gets the type of the text element.

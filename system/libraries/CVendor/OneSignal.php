@@ -54,7 +54,7 @@ class CVendor_OneSignal {
      * @param CVendor_OneSignal_Config $config
      * @param Client                   $client
      */
-    public function __construct(CVendor_OneSignal_Config $config = null, ClientInterface $httpClient = null, RequestFactoryInterface $requestFactory = null, StreamFactoryInterface $streamFactory = null) {
+    public function __construct(?CVendor_OneSignal_Config $config = null, ?ClientInterface $httpClient = null, ?RequestFactoryInterface $requestFactory = null, ?StreamFactoryInterface $streamFactory = null) {
         if ($httpClient == null) {
             $httpClient = new GuzzleClient();
         }

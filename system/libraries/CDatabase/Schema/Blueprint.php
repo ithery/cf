@@ -62,7 +62,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @return void
      */
-    public function __construct($table, Closure $callback = null) {
+    public function __construct($table, ?Closure $callback = null) {
         $this->table = $table;
 
         if (!is_null($callback)) {

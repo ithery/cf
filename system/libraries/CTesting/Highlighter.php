@@ -72,7 +72,7 @@ final class CTesting_Highlighter {
     /**
      * Creates an instance of the Highlighter.
      */
-    public function __construct(CTesting_ConsoleColor $color = null, bool $UTF8 = true) {
+    public function __construct(?CTesting_ConsoleColor $color = null, bool $UTF8 = true) {
         $this->color = $color ?: new CTesting_ConsoleColor();
 
         foreach (self::DEFAULT_THEME as $name => $styles) {

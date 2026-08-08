@@ -18,7 +18,7 @@ interface CAuth_OTP_Contract_TOTPInterface extends CAuth_OTP_Contract_OTPInterfa
      * @deprecated Deprecated since v11.1, use ::createFromSecret or ::generate instead
      */
     public static function create(
-        string $secret = null,
+        ?string $secret = null,
         int $period = self::DEFAULT_PERIOD,
         string $digest = self::DEFAULT_DIGEST,
         int $digits = self::DEFAULT_DIGITS

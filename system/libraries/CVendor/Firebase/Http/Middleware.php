@@ -9,7 +9,7 @@ class CVendor_Firebase_Http_Middleware {
      */
     public static function ensureJsonSuffix() {
         return static function (callable $handler) {
-            return static function (RequestInterface $request, array $options = null) use ($handler) {
+            return static function (RequestInterface $request, ?array $options = null) use ($handler) {
                 $uri = $request->getUri();
                 $path = $uri->getPath();
 
@@ -28,7 +28,7 @@ class CVendor_Firebase_Http_Middleware {
      */
     public static function overrideAuth(CVendor_Firebase_Http_AuthInterface $override) {
         return static function (callable $handler) use ($override) {
-            return static function (RequestInterface $request, array $options = null) use ($handler, $override) {
+            return static function (RequestInterface $request, ?array $options = null) use ($handler, $override) {
                 return $handler($override->authenticateRequest($request), $options ?: []);
             };
         };
@@ -39,7 +39,7 @@ class CVendor_Firebase_Http_Middleware {
      */
     public static function responseWithSubResponses() {
         return static function (callable $handler) {
-            return static function (RequestInterface $request, array $options = null) use ($handler) {
+            return static function (RequestInterface $request, ?array $options = null) use ($handler) {
                 return $handler($request, $options ?: [])
                     ->then(static function (ResponseInterface $response) {
                         $isMultiPart = \mb_stristr($response->getHeaderLine('Content-Type'), 'multipart') !== false;

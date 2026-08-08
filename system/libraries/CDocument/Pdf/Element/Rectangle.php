@@ -184,7 +184,7 @@ class CDocument_Pdf_Element_Rectangle extends CDocument_Pdf_ElementAbstract {
      * @param float $ury upper right y
      * @param mixed $llx
      */
-    public function __construct($llx, float $lly = 0, float $urx = 0, float $ury = 0, int $rotation = null) {
+    public function __construct($llx, float $lly = 0, float $urx = 0, float $ury = 0, ?int $rotation = null) {
         if ($llx instanceof CDocument_Pdf_Element_Rectangle) {
             $lly = $llx->lly;
             $urx = $llx->urx;
@@ -209,7 +209,7 @@ class CDocument_Pdf_Element_Rectangle extends CDocument_Pdf_ElementAbstract {
      *
      * @return bool
      */
-    public function process(CEvent_Dispatcher $event = null) {
+    public function process(?CEvent_Dispatcher $event = null) {
         // try {
         //     return listener.add(this);
         // } catch (DocumentException de) {

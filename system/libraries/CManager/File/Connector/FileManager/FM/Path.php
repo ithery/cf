@@ -44,7 +44,7 @@ class CManager_File_Connector_FileManager_FM_Path {
      *
      * @return void
      */
-    public function __construct(CManager_File_Connector_FileManager_FM $fm = null) {
+    public function __construct(?CManager_File_Connector_FileManager_FM $fm = null) {
         $this->fm = $fm;
     }
 

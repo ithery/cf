@@ -9,7 +9,7 @@ class CVendor_MailerSend_Helpers_Builder_Filter implements Arrayable, \JsonSeria
 
     protected ?string $key;
 
-    public function __construct(string $comparer, string $value, string $key = null) {
+    public function __construct(string $comparer, string $value, ?string $key = null) {
         $this->comparer = $comparer;
         $this->value = $value;
         $this->key = $key;

@@ -59,7 +59,7 @@ class CPeriod implements IteratorAggregate {
      * @param null|CPeriod_Precision  $precision
      * @param null|CPeriod_Boundaries $boundaries
      */
-    public function __construct($startDate, $endDate, CPeriod_Precision $precision = null, CPeriod_Boundaries $boundaries = null) {
+    public function __construct($startDate, $endDate, ?CPeriod_Precision $precision = null, ?CPeriod_Boundaries $boundaries = null) {
         if ($startDate instanceof DateTime) {
             $startDate = new CCarbon($startDate->format('Y-m-d H:i:s.u'), $startDate->getTimezone());
         }

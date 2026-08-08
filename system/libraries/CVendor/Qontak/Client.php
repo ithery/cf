@@ -23,7 +23,7 @@ final class CVendor_Qontak_Client implements CVendor_Qontak_ClientInterface {
      */
     private $credential;
 
-    public function __construct(CVendor_Qontak_Credential $credential, HttpClient $httpClient = null) {
+    public function __construct(CVendor_Qontak_Credential $credential, ?HttpClient $httpClient = null) {
         /** @psalm-suppress PropertyTypeCoercion */
         $this->httpClient = $httpClient ?? new HttpMethodsClient(
             Psr18ClientDiscovery::find(),

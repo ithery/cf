@@ -58,7 +58,7 @@ final class CVendor_Firebase_JWT_CustomTokenGenerator {
      *
      * @return CVendor_Firebase_JWT_Contract_TokenInterface
      */
-    public function createCustomToken($uid, array $claims = null, $timeToLive = null) {
+    public function createCustomToken($uid, ?array $claims = null, $timeToLive = null) {
         $action = CVendor_Firebase_JWT_Action_CreateCustomToken::forUid($uid);
 
         if ($claims !== null) {

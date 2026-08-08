@@ -13,7 +13,7 @@ trait CLogger_Reader_Concern_LogIndex_CanFilterIndex {
 
     protected ?int $skip = null;
 
-    public function setQuery(string $query = null): self {
+    public function setQuery(?string $query = null): self {
         if ($this->query !== $query) {
             $this->query = $query;
 
@@ -80,7 +80,7 @@ trait CLogger_Reader_Concern_LogIndex_CanFilterIndex {
         return $this->filterLevels ?? CLogger_Level::caseValues();
     }
 
-    public function skip(int $skip = null): self {
+    public function skip(?int $skip = null): self {
         $this->skip = $skip;
 
         return $this;
@@ -90,7 +90,7 @@ trait CLogger_Reader_Concern_LogIndex_CanFilterIndex {
         return $this->skip;
     }
 
-    public function limit(int $limit = null): self {
+    public function limit(?int $limit = null): self {
         $this->limit = $limit;
 
         return $this;

@@ -349,7 +349,7 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
      *
      * @return static
      */
-    public function filter(callable $callback = null) {
+    public function filter(?callable $callback = null) {
         if (is_null($callback)) {
             $callback = function ($value) {
                 return (bool) $value;
@@ -373,7 +373,7 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
      *
      * @return mixed
      */
-    public function first(callable $callback = null, $default = null) {
+    public function first(?callable $callback = null, $default = null) {
         $iterator = $this->getIterator();
 
         if (is_null($callback)) {
@@ -632,7 +632,7 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
      *
      * @return mixed
      */
-    public function last(callable $callback = null, $default = null) {
+    public function last(?callable $callback = null, $default = null) {
         $needle = $placeholder = new stdClass();
 
         foreach ($this as $key => $value) {

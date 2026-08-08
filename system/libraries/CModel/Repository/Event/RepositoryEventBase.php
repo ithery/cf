@@ -23,7 +23,7 @@ abstract class CModel_Repository_Event_RepositoryEventBase {
      * @param CModel_Repository_Contract_RepositoryInterface $repository
      * @param CModel                                         $model
      */
-    public function __construct(CModel_Repository_Contract_RepositoryInterface $repository, CModel $model = null) {
+    public function __construct(CModel_Repository_Contract_RepositoryInterface $repository, ?CModel $model = null) {
         $this->repository = $repository;
         $this->model = $model;
     }

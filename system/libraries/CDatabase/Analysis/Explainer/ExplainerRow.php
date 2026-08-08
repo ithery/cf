@@ -27,7 +27,7 @@ class CDatabase_Analysis_Explainer_ExplainerRow {
 
     private $explainer = null;
 
-    public function __construct($row, CDatabase_Analysis_Explainer_ExplainerRow $prev = null, CDatabase_Analysis_Explainer $explainer = null) {
+    public function __construct($row, ?CDatabase_Analysis_Explainer_ExplainerRow $prev = null, ?CDatabase_Analysis_Explainer $explainer = null) {
         foreach ($row as $k => $v) {
             $this->cells[$k] = new CDatabase_Analysis_Explainer_ExplainerCell($v);
         }

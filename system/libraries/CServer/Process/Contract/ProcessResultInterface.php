@@ -59,5 +59,5 @@ interface CServer_Process_Contract_ProcessResultInterface
      * @param  callable|null  $callback
      * @return $this
      */
-    public function throwIf(bool $condition, callable $callback = null);
+    public function throwIf(bool $condition, ?callable $callback = null);
 }

@@ -24,7 +24,7 @@ class CVendor_Firebase_Messaging_ApiExceptionConverter {
     /**
      * @internal
      */
-    public function __construct(ClockInterface $clock = null) {
+    public function __construct(?ClockInterface $clock = null) {
         $this->responseParser = new CVendor_Firebase_Http_ErrorResponseParser();
         $this->clock = $clock ?: SystemClock::create();
     }

@@ -67,7 +67,7 @@ class CDatabase_Connection_Pdo_PostgresConnection extends CDatabase_Connection {
      *
      * @return \CDatabase_Schema_SchemaState_PostgresSchemaState
      */
-    public function getSchemaState(callable $processFactory = null) {
+    public function getSchemaState(?callable $processFactory = null) {
         return new CDatabase_Schema_SchemaState_PostgresSchemaState($this, $processFactory);
     }
 

@@ -33,7 +33,7 @@ class CMetric_Flux_FluxQuery {
         return $this;
     }
 
-    public function window($interval, Closure $filterAction = null) {
+    public function window($interval, ?Closure $filterAction = null) {
         $this->window = 'window(every: ' . $interval . ')';
         if ($filterAction != null) {
             $this->aggregate = new CMetric_Flux_Aggregates();

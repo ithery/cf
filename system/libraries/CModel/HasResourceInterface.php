@@ -94,7 +94,7 @@ interface CModel_HasResourceInterface {
      *
      * @param CModel_Resource_ResourceInterface $resource
      */
-    public function registerResourceConversions(CModel_Resource_ResourceInterface $resource = null);
+    public function registerResourceConversions(?CModel_Resource_ResourceInterface $resource = null);
 
     /**
      * Register the resource collections.

@@ -8,7 +8,7 @@ class CAI_Exception_ClientException extends Exception {
      * @param int             $code
      * @param null|\Throwable $previous
      */
-    public function __construct($message = 'An error occurred with API', $code = 0, Throwable $previous = null) {
+    public function __construct($message = 'An error occurred with API', $code = 0, ?Throwable $previous = null) {
         parent::__construct($message, $code, $previous);
     }
 

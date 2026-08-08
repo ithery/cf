@@ -127,7 +127,7 @@ class CExporter_Row implements ArrayAccess {
      *
      * @internal
      */
-    public function setPreparationCallback(Closure $preparationCallback = null) {
+    public function setPreparationCallback(?Closure $preparationCallback = null) {
         $this->preparationCallback = $preparationCallback;
     }
 }

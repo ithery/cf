@@ -21,7 +21,7 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
     /**
      * @param null|ClientInterface $client
      */
-    public function __construct(ClientInterface $client = null) {
+    public function __construct(?ClientInterface $client = null) {
         $this->client = $client ?: new Client();
     }
 

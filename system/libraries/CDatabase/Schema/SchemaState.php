@@ -39,7 +39,7 @@ abstract class CDatabase_Schema_SchemaState {
      *
      * @return void
      */
-    public function __construct(CDatabase_Connection $connection, callable $processFactory = null) {
+    public function __construct(CDatabase_Connection $connection, ?callable $processFactory = null) {
         $this->connection = $connection;
 
         $this->processFactory = $processFactory ?: function (...$arguments) {

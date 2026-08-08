@@ -10,7 +10,7 @@ class CBot_ConversationManager {
      */
     protected $listenTo = [];
 
-    public function __construct(CBot_Message_Matcher $matcher = null) {
+    public function __construct(?CBot_Message_Matcher $matcher = null) {
         $this->matcher = $matcher ?: new CBot_Message_Matcher();
     }
 

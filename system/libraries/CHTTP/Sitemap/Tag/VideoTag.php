@@ -27,7 +27,7 @@ class CHTTP_Sitemap_Tag_VideoTag {
 
     public array $deny;
 
-    public function __construct(string $thumbnailLoc, string $title, string $description, string $contentLoc = null, string $playerLoc = null, array $options = [], array $allow = [], array $deny = []) {
+    public function __construct(string $thumbnailLoc, string $title, string $description, ?string $contentLoc = null, ?string $playerLoc = null, array $options = [], array $allow = [], array $deny = []) {
         if ($contentLoc === null && $playerLoc === null) {
             // https://developers.google.com/search/docs/crawling-indexing/sitemaps/video-sitemaps
             throw new \Exception("It's required to provide either a Content Location or Player Location");

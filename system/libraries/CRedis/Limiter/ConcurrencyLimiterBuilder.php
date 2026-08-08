@@ -97,7 +97,7 @@ class CRedis_Limiter_ConcurrencyLimiterBuilder {
      *
      * @throws CRedis_Exception_LimiterTimeoutException
      */
-    public function then(callable $callback, callable $failure = null) {
+    public function then(callable $callback, ?callable $failure = null) {
         try {
             return (new CRedis_Limiter_ConcurrencyLimiter(
                 $this->connection,

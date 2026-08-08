@@ -213,7 +213,7 @@ class CHTTP_Client_PendingRequest {
      *
      * @return void
      */
-    public function __construct(CHTTP_Client $factory = null, $middleware = []) {
+    public function __construct(?CHTTP_Client $factory = null, $middleware = []) {
         $this->factory = $factory;
         $this->middleware = new CCollection($middleware);
 

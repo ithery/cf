@@ -31,7 +31,7 @@ class CDaemon_ErrorHandler {
      *
      * @return bool
      */
-    public static function daemonError($errNo, $errStr, $errFile, $errLine, $errContext = null, Exception $e = null) {
+    public static function daemonError($errNo, $errStr, $errFile, $errLine, $errContext = null, ?Exception $e = null) {
         $runningService = CDaemon::getRunningService();
 
         // Respect the error_reporting Level

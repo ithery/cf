@@ -659,7 +659,7 @@ class CApp_Mobile_Detector {
      *                          from the $headers array instead.
      */
     public function __construct(
-        array $headers = null,
+        ?array $headers = null,
         $userAgent = null
     ) {
         $this->setHttpHeaders($headers);

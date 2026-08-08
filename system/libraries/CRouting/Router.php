@@ -926,7 +926,7 @@ class CRouting_Router {
      *
      * @return void
      */
-    public function model($key, $class, Closure $callback = null) {
+    public function model($key, $class, ?Closure $callback = null) {
         $this->bind($key, CRouting_RouteBinding::forModel($this->container, $class, $callback));
     }
 

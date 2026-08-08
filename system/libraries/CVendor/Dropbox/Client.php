@@ -419,7 +419,7 @@ class CVendor_Dropbox_Client {
     /**
      * @throws Exception
      */
-    protected function uploadChunk(int $type, StreamInterface &$stream, int $chunkSize, CVendor_Dropbox_UploadSessionCursor $cursor = null): CVendor_Dropbox_UploadSessionCursor {
+    protected function uploadChunk(int $type, StreamInterface &$stream, int $chunkSize, ?CVendor_Dropbox_UploadSessionCursor $cursor = null): CVendor_Dropbox_UploadSessionCursor {
         $maximumTries = $stream->isSeekable() ? $this->maxUploadChunkRetries : 0;
         $pos = $stream->tell();
 

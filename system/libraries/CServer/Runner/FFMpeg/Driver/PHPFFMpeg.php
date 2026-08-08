@@ -44,7 +44,7 @@ class CServer_Runner_FFMpeg_Driver_PHPFFMpeg {
      */
     private $media;
 
-    public function __construct(FFMpeg $ffmpeg = null) {
+    public function __construct(?FFMpeg $ffmpeg = null) {
         if ($ffmpeg == null) {
             $ffmpeg = FFMpeg::create();
         }

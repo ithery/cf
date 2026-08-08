@@ -22,7 +22,7 @@ class CDocument_Pdf_Document {
     protected float $marginBottom = 0;
 
     public function __construct(
-        CDocument_Pdf_Element_Rectangle $rectangle = null,
+        ?CDocument_Pdf_Element_Rectangle $rectangle = null,
         float $marginLeft = 36,
         float $marginRight = 36,
         float $marginTop = 36,

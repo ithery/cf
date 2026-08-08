@@ -230,7 +230,7 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
      * @param  \CDatabase_Connection  $connection
      * @return array|string
      */
-    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection = null) {
+    public function compileRenameColumn(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, ?CDatabase_Connection $connection = null) {
         return $connection->usingNativeSchemaOperations()
             ? sprintf(
                 'alter table %s rename column %s to %s',
@@ -251,7 +251,7 @@ class CDatabase_Schema_Grammar_PostgresGrammar extends CDatabase_Schema_Grammar 
      *
      * @throws \RuntimeException
      */
-    public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection = null) {
+    public function compileChange(CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, ?CDatabase_Connection $connection = null) {
         if (! $connection->usingNativeSchemaOperations()) {
             return parent::compileChange($blueprint, $command);
         }

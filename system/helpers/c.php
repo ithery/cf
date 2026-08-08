@@ -324,7 +324,7 @@ class c {
      *
      * @return mixed
      */
-    public static function with($value, callable $callback = null) {
+    public static function with($value, ?callable $callback = null) {
         return is_null($callback) ? $value : $callback($value);
     }
 
@@ -469,7 +469,7 @@ class c {
      *
      * @return mixed
      */
-    public static function optional($value = null, callable $callback = null) {
+    public static function optional($value = null, ?callable $callback = null) {
         if (is_null($callback)) {
             return new COptional($value);
         }

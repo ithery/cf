@@ -31,7 +31,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      * @param CDatabase_Schema_Config     $schemaConfig
      * @param array                       $namespaces
      */
-    public function __construct(array $tables = [], array $sequences = [], CDatabase_Schema_Config $schemaConfig = null, array $namespaces = []) {
+    public function __construct(array $tables = [], array $sequences = [], ?CDatabase_Schema_Config $schemaConfig = null, array $namespaces = []) {
         if ($schemaConfig == null) {
             $schemaConfig = new CDatabase_Schema_Config();
         }

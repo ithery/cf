@@ -4,7 +4,7 @@ class CEmail_Checker {
     /**
      * @param AdapterInterface $adapter Checker adapter
      */
-    public function __construct(CEmail_Contract_CheckerAdapterInterface $adapter = null) {
+    public function __construct(?CEmail_Contract_CheckerAdapterInterface $adapter = null) {
         $this->adapter = $adapter ?: new CEmail_Checker_Adapter_BuiltInAdapter();
     }
 

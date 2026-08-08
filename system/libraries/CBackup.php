@@ -81,7 +81,7 @@ class CBackup {
         return $row;
     }
 
-    protected static function getFormattedBackupDate(CBackup_Record $backup = null) {
+    protected static function getFormattedBackupDate(?CBackup_Record $backup = null) {
         return is_null($backup) ? 'No backups present' : CBackup_Helper::formatAgeInDays($backup->date());
     }
 

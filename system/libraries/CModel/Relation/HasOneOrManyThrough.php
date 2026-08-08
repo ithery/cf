@@ -103,7 +103,7 @@ abstract class CModel_Relation_HasOneOrManyThrough extends CModel_Relation {
      * @param  \CModel_Query<TRelatedModel>|null  $query
      * @return void
      */
-    protected function performJoin(CModel_Query $query = null) {
+    protected function performJoin(?CModel_Query $query = null) {
         $query = $query ?: $this->query;
 
         $farKey = $this->getQualifiedFarKeyName();
@@ -304,7 +304,7 @@ abstract class CModel_Relation_HasOneOrManyThrough extends CModel_Relation {
      * @param  (\Closure(): TValue)|null  $callback
      * @return TRelatedModel|TValue
      */
-    public function firstOr($columns = ['*'], Closure $callback = null) {
+    public function firstOr($columns = ['*'], ?Closure $callback = null) {
         if ($columns instanceof Closure) {
             $callback = $columns;
 
@@ -403,7 +403,7 @@ abstract class CModel_Relation_HasOneOrManyThrough extends CModel_Relation {
      *     : TRelatedModel|TValue
      * )
      */
-    public function findOr($id, $columns = ['*'], Closure $callback = null) {
+    public function findOr($id, $columns = ['*'], ?Closure $callback = null) {
         if ($columns instanceof Closure) {
             $callback = $columns;
 

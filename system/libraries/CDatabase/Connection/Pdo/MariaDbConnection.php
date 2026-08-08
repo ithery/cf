@@ -61,7 +61,7 @@ class CDatabase_Connection_Pdo_MariaDbConnection extends CDatabase_Connection_Pd
      *
      * @return \CDatabase_Schema_SchemaState_MariaDbSchemaState
      */
-    public function getSchemaState(callable $processFactory = null) {
+    public function getSchemaState(?callable $processFactory = null) {
         return new CDatabase_Schema_SchemaState_MariaDbSchemaState($this, $processFactory);
     }
 

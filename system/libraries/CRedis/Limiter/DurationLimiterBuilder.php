@@ -100,7 +100,7 @@ class CRedis_Limiter_DurationLimiterBuilder {
      *
      * @return mixed
      */
-    public function then(callable $callback, callable $failure = null) {
+    public function then(callable $callback, ?callable $failure = null) {
         try {
             return (new CRedis_Limiter_DurationLimiter(
                 $this->connection,

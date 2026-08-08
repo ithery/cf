@@ -417,7 +417,7 @@ trait CModel_HasResource_HasResourceTrait {
      * @param mixed $collectionName
      * @param mixed $conversionName
      */
-    public function getFirstTemporaryUrl(DateTimeInterface $expiration = null, $collectionName = 'default', $conversionName = '') {
+    public function getFirstTemporaryUrl(?DateTimeInterface $expiration = null, $collectionName = 'default', $conversionName = '') {
         $expiration = $expiration ?: c::now()->addMinutes(CF::config('resource.temporary_url_default_lifetime'));
 
         return $this->getResourceItemTemporaryUrl($expiration, $collectionName, $conversionName, CResources_Enum_CollectionPosition::FIRST);
@@ -431,7 +431,7 @@ trait CModel_HasResource_HasResourceTrait {
      * @param mixed $collectionName
      * @param mixed $conversionName
      */
-    public function getLastTemporaryUrl(DateTimeInterface $expiration = null, $collectionName = 'default', $conversionName = '') {
+    public function getLastTemporaryUrl(?DateTimeInterface $expiration = null, $collectionName = 'default', $conversionName = '') {
         $expiration = $expiration ?: c::now()->addMinutes(CF::config('resource.temporary_url_default_lifetime'));
 
         return $this->getResourceItemTemporaryUrl($expiration, $collectionName, $conversionName, CResources_Enum_CollectionPosition::LAST);
@@ -740,13 +740,13 @@ trait CModel_HasResource_HasResourceTrait {
         }
     }
 
-    public function registerResourceConversions(CModel_Resource_ResourceInterface $resource = null) {
+    public function registerResourceConversions(?CModel_Resource_ResourceInterface $resource = null) {
     }
 
     public function registerResourceCollections() {
     }
 
-    public function registerAllResourceConversions(CModel_Resource_ResourceInterface $resource = null) {
+    public function registerAllResourceConversions(?CModel_Resource_ResourceInterface $resource = null) {
         $this->registerResourceCollections();
         c::collect($this->resourceCollections)->each(function (CResources_ResourceCollection $resourceCollection) use ($resource) {
             $actualResourceConversions = $this->resourceConversions;

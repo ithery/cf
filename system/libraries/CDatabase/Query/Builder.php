@@ -212,7 +212,7 @@ class CDatabase_Query_Builder {
      */
     public $useWritePdo = false;
 
-    public function __construct(CDatabase_Connection $connection = null, CDatabase_Query_Grammar $grammar = null, CDatabase_Query_Processor $processor = null) {
+    public function __construct(?CDatabase_Connection $connection = null, ?CDatabase_Query_Grammar $grammar = null, ?CDatabase_Query_Processor $processor = null) {
         $connection = $connection ?: CDatabase::manager()->connection();
 
         $this->connection = $connection;

@@ -69,7 +69,7 @@ class CDatabase_Schema_Builder_MongoDBBuilder extends CDatabase_Schema_Builder {
     /**
      * @inheritdoc
      */
-    public function create($collection, Closure $callback = null, array $options = []) {
+    public function create($collection, ?Closure $callback = null, array $options = []) {
         $blueprint = $this->createBlueprint($collection);
 
         $blueprint->create($options);
@@ -111,7 +111,7 @@ class CDatabase_Schema_Builder_MongoDBBuilder extends CDatabase_Schema_Builder {
     /**
      * @inheritdoc
      */
-    protected function createBlueprint($collection, Closure $callback = null) {
+    protected function createBlueprint($collection, ?Closure $callback = null) {
         return new CDatabase_Schema_MongoDB_Blueprint($this->connection, $collection);
     }
 
