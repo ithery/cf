@@ -10,12 +10,24 @@ class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Ha
         CObservable_Listener_Handler_Trait_BlockerHandlerTrait,
         CObservable_Listener_Handler_Trait_ParamHandlerTrait;
 
+    /**
+     * @var string
+     */
     protected $content;
 
+    /**
+     * @var array
+     */
     protected $param;
 
+    /**
+     * @var string
+     */
     protected $checkDuplicateSelector;
 
+    /**
+     * @param CObservable_Listener $listener
+     */
     public function __construct($listener) {
         parent::__construct($listener);
         $this->name = 'Append';

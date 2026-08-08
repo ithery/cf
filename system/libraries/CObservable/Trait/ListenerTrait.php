@@ -29,6 +29,11 @@ trait CObservable_Trait_ListenerTrait {
         return $this->listeners[$event];
     }
 
+    /**
+     * @param string $event
+     *
+     * @return bool
+     */
     public function haveListener($event) {
         foreach ($this->listeners as $listener) {
             if ($listener->getEvent() == $event) {
@@ -39,6 +44,11 @@ trait CObservable_Trait_ListenerTrait {
         return false;
     }
 
+    /**
+     * @param string $event
+     *
+     * @return CObservable_Listener[]
+     */
     public function getListenersByEvent($event) {
         $return = [];
         foreach ($this->listeners as $listener) {

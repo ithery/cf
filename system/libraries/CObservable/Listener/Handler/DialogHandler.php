@@ -9,24 +9,54 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         CObservable_Listener_Handler_Trait_CloseHandlerTrait,
         CTrait_Element_Property_Title;
 
+    /**
+     * @var string
+     */
     protected $content;
 
+    /**
+     * @var array
+     */
     protected $param;
 
+    /**
+     * @var array
+     */
     protected $actions;
 
+    /**
+     * @var array
+     */
     protected $param_inputs;
 
+    /**
+     * @var array
+     */
     protected $param_request;
 
+    /**
+     * @var bool
+     */
     protected $isSidebar;
 
+    /**
+     * @var bool
+     */
     protected $isFull;
 
+    /**
+     * @var string
+     */
     protected $modalClass;
 
+    /**
+     * @var mixed
+     */
     protected $backdrop;
 
+    /**
+     * @param CObservable_Listener $listener
+     */
     public function __construct($listener) {
         parent::__construct($listener);
         $this->name = 'Dialog';
@@ -53,12 +83,22 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         return $this;
     }
 
+    /**
+     * @param string $class
+     *
+     * @return $this
+     */
     public function setModalClass($class) {
         $this->modalClass = $class;
 
         return $this;
     }
 
+    /**
+     * @param mixed $backdrop
+     *
+     * @return $this
+     */
     public function setBackdrop($backdrop) {
         $this->backdrop = $backdrop;
 
@@ -87,6 +127,11 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         return $this;
     }
 
+    /**
+     * @param string $method
+     *
+     * @return $this
+     */
     public function setMethod($method) {
         $this->method = $method;
 

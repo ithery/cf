@@ -5,6 +5,9 @@ class CObservable_Listener_Handler_AjaxHandler extends CObservable_Listener_Hand
         CObservable_Listener_Handler_Trait_TargetHandlerTrait,
         CObservable_Listener_Handler_Trait_ParamHandlerTrait;
 
+    /**
+     * @param CObservable_Listener $listener
+     */
     public function __construct($listener) {
         parent::__construct($listener);
         $this->name = 'Ajax';

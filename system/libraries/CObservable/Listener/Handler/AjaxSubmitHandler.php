@@ -6,6 +6,9 @@ class CObservable_Listener_Handler_AjaxSubmitHandler extends CObservable_Listene
     use CObservable_Listener_Handler_Trait_AjaxHandlerTrait,
         CObservable_Listener_Handler_Trait_TargetHandlerTrait;
 
+    /**
+     * @param CObservable_Listener $listener
+     */
     public function __construct($listener) {
         parent::__construct($listener);
         $this->name = 'AjaxSubmit';

@@ -3,6 +3,7 @@ use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverPoint;
 use Facebook\WebDriver\WebDriverDimension;
 use Facebook\WebDriver\Remote\WebDriverBrowserType;
+
 /**
  * @see https://github.com/laravel/dusk
  */
@@ -428,8 +429,7 @@ class CTesting_Browser {
     /**
      * Switch to a specified frame in the browser and execute the given callback.
      *
-     * @param string   $selector
-     * @param \Closure $callback
+     * @param string $selector
      *
      * @return $this
      */
@@ -446,8 +446,7 @@ class CTesting_Browser {
     /**
      * Execute a Closure with a scoped browser instance.
      *
-     * @param string   $selector
-     * @param \Closure $callback
+     * @param string $selector
      *
      * @return $this
      */
@@ -458,8 +457,7 @@ class CTesting_Browser {
     /**
      * Execute a Closure with a scoped browser instance.
      *
-     * @param string   $selector
-     * @param \Closure $callback
+     * @param string $selector
      *
      * @return $this
      */
@@ -485,8 +483,7 @@ class CTesting_Browser {
     /**
      * Execute a Closure outside of the current browser scope.
      *
-     * @param string   $selector
-     * @param \Closure $callback
+     * @param string $selector
      *
      * @return $this
      */
@@ -512,8 +509,7 @@ class CTesting_Browser {
     /**
      * Execute a Closure outside of the current browser scope when the selector is available.
      *
-     * @param string   $selector
-     * @param \Closure $callback
+     * @param string $selector
      *
      * @return $this
      */
