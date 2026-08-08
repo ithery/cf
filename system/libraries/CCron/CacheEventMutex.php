@@ -40,7 +40,7 @@ class CCron_CacheEventMutex implements CCron_Contract_EventMutexInterface, CCron
      * @return bool
      */
     public function exists(CCron_Event $event) {
-        return $this->cache->store($this->store)->has($event->mutexName());
+        return CCache::manager()->store($this->store)->has($event->mutexName());
     }
 
     /**
@@ -51,7 +51,7 @@ class CCron_CacheEventMutex implements CCron_Contract_EventMutexInterface, CCron
      * @return void
      */
     public function forget(CCron_Event $event) {
-        $this->cache->store($this->store)->forget($event->mutexName());
+        CCache::manager()->store($this->store)->forget($event->mutexName());
     }
 
     /**
