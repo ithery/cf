@@ -80,9 +80,14 @@ class CDevSuite_Command_DevCloud_Collector_ExceptionCommand extends CDevSuite_Co
         $cfCommand->line('<info>Stacktrace</info>');
 
         foreach ($shown as $i => $frame) {
-            $call = carr::get($frame, 'class') . carr::get($frame, 'type') . carr::get($frame, 'function');
+            //the collector stores its own frame shape - file/class/method/
+            //line_number - not debug_backtrace()'s file/class/type/function
+            $class = (string) carr::get($frame, 'class');
+            $method = (string) carr::get($frame, 'method');
+            $call = $class === '' ? $method : $class . '::' . $method;
+
             $cfCommand->line(
-                '#' . $i . ' ' . carr::get($frame, 'file') . ':' . carr::get($frame, 'line')
+                '#' . $i . ' ' . carr::get($frame, 'file') . ':' . carr::get($frame, 'line_number')
                 . ($call === '' ? '' : '  ' . $call . '()')
             );
         }
