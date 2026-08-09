@@ -329,7 +329,7 @@ class CApp implements CInterface_Responsable, Renderable, Jsonable {
      * @return bool
      */
     public static function isAjax() {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) and is_string($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
     /**
