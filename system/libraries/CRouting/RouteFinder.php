@@ -35,7 +35,11 @@ class CRouting_RouteFinder {
 
         if (class_exists($className)) {
             $routedUri = strtolower($routeData->getControllerDir()) . $routeData->getController();
-            $routedUri .= '/' . $method;
+            // Strip { and } before splicing into the pattern - a raw method segment
+            // containing them (e.g. a scanner probe with "${IFS}" repeated) gets misread
+            // by Symfony's route compiler as a {varname} token and throws. $method itself
+            // (used below for the real @method dispatch) is untouched.
+            $routedUri .= '/' . str_replace(['{', '}'], '', $method);
 
             $arguments = $routeData->getArguments();
             //cdbg::dd($routeData);
