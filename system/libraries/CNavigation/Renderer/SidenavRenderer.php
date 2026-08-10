@@ -26,6 +26,10 @@ class CNavigation_Renderer_SidenavRenderer extends CNavigation_RendererAbstract 
         if (!is_array($navs)) {
             return '';
         }
+        //section heading yang tertunda: baru ikut dirender ketika ada item
+        //sesudahnya yang benar-benar tampil, supaya heading tidak pernah
+        //berdiri tanpa isi ketika seluruh itemnya tersaring hak akses
+        $pendingHeading = '';
         foreach ($navs as $d) {
             $child = 0;
             $pass = 0;
@@ -36,6 +40,17 @@ class CNavigation_Renderer_SidenavRenderer extends CNavigation_RendererAbstract 
             $translate = carr::get($d, 'translate', true);
             $icon = carr::get($d, 'icon');
             $class = carr::get($d, 'class');
+
+            //item dengan 'heading' => true adalah label seksi statis, bukan tautan
+            if (carr::get($d, 'heading')) {
+                if (!Helper::accessAvailable($d, CF::appId(), $domain)) {
+                    continue;
+                }
+                $pendingHeading = '<li class="sidenav-heading' . (strlen((string) $class) ? ' ' . $class : '') . '"><span>'
+                    . ($translate ? c::__($label) : $label) . '</span></li>';
+
+                continue;
+            }
             $badge = carr::get($d, 'badge');
             if ($badge != null) {
                 $badge = c::value($badge);
@@ -68,6 +83,11 @@ class CNavigation_Renderer_SidenavRenderer extends CNavigation_RendererAbstract 
                 }
 
                 $childCount++;
+
+                if (strlen($pendingHeading) > 0) {
+                    $html .= $pendingHeading;
+                    $pendingHeading = '';
+                }
 
                 $border = carr::get($d, 'border');
 
