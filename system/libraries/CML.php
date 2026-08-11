@@ -149,6 +149,219 @@ class CML {
         return $result;
     }
 
+    /**
+     * Association rule mining (Apriori) atas keranjang transaksi.
+     *
+     * Menjawab pertanyaan yang berbeda dari itemCollaborativeSimilarity():
+     * bukan "produk apa yang mirip dengan A" melainkan "kalau seseorang
+     * membeli A dan B, apa lagi yang biasanya ikut" — bentuk yang berguna
+     * untuk paket bundling dan promo, dan yang hasilnya dapat dibaca manusia.
+     *
+     * Tiga ukuran dikembalikan sekaligus karena masing-masing sendirian
+     * menyesatkan:
+     *
+     * - **support** — seberapa sering kombinasinya muncul. Besar berarti
+     *   layak digarap, tetapi tidak berarti berkaitan.
+     * - **confidence** — dari yang membeli antecedent, berapa bagian yang
+     *   ikut membeli consequent. Terlihat meyakinkan, tetapi tinggi dengan
+     *   sendirinya untuk barang yang memang laris — hampir semua orang
+     *   membelinya, apa pun isi keranjang lainnya.
+     * - **lift** — confidence dibagi support consequent. Inilah yang
+     *   memisahkan keterkaitan sejati dari sekadar populer: lift 1 berarti
+     *   tidak berhubungan, di atas 1 berarti kehadiran antecedent
+     *   benar-benar menaikkan peluang consequent.
+     *
+     * Apriori memangkas dengan sifat anti-monoton: sebuah kombinasi tidak
+     * mungkin sering muncul kalau bagiannya saja jarang. Tanpa itu jumlah
+     * kombinasi yang harus dihitung meledak kombinatorial.
+     *
+     * @param array $transactions   daftar transaksi, tiap transaksi daftar id item
+     * @param float $minSupport     ambang kemunculan, sebagai pecahan dari
+     *                              jumlah transaksi (0.01 = muncul di 1% transaksi)
+     * @param float $minConfidence  ambang confidence sebuah aturan
+     * @param int   $maxItemsetSize batas ukuran kombinasi; tiap tingkat menaikkan
+     *                              biayanya, dan aturan beranggota banyak jarang
+     *                              dapat ditindaklanjuti
+     *
+     * @return array daftar aturan {antecedent[], consequent, support, confidence, lift},
+     *               terurut menurun menurut lift
+     */
+    public static function associationRules(
+        array $transactions,
+        $minSupport = 0.01,
+        $minConfidence = 0.3,
+        $maxItemsetSize = 3
+    ) {
+        $baskets = [];
+        foreach ($transactions as $itemIds) {
+            $itemIds = array_values(array_unique(array_filter($itemIds)));
+            if (count($itemIds) > 0) {
+                sort($itemIds);
+                $baskets[] = $itemIds;
+            }
+        }
+
+        $total = count($baskets);
+        if ($total == 0) {
+            return [];
+        }
+
+        $minCount = max(1, (int) ceil($minSupport * $total));
+        $frequent = [];
+
+        //Tingkat 1: item tunggal.
+        $counts = [];
+        foreach ($baskets as $itemIds) {
+            foreach ($itemIds as $itemId) {
+                $counts[$itemId] = carr::get($counts, $itemId, 0) + 1;
+            }
+        }
+        $level = [];
+        foreach ($counts as $itemId => $count) {
+            if ($count >= $minCount) {
+                $level[] = [$itemId];
+                $frequent[(string) $itemId] = $count;
+            }
+        }
+
+        //Tingkat berikutnya: gabungkan yang sering muncul, buang yang bagiannya
+        //sendiri sudah jarang, baru hitung ke transaksi.
+        for ($size = 2; $size <= $maxItemsetSize && count($level) > 0; $size++) {
+            $candidates = static::joinItemsets($level, $frequent);
+            if (count($candidates) == 0) {
+                break;
+            }
+
+            $counts = [];
+            foreach ($baskets as $itemIds) {
+                if (count($itemIds) < $size) {
+                    continue;
+                }
+                $lookup = array_flip($itemIds);
+                foreach ($candidates as $key => $candidate) {
+                    $found = true;
+                    foreach ($candidate as $itemId) {
+                        if (!isset($lookup[$itemId])) {
+                            $found = false;
+
+                            break;
+                        }
+                    }
+                    if ($found) {
+                        $counts[$key] = carr::get($counts, $key, 0) + 1;
+                    }
+                }
+            }
+
+            $level = [];
+            foreach ($counts as $key => $count) {
+                if ($count >= $minCount) {
+                    $level[] = $candidates[$key];
+                    $frequent[$key] = $count;
+                }
+            }
+        }
+
+        return static::buildRules($frequent, $total, $minConfidence);
+    }
+
+    /**
+     * Kandidat kombinasi berikutnya, sudah dipangkas.
+     *
+     * @param array $level    kombinasi sering-muncul berukuran k
+     * @param array $frequent kunci kombinasi => jumlah kemunculan
+     *
+     * @return array kunci => kombinasi berukuran k+1
+     */
+    protected static function joinItemsets(array $level, array $frequent) {
+        $candidates = [];
+        $count = count($level);
+
+        for ($i = 0; $i < $count; $i++) {
+            for ($j = $i + 1; $j < $count; $j++) {
+                $merged = array_values(array_unique(array_merge($level[$i], $level[$j])));
+                if (count($merged) != count($level[$i]) + 1) {
+                    continue;
+                }
+                sort($merged);
+                $key = implode(',', $merged);
+                if (isset($candidates[$key])) {
+                    continue;
+                }
+
+                //Sifat anti-monoton: kalau ada bagiannya yang sudah jarang,
+                //gabungannya mustahil sering — dibuang sebelum menyentuh data.
+                $keep = true;
+                foreach ($merged as $itemId) {
+                    $subset = array_values(array_diff($merged, [$itemId]));
+                    if (!isset($frequent[implode(',', $subset)])) {
+                        $keep = false;
+
+                        break;
+                    }
+                }
+                if ($keep) {
+                    $candidates[$key] = $merged;
+                }
+            }
+        }
+
+        return $candidates;
+    }
+
+    /**
+     * Menurunkan aturan dari kombinasi yang sering muncul.
+     *
+     * Hanya consequent tunggal — "kalau beli A dan B, beli juga C" dapat
+     * ditindaklanjuti, sedangkan "beli juga C dan D" jarang berguna dan
+     * melipatgandakan jumlah aturannya.
+     *
+     * @param array $frequent      kunci kombinasi => jumlah kemunculan
+     * @param int   $total         jumlah transaksi
+     * @param float $minConfidence
+     *
+     * @return array
+     */
+    protected static function buildRules(array $frequent, $total, $minConfidence) {
+        $rules = [];
+
+        foreach ($frequent as $key => $count) {
+            $itemset = explode(',', $key);
+            if (count($itemset) < 2) {
+                continue;
+            }
+
+            foreach ($itemset as $consequent) {
+                $antecedent = array_values(array_diff($itemset, [$consequent]));
+                $antecedentKey = implode(',', $antecedent);
+                $antecedentCount = carr::get($frequent, $antecedentKey);
+                $consequentCount = carr::get($frequent, (string) $consequent);
+                if (!$antecedentCount || !$consequentCount) {
+                    continue;
+                }
+
+                $confidence = $count / $antecedentCount;
+                if ($confidence < $minConfidence) {
+                    continue;
+                }
+
+                $rules[] = [
+                    'antecedent' => array_map('intval', $antecedent),
+                    'consequent' => (int) $consequent,
+                    'support' => $count / $total,
+                    'confidence' => $confidence,
+                    'lift' => $confidence / ($consequentCount / $total),
+                ];
+            }
+        }
+
+        usort($rules, function ($a, $b) {
+            return $b['lift'] <=> $a['lift'];
+        });
+
+        return $rules;
+    }
+
     public static function textSimilarity($text, array $candidates) {
         if (empty($candidates)) {
             return [];
