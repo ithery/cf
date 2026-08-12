@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS `oauth_auth_code`;
 CREATE TABLE `oauth_auth_code` (
-  `oauth_code_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `oauth_auth_code_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `org_id` bigint(20) unsigned DEFAULT NULL,
   `user_id` bigint(20) unsigned DEFAULT NULL,
   `user_type` varchar(255) DEFAULT NULL,
