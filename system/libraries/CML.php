@@ -79,16 +79,24 @@ class CML {
      * Hanya pasangan yang pernah muncul bersama yang dihitung — pasangan
      * lain cosine-nya nol, jadi menghitungnya hanya membuang waktu O(n^2).
      *
+     * Cosine tidak mengenal seberapa banyak bukti di balik sebuah skor: dua
+     * item yang masing-masing hanya pernah muncul sekali, dan kebetulan di
+     * keranjang yang sama, punya vektor identik sehingga skornya 1 — nilai
+     * tertinggi yang mungkin, dari satu kejadian. $minPairSupport menyaringnya
+     * dengan menuntut sejumlah keranjang sebelum sebuah pasangan dianggap.
+     *
      * @param array $transactions          daftar transaksi, tiap transaksi daftar id item
      * @param int   $topK                  jumlah item terkait yang dikembalikan per item
      * @param int   $maxItemPerTransaction transaksi dengan item lebih banyak
      *                                     dari ini dilewati - pasangannya
      *                                     meledak kuadratik dan keranjang
      *                                     sebesar itu jarang belanja biasa
+     * @param int   $minPairSupport        jumlah keranjang minimum yang memuat
+     *                                     kedua item; 1 berarti tanpa penyaringan
      *
      * @return array id item => [id item terkait => skor 0..1], terurut menurun
      */
-    public static function itemCollaborativeSimilarity(array $transactions, $topK = 20, $maxItemPerTransaction = 40) {
+    public static function itemCollaborativeSimilarity(array $transactions, $topK = 20, $maxItemPerTransaction = 40, $minPairSupport = 1) {
         $vectors = [];
         $pairs = [];
 
@@ -105,8 +113,13 @@ class CML {
             }
             for ($i = 0; $i < $size; $i++) {
                 for ($j = $i + 1; $j < $size; $j++) {
-                    $pairs[$itemIds[$i]][$itemIds[$j]] = true;
-                    $pairs[$itemIds[$j]][$itemIds[$i]] = true;
+                    $left = $itemIds[$i];
+                    $right = $itemIds[$j];
+                    //dihitung, bukan ditandai: jumlah keranjang yang memuat
+                    //keduanya itulah bukti di balik skornya
+                    $support = isset($pairs[$left][$right]) ? $pairs[$left][$right] + 1 : 1;
+                    $pairs[$left][$right] = $support;
+                    $pairs[$right][$left] = $support;
                 }
             }
         }
@@ -120,7 +133,10 @@ class CML {
 
         foreach ($pairs as $itemId => $candidates) {
             $scores = [];
-            foreach (array_keys($candidates) as $otherId) {
+            foreach ($candidates as $otherId => $pairSupport) {
+                if ($pairSupport < $minPairSupport) {
+                    continue;
+                }
                 //Rubix menuntut kedua vektor sepanjang dan seurut sama, jadi
                 //vektor jarang di atas dipadatkan hanya pada transaksi yang
                 //disentuh salah satu dari keduanya - hasilnya sama dengan
