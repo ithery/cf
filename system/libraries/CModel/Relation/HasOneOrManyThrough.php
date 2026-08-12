@@ -234,7 +234,14 @@ abstract class CModel_Relation_HasOneOrManyThrough extends CModel_Relation {
                 return $this->create(array_merge($attributes, c::value($values)));
             });
         } catch (CDatabase_Exception_UniqueConstraintViolationException $exception) {
-            return $this->where($attributes)->first() ?? throw $exception;
+            //`?? throw` adalah ekspresi throw PHP 8.0; PHP 7.4 gagal mem-parse
+            //seluruh berkas ini karenanya, bukan hanya baris ini
+            $model = $this->where($attributes)->first();
+            if ($model == null) {
+                throw $exception;
+            }
+
+            return $model;
         }
     }
 
