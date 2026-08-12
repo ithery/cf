@@ -9,7 +9,7 @@ Branches: `master` (main), `development`. Docs: `application/cresenity/default/d
 ```bash
 phpcf test                               # Tests (from root=framework, from app dir=app tests)
 phpcf tinker --execute='...'             # REPL against real DB/models (run from the app dir)
-./system/vendor/PHPStan/phpstan analyse  # PHPStan level 4
+phpcf phpstan <path>                     # PHPStan level 4 (one path per run)
 php-cs-fixer fix                         # Code format
 cd media/js/cres && npm run build        # JS build
 ```
