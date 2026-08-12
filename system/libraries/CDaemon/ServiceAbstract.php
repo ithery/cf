@@ -1058,6 +1058,8 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             fclose(STDIN);
         }
 
+        $this->closeInheritedConnections();
+
         $runner = $this->runner();
 
         if ($rotateLog) {
@@ -1068,6 +1070,31 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
         // A new daemon process has been created. This one will stick around just long enough to clean up the worker processes.
         exit();
+    }
+
+    /**
+     * Close pooled Redis and database connections before the daemon re-executes itself.
+     *
+     * @return void
+     */
+    protected function closeInheritedConnections() {
+        try {
+            $redis = CRedis::instance();
+            foreach (array_keys($redis->connections()) as $name) {
+                $redis->purge($name);
+            }
+        } catch (Throwable $ex) {
+            //bersih-bersih tidak boleh menggagalkan restart
+        }
+
+        try {
+            $manager = CDatabase::manager();
+            foreach (array_keys($manager->getConnections()) as $name) {
+                $manager->disconnect($name);
+            }
+        } catch (Throwable $ex) {
+            //bersih-bersih tidak boleh menggagalkan restart
+        }
     }
 
     /**

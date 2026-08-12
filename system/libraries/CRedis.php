@@ -220,6 +220,14 @@ class CRedis implements CRedis_FactoryInterface {
      */
     public function purge($name = null) {
         $name = $name ?: 'default';
+        $connection = carr::get($this->connections, $name);
+        if ($connection != null && method_exists($connection, 'disconnect')) {
+            try {
+                $connection->disconnect();
+            } catch (Throwable $ex) {
+                //koneksi yang sudah putus tetap harus lepas dari cache
+            }
+        }
 
         unset($this->connections[$name]);
     }
