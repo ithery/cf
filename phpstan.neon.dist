@@ -127,6 +127,17 @@ services:
         arguments:
             checkProperties: %checkModelProperties%
     -
+        class: CQC_Phpstan_Service_MacroMethodsClassReflectionExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    #CQC_Phpstan_Service_Rule_NoModelMakeRule sengaja TIDAK didaftarkan.
+    #Ia sisa porting Larastan yang semantiknya tidak berlaku di sini: acuannya
+    #`Model::class` milik Laravel (tidak ada di CF, jadi tidak pernah menyala),
+    #dan `make()` di CF adalah pabrik yang me-resolve model dari nama
+    #(`TBModel::make('ShareNetwork')`), bukan `Model::make(array $attributes)`.
+    #Menyalakannya berarti menyarankan `new Model()` untuk pemanggilan yang
+    #tidak setara. Lihat docs/TODO.md.
+    -
         class: CQC_Phpstan_Service_Rule_StringToClassRule
         tags:
             - phpstan.rules.rule
