@@ -8,7 +8,14 @@ parameters:
     earlyTerminatingFunctionCalls:
         - c::abort
         - cdbg::dd
-    checkUnusedViews: true
+    #checkUnusedViews sengaja tidak ada. Ia sempat dideklarasikan tetapi tidak
+    #ada kelas yang membacanya, jadi hanya memberi kesan pemeriksaan itu aktif.
+    #Rule "unused views" Larastan juga tidak dapat dipindahkan apa adanya ke
+    #sini: berkas *.blade.php dikecualikan dari analyseAndScan sehingga
+    #collectornya tidak punya apa pun untuk dikumpulkan, dan CF merujuk view
+    #dalam dua notasi sekaligus - addView('block.card.small') dan
+    #addView('block/card/small') - sehingga collector yang hanya mengenali satu
+    #bentuk akan melaporkan view yang hidup sebagai mati. Lihat docs/TODO.md.
     checkModelProperties: true
     reportUnmatchedIgnoredErrors: false
     excludePaths:
@@ -29,7 +36,6 @@ parameters:
 
 parametersSchema:
     checkModelProperties: bool()
-    checkUnusedViews: bool()
 
 conditionalTags:
     CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertyRule:
