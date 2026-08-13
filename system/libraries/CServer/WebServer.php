@@ -63,6 +63,16 @@ class CServer_WebServer {
      */
     public function inspect() {
         $script = ''
+            //Sebagian server hanya mengizinkan masuk sebagai pengguna biasa
+            //yang ber-sudo, sementara direktori konfigurasi webserver tidak
+            //dapat ditembusnya - `/usr/local/lsws/conf` lazimnya hanya milik
+            //root. Tanpa cadangan `sudo -n`, pemeriksaan direktorinya gagal
+            //diam-diam: tidak ada galat, hanya vhost yang selalu kosong.
+            //Pola cadangan ini sama dengan yang sudah dipakai readFile().
+            . '_isdir() { [ -d "$1" ] || sudo -n test -d "$1" 2>/dev/null; }; '
+            . '_isfile() { [ -f "$1" ] || sudo -n test -f "$1" 2>/dev/null; }; '
+            . '_count() { n=$(ls -1 "$1" 2>/dev/null | wc -l); '
+            . '  [ "$n" -eq 0 ] && n=$(sudo -n ls -1 "$1" 2>/dev/null | wc -l); echo "$n"; }; '
             //status layanan; nama unit berbeda antar distribusi
             . 'for u in lsws lshttpd openlitespeed nginx httpd apache2; do '
             . '  s=$(systemctl is-active $u 2>/dev/null); [ -n "$s" ] && echo "SVC|$u|$s"; '
@@ -74,16 +84,19 @@ class CServer_WebServer {
             . 'command -v nginx >/dev/null 2>&1 && echo "VER|nginx|$(nginx -v 2>&1)"; '
             . 'command -v httpd >/dev/null 2>&1 && echo "VER|apache|$(httpd -v 2>&1 | head -1)"; '
             . 'command -v apache2 >/dev/null 2>&1 && echo "VER|apache|$(apache2 -v 2>&1 | head -1)"; '
-            //port yang benar-benar didengarkan, beserta proses pemiliknya
-            . 'ss -lntp 2>/dev/null | awk \'NR>1 {print "PORT|" $4 "|" $6}\'; '
+            //Port yang benar-benar didengarkan, beserta proses pemiliknya.
+            //Nama proses hanya terlihat untuk proses milik sendiri, sedangkan
+            //webserver berjalan sebagai root - tanpa sudo kolomnya kosong dan
+            //port tidak pernah tercocokkan ke tipe webservernya.
+            . '(sudo -n ss -lntp 2>/dev/null || ss -lntp 2>/dev/null) | awk \'NR>1 {print "PORT|" $4 "|" $6}\'; '
             //konfigurasi dan jumlah vhost
-            . '[ -d /usr/local/lsws/conf ] && echo "CONF|litespeed|/usr/local/lsws/conf/httpd_config.conf"; '
-            . '[ -d /usr/local/lsws/conf/vhosts ] && echo "VHOST|litespeed|$(ls -1 /usr/local/lsws/conf/vhosts 2>/dev/null | wc -l)"; '
-            . '[ -f /etc/nginx/nginx.conf ] && echo "CONF|nginx|/etc/nginx/nginx.conf"; '
-            . '[ -d /etc/nginx/sites-enabled ] && echo "VHOST|nginx|$(ls -1 /etc/nginx/sites-enabled 2>/dev/null | wc -l)"; '
-            . '[ -d /etc/nginx/conf.d ] && echo "VHOSTD|nginx|$(ls -1 /etc/nginx/conf.d/*.conf 2>/dev/null | wc -l)"; '
-            . '[ -f /etc/httpd/conf/httpd.conf ] && echo "CONF|apache|/etc/httpd/conf/httpd.conf"; '
-            . '[ -f /etc/apache2/apache2.conf ] && echo "CONF|apache|/etc/apache2/apache2.conf"';
+            . '_isdir /usr/local/lsws/conf && echo "CONF|litespeed|/usr/local/lsws/conf/httpd_config.conf"; '
+            . '_isdir /usr/local/lsws/conf/vhosts && echo "VHOST|litespeed|$(_count /usr/local/lsws/conf/vhosts)"; '
+            . '_isfile /etc/nginx/nginx.conf && echo "CONF|nginx|/etc/nginx/nginx.conf"; '
+            . '_isdir /etc/nginx/sites-enabled && echo "VHOST|nginx|$(_count /etc/nginx/sites-enabled)"; '
+            . '_isdir /etc/nginx/conf.d && echo "VHOSTD|nginx|$(ls -1 /etc/nginx/conf.d/*.conf 2>/dev/null | wc -l)"; '
+            . '_isfile /etc/httpd/conf/httpd.conf && echo "CONF|apache|/etc/httpd/conf/httpd.conf"; '
+            . '_isfile /etc/apache2/apache2.conf && echo "CONF|apache|/etc/apache2/apache2.conf"';
 
         $output = $this->run($script);
 
