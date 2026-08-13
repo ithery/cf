@@ -609,6 +609,8 @@ class c {
      * @param null|mixed        $default
      *
      * @return CSession_Store|mixed
+     *
+     * @phpstan-return ($key is null ? CSession_Store : mixed)
      */
     public static function session($key = null, $default = null) {
         if ($key === null) {
@@ -1093,6 +1095,8 @@ class c {
      * @param array       $parameters
      *
      * @return CContainer_Container|mixed
+     *
+     * @phpstan-return ($abstract is null ? CContainer_Container : mixed)
      */
     public static function container($abstract = null, array $parameters = []) {
         if (is_null($abstract)) {
@@ -1107,6 +1111,8 @@ class c {
      * @param mixed       $default
      *
      * @return CConfig_Repository|mixed
+     *
+     * @phpstan-return ($key is null ? CConfig_Repository : mixed)
      */
     public static function config($key = null, $default = null) {
         if ($key == null) {
@@ -1486,6 +1492,8 @@ class c {
      * @param null|mixed  $default
      *
      * @return CManager_Theme|mixed
+     *
+     * @phpstan-return ($key is null ? CManager_Theme : mixed)
      */
     public static function theme($key = null, $default = null) {
         if ($key !== null) {
