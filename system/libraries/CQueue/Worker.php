@@ -525,13 +525,31 @@ class CQueue_Worker {
                 if (!CF::isProduction()) {
                     CDaemon::log($e->getTraceAsString());
                 }
-                CLogger::error('QueueException:' . $job->resolveName(), [
-                    'job' => $job,
-                    'connection' => $connectionName,
-                    'options' => $options,
-                    'message' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
+                //Jejak di log daemon tetap ditulis apa pun jenisnya, karena di
+                //sanalah riwayat satu daemon dibaca. Yang disaring adalah
+                //pencatatan bertingkat ERROR: pengecualian yang sudah ditandai
+                //"jangan dilaporkan" bukan kegagalan, dan sebelumnya tetap
+                //tercatat sebagai ERROR di sini - kontraknya hanya dihormati
+                //pada cabang non-daemon, yang memakai report().
+                if ($this->exceptions->shouldReport($e)) {
+                    CLogger::error('QueueException:' . $job->resolveName(), [
+                        'job' => $job,
+                        'connection' => $connectionName,
+                        'options' => $options,
+                        'message' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    //Sebelumnya kegagalan job di dalam daemon tidak pernah
+                    //sampai ke collector: hanya cabang non-daemon yang
+                    //memanggil report(), padahal antrean CF lazimnya justru
+                    //dijalankan daemon. Collector dipanggil langsung, bukan
+                    //lewat report(), karena report() menulis lognya sendiri -
+                    //memakainya di sini berarti dua baris ERROR untuk satu
+                    //kegagalan, dan baris berkonteks di atas yang lebih
+                    //berguna. collectException() punya penjaga konfigurasinya
+                    //sendiri, jadi tetap diam ketika collector dimatikan.
+                    CDebug::collector()->collectException($e);
+                }
             } else {
                 $this->exceptions->report($e);
             }

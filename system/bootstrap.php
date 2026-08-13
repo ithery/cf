@@ -21,7 +21,12 @@ $domain = CF::domain();
 CException::init();
 CModel::setEventDispatcher(CEvent::dispatcher());
 if (CF::config('collector.exception')) {
-    CException::exceptionHandler()->reportable(function (Exception $e) {
+    //Bertipe Throwable, bukan Exception: pemilihan callback memakai
+    //`is_a($e, <tipe parameter pertama>)`, sedangkan Error di PHP 7+ bukan
+    //turunan Exception - keduanya hanya berbagi Throwable. Dengan tipe lama,
+    //justru galat yang paling perlu terlihat (TypeError dan kerabatnya) tidak
+    //pernah terkumpul.
+    CException::exceptionHandler()->reportable(function (Throwable $e) {
         CDebug::collector()->collectException($e);
     });
 }
