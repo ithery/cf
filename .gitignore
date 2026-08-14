@@ -99,6 +99,14 @@ botlog.log
 
 #ignore claude code local settings
 .claude/settings.local.json
+
+#ignore graphify
+graphify-out/.graphify_*.json
+graphify-out/.graphify_python
+graphify-out/.graphify_root
+graphify-out/cost.json
+**/graphify-out/cache/
+
 .php_cs.cache
 *.py
 
