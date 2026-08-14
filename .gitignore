@@ -107,6 +107,7 @@ botlog.log
 **/graphify-out/.graphify_root
 **/graphify-out/cost.json
 **/graphify-out/cache/
+**/graphify-out/.rebuild.lock
 
 .php_cs.cache
 *.py
