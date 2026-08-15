@@ -14,19 +14,52 @@ class CServer_Php {
     protected $phpBinary;
 
     /**
-     * @param CServer_Server $server
-     * @param null|string    $phpBinary
+     * @param null|string $phpBinary
      */
     public function __construct(CServer_Server $server, $phpBinary = null) {
         $this->server = $server;
-        $this->phpBinary = $phpBinary ?: 'php';
+        $this->phpBinary = $phpBinary;
+    }
+
+    /**
+     * Biner PHP yang dipakai untuk server ini.
+     *
+     * Bila tidak disebutkan saat dibuat, ia dicari pada pemakaian pertama:
+     * `php` bila memang ada di PATH, kalau tidak versi LiteSpeed tertinggi
+     * yang terpasang. `php` telanjang tidak dapat diandalkan pada server
+     * remote — PATH pengguna SSH lazim hanya `/usr/local/bin:/usr/bin`,
+     * sedangkan PHP-nya berada di `/usr/local/lsws/lsphpXX/bin/php`. Gejalanya
+     * menyesatkan: perintahnya tidak menghasilkan apa pun, sehingga pemanggil
+     * yang mengurai keluarannya melapor gagal membaca berkas, bukan gagal
+     * menemukan PHP.
+     *
+     * Hasilnya disimpan selama instance hidup, jadi pencariannya satu kali.
+     *
+     * @return string
+     */
+    public function getPhpBinary() {
+        if ($this->phpBinary === null) {
+            $this->phpBinary = $this->detectPhpBinary();
+        }
+
+        return $this->phpBinary;
     }
 
     /**
      * @return string
      */
-    public function getPhpBinary() {
-        return $this->phpBinary;
+    protected function detectPhpBinary() {
+        if (!$this->server->isRemote()) {
+            return 'php';
+        }
+
+        $output = trim((string) $this->server->runCommand(
+            'command -v php 2>/dev/null || ls -1 /usr/local/lsws/lsphp*/bin/php 2>/dev/null | sort -Vr | head -1'
+        ));
+
+        $binary = trim((string) strtok($output, "\n"));
+
+        return strlen($binary) > 0 ? $binary : 'php';
     }
 
     /**
@@ -41,7 +74,7 @@ class CServer_Php {
      */
     public function getVersion() {
         if ($this->server->isRemote()) {
-            return trim($this->server->runCommand($this->phpBinary . ' -r "echo phpversion();"'));
+            return trim($this->server->runCommand($this->getPhpBinary() . ' -r "echo phpversion();"'));
         }
 
         return phpversion();
@@ -54,7 +87,7 @@ class CServer_Php {
      */
     public function getExtVersion($extName) {
         if ($this->server->isRemote()) {
-            return trim($this->server->runCommand($this->phpBinary . ' -r "echo phpversion(\'' . $extName . '\');"'));
+            return trim($this->server->runCommand($this->getPhpBinary() . ' -r "echo phpversion(\'' . $extName . '\');"'));
         }
 
         return phpversion($extName);
@@ -65,7 +98,7 @@ class CServer_Php {
      */
     public function getAllIniConfiguration() {
         if ($this->server->isRemote()) {
-            $output = trim($this->server->runCommand($this->phpBinary . ' -r "echo json_encode(ini_get_all());"'));
+            $output = trim($this->server->runCommand($this->getPhpBinary() . ' -r "echo json_encode(ini_get_all());"'));
 
             return json_decode($output, true) ?: [];
         }
@@ -80,7 +113,7 @@ class CServer_Php {
      */
     public function getAllIniConfigurationExt($extName) {
         if ($this->server->isRemote()) {
-            $output = trim($this->server->runCommand($this->phpBinary . ' -r "echo json_encode(ini_get_all(\'' . $extName . '\'));"'));
+            $output = trim($this->server->runCommand($this->getPhpBinary() . ' -r "echo json_encode(ini_get_all(\'' . $extName . '\'));"'));
 
             return json_decode($output, true) ?: [];
         }
@@ -95,7 +128,7 @@ class CServer_Php {
      */
     public function getIniConfiguration($varName) {
         if ($this->server->isRemote()) {
-            return trim($this->server->runCommand($this->phpBinary . ' -r "echo ini_get(\'' . $varName . '\');"'));
+            return trim($this->server->runCommand($this->getPhpBinary() . ' -r "echo ini_get(\'' . $varName . '\');"'));
         }
 
         return ini_get($varName);
@@ -106,7 +139,7 @@ class CServer_Php {
      */
     public function getIniLoadedFile() {
         if ($this->server->isRemote()) {
-            return trim($this->server->runCommand($this->phpBinary . ' -r "echo php_ini_loaded_file();"'));
+            return trim($this->server->runCommand($this->getPhpBinary() . ' -r "echo php_ini_loaded_file();"'));
         }
 
         return php_ini_loaded_file();
@@ -117,7 +150,7 @@ class CServer_Php {
      */
     public function getSapiName() {
         if ($this->server->isRemote()) {
-            return trim($this->server->runCommand($this->phpBinary . ' -r "echo php_sapi_name();"'));
+            return trim($this->server->runCommand($this->getPhpBinary() . ' -r "echo php_sapi_name();"'));
         }
 
         return php_sapi_name();
@@ -128,7 +161,7 @@ class CServer_Php {
      */
     public function getTempDir() {
         if ($this->server->isRemote()) {
-            return trim($this->server->runCommand($this->phpBinary . ' -r "echo sys_get_temp_dir();"'));
+            return trim($this->server->runCommand($this->getPhpBinary() . ' -r "echo sys_get_temp_dir();"'));
         }
 
         return sys_get_temp_dir();
@@ -153,8 +186,7 @@ class CServer_Php {
      * dalam satu perintah karena tiap perjalanan SSH berbiaya mahal, dan jalur
      * symlink diselesaikan agar `php` dan `php8.3` tidak terhitung dua kali.
      *
-     * @param CServer_Server $server
-     * @param array          $iniList pengaturan yang ingin dibaca
+     * @param array $iniList pengaturan yang ingin dibaca
      *
      * @return array default, versions, fpm
      */
