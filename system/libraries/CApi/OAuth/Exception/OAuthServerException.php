@@ -13,9 +13,6 @@ class CApi_OAuth_Exception_OAuthServerException extends Exception implements CAp
     /**
      * Create a new OAuthServerException.
      *
-     * @param \League\OAuth2\Server\Exception\OAuthServerException $e
-     * @param \CHTTP_Response                                      $response
-     *
      * @return void
      */
     public function __construct(LeagueException $e, CHTTP_Response $response) {
@@ -42,5 +39,19 @@ class CApi_OAuth_Exception_OAuthServerException extends Exception implements CAp
      */
     public function statusCode() {
         return $this->response->getStatusCode();
+    }
+
+    /**
+     * Report the exception.
+     *
+     * A 4xx comes from the client - a wrong password, an expired refresh token -
+     * and is already answered by the response this exception renders, so it is
+     * handled here and never reaches the logger. Returning false lets a 5xx fall
+     * through and be reported as before.
+     *
+     * @return bool
+     */
+    public function report() {
+        return $this->statusCode() < 500;
     }
 }
