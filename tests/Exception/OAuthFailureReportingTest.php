@@ -11,6 +11,22 @@ use League\OAuth2\Server\Exception\OAuthServerException as LeagueException;
  * CApi_OAuth_Trait_HandleOAuthErrorTrait::withErrorHandling(). That last class
  * extends plain Exception, so every wrong password was logged as ERROR.
  */
+/**
+ * Membuka withErrorHandling() tanpa menjalankan peladen OAuth sungguhan.
+ */
+class OAuthFailureReportingTestRunner {
+    use CApi_OAuth_Trait_HandleOAuthErrorTrait;
+
+    /**
+     * @param \Closure $callback
+     *
+     * @return mixed
+     */
+    public function run($callback) {
+        return $this->withErrorHandling($callback);
+    }
+}
+
 class OAuthFailureReportingTest extends TestCase {
     /**
      * @param string $message
@@ -80,6 +96,46 @@ class OAuthFailureReportingTest extends TestCase {
         $e = $this->thrownException('database gone', 500);
 
         $this->assertFalse($e->report());
+    }
+
+    /**
+     * The whole chain, not just the wrapper: CApi_OAuth_Bridge_UserRepository
+     * still throws a plain LeagueException, and it is withErrorHandling() that
+     * turns it into the wrapper. The status set at the throw site is what the
+     * wrapper later reads back through generateHttpResponse().
+     *
+     * @return void
+     */
+    public function testTheStatusSurvivesTheRewrapDoneByWithErrorHandling() {
+        $runner = new OAuthFailureReportingTestRunner();
+
+        try {
+            $runner->run(function () {
+                throw new LeagueException('Email atau kata sandi salah!', 9, 'access_denied', 401, 'Email atau kata sandi salah!');
+            });
+            $this->fail('withErrorHandling() seharusnya melempar ulang');
+        } catch (CApi_OAuth_Exception_OAuthServerException $e) {
+            $this->assertInstanceOf(LeagueException::class, $e->getPrevious());
+            $this->assertSame(401, $e->statusCode());
+            $this->assertTrue($e->report());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testAServerErrorSurvivesTheRewrapAsReportable() {
+        $runner = new OAuthFailureReportingTestRunner();
+
+        try {
+            $runner->run(function () {
+                throw LeagueException::serverError('database gone');
+            });
+            $this->fail('withErrorHandling() seharusnya melempar ulang');
+        } catch (CApi_OAuth_Exception_OAuthServerException $e) {
+            $this->assertSame(500, $e->statusCode());
+            $this->assertFalse($e->report());
+        }
     }
 
     /**
