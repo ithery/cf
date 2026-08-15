@@ -129,9 +129,19 @@ class CServer_WebServer_LiteSpeed {
      * @return string
      */
     public function restart() {
+        $binary = CVendor_LiteSpeed::serverRoot() . '/bin/lswsctrl';
+
+        //sudo didahulukan, bukan dijadikan cadangan. Sebagai pengguna biasa
+        //yang ber-sudo, `lswsctrl` tidak gagal bersih: ia menempuh separuh
+        //jalan lebih dulu - gagal menulis logs/lsrestart.log, gagal `pkill`
+        //proses milik root, melaporkan "Can't determine the Home of LiteSpeed
+        //Web Server", lalu "[ERROR] Failed to start litespeed!". Rangkaian itu
+        //sudah terjadi sebelum `||` sempat menyalakan jalur sudo, sehingga
+        //keluarannya tampak seperti webserver gagal dinyalakan padahal pada
+        //akhirnya berhasil.
         return (string) $this->server->runCommand(
-            CVendor_LiteSpeed::serverRoot() . '/bin/lswsctrl restart 2>&1'
-            . ' || sudo -n ' . CVendor_LiteSpeed::serverRoot() . '/bin/lswsctrl restart 2>&1'
+            'sudo -n ' . $binary . ' restart 2>&1'
+            . ' || ' . $binary . ' restart 2>&1'
         );
     }
 
