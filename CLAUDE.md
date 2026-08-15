@@ -16,6 +16,10 @@ cd media/js/cres && npm run build        # JS build
 
 Framework tests in `tests/`, app tests in `application/{app}/default/tests/`.
 
+The CLI is **`phpcf`**. The `cf` file sitting in the docroot is a **0-byte legacy stub** — that
+is normal and expected, not a broken install. It runs, prints nothing, and exits 0, which reads
+exactly like a working command that found nothing to do; don't diagnose a dead CLI from it.
+
 `phpcf tinker`: run from the app dir (e.g. `application/ohayomart/`). **No manual bootstrap call is needed** — `CF::appCode()` derives the app from the working directory, so `CF::loadBootstrapFiles()` includes that app's `bootstrap.php` (and whatever it calls, e.g. `DBootstrap::boot()`) during boot. Verified 2026-08-02 from three different app dirs, each resolving to its own app. Fake org context with `OH::setOrgIdResolver(fn() => $orgId)` (per-app helper name varies). Wrap anything that writes in `$db = c::db(); $db->begin(); ...; $db->rollback();` to explore/verify against live data without leaving traces — invaluable for validating a bug fix or test fixture against real framework behavior before writing it into a test file.
 
 ## Code Style
