@@ -5,6 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Psr\Log\LogLevel;
 use Whoops\Run as Whoops;
 use Whoops\Handler\HandlerInterface;
+use League\OAuth2\Server\Exception\OAuthServerException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -116,8 +117,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
 
     /**
      * Create a new exception handler instance.
-     *
-     * s    * @return void
      */
     public function __construct() {
         $this->container = c::container();
@@ -125,8 +124,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
 
     /**
      * Register a reportable callback.
-     *
-     * @param callable $reportUsing
      *
      * @return CException_ReportableHandler
      */
@@ -144,8 +141,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
 
     /**
      * Register a renderable callback.
-     *
-     * @param callable $renderUsing
      *
      * @return $this
      */
@@ -327,6 +322,10 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return bool
      */
     protected function shouldntReport($e) {
+        if ($this->isClientSideOAuthFailure($e)) {
+            return true;
+        }
+
         $dontReport = array_merge($this->dontReport, $this->internalDontReport);
 
         return !is_null(carr::first($dontReport, function ($type) use ($e) {
@@ -335,9 +334,27 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     }
 
     /**
-     * Remove the given exception class from the list of exceptions that should be ignored.
+     * Determine if the exception is an OAuth failure caused by the client.
      *
-     * @param string $exception
+     * CAuth_Exception_AuthorizationException is already in the do-not-report
+     * list, but CApi_OAuth_Bridge_UserRepository rewraps it as an
+     * OAuthServerException, so the intent was lost. Only 4xx is treated this
+     * way; OAuthServerException::serverError() carries 500 and still reports.
+     *
+     * @param \Throwable $e
+     *
+     * @return bool
+     */
+    protected function isClientSideOAuthFailure($e) {
+        if (!$e instanceof OAuthServerException) {
+            return false;
+        }
+
+        return $e->getHttpStatusCode() < 500;
+    }
+
+    /**
+     * Remove the given exception class from the list of exceptions that should be ignored.
      *
      * @return $this
      */
@@ -358,8 +375,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     /**
      * Create the context array for logging the given exception.
      *
-     * @param \Throwable $e
-     *
      * @return array
      */
     protected function buildExceptionContext(Throwable $e) {
@@ -372,8 +387,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
 
     /**
      * Get the default exception context variables for logging.
-     *
-     * @param \Throwable $e
      *
      * @return array
      */
@@ -520,8 +533,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     /**
      * Convert an authentication exception into a response.
      *
-     * @param CHTTP_Request                           $request
-     * @param CAuth_Exception_AuthenticationException $exception
+     * @param CHTTP_Request $request
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -532,8 +544,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     /**
      * Create a response object from the given validation exception.
      *
-     * @param CValidation_Exception $e
-     * @param \CHTTP_Request        $request
+     * @param \CHTTP_Request $request
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -548,8 +559,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     /**
      * Convert a validation exception into a response.
      *
-     * @param CHTTP_Request         $request
-     * @param CValidation_Exception $exception
+     * @param CHTTP_Request $request
      *
      * @return CHTTP_Response
      */
@@ -562,8 +572,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     /**
      * Convert a validation exception into a JSON response.
      *
-     * @param CHTTP_Request         $request
-     * @param CValidation_Exception $exception
+     * @param CHTTP_Request $request
      *
      * @return CHttp_JsonResponse
      */
@@ -778,8 +787,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
 
     /**
      * Get the view used to render HTTP exceptions.
-     *
-     * @param \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e
      *
      * @return null|string
      */
