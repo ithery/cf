@@ -32,9 +32,6 @@ class CServer_WebServer_LiteSpeed {
      */
     protected $httpdConfig;
 
-    /**
-     * @param CServer_Server $server
-     */
     public function __construct(CServer_Server $server) {
         $this->server = $server;
     }
@@ -62,10 +59,16 @@ class CServer_WebServer_LiteSpeed {
     public function readFile($path) {
         $quoted = escapeshellarg($path);
         $output = $this->server->runCommand(
+            //`[ -e ]` bernilai salah bila direktori induknya sendiri tidak
+            //dapat ditembus, dan itu keadaan yang lazim: /usr/local/lsws/conf
+            //ber-mode 0750 milik lsadm. Ketika ia menjadi penjaga bagi jalur
+            //sudo, berkas yang sebenarnya terbaca lewat sudo dilaporkan
+            //`missing` - tanpa galat, seolah tidak ada apa-apa di sana. Karena
+            //itu sudo dicoba lebih dulu, dan keberadaan berkas baru
+            //dipertanyakan sesudah keduanya gagal.
             'if [ -r ' . $quoted . ' ]; then echo "LSSTATE|ok"; cat ' . $quoted . ';'
-            . ' elif [ -e ' . $quoted . ' ]; then'
-            . '   if sudo -n cat ' . $quoted . ' >/dev/null 2>&1; then echo "LSSTATE|ok"; sudo -n cat ' . $quoted . ';'
-            . '   else echo "LSSTATE|denied"; fi;'
+            . ' elif sudo -n cat ' . $quoted . ' >/dev/null 2>&1; then echo "LSSTATE|ok"; sudo -n cat ' . $quoted . ';'
+            . ' elif [ -e ' . $quoted . ' ] || sudo -n test -e ' . $quoted . ' 2>/dev/null; then echo "LSSTATE|denied";'
             . ' else echo "LSSTATE|missing"; fi'
         );
 
@@ -420,8 +423,6 @@ class CServer_WebServer_LiteSpeed {
 
     /**
      * Listener yang memetakan ke sebuah virtual host.
-     *
-     * @param string $name
      *
      * @return array[]
      */
