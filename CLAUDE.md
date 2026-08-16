@@ -39,6 +39,17 @@ would double-load Alpine.
 
 ## Conventions
 
+- **`status` is CF's soft-delete column, applied as a global scope.**
+  `CModel_SoftDelete_Scope::apply()` adds `where(status, '>', 0)` to *every*
+  query on a model using `CModel_SoftDelete_SoftDeleteTrait`, and `runSoftDelete()`
+  sets `status = 0` — `deleted`/`deletedby` are audit stamps written alongside,
+  not the thing the scope filters on. Two consequences worth knowing before
+  debugging: a `status = 0` row is invisible to the model no matter what the
+  code says, and **querying the same table via the `mysql` client bypasses the
+  scope entirely**, so raw SQL shows rows the application can never reach. That
+  gap produced a confidently-reported bug that did not exist (wapro `server`
+  table, 2026-08-16: 15 rows in SQL, 3 visible to the model). Verify through
+  `phpcf tinker`, not `mysql`, whenever a row's reachability is the question.
 - `system/vendor/` manually managed — no composer install
 - `env.php` has secrets — never commit
 - `application/` folders are separate repos (gitignored except `cresenity`)
