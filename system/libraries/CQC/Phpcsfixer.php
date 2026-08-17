@@ -1,6 +1,16 @@
 <?php
 
 class CQC_Phpcsfixer {
+    /**
+     * Versi php-cs-fixer yang didukung.
+     *
+     * Berjalan pada PHP 7.4 sampai 8.4. Versi 3.13.0 yang dipakai sebelumnya
+     * punya batas atas PHP 8.1 dan menolak jalan di atas itu.
+     *
+     * @var string
+     */
+    const VERSION = '3.95.18';
+
     private static $instance;
 
     public static function instance() {
@@ -20,6 +30,22 @@ class CQC_Phpcsfixer {
 
     public static function phpcsfixerPhar() {
         return DOCROOT . '.bin' . DS . 'php-cs-fixer' . DS . 'php-cs-fixer.phar';
+    }
+
+    /**
+     * Versi phar yang terpasang, null bila belum ada atau tidak terbaca.
+     *
+     * @return null|string
+     */
+    public static function installedVersion() {
+        return CQC::pharVersion(static::phpcsfixerPhar());
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isVersionSupported() {
+        return static::installedVersion() === static::VERSION;
     }
 
     public static function phpcsfixerAppConfiguration() {

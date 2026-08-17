@@ -47,31 +47,36 @@ class CConsole_Command_Phpcsfixer_InstallCommand extends CConsole_Command {
     }
 
     protected function downloadPhpcsfixerPharOnBinPath() {
+        $version = CQC_Phpcsfixer::VERSION;
         $pharPath = CQC::phpcsfixer()->phpcsfixerPhar();
-        if (!file_exists($pharPath)) {
-            $this->info('Downloading php-cs-fixer.phar');
-            $errCode = 0;
-            $errMessage = '';
+        $installed = CQC_Phpcsfixer::installedVersion();
 
-            try {
-                if (!CFile::isDirectory(dirname($pharPath))) {
-                    CFile::makeDirectory(dirname($pharPath), 0755, true);
-                }
-                copy('https://devcloud.cresenity.com/application/devcloud/default/data/bin/php-cs-fixer/php-cs-fixer.phar', $pharPath);
-                $this->info($pharPath . ' downloaded');
-            } catch (Exception $ex) {
-                $errCode++;
-                $errMessage = $ex->getMessage();
-            }
+        if ($installed === $version) {
+            $this->info($pharPath . ' is already installed (' . $version . ')');
 
-            if ($errCode > 0) {
-                $this->error($errMessage);
-
-                return false;
-            }
-        } else {
-            $this->info($pharPath . ' is already installed');
+            return true;
         }
+
+        //Yang diperiksa versinya, bukan keberadaan berkasnya. Phar lama tetap
+        //ada di tempatnya dan lolos file_exists() walau ia menolak jalan pada
+        //versi PHP di sini - sehingga tidak pernah tergantikan.
+        if (file_exists($pharPath)) {
+            $this->info('Replacing php-cs-fixer ' . ($installed == null ? '(unreadable)' : $installed) . ' with ' . $version);
+        }
+
+        $url = 'https://devcloud.cresenity.com/application/devcloud/default/data/bin/php-cs-fixer/php-cs-fixer.' . $version . '.phar';
+
+        $this->info('Downloading ' . basename($url));
+
+        try {
+            CQC::downloadPhar($url, $pharPath, $version);
+        } catch (Exception $ex) {
+            $this->error($ex->getMessage());
+
+            return false;
+        }
+
+        $this->info($pharPath . ' downloaded (' . $version . ')');
 
         return true;
     }
