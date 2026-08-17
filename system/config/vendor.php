@@ -20,6 +20,11 @@ return [
         'recaptcha_v2_site_key' => c::env('RECAPTCHA_V2_SITE_KEY'),
         'recaptcha_v2_api_key' => c::env('RECAPTCHA_V2_API_KEY'),
     ],
+    'brevo' => [
+        'api_key' => c::env('BREVO_API_KEY'),
+        'sender_email' => c::env('BREVO_SENDER_EMAIL'),
+        'sender_name' => c::env('BREVO_SENDER_NAME'),
+    ],
     'cloudflare' => [
         'turnstile_site_key' => c::env('CLOUDFLARE_TURNSTILE_SITE_KEY'),
         'turnstile_secret_key' => c::env('CLOUDFLARE_TURNSTILE_SECRET_KEY'),

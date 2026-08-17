@@ -35,6 +35,12 @@ return [
             'transport' => 'sendgrid',
             // 'key' => c::env('SENDGRID_API_KEY'),
         ],
+        'brevo' => [
+            'transport' => 'brevo',
+            //Kunci API, bukan SMTP key. Brevo memakai dua kredensial berbeda
+            //dan yang untuk SMTP ditolak REST API-nya dengan 401.
+            'key' => c::env('BREVO_API_KEY'),
+        ],
         'mailgun' => [
             'transport' => 'mailgun',
             'domain' => c::env('MAILGUN_DOMAIN'),

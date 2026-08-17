@@ -56,6 +56,8 @@ class CEmail_Config {
         'smtp.postmarkapp.com' => 'postmarkapp',
         'smtp.amazonaws.com' => 'ses',
         'smtp.mailersend.com' => 'mailersend',
+        'smtp-relay.brevo.com' => 'brevo',
+        'smtp-relay.sendinblue.com' => 'brevo',
     ];
 
     public function __construct($options = []) {

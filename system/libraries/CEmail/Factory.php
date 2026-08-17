@@ -4,6 +4,7 @@ class CEmail_Factory {
     protected static $driverMap = [
         'sendgrid' => CEmail_Driver_SendGridDriver::class,
         'mailgun' => CEmail_Driver_MailgunDriver::class,
+        'brevo' => CEmail_Driver_BrevoDriver::class,
         'mail' => CEmail_Driver_MailDriver::class,
         'kirimemail' => CEmail_Driver_KirimEmailDriver::class,
         'ses' => CEmail_Driver_SesDriver::class,
