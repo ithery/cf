@@ -20,6 +20,10 @@ return [
         'recaptcha_v2_site_key' => c::env('RECAPTCHA_V2_SITE_KEY'),
         'recaptcha_v2_api_key' => c::env('RECAPTCHA_V2_API_KEY'),
     ],
+    'cloudflare' => [
+        'turnstile_site_key' => c::env('CLOUDFLARE_TURNSTILE_SITE_KEY'),
+        'turnstile_secret_key' => c::env('CLOUDFLARE_TURNSTILE_SECRET_KEY'),
+    ],
     'zenziva' => [
         'key' => c::env('ZENZIVA_API_KEY'),
         'secret' => c::env('ZENZIVA_API_SECRET'),
