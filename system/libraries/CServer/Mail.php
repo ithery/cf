@@ -141,6 +141,23 @@ class CServer_Mail {
                     'Domainnya harus terverifikasi lebih dulu; SMTP user tidak dapat dibuat sebelum itu.',
                 ],
             ],
+            'brevo' => [
+                'label' => 'Brevo',
+                'host' => 'smtp-relay.brevo.com',
+                'port' => 587,
+                'portList' => [587, 2525, 465, 25],
+                'usernameLabel' => 'SMTP Login',
+                'passwordLabel' => 'SMTP Key',
+                'usernameFixed' => null,
+                'docUrl' => 'https://app.brevo.com/settings/keys/smtp',
+                'steps' => [
+                    'Masuk ke Brevo, buka menu SMTP & API lalu tab SMTP.',
+                    'Salin nilai Login sebagai nama pengguna — sebuah alamat surel, bukan nama merek.',
+                    'Buat SMTP key baru lalu salin nilainya sebagai kata sandi.',
+                    'SMTP key berbeda dari API key di tab sebelahnya: kunci API ditolak relai SMTP,'
+                        . ' dan sebaliknya kunci SMTP ditolak REST API.',
+                ],
+            ],
         ];
     }
 
