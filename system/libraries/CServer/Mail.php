@@ -80,11 +80,13 @@ class CServer_Mail {
     /**
      * Penyedia relai yang didukung beserta bentuk kredensialnya.
      *
-     * Ketiganya berbeda bukan hanya di nama host: SendGrid memakai kata
+     * Keempatnya berbeda bukan hanya di nama host: SendGrid memakai kata
      * `apikey` harfiah sebagai nama pengguna dan API key sebagai kata sandi,
-     * sedangkan Mailjet dan MailerSend memakai sepasang nilai. Perbedaan itu
-     * jadi sumber kebingungan yang lazim, jadi dijelaskan di sini alih-alih
-     * dibiarkan ditebak.
+     * sedangkan Mailjet dan MailerSend memakai sepasang nilai. Brevo memakai
+     * sepasang nilai juga, tetapi REST API-nya menuntut kunci ketiga yang
+     * berbeda — itulah `apiKeyLabel`, yang null bila penyedianya tidak
+     * membedakan keduanya. Perbedaan itu jadi sumber kebingungan yang lazim,
+     * jadi dijelaskan di sini alih-alih dibiarkan ditebak.
      *
      * @return array
      */
@@ -98,6 +100,7 @@ class CServer_Mail {
                 'usernameLabel' => 'API Key',
                 'passwordLabel' => 'Secret Key',
                 'usernameFixed' => null,
+                'apiKeyLabel' => null,
                 'docUrl' => 'https://app.mailjet.com/account/apikeys',
                 'steps' => [
                     'Masuk ke akun Mailjet, buka menu Account Settings.',
@@ -117,6 +120,7 @@ class CServer_Mail {
                 //SendGrid selalu memakai kata "apikey" harfiah sebagai nama
                 //pengguna; yang berubah hanya kata sandinya
                 'usernameFixed' => 'apikey',
+                'apiKeyLabel' => null,
                 'docUrl' => 'https://app.sendgrid.com/settings/api_keys',
                 'steps' => [
                     'Masuk ke SendGrid, buka Settings lalu API Keys.',
@@ -133,6 +137,7 @@ class CServer_Mail {
                 'usernameLabel' => 'SMTP Username',
                 'passwordLabel' => 'SMTP Password',
                 'usernameFixed' => null,
+                'apiKeyLabel' => null,
                 'docUrl' => 'https://app.mailersend.com/domains',
                 'steps' => [
                     'Masuk ke MailerSend, buka Domains lalu pilih domain yang sudah terverifikasi.',
@@ -149,6 +154,10 @@ class CServer_Mail {
                 'usernameLabel' => 'SMTP Login',
                 'passwordLabel' => 'SMTP Key',
                 'usernameFixed' => null,
+                //satu-satunya penyedia di sini yang REST API-nya memakai kunci
+                //berbeda dari kredensial SMTP-nya
+                'apiKeyLabel' => 'API Key',
+                'apiKeyDocUrl' => 'https://app.brevo.com/settings/keys/api',
                 'docUrl' => 'https://app.brevo.com/settings/keys/smtp',
                 'steps' => [
                     'Masuk ke Brevo, buka menu SMTP & API lalu tab SMTP.',
