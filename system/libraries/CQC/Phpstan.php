@@ -6,6 +6,20 @@
  */
 class CQC_Phpstan {
     /**
+     * Versi PHPStan yang didukung.
+     *
+     * Berjalan pada PHP 7.4 sampai 8.x - diuji langsung di lsphp74 dan 8.2,
+     * 2026-08-18. Tetap di jalur 1.x: 2.x membuang
+     * `ParametersAcceptorSelector::selectSingle()` dan `TypeUtils`, yang
+     * dipakai 11 dari 56 berkas CQC_Phpstan, dan mewajibkan identifier pada
+     * tiap rule. Naik ke sana pekerjaan tersendiri, bukan sekadar mengganti
+     * phar - lihat docs/TODO.md.
+     *
+     * @var string
+     */
+    const VERSION = '1.12.0';
+
+    /**
      * @var CQC_Phpstan
      */
     private static $instance;
@@ -52,6 +66,26 @@ class CQC_Phpstan {
 
     public static function phpstanPhar() {
         return DOCROOT . '.bin' . DS . 'phpstan' . DS . 'phpstan.phar';
+    }
+
+    /**
+     * Versi phar yang terpasang, null bila belum ada atau tidak terbaca.
+     *
+     * @param null|string $pharPath
+     *
+     * @return null|string
+     */
+    public static function installedVersion($pharPath = null) {
+        return CQC::pharVersion($pharPath == null ? static::phpstanPhar() : $pharPath);
+    }
+
+    /**
+     * @param null|string $pharPath
+     *
+     * @return bool
+     */
+    public static function isVersionSupported($pharPath = null) {
+        return static::installedVersion($pharPath) === static::VERSION;
     }
 
     /**
