@@ -225,17 +225,86 @@ class CModel_Console_PropertiesHelper {
             $casts = static::sanitizeCastType($casts);
             $type = carr::get($casts, $field, $type);
             $type = static::getType($type);
+            $notnull = $column->getNotnull();
+
+            //Accessor menang atas tipe kolom maupun casts: yang diterima
+            //pembaca atribut adalah nilai kembalian accessornya, bukan isi
+            //kolomnya. Tanpa ini `credentials` yang dibaca sebagai array
+            //ditulis `string` - anotasi yang salah, dan anotasi salah lebih
+            //buruk daripada tidak ada anotasi sebab ia menang atas ekstensi
+            //PHPStan yang menurunkan tipe dari kode.
+            $accessorType = static::getAccessorType($modelInstance, $field);
+            if ($accessorType !== null) {
+                $type = $accessorType;
+                //nullability-nya ikut anotasi accessor itu sendiri, jadi
+                //jangan ditambahi `null|` lagi dari kolomnya
+                $notnull = true;
+            }
 
             if (!in_array($field, $excludedFields)) {
                 $properties[$field] = [
                     'type' => $type,
-                    'notnull' => $column->getNotnull(),
+                    'notnull' => $notnull,
                     'default' => $column->getDefault(),
                 ];
             }
         }
 
         return $properties;
+    }
+
+    /**
+     * Tipe yang dijanjikan accessor sebuah kolom, bila ada.
+     *
+     * Dibaca dari `@return` accessornya, bukan dari tipe kembalian bawaan -
+     * kode CF menargetkan PHP 7.4 dan hampir tidak pernah menuliskannya.
+     * `mixed` dan `void` diabaikan: keduanya tidak lebih memberi tahu daripada
+     * tipe kolomnya sendiri.
+     *
+     * @param null|CModel $modelInstance
+     * @param string      $field
+     *
+     * @return null|string
+     */
+    public static function getAccessorType($modelInstance, $field) {
+        if ($modelInstance == null) {
+            return null;
+        }
+
+        $method = 'get' . cstr::studly($field) . 'Attribute';
+        if (!method_exists($modelInstance, $method)) {
+            return null;
+        }
+
+        try {
+            $reflection = new ReflectionMethod($modelInstance, $method);
+        } catch (ReflectionException $ex) {
+            return null;
+        }
+
+        $returnType = $reflection->getReturnType();
+        if ($returnType != null && method_exists($returnType, 'getName')) {
+            $name = $returnType->getName();
+            if (!in_array($name, ['mixed', 'void'])) {
+                return $returnType->allowsNull() ? 'null|' . $name : $name;
+            }
+        }
+
+        $docComment = $reflection->getDocComment();
+        if ($docComment === false) {
+            return null;
+        }
+
+        if (preg_match('/@return\s+(\S+)/', $docComment, $matches) !== 1) {
+            return null;
+        }
+
+        $type = trim($matches[1]);
+        if (strlen($type) == 0 || in_array($type, ['mixed', 'void', '$this'])) {
+            return null;
+        }
+
+        return $type;
     }
 
     public static function getModel($table) {
