@@ -51,9 +51,20 @@ jobs:
           # PHP 8.1 dan tidak dapat diurai pada 7.4 - itu keadaan yang memang
           # dikehendaki, bukan kesalahan. modules/ juga dilewati: 8.598 berkas
           # warisan yang targetnya memang hendak dihapus di CF 1.9.
-          find system/libraries system/core system/helpers system/data tests application/cresenity \
-            -name '*.php' -not -name '*.blade.php' -print0 \
-            | xargs -0 -n1 -P4 php -l > /tmp/lint.log \
+          PATHS="system/libraries system/core system/helpers system/data tests application/cresenity"
+
+          if [ "${{ matrix.php }}" = "7.4" ]; then
+            # CQC_Phpstan sengaja ditulis dengan sintaks PHP 8: ia perkakas
+            # pengembangan yang dimuat container PHPStan, tidak pernah oleh
+            # runtime aplikasi. Alasan yang sama membuat tests/Qc membacanya
+            # sebagai teks alih-alih memuatnya.
+            find $PATHS -path system/libraries/CQC -prune -o \
+              \( -name '*.php' ! -name '*.blade.php' -print0 \) > /tmp/files.bin
+          else
+            find $PATHS -name '*.php' ! -name '*.blade.php' -print0 > /tmp/files.bin
+          fi
+
+          xargs -0 -n1 -P4 php -l < /tmp/files.bin > /tmp/lint.log \
             || { grep -v '^No syntax errors detected' /tmp/lint.log; exit 1; }
           echo "berkas diperiksa: $(grep -c '^No syntax errors detected' /tmp/lint.log)"
 
