@@ -15,7 +15,7 @@ class CConsole_Command_Phpcsfixer_FormatCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'php-cs-fixer:format {path} {--format=table : format to display} {--debug} {--ignore-env}';
+    protected $signature = 'php-cs-fixer:format {path} {--format=table : format to display} {--config= : config file to use, defaults to the resolved .php-cs-fixer.dist.php} {--debug} {--ignore-env}';
 
     public function handle() {
         $isFramework = CF::appCode() == null;
@@ -54,7 +54,14 @@ class CConsole_Command_Phpcsfixer_FormatCommand extends CConsole_Command {
 
         CFile::put($tempFile, CFile::get($scanPath));
         //$command = [$this->phpBinary(), $this->getPhpCsPhar(),$appDir];
-        $command = [$this->phpBinary(), $this->getPhpCsFixerPhar(), '--config=' . CQC::phpcsfixer()->phpcsfixerConfiguration()];
+        //Config boleh ditentukan pemanggil. Yang dipilih CQC bergantung pada
+        //CF::appCode(), yang berasal dari direktori kerja - dan berkas yang
+        //diformat di sini justru berada di direktori sementara.
+        $configuration = $this->option('config');
+        if (!strlen((string) $configuration)) {
+            $configuration = CQC::phpcsfixer()->phpcsfixerConfiguration();
+        }
+        $command = [$this->phpBinary(), $this->getPhpCsFixerPhar(), '--config=' . $configuration];
         $command[] = 'fix';
         $command[] = $tempFile;
         $envVariables = [];
