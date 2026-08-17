@@ -144,6 +144,10 @@ services:
     #Menyalakannya berarti menyarankan `new Model()` untuk pemanggilan yang
     #tidak setara. Lihat docs/TODO.md.
     -
+        class: CQC_Phpstan_Service_Rule_RelationExistenceRule
+        tags:
+            - phpstan.rules.rule
+    -
         class: CQC_Phpstan_Service_Rule_StringToClassRule
         tags:
             - phpstan.rules.rule
