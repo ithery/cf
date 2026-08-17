@@ -101,8 +101,6 @@ botlog.log
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
-# ignore github copilot
-.github
 
 #ignore vscode
 .vscode
