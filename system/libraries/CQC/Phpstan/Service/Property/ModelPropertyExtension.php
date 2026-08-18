@@ -9,7 +9,7 @@ use PHPStan\Type\IntegerType;
 use PHPStan\Type\TypeCombinator;
 use PHPStan\PhpDoc\TypeStringResolver;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\MethodReflection;
+use PHPStan\Reflection\ExtendedMethodReflection;
 use PHPStan\Reflection\PropertyReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Type\Generic\GenericObjectType;
@@ -53,7 +53,7 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
     ];
 
     /**
-     * @var array<string, SchemaTable>
+     * @var array<string, CQC_Phpstan_Service_Property_SchemaTable>
      */
     private $tables = [];
 
@@ -219,7 +219,7 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
     /**
      * Method relasi yang namanya cocok dengan properti ini, bila ada.
      *
-     * @return null|MethodReflection
+     * @return null|ExtendedMethodReflection
      */
     private function findRelationMethod(ClassReflection $classReflection, string $propertyName) {
         $methodName = $propertyName;
@@ -252,7 +252,7 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
     /**
      * Hasil sebuah relasi bila dibaca sebagai properti.
      */
-    private function relationResultType(MethodReflection $methodReflection): Type {
+    private function relationResultType(ExtendedMethodReflection $methodReflection): Type {
         $returnType = $methodReflection->getOnlyVariant()->getReturnType();
 
         //model terkait diturunkan dari badan methodnya - tipe kembalian yang
