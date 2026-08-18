@@ -11,7 +11,7 @@ RewriteRule ^(.*)$ http://%1/$1 [R=301,L]
 
 # Protect application and system files from being viewed
 # RewriteCond %{REQUEST_URI} !^/?(wp)/
-RewriteCond %{REQUEST_URI} !^/?(modules/.+?/media)/ [NC]
+RewriteCond %{REQUEST_URI} !^/?(modules/.+?/media|system/media)/ [NC]
 
 RewriteRule ^(modules|system|logs) - [F,L]
 RewriteRule ^(wp)($|/) - [L]
