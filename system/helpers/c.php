@@ -727,7 +727,7 @@ class c {
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      *
-     * @return void
+     * @return never
      */
     public static function abort($code, $message = '', array $headers = []) {
         if ($code instanceof CHTTP_Response) {
