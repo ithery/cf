@@ -2,6 +2,8 @@
 
 namespace PHPStan;
 
+use PHPStan\Turbo\ReferencedByTurboExtension;
+use PHPStan\Turbo\ShadowedByTurboExtension;
 use PHPStan\Type\BooleanType;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use function array_column;
@@ -9,18 +11,50 @@ use function max;
 use function min;
 
 /**
+ * Three-valued logic used throughout PHPStan's type system.
+ *
+ * Unlike boolean logic, TrinaryLogic has three states: Yes, No, and Maybe.
+ * This is essential for static analysis because type relationships aren't always
+ * certain. For example, a `mixed` type *might* be a string — that's `Maybe`.
+ *
+ * Many Type methods return TrinaryLogic instead of bool because the answer may
+ * depend on runtime values that can't be known statically. Extension developers
+ * encounter TrinaryLogic extensively when querying type properties:
+ *
+ *     if ($type->isString()->yes()) {
+ *         // Definitely a string
+ *     }
+ *     if ($type->isString()->maybe()) {
+ *         // Could be a string (e.g. mixed)
+ *     }
+ *     if ($type->isString()->no()) {
+ *         // Definitely not a string
+ *     }
+ *
+ * TrinaryLogic supports logical operations (and, or, negate) that propagate
+ * uncertainty correctly. It is used as a flyweight — instances are cached and
+ * compared by identity.
+ *
  * @api
- * @see https://en.wikipedia.org/wiki/Three-valued_logic
+ * @see https://phpstan.org/developing-extensions/trinary-logic
  */
-class TrinaryLogic
+#[ShadowedByTurboExtension(turboClass: 'PHPStanTurbo\TrinaryLogic', implementation: __DIR__ . '/../turbo-ext/src/TrinaryLogic.cpp')]
+#[ReferencedByTurboExtension(key: 'trinaryLogic')]
+final class TrinaryLogic
 {
 
-	private const YES = 1;
-	private const MAYBE = 0;
-	private const NO = -1;
+	private const YES = 3;
+	private const MAYBE = 1;
+	private const NO = 0;
 
 	/** @var self[] */
 	private static array $registry = [];
+
+	private static self $YES;
+
+	private static self $MAYBE;
+
+	private static self $NO;
 
 	private function __construct(private int $value)
 	{
@@ -28,17 +62,17 @@ class TrinaryLogic
 
 	public static function createYes(): self
 	{
-		return self::$registry[self::YES] ??= new self(self::YES);
+		return self::$YES ??= (self::$registry[self::YES] ??= new self(self::YES));
 	}
 
 	public static function createNo(): self
 	{
-		return self::$registry[self::NO] ??= new self(self::NO);
+		return self::$NO ??= (self::$registry[self::NO] ??= new self(self::NO));
 	}
 
 	public static function createMaybe(): self
 	{
-		return self::$registry[self::MAYBE] ??= new self(self::MAYBE);
+		return self::$MAYBE ??= (self::$registry[self::MAYBE] ??= new self(self::MAYBE));
 	}
 
 	public static function createFromBoolean(bool $value): self
@@ -49,20 +83,31 @@ class TrinaryLogic
 
 	private static function create(int $value): self
 	{
-		self::$registry[$value] ??= new self($value);
-		return self::$registry[$value];
+		return self::$registry[$value] ??= new self($value);
 	}
 
+	/**
+	 * @phpstan-assert-if-true =false $this->no()
+	 * @phpstan-assert-if-true =false $this->maybe()
+	 */
 	public function yes(): bool
 	{
 		return $this->value === self::YES;
 	}
 
+	/**
+	 * @phpstan-assert-if-true =false $this->no()
+	 * @phpstan-assert-if-true =false $this->yes()
+	 */
 	public function maybe(): bool
 	{
 		return $this->value === self::MAYBE;
 	}
 
+	/**
+	 * @phpstan-assert-if-true =false $this->maybe()
+	 * @phpstan-assert-if-true =false $this->yes()
+	 */
 	public function no(): bool
 	{
 		return $this->value === self::NO;
@@ -77,11 +122,13 @@ class TrinaryLogic
 		return new ConstantBooleanType($this->value === self::YES);
 	}
 
-	public function and(self ...$operands): self
+	public function and(?self $operand = null, self ...$rest): self
 	{
-		$operandValues = array_column($operands, 'value');
-		$operandValues[] = $this->value;
-		return self::create(min($operandValues));
+		$min = $this->value & ($operand !== null ? $operand->value : self::YES);
+		foreach ($rest as $restOperand) {
+			$min &= $restOperand->value;
+		}
+		return self::$registry[$min] ??= new self($min);
 	}
 
 	/**
@@ -94,10 +141,14 @@ class TrinaryLogic
 		callable $callback,
 	): self
 	{
+		if ($this->value === self::NO) {
+			return $this;
+		}
+
 		$results = [];
 		foreach ($objects as $object) {
 			$result = $callback($object);
-			if ($result->no()) {
+			if ($result->value === self::NO) {
 				return $result;
 			}
 
@@ -107,11 +158,13 @@ class TrinaryLogic
 		return $this->and(...$results);
 	}
 
-	public function or(self ...$operands): self
+	public function or(?self $operand = null, self ...$rest): self
 	{
-		$operandValues = array_column($operands, 'value');
-		$operandValues[] = $this->value;
-		return self::create(max($operandValues));
+		$max = $this->value | ($operand !== null ? $operand->value : self::NO);
+		foreach ($rest as $restOperand) {
+			$max |= $restOperand->value;
+		}
+		return self::$registry[$max] ??= new self($max);
 	}
 
 	/**
@@ -124,10 +177,14 @@ class TrinaryLogic
 		callable $callback,
 	): self
 	{
+		if ($this->value === self::YES) {
+			return $this;
+		}
+
 		$results = [];
 		foreach ($objects as $object) {
 			$result = $callback($object);
-			if ($result->yes()) {
+			if ($result->value === self::YES) {
 				return $result;
 			}
 
@@ -137,6 +194,9 @@ class TrinaryLogic
 		return $this->or(...$results);
 	}
 
+	/**
+	 * Returns the operands' value if they all agree, Maybe if any differ.
+	 */
 	public static function extremeIdentity(self ...$operands): self
 	{
 		if ($operands === []) {
@@ -158,33 +218,45 @@ class TrinaryLogic
 		callable $callback,
 	): self
 	{
+		if ($objects === []) {
+			throw new ShouldNotHappenException();
+		}
+
 		$lastResult = null;
-		$results = [];
 		foreach ($objects as $object) {
 			$result = $callback($object);
 			if ($lastResult === null) {
 				$lastResult = $result;
-				$results[] = $result;
 				continue;
 			}
 			if ($lastResult->equals($result)) {
-				$results[] = $result;
 				continue;
 			}
 
 			return self::createMaybe();
 		}
 
-		return self::extremeIdentity(...$results);
+		return $lastResult;
 	}
 
+	/**
+	 * Returns Yes if any operand is Yes, otherwise the minimum.
+	 */
 	public static function maxMin(self ...$operands): self
 	{
 		if ($operands === []) {
 			throw new ShouldNotHappenException();
 		}
-		$operandValues = array_column($operands, 'value');
-		return self::create(max($operandValues) > 0 ? 1 : min($operandValues));
+
+		$max = self::NO;
+		$min = self::YES;
+		foreach ($operands as $operand) {
+			$max |= $operand->value;
+			$min &= $operand->value;
+		}
+		$maxMin = $max === self::YES ? self::YES : $min;
+
+		return self::$registry[$maxMin] ??= new self($maxMin);
 	}
 
 	/**
@@ -197,22 +269,25 @@ class TrinaryLogic
 		callable $callback,
 	): self
 	{
-		$results = [];
+		$min = self::YES;
 		foreach ($objects as $object) {
 			$result = $callback($object);
-			if ($result->yes()) {
+			if ($result->value === self::YES) {
 				return $result;
 			}
 
-			$results[] = $result;
+			$min &= $result->value;
 		}
 
-		return self::maxMin(...$results);
+		return self::$registry[$min] ??= new self($min);
 	}
 
 	public function negate(): self
 	{
-		return self::create(-$this->value);
+		// 0b11 >> 0 == 0b11 (3)
+		// 0b11 >> 1 == 0b01 (1)
+		// 0b11 >> 3 == 0b00 (0)
+		return self::create(3 >> $this->value);
 	}
 
 	public function equals(self $other): bool
@@ -220,6 +295,9 @@ class TrinaryLogic
 		return $this === $other;
 	}
 
+	/**
+	 * Returns the stronger of the two values, or null if they are equal (Yes > Maybe > No).
+	 */
 	public function compareTo(self $other): ?self
 	{
 		if ($this->value > $other->value) {
@@ -240,14 +318,6 @@ class TrinaryLogic
 		];
 
 		return $labels[$this->value];
-	}
-
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): self
-	{
-		return self::create($properties['value']);
 	}
 
 }

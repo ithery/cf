@@ -4,13 +4,16 @@ namespace PHPStan\Rules\Properties;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Node\Expr\CloneReinitializationExpr;
 use PHPStan\Node\PropertyAssignNode;
+use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\ConstructorsHelper;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\ShouldNotHappenException;
-use PHPStan\Type\ThisType;
+use PHPStan\Type\TypeUtils;
 use function in_array;
 use function sprintf;
 use function strtolower;
@@ -18,12 +21,14 @@ use function strtolower;
 /**
  * @implements Rule<PropertyAssignNode>
  */
-class ReadOnlyPropertyAssignRule implements Rule
+#[RegisteredRule(level: 3)]
+final class ReadOnlyPropertyAssignRule implements Rule
 {
 
 	public function __construct(
 		private PropertyReflectionFinder $propertyReflectionFinder,
 		private ConstructorsHelper $constructorsHelper,
+		private PhpVersion $phpVersion,
 	)
 	{
 	}
@@ -40,6 +45,11 @@ class ReadOnlyPropertyAssignRule implements Rule
 			return [];
 		}
 
+		$inCloneWith = (bool) $propertyFetch->getAttribute('inCloneWith', false);
+		if ($inCloneWith) {
+			return [];
+		}
+
 		$errors = [];
 		$reflections = $this->propertyReflectionFinder->findPropertyReflectionsFromNode($propertyFetch, $scope);
 		foreach ($reflections as $propertyReflection) {
@@ -47,7 +57,7 @@ class ReadOnlyPropertyAssignRule implements Rule
 			if ($nativeReflection === null) {
 				continue;
 			}
-			if (!$scope->canAccessProperty($propertyReflection)) {
+			if (!$scope->canWriteProperty($propertyReflection)) {
 				continue;
 			}
 			if (!$nativeReflection->isReadOnly()) {
@@ -57,14 +67,25 @@ class ReadOnlyPropertyAssignRule implements Rule
 			$declaringClass = $nativeReflection->getDeclaringClass();
 
 			if (!$scope->isInClass()) {
-				$errors[] = RuleErrorBuilder::message(sprintf('Readonly property %s::$%s is assigned outside of its declaring class.', $declaringClass->getDisplayName(), $propertyReflection->getName()))->build();
+				$errors[] = RuleErrorBuilder::message(sprintf('Readonly property %s::$%s is assigned outside of its declaring class.', $declaringClass->getDisplayName(), $propertyReflection->getName()))
+					->line($propertyFetch->name->getStartLine())
+					->identifier('property.readOnlyAssignOutOfClass')
+					->build();
 				continue;
 			}
 
 			$scopeClassReflection = $scope->getClassReflection();
 			if ($scopeClassReflection->getName() !== $declaringClass->getName()) {
-				$errors[] = RuleErrorBuilder::message(sprintf('Readonly property %s::$%s is assigned outside of its declaring class.', $declaringClass->getDisplayName(), $propertyReflection->getName()))->build();
-				continue;
+				$allowedInSubclass = $this->phpVersion->supportsAsymmetricVisibility()
+					&& !$propertyReflection->isPrivateSet()
+					&& $scopeClassReflection->isSubclassOfClass($propertyReflection->getDeclaringClass());
+				if (!$allowedInSubclass) {
+					$errors[] = RuleErrorBuilder::message(sprintf('Readonly property %s::$%s is assigned outside of its declaring class.', $declaringClass->getDisplayName(), $propertyReflection->getName()))
+						->line($propertyFetch->name->getStartLine())
+						->identifier('property.readOnlyAssignOutOfClass')
+						->build();
+					continue;
+				}
 			}
 
 			$scopeMethod = $scope->getFunction();
@@ -72,18 +93,39 @@ class ReadOnlyPropertyAssignRule implements Rule
 				throw new ShouldNotHappenException();
 			}
 
+			$methodName = $scopeMethod->getName();
+			$inClone = $this->phpVersion->supportsReadonlyPropertyReinitializationOnClone() && strtolower($methodName) === '__clone';
 			if (
-				in_array($scopeMethod->getName(), $this->constructorsHelper->getConstructors($scopeClassReflection), true)
-				|| strtolower($scopeMethod->getName()) === '__unserialize'
+				in_array($methodName, $this->constructorsHelper->getConstructors($scopeClassReflection), true)
+				|| strtolower($methodName) === '__unserialize'
+				|| $inClone
 			) {
-				if (!$scope->getType($propertyFetch->var) instanceof ThisType) {
-					$errors[] = RuleErrorBuilder::message(sprintf('Readonly property %s::$%s is not assigned on $this.', $declaringClass->getDisplayName(), $propertyReflection->getName()))->build();
+				if (TypeUtils::findThisType($scope->getType($propertyFetch->var)) === null) {
+					$errors[] = RuleErrorBuilder::message(sprintf('Readonly property %s::$%s is not assigned on $this.', $declaringClass->getDisplayName(), $propertyReflection->getName()))
+						->line($propertyFetch->name->getStartLine())
+						->identifier('property.readOnlyAssignNotOnThis')
+						->build();
+				} elseif (
+					$inClone
+					&& !$scope->hasExpressionType(new CloneReinitializationExpr($propertyReflection->getName()))->no()
+				) {
+					$errors[] = RuleErrorBuilder::message(sprintf('Readonly property %s::$%s is already assigned.', $declaringClass->getDisplayName(), $propertyReflection->getName()))
+						->line($propertyFetch->name->getStartLine())
+						->identifier('assign.readOnlyProperty')
+						->build();
 				}
 
 				continue;
 			}
 
-			$errors[] = RuleErrorBuilder::message(sprintf('Readonly property %s::$%s is assigned outside of the constructor.', $declaringClass->getDisplayName(), $propertyReflection->getName()))->build();
+			if ($node->isArrayAccessOffsetWrite($scope)) {
+				continue;
+			}
+
+			$errors[] = RuleErrorBuilder::message(sprintf('Readonly property %s::$%s is assigned outside of the constructor.', $declaringClass->getDisplayName(), $propertyReflection->getName()))
+				->line($propertyFetch->name->getStartLine())
+				->identifier('property.readOnlyAssignNotInConstructor')
+				->build();
 		}
 
 		return $errors;

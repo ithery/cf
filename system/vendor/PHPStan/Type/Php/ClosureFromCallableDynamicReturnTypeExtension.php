@@ -5,15 +5,18 @@ namespace PHPStan\Type\Php;
 use Closure;
 use PhpParser\Node\Expr\StaticCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
 use PHPStan\Reflection\MethodReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Type\ClosureType;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\ErrorType;
+use PHPStan\Type\Generic\TemplateTypeVarianceMap;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 
-class ClosureFromCallableDynamicReturnTypeExtension implements DynamicStaticMethodReturnTypeExtension
+#[AutowiredService]
+final class ClosureFromCallableDynamicReturnTypeExtension implements DynamicStaticMethodReturnTypeExtension
 {
 
 	public function getClass(): string
@@ -26,14 +29,10 @@ class ClosureFromCallableDynamicReturnTypeExtension implements DynamicStaticMeth
 		return $methodReflection->getName() === 'fromCallable';
 	}
 
-	public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): Type
+	public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): ?Type
 	{
 		if (!isset($methodCall->getArgs()[0])) {
-			return ParametersAcceptorSelector::selectFromArgs(
-				$scope,
-				$methodCall->getArgs(),
-				$methodReflection->getVariants(),
-			)->getReturnType();
+			return null;
 		}
 
 		$callableType = $scope->getType($methodCall->getArgs()[0]->value);
@@ -50,6 +49,15 @@ class ClosureFromCallableDynamicReturnTypeExtension implements DynamicStaticMeth
 				$variant->isVariadic(),
 				$variant->getTemplateTypeMap(),
 				$variant->getResolvedTemplateTypeMap(),
+				$variant instanceof ExtendedParametersAcceptor ? $variant->getCallSiteVarianceMap() : TemplateTypeVarianceMap::createEmpty(),
+				throwPoints: $variant->getThrowPoints(),
+				impurePoints: $variant->getImpurePoints(),
+				invalidateExpressions: $variant->getInvalidateExpressions(),
+				usedVariables: $variant->getUsedVariables(),
+				acceptsNamedArguments: $variant->acceptsNamedArguments(),
+				mustUseReturnValue: $variant->mustUseReturnValue(),
+				assertions: $variant->getAsserts(),
+				isStatic: $variant->isStaticClosure(),
 			);
 		}
 

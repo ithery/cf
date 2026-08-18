@@ -3,78 +3,122 @@
 namespace PHPStan\Rules\Comparison;
 
 use PhpParser\Node;
+use PHPStan\Analyser\CollectedDataEmitter;
+use PHPStan\Analyser\NodeCallbackInvoker;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Node\FunctionCallExpressionNode;
+use PHPStan\Parser\LastConditionVisitor;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function sprintf;
-use function strtolower;
 
 /**
- * @implements Rule<Node\Expr\FuncCall>
+ * @implements Rule<FunctionCallExpressionNode>
  */
-class ImpossibleCheckTypeFunctionCallRule implements Rule
+#[RegisteredRule(level: 4)]
+final class ImpossibleCheckTypeFunctionCallRule implements Rule
 {
 
 	public function __construct(
 		private ImpossibleCheckTypeHelper $impossibleCheckTypeHelper,
-		private bool $checkAlwaysTrueCheckTypeFunctionCall,
+		private PossiblyImpureTipHelper $possiblyImpureTipHelper,
+		private ConstantConditionInTraitHelper $constantConditionInTraitHelper,
+		private FunctionCallConstantConditionHelper $functionCallConstantConditionHelper,
+		#[AutowiredParameter]
 		private bool $treatPhpDocTypesAsCertain,
+		#[AutowiredParameter]
+		private bool $reportAlwaysTrueInLastCondition,
+		#[AutowiredParameter(ref: '%tips.treatPhpDocTypesAsCertain%')]
+		private bool $treatPhpDocTypesAsCertainTip,
 	)
 	{
 	}
 
 	public function getNodeType(): string
 	{
-		return Node\Expr\FuncCall::class;
+		return FunctionCallExpressionNode::class;
 	}
 
-	public function processNode(Node $node, Scope $scope): array
+	public function processNode(Node $node, Scope&NodeCallbackInvoker&CollectedDataEmitter $scope): array
 	{
-		if (!$node->name instanceof Node\Name) {
+		$funcCall = $node->getOriginalNode();
+		if (!$funcCall->name instanceof Node\Name) {
 			return [];
 		}
 
-		$functionName = (string) $node->name;
-		if (strtolower($functionName) === 'is_a') {
-			return [];
-		}
-		$isAlways = $this->impossibleCheckTypeHelper->findSpecifiedType($scope, $node);
+		$functionName = (string) $funcCall->name;
+		$reasons = [];
+		$isAlways = $this->impossibleCheckTypeHelper->findSpecifiedType($scope, $funcCall, $reasons);
 		if ($isAlways === null) {
+			$this->constantConditionInTraitHelper->emitNoError(self::class, $scope, $funcCall);
 			return [];
 		}
 
-		$addTip = function (RuleErrorBuilder $ruleErrorBuilder) use ($scope, $node): RuleErrorBuilder {
+		$this->functionCallConstantConditionHelper->emitImpossibleCheckReported($scope, $funcCall);
+
+		$addTip = function (RuleErrorBuilder $ruleErrorBuilder) use ($scope, $funcCall, $reasons): RuleErrorBuilder {
+			if ($reasons !== []) {
+				return $this->possiblyImpureTipHelper->addTip($scope, $funcCall, $ruleErrorBuilder->acceptsReasonsTip($reasons));
+			}
+
 			if (!$this->treatPhpDocTypesAsCertain) {
-				return $ruleErrorBuilder;
+				return $this->possiblyImpureTipHelper->addTip($scope, $funcCall, $ruleErrorBuilder);
 			}
 
-			$isAlways = $this->impossibleCheckTypeHelper->doNotTreatPhpDocTypesAsCertain()->findSpecifiedType($scope, $node);
+			$isAlways = $this->impossibleCheckTypeHelper->doNotTreatPhpDocTypesAsCertain()->findSpecifiedType($scope, $funcCall, $reasons);
 			if ($isAlways !== null) {
-				return $ruleErrorBuilder;
+				return $this->possiblyImpureTipHelper->addTip($scope, $funcCall, $ruleErrorBuilder);
+			}
+			if (!$this->treatPhpDocTypesAsCertainTip) {
+				return $this->possiblyImpureTipHelper->addTip($scope, $funcCall, $ruleErrorBuilder);
 			}
 
-			return $ruleErrorBuilder->tip('Because the type is coming from a PHPDoc, you can turn off this check by setting <fg=cyan>treatPhpDocTypesAsCertain: false</> in your <fg=cyan>%configurationFile%</>.');
+			$ruleErrorBuilder = $ruleErrorBuilder->treatPhpDocTypesAsCertainTip();
+
+			return $this->possiblyImpureTipHelper->addTip($scope, $funcCall, $ruleErrorBuilder);
 		};
 
 		if (!$isAlways) {
-			return [
-				$addTip(RuleErrorBuilder::message(sprintf(
-					'Call to function %s()%s will always evaluate to false.',
-					$functionName,
-					$this->impossibleCheckTypeHelper->getArgumentsDescription($scope, $node->getArgs()),
-				)))->build(),
-			];
-		} elseif ($this->checkAlwaysTrueCheckTypeFunctionCall) {
-			return [
-				$addTip(RuleErrorBuilder::message(sprintf(
-					'Call to function %s()%s will always evaluate to true.',
-					$functionName,
-					$this->impossibleCheckTypeHelper->getArgumentsDescription($scope, $node->getArgs()),
-				)))->build(),
-			];
+			$errorBuilder = $addTip(RuleErrorBuilder::message(sprintf(
+				'Call to function %s()%s will always evaluate to false.',
+				$functionName,
+				$this->impossibleCheckTypeHelper->getArgumentsDescription($scope, $funcCall->getArgs()),
+			)));
+			$ruleError = $errorBuilder->identifier('function.impossibleType')->build();
+			if ($scope->isInTrait()) {
+				$this->constantConditionInTraitHelper->emitError(self::class, $scope, $funcCall, false, $ruleError);
+				return [];
+			}
+
+			return [$ruleError];
 		}
 
-		return [];
+		$isLast = $funcCall->getAttribute(LastConditionVisitor::ATTRIBUTE_NAME);
+		if ($isLast === true && !$this->reportAlwaysTrueInLastCondition) {
+			$this->constantConditionInTraitHelper->emitNoError(self::class, $scope, $funcCall);
+			return [];
+		}
+
+		$errorBuilder = $addTip(RuleErrorBuilder::message(sprintf(
+			'Call to function %s()%s will always evaluate to true.',
+			$functionName,
+			$this->impossibleCheckTypeHelper->getArgumentsDescription($scope, $funcCall->getArgs()),
+		)));
+		if ($isLast === false && !$this->reportAlwaysTrueInLastCondition) {
+			$errorBuilder->tip('Remove remaining cases below this one and this error will disappear too.');
+		}
+
+		$errorBuilder->identifier('function.alreadyNarrowedType');
+
+		$ruleError = $errorBuilder->build();
+		if ($scope->isInTrait()) {
+			$this->constantConditionInTraitHelper->emitError(self::class, $scope, $funcCall, true, $ruleError);
+			return [];
+		}
+
+		return [$ruleError];
 	}
 
 }

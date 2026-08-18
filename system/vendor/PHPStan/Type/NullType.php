@@ -2,6 +2,10 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantBooleanType;
@@ -17,6 +21,7 @@ use PHPStan\Type\Traits\NonObjectTypeTrait;
 use PHPStan\Type\Traits\NonRemoveableTypeTrait;
 
 /** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::isNull()')]
 class NullType implements ConstantScalarType
 {
 
@@ -33,10 +38,22 @@ class NullType implements ConstantScalarType
 	{
 	}
 
-	/**
-	 * @return string[]
-	 */
 	public function getReferencedClasses(): array
+	{
+		return [];
+	}
+
+	public function getObjectClassNames(): array
+	{
+		return [];
+	}
+
+	public function getObjectClassReflections(): array
+	{
+		return [];
+	}
+
+	public function getConstantStrings(): array
 	{
 		return [];
 	}
@@ -54,30 +71,30 @@ class NullType implements ConstantScalarType
 		return $this;
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
 		if ($type instanceof self) {
-			return TrinaryLogic::createYes();
+			return AcceptsResult::createYes();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
-		return TrinaryLogic::createNo();
+		return AcceptsResult::createNo();
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof self) {
-			return TrinaryLogic::createYes();
+			return IsSuperTypeOfResult::createYes();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
 		}
 
-		return TrinaryLogic::createNo();
+		return IsSuperTypeOfResult::createNo();
 	}
 
 	public function equals(Type $type): bool
@@ -85,27 +102,35 @@ class NullType implements ConstantScalarType
 		return $type instanceof self;
 	}
 
-	public function isSmallerThan(Type $otherType): TrinaryLogic
+	public function isSmallerThan(Type $otherType, PhpVersion $phpVersion): TrinaryLogic
 	{
 		if ($otherType instanceof ConstantScalarType) {
 			return TrinaryLogic::createFromBoolean(null < $otherType->getValue());
 		}
 
 		if ($otherType instanceof CompoundType) {
-			return $otherType->isGreaterThan($this);
+			return $otherType->isGreaterThan($this, $phpVersion);
+		}
+
+		if ($otherType->isObject()->yes()) {
+			return TrinaryLogic::createYes();
 		}
 
 		return TrinaryLogic::createMaybe();
 	}
 
-	public function isSmallerThanOrEqual(Type $otherType): TrinaryLogic
+	public function isSmallerThanOrEqual(Type $otherType, PhpVersion $phpVersion): TrinaryLogic
 	{
 		if ($otherType instanceof ConstantScalarType) {
 			return TrinaryLogic::createFromBoolean(null <= $otherType->getValue());
 		}
 
 		if ($otherType instanceof CompoundType) {
-			return $otherType->isGreaterThanOrEqual($this);
+			return $otherType->isGreaterThanOrEqual($this, $phpVersion);
+		}
+
+		if ($otherType->isObject()->yes()) {
+			return TrinaryLogic::createYes();
 		}
 
 		return TrinaryLogic::createMaybe();
@@ -119,6 +144,23 @@ class NullType implements ConstantScalarType
 	public function toNumber(): Type
 	{
 		return new ConstantIntegerType(0);
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toClassConstantType(ReflectionProvider $reflectionProvider): Type
+	{
+		// Null `::class` reads as `null` (mirrors how `null::class` flows
+		// through the `::class` resolution pipeline alongside object types).
+		return $this;
+	}
+
+	public function toAbsoluteNumber(): Type
+	{
+		return $this->toNumber()->toAbsoluteNumber();
 	}
 
 	public function toString(): Type
@@ -146,7 +188,17 @@ class NullType implements ConstantScalarType
 		return new ConstantStringType('');
 	}
 
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		return $this;
+	}
+
 	public function isOffsetAccessible(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isOffsetAccessLegal(): TrinaryLogic
 	{
 		return TrinaryLogic::createYes();
 	}
@@ -167,6 +219,11 @@ class NullType implements ConstantScalarType
 		return $array->setOffsetValueType($offsetType, $valueType, $unionValues);
 	}
 
+	public function setExistingOffsetValueType(Type $offsetType, Type $valueType): Type
+	{
+		return $this;
+	}
+
 	public function unsetOffset(Type $offsetType): Type
 	{
 		return $this;
@@ -177,12 +234,72 @@ class NullType implements ConstantScalarType
 		return $this;
 	}
 
+	public function traverseSimultaneously(Type $right, callable $cb): Type
+	{
+		return $this;
+	}
+
+	public function isNull(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isConstantValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isConstantScalarValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function getConstantScalarTypes(): array
+	{
+		return [$this];
+	}
+
+	public function getConstantScalarValues(): array
+	{
+		return [$this->getValue()];
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isBoolean(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFloat(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isInteger(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
 	public function isString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
 
 	public function isNumericString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isDecimalIntegerString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
@@ -202,12 +319,65 @@ class NullType implements ConstantScalarType
 		return TrinaryLogic::createNo();
 	}
 
-	public function getSmallerType(): Type
+	public function isLowercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isUppercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isClassString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function isVoid(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		if ($type instanceof ConstantScalarType) {
+			return LooseComparisonHelper::compareConstantScalars($this, $type, $phpVersion);
+		}
+
+		if ($type->isConstantArray()->yes() && $type->isIterableAtLeastOnce()->no()) {
+			// @phpstan-ignore equal.alwaysTrue, equal.notAllowed
+			return new ConstantBooleanType($this->getValue() == []); // phpcs:ignore
+		}
+
+		if ($type instanceof CompoundType) {
+			return $type->looseCompare($this, $phpVersion);
+		}
+
+		return new BooleanType();
+	}
+
+	public function getSmallerType(PhpVersion $phpVersion): Type
 	{
 		return new NeverType();
 	}
 
-	public function getSmallerOrEqualType(): Type
+	public function getSmallerOrEqualType(PhpVersion $phpVersion): Type
 	{
 		// All falsey types except '0'
 		return new UnionType([
@@ -220,10 +390,10 @@ class NullType implements ConstantScalarType
 		]);
 	}
 
-	public function getGreaterType(): Type
+	public function getGreaterType(PhpVersion $phpVersion): Type
 	{
 		// All truthy types, but also '0'
-		return new MixedType(false, new UnionType([
+		return new MixedType(subtractedType: new UnionType([
 			new NullType(),
 			new ConstantBooleanType(false),
 			new ConstantIntegerType(0),
@@ -233,17 +403,34 @@ class NullType implements ConstantScalarType
 		]));
 	}
 
-	public function getGreaterOrEqualType(): Type
+	public function getGreaterOrEqualType(PhpVersion $phpVersion): Type
 	{
 		return new MixedType();
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function getFiniteTypes(): array
 	{
-		return new self();
+		return [$this];
+	}
+
+	public function exponentiate(Type $exponent): Type
+	{
+		return new UnionType(
+			[
+				new ConstantIntegerType(0),
+				new ConstantIntegerType(1),
+			],
+		);
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode('null');
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return false;
 	}
 
 }

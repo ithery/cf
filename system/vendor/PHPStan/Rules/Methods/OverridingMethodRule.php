@@ -3,34 +3,46 @@
 namespace PHPStan\Rules\Methods;
 
 use PhpParser\Node;
+use PhpParser\Node\Attribute;
+use PHPStan\Analyser\CollectedDataEmitter;
+use PHPStan\Analyser\NodeCallbackInvoker;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Node\InClassMethodNode;
 use PHPStan\Php\PhpVersion;
-use PHPStan\Reflection\FunctionVariantWithPhpDocs;
+use PHPStan\Reflection\ExtendedFunctionVariant;
 use PHPStan\Reflection\MethodPrototypeReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
-use PHPStan\Reflection\Php\PhpMethodFromParserNodeReflection;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\ShouldNotHappenException;
+use PHPStan\Type\MixedType;
 use PHPStan\Type\VerbosityLevel;
 use function array_merge;
 use function count;
+use function is_bool;
 use function sprintf;
 use function strtolower;
 
 /**
  * @implements Rule<InClassMethodNode>
  */
-class OverridingMethodRule implements Rule
+#[RegisteredRule(level: 0)]
+#[ValidatesStubFiles]
+final class OverridingMethodRule implements Rule
 {
 
 	public function __construct(
 		private PhpVersion $phpVersion,
 		private MethodSignatureRule $methodSignatureRule,
+		#[AutowiredParameter]
 		private bool $checkPhpDocMethodSignatures,
 		private MethodParameterComparisonHelper $methodParameterComparisonHelper,
+		private MethodVisibilityComparisonHelper $methodVisibilityComparisonHelper,
+		private MethodPrototypeFinder $methodPrototypeFinder,
+		#[AutowiredParameter]
+		private bool $checkMissingOverrideMethodAttribute,
 	)
 	{
 	}
@@ -40,49 +52,132 @@ class OverridingMethodRule implements Rule
 		return InClassMethodNode::class;
 	}
 
-	public function processNode(Node $node, Scope $scope): array
+	public function processNode(Node $node, Scope&NodeCallbackInvoker&CollectedDataEmitter $scope): array
 	{
-		$method = $scope->getFunction();
-		if (!$method instanceof PhpMethodFromParserNodeReflection) {
-			throw new ShouldNotHappenException();
-		}
-
-		$prototype = $method->getPrototype();
-		if ($prototype->getDeclaringClass()->getName() === $method->getDeclaringClass()->getName()) {
+		$method = $node->getMethodReflection();
+		$prototypeData = $this->methodPrototypeFinder->findPrototype($node->getClassReflection(), $method->getName());
+		if ($prototypeData === null) {
 			if (strtolower($method->getName()) === '__construct') {
 				$parent = $method->getDeclaringClass()->getParentClass();
 				if ($parent !== null && $parent->hasConstructor()) {
 					$parentConstructor = $parent->getConstructor();
-					if ($parentConstructor->isFinal()->yes()) {
+					if ($parentConstructor->isFinalByKeyword()->yes()) {
 						return $this->addErrors([
 							RuleErrorBuilder::message(sprintf(
 								'Method %s::%s() overrides final method %s::%s().',
 								$method->getDeclaringClass()->getDisplayName(),
 								$method->getName(),
-								$parent->getDisplayName(),
+								$parent->getDisplayName(true),
 								$parentConstructor->getName(),
-							))->nonIgnorable()->build(),
+							))
+								->nonIgnorable()
+								->identifier('method.parentMethodFinal')
+								->build(),
+						], $node, $scope);
+					}
+					if ($parentConstructor->isFinal()->yes()) {
+						return $this->addErrors([
+							RuleErrorBuilder::message(sprintf(
+								'Method %s::%s() overrides @final method %s::%s().',
+								$method->getDeclaringClass()->getDisplayName(),
+								$method->getName(),
+								$parent->getDisplayName(true),
+								$parentConstructor->getName(),
+							))->identifier('method.parentMethodFinalByPhpDoc')
+								->build(),
+						], $node, $scope);
+					}
+					$parentAbstract = $parentConstructor->isAbstract();
+					if (
+						$method->isAbstract()->yes()
+						&& !(is_bool($parentAbstract) ? $parentAbstract : $parentAbstract->yes())
+					) {
+						return $this->addErrors([
+							RuleErrorBuilder::message(sprintf(
+								'Cannot make non-abstract method %s::%s() abstract in class %s.',
+								$parentConstructor->getDeclaringClass()->getDisplayName(true),
+								$parentConstructor->getName(),
+								$method->getDeclaringClass()->getDisplayName(),
+							))
+								->nonIgnorable()
+								->identifier('method.abstractOverridingNonAbstract')
+								->build(),
 						], $node, $scope);
 					}
 				}
 			}
 
+			if ($this->hasOverrideAttribute($node->getOriginalNode())) {
+				return [
+					RuleErrorBuilder::message(sprintf(
+						'Method %s::%s() has #[\Override] attribute but does not override any method.',
+						$method->getDeclaringClass()->getDisplayName(),
+						$method->getName(),
+					))
+						->nonIgnorable()
+						->identifier('method.override')
+						->fixNode($node->getOriginalNode(), function (Node\Stmt\ClassMethod $method) {
+							$method->attrGroups = $this->filterOverrideAttribute($method->attrGroups);
+							return $method;
+						})
+						->build(),
+				];
+			}
+
 			return [];
 		}
 
-		if (!$prototype instanceof MethodPrototypeReflection) {
-			return [];
-		}
+		[
+			$prototype,
+			$prototypeDeclaringClass,
+			$checkVisibility,
+			$inheritancePrototype,
+			$inheritancePrototypeDeclaringClass,
+		] = $prototypeData;
 
 		$messages = [];
-		if ($prototype->isFinal()) {
+		if (
+			$this->checkMissingOverrideMethodAttribute
+			&& !$scope->isInTrait()
+			&& !$this->hasOverrideAttribute($node->getOriginalNode())
+		) {
+			$messages[] = RuleErrorBuilder::message(sprintf(
+				'Method %s::%s() overrides method %s::%s() but is missing the #[\Override] attribute.',
+				$method->getDeclaringClass()->getDisplayName(),
+				$method->getName(),
+				$inheritancePrototypeDeclaringClass->getDisplayName(true),
+				$inheritancePrototype->getName(),
+			))
+				->identifier('method.missingOverride')
+				->fixNode($node->getOriginalNode(), static function (Node\Stmt\ClassMethod $method) {
+					$method->attrGroups[] = new Node\AttributeGroup([
+						new Attribute(new Node\Name\FullyQualified('Override')),
+					]);
+
+					return $method;
+				})
+				->build();
+		}
+		if ($inheritancePrototype->isFinalByKeyword()->yes()) {
 			$messages[] = RuleErrorBuilder::message(sprintf(
 				'Method %s::%s() overrides final method %s::%s().',
 				$method->getDeclaringClass()->getDisplayName(),
 				$method->getName(),
-				$prototype->getDeclaringClass()->getDisplayName(),
-				$prototype->getName(),
-			))->nonIgnorable()->build();
+				$inheritancePrototypeDeclaringClass->getDisplayName(true),
+				$inheritancePrototype->getName(),
+			))
+				->nonIgnorable()
+				->identifier('method.parentMethodFinal')
+				->build();
+		} elseif ($inheritancePrototype->isFinal()->yes()) {
+			$messages[] = RuleErrorBuilder::message(sprintf(
+				'Method %s::%s() overrides @final method %s::%s().',
+				$method->getDeclaringClass()->getDisplayName(),
+				$method->getName(),
+				$inheritancePrototypeDeclaringClass->getDisplayName(true),
+				$inheritancePrototype->getName(),
+			))->identifier('method.parentMethodFinalByPhpDoc')
+				->build();
 		}
 
 		if ($prototype->isStatic()) {
@@ -91,39 +186,44 @@ class OverridingMethodRule implements Rule
 					'Non-static method %s::%s() overrides static method %s::%s().',
 					$method->getDeclaringClass()->getDisplayName(),
 					$method->getName(),
-					$prototype->getDeclaringClass()->getDisplayName(),
+					$prototypeDeclaringClass->getDisplayName(true),
 					$prototype->getName(),
-				))->nonIgnorable()->build();
+				))
+					->nonIgnorable()
+					->identifier('method.nonStatic')
+					->build();
 			}
 		} elseif ($method->isStatic()) {
 			$messages[] = RuleErrorBuilder::message(sprintf(
 				'Static method %s::%s() overrides non-static method %s::%s().',
 				$method->getDeclaringClass()->getDisplayName(),
 				$method->getName(),
-				$prototype->getDeclaringClass()->getDisplayName(),
+				$prototypeDeclaringClass->getDisplayName(true),
 				$prototype->getName(),
-			))->nonIgnorable()->build();
+			))
+				->nonIgnorable()
+				->identifier('method.static')
+				->build();
 		}
 
-		if ($prototype->isPublic()) {
-			if (!$method->isPublic()) {
-				$messages[] = RuleErrorBuilder::message(sprintf(
-					'%s method %s::%s() overriding public method %s::%s() should also be public.',
-					$method->isPrivate() ? 'Private' : 'Protected',
-					$method->getDeclaringClass()->getDisplayName(),
-					$method->getName(),
-					$prototype->getDeclaringClass()->getDisplayName(),
-					$prototype->getName(),
-				))->nonIgnorable()->build();
-			}
-		} elseif ($method->isPrivate()) {
+		$prototypeAbstract = $prototype->isAbstract();
+		if (
+			$method->isAbstract()->yes()
+			&& !(is_bool($prototypeAbstract) ? $prototypeAbstract : $prototypeAbstract->yes())
+		) {
 			$messages[] = RuleErrorBuilder::message(sprintf(
-				'Private method %s::%s() overriding protected method %s::%s() should be protected or public.',
-				$method->getDeclaringClass()->getDisplayName(),
-				$method->getName(),
-				$prototype->getDeclaringClass()->getDisplayName(),
+				'Cannot make non-abstract method %s::%s() abstract in class %s.',
+				$prototypeDeclaringClass->getDisplayName(true),
 				$prototype->getName(),
-			))->nonIgnorable()->build();
+				$method->getDeclaringClass()->getDisplayName(),
+			))
+				->nonIgnorable()
+				->identifier('method.abstractOverridingNonAbstract')
+				->build();
+		}
+
+		if ($checkVisibility) {
+			$messages = array_merge($messages, $this->methodVisibilityComparisonHelper->compare($prototype, $prototypeDeclaringClass, $method));
 		}
 
 		$prototypeVariants = $prototype->getVariants();
@@ -133,37 +233,75 @@ class OverridingMethodRule implements Rule
 
 		$prototypeVariant = $prototypeVariants[0];
 
-		$methodVariant = ParametersAcceptorSelector::selectSingle($method->getVariants());
-		$methodReturnType = $methodVariant->getNativeReturnType();
+		$methodReturnType = $method->getNativeReturnType();
+
+		$realPrototype = $method->getPrototype();
 
 		if (
-			$this->phpVersion->hasTentativeReturnTypes()
-			&& $prototype->getTentativeReturnType() !== null
+			$realPrototype instanceof MethodPrototypeReflection
+			&& $this->phpVersion->hasTentativeReturnTypes()
+			&& $realPrototype->getTentativeReturnType() !== null
 			&& !$this->hasReturnTypeWillChangeAttribute($node->getOriginalNode())
+			&& count($prototypeDeclaringClass->getNativeReflection()->getMethod($prototype->getName())->getAttributes('ReturnTypeWillChange')) === 0
 		) {
-
-			if (!$this->methodParameterComparisonHelper->isReturnTypeCompatible($prototype->getTentativeReturnType(), $methodVariant->getNativeReturnType(), true)) {
+			if (!$this->methodParameterComparisonHelper->isReturnTypeCompatible($realPrototype->getTentativeReturnType(), $method->getNativeReturnType(), true)) {
 				$messages[] = RuleErrorBuilder::message(sprintf(
 					'Return type %s of method %s::%s() is not covariant with tentative return type %s of method %s::%s().',
 					$methodReturnType->describe(VerbosityLevel::typeOnly()),
 					$method->getDeclaringClass()->getDisplayName(),
 					$method->getName(),
-					$prototype->getTentativeReturnType()->describe(VerbosityLevel::typeOnly()),
-					$prototype->getDeclaringClass()->getDisplayName(),
-					$prototype->getName(),
-				))->tip('Make it covariant, or use the #[\ReturnTypeWillChange] attribute to temporarily suppress the error.')->nonIgnorable()->build();
+					$realPrototype->getTentativeReturnType()->describe(VerbosityLevel::typeOnly()),
+					$realPrototype->getDeclaringClass()->getDisplayName(true),
+					$realPrototype->getName(),
+				))
+					->tip('Make it covariant, or use the #[\ReturnTypeWillChange] attribute to temporarily suppress the error.')
+					->nonIgnorable()
+					->identifier('method.tentativeReturnType')
+					->build();
 			}
 		}
 
-		$messages = array_merge($messages, $this->methodParameterComparisonHelper->compare($prototype, $method));
+		$messages = array_merge($messages, $this->methodParameterComparisonHelper->compare($prototype, $prototypeDeclaringClass, $method, $scope, false));
 
-		if (!$prototypeVariant instanceof FunctionVariantWithPhpDocs) {
+		if (!$prototypeVariant instanceof ExtendedFunctionVariant) {
 			return $this->addErrors($messages, $node, $scope);
 		}
 
 		$prototypeReturnType = $prototypeVariant->getNativeReturnType();
+		$reportReturnType = true;
+		if ($this->phpVersion->hasTentativeReturnTypes()) {
+			$reportReturnType = !$realPrototype instanceof MethodPrototypeReflection
+				|| $realPrototype->getTentativeReturnType() === null
+				|| (is_bool($prototype->isBuiltin()) ? !$prototype->isBuiltin() : $prototype->isBuiltin()->no());
+		} else {
+			if ($realPrototype instanceof MethodPrototypeReflection && $realPrototype->isInternal()) {
+				if (
+					(is_bool($prototype->isBuiltin()) ? $prototype->isBuiltin() : $prototype->isBuiltin()->yes())
+					&& $prototypeDeclaringClass->getName() !== $realPrototype->getDeclaringClass()->getName()
+				) {
+					$realPrototypeVariant = $realPrototype->getVariants()[0];
+					if (
+						$prototypeReturnType instanceof MixedType
+						&& !$prototypeReturnType->isExplicitMixed()
+						&& (!$realPrototypeVariant->getReturnType() instanceof MixedType || $realPrototypeVariant->getReturnType()->isExplicitMixed())
+					) {
+						$reportReturnType = false;
+					}
+				}
 
-		if (!$this->methodParameterComparisonHelper->isReturnTypeCompatible($prototypeReturnType, $methodReturnType, $this->phpVersion->supportsReturnCovariance())) {
+				if (
+					$reportReturnType
+					&& (is_bool($prototype->isBuiltin()) ? $prototype->isBuiltin() : $prototype->isBuiltin()->yes())
+				) {
+					$reportReturnType = !$this->hasReturnTypeWillChangeAttribute($node->getOriginalNode());
+				}
+			}
+		}
+
+		if (
+			$reportReturnType
+			&& !$this->methodParameterComparisonHelper->isReturnTypeCompatible($prototypeReturnType, $methodReturnType, $this->phpVersion->supportsReturnCovariance())
+		) {
 			if ($this->phpVersion->supportsReturnCovariance()) {
 				$messages[] = RuleErrorBuilder::message(sprintf(
 					'Return type %s of method %s::%s() is not covariant with return type %s of method %s::%s().',
@@ -171,9 +309,12 @@ class OverridingMethodRule implements Rule
 					$method->getDeclaringClass()->getDisplayName(),
 					$method->getName(),
 					$prototypeReturnType->describe(VerbosityLevel::typeOnly()),
-					$prototype->getDeclaringClass()->getDisplayName(),
+					$prototypeDeclaringClass->getDisplayName(true),
 					$prototype->getName(),
-				))->nonIgnorable()->build();
+				))
+					->nonIgnorable()
+					->identifier('method.childReturnType')
+					->build();
 			} else {
 				$messages[] = RuleErrorBuilder::message(sprintf(
 					'Return type %s of method %s::%s() is not compatible with return type %s of method %s::%s().',
@@ -181,9 +322,12 @@ class OverridingMethodRule implements Rule
 					$method->getDeclaringClass()->getDisplayName(),
 					$method->getName(),
 					$prototypeReturnType->describe(VerbosityLevel::typeOnly()),
-					$prototype->getDeclaringClass()->getDisplayName(),
+					$prototypeDeclaringClass->getDisplayName(true),
 					$prototype->getName(),
-				))->nonIgnorable()->build();
+				))
+					->nonIgnorable()
+					->identifier('method.childReturnType')
+					->build();
 			}
 		}
 
@@ -191,13 +335,37 @@ class OverridingMethodRule implements Rule
 	}
 
 	/**
-	 * @param RuleError[] $errors
-	 * @return (string|RuleError)[]
+	 * @param Node\AttributeGroup[] $attrGroups
+	 * @return Node\AttributeGroup[]
+	 */
+	private function filterOverrideAttribute(array $attrGroups): array
+	{
+		foreach ($attrGroups as $i => $attrGroup) {
+			foreach ($attrGroup->attrs as $j => $attr) {
+				if ($attr->name->toLowerString() !== 'override') {
+					continue;
+				}
+
+				unset($attrGroup->attrs[$j]);
+				if (count($attrGroup->attrs) !== 0) {
+					continue;
+				}
+
+				unset($attrGroups[$i]);
+			}
+		}
+
+		return $attrGroups;
+	}
+
+	/**
+	 * @param list<IdentifierRuleError> $errors
+	 * @return list<IdentifierRuleError>
 	 */
 	private function addErrors(
 		array $errors,
 		InClassMethodNode $classMethod,
-		Scope $scope,
+		Scope&NodeCallbackInvoker&CollectedDataEmitter $scope,
 	): array
 	{
 		if (count($errors) > 0) {
@@ -216,6 +384,19 @@ class OverridingMethodRule implements Rule
 		foreach ($method->attrGroups as $attrGroup) {
 			foreach ($attrGroup->attrs as $attr) {
 				if ($attr->name->toLowerString() === 'returntypewillchange') {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private function hasOverrideAttribute(Node\Stmt\ClassMethod $method): bool
+	{
+		foreach ($method->attrGroups as $attrGroup) {
+			foreach ($attrGroup->attrs as $attr) {
+				if ($attr->name->toLowerString() === 'override') {
 					return true;
 				}
 			}

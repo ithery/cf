@@ -2,15 +2,20 @@
 
 namespace PHPStan\Reflection\Annotations;
 
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ExtendedPropertyReflection;
 use PHPStan\Reflection\PropertiesClassReflectionExtension;
-use PHPStan\Reflection\PropertyReflection;
 use PHPStan\Type\Generic\TemplateTypeHelper;
+use PHPStan\Type\Generic\TemplateTypeVariance;
+use PHPStan\Type\NeverType;
 
-class AnnotationsPropertiesClassReflectionExtension implements PropertiesClassReflectionExtension
+// autoTag: false - wired explicitly in ClassReflectionExtensionRegistry, must not be tagged
+#[AutowiredService(autoTag: false)]
+final class AnnotationsPropertiesClassReflectionExtension implements PropertiesClassReflectionExtension
 {
 
-	/** @var PropertyReflection[][] */
+	/** @var ExtendedPropertyReflection[][] */
 	private array $properties = [];
 
 	public function hasProperty(ClassReflection $classReflection, string $propertyName): bool
@@ -23,10 +28,10 @@ class AnnotationsPropertiesClassReflectionExtension implements PropertiesClassRe
 			$this->properties[$classReflection->getCacheKey()][$propertyName] = $property;
 		}
 
-		return isset($this->properties[$classReflection->getCacheKey()][$propertyName]);
+		return true;
 	}
 
-	public function getProperty(ClassReflection $classReflection, string $propertyName): PropertyReflection
+	public function getProperty(ClassReflection $classReflection, string $propertyName): ExtendedPropertyReflection
 	{
 		return $this->properties[$classReflection->getCacheKey()][$propertyName];
 	}
@@ -35,18 +40,39 @@ class AnnotationsPropertiesClassReflectionExtension implements PropertiesClassRe
 		ClassReflection $classReflection,
 		ClassReflection $declaringClass,
 		string $propertyName,
-	): ?PropertyReflection
+	): ?ExtendedPropertyReflection
 	{
 		$propertyTags = $classReflection->getPropertyTags();
 		if (isset($propertyTags[$propertyName])) {
+			$propertyTag = $propertyTags[$propertyName];
+
+			$isReadable = $propertyTags[$propertyName]->isReadable();
+			$isWritable = $propertyTags[$propertyName]->isWritable();
+			if ($classReflection->hasNativeProperty($propertyName)) {
+				$nativeProperty = $classReflection->getNativeProperty($propertyName);
+				if (!$nativeProperty->isPrivate() && !$nativeProperty->isStatic()) {
+					$isReadable = $isReadable || $nativeProperty->isReadable();
+					$isWritable = $isWritable || $nativeProperty->isWritable();
+				}
+			}
+
 			return new AnnotationPropertyReflection(
+				$propertyName,
 				$declaringClass,
 				TemplateTypeHelper::resolveTemplateTypes(
-					$propertyTags[$propertyName]->getType(),
+					$propertyTag->getReadableType() ?? new NeverType(),
 					$classReflection->getActiveTemplateTypeMap(),
+					$classReflection->getCallSiteVarianceMap(),
+					TemplateTypeVariance::createCovariant(),
 				),
-				$propertyTags[$propertyName]->isReadable(),
-				$propertyTags[$propertyName]->isWritable(),
+				TemplateTypeHelper::resolveTemplateTypes(
+					$propertyTag->getWritableType() ?? new NeverType(),
+					$classReflection->getActiveTemplateTypeMap(),
+					$classReflection->getCallSiteVarianceMap(),
+					TemplateTypeVariance::createContravariant(),
+				),
+				$isReadable,
+				$isWritable,
 			);
 		}
 
@@ -59,21 +85,12 @@ class AnnotationsPropertiesClassReflectionExtension implements PropertiesClassRe
 			return $methodWithDeclaringClass;
 		}
 
-		foreach ($classReflection->getParents() as $parentClass) {
+		$parentClass = $classReflection->getParentClass();
+		if ($parentClass !== null) {
 			$methodWithDeclaringClass = $this->findClassReflectionWithProperty($parentClass, $parentClass, $propertyName);
-			if ($methodWithDeclaringClass === null) {
-				foreach ($parentClass->getTraits() as $traitClass) {
-					$parentTraitMethodWithDeclaringClass = $this->findClassReflectionWithProperty($traitClass, $parentClass, $propertyName);
-					if ($parentTraitMethodWithDeclaringClass === null) {
-						continue;
-					}
-
-					return $parentTraitMethodWithDeclaringClass;
-				}
-				continue;
+			if ($methodWithDeclaringClass !== null) {
+				return $methodWithDeclaringClass;
 			}
-
-			return $methodWithDeclaringClass;
 		}
 
 		foreach ($classReflection->getInterfaces() as $interfaceClass) {

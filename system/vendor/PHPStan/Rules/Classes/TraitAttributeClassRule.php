@@ -4,13 +4,15 @@ namespace PHPStan\Rules\Classes;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
 /**
  * @implements Rule<Node\Stmt\Trait_>
  */
-class TraitAttributeClassRule implements Rule
+#[RegisteredRule(level: 0)]
+final class TraitAttributeClassRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -25,7 +27,9 @@ class TraitAttributeClassRule implements Rule
 				$name = $attr->name->toLowerString();
 				if ($name === 'attribute') {
 					return [
-						RuleErrorBuilder::message('Trait cannot be an Attribute class.')->build(),
+						RuleErrorBuilder::message('Trait cannot be an Attribute class.')
+							->identifier('attribute.trait')
+							->build(),
 					];
 				}
 			}

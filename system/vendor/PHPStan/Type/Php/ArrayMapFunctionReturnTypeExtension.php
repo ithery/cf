@@ -2,26 +2,36 @@
 
 namespace PHPStan\Type\Php;
 
+use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Node\Expr\TypeExpr;
+use PHPStan\Parser\ArrayMapArgVisitor;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
+use PHPStan\TrinaryLogic;
+use PHPStan\Type\Accessory\AccessoryArrayListType;
+use PHPStan\Type\Accessory\AccessoryType;
+use PHPStan\Type\Accessory\HasOffsetValueType;
 use PHPStan\Type\Accessory\NonEmptyArrayType;
 use PHPStan\Type\ArrayType;
+use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantArrayTypeBuilder;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
-use PHPStan\Type\IntegerType;
+use PHPStan\Type\IntegerRangeType;
+use PHPStan\Type\IntersectionType;
 use PHPStan\Type\MixedType;
-use PHPStan\Type\NeverType;
-use PHPStan\Type\NullType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\TypeUtils;
+use function array_map;
+use function array_reduce;
 use function array_slice;
 use function count;
 
-class ArrayMapFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class ArrayMapFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -29,27 +39,81 @@ class ArrayMapFunctionReturnTypeExtension implements DynamicFunctionReturnTypeEx
 		return $functionReflection->getName() === 'array_map';
 	}
 
-	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
+	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		if (count($functionCall->getArgs()) < 2) {
-			return ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+		$args = $functionCall->getArgs();
+		$numArgs = count($args);
+		if ($numArgs < 2) {
+			return null;
 		}
 
-		$singleArrayArgument = !isset($functionCall->getArgs()[2]);
-		$callableType = $scope->getType($functionCall->getArgs()[0]->value);
-		$callableIsNull = (new NullType())->isSuperTypeOf($callableType)->yes();
+		$singleArrayArgument = !isset($args[2]);
+		$callback = $args[0]->value;
+		$callableType = $scope->getType($callback);
+		$callableIsNull = $callableType->isNull()->yes();
 
 		if ($callableType->isCallable()->yes()) {
-			$valueType = new NeverType();
-			foreach ($callableType->getCallableParametersAcceptors($scope) as $parametersAcceptor) {
-				$valueType = TypeCombinator::union($valueType, $parametersAcceptor->getReturnType());
-			}
+			$valueType = $scope->getType(new FuncCall(
+				$callback,
+				array_map(
+					static fn (Node\Arg $arg) => new Node\Arg(new TypeExpr($scope->getType($arg->value)->getIterableValueType())),
+					array_slice($args, 1),
+				),
+			));
 		} elseif ($callableIsNull) {
 			$arrayBuilder = ConstantArrayTypeBuilder::createEmpty();
-			foreach (array_slice($functionCall->getArgs(), 1) as $index => $arg) {
+			$argTypes = [];
+			$areAllSameSize = true;
+			$expectedSize = null;
+			foreach (array_slice($args, 1) as $index => $arg) {
+				$argTypes[$index] = $argType = $scope->getType($arg->value);
+				if (!$areAllSameSize || $numArgs === 2) {
+					continue;
+				}
+
+				$arraySizes = $argType->getArraySize()->getConstantScalarValues();
+				if ($arraySizes === []) {
+					$areAllSameSize = false;
+					continue;
+				}
+
+				foreach ($arraySizes as $size) {
+					$expectedSize ??= $size;
+					if ($expectedSize === $size) {
+						continue;
+					}
+
+					$areAllSameSize = false;
+					continue 2;
+				}
+			}
+
+			if (!$areAllSameSize) {
+				$firstArr = $args[1]->value;
+				$identities = [];
+				foreach (array_slice($args, 2) as $arg) {
+					$identities[] = new Node\Expr\BinaryOp\Identical($firstArr, $arg->value);
+				}
+
+				$and = array_reduce(
+					$identities,
+					static fn (Node\Expr $a, Node\Expr $b) => new Node\Expr\BinaryOp\BooleanAnd($a, $b),
+					new Node\Expr\ConstFetch(new Node\Name('true')),
+				);
+				$areAllSameSize = $scope->getType($and)->isTrue()->yes();
+			}
+
+			$addNull = !$areAllSameSize;
+
+			foreach ($argTypes as $index => $argType) {
+				$offsetValueType = $argType->getIterableValueType();
+				if ($addNull) {
+					$offsetValueType = TypeCombinator::addNull($offsetValueType);
+				}
+
 				$arrayBuilder->setOffsetValueType(
 					new ConstantIntegerType($index),
-					$scope->getType($arg->value)->getIterableValueType(),
+					$offsetValueType,
 				);
 			}
 			$valueType = $arrayBuilder->getArray();
@@ -57,7 +121,7 @@ class ArrayMapFunctionReturnTypeExtension implements DynamicFunctionReturnTypeEx
 			$valueType = new MixedType();
 		}
 
-		$arrayType = $scope->getType($functionCall->getArgs()[1]->value);
+		$arrayType = $scope->getType($args[1]->value);
 
 		if ($singleArrayArgument) {
 			if ($callableIsNull) {
@@ -65,25 +129,20 @@ class ArrayMapFunctionReturnTypeExtension implements DynamicFunctionReturnTypeEx
 			}
 			$constantArrays = $arrayType->getConstantArrays();
 			if (count($constantArrays) > 0) {
-				$arrayTypes = [];
-				foreach ($constantArrays as $constantArray) {
-					$returnedArrayBuilder = ConstantArrayTypeBuilder::createEmpty();
-					foreach ($constantArray->getKeyTypes() as $i => $keyType) {
-						$returnedArrayBuilder->setOffsetValueType(
-							$keyType,
-							$valueType,
-							$constantArray->isOptionalKey($i),
-						);
-					}
-					$arrayTypes[] = $returnedArrayBuilder->getArray();
+				$totalCount = TypeCombinator::countConstantArrayValueTypes($constantArrays) * TypeCombinator::countConstantArrayValueTypes([$valueType]);
+				if ($totalCount < ConstantArrayTypeBuilder::ARRAY_COUNT_LIMIT) {
+					$mappedArrayType = $arrayType->mapValueType(static fn (Type $type): Type => self::resolveCallbackReturnType($scope, $callback, $type));
+				} else {
+					$mappedArrayType = TypeCombinator::intersect(new ArrayType(
+						$arrayType->getIterableKeyType(),
+						$valueType,
+					), ...$this->getAccessoryTypes($arrayType, $valueType));
 				}
-
-				$mappedArrayType = TypeCombinator::union(...$arrayTypes);
 			} elseif ($arrayType->isArray()->yes()) {
 				$mappedArrayType = TypeCombinator::intersect(new ArrayType(
 					$arrayType->getIterableKeyType(),
 					$valueType,
-				), ...TypeUtils::getAccessoryTypes($arrayType));
+				), ...$this->getAccessoryTypes($arrayType, $valueType));
 			} else {
 				$mappedArrayType = new ArrayType(
 					new MixedType(),
@@ -91,10 +150,10 @@ class ArrayMapFunctionReturnTypeExtension implements DynamicFunctionReturnTypeEx
 				);
 			}
 		} else {
-			$mappedArrayType = TypeCombinator::intersect(new ArrayType(
-				new IntegerType(),
+			$mappedArrayType = new IntersectionType([new ArrayType(
+				IntegerRangeType::createAllGreaterThanOrEqualTo(0),
 				$valueType,
-			), ...TypeUtils::getAccessoryTypes($arrayType));
+			), new AccessoryArrayListType(), ...$this->getAccessoryTypes($arrayType, $valueType)]);
 		}
 
 		if ($arrayType->isIterableAtLeastOnce()->yes()) {
@@ -102,6 +161,44 @@ class ArrayMapFunctionReturnTypeExtension implements DynamicFunctionReturnTypeEx
 		}
 
 		return $mappedArrayType;
+	}
+
+	private static function resolveCallbackReturnType(Scope $scope, Node\Expr $callback, Type $argType): Type
+	{
+		if ($callback instanceof Node\Expr\Closure || $callback instanceof Node\Expr\ArrowFunction) {
+			$clone = clone $callback;
+			$wrappedType = new ConstantArrayType(
+				[new ConstantIntegerType(0)],
+				[$argType],
+				isList: TrinaryLogic::createYes(),
+			);
+			$clone->setAttribute(ArrayMapArgVisitor::ATTRIBUTE_NAME, [new Node\Arg(new TypeExpr($wrappedType))]);
+			$clone->setAttribute('phpstanCachedTypes', []);
+
+			return $scope->getType($clone)->getCallableParametersAcceptors($scope)[0]->getReturnType();
+		}
+
+		return $scope->getType(new FuncCall($callback, [
+			new Node\Arg(new TypeExpr($argType)),
+		]));
+	}
+
+	/**
+	 * @return list<AccessoryType>
+	 */
+	private function getAccessoryTypes(Type $arrayType, Type $valueType): array
+	{
+		$accessoryTypes = [];
+		foreach (TypeUtils::getAccessoryTypes($arrayType) as $accessoryType) {
+			if (!$accessoryType instanceof HasOffsetValueType) {
+				$accessoryTypes[] = $accessoryType;
+				continue;
+			}
+
+			$accessoryTypes[] = new HasOffsetValueType($accessoryType->getOffsetType(), $valueType);
+		}
+
+		return $accessoryTypes;
 	}
 
 }

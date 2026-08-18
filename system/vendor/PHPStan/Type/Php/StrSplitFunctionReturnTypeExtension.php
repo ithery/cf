@@ -4,11 +4,13 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\ShouldNotHappenException;
+use PHPStan\TrinaryLogic;
 use PHPStan\Type\Accessory\AccessoryArrayListType;
+use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
 use PHPStan\Type\Accessory\NonEmptyArrayType;
 use PHPStan\Type\ArrayType;
 use PHPStan\Type\Constant\ConstantArrayType;
@@ -16,14 +18,14 @@ use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
-use PHPStan\Type\IntegerType;
+use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntersectionType;
+use PHPStan\Type\NeverType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeTraverser;
-use PHPStan\Type\TypeUtils;
 use PHPStan\Type\UnionType;
+use function array_is_list;
 use function array_map;
 use function array_unique;
 use function count;
@@ -32,6 +34,7 @@ use function mb_internal_encoding;
 use function mb_str_split;
 use function str_split;
 
+#[AutowiredService]
 final class StrSplitFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
@@ -46,75 +49,96 @@ final class StrSplitFunctionReturnTypeExtension implements DynamicFunctionReturn
 		return in_array($functionReflection->getName(), ['str_split', 'mb_str_split'], true);
 	}
 
-	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
+	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		$defaultReturnType = ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
-
-		if (count($functionCall->getArgs()) < 1) {
-			return $defaultReturnType;
+		$args = $functionCall->getArgs();
+		if (count($args) < 1) {
+			return null;
 		}
 
-		if (count($functionCall->getArgs()) >= 2) {
-			$splitLengthType = $scope->getType($functionCall->getArgs()[1]->value);
-			if ($splitLengthType instanceof ConstantIntegerType) {
-				$splitLength = $splitLengthType->getValue();
-				if ($splitLength < 1) {
-					return new ConstantBooleanType(false);
-				}
-			}
+		if (count($args) >= 2) {
+			$splitLengthType = $scope->getType($args[1]->value);
 		} else {
-			$splitLength = 1;
+			$splitLengthType = new ConstantIntegerType(1);
+		}
+
+		if ($splitLengthType instanceof ConstantIntegerType) {
+			$splitLength = $splitLengthType->getValue();
+			if ($splitLength < 1) {
+				return $this->phpVersion->throwsValueErrorForInternalFunctions() ? new NeverType() : new ConstantBooleanType(false);
+			}
 		}
 
 		$encoding = null;
 		if ($functionReflection->getName() === 'mb_str_split') {
-			if (count($functionCall->getArgs()) >= 3) {
-				$strings = TypeUtils::getConstantStrings($scope->getType($functionCall->getArgs()[2]->value));
+			if (count($args) >= 3) {
+				$strings = $scope->getType($args[2]->value)->getConstantStrings();
 				$values = array_unique(array_map(static fn (ConstantStringType $encoding): string => $encoding->getValue(), $strings));
 
-				if (count($values) !== 1) {
-					return $defaultReturnType;
-				}
-
-				$encoding = $values[0];
-				if (!$this->isSupportedEncoding($encoding)) {
-					return new ConstantBooleanType(false);
+				if (count($values) === 1) {
+					$encoding = $values[0];
+					if (!$this->isSupportedEncoding($encoding)) {
+						return $this->phpVersion->throwsValueErrorForInternalFunctions() ? new NeverType() : new ConstantBooleanType(false);
+					}
 				}
 			} else {
 				$encoding = mb_internal_encoding();
 			}
 		}
 
-		if (!isset($splitLength)) {
-			return $defaultReturnType;
+		$stringType = $scope->getType($args[0]->value);
+		if (
+			isset($splitLength)
+			&& ($functionReflection->getName() === 'str_split' || $encoding !== null)
+		) {
+			$constantStrings = $stringType->getConstantStrings();
+			if (count($constantStrings) > 0) {
+				$results = [];
+				foreach ($constantStrings as $constantString) {
+					$value = $constantString->getValue();
+
+					if ($encoding === null && $value === '') {
+						// Simulate the str_split call with the analysed PHP Version instead of the runtime one.
+						$items = $this->phpVersion->strSplitReturnsEmptyArray() ? [] : [''];
+					} else {
+						$items = $encoding === null
+							? str_split($value, $splitLength)
+							: @mb_str_split($value, $splitLength, $encoding);
+					}
+
+					$results[] = self::createConstantArrayFrom($items, $scope);
+				}
+
+				return TypeCombinator::union(...$results);
+			}
 		}
 
-		$stringType = $scope->getType($functionCall->getArgs()[0]->value);
+		$isInputNonEmptyString = $stringType->isNonEmptyString()->yes();
 
-		return TypeTraverser::map($stringType, function (Type $type, callable $traverse) use ($encoding, $splitLength, $scope): Type {
-			if ($type instanceof UnionType || $type instanceof IntersectionType) {
-				return $traverse($type);
-			}
+		if ($isInputNonEmptyString || $this->phpVersion->strSplitReturnsEmptyArray()) {
+			$returnValueType = new IntersectionType([new StringType(), new AccessoryNonEmptyStringType()]);
+		} else {
+			$returnValueType = new StringType();
+		}
 
-			if (!$type instanceof ConstantStringType) {
-				$returnType = AccessoryArrayListType::intersectWith(new ArrayType(new IntegerType(), new StringType()));
+		$returnType = new IntersectionType([new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), $returnValueType), new AccessoryArrayListType()]);
+		if (
+			// Non-empty-string will return an array with at least an element
+			$isInputNonEmptyString
+			// str_split('', 1) returns [''] on old PHP version and [] on new ones
+			|| ($functionReflection->getName() === 'str_split' && !$this->phpVersion->strSplitReturnsEmptyArray())
+		) {
+			$returnType = TypeCombinator::intersect($returnType, new NonEmptyArrayType());
+		}
+		if (
+			// Length parameter accepts int<1, max> or throws a ValueError/return false based on PHP Version.
+			!$this->phpVersion->throwsValueErrorForInternalFunctions()
+			&& !IntegerRangeType::fromInterval(1, null)->isSuperTypeOf($splitLengthType)->yes()
+		) {
+			$returnType = new UnionType([$returnType, new ConstantBooleanType(false)]);
+		}
 
-				return $encoding === null && !$this->phpVersion->strSplitReturnsEmptyArray()
-					? TypeCombinator::intersect($returnType, new NonEmptyArrayType())
-					: $returnType;
-			}
-
-			$stringValue = $type->getValue();
-
-			$items = $encoding === null
-				? str_split($stringValue, $splitLength)
-				: @mb_str_split($stringValue, $splitLength, $encoding);
-			if ($items === false) {
-				throw new ShouldNotHappenException();
-			}
-
-			return self::createConstantArrayFrom($items, $scope);
-		});
+		return $returnType;
 	}
 
 	/**
@@ -140,7 +164,7 @@ final class StrSplitFunctionReturnTypeExtension implements DynamicFunctionReturn
 			$i++;
 		}
 
-		return new ConstantArrayType($keyTypes, $valueTypes, $isList ? [$i] : [0]);
+		return new ConstantArrayType($keyTypes, $valueTypes, $isList ? [$i] : [0], isList: TrinaryLogic::createFromBoolean(array_is_list($constantArray)));
 	}
 
 }

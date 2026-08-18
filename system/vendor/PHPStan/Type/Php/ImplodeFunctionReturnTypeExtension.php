@@ -4,13 +4,16 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
+use PHPStan\Reflection\InitializerExprTypeResolver;
 use PHPStan\Type\Accessory\AccessoryLiteralStringType;
+use PHPStan\Type\Accessory\AccessoryLowercaseStringType;
 use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
 use PHPStan\Type\Accessory\AccessoryNonFalsyStringType;
+use PHPStan\Type\Accessory\AccessoryUppercaseStringType;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantStringType;
-use PHPStan\Type\ConstantScalarType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\IntersectionType;
 use PHPStan\Type\StringType;
@@ -20,7 +23,8 @@ use function count;
 use function implode;
 use function in_array;
 
-class ImplodeFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class ImplodeFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -57,18 +61,33 @@ class ImplodeFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExt
 
 	private function implode(Type $arrayType, Type $separatorType): Type
 	{
-		if ($arrayType instanceof ConstantArrayType && $separatorType instanceof ConstantStringType) {
-			$constantType = $this->inferConstantType($arrayType, $separatorType);
-			if ($constantType !== null) {
-				return $constantType;
+		if (count($arrayType->getConstantArrays()) > 0 && count($separatorType->getConstantStrings()) > 0) {
+			$isNonEmpty = $arrayType->isIterableAtLeastOnce()->yes();
+			$result = [];
+			foreach ($separatorType->getConstantStrings() as $separator) {
+				foreach ($arrayType->getConstantArrays() as $constantArray) {
+					$constantType = $this->inferConstantType($constantArray, $separator, $isNonEmpty);
+					if ($constantType !== null) {
+						$result[] = $constantType;
+						continue;
+					}
+
+					$result = [];
+					break 2;
+				}
+			}
+
+			if (count($result) > 0) {
+				return TypeCombinator::union(...$result);
 			}
 		}
 
 		$accessoryTypes = [];
+		$valueTypeAsString = $arrayType->getIterableValueType()->toString();
 		if ($arrayType->isIterableAtLeastOnce()->yes()) {
-			if ($arrayType->getIterableValueType()->isNonFalsyString()->yes() || $separatorType->isNonFalsyString()->yes()) {
+			if ($valueTypeAsString->isNonFalsyString()->yes() || $separatorType->isNonFalsyString()->yes()) {
 				$accessoryTypes[] = new AccessoryNonFalsyStringType();
-			} elseif ($arrayType->getIterableValueType()->isNonEmptyString()->yes() || $separatorType->isNonEmptyString()->yes()) {
+			} elseif ($valueTypeAsString->isNonEmptyString()->yes() || $separatorType->isNonEmptyString()->yes()) {
 				$accessoryTypes[] = new AccessoryNonEmptyStringType();
 			}
 		}
@@ -76,6 +95,12 @@ class ImplodeFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExt
 		// implode is one of the four functions that can produce literal strings as blessed by the original RFC: wiki.php.net/rfc/is_literal
 		if ($arrayType->getIterableValueType()->isLiteralString()->yes() && $separatorType->isLiteralString()->yes()) {
 			$accessoryTypes[] = new AccessoryLiteralStringType();
+		}
+		if ($valueTypeAsString->isLowercaseString()->yes() && $separatorType->isLowercaseString()->yes()) {
+			$accessoryTypes[] = new AccessoryLowercaseStringType();
+		}
+		if ($valueTypeAsString->isUppercaseString()->yes() && $separatorType->isUppercaseString()->yes()) {
+			$accessoryTypes[] = new AccessoryUppercaseStringType();
 		}
 
 		if (count($accessoryTypes) > 0) {
@@ -86,21 +111,61 @@ class ImplodeFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExt
 		return new StringType();
 	}
 
-	private function inferConstantType(ConstantArrayType $arrayType, ConstantStringType $separatorType): ?Type
+	private function inferConstantType(ConstantArrayType $arrayType, ConstantStringType $separatorType, bool $isNonEmpty): ?Type
 	{
-		$strings = [];
-		foreach ($arrayType->getAllArrays() as $array) {
-			$valueTypes = $array->getValueTypes();
+		// Unsealed extras can append further segments the constant fold
+		// can't see, so the exact string result would be unsound. Fall
+		// back to the accessory-based result.
+		if ($arrayType->isUnsealed()->yes()) {
+			return null;
+		}
 
-			$arrayValues = [];
-			foreach ($valueTypes as $valueType) {
-				if (!$valueType instanceof ConstantScalarType) {
-					return null;
-				}
-				$arrayValues[] = $valueType->getValue();
+		$sep = $separatorType->getValue();
+		$valueTypes = $arrayType->getValueTypes();
+		$limit = InitializerExprTypeResolver::CALCULATE_SCALARS_LIMIT;
+
+		// Build implode results incrementally, processing one key at a time.
+		// For optional keys, fork each partial result into with/without variants.
+		// This avoids generating 2^N ConstantArrayType objects via getAllArrays().
+		/** @var list<list<scalar>> $partials */
+		$partials = [[]];
+
+		foreach ($valueTypes as $i => $valueType) {
+			$constScalars = $valueType->getConstantScalarValues();
+			if (count($constScalars) === 0) {
+				return null;
 			}
 
-			$strings[] = new ConstantStringType(implode($separatorType->getValue(), $arrayValues));
+			$isOptional = $arrayType->isOptionalKey($i);
+			$newPartials = [];
+
+			foreach ($partials as $partial) {
+				if ($isOptional) {
+					$newPartials[] = $partial;
+				}
+				foreach ($constScalars as $scalar) {
+					$newPartial = $partial;
+					$newPartial[] = $scalar;
+					$newPartials[] = $newPartial;
+				}
+			}
+
+			$partials = $newPartials;
+			if (count($partials) > $limit) {
+				return null;
+			}
+		}
+
+		$strings = [];
+		foreach ($partials as $partial) {
+			if ($partial === [] && $isNonEmpty) {
+				continue;
+			}
+			$strings[] = new ConstantStringType(implode($sep, $partial));
+		}
+
+		if ($strings === []) {
+			return null;
 		}
 
 		return TypeCombinator::union(...$strings);

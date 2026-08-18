@@ -5,7 +5,7 @@ namespace PHPStan\Analyser;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\ShouldNotHappenException;
 
-class ScopeContext
+final class ScopeContext
 {
 
 	private function __construct(
@@ -19,12 +19,12 @@ class ScopeContext
 	/** @api */
 	public static function create(string $file): self
 	{
-		return new self($file, null, null);
+		return new self($file, classReflection: null, traitReflection: null);
 	}
 
 	public function beginFile(): self
 	{
-		return new self($this->file, null, null);
+		return new self($this->file, classReflection: null, traitReflection: null);
 	}
 
 	public function enterClass(ClassReflection $classReflection): self
@@ -35,7 +35,7 @@ class ScopeContext
 		if ($classReflection->isTrait()) {
 			throw new ShouldNotHappenException();
 		}
-		return new self($this->file, $classReflection, null);
+		return new self($this->file, $classReflection, traitReflection: null);
 	}
 
 	public function enterTrait(ClassReflection $traitReflection): self

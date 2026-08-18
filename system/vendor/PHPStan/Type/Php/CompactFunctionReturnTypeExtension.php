@@ -4,8 +4,9 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantArrayTypeBuilder;
 use PHPStan\Type\Constant\ConstantStringType;
@@ -14,10 +15,14 @@ use PHPStan\Type\Type;
 use function array_merge;
 use function count;
 
-class CompactFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class CompactFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
-	public function __construct(private bool $checkMaybeUndefinedVariables)
+	public function __construct(
+		#[AutowiredParameter]
+		private bool $checkMaybeUndefinedVariables,
+	)
 	{
 	}
 
@@ -30,15 +35,14 @@ class CompactFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExt
 		FunctionReflection $functionReflection,
 		FuncCall $functionCall,
 		Scope $scope,
-	): Type
+	): ?Type
 	{
-		$defaultReturnType = ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
 		if (count($functionCall->getArgs()) === 0) {
-			return $defaultReturnType;
+			return null;
 		}
 
 		if ($scope->canAnyVariableExist() && !$this->checkMaybeUndefinedVariables) {
-			return $defaultReturnType;
+			return null;
 		}
 
 		$array = ConstantArrayTypeBuilder::createEmpty();
@@ -46,7 +50,7 @@ class CompactFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExt
 			$type = $scope->getType($arg->value);
 			$constantStrings = $this->findConstantStrings($type);
 			if ($constantStrings === null) {
-				return $defaultReturnType;
+				return null;
 			}
 			foreach ($constantStrings as $constantString) {
 				$has = $scope->hasVariableType($constantString->getValue());
@@ -71,6 +75,13 @@ class CompactFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExt
 		}
 
 		if ($type instanceof ConstantArrayType) {
+			// Unsealed extras are unknown further variable names that can't
+			// be enumerated — bail so the caller falls back to the general
+			// `compact()` signature.
+			if ($type->isUnsealed()->yes()) {
+				return null;
+			}
+
 			$result = [];
 			foreach ($type->getValueTypes() as $valueType) {
 				$constantStrings = $this->findConstantStrings($valueType);

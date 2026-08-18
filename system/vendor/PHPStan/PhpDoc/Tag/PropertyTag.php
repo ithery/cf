@@ -4,31 +4,43 @@ namespace PHPStan\PhpDoc\Tag;
 
 use PHPStan\Type\Type;
 
-/** @api */
-class PropertyTag
+/**
+ * @api
+ */
+final class PropertyTag
 {
 
 	public function __construct(
-		private Type $type,
-		private bool $readable,
-		private bool $writable,
+		private ?Type $readableType,
+		private ?Type $writableType,
 	)
 	{
 	}
 
-	public function getType(): Type
+	public function getReadableType(): ?Type
 	{
-		return $this->type;
+		return $this->readableType;
 	}
 
+	public function getWritableType(): ?Type
+	{
+		return $this->writableType;
+	}
+
+	/**
+	 * @phpstan-assert-if-true !null $this->getReadableType()
+	 */
 	public function isReadable(): bool
 	{
-		return $this->readable;
+		return $this->readableType !== null;
 	}
 
+	/**
+	 * @phpstan-assert-if-true !null $this->getWritableType()
+	 */
 	public function isWritable(): bool
 	{
-		return $this->writable;
+		return $this->writableType !== null;
 	}
 
 }

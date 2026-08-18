@@ -5,6 +5,7 @@ namespace PHPStan\Type\Php;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\UnaryMinus;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\Accessory\AccessoryNumericStringType;
@@ -12,17 +13,17 @@ use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\ConstantScalarType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\IntegerRangeType;
-use PHPStan\Type\IntegerType;
+use PHPStan\Type\IntersectionType;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\NullType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
-use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\UnionType;
 use function in_array;
 use function is_numeric;
 
-class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function __construct(private PhpVersion $phpVersion)
@@ -44,9 +45,10 @@ class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnType
 			return $this->getTypeForBcPowMod($functionCall, $scope);
 		}
 
-		$stringAndNumericStringType = TypeCombinator::intersect(new StringType(), new AccessoryNumericStringType());
+		$stringAndNumericStringType = new IntersectionType([new StringType(), new AccessoryNumericStringType()]);
 
-		if (isset($functionCall->getArgs()[1]) === false) {
+		$args = $functionCall->getArgs();
+		if (isset($args[1]) === false) {
 			if ($this->phpVersion->throwsTypeErrorForInternalFunctions()) {
 				return new NeverType();
 			}
@@ -60,8 +62,8 @@ class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnType
 			$defaultReturnType = new UnionType([$stringAndNumericStringType, new NullType()]);
 		}
 
-		$secondArgument = $scope->getType($functionCall->getArgs()[1]->value);
-		$secondArgumentIsNumeric = ($secondArgument instanceof ConstantScalarType && is_numeric($secondArgument->getValue())) || $secondArgument instanceof IntegerType;
+		$secondArgument = $scope->getType($args[1]->value);
+		$secondArgumentIsNumeric = ($secondArgument instanceof ConstantScalarType && is_numeric($secondArgument->getValue())) || $secondArgument->isInteger()->yes();
 
 		if ($secondArgument instanceof ConstantScalarType && ($this->isZero($secondArgument->getValue()) || !$secondArgumentIsNumeric)) {
 			if ($this->phpVersion->throwsTypeErrorForInternalFunctions()) {
@@ -71,7 +73,7 @@ class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnType
 			return new NullType();
 		}
 
-		if (isset($functionCall->getArgs()[2]) === false) {
+		if (isset($args[2]) === false) {
 			if ($secondArgument instanceof ConstantScalarType || $secondArgumentIsNumeric) {
 				return $stringAndNumericStringType;
 			}
@@ -79,13 +81,13 @@ class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnType
 			return $defaultReturnType;
 		}
 
-		$thirdArgument = $scope->getType($functionCall->getArgs()[2]->value);
+		$thirdArgument = $scope->getType($args[2]->value);
 		$thirdArgumentIsNumeric = false;
 		$thirdArgumentIsNegative = false;
 		if ($thirdArgument instanceof ConstantScalarType && is_numeric($thirdArgument->getValue())) {
 			$thirdArgumentIsNumeric = true;
 			$thirdArgumentIsNegative = ($thirdArgument->getValue() < 0);
-		} elseif ((new IntegerType())->isSuperTypeOf($thirdArgument)->yes()) {
+		} elseif ($thirdArgument->isInteger()->yes()) {
 			$thirdArgumentIsNumeric = true;
 			if (IntegerRangeType::fromInterval(null, -1)->isSuperTypeOf($thirdArgument)->yes()) {
 				$thirdArgumentIsNegative = true;
@@ -119,14 +121,15 @@ class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnType
 	 */
 	private function getTypeForBcSqrt(FuncCall $functionCall, Scope $scope): Type
 	{
-		$stringAndNumericStringType = TypeCombinator::intersect(new StringType(), new AccessoryNumericStringType());
+		$stringAndNumericStringType = new IntersectionType([new StringType(), new AccessoryNumericStringType()]);
 		if ($this->phpVersion->throwsTypeErrorForInternalFunctions()) {
 			$defaultReturnType = $stringAndNumericStringType;
 		} else {
 			$defaultReturnType = new UnionType([$stringAndNumericStringType, new NullType()]);
 		}
 
-		if (isset($functionCall->getArgs()[0]) === false) {
+		$args = $functionCall->getArgs();
+		if (isset($args[0]) === false) {
 			if ($this->phpVersion->throwsTypeErrorForInternalFunctions()) {
 				return new NeverType();
 			}
@@ -134,7 +137,7 @@ class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnType
 			return $defaultReturnType;
 		}
 
-		$firstArgument = $scope->getType($functionCall->getArgs()[0]->value);
+		$firstArgument = $scope->getType($args[0]->value);
 
 		$firstArgumentIsPositive = $firstArgument instanceof ConstantScalarType && is_numeric($firstArgument->getValue()) && $firstArgument->getValue() >= 0;
 		$firstArgumentIsNegative = $firstArgument instanceof ConstantScalarType && is_numeric($firstArgument->getValue()) && $firstArgument->getValue() < 0;
@@ -147,7 +150,7 @@ class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnType
 			return new NullType();
 		}
 
-		if (isset($functionCall->getArgs()[1]) === false) {
+		if (isset($args[1]) === false) {
 			if ($firstArgumentIsPositive) {
 				return $stringAndNumericStringType;
 			}
@@ -155,7 +158,7 @@ class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnType
 			return $defaultReturnType;
 		}
 
-		$secondArgument = $scope->getType($functionCall->getArgs()[1]->value);
+		$secondArgument = $scope->getType($args[1]->value);
 		$secondArgumentIsValid = $secondArgument instanceof ConstantScalarType && is_numeric($secondArgument->getValue()) && !$this->isZero($secondArgument->getValue());
 		$secondArgumentIsNonNumeric = $secondArgument instanceof ConstantScalarType && !is_numeric($secondArgument->getValue());
 		$secondArgumentIsNegative = $secondArgument instanceof ConstantScalarType && is_numeric($secondArgument->getValue()) && $secondArgument->getValue() < 0;
@@ -188,13 +191,14 @@ class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnType
 	 */
 	private function getTypeForBcPowMod(FuncCall $functionCall, Scope $scope): Type
 	{
-		if ($this->phpVersion->throwsTypeErrorForInternalFunctions() && isset($functionCall->getArgs()[0]) === false) {
+		$args = $functionCall->getArgs();
+		if ($this->phpVersion->throwsTypeErrorForInternalFunctions() && isset($args[0]) === false) {
 			return new NeverType();
 		}
 
-		$stringAndNumericStringType = TypeCombinator::intersect(new StringType(), new AccessoryNumericStringType());
+		$stringAndNumericStringType = new IntersectionType([new StringType(), new AccessoryNumericStringType()]);
 
-		if (isset($functionCall->getArgs()[1]) === false) {
+		if (isset($args[1]) === false) {
 			if ($this->phpVersion->throwsTypeErrorForInternalFunctions()) {
 				return new NeverType();
 			}
@@ -202,7 +206,7 @@ class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnType
 			return new UnionType([$stringAndNumericStringType, new ConstantBooleanType(false)]);
 		}
 
-		$exponent = $scope->getType($functionCall->getArgs()[1]->value);
+		$exponent = $scope->getType($args[1]->value);
 
 		// Expontent is non numeric
 		if ($this->phpVersion->throwsTypeErrorForInternalFunctions()
@@ -225,8 +229,8 @@ class BcMathStringOrNullReturnTypeExtension implements DynamicFunctionReturnType
 			return new ConstantBooleanType(false);
 		}
 
-		if (isset($functionCall->getArgs()[2])) {
-			$modulus = $scope->getType($functionCall->getArgs()[2]->value);
+		if (isset($args[2])) {
+			$modulus = $scope->getType($args[2]->value);
 			$modulusIsZero = $modulus instanceof ConstantScalarType && $this->isZero($modulus->getValue());
 			$modulusIsNonNumeric = $modulus instanceof ConstantScalarType && !is_numeric($modulus->getValue());
 

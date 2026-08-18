@@ -2,16 +2,23 @@
 
 namespace PHPStan\Reflection;
 
+use PHPStan\Reflection\Callables\CallableParametersAcceptor;
+use PHPStan\Reflection\Callables\SimpleImpurePoint;
+use PHPStan\TrinaryLogic;
 use PHPStan\Type\Generic\TemplateTypeMap;
+use PHPStan\Type\Generic\TemplateTypeVarianceMap;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\Type;
+use function sprintf;
 
-/** @api */
-class TrivialParametersAcceptor implements ParametersAcceptor
+/**
+ * @api
+ */
+final class TrivialParametersAcceptor implements ExtendedParametersAcceptor, CallableParametersAcceptor
 {
 
 	/** @api */
-	public function __construct()
+	public function __construct(private string $callableName = 'callable')
 	{
 	}
 
@@ -25,9 +32,11 @@ class TrivialParametersAcceptor implements ParametersAcceptor
 		return TemplateTypeMap::createEmpty();
 	}
 
-	/**
-	 * @return array<int, ParameterReflection>
-	 */
+	public function getCallSiteVarianceMap(): TemplateTypeVarianceMap
+	{
+		return TemplateTypeVarianceMap::createEmpty();
+	}
+
 	public function getParameters(): array
 	{
 		return [];
@@ -41,6 +50,67 @@ class TrivialParametersAcceptor implements ParametersAcceptor
 	public function getReturnType(): Type
 	{
 		return new MixedType();
+	}
+
+	public function getPhpDocReturnType(): Type
+	{
+		return new MixedType();
+	}
+
+	public function getNativeReturnType(): Type
+	{
+		return new MixedType();
+	}
+
+	public function getThrowPoints(): array
+	{
+		return [];
+	}
+
+	public function isPure(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function getImpurePoints(): array
+	{
+		return [
+			new SimpleImpurePoint(
+				'functionCall',
+				sprintf('call to a %s', $this->callableName),
+				false,
+			),
+		];
+	}
+
+	public function getInvalidateExpressions(): array
+	{
+		return [];
+	}
+
+	public function getUsedVariables(): array
+	{
+		return [];
+	}
+
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function getAsserts(): Assertions
+	{
+		return Assertions::createEmpty();
+	}
+
+	public function isStaticClosure(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
 	}
 
 }

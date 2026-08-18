@@ -2,7 +2,27 @@
 
 namespace PHPStan\Reflection;
 
-/** @api */
+use PHPStan\Broker\BrokerFactory;
+use PHPStan\DependencyInjection\ExtensionInterface;
+
+/**
+ * This is the interface custom properties class reflection extensions implement.
+ *
+ * To register it in the configuration file use the `phpstan.broker.propertiesClassReflectionExtension` service tag:
+ *
+ * ```
+ * services:
+ * 	-
+ *		class: App\PHPStan\MyPropertiesClassReflectionExtension
+ *		tags:
+ *			- phpstan.broker.propertiesClassReflectionExtension
+ * ```
+ *
+ * Learn more: https://phpstan.org/developing-extensions/class-reflection-extensions
+ *
+ * @api
+ */
+#[ExtensionInterface(tag: BrokerFactory::PROPERTIES_CLASS_REFLECTION_EXTENSION_TAG)]
 interface PropertiesClassReflectionExtension
 {
 

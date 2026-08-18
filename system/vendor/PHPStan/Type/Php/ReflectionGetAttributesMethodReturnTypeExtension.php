@@ -5,18 +5,20 @@ namespace PHPStan\Type\Php;
 use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
+use PHPStan\Reflection\ParametersAcceptorSelector;
+use PHPStan\Type\Accessory\AccessoryArrayListType;
 use PHPStan\Type\ArrayType;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
-use PHPStan\Type\Generic\GenericClassStringType;
 use PHPStan\Type\Generic\GenericObjectType;
-use PHPStan\Type\MixedType;
+use PHPStan\Type\IntegerRangeType;
+use PHPStan\Type\IntersectionType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
 use ReflectionAttribute;
 use function count;
 
-class ReflectionGetAttributesMethodReturnTypeExtension implements DynamicMethodReturnTypeExtension
+final class ReflectionGetAttributesMethodReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {
 
 	/**
@@ -33,8 +35,7 @@ class ReflectionGetAttributesMethodReturnTypeExtension implements DynamicMethodR
 
 	public function isMethodSupported(MethodReflection $methodReflection): bool
 	{
-		return $methodReflection->getDeclaringClass()->getName() === $this->className
-			&& $methodReflection->getName() === 'getAttributes';
+		return $methodReflection->getName() === 'getAttributes';
 	}
 
 	public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): ?Type
@@ -43,16 +44,36 @@ class ReflectionGetAttributesMethodReturnTypeExtension implements DynamicMethodR
 			return null;
 		}
 		$argType = $scope->getType($methodCall->getArgs()[0]->value);
+		$classType = $argType->getClassStringObjectType();
 
-		if ($argType instanceof ConstantStringType) {
-			$classType = new ObjectType($argType->getValue());
-		} elseif ($argType instanceof GenericClassStringType) {
-			$classType = $argType->getGenericType();
-		} else {
-			return null;
+		$variant = ParametersAcceptorSelector::selectFromArgs($scope, $methodCall->getArgs(), $methodReflection->getVariants());
+		$valueType = $this->resolveReflectionAttributeType($variant->getReturnType(), $classType);
+
+		return new IntersectionType([new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), $valueType), new AccessoryArrayListType()]);
+	}
+
+	private function resolveReflectionAttributeType(Type $returnType, Type $classType): Type
+	{
+		$nativeReflectionAttributeType = new ObjectType(ReflectionAttribute::class);
+
+		$valueTypes = [];
+		foreach ($returnType->getIterableValueType()->getObjectClassNames() as $className) {
+			if (!$nativeReflectionAttributeType->isSuperTypeOf(new ObjectType($className))->yes()) {
+				continue;
+			}
+
+			$valueTypes[] = new GenericObjectType($className, [$classType]);
 		}
 
-		return new ArrayType(new MixedType(), new GenericObjectType(ReflectionAttribute::class, [$classType]));
+		if (count($valueTypes) === 0) {
+			return new GenericObjectType(ReflectionAttribute::class, [$classType]);
+		}
+
+		if (count($valueTypes) === 1) {
+			return $valueTypes[0];
+		}
+
+		return TypeCombinator::union(...$valueTypes);
 	}
 
 }

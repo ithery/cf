@@ -4,17 +4,19 @@ namespace PHPStan\Rules\Api;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function count;
 use function sprintf;
-use function strpos;
+use function str_contains;
 
 /**
  * @implements Rule<Node\Expr\MethodCall>
  */
-class ApiMethodCallRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ApiMethodCallRule implements Rule
 {
 
 	public function __construct(private ApiRuleHelper $apiRuleHelper)
@@ -50,7 +52,7 @@ class ApiMethodCallRule implements Rule
 			'Calling %s::%s() is not covered by backward compatibility promise. The method might change in a minor PHPStan version.',
 			$declaringClass->getDisplayName(),
 			$methodReflection->getName(),
-		))->tip(sprintf(
+		))->identifier('phpstanApi.method')->tip(sprintf(
 			"If you think it should be covered by backward compatibility promise, open a discussion:\n   %s\n\n   See also:\n   https://phpstan.org/developing-extensions/backward-compatibility-promise",
 			'https://github.com/phpstan/phpstan/discussions',
 		))->build();
@@ -76,7 +78,7 @@ class ApiMethodCallRule implements Rule
 			return false;
 		}
 
-		return strpos($methodDocComment, '@api') !== false;
+		return str_contains($methodDocComment, '@api');
 	}
 
 }

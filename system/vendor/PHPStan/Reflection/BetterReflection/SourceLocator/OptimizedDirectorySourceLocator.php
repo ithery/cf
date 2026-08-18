@@ -2,123 +2,203 @@
 
 namespace PHPStan\Reflection\BetterReflection\SourceLocator;
 
+use Override;
 use PhpParser\Node;
 use PHPStan\BetterReflection\Identifier\Identifier;
 use PHPStan\BetterReflection\Identifier\IdentifierType;
 use PHPStan\BetterReflection\Reflection\Reflection;
+use PHPStan\BetterReflection\Reflection\ReflectionClass;
+use PHPStan\BetterReflection\Reflection\ReflectionConstant;
+use PHPStan\BetterReflection\Reflection\ReflectionEnum;
+use PHPStan\BetterReflection\Reflection\ReflectionFunction;
 use PHPStan\BetterReflection\Reflector\Reflector;
 use PHPStan\BetterReflection\SourceLocator\Ast\Strategy\NodeToReflection;
 use PHPStan\BetterReflection\SourceLocator\Type\SourceLocator;
+use PHPStan\Cache\ArenaCache;
+use PHPStan\Cache\Cache;
+use PHPStan\File\CouldNotReadFileException;
+use PHPStan\File\FileContentHasher;
+use PHPStan\Internal\ComposerHelper;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\ConstantNameHelper;
 use PHPStan\ShouldNotHappenException;
 use function array_key_exists;
 use function array_values;
-use function count;
 use function current;
-use function ltrim;
-use function php_strip_whitespace;
-use function preg_match_all;
-use function preg_replace;
+use function is_array;
+use function is_string;
 use function sprintf;
 use function strtolower;
 
-class OptimizedDirectorySourceLocator implements SourceLocator
+final class OptimizedDirectorySourceLocator implements SourceLocator
 {
 
-	private PhpFileCleaner $cleaner;
+	/** @var array<string, string|false> */
+	private array $arenaClassLookups = [];
 
-	private string $extraTypes;
+	/** @var array<string, array<int, string>|false> */
+	private array $arenaFunctionLookups = [];
 
-	/** @var array<string, string>|null */
-	private ?array $classToFile = null;
+	/** @var array<string, string|false> */
+	private array $arenaConstantLookups = [];
 
-	/** @var array<string, string>|null */
-	private ?array $constantToFile = null;
-
-	/** @var array<string, array<int, string>>|null */
-	private ?array $functionToFiles = null;
+	private bool $hydratedFromArena = false;
 
 	/**
-	 * @param string[] $files
+	 * With $arenaKeyPrefix set, the maps start empty and names resolve lazily
+	 * from the run's shared arena (published by whichever process built this
+	 * directory's index first), so the worker materializes only the names it
+	 * touches instead of the whole index.
+	 *
+	 * @param array<string, string> $classToFile
+	 * @param array<string, array<int, string>> $functionToFiles
+	 * @param array<string, string> $constantToFile
 	 */
 	public function __construct(
 		private FileNodesFetcher $fileNodesFetcher,
+		private Cache $cache,
 		private PhpVersion $phpVersion,
-		private array $files,
+		private FileContentHasher $fileContentHasher,
+		private array $classToFile,
+		private array $functionToFiles,
+		private array $constantToFile,
+		private ?string $arenaKeyPrefix = null,
 	)
 	{
-		$this->extraTypes = $this->phpVersion->supportsEnums() ? '|enum' : '';
-
-		$this->cleaner = new PhpFileCleaner();
 	}
 
+	/**
+	 * @return array{non-empty-string, string}
+	 */
+	private function getCacheKeys(string $file, Identifier $identifier): array
+	{
+		$fileHash = $this->fileContentHasher->hash($file);
+		if ($fileHash === false) {
+			throw new CouldNotReadFileException($file);
+		}
+
+		$reflectionCacheKey = sprintf('odsl-%s-%s-%s', $file, $identifier->getType()->getName(), $identifier->getName());
+		$variableCacheKey = sprintf('v2-%s-%s-%s', ComposerHelper::getBetterReflectionVersion(), $this->phpVersion->getVersionString(), $fileHash);
+
+		return [$reflectionCacheKey, $variableCacheKey];
+	}
+
+	#[Override]
 	public function locateIdentifier(Reflector $reflector, Identifier $identifier): ?Reflection
 	{
 		if ($identifier->isClass()) {
-			$className = strtolower($identifier->getName());
-			$file = $this->findFileByClass($className);
+			$identifierName = strtolower($identifier->getName());
+			$file = $this->findFileByClass($identifierName);
+			if ($file === null) {
+				return null;
+			}
+			$files = [$file];
+		} elseif ($identifier->isFunction()) {
+			$identifierName = strtolower($identifier->getName());
+			$files = $this->findFilesByFunction($identifierName);
+		} elseif ($identifier->isConstant()) {
+			$identifierName = ConstantNameHelper::normalize($identifier->getName());
+			$file = $this->findFileByConstant($identifierName);
+
 			if ($file === null) {
 				return null;
 			}
 
-			$fetchedClassNodes = $this->fileNodesFetcher->fetchNodes($file)->getClassNodes();
-
-			if (!array_key_exists($className, $fetchedClassNodes)) {
-				return null;
-			}
-
-			/** @var FetchedNode<Node\Stmt\ClassLike> $fetchedClassNode */
-			$fetchedClassNode = current($fetchedClassNodes[$className]);
-
-			return $this->nodeToReflection($reflector, $fetchedClassNode);
+			$files = [$file];
+		} else {
+			return null;
 		}
 
-		if ($identifier->isFunction()) {
-			$functionName = strtolower($identifier->getName());
-			$files = $this->findFilesByFunction($functionName);
+		foreach ($files as $file) {
+			[$reflectionCacheKey, $variableCacheKey] = $this->getCacheKeys($file, $identifier);
+			$cachedReflection = $this->cache->load($reflectionCacheKey, $variableCacheKey);
+			if ($cachedReflection === null) {
+				continue;
+			}
 
+			if ($identifier->isConstant()) {
+				return ReflectionConstant::importFromCache($reflector, $cachedReflection);
+			}
+			if ($identifier->isFunction()) {
+				return ReflectionFunction::importFromCache($reflector, $cachedReflection);
+			}
+			if ($identifier->isClass()) {
+				if (array_key_exists('backingType', $cachedReflection)) {
+					return ReflectionEnum::importFromCache($reflector, $cachedReflection);
+				}
+
+				return ReflectionClass::importFromCache($reflector, $cachedReflection);
+			}
+		}
+
+		if ($identifier->isClass()) {
+			$fetchedClassNode = null;
+			$fetchedFile = null;
+			foreach ($files as $file) {
+				$fetchedClassNodes = $this->fileNodesFetcher->fetchNodes($file)->getClassNodes();
+
+				if (!array_key_exists($identifierName, $fetchedClassNodes)) {
+					return null;
+				}
+
+				/** @var FetchedNode<Node\Stmt\ClassLike> $fetchedClassNode */
+				$fetchedClassNode = current($fetchedClassNodes[$identifierName]);
+				$fetchedFile = $file;
+			}
+
+			[$reflectionCacheKey, $variableCacheKey] = $this->getCacheKeys($fetchedFile, $identifier);
+			$classReflection = $this->nodeToReflection($reflector, $fetchedClassNode);
+			$this->cache->save($reflectionCacheKey, $variableCacheKey, $classReflection->exportToCache());
+
+			return $classReflection;
+		} elseif ($identifier->isFunction()) {
 			$fetchedFunctionNode = null;
 			foreach ($files as $file) {
 				$fetchedFunctionNodes = $this->fileNodesFetcher->fetchNodes($file)->getFunctionNodes();
 
-				if (!array_key_exists($functionName, $fetchedFunctionNodes)) {
+				if (!array_key_exists($identifierName, $fetchedFunctionNodes)) {
 					continue;
 				}
 
 				/** @var FetchedNode<Node\Stmt\Function_> $fetchedFunctionNode */
-				$fetchedFunctionNode = current($fetchedFunctionNodes[$functionName]);
+				$fetchedFunctionNode = current($fetchedFunctionNodes[$identifierName]);
 			}
 
 			if ($fetchedFunctionNode === null) {
 				return null;
 			}
 
-			return $this->nodeToReflection($reflector, $fetchedFunctionNode);
-		}
+			[$reflectionCacheKey, $variableCacheKey] = $this->getCacheKeys($file, $identifier); // @phpstan-ignore variable.undefined
+			$functionReflection = $this->nodeToReflection($reflector, $fetchedFunctionNode);
+			$this->cache->save($reflectionCacheKey, $variableCacheKey, $functionReflection->exportToCache());
 
-		if ($identifier->isConstant()) {
-			$constantName = ConstantNameHelper::normalize($identifier->getName());
-			$file = $this->findFileByConstant($constantName);
+			return $functionReflection;
+		} elseif ($identifier->isConstant()) {
+			$fetchedConstantNode = null;
+			foreach ($files as $file) {
+				$fetchedConstantNodes = $this->fileNodesFetcher->fetchNodes($file)->getConstantNodes();
 
-			if ($file === null) {
+				if (!array_key_exists($identifierName, $fetchedConstantNodes)) {
+					return null;
+				}
+
+				/** @var FetchedNode<Node\Stmt\Const_|Node\Expr\FuncCall> $fetchedConstantNode */
+				$fetchedConstantNode = current($fetchedConstantNodes[$identifierName]);
+			}
+
+			if ($fetchedConstantNode === null) {
 				return null;
 			}
 
-			$fetchedConstantNodes = $this->fileNodesFetcher->fetchNodes($file)->getConstantNodes();
-
-			if (!array_key_exists($constantName, $fetchedConstantNodes)) {
-				return null;
-			}
-
-			/** @var FetchedNode<Node\Stmt\Const_|Node\Expr\FuncCall> $fetchedConstantNode */
-			$fetchedConstantNode = current($fetchedConstantNodes[$constantName]);
-
-			return $this->nodeToReflection(
+			[$reflectionCacheKey, $variableCacheKey] = $this->getCacheKeys($file, $identifier);
+			$constantReflection = $this->nodeToReflection(
 				$reflector,
 				$fetchedConstantNode,
-				$this->findConstantPositionInConstNode($fetchedConstantNode->getNode(), $constantName),
+				$this->findConstantPositionInConstNode($fetchedConstantNode->getNode(), $identifierName),
 			);
+			$this->cache->save($reflectionCacheKey, $variableCacheKey, $constantReflection->exportToCache());
+
+			return $constantReflection;
 		}
 
 		return null;
@@ -127,7 +207,7 @@ class OptimizedDirectorySourceLocator implements SourceLocator
 	/**
 	 * @param FetchedNode<Node\Stmt\ClassLike>|FetchedNode<Node\Stmt\Function_>|FetchedNode<Node\Stmt\Const_|Node\Expr\FuncCall> $fetchedNode
 	 */
-	private function nodeToReflection(Reflector $reflector, FetchedNode $fetchedNode, ?int $positionInNode = null): Reflection
+	private function nodeToReflection(Reflector $reflector, FetchedNode $fetchedNode, ?int $positionInNode = null): ReflectionClass|ReflectionConstant|ReflectionFunction
 	{
 		$nodeToReflection = new NodeToReflection();
 		return $nodeToReflection->__invoke(
@@ -141,34 +221,48 @@ class OptimizedDirectorySourceLocator implements SourceLocator
 
 	private function findFileByClass(string $className): ?string
 	{
-		if ($this->classToFile === null) {
-			$this->init();
-			if ($this->classToFile === null) {
-				throw new ShouldNotHappenException();
-			}
+		if (array_key_exists($className, $this->classToFile)) {
+			return $this->classToFile[$className];
 		}
 
-		if (!array_key_exists($className, $this->classToFile)) {
+		if ($this->arenaKeyPrefix === null) {
 			return null;
 		}
 
-		return $this->classToFile[$className];
+		if (array_key_exists($className, $this->arenaClassLookups)) {
+			$file = $this->arenaClassLookups[$className];
+		} else {
+			$file = ArenaCache::lookupHash($this->arenaKeyPrefix . '-classes', $className);
+			if (!is_string($file)) {
+				$file = false;
+			}
+			$this->arenaClassLookups[$className] = $file;
+		}
+
+		return $file === false ? null : $file;
 	}
 
 	private function findFileByConstant(string $constantName): ?string
 	{
-		if ($this->constantToFile === null) {
-			$this->init();
-			if ($this->constantToFile === null) {
-				throw new ShouldNotHappenException();
-			}
+		if (array_key_exists($constantName, $this->constantToFile)) {
+			return $this->constantToFile[$constantName];
 		}
 
-		if (!array_key_exists($constantName, $this->constantToFile)) {
+		if ($this->arenaKeyPrefix === null) {
 			return null;
 		}
 
-		return $this->constantToFile[$constantName];
+		if (array_key_exists($constantName, $this->arenaConstantLookups)) {
+			$file = $this->arenaConstantLookups[$constantName];
+		} else {
+			$file = ArenaCache::lookupHash($this->arenaKeyPrefix . '-constants', $constantName);
+			if (!is_string($file)) {
+				$file = false;
+			}
+			$this->arenaConstantLookups[$constantName] = $file;
+		}
+
+		return $file === false ? null : $file;
 	}
 
 	/**
@@ -176,131 +270,71 @@ class OptimizedDirectorySourceLocator implements SourceLocator
 	 */
 	private function findFilesByFunction(string $functionName): array
 	{
-		if ($this->functionToFiles === null) {
-			$this->init();
-			if ($this->functionToFiles === null) {
-				throw new ShouldNotHappenException();
-			}
+		if (array_key_exists($functionName, $this->functionToFiles)) {
+			return $this->functionToFiles[$functionName];
 		}
 
-		if (!array_key_exists($functionName, $this->functionToFiles)) {
+		if ($this->arenaKeyPrefix === null) {
 			return [];
 		}
 
-		return $this->functionToFiles[$functionName];
-	}
-
-	private function init(): void
-	{
-		$classToFile = [];
-		$constantToFile = [];
-		$functionToFiles = [];
-		foreach ($this->files as $file) {
-			$symbols = $this->findSymbols($file);
-			foreach ($symbols['classes'] as $classInFile) {
-				$classToFile[$classInFile] = $file;
+		if (array_key_exists($functionName, $this->arenaFunctionLookups)) {
+			$files = $this->arenaFunctionLookups[$functionName];
+		} else {
+			/** @var array<int, string>|mixed $files */
+			$files = ArenaCache::lookupHash($this->arenaKeyPrefix . '-functions', $functionName);
+			if (!is_array($files)) {
+				$files = false;
 			}
-			foreach ($symbols['constants'] as $constantInFile) {
-				$constantToFile[$constantInFile] = $file;
-			}
-			foreach ($symbols['functions'] as $functionInFile) {
-				if (!array_key_exists($functionInFile, $functionToFiles)) {
-					$functionToFiles[$functionInFile] = [];
-				}
-				$functionToFiles[$functionInFile][] = $file;
-			}
+			$this->arenaFunctionLookups[$functionName] = $files;
 		}
 
-		$this->classToFile = $classToFile;
-		$this->functionToFiles = $functionToFiles;
-		$this->constantToFile = $constantToFile;
+		return $files === false ? [] : $files;
 	}
 
 	/**
-	 * Inspired by Composer\Autoload\ClassMapGenerator::findClasses()
-	 * @link https://github.com/composer/composer/blob/45d3e133a4691eccb12e9cd6f9dfd76eddc1906d/src/Composer/Autoload/ClassMapGenerator.php#L216
-	 *
-	 * @return array{classes: string[], functions: string[], constants: string[]}
+	 * Enumeration needs the full maps: hydrates them from the arena records
+	 * in their publication order, which equals the insertion order a locally
+	 * built index would have. A null (a corrupt record — impossible with an
+	 * intact arena, the factory gated on all three records) leaves a map
+	 * empty rather than failing the run.
 	 */
-	private function findSymbols(string $file): array
+	private function hydrateSymbolsFromArena(): void
 	{
-		$contents = @php_strip_whitespace($file);
-		if ($contents === '') {
-			return ['classes' => [], 'functions' => [], 'constants' => []];
+		if ($this->arenaKeyPrefix === null || $this->hydratedFromArena) {
+			return;
 		}
 
-		$matchResults = (bool) preg_match_all(sprintf('{\b(?:(?:class|interface|trait|const|function%s)\s)|(?:define\s*\()}i', $this->extraTypes), $contents, $matches);
-		if (!$matchResults) {
-			return ['classes' => [], 'functions' => [], 'constants' => []];
+		$this->hydratedFromArena = true;
+
+		/** @var array<string, string>|null $classes */
+		$classes = ArenaCache::lookupHashAll($this->arenaKeyPrefix . '-classes');
+		if ($classes !== null) {
+			$this->classToFile = $classes;
 		}
 
-		$contents = $this->cleaner->clean($contents, count($matches[0]));
-
-		preg_match_all(sprintf('{
-			(?:
-				\b(?<![\$:>])(?:
-					(?: (?P<type>class|interface|trait%s) \s++ (?P<name>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff\-]*+) )
-					| (?: (?P<function>function) \s++ (?:&\s*)? (?P<fname>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff\-]*+) \s*+ [&\(] )
-					| (?: (?P<constant>const) \s++ (?P<cname>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff\-]*+) \s*+ [^;] )
-					| (?: (?:\\\)? (?P<define>define) \s*+ \( \s*+ [\'"] (?P<dname>[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:[\\\\]{1,2}[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+) )
-					| (?: (?P<ns>namespace) (?P<nsname>\s++[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+(?:\s*+\\\\\s*+[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*+)*+)? \s*+ [\{;] )
-				)
-			)
-		}ix', $this->extraTypes), $contents, $matches);
-
-		$classes = [];
-		$functions = [];
-		$constants = [];
-		$namespace = '';
-
-		for ($i = 0, $len = count($matches['type']); $i < $len; $i++) {
-			if (isset($matches['ns'][$i]) && $matches['ns'][$i] !== '') {
-				$namespace = preg_replace('~\s+~', '', strtolower($matches['nsname'][$i])) . '\\';
-				continue;
-			}
-
-			if ($matches['function'][$i] !== '') {
-				$functions[] = strtolower(ltrim($namespace . $matches['fname'][$i], '\\'));
-				continue;
-			}
-
-			if ($matches['constant'][$i] !== '') {
-				$constants[] = ConstantNameHelper::normalize(ltrim($namespace . $matches['cname'][$i], '\\'));
-			}
-
-			if ($matches['define'][$i] !== '') {
-				$constants[] = ConstantNameHelper::normalize($matches['dname'][$i]);
-				continue;
-			}
-
-			$name = $matches['name'][$i];
-
-			// skip anon classes extending/implementing
-			if ($name === 'extends' || $name === 'implements') {
-				continue;
-			}
-
-			$classes[] = strtolower(ltrim($namespace . $name, '\\'));
+		/** @var array<string, array<int, string>>|null $functions */
+		$functions = ArenaCache::lookupHashAll($this->arenaKeyPrefix . '-functions');
+		if ($functions !== null) {
+			$this->functionToFiles = $functions;
 		}
 
-		return [
-			'classes' => $classes,
-			'functions' => $functions,
-			'constants' => $constants,
-		];
+		/** @var array<string, string>|null $constants */
+		$constants = ArenaCache::lookupHashAll($this->arenaKeyPrefix . '-constants');
+		if ($constants === null) {
+			return;
+		}
+
+		$this->constantToFile = $constants;
 	}
 
 	/**
 	 * @return list<Reflection>
 	 */
+	#[Override]
 	public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType): array
 	{
-		if ($this->classToFile === null || $this->functionToFiles === null || $this->constantToFile === null) {
-			$this->init();
-			if ($this->classToFile === null || $this->functionToFiles === null || $this->constantToFile === null) {
-				throw new ShouldNotHappenException();
-			}
-		}
+		$this->hydrateSymbolsFromArena();
 
 		$reflections = [];
 		if ($identifierType->isClass()) {

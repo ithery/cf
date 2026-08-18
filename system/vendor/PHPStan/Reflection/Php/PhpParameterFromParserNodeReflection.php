@@ -2,19 +2,25 @@
 
 namespace PHPStan\Reflection\Php;
 
-use PHPStan\Reflection\ParameterReflectionWithPhpDocs;
+use PHPStan\Reflection\AllowedConstantsResult;
+use PHPStan\Reflection\AttributeReflection;
+use PHPStan\Reflection\ExtendedParameterReflection;
+use PHPStan\Reflection\ParameterAllowedConstants;
 use PHPStan\Reflection\PassedByReference;
+use PHPStan\TrinaryLogic;
 use PHPStan\Type\MixedType;
-use PHPStan\Type\NullType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\TypehintHelper;
 
-class PhpParameterFromParserNodeReflection implements ParameterReflectionWithPhpDocs
+final class PhpParameterFromParserNodeReflection implements ExtendedParameterReflection
 {
 
 	private ?Type $type = null;
 
+	/**
+	 * @param list<AttributeReflection> $attributes
+	 */
 	public function __construct(
 		private string $name,
 		private bool $optional,
@@ -24,6 +30,10 @@ class PhpParameterFromParserNodeReflection implements ParameterReflectionWithPhp
 		private ?Type $defaultValue,
 		private bool $variadic,
 		private ?Type $outType,
+		private TrinaryLogic $immediatelyInvokedCallable,
+		private ?Type $closureThisType,
+		private array $attributes,
+		private TrinaryLogic $pureUnlessCallableIsImpureParameter,
 	)
 	{
 	}
@@ -43,7 +53,7 @@ class PhpParameterFromParserNodeReflection implements ParameterReflectionWithPhp
 		if ($this->type === null) {
 			$phpDocType = $this->phpDocType;
 			if ($phpDocType !== null && $this->defaultValue !== null) {
-				if ($this->defaultValue instanceof NullType) {
+				if ($this->defaultValue->isNull()->yes()) {
 					$inferred = $phpDocType->inferTemplateTypes($this->defaultValue);
 					if ($inferred->isEmpty()) {
 						$phpDocType = TypeCombinator::addNull($phpDocType);
@@ -59,6 +69,11 @@ class PhpParameterFromParserNodeReflection implements ParameterReflectionWithPhp
 	public function getPhpDocType(): Type
 	{
 		return $this->phpDocType ?? new MixedType();
+	}
+
+	public function hasNativeType(): bool
+	{
+		return !$this->realType instanceof MixedType || $this->realType->isExplicitMixed();
 	}
 
 	public function getNativeType(): Type
@@ -84,6 +99,36 @@ class PhpParameterFromParserNodeReflection implements ParameterReflectionWithPhp
 	public function getOutType(): ?Type
 	{
 		return $this->outType;
+	}
+
+	public function isImmediatelyInvokedCallable(): TrinaryLogic
+	{
+		return $this->immediatelyInvokedCallable;
+	}
+
+	public function getClosureThisType(): ?Type
+	{
+		return $this->closureThisType;
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->attributes;
+	}
+
+	public function getAllowedConstants(): ?ParameterAllowedConstants
+	{
+		return null;
+	}
+
+	public function checkAllowedConstants(array $constants): AllowedConstantsResult
+	{
+		return new AllowedConstantsResult([], [], false);
+	}
+
+	public function isPureUnlessCallableIsImpureParameter(): TrinaryLogic
+	{
+		return $this->pureUnlessCallableIsImpureParameter;
 	}
 
 }

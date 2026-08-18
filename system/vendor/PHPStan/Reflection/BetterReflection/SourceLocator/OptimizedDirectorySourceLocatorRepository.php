@@ -2,9 +2,11 @@
 
 namespace PHPStan\Reflection\BetterReflection\SourceLocator;
 
+use PHPStan\DependencyInjection\AutowiredService;
 use function array_key_exists;
 
-class OptimizedDirectorySourceLocatorRepository
+#[AutowiredService]
+final class OptimizedDirectorySourceLocatorRepository
 {
 
 	/** @var array<string, OptimizedDirectorySourceLocator> */

@@ -3,13 +3,14 @@
 namespace PHPStan\Dependency\ExportedNode;
 
 use JsonSerializable;
+use Override;
 use PHPStan\Dependency\ExportedNode;
 use PHPStan\Dependency\RootExportedNode;
 use ReturnTypeWillChange;
 use function array_map;
 use function count;
 
-class ExportedInterfaceNode implements RootExportedNode, JsonSerializable
+final class ExportedInterfaceNode implements RootExportedNode, JsonSerializable
 {
 
 	/**
@@ -56,9 +57,8 @@ class ExportedInterfaceNode implements RootExportedNode, JsonSerializable
 
 	/**
 	 * @param mixed[] $properties
-	 * @return self
 	 */
-	public static function __set_state(array $properties): ExportedNode
+	public static function __set_state(array $properties): self
 	{
 		return new self(
 			$properties['name'],
@@ -72,6 +72,7 @@ class ExportedInterfaceNode implements RootExportedNode, JsonSerializable
 	 * @return mixed
 	 */
 	#[ReturnTypeWillChange]
+	#[Override]
 	public function jsonSerialize()
 	{
 		return [
@@ -87,9 +88,8 @@ class ExportedInterfaceNode implements RootExportedNode, JsonSerializable
 
 	/**
 	 * @param mixed[] $data
-	 * @return self
 	 */
-	public static function decode(array $data): ExportedNode
+	public static function decode(array $data): self
 	{
 		return new self(
 			$data['name'],
@@ -103,6 +103,9 @@ class ExportedInterfaceNode implements RootExportedNode, JsonSerializable
 		);
 	}
 
+	/**
+	 * @return self::TYPE_INTERFACE
+	 */
 	public function getType(): string
 	{
 		return self::TYPE_INTERFACE;

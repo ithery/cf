@@ -5,14 +5,22 @@ namespace PHPStan\PhpDoc\Tag;
 use PHPStan\Type\Generic\TemplateTypeVariance;
 use PHPStan\Type\Type;
 
-/** @api */
-class TemplateTag
+/**
+ * @api
+ */
+final class TemplateTag
 {
 
-	public function __construct(private string $name, private Type $bound, private TemplateTypeVariance $variance)
+	/**
+	 * @param non-empty-string $name
+	 */
+	public function __construct(private string $name, private Type $bound, private ?Type $default, private TemplateTypeVariance $variance)
 	{
 	}
 
+	/**
+	 * @return non-empty-string
+	 */
 	public function getName(): string
 	{
 		return $this->name;
@@ -21,6 +29,11 @@ class TemplateTag
 	public function getBound(): Type
 	{
 		return $this->bound;
+	}
+
+	public function getDefault(): ?Type
+	{
+		return $this->default;
 	}
 
 	public function getVariance(): TemplateTypeVariance

@@ -2,34 +2,47 @@
 
 namespace PHPStan\Node;
 
+use Override;
+use PhpParser\Node\Expr\Yield_;
+use PhpParser\Node\Expr\YieldFrom;
+use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeAbstract;
+use PHPStan\Analyser\ImpurePoint;
 use PHPStan\Analyser\StatementResult;
+use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\Php\PhpMethodFromParserNodeReflection;
+use function count;
 
-/** @api */
-class MethodReturnStatementsNode extends NodeAbstract implements ReturnStatementsNode
+/**
+ * @api
+ */
+final class MethodReturnStatementsNode extends NodeAbstract implements ReturnStatementsNode
 {
 
 	private ClassMethod $classMethod;
 
 	/**
-	 * @param ReturnStatement[] $returnStatements
-	 * @param ExecutionEndNode[] $executionEnds
+	 * @param list<ReturnStatement> $returnStatements
+	 * @param list<Yield_|YieldFrom> $yieldStatements
+	 * @param list<ExecutionEndNode> $executionEnds
+	 * @param ImpurePoint[] $impurePoints
 	 */
 	public function __construct(
 		ClassMethod $method,
 		private array $returnStatements,
+		private array $yieldStatements,
 		private StatementResult $statementResult,
 		private array $executionEnds,
+		private array $impurePoints,
+		private ClassReflection $classReflection,
+		private PhpMethodFromParserNodeReflection $methodReflection,
 	)
 	{
 		parent::__construct($method->getAttributes());
 		$this->classMethod = $method;
 	}
 
-	/**
-	 * @return ReturnStatement[]
-	 */
 	public function getReturnStatements(): array
 	{
 		return $this->returnStatements;
@@ -40,12 +53,14 @@ class MethodReturnStatementsNode extends NodeAbstract implements ReturnStatement
 		return $this->statementResult;
 	}
 
-	/**
-	 * @return ExecutionEndNode[]
-	 */
 	public function getExecutionEnds(): array
 	{
 		return $this->executionEnds;
+	}
+
+	public function getImpurePoints(): array
+	{
+		return $this->impurePoints;
 	}
 
 	public function returnsByRef(): bool
@@ -58,6 +73,45 @@ class MethodReturnStatementsNode extends NodeAbstract implements ReturnStatement
 		return $this->classMethod->returnType !== null;
 	}
 
+	public function getMethodName(): string
+	{
+		return $this->classMethod->name->toString();
+	}
+
+	public function getYieldStatements(): array
+	{
+		return $this->yieldStatements;
+	}
+
+	public function getClassReflection(): ClassReflection
+	{
+		return $this->classReflection;
+	}
+
+	public function getMethodReflection(): PhpMethodFromParserNodeReflection
+	{
+		return $this->methodReflection;
+	}
+
+	/**
+	 * @return Stmt[]
+	 */
+	public function getStatements(): array
+	{
+		$stmts = $this->classMethod->getStmts();
+		if ($stmts === null) {
+			return [];
+		}
+
+		return $stmts;
+	}
+
+	public function isGenerator(): bool
+	{
+		return count($this->yieldStatements) > 0;
+	}
+
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Node_MethodReturnStatementsNode';
@@ -66,6 +120,7 @@ class MethodReturnStatementsNode extends NodeAbstract implements ReturnStatement
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];

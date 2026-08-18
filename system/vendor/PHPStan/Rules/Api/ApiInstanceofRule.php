@@ -4,23 +4,24 @@ namespace PHPStan\Rules\Api;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
-use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\UnionType;
 use function count;
 use function sprintf;
+use function strtolower;
 
 /**
  * @implements Rule<Node\Expr\Instanceof_>
  */
-class ApiInstanceofRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ApiInstanceofRule implements Rule
 {
 
 	public function __construct(
@@ -54,11 +55,13 @@ class ApiInstanceofRule implements Rule
 		$ruleError = RuleErrorBuilder::message(sprintf(
 			'Asking about instanceof %s is not covered by backward compatibility promise. The %s might change in a minor PHPStan version.',
 			$classReflection->getDisplayName(),
-			$classReflection->isInterface() ? 'interface' : 'class',
-		))->tip(sprintf(
-			"If you think it should be covered by backward compatibility promise, open a discussion:\n   %s\n\n   See also:\n   https://phpstan.org/developing-extensions/backward-compatibility-promise",
-			'https://github.com/phpstan/phpstan/discussions',
-		))->build();
+			strtolower($classReflection->getClassTypeDescription()),
+		))
+			->identifier(sprintf('phpstanApi.%s', strtolower($classReflection->getClassTypeDescription())))
+			->tip(sprintf(
+				"If you think it should be covered by backward compatibility promise, open a discussion:\n   %s\n\n   See also:\n   https://phpstan.org/developing-extensions/backward-compatibility-promise",
+				'https://github.com/phpstan/phpstan/discussions',
+			))->build();
 
 		$docBlock = $classReflection->getResolvedPhpDoc();
 		if ($docBlock === null) {
@@ -76,25 +79,28 @@ class ApiInstanceofRule implements Rule
 	}
 
 	/**
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
 	private function processCoveredClass(Node\Expr\Instanceof_ $node, Scope $scope, ClassReflection $classReflection): array
 	{
-		if ($classReflection->getName() === Type::class || $classReflection->isSubclassOf(Type::class)) {
+		if ($classReflection->is(Type::class)) {
+			return [];
+		}
+		if ($classReflection->isInterface()) {
 			return [];
 		}
 
 		$instanceofType = $scope->getType($node);
-		if ($instanceofType instanceof ConstantBooleanType) {
+		if ($instanceofType->isTrue()->or($instanceofType->isFalse())->yes()) {
 			return [];
 		}
 
-		$classType = new ObjectType($classReflection->getName(), null, $classReflection);
+		$classType = new ObjectType($classReflection->getName(), classReflection: $classReflection);
 
 		$exprType = $scope->getType($node->expr);
 		if ($exprType instanceof UnionType) {
 			foreach ($exprType->getTypes() as $innerType) {
-				if ($innerType instanceof TypeWithClassName && $classType->isSuperTypeOf($innerType)->yes()) {
+				if ($innerType->getObjectClassNames() !== [] && $classType->isSuperTypeOf($innerType)->yes()) {
 					return [];
 				}
 			}
@@ -104,7 +110,7 @@ class ApiInstanceofRule implements Rule
 			RuleErrorBuilder::message(sprintf(
 				'Although %s is covered by backward compatibility promise, this instanceof assumption might break because it\'s not guaranteed to always stay the same.',
 				$classReflection->getDisplayName(),
-			))->tip(sprintf(
+			))->identifier('phpstanApi.instanceofAssumption')->tip(sprintf(
 				"In case of questions how to solve this correctly, open a discussion:\n   %s\n\n   See also:\n   https://phpstan.org/developing-extensions/backward-compatibility-promise",
 				'https://github.com/phpstan/phpstan/discussions',
 			))->build(),

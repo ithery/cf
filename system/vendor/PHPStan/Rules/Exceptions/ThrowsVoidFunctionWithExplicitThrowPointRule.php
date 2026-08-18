@@ -4,25 +4,27 @@ namespace PHPStan\Rules\Exceptions;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\FunctionReturnStatementsNode;
-use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\ShouldNotHappenException;
+use PHPStan\TrinaryLogic;
 use PHPStan\Type\TypeUtils;
-use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\VerbosityLevel;
-use PHPStan\Type\VoidType;
 use function sprintf;
 
 /**
  * @implements Rule<FunctionReturnStatementsNode>
  */
-class ThrowsVoidFunctionWithExplicitThrowPointRule implements Rule
+#[RegisteredRule(level: 3)]
+final class ThrowsVoidFunctionWithExplicitThrowPointRule implements Rule
 {
 
 	public function __construct(
+		#[AutowiredParameter(ref: '@exceptionTypeResolver')]
 		private ExceptionTypeResolver $exceptionTypeResolver,
+		#[AutowiredParameter(ref: '%exceptions.check.missingCheckedExceptionInThrows%')]
 		private bool $missingCheckedExceptionInThrows,
 	)
 	{
@@ -36,12 +38,9 @@ class ThrowsVoidFunctionWithExplicitThrowPointRule implements Rule
 	public function processNode(Node $node, Scope $scope): array
 	{
 		$statementResult = $node->getStatementResult();
-		$functionReflection = $scope->getFunction();
-		if (!$functionReflection instanceof FunctionReflection) {
-			throw new ShouldNotHappenException();
-		}
+		$functionReflection = $node->getFunctionReflection();
 
-		if (!$functionReflection->getThrowType() instanceof VoidType) {
+		if ($functionReflection->getThrowType() === null || !$functionReflection->getThrowType()->isVoid()->yes()) {
 			return [];
 		}
 
@@ -52,11 +51,11 @@ class ThrowsVoidFunctionWithExplicitThrowPointRule implements Rule
 			}
 
 			foreach (TypeUtils::flattenTypes($throwPoint->getType()) as $throwPointType) {
-				if (
-					$throwPointType instanceof TypeWithClassName
-					&& $this->exceptionTypeResolver->isCheckedException($throwPointType->getClassName(), $throwPoint->getScope())
-					&& $this->missingCheckedExceptionInThrows
-				) {
+				$isCheckedException = TrinaryLogic::createFromBoolean($this->missingCheckedExceptionInThrows)->lazyAnd(
+					$throwPointType->getObjectClassNames(),
+					fn (string $objectClassName) => TrinaryLogic::createFromBoolean($this->exceptionTypeResolver->isCheckedException($objectClassName, $throwPoint->getScope())),
+				);
+				if ($isCheckedException->yes()) {
 					continue;
 				}
 
@@ -64,7 +63,10 @@ class ThrowsVoidFunctionWithExplicitThrowPointRule implements Rule
 					'Function %s() throws exception %s but the PHPDoc contains @throws void.',
 					$functionReflection->getName(),
 					$throwPointType->describe(VerbosityLevel::typeOnly()),
-				))->line($throwPoint->getNode()->getLine())->build();
+				))
+					->line($throwPoint->getNode()->getStartLine())
+					->identifier('throws.void')
+					->build();
 			}
 		}
 

@@ -4,19 +4,23 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantBooleanType;
-use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
-use PHPStan\Type\IntersectionType;
+use PHPStan\Type\NeverType;
+use PHPStan\Type\NullType;
 use PHPStan\Type\Type;
-use PHPStan\Type\TypeTraverser;
-use PHPStan\Type\UnionType;
 use function count;
 
-class ArraySliceFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class ArraySliceFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
+
+	public function __construct(private PhpVersion $phpVersion)
+	{
+	}
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
 	{
@@ -25,36 +29,21 @@ class ArraySliceFunctionReturnTypeExtension implements DynamicFunctionReturnType
 
 	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		if (count($functionCall->getArgs()) < 1) {
+		$args = $functionCall->getArgs();
+		if (count($args) < 2) {
 			return null;
 		}
 
-		$valueType = $scope->getType($functionCall->getArgs()[0]->value);
-		if (!$valueType->isIterable()->yes()) {
-			return null;
+		$arrayType = $scope->getType($args[0]->value);
+		if ($arrayType->isArray()->no()) {
+			return $this->phpVersion->arrayFunctionsReturnNullWithNonArray() ? new NullType() : new NeverType();
 		}
 
-		$offsetType = isset($functionCall->getArgs()[1]) ? $scope->getType($functionCall->getArgs()[1]->value) : null;
-		$offset = $offsetType instanceof ConstantIntegerType ? $offsetType->getValue() : 0;
+		$offsetType = $scope->getType($args[1]->value);
+		$lengthType = isset($args[2]) ? $scope->getType($args[2]->value) : new NullType();
+		$preserveKeysType = isset($args[3]) ? $scope->getType($args[3]->value) : new ConstantBooleanType(false);
 
-		$limitType = isset($functionCall->getArgs()[2]) ? $scope->getType($functionCall->getArgs()[2]->value) : null;
-		$limit = $limitType instanceof ConstantIntegerType ? $limitType->getValue() : null;
-
-		$preserveKeysType = isset($functionCall->getArgs()[3]) ? $scope->getType($functionCall->getArgs()[3]->value) : null;
-		$preserveKeys = $preserveKeysType instanceof ConstantBooleanType ? $preserveKeysType->getValue() : false;
-
-		return TypeTraverser::map($valueType, static function (Type $type, callable $traverse) use ($offset, $limit, $preserveKeys): Type {
-			if ($type instanceof UnionType || $type instanceof IntersectionType) {
-				return $traverse($type);
-			}
-			if ($type instanceof ConstantArrayType) {
-				return $type->slice($offset, $limit, $preserveKeys);
-			}
-			if ($type->isIterableAtLeastOnce()->yes()) {
-				return $type->toArray();
-			}
-			return $type;
-		});
+		return $arrayType->sliceArray($offsetType, $lengthType, $preserveKeysType->isTrue());
 	}
 
 }

@@ -4,8 +4,10 @@ namespace PHPStan\PhpDoc\Tag;
 
 use PHPStan\Type\Type;
 
-/** @api */
-class MixinTag
+/**
+ * @api
+ */
+final class MixinTag
 {
 
 	public function __construct(private Type $type)

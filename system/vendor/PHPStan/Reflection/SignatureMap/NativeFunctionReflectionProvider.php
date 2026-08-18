@@ -6,43 +6,51 @@ use PHPStan\BetterReflection\Identifier\Exception\InvalidIdentifierName;
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionFunction;
 use PHPStan\BetterReflection\Reflector\Exception\IdentifierNotFound;
 use PHPStan\BetterReflection\Reflector\Reflector;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\PhpDoc\ResolvedPhpDocBlock;
 use PHPStan\PhpDoc\StubPhpDocProvider;
 use PHPStan\Reflection\Assertions;
-use PHPStan\Reflection\FunctionVariantWithPhpDocs;
+use PHPStan\Reflection\AttributeReflectionFactory;
+use PHPStan\Reflection\ExtendedFunctionVariant;
+use PHPStan\Reflection\InitializerExprContext;
+use PHPStan\Reflection\Native\ExtendedNativeParameterReflection;
 use PHPStan\Reflection\Native\NativeFunctionReflection;
-use PHPStan\Reflection\Native\NativeParameterWithPhpDocsReflection;
+use PHPStan\Reflection\ParameterAllowedConstantsMapProvider;
 use PHPStan\TrinaryLogic;
-use PHPStan\Type\ArrayType;
-use PHPStan\Type\BooleanType;
 use PHPStan\Type\FileTypeMapper;
-use PHPStan\Type\FloatType;
 use PHPStan\Type\Generic\TemplateTypeMap;
-use PHPStan\Type\IntegerType;
 use PHPStan\Type\MixedType;
-use PHPStan\Type\NullType;
-use PHPStan\Type\StringAlwaysAcceptingObjectWithToStringType;
-use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypehintHelper;
-use PHPStan\Type\UnionType;
 use function array_key_exists;
 use function array_map;
+use function str_contains;
 use function strtolower;
 
-class NativeFunctionReflectionProvider
+#[AutowiredService]
+final class NativeFunctionReflectionProvider
 {
 
 	/** @var NativeFunctionReflection[] */
 	private array $functionMap = [];
 
-	public function __construct(private SignatureMapProvider $signatureMapProvider, private Reflector $reflector, private FileTypeMapper $fileTypeMapper, private StubPhpDocProvider $stubPhpDocProvider)
+	public function __construct(
+		private SignatureMapProvider $signatureMapProvider,
+		#[AutowiredParameter(ref: '@betterReflectionReflector')]
+		private Reflector $reflector,
+		private FileTypeMapper $fileTypeMapper,
+		private StubPhpDocProvider $stubPhpDocProvider,
+		private AttributeReflectionFactory $attributeReflectionFactory,
+		private ParameterAllowedConstantsMapProvider $allowedConstantsMapProvider,
+	)
 	{
 	}
 
 	public function findFunctionReflection(string $functionName): ?NativeFunctionReflection
 	{
 		$lowerCasedFunctionName = strtolower($functionName);
+		$realFunctionName = $lowerCasedFunctionName;
 		if (isset($this->functionMap[$lowerCasedFunctionName])) {
 			return $this->functionMap[$lowerCasedFunctionName];
 		}
@@ -58,12 +66,21 @@ class NativeFunctionReflectionProvider
 		$asserts = Assertions::createEmpty();
 		$docComment = null;
 		$returnsByReference = TrinaryLogic::createMaybe();
+		$acceptsNamedArguments = true;
+		$fileName = null;
+		$attributes = [];
 		try {
 			$reflectionFunction = $this->reflector->reflectFunction($functionName);
 			$reflectionFunctionAdapter = new ReflectionFunction($reflectionFunction);
+			$attributes = $reflectionFunctionAdapter->getAttributes();
 			$returnsByReference = TrinaryLogic::createFromBoolean($reflectionFunctionAdapter->returnsReference());
+			$realFunctionName = $reflectionFunction->getName();
+			$isDeprecated = $reflectionFunction->isDeprecated();
 			if ($reflectionFunction->getFileName() !== null) {
 				$fileName = $reflectionFunction->getFileName();
+				if (!$reflectionFunctionAdapter->isInternal() && !str_contains(strtolower($fileName), 'polyfill')) {
+					return null;
+				}
 				$docComment = $reflectionFunction->getDocComment();
 				if ($docComment !== null) {
 					$resolvedPhpDoc = $this->fileTypeMapper->getResolvedPhpDoc($fileName, null, null, $reflectionFunction->getName(), $docComment);
@@ -71,16 +88,15 @@ class NativeFunctionReflectionProvider
 					if ($throwsTag !== null) {
 						$throwType = $throwsTag->getType();
 					}
-					$isDeprecated = $reflectionFunction->isDeprecated();
 				}
 			}
 		} catch (IdentifierNotFound | InvalidIdentifierName) {
 			// pass
 		}
 
-		$functionSignatures = $this->signatureMapProvider->getFunctionSignatures($lowerCasedFunctionName, null, $reflectionFunctionAdapter);
+		$functionSignaturesResult = $this->signatureMapProvider->getFunctionSignatures($lowerCasedFunctionName, null, $reflectionFunctionAdapter);
 
-		$phpDoc = $this->stubPhpDocProvider->findFunctionPhpDoc($lowerCasedFunctionName, array_map(static fn (ParameterSignature $parameter): string => $parameter->getName(), $functionSignatures[0]->getParameters()));
+		$phpDoc = $this->stubPhpDocProvider->findFunctionPhpDoc($lowerCasedFunctionName, array_map(static fn (ParameterSignature $parameter): string => $parameter->getName(), $functionSignaturesResult['positional'][0]->getParameters()));
 		if ($phpDoc !== null) {
 			if ($phpDoc->hasPhpDocString()) {
 				$docComment = $phpDoc->getPhpDocString();
@@ -90,93 +106,90 @@ class NativeFunctionReflectionProvider
 			}
 			$asserts = Assertions::createFromResolvedPhpDocBlock($phpDoc);
 			$phpDocReturnType = $this->getReturnTypeFromPhpDoc($phpDoc);
+			$acceptsNamedArguments = $phpDoc->acceptsNamedArguments();
 		}
 
-		$variants = [];
-		$functionSignatures = $this->signatureMapProvider->getFunctionSignatures($lowerCasedFunctionName, null, $reflectionFunctionAdapter);
-		foreach ($functionSignatures as $functionSignature) {
-			$variants[] = new FunctionVariantWithPhpDocs(
-				TemplateTypeMap::createEmpty(),
-				null,
-				array_map(static function (ParameterSignature $parameterSignature) use ($lowerCasedFunctionName, $phpDoc): NativeParameterWithPhpDocsReflection {
-					$type = $parameterSignature->getType();
-
-					$phpDocType = null;
-					if ($phpDoc !== null) {
-						$phpDocParam = $phpDoc->getParamTags()[$parameterSignature->getName()] ?? null;
-						if ($phpDocParam !== null) {
-							$phpDocType = $phpDocParam->getType();
-						}
-					}
-					if (
-						$parameterSignature->getName() === 'values'
-						&& (
-							$lowerCasedFunctionName === 'printf'
-							|| $lowerCasedFunctionName === 'sprintf'
-						)
-					) {
-						$type = new UnionType([
-							new StringAlwaysAcceptingObjectWithToStringType(),
-							new IntegerType(),
-							new FloatType(),
-							new NullType(),
-							new BooleanType(),
-						]);
-					}
-
-					if (
-						$parameterSignature->getName() === 'fields'
-						&& $lowerCasedFunctionName === 'fputcsv'
-					) {
-						$type = new ArrayType(
-							new UnionType([
-								new StringType(),
-								new IntegerType(),
-							]),
-							new UnionType([
-								new StringAlwaysAcceptingObjectWithToStringType(),
-								new IntegerType(),
-								new FloatType(),
-								new NullType(),
-								new BooleanType(),
-							]),
-						);
-					}
-
-					return new NativeParameterWithPhpDocsReflection(
-						$parameterSignature->getName(),
-						$parameterSignature->isOptional(),
-						TypehintHelper::decideType($type, $phpDocType),
-						$phpDocType ?? new MixedType(),
-						$type,
-						$parameterSignature->passedByReference(),
-						$parameterSignature->isVariadic(),
-						$parameterSignature->getDefaultValue(),
-						$phpDoc !== null ? NativeFunctionReflectionProvider::getParamOutTypeFromPhpDoc($parameterSignature->getName(), $phpDoc) : null,
-					);
-				}, $functionSignature->getParameters()),
-				$functionSignature->isVariadic(),
-				TypehintHelper::decideType($functionSignature->getReturnType(), $phpDocReturnType),
-				$phpDocReturnType ?? new MixedType(),
-				$functionSignature->getReturnType(),
-			);
-		}
-
+		$allowedConstantsMapProvider = $this->allowedConstantsMapProvider;
+		$pureUnlessCallableIsImpureParameters = [];
 		if ($this->signatureMapProvider->hasFunctionMetadata($lowerCasedFunctionName)) {
-			$hasSideEffects = TrinaryLogic::createFromBoolean($this->signatureMapProvider->getFunctionMetadata($lowerCasedFunctionName)['hasSideEffects']);
+			$functionMetadata = $this->signatureMapProvider->getFunctionMetadata($lowerCasedFunctionName);
+			if (isset($functionMetadata['pureUnlessCallableIsImpureParameters'])) {
+				$pureUnlessCallableIsImpureParameters = $functionMetadata['pureUnlessCallableIsImpureParameters'];
+			}
 		} else {
-			$hasSideEffects = TrinaryLogic::createMaybe();
+			$functionMetadata = null;
 		}
+
+		$variantsByType = ['positional' => []];
+		foreach ($functionSignaturesResult as $signatureType => $functionSignatures) {
+			foreach ($functionSignatures ?? [] as $functionSignature) {
+				$variantsByType[$signatureType][] = new ExtendedFunctionVariant(
+					TemplateTypeMap::createEmpty(),
+					null,
+					array_map(static function (ParameterSignature $parameterSignature) use ($phpDoc, $lowerCasedFunctionName, $allowedConstantsMapProvider, $pureUnlessCallableIsImpureParameters): ExtendedNativeParameterReflection {
+						$name = $parameterSignature->getName();
+						$type = $parameterSignature->getType();
+
+						$phpDocType = null;
+						$immediatelyInvokedCallable = TrinaryLogic::createMaybe();
+						$closureThisType = null;
+						$pureUnlessCallableIsImpureParameter = TrinaryLogic::createFromBoolean($pureUnlessCallableIsImpureParameters[$name] ?? false);
+						if ($phpDoc !== null) {
+							if (array_key_exists($parameterSignature->getName(), $phpDoc->getParamTags())) {
+								$phpDocType = $phpDoc->getParamTags()[$parameterSignature->getName()]->getType();
+							}
+							if (array_key_exists($parameterSignature->getName(), $phpDoc->getParamsImmediatelyInvokedCallable())) {
+								$immediatelyInvokedCallable = TrinaryLogic::createFromBoolean($phpDoc->getParamsImmediatelyInvokedCallable()[$parameterSignature->getName()]);
+							}
+							if (array_key_exists($parameterSignature->getName(), $phpDoc->getParamClosureThisTags())) {
+								$closureThisType = $phpDoc->getParamClosureThisTags()[$parameterSignature->getName()]->getType();
+							}
+							if (($phpDoc->getParamsPureUnlessCallableIsImpure()[$parameterSignature->getName()] ?? false) === true) {
+								$pureUnlessCallableIsImpureParameter = TrinaryLogic::createYes();
+							}
+						}
+
+						return new ExtendedNativeParameterReflection(
+							$parameterSignature->getName(),
+							$parameterSignature->isOptional(),
+							TypehintHelper::decideType($type, $phpDocType),
+							$phpDocType ?? new MixedType(),
+							$type,
+							$parameterSignature->passedByReference(),
+							$parameterSignature->isVariadic(),
+							$parameterSignature->getDefaultValue(),
+							$phpDoc !== null ? NativeFunctionReflectionProvider::getParamOutTypeFromPhpDoc($parameterSignature->getName(), $phpDoc) : null,
+							$immediatelyInvokedCallable,
+							$closureThisType,
+							[],
+							$allowedConstantsMapProvider->getForFunctionParameter($lowerCasedFunctionName, $parameterSignature->getName()),
+							$pureUnlessCallableIsImpureParameter,
+						);
+					}, $functionSignature->getParameters()),
+					$functionSignature->isVariadic(),
+					TypehintHelper::decideType($functionSignature->getReturnType(), $phpDocReturnType),
+					$phpDocReturnType ?? new MixedType(),
+					$functionSignature->getReturnType(),
+				);
+			}
+		}
+
+		$hasSideEffects = isset($functionMetadata['hasSideEffects'])
+			? TrinaryLogic::createFromBoolean($functionMetadata['hasSideEffects'])
+			: TrinaryLogic::createMaybe();
 
 		$functionReflection = new NativeFunctionReflection(
-			$lowerCasedFunctionName,
-			$variants,
+			$realFunctionName,
+			$variantsByType['positional'],
+			$variantsByType['named'] ?? null,
 			$throwType,
 			$hasSideEffects,
 			$isDeprecated,
 			$asserts,
 			$docComment,
 			$returnsByReference,
+			$acceptsNamedArguments,
+			$this->attributeReflectionFactory->fromNativeReflection($attributes, InitializerExprContext::fromFunction($realFunctionName, $fileName)),
 		);
 		$this->functionMap[$lowerCasedFunctionName] = $functionReflection;
 

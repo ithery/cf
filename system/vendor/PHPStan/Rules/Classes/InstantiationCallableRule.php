@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Classes;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\InstantiationCallableNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -11,7 +12,8 @@ use PHPStan\Rules\RuleErrorBuilder;
 /**
  * @implements Rule<InstantiationCallableNode>
  */
-class InstantiationCallableRule implements Rule
+#[RegisteredRule(level: 0)]
+final class InstantiationCallableRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -22,7 +24,10 @@ class InstantiationCallableRule implements Rule
 	public function processNode(Node $node, Scope $scope): array
 	{
 		return [
-			RuleErrorBuilder::message('Cannot create callable from the new operator.')->nonIgnorable()->build(),
+			RuleErrorBuilder::message('Cannot create callable from the new operator.')
+				->identifier('callable.notSupported')
+				->nonIgnorable()
+				->build(),
 		];
 	}
 

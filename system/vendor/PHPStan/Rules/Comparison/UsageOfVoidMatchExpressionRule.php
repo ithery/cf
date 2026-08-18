@@ -4,14 +4,15 @@ namespace PHPStan\Rules\Comparison;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\Type\VoidType;
 
 /**
  * @implements Rule<Node\Expr\Match_>
  */
-class UsageOfVoidMatchExpressionRule implements Rule
+#[RegisteredRule(level: 2)]
+final class UsageOfVoidMatchExpressionRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -21,12 +22,11 @@ class UsageOfVoidMatchExpressionRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$matchResultType = $scope->getType($node);
-		if (
-			$matchResultType instanceof VoidType
-			&& !$scope->isInFirstLevelStatement()
-		) {
-			return [RuleErrorBuilder::message('Result of match expression (void) is used.')->build()];
+		if (!$scope->isInFirstLevelStatement()) {
+			$matchResultType = $scope->getKeepVoidType($node);
+			if ($matchResultType->isVoid()->yes()) {
+				return [RuleErrorBuilder::message('Result of match expression (void) is used.')->identifier('match.void')->build()];
+			}
 		}
 
 		return [];

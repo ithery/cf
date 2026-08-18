@@ -6,41 +6,45 @@ use PhpParser\Node\Expr\BinaryOp\Smaller;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Ternary;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Node\Expr\AlwaysRememberedExpr;
+use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\ConstantScalarType;
-use PHPStan\Type\ConstantType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\ErrorType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\UnionType;
 use function count;
+use function in_array;
 
-class MinMaxFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class MinMaxFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
-	/** @var string[] */
-	private array $functionNames = [
-		'min' => '',
-		'max' => '',
-	];
+	public function __construct(
+		private PhpVersion $phpVersion,
+	)
+	{
+	}
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
 	{
-		return isset($this->functionNames[$functionReflection->getName()]);
+		return in_array($functionReflection->getName(), ['min', 'max'], true);
 	}
 
-	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
+	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		if (!isset($functionCall->getArgs()[0])) {
-			return ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+		$args = $functionCall->getArgs();
+		if (!isset($args[0])) {
+			return null;
 		}
 
-		if (count($functionCall->getArgs()) === 1) {
-			$argType = $scope->getType($functionCall->getArgs()[0]->value);
+		if (count($args) === 1) {
+			$argType = $scope->getType($args[0]->value);
 			if ($argType->isArray()->yes()) {
 				return $this->processArrayType(
 					$functionReflection->getName(),
@@ -54,21 +58,25 @@ class MinMaxFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExte
 		// rewrite min($x, $y) as $x < $y ? $x : $y
 		// we don't handle arrays, which have different semantics
 		$functionName = $functionReflection->getName();
-		$args = $functionCall->getArgs();
-		if (count($functionCall->getArgs()) === 2) {
+		if (count($args) === 2) {
 			$argType0 = $scope->getType($args[0]->value);
 			$argType1 = $scope->getType($args[1]->value);
 
 			if ($argType0->isArray()->no() && $argType1->isArray()->no()) {
+				$comparisonExpr = new Smaller(
+					new AlwaysRememberedExpr($args[0]->value, $argType0, $scope->getNativeType($args[0]->value)),
+					new AlwaysRememberedExpr($args[1]->value, $argType1, $scope->getNativeType($args[1]->value)),
+				);
+
 				if ($functionName === 'min') {
 					return $scope->getType(new Ternary(
-						new Smaller($args[0]->value, $args[1]->value),
+						$comparisonExpr,
 						$args[0]->value,
 						$args[1]->value,
 					));
 				} elseif ($functionName === 'max') {
 					return $scope->getType(new Ternary(
-						new Smaller($args[0]->value, $args[1]->value),
+						$comparisonExpr,
 						$args[1]->value,
 						$args[0]->value,
 					));
@@ -77,7 +85,7 @@ class MinMaxFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExte
 		}
 
 		$argumentTypes = [];
-		foreach ($functionCall->getArgs() as $arg) {
+		foreach ($args as $arg) {
 			$argType = $scope->getType($arg->value);
 			if ($arg->unpack) {
 				$iterableValueType = $argType->getIterableValueType();
@@ -107,17 +115,25 @@ class MinMaxFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExte
 			$resultTypes = [];
 			foreach ($constArrayTypes as $constArrayType) {
 				$isIterable = $constArrayType->isIterableAtLeastOnce();
-				if ($isIterable->no()) {
+				if ($isIterable->no() && !$this->phpVersion->throwsValueErrorForInternalFunctions()) {
 					$resultTypes[] = new ConstantBooleanType(false);
 					continue;
 				}
 				$argumentTypes = [];
-				if (!$isIterable->yes()) {
+				if (!$isIterable->yes() && !$this->phpVersion->throwsValueErrorForInternalFunctions()) {
 					$argumentTypes[] = new ConstantBooleanType(false);
 				}
 
 				foreach ($constArrayType->getValueTypes() as $innerType) {
 					$argumentTypes[] = $innerType;
+				}
+
+				$unsealedTypes = $constArrayType->getUnsealedTypes();
+				if ($unsealedTypes !== null && $constArrayType->isUnsealed()->yes()) {
+					// Unsealed extras can hold further values, so the min/max
+					// must also range over the unsealed value type — otherwise
+					// the explicit entries would be reported as the answer.
+					$argumentTypes[] = $unsealedTypes[1];
 				}
 
 				$resultTypes[] = $this->processType($functionName, $argumentTypes);
@@ -127,12 +143,12 @@ class MinMaxFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExte
 		}
 
 		$isIterable = $argType->isIterableAtLeastOnce();
-		if ($isIterable->no()) {
+		if ($isIterable->no() && !$this->phpVersion->throwsValueErrorForInternalFunctions()) {
 			return new ConstantBooleanType(false);
 		}
 		$iterableValueType = $argType->getIterableValueType();
 		$argumentTypes = [];
-		if (!$isIterable->yes()) {
+		if (!$isIterable->yes() && !$this->phpVersion->throwsValueErrorForInternalFunctions()) {
 			$argumentTypes[] = new ConstantBooleanType(false);
 		}
 
@@ -142,7 +158,7 @@ class MinMaxFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExte
 	}
 
 	/**
-	 * @param Type[] $types
+	 * @param list<Type> $types
 	 */
 	private function processType(
 		string $functionName,
@@ -151,16 +167,16 @@ class MinMaxFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExte
 	{
 		$resultType = null;
 		foreach ($types as $type) {
-			if (!$type instanceof ConstantType) {
-				return TypeCombinator::union(...$types);
-			}
-
 			if ($resultType === null) {
 				$resultType = $type;
 				continue;
 			}
 
 			$compareResult = $this->compareTypes($resultType, $type);
+			if ($compareResult === null) {
+				return TypeCombinator::union(...$types);
+			}
+
 			if ($functionName === 'min') {
 				if ($compareResult === $type) {
 					$resultType = $type;
@@ -185,15 +201,15 @@ class MinMaxFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExte
 	): ?Type
 	{
 		if (
-			$firstType->isConstantArray()->yes()
-			&& $secondType instanceof ConstantScalarType
+			$firstType->isArray()->yes()
+			&& $secondType->isConstantScalarValue()->yes()
 		) {
 			return $secondType;
 		}
 
 		if (
-			$firstType instanceof ConstantScalarType
-			&& $secondType->isConstantArray()->yes()
+			$firstType->isConstantScalarValue()->yes()
+			&& $secondType->isArray()->yes()
 		) {
 			return $firstType;
 		}

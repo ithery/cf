@@ -3,8 +3,14 @@
 namespace PHPStan\Rules\Comparison;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr;
+use PHPStan\Analyser\CollectedDataEmitter;
+use PHPStan\Analyser\NodeCallbackInvoker;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\BooleanOrNode;
+use PHPStan\Parser\LastConditionVisitor;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\Constant\ConstantBooleanType;
@@ -14,13 +20,21 @@ use function sprintf;
 /**
  * @implements Rule<BooleanOrNode>
  */
-class BooleanOrConstantConditionRule implements Rule
+#[RegisteredRule(level: 4)]
+final class BooleanOrConstantConditionRule implements Rule
 {
 
 	public function __construct(
 		private ConstantConditionRuleHelper $helper,
+		private PossiblyImpureTipHelper $possiblyImpureTipHelper,
+		private ConstantConditionInTraitHelper $constantConditionInTraitHelper,
+		private FunctionCallConstantConditionHelper $functionCallConstantConditionHelper,
+		#[AutowiredParameter]
 		private bool $treatPhpDocTypesAsCertain,
-		private bool $bleedingEdge,
+		#[AutowiredParameter]
+		private bool $reportAlwaysTrueInLastCondition,
+		#[AutowiredParameter(ref: '%tips.treatPhpDocTypesAsCertain%')]
+		private bool $treatPhpDocTypesAsCertainTip,
 	)
 	{
 	}
@@ -32,32 +46,61 @@ class BooleanOrConstantConditionRule implements Rule
 
 	public function processNode(
 		Node $node,
-		Scope $scope,
+		Scope&NodeCallbackInvoker&CollectedDataEmitter $scope,
 	): array
 	{
 		$originalNode = $node->getOriginalNode();
-		$nodeText = $this->bleedingEdge ? $originalNode->getOperatorSigil() : '||';
+		$nodeText = $originalNode->getOperatorSigil();
 		$messages = [];
 		$leftType = $this->helper->getBooleanType($scope, $originalNode->left);
-		$tipText = 'Because the type is coming from a PHPDoc, you can turn off this check by setting <fg=cyan>treatPhpDocTypesAsCertain: false</> in your <fg=cyan>%configurationFile%</>.';
+		$identifierType = $originalNode instanceof Node\Expr\BinaryOp\BooleanOr ? 'booleanOr' : 'logicalOr';
+		$isInTrait = $scope->isInTrait();
+		$hasLeftOrRightError = false;
 		if ($leftType instanceof ConstantBooleanType) {
-			$addTipLeft = function (RuleErrorBuilder $ruleErrorBuilder) use ($scope, $originalNode, $tipText): RuleErrorBuilder {
+			$addTipLeft = function (RuleErrorBuilder $ruleErrorBuilder) use ($scope, $originalNode): RuleErrorBuilder {
 				if (!$this->treatPhpDocTypesAsCertain) {
-					return $ruleErrorBuilder;
+					return $this->possiblyImpureTipHelper->addTip($scope, $originalNode->left, $ruleErrorBuilder);
 				}
 
 				$booleanNativeType = $this->helper->getNativeBooleanType($scope, $originalNode->left);
 				if ($booleanNativeType instanceof ConstantBooleanType) {
-					return $ruleErrorBuilder;
+					return $this->possiblyImpureTipHelper->addTip($scope, $originalNode->left, $ruleErrorBuilder);
+				}
+				if (!$this->treatPhpDocTypesAsCertainTip) {
+					return $this->possiblyImpureTipHelper->addTip($scope, $originalNode->left, $ruleErrorBuilder);
 				}
 
-				return $ruleErrorBuilder->tip($tipText);
+				$ruleErrorBuilder = $ruleErrorBuilder->treatPhpDocTypesAsCertainTip();
+
+				return $this->possiblyImpureTipHelper->addTip($scope, $originalNode->left, $ruleErrorBuilder);
 			};
-			$messages[] = $addTipLeft(RuleErrorBuilder::message(sprintf(
-				'Left side of %s is always %s.',
-				$nodeText,
-				$leftType->getValue() ? 'true' : 'false',
-			)))->line($originalNode->left->getLine())->build();
+
+			$isLast = $node->getAttribute(LastConditionVisitor::ATTRIBUTE_NAME);
+			if (!$leftType->getValue() || $isLast !== true || $this->reportAlwaysTrueInLastCondition) {
+				$errorBuilder = $addTipLeft(RuleErrorBuilder::message(sprintf(
+					'Left side of %s is always %s.',
+					$nodeText,
+					$leftType->getValue() ? 'true' : 'false',
+				)))
+					->identifier(sprintf('%s.leftAlways%s', $identifierType, $leftType->getValue() ? 'True' : 'False'))
+					->line($originalNode->left->getStartLine());
+				if ($leftType->getValue() && $isLast === false && !$this->reportAlwaysTrueInLastCondition) {
+					$errorBuilder->tip('Remove remaining cases below this one and this error will disappear too.');
+				}
+				$ruleError = $errorBuilder->build();
+				$hasLeftOrRightError = true;
+				if ($this->functionCallConstantConditionHelper->isTypeCheckCandidate($originalNode->left)) {
+					$this->functionCallConstantConditionHelper->emitFunctionCallError(self::class, $scope, $originalNode->left, $leftType->getValue(), $ruleError);
+				} elseif ($isInTrait) {
+					$this->constantConditionInTraitHelper->emitError(self::class, $scope, $originalNode->left, $leftType->getValue(), $ruleError);
+				} else {
+					$messages[] = $ruleError;
+				}
+			} else {
+				$this->emitNoError($scope, $originalNode->left);
+			}
+		} else {
+			$this->emitNoError($scope, $originalNode->left);
 		}
 
 		$rightScope = $node->getRightScope();
@@ -65,59 +108,117 @@ class BooleanOrConstantConditionRule implements Rule
 			$rightScope,
 			$originalNode->right,
 		);
-		if ($rightType instanceof ConstantBooleanType) {
-			$addTipRight = function (RuleErrorBuilder $ruleErrorBuilder) use ($rightScope, $originalNode, $tipText): RuleErrorBuilder {
+		if ($rightType instanceof ConstantBooleanType && !$scope->isInFirstLevelStatement()) {
+			$addTipRight = function (RuleErrorBuilder $ruleErrorBuilder) use ($rightScope, $originalNode): RuleErrorBuilder {
 				if (!$this->treatPhpDocTypesAsCertain) {
-					return $ruleErrorBuilder;
+					return $this->possiblyImpureTipHelper->addTip($rightScope, $originalNode->right, $ruleErrorBuilder);
 				}
 
 				$booleanNativeType = $this->helper->getNativeBooleanType(
-					$rightScope->doNotTreatPhpDocTypesAsCertain(),
+					$rightScope,
 					$originalNode->right,
 				);
 				if ($booleanNativeType instanceof ConstantBooleanType) {
-					return $ruleErrorBuilder;
+					return $this->possiblyImpureTipHelper->addTip($rightScope, $originalNode->right, $ruleErrorBuilder);
+				}
+				if (!$this->treatPhpDocTypesAsCertainTip) {
+					return $this->possiblyImpureTipHelper->addTip($rightScope, $originalNode->right, $ruleErrorBuilder);
 				}
 
-				return $ruleErrorBuilder->tip($tipText);
+				$ruleErrorBuilder = $ruleErrorBuilder->treatPhpDocTypesAsCertainTip();
+
+				return $this->possiblyImpureTipHelper->addTip($rightScope, $originalNode->right, $ruleErrorBuilder);
 			};
 
-			if (!$scope->isInFirstLevelStatement()) {
-				$messages[] = $addTipRight(RuleErrorBuilder::message(sprintf(
+			$isLast = $node->getAttribute(LastConditionVisitor::ATTRIBUTE_NAME);
+			if (!$rightType->getValue() || $isLast !== true || $this->reportAlwaysTrueInLastCondition) {
+				$errorBuilder = $addTipRight(RuleErrorBuilder::message(sprintf(
 					'Right side of %s is always %s.',
 					$nodeText,
 					$rightType->getValue() ? 'true' : 'false',
-				)))->line($originalNode->right->getLine())->build();
+				)))
+					->identifier(sprintf('%s.rightAlways%s', $identifierType, $rightType->getValue() ? 'True' : 'False'))
+					->line($originalNode->right->getStartLine());
+				if ($rightType->getValue() && $isLast === false && !$this->reportAlwaysTrueInLastCondition) {
+					$errorBuilder->tip('Remove remaining cases below this one and this error will disappear too.');
+				}
+				$ruleError = $errorBuilder->build();
+				$hasLeftOrRightError = true;
+				if ($this->functionCallConstantConditionHelper->isTypeCheckCandidate($originalNode->right)) {
+					$this->functionCallConstantConditionHelper->emitFunctionCallError(self::class, $scope, $originalNode->right, $rightType->getValue(), $ruleError);
+				} elseif ($isInTrait) {
+					$this->constantConditionInTraitHelper->emitError(self::class, $scope, $originalNode->right, $rightType->getValue(), $ruleError);
+				} else {
+					$messages[] = $ruleError;
+				}
+			} else {
+				$this->emitNoError($scope, $originalNode->right);
 			}
+		} else {
+			$this->emitNoError($scope, $originalNode->right);
 		}
 
-		if (count($messages) === 0) {
+		if (count($messages) === 0 && !$hasLeftOrRightError && !$scope->isInFirstLevelStatement()) {
 			$nodeType = $this->treatPhpDocTypesAsCertain ? $scope->getType($originalNode) : $scope->getNativeType($originalNode);
 			if ($nodeType instanceof ConstantBooleanType) {
-				$addTip = function (RuleErrorBuilder $ruleErrorBuilder) use ($scope, $originalNode, $tipText): RuleErrorBuilder {
+				$addTip = function (RuleErrorBuilder $ruleErrorBuilder) use ($scope, $originalNode): RuleErrorBuilder {
 					if (!$this->treatPhpDocTypesAsCertain) {
-						return $ruleErrorBuilder;
+						return $this->possiblyImpureTipHelper->addTip($scope, $originalNode, $ruleErrorBuilder);
 					}
 
-					$booleanNativeType = $scope->doNotTreatPhpDocTypesAsCertain()->getType($originalNode);
+					$booleanNativeType = $scope->getNativeType($originalNode);
 					if ($booleanNativeType instanceof ConstantBooleanType) {
-						return $ruleErrorBuilder;
+						return $this->possiblyImpureTipHelper->addTip($scope, $originalNode, $ruleErrorBuilder);
+					}
+					if (!$this->treatPhpDocTypesAsCertainTip) {
+						return $this->possiblyImpureTipHelper->addTip($scope, $originalNode, $ruleErrorBuilder);
 					}
 
-					return $ruleErrorBuilder->tip($tipText);
+					$ruleErrorBuilder = $ruleErrorBuilder->treatPhpDocTypesAsCertainTip();
+
+					return $this->possiblyImpureTipHelper->addTip($scope, $originalNode, $ruleErrorBuilder);
 				};
 
-				if (!$scope->isInFirstLevelStatement()) {
-					$messages[] = $addTip(RuleErrorBuilder::message(sprintf(
+				$isLast = $node->getAttribute(LastConditionVisitor::ATTRIBUTE_NAME);
+				if (!$nodeType->getValue() || $isLast !== true || $this->reportAlwaysTrueInLastCondition) {
+					$errorBuilder = $addTip(RuleErrorBuilder::message(sprintf(
 						'Result of %s is always %s.',
 						$nodeText,
 						$nodeType->getValue() ? 'true' : 'false',
-					)))->build();
+					)));
+					if ($nodeType->getValue() && $isLast === false && !$this->reportAlwaysTrueInLastCondition) {
+						$errorBuilder->tip('Remove remaining cases below this one and this error will disappear too.');
+					}
+
+					$errorBuilder->identifier(sprintf('%s.always%s', $identifierType, $nodeType->getValue() ? 'True' : 'False'));
+
+					$ruleError = $errorBuilder->build();
+					if ($isInTrait) {
+						$this->constantConditionInTraitHelper->emitError(self::class, $scope, $originalNode, $nodeType->getValue(), $ruleError);
+					} else {
+						$messages[] = $ruleError;
+					}
+				} else {
+					$this->constantConditionInTraitHelper->emitNoError(self::class, $scope, $originalNode);
 				}
+			} else {
+				$this->constantConditionInTraitHelper->emitNoError(self::class, $scope, $originalNode);
 			}
 		}
 
 		return $messages;
+	}
+
+	private function emitNoError(
+		Scope&NodeCallbackInvoker&CollectedDataEmitter $scope,
+		Expr $expr,
+	): void
+	{
+		if ($this->functionCallConstantConditionHelper->isTypeCheckCandidate($expr)) {
+			$this->functionCallConstantConditionHelper->emitFunctionCallNoError(self::class, $scope, $expr);
+		} else {
+			$this->constantConditionInTraitHelper->emitNoError(self::class, $scope, $expr);
+		}
 	}
 
 }

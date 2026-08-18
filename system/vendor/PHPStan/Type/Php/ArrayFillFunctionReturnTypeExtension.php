@@ -4,9 +4,9 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Type\Accessory\AccessoryArrayListType;
 use PHPStan\Type\Accessory\NonEmptyArrayType;
 use PHPStan\Type\ArrayType;
@@ -21,7 +21,8 @@ use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 use function count;
 
-class ArrayFillFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class ArrayFillFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	private const MAX_SIZE_USE_CONSTANT_ARRAY = 100;
@@ -35,16 +36,14 @@ class ArrayFillFunctionReturnTypeExtension implements DynamicFunctionReturnTypeE
 		return $functionReflection->getName() === 'array_fill';
 	}
 
-	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
+	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		if (count($functionCall->getArgs()) < 3) {
-			return ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+		$args = $functionCall->getArgs();
+		if (count($args) < 3) {
+			return null;
 		}
 
-		$startIndexType = $scope->getType($functionCall->getArgs()[0]->value);
-		$numberType = $scope->getType($functionCall->getArgs()[1]->value);
-		$valueType = $scope->getType($functionCall->getArgs()[2]->value);
-
+		$numberType = $scope->getType($args[1]->value);
 		$isValidNumberType = IntegerRangeType::fromInterval(0, null)->isSuperTypeOf($numberType);
 
 		// check against negative-int, which is not allowed
@@ -54,6 +53,9 @@ class ArrayFillFunctionReturnTypeExtension implements DynamicFunctionReturnTypeE
 			}
 			return new ConstantBooleanType(false);
 		}
+
+		$startIndexType = $scope->getType($args[0]->value);
+		$valueType = $scope->getType($args[2]->value);
 
 		if (
 			$startIndexType instanceof ConstantIntegerType
@@ -79,7 +81,7 @@ class ArrayFillFunctionReturnTypeExtension implements DynamicFunctionReturnTypeE
 
 		$resultType = new ArrayType(new IntegerType(), $valueType);
 		if ((new ConstantIntegerType(0))->isSuperTypeOf($startIndexType)->yes()) {
-			$resultType = AccessoryArrayListType::intersectWith($resultType);
+			$resultType = TypeCombinator::intersect($resultType, new AccessoryArrayListType());
 		}
 		if (IntegerRangeType::fromInterval(1, null)->isSuperTypeOf($numberType)->yes()) {
 			$resultType = TypeCombinator::intersect($resultType, new NonEmptyArrayType());

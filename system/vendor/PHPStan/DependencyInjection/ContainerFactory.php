@@ -2,10 +2,17 @@
 
 namespace PHPStan\DependencyInjection;
 
+use Nette\Bootstrap\Extensions\PhpExtension;
 use Nette\DI\Config\Adapters\PhpAdapter;
-use Nette\DI\Extensions\ExtensionsExtension;
-use Nette\DI\Extensions\PhpExtension;
+use Nette\DI\Definitions\Statement;
 use Nette\DI\Helpers;
+use Nette\Schema\Context as SchemaContext;
+use Nette\Schema\Elements\AnyOf;
+use Nette\Schema\Elements\Structure;
+use Nette\Schema\Elements\Type;
+use Nette\Schema\Expect;
+use Nette\Schema\Processor;
+use Nette\Schema\Schema;
 use Nette\Utils\Strings;
 use Nette\Utils\Validators;
 use Phar;
@@ -14,34 +21,43 @@ use PHPStan\BetterReflection\BetterReflection;
 use PHPStan\BetterReflection\Reflector\Reflector;
 use PHPStan\BetterReflection\SourceLocator\SourceStubber\PhpStormStubsSourceStubber;
 use PHPStan\BetterReflection\SourceLocator\Type\SourceLocator;
-use PHPStan\Broker\Broker;
 use PHPStan\Command\CommandHelper;
+use PHPStan\Command\Environment;
 use PHPStan\File\FileHelper;
+use PHPStan\Node\Printer\Printer;
 use PHPStan\Php\PhpVersion;
+use PHPStan\Reflection\PhpVersionStaticAccessor;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Reflection\ReflectionProviderStaticAccessor;
-use PHPStan\Type\Accessory\AccessoryArrayListType;
-use Symfony\Component\Finder\Finder;
+use PHPStan\ShouldNotHappenException;
+use PHPStan\Type\ObjectType;
+use PHPStan\Type\TypeCombinator;
 use function array_diff_key;
+use function array_intersect;
+use function array_key_exists;
+use function array_keys;
 use function array_map;
 use function array_merge;
+use function array_slice;
 use function array_unique;
 use function count;
 use function dirname;
 use function extension_loaded;
+use function implode;
 use function ini_get;
-use function is_dir;
+use function is_array;
 use function is_file;
 use function is_readable;
-use function spl_object_hash;
+use function is_string;
+use function spl_object_id;
 use function sprintf;
 use function str_ends_with;
-use function sys_get_temp_dir;
-use function time;
-use function unlink;
+use function substr;
 
-/** @api */
-class ContainerFactory
+/**
+ * @api
+ */
+final class ContainerFactory
 {
 
 	private FileHelper $fileHelper;
@@ -50,10 +66,12 @@ class ContainerFactory
 
 	private string $configDirectory;
 
-	private static ?string $lastInitializedContainerId = null;
+	private static ?int $lastInitializedContainerId = null;
+
+	private bool $journalContainer = false;
 
 	/** @api */
-	public function __construct(private string $currentWorkingDirectory, private bool $checkDuplicateFiles = false)
+	public function __construct(private string $currentWorkingDirectory)
 	{
 		$this->fileHelper = new FileHelper($currentWorkingDirectory);
 
@@ -69,11 +87,17 @@ class ContainerFactory
 		$this->configDirectory = $originalRootDir . '/conf';
 	}
 
+	public function setJournalContainer(): void
+	{
+		$this->journalContainer = true;
+	}
+
 	/**
 	 * @param string[] $additionalConfigFiles
 	 * @param string[] $analysedPaths
 	 * @param string[] $composerAutoloaderProjectPaths
 	 * @param string[] $analysedPathsFromConfig
+	 * @param array<mixed> $additionalParameters
 	 */
 	public function create(
 		string $tempDirectory,
@@ -86,13 +110,15 @@ class ContainerFactory
 		?string $cliAutoloadFile = null,
 		?string $singleReflectionFile = null,
 		?string $singleReflectionInsteadOfFile = null,
+		array $additionalParameters = [],
 	): Container
 	{
-		$allConfigFiles = $this->detectDuplicateIncludedFiles(
-			$additionalConfigFiles,
+		[$allConfigFiles, $projectConfig] = $this->detectDuplicateIncludedFiles(
+			array_merge([__DIR__ . '/../../conf/parametersSchema.neon'], $additionalConfigFiles),
 			[
 				'rootDir' => $this->rootDirectory,
 				'currentWorkingDirectory' => $this->currentWorkingDirectory,
+				'env' => Environment::getCleanedArray(),
 			],
 		);
 
@@ -101,25 +127,28 @@ class ContainerFactory
 			$this->rootDirectory,
 			$this->currentWorkingDirectory,
 			$generateBaselineFile,
-		));
+			$projectConfig['expandRelativePaths'],
+		), $this->journalContainer);
 		$configurator->defaultExtensions = [
 			'php' => PhpExtension::class,
-			'extensions' => ExtensionsExtension::class,
+			// registers everything marked with #[ContainerExtension] and handles `extensions:` sections
+			'extensions' => ContainerExtensionsExtension::class,
 		];
 		$configurator->setDebugMode(true);
 		$configurator->setTempDirectory($tempDirectory);
-		$configurator->addParameters([
+		$configurator->addParameters(array_merge([
 			'rootDir' => $this->rootDirectory,
 			'currentWorkingDirectory' => $this->currentWorkingDirectory,
 			'cliArgumentsVariablesRegistered' => ini_get('register_argc_argv') === '1',
 			'tmpDir' => $tempDirectory,
 			'additionalConfigFiles' => $additionalConfigFiles,
+			'allConfigFiles' => $allConfigFiles,
 			'composerAutoloaderProjectPaths' => $composerAutoloaderProjectPaths,
 			'generateBaselineFile' => $generateBaselineFile,
 			'usedLevel' => $usedLevel,
 			'cliAutoloadFile' => $cliAutoloadFile,
-			'fixerTmpDir' => sys_get_temp_dir() . '/phpstan-fixer',
-		]);
+			'env' => Environment::getCleanedArray(),
+		], $additionalParameters));
 		$configurator->addDynamicParameters([
 			'singleReflectionFile' => $singleReflectionFile,
 			'singleReflectionInsteadOfFile' => $singleReflectionInsteadOfFile,
@@ -134,6 +163,7 @@ class ContainerFactory
 		$configurator->setAllConfigFiles($allConfigFiles);
 
 		$container = $configurator->createContainer()->getByType(Container::class);
+		$this->validateParameters($container->getParameters(), $projectConfig['parametersSchema']);
 		self::postInitializeContainer($container);
 
 		return $container;
@@ -142,7 +172,7 @@ class ContainerFactory
 	/** @internal */
 	public static function postInitializeContainer(Container $container): void
 	{
-		$containerId = spl_object_hash($container);
+		$containerId = spl_object_id($container);
 		if ($containerId === self::$lastInitializedContainerId) {
 			return;
 		}
@@ -164,52 +194,24 @@ class ContainerFactory
 			$reflector,
 			$phpParser,
 			$container->getByType(PhpStormStubsSourceStubber::class),
+			$container->getByType(Printer::class),
 		);
 
-		/** @var Broker $broker */
-		$broker = $container->getByType(Broker::class);
-		Broker::registerInstance($broker);
 		ReflectionProviderStaticAccessor::registerInstance($container->getByType(ReflectionProvider::class));
+		PhpVersionStaticAccessor::registerInstance($container->getByType(PhpVersion::class));
+		ObjectType::resetCaches();
+
 		$container->getService('typeSpecifier');
 
 		BleedingEdgeToggle::setBleedingEdge($container->getParameter('featureToggles')['bleedingEdge']);
-		AccessoryArrayListType::setListTypeEnabled($container->getParameter('featureToggles')['listType']);
-	}
+		ReportUnsafeArrayStringKeyCastingToggle::setLevel($container->getParameter('reportUnsafeArrayStringKeyCasting'));
 
-	public function clearOldContainers(string $tempDirectory): void
-	{
-		$configurator = new Configurator(new LoaderFactory(
-			$this->fileHelper,
-			$this->rootDirectory,
-			$this->currentWorkingDirectory,
-			null,
-		));
-		$configurator->setDebugMode(true);
-		$configurator->setTempDirectory($tempDirectory);
-
-		$containerDirectory = $configurator->getContainerCacheDirectory();
-		if (!is_dir($containerDirectory)) {
-			return;
-		}
-
-		$finder = new Finder();
-		$finder->name('Container_*')->in($containerDirectory);
-		$twoDaysAgo = time() - 24 * 60 * 60 * 2;
-
-		foreach ($finder as $containerFile) {
-			$path = $containerFile->getRealPath();
-			if ($path === false) {
-				continue;
-			}
-			if ($containerFile->getATime() > $twoDaysAgo) {
-				continue;
-			}
-			if ($containerFile->getCTime() > $twoDaysAgo) {
-				continue;
-			}
-
-			@unlink($path);
-		}
+		// Type operations read global state — the toggles above, the reflection provider,
+		// the PHP version — so a memoized result is only valid for the state it was computed
+		// under. Clearing must be the LAST step: building the typeSpecifier service runs
+		// extension constructors that can already perform type operations, and entries
+		// memoized before the toggles are set would encode the previous container's state.
+		TypeCombinator::clearCache();
 	}
 
 	public function getCurrentWorkingDirectory(): string
@@ -229,8 +231,8 @@ class ContainerFactory
 
 	/**
 	 * @param string[] $configFiles
-	 * @param array<string, string> $loaderParameters
-	 * @return string[]
+	 * @param array<string, mixed> $loaderParameters
+	 * @return array{list<string>, array<mixed>}
 	 * @throws DuplicateIncludedFilesException
 	 */
 	private function detectDuplicateIncludedFiles(
@@ -238,22 +240,23 @@ class ContainerFactory
 		array $loaderParameters,
 	): array
 	{
-		$neonAdapter = new NeonAdapter();
+		$neonAdapter = new NeonCachedFileReader([]);
 		$phpAdapter = new PhpAdapter();
 		$allConfigFiles = [];
+		$configArray = [];
 		foreach ($configFiles as $configFile) {
-			$allConfigFiles = array_merge($allConfigFiles, self::getConfigFiles($this->fileHelper, $neonAdapter, $phpAdapter, $configFile, $loaderParameters, null));
+			[$tmpConfigFiles, $tmpConfigArray] = self::getConfigFiles($this->fileHelper, $neonAdapter, $phpAdapter, $configFile, $loaderParameters, null);
+			$allConfigFiles = array_merge($allConfigFiles, $tmpConfigFiles);
+
+			/** @var array<mixed> $configArray */
+			$configArray = \Nette\Schema\Helpers::merge($tmpConfigArray, $configArray);
 		}
 
 		$normalized = array_map(fn (string $file): string => $this->fileHelper->normalizePath($file), $allConfigFiles);
 
 		$deduplicated = array_unique($normalized);
 		if (count($normalized) <= count($deduplicated)) {
-			return $normalized;
-		}
-
-		if (!$this->checkDuplicateFiles) {
-			return $normalized;
+			return [$normalized, $configArray];
 		}
 
 		$duplicateFiles = array_unique(array_diff_key($normalized, $deduplicated));
@@ -263,11 +266,11 @@ class ContainerFactory
 
 	/**
 	 * @param array<string, string> $loaderParameters
-	 * @return string[]
+	 * @return array{list<string>, array<mixed>}
 	 */
 	private static function getConfigFiles(
 		FileHelper $fileHelper,
-		NeonAdapter $neonAdapter,
+		NeonCachedFileReader $neonAdapter,
 		PhpAdapter $phpAdapter,
 		string $configFile,
 		array $loaderParameters,
@@ -275,10 +278,10 @@ class ContainerFactory
 	): array
 	{
 		if ($generateBaselineFile === $fileHelper->normalizePath($configFile)) {
-			return [];
+			return [[], []];
 		}
 		if (!is_file($configFile) || !is_readable($configFile)) {
-			return [];
+			return [[], []];
 		}
 
 		if (str_ends_with($configFile, '.php')) {
@@ -292,11 +295,15 @@ class ContainerFactory
 			$includes = Helpers::expand($data['includes'], $loaderParameters);
 			foreach ($includes as $include) {
 				$include = self::expandIncludedFile($include, $configFile);
-				$allConfigFiles = array_merge($allConfigFiles, self::getConfigFiles($fileHelper, $neonAdapter, $phpAdapter, $include, $loaderParameters, $generateBaselineFile));
+				[$tmpConfigFiles, $tmpConfigArray] = self::getConfigFiles($fileHelper, $neonAdapter, $phpAdapter, $include, $loaderParameters, $generateBaselineFile);
+				$allConfigFiles = array_merge($allConfigFiles, $tmpConfigFiles);
+
+				/** @var array<mixed> $data */
+				$data = \Nette\Schema\Helpers::merge($tmpConfigArray, $data);
 			}
 		}
 
-		return $allConfigFiles;
+		return [$allConfigFiles, $data];
 	}
 
 	private static function expandIncludedFile(string $includedFile, string $mainFile): string
@@ -304,6 +311,135 @@ class ContainerFactory
 		return Strings::match($includedFile, '#([a-z]+:)?[/\\\\]#Ai') !== null // is absolute
 			? $includedFile
 			: dirname($mainFile) . '/' . $includedFile;
+	}
+
+	/**
+	 * @param array<mixed> $parameters
+	 * @param array<mixed> $parametersSchema
+	 */
+	private function validateParameters(array $parameters, array $parametersSchema): void
+	{
+		if (!(bool) $parameters['__validate']) {
+			return;
+		}
+
+		$schema = $this->processArgument(
+			new Statement('schema', [
+				new Statement('structure', [$parametersSchema]),
+			]),
+		);
+		$processor = new Processor();
+		$processor->onNewContext[] = static function (SchemaContext $context): void {
+			$context->path = ['parameters'];
+		};
+		$processor->process($schema, $parameters);
+
+		if (
+			array_key_exists('phpVersion', $parameters)
+			&& is_array($parameters['phpVersion'])
+		) {
+			$phpVersion = $parameters['phpVersion'];
+
+			if ($phpVersion['max'] < $phpVersion['min']) {
+				throw new InvalidPhpVersionException('Invalid PHP version range: phpVersion.max should be greater or equal to phpVersion.min.');
+			}
+		}
+
+		foreach ($parameters['ignoreErrors'] ?? [] as $ignoreError) {
+			if (is_string($ignoreError)) {
+				continue;
+			}
+
+			$atLeastOneOf = ['message', 'messages', 'rawMessage', 'rawMessages', 'identifier', 'identifiers', 'path', 'paths'];
+			if (array_intersect($atLeastOneOf, array_keys($ignoreError)) === []) {
+				throw new InvalidIgnoredErrorException('An ignoreErrors entry must contain at least one of the following fields: ' . implode(', ', $atLeastOneOf) . '.');
+			}
+
+			foreach ([
+				['rawMessage', 'rawMessages', 'message', 'messages'],
+				['identifier', 'identifiers'],
+				['path', 'paths'],
+			] as $incompatibleFields) {
+				foreach ($incompatibleFields as $index => $field1) {
+					$fieldsToCheck = array_slice($incompatibleFields, $index + 1);
+					foreach ($fieldsToCheck as $field2) {
+						if (array_key_exists($field1, $ignoreError) && array_key_exists($field2, $ignoreError)) {
+							throw new InvalidIgnoredErrorException(sprintf('An ignoreErrors entry cannot contain both %s and %s fields.', $field1, $field2));
+						}
+					}
+				}
+			}
+
+			if (array_key_exists('count', $ignoreError) && !array_key_exists('path', $ignoreError)) {
+				throw new InvalidIgnoredErrorException('An ignoreErrors entry with count field must also contain path field.');
+			}
+		}
+	}
+
+	/**
+	 * @param Statement[] $statements
+	 */
+	private function processSchema(array $statements, bool $required = true): Schema
+	{
+		if (count($statements) === 0) {
+			throw new ShouldNotHappenException();
+		}
+
+		$parameterSchema = null;
+		foreach ($statements as $statement) {
+			$processedArguments = array_map(fn ($argument) => $this->processArgument($argument), $statement->arguments);
+			if ($parameterSchema === null) {
+				/** @var Type|AnyOf|Structure $parameterSchema */
+				$parameterSchema = Expect::{$statement->getEntity()}(...$processedArguments);
+			} else {
+				$parameterSchema->{$statement->getEntity()}(...$processedArguments);
+			}
+		}
+
+		if ($required) {
+			$parameterSchema->required();
+		}
+
+		return $parameterSchema;
+	}
+
+	/**
+	 * @param mixed $argument
+	 * @return mixed
+	 */
+	private function processArgument($argument, bool $required = true)
+	{
+		if ($argument instanceof Statement) {
+			if ($argument->entity === 'schema') {
+				$arguments = [];
+				foreach ($argument->arguments as $schemaArgument) {
+					if (!$schemaArgument instanceof Statement) {
+						throw new ShouldNotHappenException('schema() should contain another statement().');
+					}
+
+					$arguments[] = $schemaArgument;
+				}
+
+				if (count($arguments) === 0) {
+					throw new ShouldNotHappenException('schema() should have at least one argument.');
+				}
+
+				return $this->processSchema($arguments, $required);
+			}
+
+			return $this->processSchema([$argument], $required);
+		} elseif (is_array($argument)) {
+			$processedArray = [];
+			foreach ($argument as $key => $val) {
+				$required = $key[0] !== '?';
+				$key = $required ? $key : substr($key, 1);
+				$processedArray[$key] = $this->processArgument($val, $required);
+			}
+
+			return $processedArray;
+		}
+
+		return $argument;
 	}
 
 }

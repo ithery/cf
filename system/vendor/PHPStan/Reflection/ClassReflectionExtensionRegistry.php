@@ -2,10 +2,11 @@
 
 namespace PHPStan\Reflection;
 
-use PHPStan\Broker\Broker;
-use function array_merge;
+use PHPStan\Reflection\Php\PhpClassReflectionExtension;
+use PHPStan\Reflection\RequireExtension\RequireExtendsMethodsClassReflectionExtension;
+use PHPStan\Reflection\RequireExtension\RequireExtendsPropertiesClassReflectionExtension;
 
-class ClassReflectionExtensionRegistry
+final class ClassReflectionExtensionRegistry
 {
 
 	/**
@@ -14,19 +15,14 @@ class ClassReflectionExtensionRegistry
 	 * @param AllowedSubTypesClassReflectionExtension[] $allowedSubTypesClassReflectionExtensions
 	 */
 	public function __construct(
-		Broker $broker,
 		private array $propertiesClassReflectionExtensions,
 		private array $methodsClassReflectionExtensions,
 		private array $allowedSubTypesClassReflectionExtensions,
+		private RequireExtendsPropertiesClassReflectionExtension $requireExtendsPropertiesClassReflectionExtension,
+		private RequireExtendsMethodsClassReflectionExtension $requireExtendsMethodsClassReflectionExtension,
+		private PhpClassReflectionExtension $phpClassReflectionExtension,
 	)
 	{
-		foreach (array_merge($propertiesClassReflectionExtensions, $methodsClassReflectionExtensions, $allowedSubTypesClassReflectionExtensions) as $extension) {
-			if (!($extension instanceof BrokerAwareExtension)) {
-				continue;
-			}
-
-			$extension->setBroker($broker);
-		}
 	}
 
 	/**
@@ -51,6 +47,21 @@ class ClassReflectionExtensionRegistry
 	public function getAllowedSubTypesClassReflectionExtensions(): array
 	{
 		return $this->allowedSubTypesClassReflectionExtensions;
+	}
+
+	public function getRequireExtendsPropertyClassReflectionExtension(): RequireExtendsPropertiesClassReflectionExtension
+	{
+		return $this->requireExtendsPropertiesClassReflectionExtension;
+	}
+
+	public function getRequireExtendsMethodsClassReflectionExtension(): RequireExtendsMethodsClassReflectionExtension
+	{
+		return $this->requireExtendsMethodsClassReflectionExtension;
+	}
+
+	public function getPhpClassReflectionExtension(): PhpClassReflectionExtension
+	{
+		return $this->phpClassReflectionExtension;
 	}
 
 }

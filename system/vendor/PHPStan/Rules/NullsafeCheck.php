@@ -3,8 +3,10 @@
 namespace PHPStan\Rules;
 
 use PhpParser\Node\Expr;
+use PHPStan\DependencyInjection\AutowiredService;
 
-class NullsafeCheck
+#[AutowiredService]
+final class NullsafeCheck
 {
 
 	public function containsNullSafe(Expr $expr): bool
@@ -36,7 +38,7 @@ class NullsafeCheck
 			return $this->containsNullSafe($expr->class);
 		}
 
-		if ($expr instanceof Expr\List_ || $expr instanceof Expr\Array_) {
+		if ($expr instanceof Expr\List_) {
 			foreach ($expr->items as $item) {
 				if ($item === null) {
 					continue;

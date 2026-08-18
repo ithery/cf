@@ -8,7 +8,7 @@ use function array_map;
 use function count;
 use function implode;
 
-class ParserErrorsException extends Exception
+final class ParserErrorsException extends Exception
 {
 
 	/** @var mixed[] */
@@ -22,7 +22,7 @@ class ParserErrorsException extends Exception
 		private ?string $parsedFile,
 	)
 	{
-		parent::__construct(implode(', ', array_map(static fn (Error $error): string => $error->getMessage(), $errors)));
+		parent::__construct(implode(', ', array_map(static fn (Error $error): string => $error->getRawMessage(), $errors)));
 		if (count($errors) > 0) {
 			$this->attributes = $errors[0]->getAttributes();
 		} else {

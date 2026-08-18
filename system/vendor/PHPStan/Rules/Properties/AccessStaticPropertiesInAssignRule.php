@@ -4,16 +4,18 @@ namespace PHPStan\Rules\Properties;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\PropertyAssignNode;
 use PHPStan\Rules\Rule;
 
 /**
  * @implements Rule<PropertyAssignNode>
  */
-class AccessStaticPropertiesInAssignRule implements Rule
+#[RegisteredRule(level: 0)]
+final class AccessStaticPropertiesInAssignRule implements Rule
 {
 
-	public function __construct(private AccessStaticPropertiesRule $accessStaticPropertiesRule)
+	public function __construct(private AccessStaticPropertiesCheck $check)
 	{
 	}
 
@@ -32,7 +34,7 @@ class AccessStaticPropertiesInAssignRule implements Rule
 			return [];
 		}
 
-		return $this->accessStaticPropertiesRule->processNode($node->getPropertyFetch(), $scope);
+		return $this->check->check($node->getPropertyFetch(), $scope, true);
 	}
 
 }

@@ -3,16 +3,22 @@
 namespace PHPStan\Reflection\Dummy;
 
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\PropertyReflection;
+use PHPStan\Reflection\ExtendedMethodReflection;
+use PHPStan\Reflection\ExtendedPropertyReflection;
 use PHPStan\Reflection\WrapperPropertyReflection;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Type;
 
-class ChangedTypePropertyReflection implements WrapperPropertyReflection
+final class ChangedTypePropertyReflection implements WrapperPropertyReflection
 {
 
-	public function __construct(private ClassReflection $declaringClass, private PropertyReflection $reflection, private Type $readableType, private Type $writableType)
+	public function __construct(private ClassReflection $declaringClass, private ExtendedPropertyReflection $reflection, private Type $readableType, private Type $writableType, private Type $phpDocType, private Type $nativeType)
 	{
+	}
+
+	public function getName(): string
+	{
+		return $this->reflection->getName();
 	}
 
 	public function getDeclaringClass(): ClassReflection
@@ -38,6 +44,26 @@ class ChangedTypePropertyReflection implements WrapperPropertyReflection
 	public function getDocComment(): ?string
 	{
 		return $this->reflection->getDocComment();
+	}
+
+	public function hasPhpDocType(): bool
+	{
+		return $this->reflection->hasPhpDocType();
+	}
+
+	public function getPhpDocType(): Type
+	{
+		return $this->phpDocType;
+	}
+
+	public function hasNativeType(): bool
+	{
+		return $this->reflection->hasNativeType();
+	}
+
+	public function getNativeType(): Type
+	{
+		return $this->nativeType;
 	}
 
 	public function getReadableType(): Type
@@ -80,9 +106,59 @@ class ChangedTypePropertyReflection implements WrapperPropertyReflection
 		return $this->reflection->isInternal();
 	}
 
-	public function getOriginalReflection(): PropertyReflection
+	public function getOriginalReflection(): ExtendedPropertyReflection
 	{
 		return $this->reflection;
+	}
+
+	public function isAbstract(): TrinaryLogic
+	{
+		return $this->reflection->isAbstract();
+	}
+
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return $this->reflection->isFinalByKeyword();
+	}
+
+	public function isFinal(): TrinaryLogic
+	{
+		return $this->reflection->isFinal();
+	}
+
+	public function isVirtual(): TrinaryLogic
+	{
+		return $this->reflection->isVirtual();
+	}
+
+	public function hasHook(string $hookType): bool
+	{
+		return $this->reflection->hasHook($hookType);
+	}
+
+	public function getHook(string $hookType): ExtendedMethodReflection
+	{
+		return $this->reflection->getHook($hookType);
+	}
+
+	public function isProtectedSet(): bool
+	{
+		return $this->reflection->isProtectedSet();
+	}
+
+	public function isPrivateSet(): bool
+	{
+		return $this->reflection->isPrivateSet();
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->reflection->getAttributes();
+	}
+
+	public function isDummy(): TrinaryLogic
+	{
+		return $this->reflection->isDummy();
 	}
 
 }

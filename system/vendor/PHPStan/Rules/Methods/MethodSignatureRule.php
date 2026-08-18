@@ -4,17 +4,23 @@ namespace PHPStan\Rules\Methods;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Node\InClassMethodNode;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\ParameterReflectionWithPhpDocs;
-use PHPStan\Reflection\ParametersAcceptorSelector;
-use PHPStan\Reflection\ParametersAcceptorWithPhpDocs;
-use PHPStan\Reflection\Php\PhpMethodFromParserNodeReflection;
+use PHPStan\Reflection\ExtendedParameterReflection;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
+use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\TrinaryLogic;
+use PHPStan\Type\Accessory\AccessoryArrayListType;
+use PHPStan\Type\ArrayType;
+use PHPStan\Type\Generic\GenericStaticType;
 use PHPStan\Type\Generic\TemplateTypeHelper;
+use PHPStan\Type\IntegerRangeType;
+use PHPStan\Type\IntersectionType;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\StaticType;
@@ -22,20 +28,27 @@ use PHPStan\Type\Type;
 use PHPStan\Type\TypehintHelper;
 use PHPStan\Type\TypeTraverser;
 use PHPStan\Type\VerbosityLevel;
-use PHPStan\Type\VoidType;
 use function count;
 use function min;
 use function sprintf;
+use function strtolower;
 
 /**
  * @implements Rule<InClassMethodNode>
  */
-class MethodSignatureRule implements Rule
+// autoTag: false - not registered as a rule, checked as part of OverridingMethodRule
+#[AutowiredService(autoTag: false)]
+final class MethodSignatureRule implements Rule
 {
 
 	public function __construct(
+		private ParentMethodHelper $parentMethodHelper,
+		#[AutowiredParameter(ref: '%reportMaybesInMethodSignatures%')]
 		private bool $reportMaybes,
+		#[AutowiredParameter(ref: '%reportStaticMethodSignatures%')]
 		private bool $reportStatic,
+		#[AutowiredParameter(ref: '%featureToggles.reportMethodPurityOverride%')]
+		private bool $reportMethodPurityOverride,
 	)
 	{
 	}
@@ -47,11 +60,7 @@ class MethodSignatureRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$method = $scope->getFunction();
-		if (!$method instanceof PhpMethodFromParserNodeReflection) {
-			return [];
-		}
-
+		$method = $node->getMethodReflection();
 		$methodName = $method->getName();
 		if ($methodName === '__construct') {
 			return [];
@@ -62,35 +71,78 @@ class MethodSignatureRule implements Rule
 		if ($method->isPrivate()) {
 			return [];
 		}
-		$parameters = ParametersAcceptorSelector::selectSingle($method->getVariants());
-
 		$errors = [];
 		$declaringClass = $method->getDeclaringClass();
-		foreach ($this->collectParentMethods($methodName, $method->getDeclaringClass()) as $parentMethod) {
+		foreach ($this->parentMethodHelper->collectParentMethods($methodName, $method->getDeclaringClass()) as [$parentMethod, $parentMethodDeclaringClass]) {
+			if ($this->reportMethodPurityOverride && $method->isPure()->no() && $parentMethod->isPure()->yes()) {
+				$errors[] = RuleErrorBuilder::message(sprintf(
+					'Impure method %s::%s() overrides pure method %s::%s().',
+					$method->getDeclaringClass()->getDisplayName(),
+					$method->getName(),
+					$parentMethodDeclaringClass->getDisplayName(),
+					$parentMethod->getName(),
+				))->identifier('method.impure')->build();
+			} elseif (
+				$this->reportMethodPurityOverride
+				&& $method->isPure()->no()
+				&& count($parentMethod->getPureUnlessCallableIsImpureParameters()) > 0
+			) {
+				$errors[] = RuleErrorBuilder::message(sprintf(
+					'Impure method %s::%s() overrides method %s::%s() marked @pure-unless-callable-is-impure.',
+					$method->getDeclaringClass()->getDisplayName(),
+					$method->getName(),
+					$parentMethodDeclaringClass->getDisplayName(),
+					$parentMethod->getName(),
+				))->identifier('method.impureOverridePureUnlessCallable')->build();
+			}
+
 			$parentVariants = $parentMethod->getVariants();
 			if (count($parentVariants) !== 1) {
 				continue;
 			}
-			$parentParameters = ParametersAcceptorSelector::selectSingle($parentVariants);
-			if (!$parentParameters instanceof ParametersAcceptorWithPhpDocs) {
-				continue;
-			}
-
-			[$returnTypeCompatibility, $returnType, $parentReturnType] = $this->checkReturnTypeCompatibility($declaringClass, $parameters, $parentParameters);
+			$parentVariant = $parentVariants[0];
+			[$returnTypeCompatibility, $returnType, $parentReturnType] = $this->checkReturnTypeCompatibility($declaringClass, $method, $parentVariant);
 			if ($returnTypeCompatibility->no() || (!$returnTypeCompatibility->yes() && $this->reportMaybes)) {
-				$errors[] = RuleErrorBuilder::message(sprintf(
+				$builder = RuleErrorBuilder::message(sprintf(
 					'Return type (%s) of method %s::%s() should be %s with return type (%s) of method %s::%s()',
 					$returnType->describe(VerbosityLevel::value()),
 					$method->getDeclaringClass()->getDisplayName(),
 					$method->getName(),
 					$returnTypeCompatibility->no() ? 'compatible' : 'covariant',
 					$parentReturnType->describe(VerbosityLevel::value()),
-					$parentMethod->getDeclaringClass()->getDisplayName(),
+					$parentMethodDeclaringClass->getDisplayName(),
 					$parentMethod->getName(),
-				))->build();
+				))->identifier('method.childReturnType');
+				if (
+					$parentMethod->getDeclaringClass()->getName() === Rule::class
+					&& strtolower($methodName) === 'processnode'
+				) {
+					$ruleErrorType = new ObjectType(RuleError::class);
+					$identifierRuleErrorType = new ObjectType(IdentifierRuleError::class);
+					$listOfIdentifierRuleErrors = new IntersectionType([
+						new ArrayType(IntegerRangeType::fromInterval(0, null), $identifierRuleErrorType),
+						new AccessoryArrayListType(),
+					]);
+					if ($listOfIdentifierRuleErrors->isSuperTypeOf($parentReturnType)->yes()) {
+						$returnValueType = $returnType->getIterableValueType();
+						if (!$returnValueType->isString()->no()) {
+							$builder->tip('Rules can no longer return plain strings. See: https://phpstan.org/blog/using-rule-error-builder');
+						} elseif (
+							$ruleErrorType->isSuperTypeOf($returnValueType)->yes()
+							&& !$identifierRuleErrorType->isSuperTypeOf($returnValueType)->yes()
+						) {
+							$builder->tip('Errors are missing identifiers. See: https://phpstan.org/blog/using-rule-error-builder');
+						} elseif (!$returnType->isList()->yes()) {
+							$builder->tip('Return type must be a list. See: https://phpstan.org/blog/using-rule-error-builder');
+						}
+					}
+				}
+				$errors[] = $builder->build();
 			}
 
-			$parameterResults = $this->checkParameterTypeCompatibility($declaringClass, $parameters->getParameters(), $parentParameters->getParameters());
+			$methodParameters = $method->getParameters();
+			$parentVariantParameters = $parentVariant->getParameters();
+			$parameterResults = $this->checkParameterTypeCompatibility($declaringClass, $methodParameters, $parentVariantParameters);
 			foreach ($parameterResults as $parameterIndex => [$parameterResult, $parameterType, $parentParameterType]) {
 				if ($parameterResult->yes()) {
 					continue;
@@ -98,8 +150,8 @@ class MethodSignatureRule implements Rule
 				if (!$parameterResult->no() && !$this->reportMaybes) {
 					continue;
 				}
-				$parameter = $parameters->getParameters()[$parameterIndex];
-				$parentParameter = $parentParameters->getParameters()[$parameterIndex];
+				$parameter = $methodParameters[$parameterIndex];
+				$parentParameter = $parentVariantParameters[$parameterIndex];
 				$errors[] = RuleErrorBuilder::message(sprintf(
 					'Parameter #%d $%s (%s) of method %s::%s() should be %s with parameter $%s (%s) of method %s::%s()',
 					$parameterIndex + 1,
@@ -110,9 +162,9 @@ class MethodSignatureRule implements Rule
 					$parameterResult->no() ? 'compatible' : 'contravariant',
 					$parentParameter->getName(),
 					$parentParameterType->describe(VerbosityLevel::value()),
-					$parentMethod->getDeclaringClass()->getDisplayName(),
+					$parentMethodDeclaringClass->getDisplayName(),
 					$parentMethod->getName(),
-				))->build();
+				))->identifier('method.childParameterType')->build();
 			}
 		}
 
@@ -120,38 +172,12 @@ class MethodSignatureRule implements Rule
 	}
 
 	/**
-	 * @return ExtendedMethodReflection[]
-	 */
-	private function collectParentMethods(string $methodName, ClassReflection $class): array
-	{
-		$parentMethods = [];
-
-		$parentClass = $class->getParentClass();
-		if ($parentClass !== null && $parentClass->hasNativeMethod($methodName)) {
-			$parentMethod = $parentClass->getNativeMethod($methodName);
-			if (!$parentMethod->isPrivate()) {
-				$parentMethods[] = $parentMethod;
-			}
-		}
-
-		foreach ($class->getInterfaces() as $interface) {
-			if (!$interface->hasNativeMethod($methodName)) {
-				continue;
-			}
-
-			$parentMethods[] = $interface->getNativeMethod($methodName);
-		}
-
-		return $parentMethods;
-	}
-
-	/**
 	 * @return array{TrinaryLogic, Type, Type}
 	 */
 	private function checkReturnTypeCompatibility(
 		ClassReflection $declaringClass,
-		ParametersAcceptorWithPhpDocs $currentVariant,
-		ParametersAcceptorWithPhpDocs $parentVariant,
+		ExtendedParametersAcceptor $currentVariant,
+		ExtendedParametersAcceptor $parentVariant,
 	): array
 	{
 		$returnType = TypehintHelper::decideType(
@@ -164,24 +190,24 @@ class MethodSignatureRule implements Rule
 		);
 		$parentReturnType = $this->transformStaticType($declaringClass, $originalParentReturnType);
 		// Allow adding `void` return type hints when the parent defines no return type
-		if ($returnType instanceof VoidType && $parentReturnType instanceof MixedType) {
+		if ($returnType->isVoid()->yes() && $parentReturnType instanceof MixedType) {
 			return [TrinaryLogic::createYes(), $returnType, $parentReturnType];
 		}
 
 		// We can return anything
-		if ($parentReturnType instanceof VoidType) {
+		if ($parentReturnType->isVoid()->yes()) {
 			return [TrinaryLogic::createYes(), $returnType, $parentReturnType];
 		}
 
-		return [$parentReturnType->isSuperTypeOf($returnType), TypehintHelper::decideType(
+		return [$parentReturnType->isSuperTypeOf($returnType)->result, TypehintHelper::decideType(
 			$currentVariant->getNativeReturnType(),
 			$currentVariant->getPhpDocReturnType(),
 		), $originalParentReturnType];
 	}
 
 	/**
-	 * @param ParameterReflectionWithPhpDocs[] $parameters
-	 * @param ParameterReflectionWithPhpDocs[] $parentParameters
+	 * @param ExtendedParameterReflection[] $parameters
+	 * @param ExtendedParameterReflection[] $parentParameters
 	 * @return array<int, array{TrinaryLogic, Type, Type}>
 	 */
 	private function checkParameterTypeCompatibility(
@@ -207,7 +233,7 @@ class MethodSignatureRule implements Rule
 			);
 			$parentParameterType = $this->transformStaticType($declaringClass, $originalParameterType);
 
-			$parameterResults[] = [$parameterType->isSuperTypeOf($parentParameterType), TypehintHelper::decideType(
+			$parameterResults[] = [$parameterType->isSuperTypeOf($parentParameterType)->result, TypehintHelper::decideType(
 				$parameter->getNativeType(),
 				$parameter->getPhpDocType(),
 			), $originalParameterType];
@@ -219,6 +245,15 @@ class MethodSignatureRule implements Rule
 	private function transformStaticType(ClassReflection $declaringClass, Type $type): Type
 	{
 		return TypeTraverser::map($type, static function (Type $type, callable $traverse) use ($declaringClass): Type {
+			if ($type instanceof GenericStaticType) {
+				if ($declaringClass->isFinal()) {
+					$changedType = $type->changeBaseClass($declaringClass)->getStaticObjectType();
+				} else {
+					$changedType = $type->changeBaseClass($declaringClass);
+				}
+				return $traverse($changedType);
+			}
+
 			if ($type instanceof StaticType) {
 				if ($declaringClass->isFinal()) {
 					$changedType = new ObjectType($declaringClass->getName());

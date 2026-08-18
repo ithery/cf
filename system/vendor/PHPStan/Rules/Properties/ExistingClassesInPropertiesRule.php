@@ -4,15 +4,18 @@ namespace PHPStan\Rules\Properties;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Node\ClassPropertyNode;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Rules\ClassCaseSensitivityCheck;
+use PHPStan\Rules\ClassNameCheck;
 use PHPStan\Rules\ClassNameNodePair;
+use PHPStan\Rules\ClassNameUsageLocation;
 use PHPStan\Rules\PhpDoc\UnresolvableTypeHelper;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\ShouldNotHappenException;
 use function array_map;
 use function array_merge;
 use function sprintf;
@@ -20,16 +23,22 @@ use function sprintf;
 /**
  * @implements Rule<ClassPropertyNode>
  */
-class ExistingClassesInPropertiesRule implements Rule
+#[RegisteredRule(level: 0)]
+#[ValidatesStubFiles]
+final class ExistingClassesInPropertiesRule implements Rule
 {
 
 	public function __construct(
 		private ReflectionProvider $reflectionProvider,
-		private ClassCaseSensitivityCheck $classCaseSensitivityCheck,
+		private ClassNameCheck $classCheck,
 		private UnresolvableTypeHelper $unresolvableTypeHelper,
 		private PhpVersion $phpVersion,
+		#[AutowiredParameter]
 		private bool $checkClassCaseSensitivity,
+		#[AutowiredParameter]
 		private bool $checkThisOnly,
+		#[AutowiredParameter(ref: '%tips.discoveringSymbols%')]
+		private bool $discoveringSymbolsTip,
 	)
 	{
 	}
@@ -41,11 +50,7 @@ class ExistingClassesInPropertiesRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if (!$scope->isInClass()) {
-			throw new ShouldNotHappenException();
-		}
-
-		$propertyReflection = $scope->getClassReflection()->getNativeProperty($node->getName());
+		$propertyReflection = $node->getClassReflection()->getNativeProperty($node->getName());
 		if ($this->checkThisOnly) {
 			$referencedClasses = $propertyReflection->getNativeType()->getReferencedClasses();
 		} else {
@@ -64,35 +69,51 @@ class ExistingClassesInPropertiesRule implements Rule
 						$propertyReflection->getDeclaringClass()->getDisplayName(),
 						$node->getName(),
 						$referencedClass,
-					))->build();
+					))->identifier('property.trait')->build();
 				}
 				continue;
 			}
 
-			$errors[] = RuleErrorBuilder::message(sprintf(
+			$errorBuilder = RuleErrorBuilder::message(sprintf(
 				'Property %s::$%s has unknown class %s as its type.',
 				$propertyReflection->getDeclaringClass()->getDisplayName(),
 				$node->getName(),
 				$referencedClass,
-			))->discoveringSymbolsTip()->build();
+			))
+				->identifier('class.notFound');
+
+			if ($this->discoveringSymbolsTip) {
+				$errorBuilder->discoveringSymbolsTip();
+			}
+
+			$errors[] = $errorBuilder->build();
 		}
 
-		if ($this->checkClassCaseSensitivity) {
-			$errors = array_merge(
-				$errors,
-				$this->classCaseSensitivityCheck->checkClassNames(array_map(static fn (string $class): ClassNameNodePair => new ClassNameNodePair($class, $node), $referencedClasses)),
-			);
-		}
+		$errors = array_merge(
+			$errors,
+			$this->classCheck->checkClassNames(
+				$scope,
+				array_map(static fn (string $class): ClassNameNodePair => new ClassNameNodePair($class, $node), $referencedClasses),
+				ClassNameUsageLocation::from(ClassNameUsageLocation::PROPERTY_TYPE, [
+					'property' => $propertyReflection,
+				]),
+				$this->checkClassCaseSensitivity,
+			),
+		);
 
-		if (
-			$this->phpVersion->supportsPureIntersectionTypes()
-			&& $this->unresolvableTypeHelper->containsUnresolvableType($propertyReflection->getNativeType())
-		) {
-			$errors[] = RuleErrorBuilder::message(sprintf(
+		$unresolvableType = $this->phpVersion->supportsPureIntersectionTypes()
+			? $this->unresolvableTypeHelper->getUnresolvableType($propertyReflection->getNativeType())
+			: null;
+		if ($unresolvableType !== null) {
+			$errorBuilder = RuleErrorBuilder::message(sprintf(
 				'Property %s::$%s has unresolvable native type.',
 				$propertyReflection->getDeclaringClass()->getDisplayName(),
 				$node->getName(),
-			))->build();
+			))->identifier('property.unresolvableNativeType');
+			foreach ($unresolvableType->reasons as $reason) {
+				$errorBuilder->addTip($reason);
+			}
+			$errors[] = $errorBuilder->build();
 		}
 
 		return $errors;

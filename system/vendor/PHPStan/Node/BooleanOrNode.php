@@ -2,13 +2,16 @@
 
 namespace PHPStan\Node;
 
+use Override;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\BinaryOp\BooleanOr;
 use PhpParser\Node\Expr\BinaryOp\LogicalOr;
 use PHPStan\Analyser\Scope;
 
-/** @api */
-class BooleanOrNode extends Expr implements VirtualNode
+/**
+ * @api
+ */
+final class BooleanOrNode extends Expr implements VirtualNode
 {
 
 	public function __construct(private BooleanOr|LogicalOr $originalNode, private Scope $rightScope)
@@ -16,10 +19,7 @@ class BooleanOrNode extends Expr implements VirtualNode
 		parent::__construct($originalNode->getAttributes());
 	}
 
-	/**
-	 * @return BooleanOr|LogicalOr
-	 */
-	public function getOriginalNode()
+	public function getOriginalNode(): BooleanOr|LogicalOr
 	{
 		return $this->originalNode;
 	}
@@ -29,6 +29,7 @@ class BooleanOrNode extends Expr implements VirtualNode
 		return $this->rightScope;
 	}
 
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Node_BooleanOrNode';
@@ -37,6 +38,7 @@ class BooleanOrNode extends Expr implements VirtualNode
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];

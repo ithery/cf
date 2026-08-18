@@ -5,7 +5,14 @@ namespace PHPStan\Broker;
 use PHPStan\AnalysedCodeException;
 use function sprintf;
 
-class FunctionNotFoundException extends AnalysedCodeException
+/**
+ * @api
+ *
+ * Unchecked exception thrown from `ReflectionProvider`
+ * in case the user does not check the existence of the function beforehand
+ * with `hasFunction()`.
+ */
+final class FunctionNotFoundException extends AnalysedCodeException
 {
 
 	public function __construct(private string $functionName)
@@ -18,7 +25,7 @@ class FunctionNotFoundException extends AnalysedCodeException
 		return $this->functionName;
 	}
 
-	public function getTip(): ?string
+	public function getTip(): string
 	{
 		return 'Learn more at https://phpstan.org/user-guide/discovering-symbols';
 	}

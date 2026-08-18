@@ -3,6 +3,9 @@
 namespace PHPStan\Command;
 
 use OndraM\CiDetector\CiDetector;
+use Override;
+use PHPStan\Internal\AgentDetector;
+use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,12 +16,10 @@ use function array_unshift;
 use function explode;
 use function implode;
 use function sprintf;
-use function str_starts_with;
 use function strlen;
-use function wordwrap;
 use const DIRECTORY_SEPARATOR;
 
-class ErrorsConsoleStyle extends SymfonyStyle
+final class ErrorsConsoleStyle extends SymfonyStyle
 {
 
 	public const OPTION_NO_PROGRESS = 'no-progress';
@@ -49,13 +50,15 @@ class ErrorsConsoleStyle extends SymfonyStyle
 	 * @param string[] $headers
 	 * @param string[][] $rows
 	 */
+	#[Override]
 	public function table(array $headers, array $rows): void
 	{
 		/** @var int $terminalWidth */
 		$terminalWidth = (new Terminal())->getWidth() - 2;
 		$maxHeaderWidth = strlen($headers[0]);
 		foreach ($rows as $row) {
-			$length = strlen($row[0]);
+			$length = Helper::width(Helper::removeDecoration($this->getFormatter(), $row[0]));
+
 			if ($maxHeaderWidth !== 0 && $length <= $maxHeaderWidth) {
 				continue;
 			}
@@ -63,11 +66,6 @@ class ErrorsConsoleStyle extends SymfonyStyle
 			$maxHeaderWidth = $length;
 		}
 
-		// manual wrapping could be replaced with $table->setColumnMaxWidth()
-		// but it's buggy for <href> lines
-		// https://github.com/symfony/symfony/issues/45520
-		// https://github.com/symfony/symfony/issues/45521
-		$headers = $this->wrap($headers, $terminalWidth, $maxHeaderWidth);
 		foreach ($headers as $i => $header) {
 			$newHeader = [];
 			foreach (explode("\n", $header) as $h) {
@@ -77,11 +75,9 @@ class ErrorsConsoleStyle extends SymfonyStyle
 			$headers[$i] = implode("\n", $newHeader);
 		}
 
-		foreach ($rows as $i => $row) {
-			$rows[$i] = $this->wrap($row, $terminalWidth, $maxHeaderWidth);
-		}
-
 		$table = $this->createTable();
+		// -5 because there are 5 padding spaces: One on each side of the table, one on each side of a cell and one between columns.
+		$table->setColumnMaxWidth(1, $terminalWidth - $maxHeaderWidth - 5);
 		array_unshift($rows, $headers, new TableSeparator());
 		$table->setRows($rows);
 
@@ -89,40 +85,21 @@ class ErrorsConsoleStyle extends SymfonyStyle
 		$this->newLine();
 	}
 
-	/**
-	 * @param string[] $rows
-	 * @return string[]
-	 */
-	private function wrap(array $rows, int $terminalWidth, int $maxHeaderWidth): array
-	{
-		foreach ($rows as $i => $column) {
-			$columnRows = explode("\n", $column);
-			foreach ($columnRows as $k => $columnRow) {
-				if (str_starts_with($columnRow, '✏️')) {
-					continue;
-				}
-				$columnRows[$k] = wordwrap(
-					$columnRow,
-					$terminalWidth - $maxHeaderWidth - 5,
-					"\n",
-					true,
-				);
-			}
-
-			$rows[$i] = implode("\n", $columnRows);
-		}
-
-		return $rows;
-	}
-
+	#[Override]
 	public function createProgressBar(int $max = 0): ProgressBar
 	{
 		$this->progressBar = parent::createProgressBar($max);
 
-		$ci = $this->isCiDetected();
-		$this->progressBar->setOverwrite(!$ci);
+		$format = $this->getProgressBarFormat();
+		if ($format !== null) {
+			$this->progressBar->setFormat($format);
+		}
 
-		if ($ci) {
+		$ci = $this->isCiDetected();
+		$agent = AgentDetector::isRunningInAgent();
+		$this->progressBar->setOverwrite(!$ci && !$agent);
+
+		if ($ci || $agent) {
 			$this->progressBar->minSecondsBetweenRedraws(15);
 			$this->progressBar->maxSecondsBetweenRedraws(30);
 		} elseif (DIRECTORY_SEPARATOR === '\\') {
@@ -136,6 +113,32 @@ class ErrorsConsoleStyle extends SymfonyStyle
 		return $this->progressBar;
 	}
 
+	private function getProgressBarFormat(): ?string
+	{
+		switch ($this->getVerbosity()) {
+			case OutputInterface::VERBOSITY_NORMAL:
+				$formatName = ProgressBar::FORMAT_NORMAL;
+				break;
+			case OutputInterface::VERBOSITY_VERBOSE:
+				$formatName = ProgressBar::FORMAT_VERBOSE;
+				break;
+			case OutputInterface::VERBOSITY_VERY_VERBOSE:
+			case OutputInterface::VERBOSITY_DEBUG:
+				$formatName = ProgressBar::FORMAT_VERY_VERBOSE;
+				break;
+			default:
+				$formatName = null;
+				break;
+		}
+
+		if ($formatName === null) {
+			return null;
+		}
+
+		return ProgressBar::getFormatDefinition($formatName);
+	}
+
+	#[Override]
 	public function progressStart(int $max = 0): void
 	{
 		if (!$this->showProgress) {
@@ -144,6 +147,7 @@ class ErrorsConsoleStyle extends SymfonyStyle
 		parent::progressStart($max);
 	}
 
+	#[Override]
 	public function progressAdvance(int $step = 1): void
 	{
 		if (!$this->showProgress) {
@@ -153,6 +157,7 @@ class ErrorsConsoleStyle extends SymfonyStyle
 		parent::progressAdvance($step);
 	}
 
+	#[Override]
 	public function progressFinish(): void
 	{
 		if (!$this->showProgress) {

@@ -2,44 +2,53 @@
 
 namespace PHPStan\Rules\Methods;
 
+use DOMDocument;
 use PhpParser\Node\Expr;
+use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use PHPStan\Analyser\NullsafeOperatorHelper;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Internal\SprintfHelper;
+use PHPStan\Reflection\ExtendedMethodReflection;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\Native\NativeMethodReflection;
 use PHPStan\Reflection\Php\PhpMethodReflection;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Rules\ClassCaseSensitivityCheck;
+use PHPStan\Rules\ClassNameCheck;
 use PHPStan\Rules\ClassNameNodePair;
-use PHPStan\Rules\RuleError;
+use PHPStan\Rules\ClassNameUsageLocation;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
 use PHPStan\ShouldNotHappenException;
+use PHPStan\TrinaryLogic;
 use PHPStan\Type\ErrorType;
 use PHPStan\Type\Generic\GenericClassStringType;
-use PHPStan\Type\ObjectWithoutClassType;
+use PHPStan\Type\StaticType;
 use PHPStan\Type\StringType;
-use PHPStan\Type\ThisType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeUtils;
-use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\VerbosityLevel;
 use function array_merge;
 use function in_array;
 use function sprintf;
 use function strtolower;
 
-class StaticMethodCallCheck
+#[AutowiredService]
+final class StaticMethodCallCheck
 {
 
 	public function __construct(
 		private ReflectionProvider $reflectionProvider,
 		private RuleLevelHelper $ruleLevelHelper,
-		private ClassCaseSensitivityCheck $classCaseSensitivityCheck,
+		private ClassNameCheck $classCheck,
+		#[AutowiredParameter]
 		private bool $checkFunctionNameCase,
+		#[AutowiredParameter(ref: '%tips.discoveringSymbols%')]
+		private bool $discoveringSymbolsTip,
+		#[AutowiredParameter]
 		private bool $reportMagicMethods,
 	)
 	{
@@ -47,17 +56,23 @@ class StaticMethodCallCheck
 
 	/**
 	 * @param Name|Expr $class
-	 * @return array{RuleError[], MethodReflection|null}
+	 * @return array{list<IdentifierRuleError>, ExtendedMethodReflection|null}
 	 */
 	public function check(
 		Scope $scope,
 		string $methodName,
 		$class,
+		Identifier|Expr $astName,
 	): array
 	{
 		$errors = [];
 		$isAbstract = false;
 		if ($class instanceof Name) {
+			$classStringType = $scope->getType(new Expr\ClassConstFetch($class, 'class'));
+			if ($classStringType->hasMethod($methodName)->yes()) {
+				return [[], null];
+			}
+
 			$className = (string) $class;
 			$lowercasedClassName = strtolower($className);
 			if (in_array($lowercasedClassName, ['self', 'static'], true)) {
@@ -68,7 +83,9 @@ class StaticMethodCallCheck
 								'Calling %s::%s() outside of class scope.',
 								$className,
 								$methodName,
-							))->build(),
+							))
+								->line($astName->getStartLine())
+								->identifier(sprintf('outOfClass.%s', $lowercasedClassName))->build(),
 						],
 						null,
 					];
@@ -82,7 +99,10 @@ class StaticMethodCallCheck
 								'Calling %s::%s() outside of class scope.',
 								$className,
 								$methodName,
-							))->build(),
+							))
+								->line($astName->getStartLine())
+								->identifier(sprintf('outOfClass.parent'))
+								->build(),
 						],
 						null,
 					];
@@ -97,7 +117,10 @@ class StaticMethodCallCheck
 								$scope->getFunctionName(),
 								$methodName,
 								$scope->getClassReflection()->getDisplayName(),
-							))->build(),
+							))
+								->line($astName->getStartLine())
+								->identifier('class.noParent')
+								->build(),
 						],
 						null,
 					];
@@ -114,19 +137,37 @@ class StaticMethodCallCheck
 						return [[], null];
 					}
 
+					$errorBuilder = RuleErrorBuilder::message(sprintf(
+						'Call to static method %s() on an unknown class %s.',
+						$methodName,
+						$className,
+					))
+						->line($astName->getStartLine())
+						->identifier('class.notFound');
+
+					if ($this->discoveringSymbolsTip) {
+						$errorBuilder->discoveringSymbolsTip();
+					}
+
 					return [
 						[
-							RuleErrorBuilder::message(sprintf(
-								'Call to static method %s() on an unknown class %s.',
-								$methodName,
-								$className,
-							))->discoveringSymbolsTip()->build(),
+							$errorBuilder->build(),
 						],
 						null,
 					];
-				} else {
-					$errors = $this->classCaseSensitivityCheck->checkClassNames([new ClassNameNodePair($className, $class)]);
 				}
+
+				$locationData = [];
+				$locationClassReflection = $this->reflectionProvider->getClass($className);
+				if ($locationClassReflection->hasMethod($methodName)) {
+					$locationData['method'] = $locationClassReflection->getMethod($methodName, $scope);
+				}
+
+				$errors = $this->classCheck->checkClassNames(
+					$scope,
+					[new ClassNameNodePair($className, $class)],
+					ClassNameUsageLocation::from(ClassNameUsageLocation::STATIC_METHOD_CALL, $locationData),
+				);
 
 				$classType = $scope->resolveTypeByName($class);
 			}
@@ -136,6 +177,9 @@ class StaticMethodCallCheck
 				$nativeMethodReflection = $classReflection->getNativeMethod($methodName);
 				if ($nativeMethodReflection instanceof PhpMethodReflection || $nativeMethodReflection instanceof NativeMethodReflection) {
 					$isAbstract = $nativeMethodReflection->isAbstract();
+					if ($isAbstract instanceof TrinaryLogic) {
+						$isAbstract = $isAbstract->yes();
+					}
 				}
 			}
 		} else {
@@ -153,7 +197,7 @@ class StaticMethodCallCheck
 
 		if ($classType instanceof GenericClassStringType) {
 			$classType = $classType->getGenericType();
-			if (!(new ObjectWithoutClassType())->isSuperTypeOf($classType)->yes()) {
+			if (!$classType->isObject()->yes()) {
 				return [[], null];
 			}
 		} elseif ($classType->isString()->yes()) {
@@ -161,7 +205,7 @@ class StaticMethodCallCheck
 		}
 
 		$typeForDescribe = $classType;
-		if ($classType instanceof ThisType) {
+		if ($classType instanceof StaticType) {
 			$typeForDescribe = $classType->getStaticObjectType();
 		}
 		$classType = TypeCombinator::remove($classType, new StringType());
@@ -173,7 +217,10 @@ class StaticMethodCallCheck
 						'Cannot call static method %s() on %s.',
 						$methodName,
 						$typeForDescribe->describe(VerbosityLevel::typeOnly()),
-					))->build(),
+					))
+						->line($astName->getStartLine())
+						->identifier('staticMethod.nonObject')
+						->build(),
 				]),
 				null,
 			];
@@ -181,8 +228,7 @@ class StaticMethodCallCheck
 
 		if (!$classType->hasMethod($methodName)->yes()) {
 			if (!$this->reportMagicMethods) {
-				$directClassNames = TypeUtils::getDirectClassNames($classType);
-				foreach ($directClassNames as $className) {
+				foreach ($classType->getObjectClassNames() as $className) {
 					if (!$this->reflectionProvider->hasClass($className)) {
 						continue;
 					}
@@ -200,7 +246,10 @@ class StaticMethodCallCheck
 						'Call to an undefined static method %s::%s().',
 						$typeForDescribe->describe(VerbosityLevel::typeOnly()),
 						$methodName,
-					))->build(),
+					))
+						->line($astName->getStartLine())
+						->identifier('staticMethod.notFound')
+						->build(),
 				]),
 				null,
 			];
@@ -209,23 +258,34 @@ class StaticMethodCallCheck
 		$method = $classType->getMethod($methodName, $scope);
 		if (!$method->isStatic()) {
 			$function = $scope->getFunction();
+
+			$scopeIsInMethodClassOrSubClass = TrinaryLogic::createFromBoolean($scope->isInClass())->lazyAnd(
+				$classType->getObjectClassNames(),
+				static fn (string $objectClassName) => TrinaryLogic::createFromBoolean(
+					$scope->isInClass()
+					&& $scope->getClassReflection()->is($objectClassName),
+				),
+			);
 			if (
 				!$function instanceof MethodReflection
 				|| $function->isStatic()
-				|| !$scope->isInClass()
-				|| (
-					$classType instanceof TypeWithClassName
-					&& $scope->getClassReflection()->getName() !== $classType->getClassName()
-					&& !$scope->getClassReflection()->isSubclassOf($classType->getClassName())
-				)
+				|| $scopeIsInMethodClassOrSubClass->no()
 			) {
+				// per php-src docs, this method can be called statically, even if declared non-static
+				if (strtolower($method->getName()) === 'loadhtml' && $method->getDeclaringClass()->getName() === DOMDocument::class) {
+					return [[], null];
+				}
+
 				return [
 					array_merge($errors, [
 						RuleErrorBuilder::message(sprintf(
 							'Static call to instance method %s::%s().',
 							$method->getDeclaringClass()->getDisplayName(),
 							$method->getName(),
-						))->build(),
+						))
+							->line($astName->getStartLine())
+							->identifier('method.staticCall')
+							->build(),
 					]),
 					$method,
 				];
@@ -240,7 +300,10 @@ class StaticMethodCallCheck
 					$method->isStatic() ? 'static method' : 'method',
 					$method->getName(),
 					$method->getDeclaringClass()->getDisplayName(),
-				))->build(),
+				))
+					->line($astName->getStartLine())
+					->identifier(sprintf('staticMethod.%s', $method->isPrivate() ? 'private' : 'protected'))
+					->build(),
 			]);
 		}
 
@@ -252,7 +315,12 @@ class StaticMethodCallCheck
 						$method->isStatic() ? ' static' : '',
 						$method->getDeclaringClass()->getDisplayName(),
 						$method->getName(),
-					))->build(),
+					))
+						->line($astName->getStartLine())
+						->identifier(sprintf(
+							'%s.callToAbstract',
+							$method->isStatic() ? 'staticMethod' : 'method',
+						))->build(),
 				],
 				$method,
 			];
@@ -272,7 +340,10 @@ class StaticMethodCallCheck
 				'Call to %s with incorrect case: %s',
 				$lowercasedMethodName,
 				$methodName,
-			))->build();
+			))
+				->line($astName->getStartLine())
+				->identifier('staticMethod.nameCase')
+				->build();
 		}
 
 		return [$errors, $method];

@@ -6,13 +6,15 @@ use PhpParser\Comment\Doc;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Node\Expr\NativeTypeExpr;
 use PHPStan\Node\InClassMethodNode;
 use PHPStan\Node\InClassNode;
 use PHPStan\Node\InFunctionNode;
 use PHPStan\Node\VirtualNode;
 use PHPStan\PhpDoc\Tag\VarTag;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\FileTypeMapper;
@@ -29,11 +31,13 @@ use function sprintf;
 /**
  * @implements Rule<Node\Stmt>
  */
-class WrongVariableNameInVarTagRule implements Rule
+#[RegisteredRule(level: 2)]
+final class WrongVariableNameInVarTagRule implements Rule
 {
 
 	public function __construct(
 		private FileTypeMapper $fileTypeMapper,
+		private VarTagTypeRuleHelper $varTagTypeRuleHelper,
 	)
 	{
 	}
@@ -46,11 +50,24 @@ class WrongVariableNameInVarTagRule implements Rule
 	public function processNode(Node $node, Scope $scope): array
 	{
 		if (
-			$node instanceof Node\Stmt\Property
-			|| $node instanceof Node\Stmt\PropertyProperty
-			|| $node instanceof Node\Stmt\ClassConst
-			|| $node instanceof Node\Stmt\Const_
-			|| ($node instanceof VirtualNode && !$node instanceof InFunctionNode && !$node instanceof InClassMethodNode && !$node instanceof InClassNode)
+			// mirrored from top of NodeScopeResolver::processStmtNode
+		!(
+			!$node instanceof Node\Stmt\Property
+			&& !$node instanceof Node\Stmt\ClassConst
+			&& !$node instanceof Node\Stmt\Const_
+			&& !$node instanceof Node\Stmt\ClassLike
+			&& !$node instanceof Node\Stmt\Function_
+			&& !$node instanceof Node\Stmt\ClassMethod
+		)
+		) {
+			return [];
+		}
+
+		if (
+			$node instanceof VirtualNode
+			&& !$node instanceof InFunctionNode
+			&& !$node instanceof InClassMethodNode
+			&& !$node instanceof InClassNode
 		) {
 			return [];
 		}
@@ -78,23 +95,26 @@ class WrongVariableNameInVarTagRule implements Rule
 		}
 
 		if ($node instanceof Node\Stmt\Foreach_) {
-			return $this->processForeach($node->expr, $node->keyVar, $node->valueVar, $varTags);
+			return $this->processForeach($scope, $node->expr, $node->keyVar, $node->valueVar, $varTags);
 		}
 
 		if ($node instanceof Node\Stmt\Static_) {
-			return $this->processStatic($node->vars, $varTags);
+			return $this->processStatic($scope, $node->vars, $varTags);
 		}
 
 		if ($node instanceof Node\Stmt\Expression) {
+			if ($node->expr instanceof Expr\Throw_) {
+				return $this->processStmt($scope, $varTags, $node->expr);
+			}
 			return $this->processExpression($scope, $node->expr, $varTags);
 		}
 
-		if ($node instanceof Node\Stmt\Throw_ || $node instanceof Node\Stmt\Return_) {
+		if ($node instanceof Node\Stmt\Return_) {
 			return $this->processStmt($scope, $varTags, $node->expr);
 		}
 
 		if ($node instanceof Node\Stmt\Global_) {
-			return $this->processGlobal($scope, $node, $varTags);
+			return $this->processGlobal($node, $varTags);
 		}
 
 		if ($node instanceof InClassNode || $node instanceof InClassMethodNode || $node instanceof InFunctionNode) {
@@ -116,7 +136,7 @@ class WrongVariableNameInVarTagRule implements Rule
 				RuleErrorBuilder::message(sprintf(
 					'PHPDoc tag @var above %s has no effect.',
 					$description,
-				))->build(),
+				))->identifier('varTag.misplaced')->build(),
 			];
 		}
 
@@ -125,9 +145,9 @@ class WrongVariableNameInVarTagRule implements Rule
 
 	/**
 	 * @param VarTag[] $varTags
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
-	private function processAssign(Scope $scope, Node\Expr $var, array $varTags): array
+	private function processAssign(Scope $scope, Node\Expr $var, Node\Expr $expr, array $varTags): array
 	{
 		$errors = [];
 		$hasMultipleMessage = false;
@@ -136,13 +156,15 @@ class WrongVariableNameInVarTagRule implements Rule
 			if (is_int($key)) {
 				if (count($varTags) !== 1) {
 					if (!$hasMultipleMessage) {
-						$errors[] = RuleErrorBuilder::message('Multiple PHPDoc @var tags above single variable assignment are not supported.')->build();
+						$errors[] = RuleErrorBuilder::message('Multiple PHPDoc @var tags above single variable assignment are not supported.')
+							->identifier('varTag.multipleTags')
+							->build();
 						$hasMultipleMessage = true;
 					}
 				} elseif (count($assignedVariables) !== 1) {
 					$errors[] = RuleErrorBuilder::message(
 						'PHPDoc tag @var above assignment does not specify variable name.',
-					)->build();
+					)->identifier('varTag.noVariable')->build();
 				}
 				continue;
 			}
@@ -160,9 +182,17 @@ class WrongVariableNameInVarTagRule implements Rule
 					'Variable $%s in PHPDoc tag @var does not match assigned variable $%s.',
 					$key,
 					$assignedVariables[0],
-				))->build();
+				))->identifier('varTag.differentVariable')->build();
 			} else {
-				$errors[] = RuleErrorBuilder::message(sprintf('Variable $%s in PHPDoc tag @var does not exist.', $key))->build();
+				$errors[] = RuleErrorBuilder::message(sprintf('Variable $%s in PHPDoc tag @var does not exist.', $key))
+					->identifier('varTag.variableNotFound')
+					->build();
+			}
+		}
+
+		if (count($errors) === 0) {
+			foreach ($this->varTagTypeRuleHelper->checkVarType($scope, $var, $expr, $varTags, $assignedVariables) as $error) {
+				$errors[] = $error;
 			}
 		}
 
@@ -182,7 +212,7 @@ class WrongVariableNameInVarTagRule implements Rule
 			return [];
 		}
 
-		if ($expr instanceof Expr\List_ || $expr instanceof Expr\Array_) {
+		if ($expr instanceof Expr\List_) {
 			$names = [];
 			foreach ($expr->items as $item) {
 				if ($item === null) {
@@ -200,9 +230,9 @@ class WrongVariableNameInVarTagRule implements Rule
 
 	/**
 	 * @param VarTag[] $varTags
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
-	private function processForeach(Node\Expr $iterateeExpr, ?Node\Expr $keyVar, Node\Expr $valueVar, array $varTags): array
+	private function processForeach(Scope $scope, Node\Expr $iterateeExpr, ?Node\Expr $keyVar, Node\Expr $valueVar, array $varTags): array
 	{
 		$variableNames = [];
 		if ($iterateeExpr instanceof Node\Expr\Variable && is_string($iterateeExpr->name)) {
@@ -221,7 +251,7 @@ class WrongVariableNameInVarTagRule implements Rule
 				}
 				$errors[] = RuleErrorBuilder::message(
 					'PHPDoc tag @var above foreach loop does not specify variable name.',
-				)->build();
+				)->identifier('varTag.noVariable')->build();
 				continue;
 			}
 
@@ -233,18 +263,55 @@ class WrongVariableNameInVarTagRule implements Rule
 				'Variable $%s in PHPDoc tag @var does not match any variable in the foreach loop: %s',
 				$name,
 				implode(', ', array_map(static fn (string $name): string => sprintf('$%s', $name), $variableNames)),
-			))->build();
+			))->identifier('varTag.differentVariable')->build();
+		}
+
+		foreach ($this->varTagTypeRuleHelper->checkVarType($scope, $iterateeExpr, $iterateeExpr, $varTags, $variableNames) as $error) {
+			$errors[] = $error;
+		}
+		if ($keyVar !== null) {
+			$keyTypeExpr = new NativeTypeExpr(
+				$scope->getIterableKeyType($scope->getScopeType($iterateeExpr)),
+				$scope->getIterableKeyType($scope->getScopeNativeType($iterateeExpr)),
+			);
+			foreach ($this->varTagTypeRuleHelper->checkVarType($scope, $keyVar, $keyTypeExpr, $varTags, $variableNames) as $error) {
+				$errors[] = $error;
+			}
+		}
+		$valueTypeExpr = new NativeTypeExpr(
+			$scope->getIterableValueType($scope->getScopeType($iterateeExpr)),
+			$scope->getIterableValueType($scope->getScopeNativeType($iterateeExpr)),
+		);
+		foreach ($this->varTagTypeRuleHelper->checkVarType($scope, $valueVar, $valueTypeExpr, $varTags, $variableNames) as $error) {
+			$errors[] = $error;
 		}
 
 		return $errors;
 	}
 
 	/**
-	 * @param Node\Stmt\StaticVar[] $vars
 	 * @param VarTag[] $varTags
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
-	private function processStatic(array $vars, array $varTags): array
+	private function processExpression(Scope $scope, Expr $expr, array $varTags): array
+	{
+		if (
+			$expr instanceof Node\Expr\Assign
+			|| $expr instanceof Node\Expr\AssignRef
+			|| $expr instanceof Node\Expr\AssignOp
+		) {
+			return $this->processAssign($scope, $expr->var, $expr->expr, $varTags);
+		}
+
+		return $this->processStmt($scope, $varTags, null);
+	}
+
+	/**
+	 * @param Node\StaticVar[] $vars
+	 * @param VarTag[] $varTags
+	 * @return list<IdentifierRuleError>
+	 */
+	private function processStatic(Scope $scope, array $vars, array $varTags): array
 	{
 		$variableNames = [];
 		foreach ($vars as $var) {
@@ -252,7 +319,7 @@ class WrongVariableNameInVarTagRule implements Rule
 				continue;
 			}
 
-			$variableNames[$var->var->name] = true;
+			$variableNames[] = $var->var->name;
 		}
 
 		$errors = [];
@@ -264,19 +331,28 @@ class WrongVariableNameInVarTagRule implements Rule
 
 				$errors[] = RuleErrorBuilder::message(
 					'PHPDoc tag @var above multiple static variables does not specify variable name.',
-				)->build();
+				)->identifier('varTag.noVariable')->build();
 				continue;
 			}
 
-			if (isset($variableNames[$name])) {
+			if (in_array($name, $variableNames, true)) {
 				continue;
 			}
 
 			$errors[] = RuleErrorBuilder::message(sprintf(
 				'Variable $%s in PHPDoc tag @var does not match any static variable: %s',
 				$name,
-				implode(', ', array_map(static fn (string $name): string => sprintf('$%s', $name), array_keys($variableNames))),
-			))->build();
+				implode(', ', array_map(static fn (string $name): string => sprintf('$%s', $name), $variableNames)),
+			))->identifier('varTag.differentVariable')->build();
+		}
+
+		foreach ($vars as $var) {
+			if ($var->default === null) {
+				continue;
+			}
+			foreach ($this->varTagTypeRuleHelper->checkVarType($scope, $var->var, $var->default, $varTags, $variableNames) as $error) {
+				$errors[] = $error;
+			}
 		}
 
 		return $errors;
@@ -284,20 +360,7 @@ class WrongVariableNameInVarTagRule implements Rule
 
 	/**
 	 * @param VarTag[] $varTags
-	 * @return RuleError[]
-	 */
-	private function processExpression(Scope $scope, Expr $expr, array $varTags): array
-	{
-		if ($expr instanceof Node\Expr\Assign || $expr instanceof Node\Expr\AssignRef) {
-			return $this->processAssign($scope, $expr->var, $varTags);
-		}
-
-		return $this->processStmt($scope, $varTags, null);
-	}
-
-	/**
-	 * @param VarTag[] $varTags
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
 	private function processStmt(Scope $scope, array $varTags, ?Expr $defaultExpr): array
 	{
@@ -314,12 +377,16 @@ class WrongVariableNameInVarTagRule implements Rule
 				continue;
 			}
 
-			$errors[] = RuleErrorBuilder::message(sprintf('Variable $%s in PHPDoc tag @var does not exist.', $name))->build();
+			$errors[] = RuleErrorBuilder::message(sprintf('Variable $%s in PHPDoc tag @var does not exist.', $name))
+				->identifier('varTag.variableNotFound')
+				->build();
 		}
 
 		if (count($variableLessVarTags) !== 1 || $defaultExpr === null) {
 			if (count($variableLessVarTags) > 0) {
-				$errors[] = RuleErrorBuilder::message('PHPDoc tag @var does not specify variable name.')->build();
+				$errors[] = RuleErrorBuilder::message('PHPDoc tag @var does not specify variable name.')
+					->identifier('varTag.noVariable')
+					->build();
 			}
 		}
 
@@ -328,9 +395,9 @@ class WrongVariableNameInVarTagRule implements Rule
 
 	/**
 	 * @param VarTag[] $varTags
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
-	private function processGlobal(Scope $scope, Node\Stmt\Global_ $node, array $varTags): array
+	private function processGlobal(Node\Stmt\Global_ $node, array $varTags): array
 	{
 		$variableNames = [];
 		foreach ($node->vars as $var) {
@@ -353,7 +420,7 @@ class WrongVariableNameInVarTagRule implements Rule
 
 				$errors[] = RuleErrorBuilder::message(
 					'PHPDoc tag @var above multiple global variables does not specify variable name.',
-				)->build();
+				)->identifier('varTag.noVariable')->build();
 				continue;
 			}
 
@@ -365,7 +432,7 @@ class WrongVariableNameInVarTagRule implements Rule
 				'Variable $%s in PHPDoc tag @var does not match any global variable: %s',
 				$name,
 				implode(', ', array_map(static fn (string $name): string => sprintf('$%s', $name), array_keys($variableNames))),
-			))->build();
+			))->identifier('varTag.differentVariable')->build();
 		}
 
 		return $errors;

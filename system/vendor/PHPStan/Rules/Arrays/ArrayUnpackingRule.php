@@ -3,9 +3,10 @@
 namespace PHPStan\Rules\Arrays;
 
 use PhpParser\Node;
-use PhpParser\Node\Expr\ArrayItem;
+use PhpParser\Node\ArrayItem;
 use PHPStan\Analyser\Scope;
-use PHPStan\Node\Expr\GetIterableKeyTypeExpr;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Node\Expr\NativeTypeExpr;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -18,7 +19,8 @@ use function sprintf;
 /**
  * @implements Rule<ArrayItem>
  */
-class ArrayUnpackingRule implements Rule
+#[RegisteredRule(level: 3)]
+final class ArrayUnpackingRule implements Rule
 {
 
 	public function __construct(private PhpVersion $phpVersion, private RuleLevelHelper $ruleLevelHelper)
@@ -38,7 +40,10 @@ class ArrayUnpackingRule implements Rule
 
 		$typeResult = $this->ruleLevelHelper->findTypeToCheck(
 			$scope,
-			new GetIterableKeyTypeExpr($node->value),
+			new NativeTypeExpr(
+				$scope->getIterableKeyType($scope->getType($node->value)),
+				$scope->getIterableKeyType($scope->getNativeType($node->value)),
+			),
 			'',
 			static fn (Type $type): bool => $type->isString()->no(),
 		);
@@ -58,7 +63,7 @@ class ArrayUnpackingRule implements Rule
 				'Array unpacking cannot be used on an array with %sstring keys: %s',
 				$isString->yes() ? '' : 'potential ',
 				$scope->getType($node->value)->describe(VerbosityLevel::value()),
-			))->build(),
+			))->identifier('arrayUnpacking.stringOffset')->build(),
 		];
 	}
 

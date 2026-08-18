@@ -10,6 +10,10 @@ use Nette\Utils\Strings;
 use PhpParser\Node\Name;
 use PHPStan\Analyser\ConstantResolver;
 use PHPStan\Analyser\NameScope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\DependencyInjection\ReportUnsafeArrayStringKeyCastingToggle;
+use PHPStan\PhpDoc\Tag\TemplateTag;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprArrayNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFalseNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprFloatNode;
@@ -18,6 +22,7 @@ use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprNullNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprTrueNode;
 use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
+use PHPStan\PhpDocParser\Ast\Type\ArrayShapeItemNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\ArrayTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\CallableTypeNode;
@@ -28,31 +33,42 @@ use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\InvalidTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\NullableTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\ObjectShapeNode;
 use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
+use PHPStan\Reflection\Assertions;
+use PHPStan\Reflection\Callables\SimpleImpurePoint;
 use PHPStan\Reflection\InitializerExprContext;
 use PHPStan\Reflection\InitializerExprTypeResolver;
 use PHPStan\Reflection\Native\NativeParameterReflection;
 use PHPStan\Reflection\PassedByReference;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\ShouldNotHappenException;
+use PHPStan\TrinaryLogic;
 use PHPStan\Type\Accessory\AccessoryArrayListType;
+use PHPStan\Type\Accessory\AccessoryDecimalIntegerStringType;
 use PHPStan\Type\Accessory\AccessoryLiteralStringType;
+use PHPStan\Type\Accessory\AccessoryLowercaseStringType;
 use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
 use PHPStan\Type\Accessory\AccessoryNonFalsyStringType;
 use PHPStan\Type\Accessory\AccessoryNumericStringType;
+use PHPStan\Type\Accessory\AccessoryUppercaseStringType;
 use PHPStan\Type\Accessory\NonEmptyArrayType;
 use PHPStan\Type\ArrayType;
 use PHPStan\Type\BenevolentUnionType;
 use PHPStan\Type\BooleanType;
+use PHPStan\Type\CallableAssertionsHelper;
 use PHPStan\Type\CallableType;
+use PHPStan\Type\ClassConstantAccessType;
 use PHPStan\Type\ClassStringType;
 use PHPStan\Type\ClosureType;
 use PHPStan\Type\ConditionalType;
 use PHPStan\Type\ConditionalTypeForParameter;
+use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantArrayTypeBuilder;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantFloatType;
@@ -63,35 +79,47 @@ use PHPStan\Type\ErrorType;
 use PHPStan\Type\FloatType;
 use PHPStan\Type\Generic\GenericClassStringType;
 use PHPStan\Type\Generic\GenericObjectType;
+use PHPStan\Type\Generic\GenericStaticType;
+use PHPStan\Type\Generic\TemplateType;
+use PHPStan\Type\Generic\TemplateTypeFactory;
+use PHPStan\Type\Generic\TemplateTypeMap;
+use PHPStan\Type\Generic\TemplateTypeScope;
+use PHPStan\Type\Generic\TemplateTypeVariance;
+use PHPStan\Type\Helper\GetTemplateTypeType;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntegerType;
 use PHPStan\Type\IntersectionType;
 use PHPStan\Type\IterableType;
 use PHPStan\Type\KeyOfType;
 use PHPStan\Type\MixedType;
-use PHPStan\Type\NeverType;
+use PHPStan\Type\NewObjectType;
+use PHPStan\Type\NonAcceptingNeverType;
 use PHPStan\Type\NonexistentParentClassType;
 use PHPStan\Type\NullType;
+use PHPStan\Type\ObjectShapeType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\ObjectWithoutClassType;
 use PHPStan\Type\OffsetAccessType;
 use PHPStan\Type\ResourceType;
 use PHPStan\Type\StaticType;
 use PHPStan\Type\StaticTypeFactory;
+use PHPStan\Type\StringAlwaysAcceptingObjectWithToStringType;
+use PHPStan\Type\StringNeverAcceptingObjectWithToStringType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\ThisType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeAliasResolver;
 use PHPStan\Type\TypeAliasResolverProvider;
 use PHPStan\Type\TypeCombinator;
+use PHPStan\Type\TypeTraverser;
 use PHPStan\Type\TypeUtils;
-use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\UnionType;
 use PHPStan\Type\ValueOfType;
 use PHPStan\Type\VoidType;
 use Traversable;
 use function array_key_exists;
 use function array_map;
+use function array_values;
 use function count;
 use function explode;
 use function get_class;
@@ -100,20 +128,33 @@ use function max;
 use function min;
 use function preg_match;
 use function preg_quote;
+use function str_contains;
 use function str_replace;
-use function strpos;
+use function str_starts_with;
 use function strtolower;
 use function substr;
 
-class TypeNodeResolver
+/**
+ * @phpstan-import-type Level from ReportUnsafeArrayStringKeyCastingToggle as ReportUnsafeArrayStringKeyCastingLevel
+ */
+#[AutowiredService]
+final class TypeNodeResolver
 {
 
+	/** @var array<string, true> */
+	private array $genericTypeResolvingStack = [];
+
+	/**
+	 * @param ReportUnsafeArrayStringKeyCastingLevel $reportUnsafeArrayStringKeyCasting
+	 */
 	public function __construct(
 		private TypeNodeResolverExtensionRegistryProvider $extensionRegistryProvider,
 		private ReflectionProvider\ReflectionProviderProvider $reflectionProviderProvider,
 		private TypeAliasResolverProvider $typeAliasResolverProvider,
 		private ConstantResolver $constantResolver,
 		private InitializerExprTypeResolver $initializerExprTypeResolver,
+		#[AutowiredParameter]
+		private ?string $reportUnsafeArrayStringKeyCasting,
 	)
 	{
 	}
@@ -160,10 +201,14 @@ class TypeNodeResolver
 
 		} elseif ($typeNode instanceof ArrayShapeNode) {
 			return $this->resolveArrayShapeNode($typeNode, $nameScope);
+		} elseif ($typeNode instanceof ObjectShapeNode) {
+			return $this->resolveObjectShapeNode($typeNode, $nameScope);
 		} elseif ($typeNode instanceof ConstTypeNode) {
 			return $this->resolveConstTypeNode($typeNode, $nameScope);
 		} elseif ($typeNode instanceof OffsetAccessTypeNode) {
 			return $this->resolveOffsetAccessNode($typeNode, $nameScope);
+		} elseif ($typeNode instanceof InvalidTypeNode) {
+			return new MixedType(true);
 		}
 
 		return new ErrorType();
@@ -173,7 +218,15 @@ class TypeNodeResolver
 	{
 		switch (strtolower($typeNode->name)) {
 			case 'int':
+				return new IntegerType();
+
 			case 'integer':
+				$type = $this->tryResolvePseudoTypeClassType($typeNode, $nameScope);
+
+				if ($type !== null) {
+					return $type;
+				}
+
 				return new IntegerType();
 
 			case 'positive-int':
@@ -188,8 +241,29 @@ class TypeNodeResolver
 			case 'non-negative-int':
 				return IntegerRangeType::fromInterval(0, null);
 
+			case 'non-zero-int':
+				return new UnionType([
+					IntegerRangeType::fromInterval(null, -1),
+					IntegerRangeType::fromInterval(1, null),
+				]);
+
 			case 'string':
 				return new StringType();
+
+			case 'decimal-int-string':
+				return new IntersectionType([new StringType(), new AccessoryDecimalIntegerStringType()]);
+
+			case 'non-decimal-int-string':
+				return new IntersectionType([
+					new StringType(),
+					new AccessoryDecimalIntegerStringType(inverse: true),
+				]);
+
+			case 'lowercase-string':
+				return new IntersectionType([new StringType(), new AccessoryLowercaseStringType()]);
+
+			case 'uppercase-string':
+				return new IntersectionType([new StringType(), new AccessoryUppercaseStringType()]);
 
 			case 'literal-string':
 				return new IntersectionType([new StringType(), new AccessoryLiteralStringType()]);
@@ -198,6 +272,9 @@ class TypeNodeResolver
 			case 'interface-string':
 			case 'trait-string':
 				return new ClassStringType();
+
+			case 'enum-string':
+				return new GenericClassStringType(new ObjectType('UnitEnum'));
 
 			case 'callable-string':
 				return new IntersectionType([new StringType(), new CallableType()]);
@@ -213,6 +290,18 @@ class TypeNodeResolver
 				}
 
 				return new UnionType([new IntegerType(), new FloatType(), new StringType(), new BooleanType()]);
+
+			case 'empty-scalar':
+				return TypeCombinator::intersect(
+					new UnionType([new IntegerType(), new FloatType(), new StringType(), new BooleanType()]),
+					StaticTypeFactory::falsey(),
+				);
+
+			case 'non-empty-scalar':
+				return TypeCombinator::remove(
+					new UnionType([new IntegerType(), new FloatType(), new StringType(), new BooleanType()]),
+					StaticTypeFactory::falsey(),
+				);
 
 			case 'number':
 				$type = $this->tryResolvePseudoTypeClassType($typeNode, $nameScope);
@@ -251,11 +340,32 @@ class TypeNodeResolver
 					new AccessoryNonEmptyStringType(),
 				]);
 
+			case 'non-empty-lowercase-string':
+				return new IntersectionType([
+					new StringType(),
+					new AccessoryNonEmptyStringType(),
+					new AccessoryLowercaseStringType(),
+				]);
+
+			case 'non-empty-uppercase-string':
+				return new IntersectionType([
+					new StringType(),
+					new AccessoryNonEmptyStringType(),
+					new AccessoryUppercaseStringType(),
+				]);
+
 			case 'truthy-string':
 			case 'non-falsy-string':
 				return new IntersectionType([
 					new StringType(),
 					new AccessoryNonFalsyStringType(),
+				]);
+
+			case 'non-empty-literal-string':
+				return new IntersectionType([
+					new StringType(),
+					new AccessoryNonEmptyStringType(),
+					new AccessoryLiteralStringType(),
 				]);
 
 			case 'bool':
@@ -296,16 +406,28 @@ class TypeNodeResolver
 				return new ArrayType(new MixedType(), new MixedType());
 
 			case 'non-empty-array':
-				return TypeCombinator::intersect(
+				return new IntersectionType([
 					new ArrayType(new MixedType(), new MixedType()),
 					new NonEmptyArrayType(),
-				);
+				]);
 
 			case 'iterable':
 				return new IterableType(new MixedType(), new MixedType());
 
 			case 'callable':
 				return new CallableType();
+
+			case 'pure-callable':
+				return new CallableType(isPure: TrinaryLogic::createYes());
+
+			case 'pure-closure':
+				return ClosureType::createPure();
+
+			case 'static-closure':
+				return new ClosureType(isStatic: TrinaryLogic::createYes());
+
+			case 'static-pure-closure':
+				return new ClosureType(impurePoints: [], isStatic: TrinaryLogic::createYes());
 
 			case 'resource':
 				$type = $this->tryResolvePseudoTypeClassType($typeNode, $nameScope);
@@ -316,8 +438,15 @@ class TypeNodeResolver
 
 				return new ResourceType();
 
+			case 'open-resource':
+			case 'closed-resource':
+				return new ResourceType();
+
 			case 'mixed':
 				return new MixedType(true);
+
+			case 'non-empty-mixed':
+				return new MixedType(true, StaticTypeFactory::falsey());
 
 			case 'void':
 				return new VoidType();
@@ -328,6 +457,9 @@ class TypeNodeResolver
 			case 'callable-object':
 				return new IntersectionType([new ObjectWithoutClassType(), new CallableType()]);
 
+			case 'callable-array':
+				return new IntersectionType([new ArrayType(new MixedType(), new MixedType()), new CallableType()]);
+
 			case 'never':
 			case 'noreturn':
 				$type = $this->tryResolvePseudoTypeClassType($typeNode, $nameScope);
@@ -336,20 +468,21 @@ class TypeNodeResolver
 					return $type;
 				}
 
-				return new NeverType(true);
+				return new NonAcceptingNeverType();
 
 			case 'never-return':
 			case 'never-returns':
 			case 'no-return':
-				return new NeverType(true);
+				return new NonAcceptingNeverType();
 
 			case 'list':
-				return AccessoryArrayListType::intersectWith(new ArrayType(new IntegerType(), new MixedType()));
+				return new IntersectionType([new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), new MixedType()), new AccessoryArrayListType()]);
 			case 'non-empty-list':
-				return AccessoryArrayListType::intersectWith(TypeCombinator::intersect(
-					new ArrayType(new IntegerType(), new MixedType()),
+				return new IntersectionType([
+					new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), new MixedType()),
 					new NonEmptyArrayType(),
-				));
+					new AccessoryArrayListType(),
+				]);
 
 			case 'empty':
 				$type = $this->tryResolvePseudoTypeClassType($typeNode, $nameScope);
@@ -358,6 +491,10 @@ class TypeNodeResolver
 				}
 
 				return StaticTypeFactory::falsey();
+			case '__stringandstringable':
+				return new StringAlwaysAcceptingObjectWithToStringType();
+			case '__stringnotstringable':
+				return new StringNeverAcceptingObjectWithToStringType();
 		}
 
 		if ($nameScope->getClassName() !== null) {
@@ -376,8 +513,9 @@ class TypeNodeResolver
 				case 'parent':
 					if ($this->getReflectionProvider()->hasClass($nameScope->getClassName())) {
 						$classReflection = $this->getReflectionProvider()->getClass($nameScope->getClassName());
-						if ($classReflection->getParentClass() !== null) {
-							return new ObjectType($classReflection->getParentClass()->getName());
+						$parentClass = $classReflection->getNativeReflection()->getParentClass();
+						if ($parentClass !== false) {
+							return new ObjectType($parentClass->getName());
 						}
 					}
 
@@ -398,7 +536,7 @@ class TypeNodeResolver
 		}
 
 		$stringName = $nameScope->resolveStringName($typeNode->name);
-		if (strpos($stringName, '-') !== false && strpos($stringName, 'OCI-') !== 0) {
+		if (str_contains($stringName, '-') && !str_starts_with($stringName, 'OCI-')) {
 			return new ErrorType();
 		}
 
@@ -490,9 +628,11 @@ class TypeNodeResolver
 					continue;
 				}
 
-				if ($type instanceof ObjectType) {
+				if ($type instanceof ObjectType && !$type instanceof GenericObjectType) {
 					$type = new IntersectionType([$type, new IterableType(new MixedType(), $arrayTypeType)]);
 				} elseif ($type instanceof ArrayType) {
+					$type = new ArrayType(new MixedType(), $arrayTypeType);
+				} elseif ($type instanceof ConstantArrayType) {
 					$type = new ArrayType(new MixedType(), $arrayTypeType);
 				} elseif ($type instanceof IterableType) {
 					$type = new IterableType(new MixedType(), $arrayTypeType);
@@ -514,7 +654,11 @@ class TypeNodeResolver
 	private function resolveIntersectionTypeNode(IntersectionTypeNode $typeNode, NameScope $nameScope): Type
 	{
 		$types = $this->resolveMultiple($typeNode->types, $nameScope);
-		return TypeCombinator::intersect(...$types);
+		$result = $types[0];
+		for ($i = 1, $count = count($types); $i < $count; $i++) {
+			$result = TypeCombinator::intersect($result, $types[$i]);
+		}
+		return $result;
 	}
 
 	private function resolveConditionalTypeNode(ConditionalTypeNode $typeNode, NameScope $nameScope): Type
@@ -542,23 +686,45 @@ class TypeNodeResolver
 	private function resolveArrayTypeNode(ArrayTypeNode $typeNode, NameScope $nameScope): Type
 	{
 		$itemType = $this->resolve($typeNode->type, $nameScope);
-		return new ArrayType(new BenevolentUnionType([new IntegerType(), new StringType()]), $itemType);
+		return new ArrayType((new BenevolentUnionType([new IntegerType(), new StringType()]))->toArrayKey(), $itemType);
 	}
 
 	private function resolveGenericTypeNode(GenericTypeNode $typeNode, NameScope $nameScope): Type
 	{
 		$mainTypeName = strtolower($typeNode->type->name);
 		$genericTypes = $this->resolveMultiple($typeNode->genericTypes, $nameScope);
+		$variances = array_map(
+			static function (string $variance): TemplateTypeVariance {
+				switch ($variance) {
+					case GenericTypeNode::VARIANCE_INVARIANT:
+						return TemplateTypeVariance::createInvariant();
+					case GenericTypeNode::VARIANCE_COVARIANT:
+						return TemplateTypeVariance::createCovariant();
+					case GenericTypeNode::VARIANCE_CONTRAVARIANT:
+						return TemplateTypeVariance::createContravariant();
+					case GenericTypeNode::VARIANCE_BIVARIANT:
+						return TemplateTypeVariance::createBivariant();
+				}
+			},
+			$typeNode->variances,
+		);
 
-		if ($mainTypeName === 'array' || $mainTypeName === 'non-empty-array') {
+		if (in_array($mainTypeName, ['array', 'non-empty-array'], true)) {
 			if (count($genericTypes) === 1) { // array<ValueType>
-				$arrayType = new ArrayType(new BenevolentUnionType([new IntegerType(), new StringType()]), $genericTypes[0]);
+				$arrayType = new ArrayType((new BenevolentUnionType([new IntegerType(), new StringType()]))->toArrayKey(), $genericTypes[0]);
 			} elseif (count($genericTypes) === 2) { // array<KeyType, ValueType>
-				$keyType = TypeCombinator::intersect($genericTypes[0], new UnionType([
-					new IntegerType(),
-					new StringType(),
-				]));
-				$arrayType = new ArrayType($keyType->toArrayKey(), $genericTypes[1]);
+				$keyType = $this->transformUnsafeArrayKey($genericTypes[0]);
+				$finiteTypes = $keyType->getFiniteTypes();
+				if (
+					count($finiteTypes) === 1
+					&& ($finiteTypes[0] instanceof ConstantStringType || $finiteTypes[0] instanceof ConstantIntegerType)
+				) {
+					$arrayBuilder = ConstantArrayTypeBuilder::createEmpty();
+					$arrayBuilder->setOffsetValueType($finiteTypes[0], $genericTypes[1], true);
+					$arrayType = $arrayBuilder->getArray();
+				} else {
+					$arrayType = new ArrayType($keyType, $genericTypes[1]);
+				}
 			} else {
 				return new ErrorType();
 			}
@@ -568,9 +734,9 @@ class TypeNodeResolver
 			}
 
 			return $arrayType;
-		} elseif ($mainTypeName === 'list' || $mainTypeName === 'non-empty-list') {
+		} elseif (in_array($mainTypeName, ['list', 'non-empty-list'], true)) {
 			if (count($genericTypes) === 1) { // list<ValueType>
-				$listType = AccessoryArrayListType::intersectWith(new ArrayType(new IntegerType(), $genericTypes[0]));
+				$listType = new IntersectionType([new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), $genericTypes[0]), new AccessoryArrayListType()]);
 				if ($mainTypeName === 'non-empty-list') {
 					return TypeCombinator::intersect($listType, new NonEmptyArrayType());
 				}
@@ -591,9 +757,16 @@ class TypeNodeResolver
 		} elseif (in_array($mainTypeName, ['class-string', 'interface-string'], true)) {
 			if (count($genericTypes) === 1) {
 				$genericType = $genericTypes[0];
-				if ((new ObjectWithoutClassType())->isSuperTypeOf($genericType)->yes() || $genericType instanceof MixedType) {
+				if ($genericType->isObject()->yes() || $genericType instanceof MixedType) {
 					return new GenericClassStringType($genericType);
 				}
+			}
+
+			return new ErrorType();
+		} elseif ($mainTypeName === 'enum-string') {
+			if (count($genericTypes) === 1) {
+				$genericType = $genericTypes[0];
+				return new GenericClassStringType(TypeCombinator::intersect($genericType, new ObjectType('UnitEnum')));
 			}
 
 			return new ErrorType();
@@ -627,27 +800,8 @@ class TypeNodeResolver
 			return new ErrorType();
 		} elseif ($mainTypeName === 'value-of') {
 			if (count($genericTypes) === 1) { // value-of<ValueType>
-				if ($genericTypes[0] instanceof TypeWithClassName) {
-					if ($this->getReflectionProvider()->hasClass($genericTypes[0]->getClassName())) {
-						$classReflection = $this->getReflectionProvider()->getClass($genericTypes[0]->getClassName());
-
-						if ($classReflection->isBackedEnum()) {
-							$cases = [];
-							foreach ($classReflection->getEnumCases() as $enumCaseReflection) {
-								$backingType = $enumCaseReflection->getBackingValueType();
-								if ($backingType === null) {
-									continue;
-								}
-
-								$cases[] = $backingType;
-							}
-
-							return TypeCombinator::union(...$cases);
-						}
-					}
-				}
-
 				$type = new ValueOfType($genericTypes[0]);
+
 				return $type->isResolvable() ? $type->resolve() : $type;
 			}
 
@@ -675,150 +829,502 @@ class TypeNodeResolver
 				return TypeUtils::toBenevolentUnion($genericTypes[0]);
 			}
 			return new ErrorType();
+		} elseif ($mainTypeName === 'template-type') {
+			if (count($genericTypes) === 3) {
+				$result = [];
+				/** @var class-string $ancestorClassName */
+				foreach ($genericTypes[1]->getObjectClassNames() as $ancestorClassName) {
+					foreach ($genericTypes[2]->getConstantStrings() as $templateTypeName) {
+						$result[] = new GetTemplateTypeType($genericTypes[0], $ancestorClassName, $templateTypeName->getValue());
+					}
+				}
+
+				return TypeCombinator::union(...$result);
+			}
+
+			return new ErrorType();
+		} elseif ($mainTypeName === 'new') {
+			if (count($genericTypes) === 1) {
+				$type = new NewObjectType($genericTypes[0]);
+				return $type->isResolvable() ? $type->resolve() : $type;
+			}
+
+			return new ErrorType();
+		} elseif ($mainTypeName === 'static') {
+			if ($nameScope->getClassName() !== null && $this->getReflectionProvider()->hasClass($nameScope->getClassName())) {
+				$classReflection = $this->getReflectionProvider()->getClass($nameScope->getClassName());
+
+				return new GenericStaticType($classReflection, $genericTypes, null, $variances);
+			}
+
+			return new ErrorType();
 		}
 
 		$mainType = $this->resolveIdentifierTypeNode($typeNode->type, $nameScope);
+		$mainTypeObjectClassNames = $mainType->getObjectClassNames();
+		if (count($mainTypeObjectClassNames) > 1) {
+			if ($mainType instanceof TemplateType) {
+				return new ErrorType();
+			}
+			throw new ShouldNotHappenException();
+		}
+		$mainTypeClassName = $mainTypeObjectClassNames[0] ?? null;
 
-		if ($mainType instanceof TypeWithClassName) {
-			if (!$this->getReflectionProvider()->hasClass($mainType->getClassName())) {
-				return new GenericObjectType($mainType->getClassName(), $genericTypes);
+		if ($mainTypeClassName !== null) {
+			if (!$this->getReflectionProvider()->hasClass($mainTypeClassName)) {
+				return new GenericObjectType($mainTypeClassName, $genericTypes, variances: $variances);
 			}
 
-			$classReflection = $this->getReflectionProvider()->getClass($mainType->getClassName());
+			$classReflection = $this->getReflectionProvider()->getClass($mainTypeClassName);
 			if ($classReflection->isGeneric()) {
-				if (in_array($mainType->getClassName(), [
+				$templateTypes = array_values($classReflection->getTemplateTypeMap()->getTypes());
+				for ($i = count($genericTypes), $templateTypesCount = count($templateTypes); $i < $templateTypesCount; $i++) {
+					$templateType = $templateTypes[$i];
+					if (!$templateType instanceof TemplateType || $templateType->getDefault() === null) {
+						continue;
+					}
+					$genericTypes[] = $templateType->getDefault();
+				}
+
+				if (in_array($mainTypeClassName, [
 					Traversable::class,
 					IteratorAggregate::class,
 					Iterator::class,
 				], true)) {
 					if (count($genericTypes) === 1) {
-						return new GenericObjectType($mainType->getClassName(), [
+						return new GenericObjectType($mainTypeClassName, [
 							new MixedType(true),
 							$genericTypes[0],
+						], variances: [
+							TemplateTypeVariance::createInvariant(),
+							$variances[0],
 						]);
 					}
 
 					if (count($genericTypes) === 2) {
-						return new GenericObjectType($mainType->getClassName(), [
+						return new GenericObjectType($mainTypeClassName, [
 							$genericTypes[0],
 							$genericTypes[1],
+						], variances: [
+							$variances[0],
+							$variances[1],
 						]);
 					}
 				}
-				if ($mainType->getClassName() === Generator::class) {
+				if ($mainTypeClassName === Generator::class) {
 					if (count($genericTypes) === 1) {
 						$mixed = new MixedType(true);
-						return new GenericObjectType($mainType->getClassName(), [
+						return new GenericObjectType($mainTypeClassName, [
 							$mixed,
 							$genericTypes[0],
 							$mixed,
 							$mixed,
+						], variances: [
+							TemplateTypeVariance::createInvariant(),
+							$variances[0],
+							TemplateTypeVariance::createInvariant(),
+							TemplateTypeVariance::createInvariant(),
 						]);
 					}
 
 					if (count($genericTypes) === 2) {
 						$mixed = new MixedType(true);
-						return new GenericObjectType($mainType->getClassName(), [
+						return new GenericObjectType($mainTypeClassName, [
 							$genericTypes[0],
 							$genericTypes[1],
 							$mixed,
 							$mixed,
+						], variances: [
+							$variances[0],
+							$variances[1],
+							TemplateTypeVariance::createInvariant(),
+							TemplateTypeVariance::createInvariant(),
 						]);
 					}
 				}
 
 				if (!$mainType->isIterable()->yes()) {
-					return new GenericObjectType($mainType->getClassName(), $genericTypes);
+					return new GenericObjectType($mainTypeClassName, $genericTypes, variances: $variances);
 				}
 
 				if (
 					count($genericTypes) !== 1
 					|| $classReflection->getTemplateTypeMap()->count() === 1
 				) {
-					return new GenericObjectType($mainType->getClassName(), $genericTypes);
+					return new GenericObjectType($mainTypeClassName, $genericTypes, variances: $variances);
 				}
 			}
 		}
 
 		if ($mainType->isIterable()->yes()) {
-			if (count($genericTypes) === 1) { // Foo<ValueType>
-				return TypeCombinator::intersect(
-					$mainType,
-					new IterableType(new MixedType(true), $genericTypes[0]),
-				);
+			if ($mainTypeClassName !== null) {
+				if (isset($this->genericTypeResolvingStack[$mainTypeClassName])) {
+					return new ErrorType();
+				}
+
+				$this->genericTypeResolvingStack[$mainTypeClassName] = true;
 			}
 
-			if (count($genericTypes) === 2) { // Foo<KeyType, ValueType>
-				return TypeCombinator::intersect(
-					$mainType,
-					new IterableType($genericTypes[0], $genericTypes[1]),
-				);
+			try {
+				if (count($genericTypes) === 1) { // Foo<ValueType>
+					return TypeCombinator::intersect(
+						$mainType,
+						new IterableType(new MixedType(true), $genericTypes[0]),
+					);
+				}
+
+				if (count($genericTypes) === 2) { // Foo<KeyType, ValueType>
+					return TypeCombinator::intersect(
+						$mainType,
+						new IterableType($genericTypes[0], $genericTypes[1]),
+					);
+				}
+			} finally {
+				if ($mainTypeClassName !== null) {
+					unset($this->genericTypeResolvingStack[$mainTypeClassName]);
+				}
 			}
 		}
 
-		if ($mainType instanceof TypeWithClassName) {
-			return new GenericObjectType($mainType->getClassName(), $genericTypes);
+		if ($mainTypeClassName !== null) {
+			return new GenericObjectType($mainTypeClassName, $genericTypes, variances: $variances);
 		}
 
 		return new ErrorType();
 	}
 
+	private function transformUnsafeArrayKey(Type $keyType): Type
+	{
+		if ($this->reportUnsafeArrayStringKeyCasting === ReportUnsafeArrayStringKeyCastingToggle::PREVENT) {
+			if (!$keyType->isSuperTypeOf(new IntegerType())->yes()) {
+				$keyType = TypeTraverser::map($keyType, static function (Type $type, callable $traverse) {
+					if ($type instanceof UnionType || $type instanceof IntersectionType) {
+						return $traverse($type);
+					}
+
+					if ($type instanceof StringType) {
+						return TypeCombinator::intersect($type, new AccessoryDecimalIntegerStringType(inverse: true));
+					}
+
+					return $type;
+				});
+			}
+		}
+
+		return TypeCombinator::intersect($keyType->toArrayKey(), new UnionType([
+			new IntegerType(),
+			new StringType(),
+		]))->toArrayKey();
+	}
+
 	private function resolveCallableTypeNode(CallableTypeNode $typeNode, NameScope $nameScope): Type
 	{
+		$templateTags = [];
+
+		if (count($typeNode->templateTypes) > 0) {
+			foreach ($typeNode->templateTypes as $templateType) {
+				$templateTags[$templateType->name] = new TemplateTag(
+					$templateType->name,
+					$templateType->bound !== null
+						? $this->resolve($templateType->bound, $nameScope)
+						: new MixedType(),
+					$templateType->default !== null
+						? $this->resolve($templateType->default, $nameScope)
+						: null,
+					TemplateTypeVariance::createInvariant(),
+				);
+			}
+			$templateTypeScope = TemplateTypeScope::createWithAnonymousFunction();
+
+			$templateTypeMap = new TemplateTypeMap(array_map(
+				static fn (TemplateTag $tag): Type => TemplateTypeFactory::fromTemplateTag($templateTypeScope, $tag),
+				$templateTags,
+			));
+
+			$nameScope = $nameScope->withTemplateTypeMap($templateTypeMap, $templateTags);
+		} else {
+			$templateTypeMap = TemplateTypeMap::createEmpty();
+		}
+
 		$mainType = $this->resolve($typeNode->identifier, $nameScope);
+
 		$isVariadic = false;
-		$parameters = array_map(
+		$parameters = array_values(array_map(
 			function (CallableTypeParameterNode $parameterNode) use ($nameScope, &$isVariadic): NativeParameterReflection {
 				$isVariadic = $isVariadic || $parameterNode->isVariadic;
 				$parameterName = $parameterNode->parameterName;
-				if (strpos($parameterName, '$') === 0) {
+				if (str_starts_with($parameterName, '$')) {
 					$parameterName = substr($parameterName, 1);
 				}
+
 				return new NativeParameterReflection(
 					$parameterName,
 					$parameterNode->isOptional || $parameterNode->isVariadic,
 					$this->resolve($parameterNode->type, $nameScope),
 					$parameterNode->isReference ? PassedByReference::createCreatesNewVariable() : PassedByReference::createNo(),
 					$parameterNode->isVariadic,
-					null,
+					defaultValue: null,
 				);
 			},
 			$typeNode->parameters,
-		);
-		$returnType = $this->resolve($typeNode->returnType, $nameScope);
+		));
+
+		$assertions = $this->resolveCallableReturnTypeAssertions($typeNode, $nameScope, $parameters);
+		if ($assertions !== null) {
+			$returnType = new BooleanType();
+		} else {
+			$returnType = $this->resolve($typeNode->returnType, $nameScope);
+		}
 
 		if ($mainType instanceof CallableType) {
-			return new CallableType($parameters, $returnType, $isVariadic);
+			$pure = $mainType->isPure();
+			if ($pure->yes() && $returnType->isVoid()->yes()) {
+				return new ErrorType();
+			}
+
+			return new CallableType($parameters, $returnType, $isVariadic, $templateTypeMap, templateTags: $templateTags, isPure: $pure, assertions: $assertions);
 
 		} elseif (
 			$mainType instanceof ObjectType
 			&& $mainType->getClassName() === Closure::class
 		) {
-			return new ClosureType($parameters, $returnType, $isVariadic);
+			return new ClosureType($parameters, $returnType, $isVariadic, $templateTypeMap, templateTags: $templateTags, impurePoints: [
+				new SimpleImpurePoint(
+					'functionCall',
+					'call to a Closure',
+					false,
+				),
+			], assertions: $assertions);
+		} elseif ($mainType instanceof ClosureType) {
+			$closure = new ClosureType($parameters, $returnType, $isVariadic, $templateTypeMap, templateTags: $templateTags, impurePoints: $mainType->getImpurePoints(), invalidateExpressions: $mainType->getInvalidateExpressions(), usedVariables: $mainType->getUsedVariables(), acceptsNamedArguments: $mainType->acceptsNamedArguments(), mustUseReturnValue: $mainType->mustUseReturnValue(), assertions: $assertions, isStatic: $mainType->isStaticClosure());
+			if ($closure->isPure()->yes() && $returnType->isVoid()->yes()) {
+				return new ErrorType();
+			}
+
+			return $closure;
 		}
 
 		return new ErrorType();
 	}
 
+	/**
+	 * Interprets a conditional return type referencing the callable's own parameter,
+	 * like `callable(mixed $value): ($value is int ? true : false)`, as a type predicate.
+	 *
+	 * @param list<NativeParameterReflection> $parameters
+	 */
+	private function resolveCallableReturnTypeAssertions(CallableTypeNode $typeNode, NameScope $nameScope, array $parameters): ?Assertions
+	{
+		$returnTypeNode = $typeNode->returnType;
+		if (!$returnTypeNode instanceof ConditionalTypeForParameterNode) {
+			return null;
+		}
+
+		foreach ($parameters as $parameter) {
+			if ('$' . $parameter->getName() !== $returnTypeNode->parameterName) {
+				continue;
+			}
+
+			return CallableAssertionsHelper::createAssertionsFromConditional(
+				$returnTypeNode->parameterName,
+				$this->resolve($returnTypeNode->targetType, $nameScope),
+				$returnTypeNode->negated,
+				$this->resolve($returnTypeNode->if, $nameScope),
+				$this->resolve($returnTypeNode->else, $nameScope),
+			);
+		}
+
+		return null;
+	}
+
 	private function resolveArrayShapeNode(ArrayShapeNode $typeNode, NameScope $nameScope): Type
 	{
 		$builder = ConstantArrayTypeBuilder::createEmpty();
+		$builder->disableArrayDegradation();
 
+		$explicitKeyValues = [];
 		foreach ($typeNode->items as $itemNode) {
-			$offsetType = null;
-			if ($itemNode->keyName instanceof ConstExprIntegerNode) {
-				$offsetType = new ConstantIntegerType((int) $itemNode->keyName->value);
-			} elseif ($itemNode->keyName instanceof IdentifierTypeNode) {
-				$offsetType = new ConstantStringType($itemNode->keyName->name);
-			} elseif ($itemNode->keyName instanceof ConstExprStringNode) {
-				$offsetType = new ConstantStringType($itemNode->keyName->value);
-			} elseif ($itemNode->keyName !== null) {
-				throw new ShouldNotHappenException('Unsupported key node type: ' . get_class($itemNode->keyName));
+			if ($itemNode->valueType instanceof CallableTypeNode) {
+				$builder->disableClosureDegradation();
+			}
+
+			$offsetType = $this->resolveArrayShapeOffsetType($itemNode, $nameScope);
+			if ($offsetType instanceof ConstantIntegerType || $offsetType instanceof ConstantStringType) {
+				$explicitKeyValues[] = $offsetType->getValue();
 			}
 			$builder->setOffsetValueType($offsetType, $this->resolve($itemNode->valueType, $nameScope), $itemNode->optional);
 		}
 
-		return $builder->getArray();
+		$isList = in_array($typeNode->kind, [
+			ArrayShapeNode::KIND_LIST,
+			ArrayShapeNode::KIND_NON_EMPTY_LIST,
+		], true);
+
+		if (!$typeNode->sealed) {
+			if ($typeNode->unsealedType === null) {
+				if ($isList) {
+					$unsealedKeyType = IntegerRangeType::createAllGreaterThanOrEqualTo(0);
+				} else {
+					$unsealedKeyType = (new BenevolentUnionType([new IntegerType(), new StringType()]))->toArrayKey();
+				}
+				$builder->makeUnsealed(
+					$unsealedKeyType,
+					new MixedType(),
+				);
+			} else {
+				if ($typeNode->unsealedType->keyType === null) {
+					if ($isList) {
+						$unsealedKeyType = IntegerRangeType::createAllGreaterThanOrEqualTo(0);
+					} else {
+						$unsealedKeyType = (new BenevolentUnionType([new IntegerType(), new StringType()]))->toArrayKey();
+					}
+				} else {
+					$unsealedKeyType = $this->transformUnsafeArrayKey($this->resolve($typeNode->unsealedType->keyType, $nameScope));
+				}
+				$unsealedKeyFiniteTypes = $unsealedKeyType->getFiniteTypes();
+				$unsealedValueType = $this->resolve($typeNode->unsealedType->valueType, $nameScope);
+				if (count($unsealedKeyFiniteTypes) > 0) {
+					foreach ($unsealedKeyFiniteTypes as $unsealedKeyFiniteType) {
+						// Explicit keys own their slot — the unsealed extras
+						// describe entries at keys NOT in the explicit set.
+						if (
+							($unsealedKeyFiniteType instanceof ConstantIntegerType || $unsealedKeyFiniteType instanceof ConstantStringType)
+							&& in_array($unsealedKeyFiniteType->getValue(), $explicitKeyValues, true)
+						) {
+							continue;
+						}
+						$builder->setOffsetValueType($unsealedKeyFiniteType, $unsealedValueType, true);
+					}
+				} else {
+					$builder->makeUnsealed($unsealedKeyType, $unsealedValueType);
+				}
+			}
+		}
+
+		$arrayType = $builder->getArray();
+
+		$accessories = [];
+		if ($isList) {
+			$accessories[] = new AccessoryArrayListType();
+		}
+
+		if (in_array($typeNode->kind, [
+			ArrayShapeNode::KIND_NON_EMPTY_ARRAY,
+			ArrayShapeNode::KIND_NON_EMPTY_LIST,
+		], true)) {
+			$accessories[] = new NonEmptyArrayType();
+		}
+
+		if (count($accessories) > 0) {
+			return TypeCombinator::intersect($arrayType, ...$accessories);
+		}
+
+		return $arrayType;
+	}
+
+	private function resolveArrayShapeOffsetType(ArrayShapeItemNode $itemNode, NameScope $nameScope): ?Type
+	{
+		if ($itemNode->keyName instanceof ConstExprIntegerNode) {
+			return new ConstantIntegerType((int) $itemNode->keyName->value);
+		} elseif ($itemNode->keyName instanceof IdentifierTypeNode) {
+			return new ConstantStringType($itemNode->keyName->name);
+		} elseif ($itemNode->keyName instanceof ConstExprStringNode) {
+			return new ConstantStringType($itemNode->keyName->value);
+		} elseif ($itemNode->keyName instanceof ConstFetchNode) {
+			$constExpr = $itemNode->keyName;
+			if ($constExpr->className === '') {
+				throw new ShouldNotHappenException(); // global constant should get parsed as class name in IdentifierTypeNode
+			}
+
+			$isStatic = false;
+			if ($nameScope->getClassName() !== null) {
+				switch (strtolower($constExpr->className)) {
+					case 'static':
+						$className = $nameScope->getClassName();
+						$isStatic = true;
+						break;
+
+					case 'self':
+						$className = $nameScope->getClassName();
+						break;
+
+					case 'parent':
+						if ($this->getReflectionProvider()->hasClass($nameScope->getClassName())) {
+							$classReflection = $this->getReflectionProvider()->getClass($nameScope->getClassName());
+							if ($classReflection->getParentClass() === null) {
+								return new ErrorType();
+
+							}
+
+							$className = $classReflection->getParentClass()->getName();
+						}
+						break;
+				}
+			}
+
+			if (!isset($className)) {
+				$className = $nameScope->resolveStringName($constExpr->className);
+			}
+
+			if (!$this->getReflectionProvider()->hasClass($className)) {
+				return new ErrorType();
+			}
+			$classReflection = $this->getReflectionProvider()->getClass($className);
+
+			if ($isStatic && $classReflection->isFinal()) {
+				$isStatic = false;
+			}
+
+			$constantName = $constExpr->name;
+			if (strtolower($constantName) === 'class') {
+				if ($isStatic) {
+					return new GenericClassStringType(new StaticType($classReflection));
+				}
+
+				return new ConstantStringType($classReflection->getName(), true);
+			}
+
+			if (!$classReflection->hasConstant($constantName)) {
+				return new ErrorType();
+			}
+
+			if ($isStatic) {
+				return new ClassConstantAccessType(new StaticType($classReflection), $constantName);
+			}
+
+			$reflectionConstant = $classReflection->getNativeReflection()->getReflectionConstant($constantName);
+			if ($reflectionConstant === false) {
+				return new ErrorType();
+			}
+			$declaringClass = $reflectionConstant->getDeclaringClass();
+
+			return $this->initializerExprTypeResolver->getType($reflectionConstant->getValueExpression(), InitializerExprContext::fromClass($declaringClass->getName(), $declaringClass->getFileName() ?: null));
+		} elseif ($itemNode->keyName !== null) {
+			throw new ShouldNotHappenException('Unsupported key node type: ' . get_class($itemNode->keyName));
+		}
+
+		return null;
+	}
+
+	private function resolveObjectShapeNode(ObjectShapeNode $typeNode, NameScope $nameScope): Type
+	{
+		$properties = [];
+		$optionalProperties = [];
+		foreach ($typeNode->items as $itemNode) {
+			if ($itemNode->keyName instanceof IdentifierTypeNode) {
+				$propertyName = $itemNode->keyName->name;
+			} elseif ($itemNode->keyName instanceof ConstExprStringNode) {
+				$propertyName = $itemNode->keyName->value;
+			}
+
+			if ($itemNode->optional) {
+				$optionalProperties[] = $propertyName;
+			}
+
+			$properties[$propertyName] = $this->resolve($itemNode->valueType, $nameScope);
+		}
+
+		return new ObjectShapeType($properties, $optionalProperties);
 	}
 
 	private function resolveConstTypeNode(ConstTypeNode $typeNode, NameScope $nameScope): Type
@@ -841,9 +1347,14 @@ class TypeNodeResolver
 				throw new ShouldNotHappenException(); // global constant should get parsed as class name in IdentifierTypeNode
 			}
 
+			$isStatic = false;
 			if ($nameScope->getClassName() !== null) {
 				switch (strtolower($constExpr->className)) {
 					case 'static':
+						$className = $nameScope->getClassName();
+						$isStatic = true;
+						break;
+
 					case 'self':
 						$className = $nameScope->getClassName();
 						break;
@@ -858,6 +1369,7 @@ class TypeNodeResolver
 
 							$className = $classReflection->getParentClass()->getName();
 						}
+						break;
 				}
 			}
 
@@ -871,7 +1383,19 @@ class TypeNodeResolver
 
 			$classReflection = $this->getReflectionProvider()->getClass($className);
 
+			if ($isStatic && $classReflection->isFinal()) {
+				$isStatic = false;
+			}
+
 			$constantName = $constExpr->name;
+			if (strtolower($constantName) === 'class') {
+				if ($isStatic) {
+					return new GenericClassStringType(new StaticType($classReflection));
+				}
+
+				return new ConstantStringType($classReflection->getName(), true);
+			}
+
 			if (Strings::contains($constantName, '*')) {
 				// convert * into .*? and escape everything else so the constants can be matched against the pattern
 				$pattern = '{^' . str_replace('\\*', '.*?', preg_quote($constantName)) . '$}D';
@@ -915,9 +1439,17 @@ class TypeNodeResolver
 				return new EnumCaseObjectType($classReflection->getName(), $constantName);
 			}
 
-			$reflectionConstant = $classReflection->getConstant($constantName);
+			if ($isStatic) {
+				return new ClassConstantAccessType(new StaticType($classReflection), $constantName);
+			}
 
-			return $this->initializerExprTypeResolver->getType($reflectionConstant->getValueExpr(), InitializerExprContext::fromClassReflection($reflectionConstant->getDeclaringClass()));
+			$reflectionConstant = $classReflection->getNativeReflection()->getReflectionConstant($constantName);
+			if ($reflectionConstant === false) {
+				return new ErrorType();
+			}
+			$declaringClass = $reflectionConstant->getDeclaringClass();
+
+			return $this->initializerExprTypeResolver->getType($reflectionConstant->getValueExpression(), InitializerExprContext::fromClass($declaringClass->getName(), $declaringClass->getFileName() ?: null));
 		}
 
 		if ($constExpr instanceof ConstExprFloatNode) {
@@ -976,13 +1508,17 @@ class TypeNodeResolver
 			return IntegerRangeType::fromInterval($min, $max);
 		}
 
+		if (count($values) > InitializerExprTypeResolver::CALCULATE_SCALARS_LIMIT) {
+			return IntegerRangeType::fromInterval($min, $max);
+		}
+
 		return TypeCombinator::union(...array_map(static fn ($value) => new ConstantIntegerType($value), $values));
 	}
 
 	/**
 	 * @api
 	 * @param TypeNode[] $typeNodes
-	 * @return Type[]
+	 * @return list<Type>
 	 */
 	public function resolveMultiple(array $typeNodes, NameScope $nameScope): array
 	{

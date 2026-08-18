@@ -3,10 +3,12 @@
 namespace PHPStan\Collectors;
 
 use PhpParser\Node;
+use PHPStan\DependencyInjection\AutowiredService;
 use function class_implements;
 use function class_parents;
 
-class Registry
+#[AutowiredService(factory: '@PHPStan\Collectors\RegistryFactory::create')]
+final class Registry
 {
 
 	/** @var Collector[][] */
@@ -27,10 +29,8 @@ class Registry
 
 	/**
 	 * @template TNodeType of Node
-	 * @phpstan-param class-string<TNodeType> $nodeType
-	 * @param Node $nodeType
-	 * @phpstan-return array<Collector<TNodeType, mixed>>
-	 * @return Collector[]
+	 * @param class-string<TNodeType> $nodeType
+	 * @return array<Collector<TNodeType, mixed>>
 	 */
 	public function getCollectors(string $nodeType): array
 	{
@@ -48,8 +48,7 @@ class Registry
 		}
 
 		/**
-		 * @phpstan-var array<Collector<TNodeType, mixed>> $selectedCollectors
-		 * @var Collector[] $selectedCollectors
+		 * @var array<Collector<TNodeType, mixed>> $selectedCollectors
 		 */
 		$selectedCollectors = $this->cache[$nodeType];
 

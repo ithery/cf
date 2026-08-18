@@ -4,20 +4,21 @@ namespace PHPStan\Reflection\Type;
 
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\Dummy\ChangedTypeMethodReflection;
+use PHPStan\Reflection\ExtendedFunctionVariant;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\FunctionVariant;
-use PHPStan\Reflection\ParameterReflection;
-use PHPStan\Reflection\ParameterReflectionWithPhpDocs;
-use PHPStan\Reflection\ParametersAcceptor;
-use PHPStan\Reflection\Php\DummyParameter;
-use PHPStan\Reflection\Php\DummyParameterWithPhpDocs;
+use PHPStan\Reflection\ExtendedParameterReflection;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
+use PHPStan\Reflection\Php\ExtendedDummyParameter;
 use PHPStan\Reflection\ResolvedMethodReflection;
+use PHPStan\Type\Generic\GenericStaticType;
 use PHPStan\Type\StaticType;
+use PHPStan\Type\ThisType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeTraverser;
 use function array_map;
+use function count;
 
-class CalledOnTypeUnresolvedMethodPrototypeReflection implements UnresolvedMethodPrototypeReflection
+final class CalledOnTypeUnresolvedMethodPrototypeReflection implements UnresolvedMethodPrototypeReflection
 {
 
 	private ?ExtendedMethodReflection $transformedMethod = null;
@@ -58,10 +59,12 @@ class CalledOnTypeUnresolvedMethodPrototypeReflection implements UnresolvedMetho
 			return $this->transformedMethod;
 		}
 		$templateTypeMap = $this->resolvedDeclaringClass->getActiveTemplateTypeMap();
+		$callSiteVarianceMap = $this->resolvedDeclaringClass->getCallSiteVarianceMap();
 
 		return $this->transformedMethod = new ResolvedMethodReflection(
 			$this->transformMethodWithStaticType($this->resolvedDeclaringClass, $this->methodReflection),
 			$this->resolveTemplateTypeMapToBounds ? $templateTypeMap->resolveToBounds() : $templateTypeMap,
+			$callSiteVarianceMap,
 		);
 	}
 
@@ -77,46 +80,77 @@ class CalledOnTypeUnresolvedMethodPrototypeReflection implements UnresolvedMetho
 
 	private function transformMethodWithStaticType(ClassReflection $declaringClass, ExtendedMethodReflection $method): ExtendedMethodReflection
 	{
-		$variants = array_map(fn (ParametersAcceptor $acceptor): ParametersAcceptor => new FunctionVariant(
-			$acceptor->getTemplateTypeMap(),
-			$acceptor->getResolvedTemplateTypeMap(),
-			array_map(
-				function (ParameterReflection $parameter): ParameterReflection {
-					if ($parameter instanceof ParameterReflectionWithPhpDocs) {
-						return new DummyParameterWithPhpDocs(
-							$parameter->getName(),
-							$this->transformStaticType($parameter->getType()),
-							$parameter->isOptional(),
-							$parameter->passedByReference(),
-							$parameter->isVariadic(),
-							$parameter->getDefaultValue(),
-							$parameter->getNativeType(),
-							$parameter->getPhpDocType(),
-							$parameter->getOutType(),
-						);
-					}
-
-					return new DummyParameter(
+		$selfOutType = $method->getSelfOutType() !== null ? $this->transformStaticType($method->getSelfOutType()) : null;
+		$variantFn = function (ExtendedParametersAcceptor $acceptor) use ($selfOutType): ExtendedParametersAcceptor {
+			$originalReturnType = $acceptor->getReturnType();
+			if ($originalReturnType instanceof ThisType && $selfOutType !== null) {
+				$returnType = $selfOutType;
+			} else {
+				$returnType = $this->transformStaticType($originalReturnType);
+			}
+			return new ExtendedFunctionVariant(
+				$acceptor->getTemplateTypeMap(),
+				$acceptor->getResolvedTemplateTypeMap(),
+				array_map(
+					fn (ExtendedParameterReflection $parameter): ExtendedParameterReflection => new ExtendedDummyParameter(
 						$parameter->getName(),
 						$this->transformStaticType($parameter->getType()),
 						$parameter->isOptional(),
 						$parameter->passedByReference(),
 						$parameter->isVariadic(),
 						$parameter->getDefaultValue(),
-					);
-				},
-				$acceptor->getParameters(),
-			),
-			$acceptor->isVariadic(),
-			$this->transformStaticType($acceptor->getReturnType()),
-		), $method->getVariants());
+						$parameter->getNativeType(),
+						$this->transformStaticType($parameter->getPhpDocType()),
+						$parameter->getOutType() !== null ? $this->transformStaticType($parameter->getOutType()) : null,
+						$parameter->isImmediatelyInvokedCallable(),
+						$parameter->getClosureThisType() !== null ? $this->transformStaticType($parameter->getClosureThisType()) : null,
+						$parameter->getAttributes(),
+						$parameter->getAllowedConstants(),
+						$parameter->isPureUnlessCallableIsImpureParameter(),
+					),
+					$acceptor->getParameters(),
+				),
+				$acceptor->isVariadic(),
+				$returnType,
+				$this->transformStaticType($acceptor->getPhpDocReturnType()),
+				$this->transformStaticType($acceptor->getNativeReturnType()),
+				$acceptor->getCallSiteVarianceMap(),
+			);
+		};
+		$variants = array_map($variantFn, $method->getVariants());
+		$namedArgumentsVariants = $method->getNamedArgumentsVariants();
+		$namedArgumentsVariants = $namedArgumentsVariants !== null
+			? array_map($variantFn, $namedArgumentsVariants)
+			: null;
+		$throwType = $method->getThrowType();
+		$throwType = $throwType !== null
+			? $this->transformStaticType($throwType)
+			: null;
 
-		return new ChangedTypeMethodReflection($declaringClass, $method, $variants);
+		return new ChangedTypeMethodReflection(
+			$declaringClass,
+			$method,
+			$variants,
+			$namedArgumentsVariants,
+			$selfOutType,
+			$throwType,
+			$method->getAsserts()->mapTypes(fn (Type $type): Type => $this->transformStaticType($type)),
+		);
 	}
 
 	private function transformStaticType(Type $type): Type
 	{
 		return TypeTraverser::map($type, function (Type $type, callable $traverse): Type {
+			if ($type instanceof GenericStaticType) {
+				$calledOnTypeReflections = $this->calledOnType->getObjectClassReflections();
+				if (count($calledOnTypeReflections) === 1) {
+					$calledOnTypeReflection = $calledOnTypeReflections[0];
+
+					return $traverse($type->changeBaseClass($calledOnTypeReflection)->getStaticObjectType());
+				}
+
+				return $this->calledOnType;
+			}
 			if ($type instanceof StaticType) {
 				return $this->calledOnType;
 			}

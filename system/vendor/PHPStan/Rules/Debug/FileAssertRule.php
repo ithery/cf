@@ -5,12 +5,13 @@ namespace PHPStan\Rules\Debug;
 use PhpParser\Node;
 use PhpParser\Node\Expr\StaticCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\PhpDoc\TypeStringResolver;
 use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\TrinaryLogic;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\VerbosityLevel;
 use function count;
 use function is_string;
@@ -19,10 +20,14 @@ use function sprintf;
 /**
  * @implements Rule<Node\Expr\FuncCall>
  */
-class FileAssertRule implements Rule
+#[AutowiredService]
+final class FileAssertRule implements Rule
 {
 
-	public function __construct(private ReflectionProvider $reflectionProvider)
+	public function __construct(
+		private ReflectionProvider $reflectionProvider,
+		private TypeStringResolver $typeStringResolver,
+	)
 	{
 	}
 
@@ -34,6 +39,10 @@ class FileAssertRule implements Rule
 	public function processNode(Node $node, Scope $scope): array
 	{
 		if (!$node->name instanceof Node\Name) {
+			return [];
+		}
+
+		if (count($node->getArgs()) !== 2) {
 			return [];
 		}
 
@@ -50,6 +59,10 @@ class FileAssertRule implements Rule
 			return $this->processAssertNativeType($node->getArgs(), $scope);
 		}
 
+		if ($function->getName() === 'PHPStan\\Testing\\assertSuperType') {
+			return $this->processAssertSuperType($node->getArgs(), $scope);
+		}
+
 		if ($function->getName() === 'PHPStan\\Testing\\assertVariableCertainty') {
 			return $this->processAssertVariableCertainty($node->getArgs(), $scope);
 		}
@@ -58,75 +71,105 @@ class FileAssertRule implements Rule
 	}
 
 	/**
-	 * @param Node\Arg[] $args
-	 * @return RuleError[]
+	 * @param array{Node\Arg, Node\Arg} $args
+	 * @return list<IdentifierRuleError>
 	 */
 	private function processAssertType(array $args, Scope $scope): array
 	{
-		if (count($args) !== 2) {
-			return [];
-		}
-
-		$expectedTypeString = $scope->getType($args[0]->value);
-		if (!$expectedTypeString instanceof ConstantStringType) {
+		$expectedTypeStrings = $scope->getType($args[0]->value)->getConstantStrings();
+		if (count($expectedTypeStrings) !== 1) {
 			return [
-				RuleErrorBuilder::message('Expected type must be a literal string.')->nonIgnorable()->build(),
+				RuleErrorBuilder::message('Expected type must be a literal string.')
+					->nonIgnorable()
+					->identifier('phpstan.unknownExpectation')
+					->build(),
 			];
 		}
 
 		$expressionType = $scope->getType($args[1]->value)->describe(VerbosityLevel::precise());
-		if ($expectedTypeString->getValue() === $expressionType) {
+		if ($expectedTypeStrings[0]->getValue() === $expressionType) {
 			return [];
 		}
 
 		return [
-			RuleErrorBuilder::message(sprintf('Expected type %s, actual: %s', $expectedTypeString->getValue(), $expressionType))->nonIgnorable()->build(),
+			RuleErrorBuilder::message(sprintf('Expected type %s, actual: %s', $expectedTypeStrings[0]->getValue(), $expressionType))
+				->nonIgnorable()
+				->identifier('phpstan.type')
+				->build(),
 		];
 	}
 
 	/**
-	 * @param Node\Arg[] $args
-	 * @return RuleError[]
+	 * @param array{Node\Arg, Node\Arg} $args
+	 * @return list<IdentifierRuleError>
 	 */
 	private function processAssertNativeType(array $args, Scope $scope): array
 	{
-		if (count($args) !== 2) {
-			return [];
-		}
-
-		$scope = $scope->doNotTreatPhpDocTypesAsCertain();
-		$expectedTypeString = $scope->getNativeType($args[0]->value);
-		if (!$expectedTypeString instanceof ConstantStringType) {
+		$expectedTypeStrings = $scope->getNativeType($args[0]->value)->getConstantStrings();
+		if (count($expectedTypeStrings) !== 1) {
 			return [
-				RuleErrorBuilder::message('Expected native type must be a literal string.')->nonIgnorable()->build(),
+				RuleErrorBuilder::message('Expected native type must be a literal string.')
+					->nonIgnorable()
+					->identifier('phpstan.unknownExpectation')
+					->build(),
 			];
 		}
 
 		$expressionType = $scope->getNativeType($args[1]->value)->describe(VerbosityLevel::precise());
-		if ($expectedTypeString->getValue() === $expressionType) {
+		if ($expectedTypeStrings[0]->getValue() === $expressionType) {
 			return [];
 		}
 
 		return [
-			RuleErrorBuilder::message(sprintf('Expected native type %s, actual: %s', $expectedTypeString->getValue(), $expressionType))->nonIgnorable()->build(),
+			RuleErrorBuilder::message(sprintf('Expected native type %s, actual: %s', $expectedTypeStrings[0]->getValue(), $expressionType))
+				->nonIgnorable()
+				->identifier('phpstan.nativeType')
+				->build(),
 		];
 	}
 
 	/**
-	 * @param Node\Arg[] $args
-	 * @return RuleError[]
+	 * @param array{Node\Arg, Node\Arg} $args
+	 * @return list<IdentifierRuleError>
 	 */
-	private function processAssertVariableCertainty(array $args, Scope $scope): array
+	private function processAssertSuperType(array $args, Scope $scope): array
 	{
-		if (count($args) !== 2) {
+		$expectedTypeStrings = $scope->getType($args[0]->value)->getConstantStrings();
+		if (count($expectedTypeStrings) !== 1) {
+			return [
+				RuleErrorBuilder::message('Expected super type must be a literal string.')
+					->nonIgnorable()
+					->identifier('phpstan.unknownExpectation')
+					->build(),
+			];
+		}
+
+		$expressionType = $scope->getType($args[1]->value);
+		$expectedType = $this->typeStringResolver->resolve($expectedTypeStrings[0]->getValue());
+		if ($expectedType->isSuperTypeOf($expressionType)->yes()) {
 			return [];
 		}
 
+		return [
+			RuleErrorBuilder::message(sprintf('Expected subtype of %s, actual: %s', $expectedTypeStrings[0]->getValue(), $expressionType->describe(VerbosityLevel::precise())))
+				->nonIgnorable()
+				->identifier('phpstan.superType')
+				->build(),
+		];
+	}
+
+	/**
+	 * @param array{Node\Arg, Node\Arg} $args
+	 * @return list<IdentifierRuleError>
+	 */
+	private function processAssertVariableCertainty(array $args, Scope $scope): array
+	{
 		$certainty = $args[0]->value;
 		if (!$certainty instanceof StaticCall) {
 			return [
 				RuleErrorBuilder::message('First argument of %s() must be TrinaryLogic call')
 					->nonIgnorable()
+					->identifier('phpstan.unknownExpectation')
 					->build(),
 			];
 		}
@@ -134,6 +177,7 @@ class FileAssertRule implements Rule
 			return [
 				RuleErrorBuilder::message('Invalid TrinaryLogic call.')
 					->nonIgnorable()
+					->identifier('phpstan.unknownExpectation')
 					->build(),
 			];
 		}
@@ -142,6 +186,7 @@ class FileAssertRule implements Rule
 			return [
 				RuleErrorBuilder::message('Invalid TrinaryLogic call.')
 					->nonIgnorable()
+					->identifier('phpstan.unknownExpectation')
 					->build(),
 			];
 		}
@@ -150,35 +195,39 @@ class FileAssertRule implements Rule
 			return [
 				RuleErrorBuilder::message('Invalid TrinaryLogic call.')
 					->nonIgnorable()
+					->identifier('phpstan.unknownExpectation')
 					->build(),
 			];
 		}
 
-		// @phpstan-ignore-next-line
+		// @phpstan-ignore staticMethod.dynamicName
 		$expectedCertaintyValue = TrinaryLogic::{$certainty->name->toString()}();
 		$variable = $args[1]->value;
-		if (!$variable instanceof Node\Expr\Variable) {
+		if ($variable instanceof Node\Expr\Variable && is_string($variable->name)) {
+			$actualCertaintyValue = $scope->hasVariableType($variable->name);
+			$variableDescription = sprintf('variable $%s', $variable->name);
+		} elseif ($variable instanceof Node\Expr\ArrayDimFetch && $variable->dim !== null) {
+			$offset = $scope->getType($variable->dim);
+			$actualCertaintyValue = $scope->getType($variable->var)->hasOffsetValueType($offset);
+			$variableDescription = sprintf('offset %s', $offset->describe(VerbosityLevel::precise()));
+		} else {
 			return [
 				RuleErrorBuilder::message('Invalid assertVariableCertainty call.')
 					->nonIgnorable()
-					->build(),
-			];
-		}
-		if (!is_string($variable->name)) {
-			return [
-				RuleErrorBuilder::message('Invalid assertVariableCertainty call.')
-					->nonIgnorable()
+					->identifier('phpstan.unknownExpectation')
 					->build(),
 			];
 		}
 
-		$actualCertaintyValue = $scope->hasVariableType($variable->name);
 		if ($expectedCertaintyValue->equals($actualCertaintyValue)) {
 			return [];
 		}
 
 		return [
-			RuleErrorBuilder::message(sprintf('Expected variable certainty %s, actual: %s', $expectedCertaintyValue->describe(), $actualCertaintyValue->describe()))->nonIgnorable()->build(),
+			RuleErrorBuilder::message(sprintf('Expected %s certainty %s, actual: %s', $variableDescription, $expectedCertaintyValue->describe(), $actualCertaintyValue->describe()))
+				->nonIgnorable()
+				->identifier('phpstan.variable')
+				->build(),
 		];
 	}
 

@@ -4,11 +4,16 @@ namespace PHPStan\Rules\Exceptions;
 
 use Nette\Utils\Strings;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ReflectionProvider;
 use function count;
 
-/** @api */
-class DefaultExceptionTypeResolver implements ExceptionTypeResolver
+/**
+ * @api
+ */
+#[AutowiredService(as: DefaultExceptionTypeResolver::class)]
+final class DefaultExceptionTypeResolver implements ExceptionTypeResolver
 {
 
 	/**
@@ -19,9 +24,13 @@ class DefaultExceptionTypeResolver implements ExceptionTypeResolver
 	 */
 	public function __construct(
 		private ReflectionProvider $reflectionProvider,
+		#[AutowiredParameter(ref: '%exceptions.uncheckedExceptionRegexes%')]
 		private array $uncheckedExceptionRegexes,
+		#[AutowiredParameter(ref: '%exceptions.uncheckedExceptionClasses%')]
 		private array $uncheckedExceptionClasses,
+		#[AutowiredParameter(ref: '%exceptions.checkedExceptionRegexes%')]
 		private array $checkedExceptionRegexes,
+		#[AutowiredParameter(ref: '%exceptions.checkedExceptionClasses%')]
 		private array $checkedExceptionClasses,
 	)
 	{
@@ -47,11 +56,7 @@ class DefaultExceptionTypeResolver implements ExceptionTypeResolver
 
 		$classReflection = $this->reflectionProvider->getClass($className);
 		foreach ($this->uncheckedExceptionClasses as $uncheckedExceptionClass) {
-			if ($classReflection->getName() === $uncheckedExceptionClass) {
-				return false;
-			}
-
-			if (!$classReflection->isSubclassOf($uncheckedExceptionClass)) {
+			if (!$classReflection->is($uncheckedExceptionClass)) {
 				continue;
 			}
 
@@ -81,11 +86,7 @@ class DefaultExceptionTypeResolver implements ExceptionTypeResolver
 
 		$classReflection = $this->reflectionProvider->getClass($className);
 		foreach ($this->checkedExceptionClasses as $checkedExceptionClass) {
-			if ($classReflection->getName() === $checkedExceptionClass) {
-				return true;
-			}
-
-			if (!$classReflection->isSubclassOf($checkedExceptionClass)) {
+			if (!$classReflection->is($checkedExceptionClass)) {
 				continue;
 			}
 

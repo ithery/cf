@@ -2,29 +2,43 @@
 
 namespace PHPStan\Type\Php;
 
+use Nette\Utils\RegexpException;
+use Nette\Utils\Strings;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Type\Accessory\AccessoryArrayListType;
+use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
+use PHPStan\Type\Accessory\NonEmptyArrayType;
 use PHPStan\Type\ArrayType;
 use PHPStan\Type\BitwiseFlagHelper;
-use PHPStan\Type\Constant\ConstantArrayType;
+use PHPStan\Type\Constant\ConstantArrayTypeBuilder;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantIntegerType;
+use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
+use PHPStan\Type\ErrorType;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntegerType;
+use PHPStan\Type\IntersectionType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
+use PHPStan\Type\UnionType;
+use function count;
+use function is_array;
+use function is_int;
+use function is_numeric;
+use function preg_split;
 use function strtolower;
 
-class PregSplitDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class PregSplitDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function __construct(
-		private BitwiseFlagHelper $bitwiseFlagAnalyser,
+		private readonly BitwiseFlagHelper $bitwiseFlagAnalyser,
 	)
 	{
 	}
@@ -34,19 +48,163 @@ class PregSplitDynamicReturnTypeExtension implements DynamicFunctionReturnTypeEx
 		return strtolower($functionReflection->getName()) === 'preg_split';
 	}
 
-	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
+	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		$flagsArg = $functionCall->getArgs()[3] ?? null;
-
-		if ($flagsArg !== null && $this->bitwiseFlagAnalyser->bitwiseOrContainsConstant($flagsArg->value, $scope, 'PREG_SPLIT_OFFSET_CAPTURE')->yes()) {
-			$type = new ArrayType(
-				new IntegerType(),
-				new ConstantArrayType([new ConstantIntegerType(0), new ConstantIntegerType(1)], [new StringType(), IntegerRangeType::fromInterval(0, null)], [2]),
-			);
-			return TypeCombinator::union(AccessoryArrayListType::intersectWith($type), new ConstantBooleanType(false));
+		$args = $functionCall->getArgs();
+		if (count($args) < 2) {
+			return null;
+		}
+		$patternArg = $args[0];
+		$subjectArg = $args[1];
+		$limitArg = $args[2] ?? null;
+		$capturesOffset = $args[3] ?? null;
+		$patternType = $scope->getType($patternArg->value);
+		$patternConstantTypes = $patternType->getConstantStrings();
+		if (count($patternConstantTypes) > 0) {
+			foreach ($patternConstantTypes as $patternConstantType) {
+				if ($this->isValidPattern($patternConstantType->getValue()) === false) {
+					return new ErrorType();
+				}
+			}
 		}
 
-		return ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+		$subjectType = $scope->getType($subjectArg->value);
+		$subjectConstantTypes = $subjectType->getConstantStrings();
+
+		$limits = [];
+		if ($limitArg === null) {
+			$limits = [-1];
+		} else {
+			$limitType = $scope->getType($limitArg->value);
+			if (!$this->isIntOrStringValue($limitType)) {
+				return new ErrorType();
+			}
+			foreach ($limitType->getConstantScalarValues() as $limit) {
+				if (!is_int($limit) && !is_numeric($limit)) {
+					return new ErrorType();
+				}
+				$limits[] = $limit;
+			}
+		}
+
+		$flags = [];
+		if ($capturesOffset === null) {
+			$flags = [0];
+		} else {
+			$flagType = $scope->getType($capturesOffset->value);
+			if (!$this->isIntOrStringValue($flagType)) {
+				return new ErrorType();
+			}
+			foreach ($flagType->getConstantScalarValues() as $flag) {
+				if (!is_int($flag) && !is_numeric($flag)) {
+					return new ErrorType();
+				}
+				$flags[] = $flag;
+			}
+		}
+
+		if ($this->isPatternOrSubjectEmpty($patternConstantTypes, $subjectConstantTypes)) {
+			if ($capturesOffset !== null
+				&& $this->bitwiseFlagAnalyser->bitwiseOrContainsConstant($capturesOffset->value, $scope, 'PREG_SPLIT_NO_EMPTY')->yes()) {
+				$returnStringType = new IntersectionType([
+					new StringType(),
+					new AccessoryNonEmptyStringType(),
+				]);
+			} else {
+				$returnStringType = new StringType();
+			}
+
+			$arrayTypeBuilder = ConstantArrayTypeBuilder::createEmpty();
+			$arrayTypeBuilder->setOffsetValueType(
+				new ConstantIntegerType(0),
+				$returnStringType,
+			);
+			$arrayTypeBuilder->setOffsetValueType(
+				new ConstantIntegerType(1),
+				IntegerRangeType::fromInterval(0, null),
+			);
+			$capturedArrayType = $arrayTypeBuilder->getArray();
+
+			$returnInternalValueType = $returnStringType;
+			if ($capturesOffset !== null) {
+				$flagState = $this->bitwiseFlagAnalyser->bitwiseOrContainsConstant($capturesOffset->value, $scope, 'PREG_SPLIT_OFFSET_CAPTURE');
+				if ($flagState->yes()) {
+					$capturedArrayListType = new IntersectionType([
+						new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), $capturedArrayType),
+						new AccessoryArrayListType(),
+					]);
+
+					if ($subjectType->isNonEmptyString()->yes()) {
+						$capturedArrayListType = TypeCombinator::intersect($capturedArrayListType, new NonEmptyArrayType());
+					}
+					return new UnionType([$capturedArrayListType, new ConstantBooleanType(false)]);
+				}
+				if ($flagState->maybe()) {
+					$returnInternalValueType = new UnionType([new StringType(), $capturedArrayType]);
+				}
+			}
+
+			$returnListType = new IntersectionType([new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), $returnInternalValueType), new AccessoryArrayListType()]);
+			if ($subjectType->isNonEmptyString()->yes()) {
+				$returnListType = new IntersectionType([new NonEmptyArrayType(), ...$returnListType->getTypes()]);
+			}
+
+			return new UnionType([$returnListType, new ConstantBooleanType(false)]);
+		}
+
+		$resultTypes = [];
+		foreach ($patternConstantTypes as $patternConstantType) {
+			foreach ($subjectConstantTypes as $subjectConstantType) {
+				foreach ($limits as $limit) {
+					foreach ($flags as $flag) {
+						$result = @preg_split($patternConstantType->getValue(), $subjectConstantType->getValue(), (int) $limit, (int) $flag);
+						if ($result === false) {
+							return new ErrorType();
+						}
+						$constantArray = ConstantArrayTypeBuilder::createEmpty();
+						foreach ($result as $key => $value) {
+							if (is_array($value)) {
+								$valueConstantArray = ConstantArrayTypeBuilder::createEmpty();
+								$valueConstantArray->setOffsetValueType(new ConstantIntegerType(0), new ConstantStringType($value[0]));
+								$valueConstantArray->setOffsetValueType(new ConstantIntegerType(1), new ConstantIntegerType($value[1]));
+								$returnInternalValueType = $valueConstantArray->getArray();
+							} else {
+								$returnInternalValueType = new ConstantStringType($value);
+							}
+							$constantArray->setOffsetValueType(new ConstantIntegerType($key), $returnInternalValueType);
+						}
+
+						$resultTypes[] = $constantArray->getArray();
+					}
+				}
+			}
+		}
+		$resultTypes[] = new ConstantBooleanType(false);
+		return TypeCombinator::union(...$resultTypes);
+	}
+
+	/**
+	 * @param ConstantStringType[] $patternConstantArray
+	 * @param ConstantStringType[] $subjectConstantArray
+	 */
+	private function isPatternOrSubjectEmpty(array $patternConstantArray, array $subjectConstantArray): bool
+	{
+		return count($patternConstantArray) === 0 || count($subjectConstantArray) === 0;
+	}
+
+	private function isValidPattern(string $pattern): bool
+	{
+		try {
+			Strings::match('', $pattern);
+		} catch (RegexpException) {
+			return false;
+		}
+		return true;
+	}
+
+	private function isIntOrStringValue(Type $type): bool
+	{
+		return (new UnionType([new IntegerType(), new StringType()]))->isSuperTypeOf($type)->yes();
 	}
 
 }

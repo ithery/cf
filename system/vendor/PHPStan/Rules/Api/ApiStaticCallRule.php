@@ -4,18 +4,20 @@ namespace PHPStan\Rules\Api;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function count;
 use function sprintf;
-use function strpos;
+use function str_contains;
 
 /**
  * @implements Rule<Node\Expr\StaticCall>
  */
-class ApiStaticCallRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ApiStaticCallRule implements Rule
 {
 
 	public function __construct(
@@ -65,7 +67,7 @@ class ApiStaticCallRule implements Rule
 			'Calling %s::%s() is not covered by backward compatibility promise. The method might change in a minor PHPStan version.',
 			$declaringClass->getDisplayName(),
 			$methodReflection->getName(),
-		))->tip(sprintf(
+		))->identifier('phpstanApi.method')->tip(sprintf(
 			"If you think it should be covered by backward compatibility promise, open a discussion:\n   %s\n\n   See also:\n   https://phpstan.org/developing-extensions/backward-compatibility-promise",
 			'https://github.com/phpstan/phpstan/discussions',
 		))->build();
@@ -76,12 +78,14 @@ class ApiStaticCallRule implements Rule
 	private function isCovered(MethodReflection $methodReflection): bool
 	{
 		$declaringClass = $methodReflection->getDeclaringClass();
-		$classDocBlock = $declaringClass->getResolvedPhpDoc();
-		if ($methodReflection->getName() !== '__construct' && $classDocBlock !== null) {
-			foreach ($classDocBlock->getPhpDocNodes() as $phpDocNode) {
-				$apiTags = $phpDocNode->getTagsByName('@api');
-				if (count($apiTags) > 0) {
-					return true;
+		if ($methodReflection->getName() !== '__construct') {
+			$classDocBlock = $declaringClass->getResolvedPhpDoc();
+			if ($classDocBlock !== null) {
+				foreach ($classDocBlock->getPhpDocNodes() as $phpDocNode) {
+					$apiTags = $phpDocNode->getTagsByName('@api');
+					if (count($apiTags) > 0) {
+						return true;
+					}
 				}
 			}
 		}
@@ -91,7 +95,7 @@ class ApiStaticCallRule implements Rule
 			return false;
 		}
 
-		return strpos($methodDocComment, '@api') !== false;
+		return str_contains($methodDocComment, '@api');
 	}
 
 }

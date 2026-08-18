@@ -2,9 +2,11 @@
 
 namespace PHPStan\PhpDoc;
 
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\DependencyInjection\Container;
 
-class LazyTypeNodeResolverExtensionRegistryProvider implements TypeNodeResolverExtensionRegistryProvider
+#[AutowiredService(as: TypeNodeResolverExtensionRegistryProvider::class)]
+final class LazyTypeNodeResolverExtensionRegistryProvider implements TypeNodeResolverExtensionRegistryProvider
 {
 
 	private ?TypeNodeResolverExtensionRegistry $registry = null;
@@ -15,14 +17,10 @@ class LazyTypeNodeResolverExtensionRegistryProvider implements TypeNodeResolverE
 
 	public function getRegistry(): TypeNodeResolverExtensionRegistry
 	{
-		if ($this->registry === null) {
-			$this->registry = new TypeNodeResolverExtensionAwareRegistry(
-				$this->container->getByType(TypeNodeResolver::class),
-				$this->container->getServicesByTag(TypeNodeResolverExtension::EXTENSION_TAG),
-			);
-		}
-
-		return $this->registry;
+		return $this->registry ??= new TypeNodeResolverExtensionAwareRegistry(
+			$this->container->getByType(TypeNodeResolver::class),
+			$this->container->getExtensionsCollection(TypeNodeResolverExtension::class)->getAll(),
+		);
 	}
 
 }

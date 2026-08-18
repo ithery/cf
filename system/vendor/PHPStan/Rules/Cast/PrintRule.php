@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Cast;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
@@ -15,7 +16,8 @@ use function sprintf;
 /**
  * @implements Rule<Node\Expr\Print_>
  */
-class PrintRule implements Rule
+#[RegisteredRule(level: 2)]
+final class PrintRule implements Rule
 {
 
 	public function __construct(private RuleLevelHelper $ruleLevelHelper)
@@ -42,7 +44,7 @@ class PrintRule implements Rule
 			return [RuleErrorBuilder::message(sprintf(
 				'Parameter %s of print cannot be converted to string.',
 				$typeResult->getType()->describe(VerbosityLevel::value()),
-			))->line($node->expr->getLine())->build()];
+			))->identifier('print.nonString')->line($node->expr->getStartLine())->build()];
 		}
 
 		return [];

@@ -3,23 +3,25 @@
 namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Name\FullyQualified;
 use PHPStan\Analyser\Scope;
 use PHPStan\Analyser\SpecifiedTypes;
 use PHPStan\Analyser\TypeSpecifier;
 use PHPStan\Analyser\TypeSpecifierAwareExtension;
 use PHPStan\Analyser\TypeSpecifierContext;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\Accessory\HasMethodType;
 use PHPStan\Type\ClassStringType;
-use PHPStan\Type\Constant\ConstantStringType;
+use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\FunctionTypeSpecifyingExtension;
 use PHPStan\Type\IntersectionType;
-use PHPStan\Type\ObjectType;
 use PHPStan\Type\ObjectWithoutClassType;
 use PHPStan\Type\UnionType;
 use function count;
 
-class MethodExistsTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
+#[AutowiredService]
+final class MethodExistsTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
 {
 
 	private TypeSpecifier $typeSpecifier;
@@ -36,7 +38,7 @@ class MethodExistsTypeSpecifyingExtension implements FunctionTypeSpecifyingExten
 	): bool
 	{
 		return $functionReflection->getName() === 'method_exists'
-			&& $context->truthy()
+			&& $context->true()
 			&& count($node->getArgs()) >= 2;
 	}
 
@@ -47,20 +49,46 @@ class MethodExistsTypeSpecifyingExtension implements FunctionTypeSpecifyingExten
 		TypeSpecifierContext $context,
 	): SpecifiedTypes
 	{
-		$objectType = $scope->getType($node->getArgs()[0]->value);
-		if (!$objectType instanceof ObjectType) {
-			if ($objectType->isString()->yes()) {
-				return new SpecifiedTypes([], []);
-			}
+		$args = $node->getArgs();
+		$methodNameType = $scope->getType($args[1]->value);
+		$constantStringTypes = $methodNameType->getConstantStrings();
+		// method_exists() will only assure one of the methods to exist.
+		if (count($constantStringTypes) !== 1) {
+			return $this->createFuncCallSpec($node, $context, $scope);
 		}
+		$methodNameType = $constantStringTypes[0];
 
-		$methodNameType = $scope->getType($node->getArgs()[1]->value);
-		if (!$methodNameType instanceof ConstantStringType) {
+		$objectOrStringType = $scope->getType($args[0]->value);
+		if ($objectOrStringType->isString()->yes()) {
+			if ($objectOrStringType->isClassString()->yes()) {
+				foreach ($objectOrStringType->getClassStringObjectType()->getObjectClassReflections() as $classReflection) {
+					if ($classReflection->hasMethod($methodNameType->getValue()) && !$classReflection->hasNativeMethod($methodNameType->getValue())) {
+						return $this->createFuncCallSpec($node, $context, $scope);
+					}
+				}
+
+				return $this->typeSpecifier->create(
+					$args[0]->value,
+					new IntersectionType([
+						$objectOrStringType,
+						new HasMethodType($methodNameType->getValue()),
+					]),
+					$context,
+					$scope,
+				);
+			}
+
 			return new SpecifiedTypes([], []);
 		}
 
+		foreach ($objectOrStringType->getObjectClassReflections() as $classReflection) {
+			if ($classReflection->hasMethod($methodNameType->getValue()) && !$classReflection->hasNativeMethod($methodNameType->getValue())) {
+				return $this->createFuncCallSpec($node, $context, $scope);
+			}
+		}
+
 		return $this->typeSpecifier->create(
-			$node->getArgs()[0]->value,
+			$args[0]->value,
 			new UnionType([
 				new IntersectionType([
 					new ObjectWithoutClassType(),
@@ -69,7 +97,16 @@ class MethodExistsTypeSpecifyingExtension implements FunctionTypeSpecifyingExten
 				new ClassStringType(),
 			]),
 			$context,
-			false,
+			$scope,
+		);
+	}
+
+	private function createFuncCallSpec(FuncCall $node, TypeSpecifierContext $context, Scope $scope): SpecifiedTypes
+	{
+		return $this->typeSpecifier->create(
+			new FuncCall(new FullyQualified('method_exists'), $node->getRawArgs()),
+			new ConstantBooleanType(true),
+			$context,
 			$scope,
 		);
 	}

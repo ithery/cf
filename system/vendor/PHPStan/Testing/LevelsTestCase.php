@@ -8,6 +8,7 @@ use PHPStan\File\FileHelper;
 use PHPStan\File\FileWriter;
 use PHPStan\ShouldNotHappenException;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function array_merge;
 use function count;
@@ -16,6 +17,7 @@ use function escapeshellcmd;
 use function exec;
 use function implode;
 use function method_exists;
+use function putenv;
 use function range;
 use function sprintf;
 use function unlink;
@@ -29,7 +31,7 @@ abstract class LevelsTestCase extends TestCase
 	/**
 	 * @return array<array<string>>
 	 */
-	abstract public function dataTopics(): array;
+	abstract public static function dataTopics(): array;
 
 	abstract public function getDataPath(): string;
 
@@ -47,9 +49,7 @@ abstract class LevelsTestCase extends TestCase
 		return true;
 	}
 
-	/**
-	 * @dataProvider dataTopics
-	 */
+	#[DataProvider('dataTopics')]
 	public function testLevels(
 		string $topic,
 	): void
@@ -68,7 +68,9 @@ abstract class LevelsTestCase extends TestCase
 			throw new ShouldNotHappenException('Could not clear result cache: ' . implode("\n", $clearResultCacheOutputLines));
 		}
 
-		foreach (range(0, 9) as $level) {
+		putenv('__PHPSTAN_FORCE_VALIDATE_STUB_FILES=1');
+
+		foreach (range(0, 10) as $level) {
 			unset($outputLines);
 			exec(sprintf('%s %s analyse --no-progress --error-format=prettyJson --level=%d %s %s %s', escapeshellarg(PHP_BINARY), $command, $level, $configPath !== null ? '--configuration ' . escapeshellarg($configPath) : '', $this->shouldAutoloadAnalysedFile() ? sprintf('--autoload-file %s', escapeshellarg($file)) : '', escapeshellarg($file)), $outputLines);
 
@@ -111,6 +113,7 @@ abstract class LevelsTestCase extends TestCase
 				}
 
 				unset($message['tip']);
+				unset($message['identifier']);
 
 				$messages[] = $message;
 			}
@@ -168,7 +171,7 @@ abstract class LevelsTestCase extends TestCase
 	{
 		if (count($expectedMessages) === 0) {
 			try {
-				self::assertFileDoesNotExist($expectedJsonFile);
+				self::ourCustomAssertFileDoesNotExist($expectedJsonFile);
 				return null;
 			} catch (AssertionFailedError $e) {
 				unlink($expectedJsonFile);
@@ -191,8 +194,9 @@ abstract class LevelsTestCase extends TestCase
 		return null;
 	}
 
-	public static function assertFileDoesNotExist(string $filename, string $message = ''): void
+	public static function ourCustomAssertFileDoesNotExist(string $filename, string $message = ''): void
 	{
+		// this method is no longer called assertFileDoesNotExist because this method is final in PHPUnit 10
 		if (!method_exists(parent::class, 'assertFileDoesNotExist')) {
 			parent::assertFileNotExists($filename, $message);
 			return;

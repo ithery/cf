@@ -3,14 +3,16 @@
 namespace PHPStan\Rules\Properties;
 
 use PhpParser\Node;
+use PhpParser\Node\Attribute;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\ClassPropertyNode;
+use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\Php\PhpPropertyReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\ShouldNotHappenException;
-use PHPStan\Type\ParserNodeTypeToPHPStanType;
 use PHPStan\Type\VerbosityLevel;
 use function array_merge;
 use function count;
@@ -19,12 +21,20 @@ use function sprintf;
 /**
  * @implements Rule<ClassPropertyNode>
  */
-class OverridingPropertyRule implements Rule
+#[RegisteredRule(level: 0)]
+final class OverridingPropertyRule implements Rule
 {
 
 	public function __construct(
+		private PhpVersion $phpVersion,
+		#[AutowiredParameter]
 		private bool $checkPhpDocMethodSignatures,
+		#[AutowiredParameter(ref: '%reportMaybesInPropertyPhpDocTypes%')]
 		private bool $reportMaybes,
+		#[AutowiredParameter]
+		private ?bool $checkMissingOverridePropertyAttribute,
+		#[AutowiredParameter]
+		private bool $checkMissingOverrideMethodAttribute,
 	)
 	{
 	}
@@ -36,17 +46,69 @@ class OverridingPropertyRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if (!$scope->isInClass()) {
-			throw new ShouldNotHappenException();
-		}
-
-		$classReflection = $scope->getClassReflection();
+		$classReflection = $node->getClassReflection();
 		$prototype = $this->findPrototype($classReflection, $node->getName());
 		if ($prototype === null) {
+			if ($this->hasOverrideAttribute($node->getAttrGroups())) {
+				$originalNode = $node->getOriginalNode();
+				if ($originalNode instanceof Node\Stmt\Property) {
+					/** @var Node\Stmt\Property $originalNode */
+					$originalNode = $originalNode->getAttribute('originalPropertyStmt');
+				}
+
+				return [
+					RuleErrorBuilder::message(sprintf(
+						'Property %s::$%s has #[\Override] attribute but does not override any property.',
+						$node->getClassReflection()->getDisplayName(),
+						$node->getName(),
+					))
+						->nonIgnorable()
+						->identifier('property.override')
+						->fixNode($originalNode, function ($property) {
+							$property->attrGroups = $this->filterOverrideAttribute($property->attrGroups);
+							return $property;
+						})
+						->build(),
+				];
+			}
 			return [];
 		}
 
 		$errors = [];
+		if (
+			(
+				$this->checkMissingOverridePropertyAttribute === true
+				|| (
+					$this->checkMissingOverridePropertyAttribute === null
+					&& $this->checkMissingOverrideMethodAttribute
+					&& $this->phpVersion->supportsOverrideAttributeOnProperty()
+				)
+			)
+			&& !$scope->isInTrait()
+			&& !$this->hasOverrideAttribute($node->getAttrGroups())
+		) {
+			$originalNode = $node->getOriginalNode();
+			if ($originalNode instanceof Node\Stmt\Property) {
+				/** @var Node\Stmt\Property $originalNode */
+				$originalNode = $originalNode->getAttribute('originalPropertyStmt');
+			}
+			$errors[] = RuleErrorBuilder::message(sprintf(
+				'Property %s::$%s overrides property %s::$%s but is missing the #[\Override] attribute.',
+				$node->getClassReflection()->getDisplayName(),
+				$node->getName(),
+				$prototype->getDeclaringClass()->getDisplayName(),
+				$prototype->getName(),
+			))
+				->identifier('property.missingOverride')
+				->fixNode($originalNode, static function ($property) {
+					$property->attrGroups[] = new Node\AttributeGroup([
+						new Attribute(new Node\Name\FullyQualified('Override')),
+					]);
+
+					return $property;
+				})
+				->build();
+		}
 		if ($prototype->isStatic()) {
 			if (!$node->isStatic()) {
 				$errors[] = RuleErrorBuilder::message(sprintf(
@@ -55,7 +117,7 @@ class OverridingPropertyRule implements Rule
 					$node->getName(),
 					$prototype->getDeclaringClass()->getDisplayName(),
 					$node->getName(),
-				))->nonIgnorable()->build();
+				))->identifier('property.nonStatic')->nonIgnorable()->build();
 			}
 		} elseif ($node->isStatic()) {
 			$errors[] = RuleErrorBuilder::message(sprintf(
@@ -64,7 +126,7 @@ class OverridingPropertyRule implements Rule
 				$node->getName(),
 				$prototype->getDeclaringClass()->getDisplayName(),
 				$node->getName(),
-			))->nonIgnorable()->build();
+			))->identifier('property.static')->nonIgnorable()->build();
 		}
 
 		if ($prototype->isReadOnly()) {
@@ -75,16 +137,64 @@ class OverridingPropertyRule implements Rule
 					$node->getName(),
 					$prototype->getDeclaringClass()->getDisplayName(),
 					$node->getName(),
-				))->nonIgnorable()->build();
+				))->identifier('property.readWrite')->nonIgnorable()->build();
 			}
 		} elseif ($node->isReadOnly()) {
-			$errors[] = RuleErrorBuilder::message(sprintf(
-				'Readonly property %s::$%s overrides readwrite property %s::$%s.',
-				$classReflection->getDisplayName(),
-				$node->getName(),
-				$prototype->getDeclaringClass()->getDisplayName(),
-				$node->getName(),
-			))->nonIgnorable()->build();
+			if (
+				!$this->phpVersion->supportsPropertyHooks()
+				|| $prototype->isWritable()
+			) {
+				$errors[] = RuleErrorBuilder::message(sprintf(
+					'Readonly property %s::$%s overrides readwrite property %s::$%s.',
+					$classReflection->getDisplayName(),
+					$node->getName(),
+					$prototype->getDeclaringClass()->getDisplayName(),
+					$node->getName(),
+				))->identifier('property.readOnly')->nonIgnorable()->build();
+			}
+		}
+
+		$propertyReflection = $classReflection->getNativeProperty($node->getName());
+		if ($this->phpVersion->supportsPropertyHooks()) {
+			if ($prototype->isReadable()) {
+				if (!$propertyReflection->isReadable()) {
+					$errors[] = RuleErrorBuilder::message(sprintf(
+						'Property %s::$%s overriding readable property %s::$%s also has to be readable.',
+						$classReflection->getDisplayName(),
+						$node->getName(),
+						$prototype->getDeclaringClass()->getDisplayName(),
+						$node->getName(),
+					))->identifier('property.notReadable')->nonIgnorable()->build();
+				}
+			}
+			if ($prototype->isWritable()) {
+				if (!$propertyReflection->isWritable()) {
+					$errors[] = RuleErrorBuilder::message(sprintf(
+						'Property %s::$%s overriding writable property %s::$%s also has to be writable.',
+						$classReflection->getDisplayName(),
+						$node->getName(),
+						$prototype->getDeclaringClass()->getDisplayName(),
+						$node->getName(),
+					))->identifier('property.notWritable')->nonIgnorable()->build();
+				}
+			}
+			if ($node->isAbstract() && $prototype->isAbstract()->no()) {
+				foreach (['get', 'set'] as $hookType) {
+					if (!$propertyReflection->hasHook($hookType) || !$prototype->hasHook($hookType)) {
+						continue;
+					}
+					$errors[] = RuleErrorBuilder::message(sprintf(
+						'Cannot make non-abstract method %s::$%s::%s() abstract in class %s.',
+						$prototype->getDeclaringClass()->getDisplayName(true),
+						$node->getName(),
+						$hookType,
+						$classReflection->getDisplayName(),
+					))
+						->nonIgnorable()
+						->identifier('property.abstractOverridingNonAbstractHook')
+						->build();
+				}
+			}
 		}
 
 		if ($prototype->isPublic()) {
@@ -96,7 +206,7 @@ class OverridingPropertyRule implements Rule
 					$node->getName(),
 					$prototype->getDeclaringClass()->getDisplayName(),
 					$node->getName(),
-				))->nonIgnorable()->build();
+				))->identifier('property.visibility')->nonIgnorable()->build();
 			}
 		} elseif ($node->isPrivate()) {
 			$errors[] = RuleErrorBuilder::message(sprintf(
@@ -105,12 +215,34 @@ class OverridingPropertyRule implements Rule
 				$node->getName(),
 				$prototype->getDeclaringClass()->getDisplayName(),
 				$node->getName(),
-			))->nonIgnorable()->build();
+			))->identifier('property.visibility')->nonIgnorable()->build();
+		}
+
+		if ($prototype->isFinalByKeyword()->yes()) {
+			$errors[] = RuleErrorBuilder::message(sprintf(
+				'Property %s::$%s overrides final property %s::$%s.',
+				$classReflection->getDisplayName(),
+				$node->getName(),
+				$prototype->getDeclaringClass()->getDisplayName(),
+				$node->getName(),
+			))->identifier('property.parentPropertyFinal')
+				->nonIgnorable()
+				->build();
+		} elseif ($prototype->isFinal()->yes()) {
+			$errors[] = RuleErrorBuilder::message(sprintf(
+				'Property %s::$%s overrides @final property %s::$%s.',
+				$classReflection->getDisplayName(),
+				$node->getName(),
+				$prototype->getDeclaringClass()->getDisplayName(),
+				$node->getName(),
+			))->identifier('property.parentPropertyFinalByPhpDoc')
+				->build();
 		}
 
 		$typeErrors = [];
+		$nativeType = $node->getNativeType();
 		if ($prototype->hasNativeType()) {
-			if ($node->getNativeType() === null) {
+			if ($nativeType === null) {
 				$typeErrors[] = RuleErrorBuilder::message(sprintf(
 					'Property %s::$%s overriding property %s::$%s (%s) should also have native type %s.',
 					$classReflection->getDisplayName(),
@@ -119,30 +251,59 @@ class OverridingPropertyRule implements Rule
 					$node->getName(),
 					$prototype->getNativeType()->describe(VerbosityLevel::typeOnly()),
 					$prototype->getNativeType()->describe(VerbosityLevel::typeOnly()),
-				))->nonIgnorable()->build();
+				))->identifier('property.missingNativeType')->nonIgnorable()->build();
 			} else {
-				$nativeType = ParserNodeTypeToPHPStanType::resolve($node->getNativeType(), $scope->getClassReflection());
 				if (!$prototype->getNativeType()->equals($nativeType)) {
-					$typeErrors[] = RuleErrorBuilder::message(sprintf(
-						'Type %s of property %s::$%s is not the same as type %s of overridden property %s::$%s.',
-						$nativeType->describe(VerbosityLevel::typeOnly()),
-						$classReflection->getDisplayName(),
-						$node->getName(),
-						$prototype->getNativeType()->describe(VerbosityLevel::typeOnly()),
-						$prototype->getDeclaringClass()->getDisplayName(),
-						$node->getName(),
-					))->nonIgnorable()->build();
+					if (
+						$this->phpVersion->supportsPropertyHooks()
+						&& ($prototype->isVirtual()->yes() || $prototype->isAbstract()->yes())
+						&& (!$prototype->isReadable() || !$prototype->isWritable())
+					) {
+						if (!$prototype->isReadable()) {
+							if (!$nativeType->isSuperTypeOf($prototype->getNativeType())->yes()) {
+								$typeErrors[] = RuleErrorBuilder::message(sprintf(
+									'Type %s of property %s::$%s is not contravariant with type %s of overridden property %s::$%s.',
+									$nativeType->describe(VerbosityLevel::typeOnly()),
+									$classReflection->getDisplayName(),
+									$node->getName(),
+									$prototype->getNativeType()->describe(VerbosityLevel::typeOnly()),
+									$prototype->getDeclaringClass()->getDisplayName(),
+									$node->getName(),
+								))->identifier('property.nativeType')->nonIgnorable()->build();
+							}
+						} elseif (!$prototype->getNativeType()->isSuperTypeOf($nativeType)->yes()) {
+							$typeErrors[] = RuleErrorBuilder::message(sprintf(
+								'Type %s of property %s::$%s is not covariant with type %s of overridden property %s::$%s.',
+								$nativeType->describe(VerbosityLevel::typeOnly()),
+								$classReflection->getDisplayName(),
+								$node->getName(),
+								$prototype->getNativeType()->describe(VerbosityLevel::typeOnly()),
+								$prototype->getDeclaringClass()->getDisplayName(),
+								$node->getName(),
+							))->identifier('property.nativeType')->nonIgnorable()->build();
+						}
+					} else {
+						$typeErrors[] = RuleErrorBuilder::message(sprintf(
+							'Type %s of property %s::$%s is not the same as type %s of overridden property %s::$%s.',
+							$nativeType->describe(VerbosityLevel::typeOnly()),
+							$classReflection->getDisplayName(),
+							$node->getName(),
+							$prototype->getNativeType()->describe(VerbosityLevel::typeOnly()),
+							$prototype->getDeclaringClass()->getDisplayName(),
+							$node->getName(),
+						))->identifier('property.nativeType')->nonIgnorable()->build();
+					}
 				}
 			}
-		} elseif ($node->getNativeType() !== null) {
+		} elseif ($nativeType !== null) {
 			$typeErrors[] = RuleErrorBuilder::message(sprintf(
 				'Property %s::$%s (%s) overriding property %s::$%s should not have a native type.',
 				$classReflection->getDisplayName(),
 				$node->getName(),
-				ParserNodeTypeToPHPStanType::resolve($node->getNativeType(), $scope->getClassReflection())->describe(VerbosityLevel::typeOnly()),
+				$nativeType->describe(VerbosityLevel::typeOnly()),
 				$prototype->getDeclaringClass()->getDisplayName(),
 				$node->getName(),
-			))->nonIgnorable()->build();
+			))->identifier('property.extraNativeType')->nonIgnorable()->build();
 		}
 
 		$errors = array_merge($errors, $typeErrors);
@@ -155,12 +316,50 @@ class OverridingPropertyRule implements Rule
 			return $errors;
 		}
 
-		$propertyReflection = $classReflection->getNativeProperty($node->getName());
 		if ($prototype->getReadableType()->equals($propertyReflection->getReadableType())) {
 			return $errors;
 		}
 
 		$verbosity = VerbosityLevel::getRecommendedLevelByType($prototype->getReadableType(), $propertyReflection->getReadableType());
+
+		if (
+			$this->phpVersion->supportsPropertyHooks()
+			&& ($prototype->isVirtual()->yes() || $prototype->isAbstract()->yes())
+			&& (!$prototype->isReadable() || !$prototype->isWritable())
+		) {
+			if (!$prototype->isReadable()) {
+				if (!$propertyReflection->getReadableType()->isSuperTypeOf($prototype->getReadableType())->yes()) {
+					$errors[] = RuleErrorBuilder::message(sprintf(
+						'PHPDoc type %s of property %s::$%s is not contravariant with PHPDoc type %s of overridden property %s::$%s.',
+						$propertyReflection->getReadableType()->describe($verbosity),
+						$classReflection->getDisplayName(),
+						$node->getName(),
+						$prototype->getReadableType()->describe($verbosity),
+						$prototype->getDeclaringClass()->getDisplayName(),
+						$node->getName(),
+					))->identifier('property.phpDocType')->tip(sprintf(
+						"You can fix 3rd party PHPDoc types with stub files:\n   %s",
+						'<fg=cyan>https://phpstan.org/user-guide/stub-files</>',
+					))->build();
+				}
+			} elseif (!$prototype->getReadableType()->isSuperTypeOf($propertyReflection->getReadableType())->yes()) {
+				$errors[] = RuleErrorBuilder::message(sprintf(
+					'PHPDoc type %s of property %s::$%s is not covariant with PHPDoc type %s of overridden property %s::$%s.',
+					$propertyReflection->getReadableType()->describe($verbosity),
+					$classReflection->getDisplayName(),
+					$node->getName(),
+					$prototype->getReadableType()->describe($verbosity),
+					$prototype->getDeclaringClass()->getDisplayName(),
+					$node->getName(),
+				))->identifier('property.phpDocType')->tip(sprintf(
+					"You can fix 3rd party PHPDoc types with stub files:\n   %s",
+					'<fg=cyan>https://phpstan.org/user-guide/stub-files</>',
+				))->build();
+			}
+
+			return $errors;
+		}
+
 		$isSuperType = $prototype->getReadableType()->isSuperTypeOf($propertyReflection->getReadableType());
 		$canBeTurnedOffError = RuleErrorBuilder::message(sprintf(
 			'PHPDoc type %s of property %s::$%s is not the same as PHPDoc type %s of overridden property %s::$%s.',
@@ -170,7 +369,7 @@ class OverridingPropertyRule implements Rule
 			$prototype->getReadableType()->describe($verbosity),
 			$prototype->getDeclaringClass()->getDisplayName(),
 			$node->getName(),
-		))->tip(sprintf(
+		))->identifier('property.phpDocType')->tip(sprintf(
 			"You can fix 3rd party PHPDoc types with stub files:\n   %s\n   This error can be turned off by setting\n   %s",
 			'<fg=cyan>https://phpstan.org/user-guide/stub-files</>',
 			'<fg=cyan>reportMaybesInPropertyPhpDocTypes: false</> in your <fg=cyan>%configurationFile%</>.',
@@ -184,7 +383,7 @@ class OverridingPropertyRule implements Rule
 			$prototype->getReadableType()->describe($verbosity),
 			$prototype->getDeclaringClass()->getDisplayName(),
 			$node->getName(),
-		))->tip(sprintf(
+		))->identifier('property.phpDocType')->tip(sprintf(
 			"You can fix 3rd party PHPDoc types with stub files:\n   %s",
 			'<fg=cyan>https://phpstan.org/user-guide/stub-files</>',
 		))->build();
@@ -207,19 +406,72 @@ class OverridingPropertyRule implements Rule
 	{
 		$parentClass = $classReflection->getParentClass();
 		if ($parentClass === null) {
-			return null;
+			return $this->findPrototypeInInterfaces($classReflection, $propertyName);
 		}
 
 		if (!$parentClass->hasNativeProperty($propertyName)) {
-			return null;
+			return $this->findPrototypeInInterfaces($classReflection, $propertyName);
 		}
 
 		$property = $parentClass->getNativeProperty($propertyName);
 		if ($property->isPrivate()) {
-			return null;
+			return $this->findPrototypeInInterfaces($classReflection, $propertyName);
 		}
 
 		return $property;
+	}
+
+	private function findPrototypeInInterfaces(ClassReflection $classReflection, string $propertyName): ?PhpPropertyReflection
+	{
+		foreach ($classReflection->getInterfaces() as $interface) {
+			if (!$interface->hasNativeProperty($propertyName)) {
+				continue;
+			}
+
+			return $interface->getNativeProperty($propertyName);
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param Node\AttributeGroup[] $attrGroups
+	 * @return Node\AttributeGroup[]
+	 */
+	private function filterOverrideAttribute(array $attrGroups): array
+	{
+		foreach ($attrGroups as $i => $attrGroup) {
+			foreach ($attrGroup->attrs as $j => $attr) {
+				if ($attr->name->toLowerString() !== 'override') {
+					continue;
+				}
+
+				unset($attrGroup->attrs[$j]);
+				if (count($attrGroup->attrs) !== 0) {
+					continue;
+				}
+
+				unset($attrGroups[$i]);
+			}
+		}
+
+		return $attrGroups;
+	}
+
+	/**
+	 * @param Node\AttributeGroup[] $attrGroups
+	 */
+	private function hasOverrideAttribute(array $attrGroups): bool
+	{
+		foreach ($attrGroups as $attrGroup) {
+			foreach ($attrGroup->attrs as $attr) {
+				if ($attr->name->toLowerString() === 'override') {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 }

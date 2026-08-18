@@ -2,6 +2,10 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\TrinaryLogic;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\Traits\NonArrayTypeTrait;
@@ -41,7 +45,22 @@ class ResourceType implements Type
 		return 'resource';
 	}
 
+	public function getConstantStrings(): array
+	{
+		return [];
+	}
+
 	public function toNumber(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toAbsoluteNumber(): Type
 	{
 		return new ErrorType();
 	}
@@ -58,7 +77,7 @@ class ResourceType implements Type
 
 	public function toFloat(): Type
 	{
-		return new ErrorType();
+		return new FloatType();
 	}
 
 	public function toArray(): Type
@@ -67,6 +86,7 @@ class ResourceType implements Type
 			[new ConstantIntegerType(0)],
 			[$this],
 			[1],
+			isList: TrinaryLogic::createYes(),
 		);
 	}
 
@@ -75,12 +95,44 @@ class ResourceType implements Type
 		return new ErrorType();
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function toCoercedArgumentType(bool $strictTypes): Type
 	{
-		return new self();
+		return $this;
+	}
+
+	public function isOffsetAccessLegal(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		return new BooleanType();
+	}
+
+	public function exponentiate(Type $exponent): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getFiniteTypes(): array
+	{
+		return [];
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode('resource');
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return false;
 	}
 
 }

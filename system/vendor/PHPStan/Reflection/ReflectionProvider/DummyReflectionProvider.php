@@ -5,13 +5,13 @@ namespace PHPStan\Reflection\ReflectionProvider;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ConstantReflection;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\GlobalConstantReflection;
 use PHPStan\Reflection\NamespaceAnswerer;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\ShouldNotHappenException;
 
-class DummyReflectionProvider implements ReflectionProvider
+final class DummyReflectionProvider implements ReflectionProvider
 {
 
 	public function hasClass(string $className): bool
@@ -29,14 +29,14 @@ class DummyReflectionProvider implements ReflectionProvider
 		return $className;
 	}
 
-	public function supportsAnonymousClasses(): bool
-	{
-		return false;
-	}
-
 	public function getAnonymousClassReflection(Node\Stmt\Class_ $classNode, Scope $scope): ClassReflection
 	{
 		throw new ShouldNotHappenException();
+	}
+
+	public function getUniversalObjectCratesClasses(): array
+	{
+		return [];
 	}
 
 	public function hasFunction(Node\Name $nameNode, ?NamespaceAnswerer $namespaceAnswerer): bool
@@ -59,7 +59,7 @@ class DummyReflectionProvider implements ReflectionProvider
 		return false;
 	}
 
-	public function getConstant(Node\Name $nameNode, ?NamespaceAnswerer $namespaceAnswerer): GlobalConstantReflection
+	public function getConstant(Node\Name $nameNode, ?NamespaceAnswerer $namespaceAnswerer): ConstantReflection
 	{
 		throw new ShouldNotHappenException();
 	}

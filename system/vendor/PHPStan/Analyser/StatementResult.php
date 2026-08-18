@@ -2,28 +2,34 @@
 
 namespace PHPStan\Analyser;
 
-use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Stmt;
 
-/** @api */
-class StatementResult
+/**
+ * @api
+ */
+final class StatementResult
 {
 
 	/**
 	 * @param StatementExitPoint[] $exitPoints
 	 * @param ThrowPoint[] $throwPoints
+	 * @param ImpurePoint[] $impurePoints
+	 * @param EndStatementResult[] $endStatements
 	 */
 	public function __construct(
-		private MutatingScope $scope,
+		private Scope $scope,
 		private bool $hasYield,
 		private bool $isAlwaysTerminating,
 		private array $exitPoints,
 		private array $throwPoints,
+		private array $impurePoints,
+		private array $endStatements = [],
 	)
 	{
 	}
 
-	public function getScope(): MutatingScope
+	public function getScope(): Scope
 	{
 		return $this->scope;
 	}
@@ -51,15 +57,15 @@ class StatementResult
 			}
 
 			$num = $statement->num;
-			if (!$num instanceof LNumber) {
-				return new self($this->scope, $this->hasYield, false, $this->exitPoints, $this->throwPoints);
+			if (!$num instanceof Int_) {
+				return new self($this->scope, $this->hasYield, false, $this->exitPoints, $this->throwPoints, $this->impurePoints);
 			}
 
 			if ($num->value !== 1) {
 				continue;
 			}
 
-			return new self($this->scope, $this->hasYield, false, $this->exitPoints, $this->throwPoints);
+			return new self($this->scope, $this->hasYield, false, $this->exitPoints, $this->throwPoints, $this->impurePoints);
 		}
 
 		return $this;
@@ -75,7 +81,7 @@ class StatementResult
 
 	/**
 	 * @param class-string<Stmt\Continue_>|class-string<Stmt\Break_> $stmtClass
-	 * @return StatementExitPoint[]
+	 * @return list<StatementExitPoint>
 	 */
 	public function getExitPointsByType(string $stmtClass): array
 	{
@@ -92,7 +98,7 @@ class StatementResult
 				continue;
 			}
 
-			if (!$value instanceof LNumber) {
+			if (!$value instanceof Int_) {
 				$exitPoints[] = $exitPoint;
 				continue;
 			}
@@ -109,7 +115,7 @@ class StatementResult
 	}
 
 	/**
-	 * @return StatementExitPoint[]
+	 * @return list<StatementExitPoint>
 	 */
 	public function getExitPointsForOuterLoop(): array
 	{
@@ -123,7 +129,7 @@ class StatementResult
 			if ($statement->num === null) {
 				continue;
 			}
-			if (!$statement->num instanceof LNumber) {
+			if (!$statement->num instanceof Int_) {
 				continue;
 			}
 			$value = $statement->num->value;
@@ -133,7 +139,7 @@ class StatementResult
 
 			$newNode = null;
 			if ($value > 2) {
-				$newNode = new LNumber($value - 1);
+				$newNode = new Int_($value - 1);
 			}
 			if ($statement instanceof Stmt\Continue_) {
 				$newStatement = new Stmt\Continue_($newNode);
@@ -153,6 +159,35 @@ class StatementResult
 	public function getThrowPoints(): array
 	{
 		return $this->throwPoints;
+	}
+
+	/**
+	 * @return ImpurePoint[]
+	 */
+	public function getImpurePoints(): array
+	{
+		return $this->impurePoints;
+	}
+
+	/**
+	 * Top-level StatementResult represents the state of the code
+	 * at the end of control flow statements like If_ or TryCatch.
+	 *
+	 * It shows how Scope etc. looks like after If_ no matter
+	 * which code branch was executed.
+	 *
+	 * For If_, "end statements" contain the state of the code
+	 * at the end of each branch - if, elseifs, else, including the last
+	 * statement node in each branch.
+	 *
+	 * For nested ifs, end statements try to contain the last non-control flow
+	 * statement like Return_ or Throw_, instead of If_, TryCatch, or Foreach_.
+	 *
+	 * @return EndStatementResult[]
+	 */
+	public function getEndStatements(): array
+	{
+		return $this->endStatements;
 	}
 
 }

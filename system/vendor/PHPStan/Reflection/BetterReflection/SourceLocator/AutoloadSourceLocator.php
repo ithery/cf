@@ -2,6 +2,7 @@
 
 namespace PHPStan\Reflection\BetterReflection\SourceLocator;
 
+use Override;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name;
@@ -47,7 +48,7 @@ use const PHP_VERSION_ID;
  *
  * Modified code from Roave/BetterReflection, Copyright (c) 2017 Roave, LLC.
  */
-class AutoloadSourceLocator implements SourceLocator
+final class AutoloadSourceLocator implements SourceLocator
 {
 
 	/** @var array{classes: array<string, string>, functions: array<string, string>, constants: array<string, string>} */
@@ -67,6 +68,7 @@ class AutoloadSourceLocator implements SourceLocator
 	{
 	}
 
+	#[Override]
 	public function locateIdentifier(Reflector $reflector, Identifier $identifier): ?Reflection
 	{
 		if ($identifier->isFunction()) {
@@ -131,7 +133,13 @@ class AutoloadSourceLocator implements SourceLocator
 				$startLine = $this->startLineByClass[$loweredClassName];
 			} else {
 				$reflection = $this->getReflectionClass($identifier->getName());
-				if ($reflection !== null && $reflection->getStartLine() !== false) {
+				if (
+					$reflection !== null
+					&& $reflection->getStartLine() !== false
+					&& is_string($reflection->getFileName())
+					&& is_file($reflection->getFileName())
+					&& $reflection->getFileName() === $this->presentSymbols['classes'][$loweredClassName]
+				) {
 					$startLine = $reflection->getStartLine();
 				}
 			}
@@ -272,6 +280,7 @@ class AutoloadSourceLocator implements SourceLocator
 		return null;
 	}
 
+	#[Override]
 	public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType): array
 	{
 		return [];
@@ -283,18 +292,7 @@ class AutoloadSourceLocator implements SourceLocator
 	private function getReflectionClass(string $className): ?ReflectionClass
 	{
 		if (class_exists($className, false) || interface_exists($className, false) || trait_exists($className, false)) {
-			$reflection = new ReflectionClass($className);
-			$filename = $reflection->getFileName();
-
-			if (!is_string($filename)) {
-				return null;
-			}
-
-			if (!is_file($filename)) {
-				return null;
-			}
-
-			return $reflection;
+			return new ReflectionClass($className);
 		}
 
 		return null;
@@ -323,6 +321,9 @@ class AutoloadSourceLocator implements SourceLocator
 			if (!is_string($filename)) {
 				return null;
 			}
+			if (!is_file($filename)) {
+				return null;
+			}
 
 			return [[$filename], $reflection->getName(), $reflection->getStartLine() !== false ? $reflection->getStartLine() : null];
 		}
@@ -334,7 +335,6 @@ class AutoloadSourceLocator implements SourceLocator
 		$this->silenceErrors();
 
 		try {
-			/** @var array{string[], string, null}|null */
 			$result = FileReadTrapStreamWrapper::withStreamWrapperOverride(
 				static function () use ($className): ?array {
 					$functions = spl_autoload_functions();

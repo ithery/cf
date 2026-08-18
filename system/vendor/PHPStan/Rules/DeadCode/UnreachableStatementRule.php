@@ -4,6 +4,7 @@ namespace PHPStan\Rules\DeadCode;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\UnreachableStatementNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -11,7 +12,8 @@ use PHPStan\Rules\RuleErrorBuilder;
 /**
  * @implements Rule<UnreachableStatementNode>
  */
-class UnreachableStatementRule implements Rule
+#[RegisteredRule(level: 4)]
+final class UnreachableStatementRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -21,17 +23,9 @@ class UnreachableStatementRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if ($node->getOriginalStatement() instanceof Node\Stmt\Nop) {
-			return [];
-		}
-
 		return [
 			RuleErrorBuilder::message('Unreachable statement - code above always terminates.')
-				->identifier('deadCode.unreachableStatement')
-				->metadata([
-					'depth' => $node->getAttribute('statementDepth'),
-					'order' => $node->getAttribute('statementOrder'),
-				])
+				->identifier('deadCode.unreachable')
 				->build(),
 		];
 	}

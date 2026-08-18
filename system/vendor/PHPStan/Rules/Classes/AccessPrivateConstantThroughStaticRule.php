@@ -5,6 +5,7 @@ namespace PHPStan\Rules\Classes;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function sprintf;
@@ -12,7 +13,8 @@ use function sprintf;
 /**
  * @implements Rule<Node\Expr\ClassConstFetch>
  */
-class AccessPrivateConstantThroughStaticRule implements Rule
+#[RegisteredRule(level: 2)]
+final class AccessPrivateConstantThroughStaticRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -54,7 +56,7 @@ class AccessPrivateConstantThroughStaticRule implements Rule
 				'Unsafe access to private constant %s::%s through static::.',
 				$constant->getDeclaringClass()->getDisplayName(),
 				$constantName,
-			))->build(),
+			))->identifier('staticClassAccess.privateConstant')->build(),
 		];
 	}
 

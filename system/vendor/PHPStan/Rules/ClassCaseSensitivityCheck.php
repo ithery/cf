@@ -2,21 +2,28 @@
 
 namespace PHPStan\Rules;
 
-use PHPStan\Reflection\ClassReflection;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Parser\UseAliasVisitor;
 use PHPStan\Reflection\ReflectionProvider;
 use function sprintf;
 use function strtolower;
 
-class ClassCaseSensitivityCheck
+#[AutowiredService]
+final class ClassCaseSensitivityCheck
 {
 
-	public function __construct(private ReflectionProvider $reflectionProvider, private bool $checkInternalClassCaseSensitivity)
+	public function __construct(
+		private ReflectionProvider $reflectionProvider,
+		#[AutowiredParameter]
+		private bool $checkInternalClassCaseSensitivity,
+	)
 	{
 	}
 
 	/**
 	 * @param ClassNameNodePair[] $pairs
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
 	public function checkClassNames(array $pairs): array
 	{
@@ -32,34 +39,28 @@ class ClassCaseSensitivityCheck
 			}
 			$realClassName = $classReflection->getName();
 			if (strtolower($realClassName) !== strtolower($className)) {
-				continue; // skip class alias
+				continue; // skip class_alias() where the alias is a completely different name
+			}
+			if ($pair->getNode()->getAttribute(UseAliasVisitor::ATTRIBUTE_NAME) === true) {
+				continue;
 			}
 			if ($realClassName === $className) {
 				continue;
 			}
 
+			$typeName = $classReflection->getClassTypeDescription();
 			$errors[] = RuleErrorBuilder::message(sprintf(
 				'%s %s referenced with incorrect case: %s.',
-				$this->getTypeName($classReflection),
+				$typeName,
 				$realClassName,
 				$className,
-			))->line($pair->getNode()->getLine())->build();
+			))
+				->identifier(sprintf('%s.nameCase', strtolower($typeName)))
+				->line($pair->getNode()->getStartLine())
+				->build();
 		}
 
 		return $errors;
-	}
-
-	private function getTypeName(ClassReflection $classReflection): string
-	{
-		if ($classReflection->isInterface()) {
-			return 'Interface';
-		} elseif ($classReflection->isTrait()) {
-			return 'Trait';
-		} elseif ($classReflection->isEnum()) {
-			return 'Enum';
-		}
-
-		return 'Class';
 	}
 
 }

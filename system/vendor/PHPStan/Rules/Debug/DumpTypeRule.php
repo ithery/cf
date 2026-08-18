@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Debug;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -15,7 +16,8 @@ use function strtolower;
 /**
  * @implements Rule<Node\Expr\FuncCall>
  */
-class DumpTypeRule implements Rule
+#[AutowiredService]
+final class DumpTypeRule implements Rule
 {
 
 	public function __construct(private ReflectionProvider $reflectionProvider)
@@ -33,6 +35,11 @@ class DumpTypeRule implements Rule
 			return [];
 		}
 
+		$args = $node->getArgs();
+		if (count($args) === 0) {
+			return [];
+		}
+
 		$functionName = $this->reflectionProvider->resolveFunctionName($node->name, $scope);
 		if ($functionName === null) {
 			return [];
@@ -42,22 +49,19 @@ class DumpTypeRule implements Rule
 			return [];
 		}
 
-		if (count($node->getArgs()) === 0) {
-			return [
-				RuleErrorBuilder::message(sprintf('Missing argument for %s() function call.', $functionName))
-					->nonIgnorable()
-					->build(),
-			];
+		$multipleArgs = count($args) > 1;
+		$errors = [];
+		foreach ($args as $i => $arg) {
+			$errors[] = RuleErrorBuilder::message(
+				sprintf(
+					$multipleArgs ? 'Dumped type #%d: %s' : 'Dumped type: %2$s',
+					$i + 1,
+					$scope->getType($arg->value)->describe(VerbosityLevel::precise()),
+				),
+			)->nonIgnorable()->identifier('phpstan.dumpType')->build();
 		}
 
-		return [
-			RuleErrorBuilder::message(
-				sprintf(
-					'Dumped type: %s',
-					$scope->getType($node->getArgs()[0]->value)->describe(VerbosityLevel::precise()),
-				),
-			)->nonIgnorable()->build(),
-		];
+		return $errors;
 	}
 
 }

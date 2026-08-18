@@ -4,8 +4,10 @@ namespace PHPStan\PhpDoc\Tag;
 
 use PHPStan\Type\Type;
 
-/** @api */
-class ReturnTag implements TypedTag
+/**
+ * @api
+ */
+final class ReturnTag implements TypedTag
 {
 
 	public function __construct(private Type $type, private bool $isExplicit)
@@ -22,10 +24,7 @@ class ReturnTag implements TypedTag
 		return $this->isExplicit;
 	}
 
-	/**
-	 * @return self
-	 */
-	public function withType(Type $type): TypedTag
+	public function withType(Type $type): self
 	{
 		return new self($type, $this->isExplicit);
 	}

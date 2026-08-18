@@ -4,6 +4,7 @@ namespace PHPStan\Type\Generic;
 
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\Traits\UndecidedComparisonCompoundTypeTrait;
+use PHPStan\Type\Type;
 
 /** @api */
 final class TemplateConstantIntegerType extends ConstantIntegerType implements TemplateType
@@ -13,12 +14,16 @@ final class TemplateConstantIntegerType extends ConstantIntegerType implements T
 	use TemplateTypeTrait;
 	use UndecidedComparisonCompoundTypeTrait;
 
+	/**
+	 * @param non-empty-string $name
+	 */
 	public function __construct(
 		TemplateTypeScope $scope,
 		TemplateTypeStrategy $templateTypeStrategy,
 		TemplateTypeVariance $templateTypeVariance,
 		string $name,
 		ConstantIntegerType $bound,
+		?Type $default,
 	)
 	{
 		parent::__construct($bound->getValue());
@@ -27,11 +32,7 @@ final class TemplateConstantIntegerType extends ConstantIntegerType implements T
 		$this->variance = $templateTypeVariance;
 		$this->name = $name;
 		$this->bound = $bound;
-	}
-
-	protected function shouldGeneralizeInferredType(): bool
-	{
-		return false;
+		$this->default = $default;
 	}
 
 }

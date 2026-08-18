@@ -2,23 +2,55 @@
 
 namespace PHPStan\Type\Php;
 
+use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Php\ConfiguredPhpVersionRangeHelper;
+use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
+use PHPStan\Type\BenevolentUnionType;
 use PHPStan\Type\BooleanType;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantIntegerType;
+use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
+use PHPStan\Type\NullType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeUtils;
+use PHPStan\Type\UnionType;
 use function array_filter;
 use function count;
+use function in_array;
 use function version_compare;
 
-class VersionCompareFunctionDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class VersionCompareFunctionDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
+
+	public const VALID_OPERATORS = [
+		'<',
+		'lt',
+		'<=',
+		'le',
+		'>',
+		'gt',
+		'>=',
+		'ge',
+		'==',
+		'=',
+		'eq',
+		'!=',
+		'<>',
+		'ne',
+	];
+
+	public function __construct(
+		private ConfiguredPhpVersionRangeHelper $phpVersionRangeHelper,
+		private PhpVersion $phpVersion,
+	)
+	{
+	}
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
 	{
@@ -29,29 +61,32 @@ class VersionCompareFunctionDynamicReturnTypeExtension implements DynamicFunctio
 		FunctionReflection $functionReflection,
 		FuncCall $functionCall,
 		Scope $scope,
-	): Type
+	): ?Type
 	{
-		if (count($functionCall->getArgs()) < 2) {
-			return ParametersAcceptorSelector::selectFromArgs($scope, $functionCall->getArgs(), $functionReflection->getVariants())->getReturnType();
+		$args = $functionCall->getArgs();
+		if (count($args) < 2) {
+			return null;
 		}
 
-		$version1Strings = TypeUtils::getConstantStrings($scope->getType($functionCall->getArgs()[0]->value));
-		$version2Strings = TypeUtils::getConstantStrings($scope->getType($functionCall->getArgs()[1]->value));
+		$version1Strings = $this->getVersionStrings($args[0]->value, $scope);
+		$version2Strings = $this->getVersionStrings($args[1]->value, $scope);
 		$counts = [
 			count($version1Strings),
 			count($version2Strings),
 		];
 
-		if (isset($functionCall->getArgs()[2])) {
-			$operatorStrings = TypeUtils::getConstantStrings($scope->getType($functionCall->getArgs()[2]->value));
+		if (isset($args[2])) {
+			$operatorStrings = $scope->getType($args[2]->value)->getConstantStrings();
 			$counts[] = count($operatorStrings);
-			$returnType = new BooleanType();
+			$returnType = $this->phpVersion->throwsValueErrorForInternalFunctions()
+				? new BooleanType()
+				: new BenevolentUnionType([new BooleanType(), new NullType()]);
 		} else {
-			$returnType = TypeCombinator::union(
+			$returnType = new UnionType([
 				new ConstantIntegerType(-1),
 				new ConstantIntegerType(0),
 				new ConstantIntegerType(1),
-			);
+			]);
 		}
 
 		if (count(array_filter($counts, static fn (int $count): bool => $count === 0)) > 0) {
@@ -63,12 +98,22 @@ class VersionCompareFunctionDynamicReturnTypeExtension implements DynamicFunctio
 		}
 
 		$types = [];
+		$canBeNull = false;
 		foreach ($version1Strings as $version1String) {
 			foreach ($version2Strings as $version2String) {
 				if (isset($operatorStrings)) {
 					foreach ($operatorStrings as $operatorString) {
-						$value = version_compare($version1String->getValue(), $version2String->getValue(), $operatorString->getValue());
-						$types[$value] = new ConstantBooleanType($value);
+						$operatorValue = $operatorString->getValue();
+						if (!in_array($operatorValue, self::VALID_OPERATORS, true)) {
+							if (!$this->phpVersion->throwsValueErrorForInternalFunctions()) {
+								$canBeNull = true;
+							}
+
+							continue;
+						}
+
+						$value = version_compare($version1String->getValue(), $version2String->getValue(), $operatorValue);
+						$types[(int) $value] = new ConstantBooleanType($value);
 					}
 				} else {
 					$value = version_compare($version1String->getValue(), $version2String->getValue());
@@ -76,7 +121,34 @@ class VersionCompareFunctionDynamicReturnTypeExtension implements DynamicFunctio
 				}
 			}
 		}
+
+		if ($canBeNull) {
+			$types[] = new NullType();
+		}
+
 		return TypeCombinator::union(...$types);
+	}
+
+	/**
+	 * @return ConstantStringType[]
+	 */
+	private function getVersionStrings(Expr $expr, Scope $scope): array
+	{
+		if (
+			$expr instanceof Expr\ConstFetch
+			&& $expr->name->toString() === 'PHP_VERSION'
+		) {
+			[$minVersion, $maxVersion] = $this->phpVersionRangeHelper->getVersionRange();
+
+			if ($minVersion !== null && $maxVersion !== null) {
+				return [
+					new ConstantStringType($minVersion->getVersionString()),
+					new ConstantStringType($maxVersion->getVersionString()),
+				];
+			}
+		}
+
+		return $scope->getType($expr)->getConstantStrings();
 	}
 
 }

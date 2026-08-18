@@ -2,7 +2,8 @@
 
 namespace PHPStan\Type\Generic;
 
-use PHPStan\TrinaryLogic;
+use PHPStan\Type\AcceptsResult;
+use PHPStan\Type\IsSuperTypeOfResult;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\StrictMixedType;
 use PHPStan\Type\Type;
@@ -14,12 +15,16 @@ final class TemplateStrictMixedType extends StrictMixedType implements TemplateT
 	/** @use TemplateTypeTrait<StrictMixedType> */
 	use TemplateTypeTrait;
 
+	/**
+	 * @param non-empty-string $name
+	 */
 	public function __construct(
 		TemplateTypeScope $scope,
 		TemplateTypeStrategy $templateTypeStrategy,
 		TemplateTypeVariance $templateTypeVariance,
 		string $name,
 		StrictMixedType $bound,
+		?Type $default,
 	)
 	{
 		$this->scope = $scope;
@@ -27,16 +32,17 @@ final class TemplateStrictMixedType extends StrictMixedType implements TemplateT
 		$this->variance = $templateTypeVariance;
 		$this->name = $name;
 		$this->bound = $bound;
+		$this->default = $default;
 	}
 
-	public function isSuperTypeOfMixed(MixedType $type): TrinaryLogic
+	public function isSuperTypeOfMixed(MixedType $type): IsSuperTypeOfResult
 	{
 		return $this->isSuperTypeOf($type);
 	}
 
-	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): TrinaryLogic
+	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): AcceptsResult
 	{
-		return $this->isSubTypeOf($acceptingType);
+		return $this->isSubTypeOf($acceptingType)->toAcceptsResult();
 	}
 
 }

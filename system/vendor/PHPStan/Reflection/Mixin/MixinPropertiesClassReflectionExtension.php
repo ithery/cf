@@ -3,16 +3,19 @@
 namespace PHPStan\Reflection\Mixin;
 
 use PHPStan\Analyser\OutOfClassScope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\PropertiesClassReflectionExtension;
 use PHPStan\Reflection\PropertyReflection;
 use PHPStan\ShouldNotHappenException;
-use PHPStan\Type\TypeUtils;
 use PHPStan\Type\VerbosityLevel;
 use function array_intersect;
 use function count;
 
-class MixinPropertiesClassReflectionExtension implements PropertiesClassReflectionExtension
+// autoTag: false - wired explicitly in ClassReflectionExtensionRegistry, must not be tagged
+#[AutowiredService(autoTag: false)]
+final class MixinPropertiesClassReflectionExtension implements PropertiesClassReflectionExtension
 {
 
 	/** @var array<string, array<string, true>> */
@@ -21,7 +24,10 @@ class MixinPropertiesClassReflectionExtension implements PropertiesClassReflecti
 	/**
 	 * @param string[] $mixinExcludeClasses
 	 */
-	public function __construct(private array $mixinExcludeClasses)
+	public function __construct(
+		#[AutowiredParameter]
+		private array $mixinExcludeClasses,
+	)
 	{
 	}
 
@@ -44,7 +50,7 @@ class MixinPropertiesClassReflectionExtension implements PropertiesClassReflecti
 	{
 		$mixinTypes = $classReflection->getResolvedMixinTypes();
 		foreach ($mixinTypes as $type) {
-			if (count(array_intersect(TypeUtils::getDirectClassNames($type), $this->mixinExcludeClasses)) > 0) {
+			if (count(array_intersect($type->getObjectClassNames(), $this->mixinExcludeClasses)) > 0) {
 				continue;
 			}
 
@@ -55,24 +61,32 @@ class MixinPropertiesClassReflectionExtension implements PropertiesClassReflecti
 
 			$this->inProcess[$typeDescription][$propertyName] = true;
 
-			if (!$type->hasProperty($propertyName)->yes()) {
+			if (!$type->hasInstanceProperty($propertyName)->yes()) {
 				unset($this->inProcess[$typeDescription][$propertyName]);
 				continue;
 			}
 
-			$property = $type->getProperty($propertyName, new OutOfClassScope());
+			$property = $type->getInstanceProperty($propertyName, new OutOfClassScope());
 			unset($this->inProcess[$typeDescription][$propertyName]);
 
 			return $property;
 		}
 
-		foreach ($classReflection->getParents() as $parentClass) {
-			$property = $this->findProperty($parentClass, $propertyName);
-			if ($property === null) {
+		foreach ($classReflection->getTraits() as $traitClass) {
+			$methodWithDeclaringClass = $this->findProperty($traitClass, $propertyName);
+			if ($methodWithDeclaringClass === null) {
 				continue;
 			}
 
-			return $property;
+			return $methodWithDeclaringClass;
+		}
+
+		$parentClass = $classReflection->getParentClass();
+		if ($parentClass !== null) {
+			$property = $this->findProperty($parentClass, $propertyName);
+			if ($property !== null) {
+				return $property;
+			}
 		}
 
 		return null;

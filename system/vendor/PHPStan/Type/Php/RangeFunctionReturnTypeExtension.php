@@ -4,8 +4,8 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Type\Accessory\AccessoryArrayListType;
 use PHPStan\Type\Accessory\NonEmptyArrayType;
 use PHPStan\Type\ArrayType;
@@ -19,15 +19,18 @@ use PHPStan\Type\FloatType;
 use PHPStan\Type\GeneralizePrecision;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntegerType;
+use PHPStan\Type\IntersectionType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeUtils;
 use PHPStan\Type\UnionType;
+use ValueError;
 use function count;
+use function is_array;
 use function range;
 
-class RangeFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class RangeFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	private const RANGE_LENGTH_THRESHOLD = 50;
@@ -37,63 +40,78 @@ class RangeFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExten
 		return $functionReflection->getName() === 'range';
 	}
 
-	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
+	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		if (count($functionCall->getArgs()) < 2) {
-			return ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+		$args = $functionCall->getArgs();
+		if (count($args) < 2) {
+			return null;
 		}
 
-		$startType = $scope->getType($functionCall->getArgs()[0]->value);
-		$endType = $scope->getType($functionCall->getArgs()[1]->value);
-		$stepType = count($functionCall->getArgs()) >= 3 ? $scope->getType($functionCall->getArgs()[2]->value) : new ConstantIntegerType(1);
+		$startType = $scope->getType($args[0]->value);
+		$endType = $scope->getType($args[1]->value);
+		$stepType = count($args) >= 3 ? $scope->getType($args[2]->value) : new ConstantIntegerType(1);
 
 		$constantReturnTypes = [];
 
-		$startConstants = TypeUtils::getConstantScalars($startType);
+		$startConstants = $startType->getConstantScalarTypes();
 		foreach ($startConstants as $startConstant) {
 			if (!$startConstant instanceof ConstantIntegerType && !$startConstant instanceof ConstantFloatType && !$startConstant instanceof ConstantStringType) {
 				continue;
 			}
 
-			$endConstants = TypeUtils::getConstantScalars($endType);
+			$endConstants = $endType->getConstantScalarTypes();
 			foreach ($endConstants as $endConstant) {
 				if (!$endConstant instanceof ConstantIntegerType && !$endConstant instanceof ConstantFloatType && !$endConstant instanceof ConstantStringType) {
 					continue;
 				}
 
-				$stepConstants = TypeUtils::getConstantScalars($stepType);
+				$stepConstants = $stepType->getConstantScalarTypes();
 				foreach ($stepConstants as $stepConstant) {
 					if (!$stepConstant instanceof ConstantIntegerType && !$stepConstant instanceof ConstantFloatType) {
 						continue;
 					}
 
-					$rangeValues = range($startConstant->getValue(), $endConstant->getValue(), $stepConstant->getValue());
+					try {
+						$rangeValues = @range($startConstant->getValue(), $endConstant->getValue(), $stepConstant->getValue());
+					} catch (ValueError) {
+						continue;
+					}
+
+					// @phpstan-ignore function.alreadyNarrowedType
+					if (!is_array($rangeValues)) {
+						continue;
+					}
+
 					if (count($rangeValues) > self::RANGE_LENGTH_THRESHOLD) {
-						if ($startConstant instanceof ConstantIntegerType && $endConstant instanceof ConstantIntegerType) {
+						if (
+							$startConstant instanceof ConstantIntegerType
+							&& $endConstant instanceof ConstantIntegerType
+							&& $stepConstant instanceof ConstantIntegerType
+						) {
 							if ($startConstant->getValue() > $endConstant->getValue()) {
 								$tmp = $startConstant;
 								$startConstant = $endConstant;
 								$endConstant = $tmp;
 							}
-							return AccessoryArrayListType::intersectWith(TypeCombinator::intersect(
-								new ArrayType(
-									new IntegerType(),
-									IntegerRangeType::fromInterval($startConstant->getValue(), $endConstant->getValue()),
+							return self::getNonEmptyListOfType(
+								IntegerRangeType::fromInterval(
+									$startConstant->getValue(),
+									$endConstant->getValue(),
 								),
-								new NonEmptyArrayType(),
-							));
+							);
 						}
 
-						return AccessoryArrayListType::intersectWith(TypeCombinator::intersect(
-							new ArrayType(
-								new IntegerType(),
-								TypeCombinator::union(
-									$startConstant->generalize(GeneralizePrecision::moreSpecific()),
-									$endConstant->generalize(GeneralizePrecision::moreSpecific()),
-								),
+						if ($stepType->isFloat()->yes()) {
+							return self::getNonEmptyListOfType(new FloatType());
+						}
+
+						return self::getNonEmptyListOfType(
+							TypeCombinator::union(
+								$startConstant->generalize(GeneralizePrecision::moreSpecific()),
+								$endConstant->generalize(GeneralizePrecision::moreSpecific()),
+								$stepType->generalize(GeneralizePrecision::moreSpecific()),
 							),
-							new NonEmptyArrayType(),
-						));
+						);
 					}
 					$arrayBuilder = ConstantArrayTypeBuilder::createEmpty();
 					foreach ($rangeValues as $value) {
@@ -110,34 +128,50 @@ class RangeFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExten
 		}
 
 		$argType = TypeCombinator::union($startType, $endType);
-		$isInteger = (new IntegerType())->isSuperTypeOf($argType)->yes();
-		$isStepInteger = (new IntegerType())->isSuperTypeOf($stepType)->yes();
+		$isInteger = $argType->isInteger()->yes();
+		$isStepInteger = $stepType->isInteger()->yes();
 
 		if ($isInteger && $isStepInteger) {
-			return AccessoryArrayListType::intersectWith(new ArrayType(new IntegerType(), new IntegerType()));
+			if ($argType instanceof IntegerRangeType) {
+				return self::getNonEmptyListOfType($argType);
+			}
+			return self::getNonEmptyListOfType(new IntegerType());
 		}
 
-		$isFloat = (new FloatType())->isSuperTypeOf($argType)->yes();
-		if ($isFloat) {
-			return AccessoryArrayListType::intersectWith(new ArrayType(new IntegerType(), new FloatType()));
+		if ($argType->isFloat()->yes()) {
+			return self::getNonEmptyListOfType(new FloatType());
 		}
 
 		$numberType = new UnionType([new IntegerType(), new FloatType()]);
 		$isNumber = $numberType->isSuperTypeOf($argType)->yes();
 		$isNumericString = $argType->isNumericString()->yes();
 		if ($isNumber || $isNumericString) {
-			return AccessoryArrayListType::intersectWith(new ArrayType(new IntegerType(), $numberType));
+			return self::getNonEmptyListOfType($numberType);
 		}
 
-		$isString = $argType->isString()->yes();
-		if ($isString) {
-			return AccessoryArrayListType::intersectWith(new ArrayType(new IntegerType(), new StringType()));
+		if ($argType->isString()->yes()) {
+			return self::getNonEmptyListOfType(new StringType());
 		}
 
-		return AccessoryArrayListType::intersectWith(new ArrayType(
-			new IntegerType(),
-			new BenevolentUnionType([new IntegerType(), new FloatType(), new StringType()]),
-		));
+		return self::getNonEmptyListOfType(
+			new BenevolentUnionType([
+				new IntegerType(),
+				new FloatType(),
+				new StringType(),
+			]),
+		);
+	}
+
+	private static function getNonEmptyListOfType(Type $type): IntersectionType
+	{
+		return new IntersectionType([
+			new ArrayType(
+				IntegerRangeType::createAllGreaterThanOrEqualTo(0),
+				$type,
+			),
+			new NonEmptyArrayType(),
+			new AccessoryArrayListType(),
+		]);
 	}
 
 }

@@ -2,17 +2,17 @@
 
 namespace PHPStan\Type\Generic;
 
-use PHPStan\TrinaryLogic;
+use PHPStan\Type\AcceptsResult;
 use PHPStan\Type\CompoundType;
 use PHPStan\Type\Type;
 
 /**
  * Template type strategy suitable for parameter type acceptance contexts
  */
-class TemplateTypeParameterStrategy implements TemplateTypeStrategy
+final class TemplateTypeParameterStrategy implements TemplateTypeStrategy
 {
 
-	public function accepts(TemplateType $left, Type $right, bool $strictTypes): TrinaryLogic
+	public function accepts(TemplateType $left, Type $right, bool $strictTypes): AcceptsResult
 	{
 		if ($right instanceof CompoundType) {
 			return $right->isAcceptedBy($left, $strictTypes);
@@ -24,14 +24,6 @@ class TemplateTypeParameterStrategy implements TemplateTypeStrategy
 	public function isArgument(): bool
 	{
 		return false;
-	}
-
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): self
-	{
-		return new self();
 	}
 
 }

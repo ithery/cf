@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Api;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -20,12 +21,13 @@ use ReflectionZendExtension;
 use function array_keys;
 use function in_array;
 use function sprintf;
-use function strpos;
+use function str_starts_with;
 
 /**
  * @implements Rule<Node\Expr\New_>
  */
-class RuntimeReflectionInstantiationRule implements Rule
+#[RegisteredRule(level: 0)]
+final class RuntimeReflectionInstantiationRule implements Rule
 {
 
 	public function __construct(private ReflectionProvider $reflectionProvider)
@@ -74,7 +76,7 @@ class RuntimeReflectionInstantiationRule implements Rule
 		$scopeClassReflection = $scope->getClassReflection();
 		$hasPhpStanInterface = false;
 		foreach (array_keys($scopeClassReflection->getInterfaces()) as $interfaceName) {
-			if (strpos($interfaceName, 'PHPStan\\') !== 0) {
+			if (!str_starts_with($interfaceName, 'PHPStan\\')) {
 				continue;
 			}
 
@@ -88,7 +90,7 @@ class RuntimeReflectionInstantiationRule implements Rule
 		return [
 			RuleErrorBuilder::message(
 				sprintf('Creating new %s is a runtime reflection concept that might not work in PHPStan because it uses fully static reflection engine. Use objects retrieved from ReflectionProvider instead.', $classReflection->getName()),
-			)->build(),
+			)->identifier('phpstanApi.runtimeReflection')->build(),
 		];
 	}
 

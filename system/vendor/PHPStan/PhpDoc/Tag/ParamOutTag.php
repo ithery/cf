@@ -4,8 +4,10 @@ namespace PHPStan\PhpDoc\Tag;
 
 use PHPStan\Type\Type;
 
-/** @api */
-class ParamOutTag implements TypedTag
+/**
+ * @api
+ */
+final class ParamOutTag implements TypedTag
 {
 
 	public function __construct(private Type $type)
@@ -17,10 +19,7 @@ class ParamOutTag implements TypedTag
 		return $this->type;
 	}
 
-	/**
-	 * @return self
-	 */
-	public function withType(Type $type): TypedTag
+	public function withType(Type $type): self
 	{
 		return new self($type);
 	}

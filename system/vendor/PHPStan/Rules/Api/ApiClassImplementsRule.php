@@ -5,19 +5,20 @@ namespace PHPStan\Rules\Api;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use function array_merge;
 use function count;
-use function in_array;
 use function sprintf;
 
 /**
  * @implements Rule<Class_>
  */
-class ApiClassImplementsRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ApiClassImplementsRule implements Rule
 {
 
 	public function __construct(
@@ -43,7 +44,7 @@ class ApiClassImplementsRule implements Rule
 	}
 
 	/**
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
 	private function checkName(Scope $scope, Node\Name $name): array
 	{
@@ -60,14 +61,10 @@ class ApiClassImplementsRule implements Rule
 		$ruleError = RuleErrorBuilder::message(sprintf(
 			'Implementing %s is not covered by backward compatibility promise. The interface might change in a minor PHPStan version.',
 			$implementedClassReflection->getDisplayName(),
-		))->tip(sprintf(
+		))->identifier('phpstanApi.interface')->tip(sprintf(
 			"If you think it should be covered by backward compatibility promise, open a discussion:\n   %s\n\n   See also:\n   https://phpstan.org/developing-extensions/backward-compatibility-promise",
 			'https://github.com/phpstan/phpstan/discussions',
 		))->build();
-
-		if (in_array($implementedClassReflection->getName(), BcUncoveredInterface::CLASSES, true)) {
-			return [$ruleError];
-		}
 
 		$docBlock = $implementedClassReflection->getResolvedPhpDoc();
 		if ($docBlock === null) {
@@ -75,8 +72,13 @@ class ApiClassImplementsRule implements Rule
 		}
 
 		foreach ($docBlock->getPhpDocNodes() as $phpDocNode) {
-			$apiTags = $phpDocNode->getTagsByName('@api');
-			if (count($apiTags) > 0) {
+			if (count($phpDocNode->getTagsByName('@api-do-not-implement')) > 0) {
+				return [$ruleError];
+			}
+		}
+
+		foreach ($docBlock->getPhpDocNodes() as $phpDocNode) {
+			if (count($phpDocNode->getTagsByName('@api')) > 0) {
 				return [];
 			}
 		}

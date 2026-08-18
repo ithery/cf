@@ -5,9 +5,8 @@ namespace PHPStan\Rules\Functions;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Return_;
 use PHPStan\Analyser\Scope;
-use PHPStan\Reflection\ParametersAcceptorSelector;
-use PHPStan\Reflection\Php\PhpFunctionFromParserNodeReflection;
-use PHPStan\Reflection\Php\PhpMethodFromParserNodeReflection;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Reflection\MethodReflection;
 use PHPStan\Rules\FunctionReturnTypeCheck;
 use PHPStan\Rules\Rule;
 use function sprintf;
@@ -15,7 +14,8 @@ use function sprintf;
 /**
  * @implements Rule<Node\Stmt\Return_>
  */
-class ReturnTypeRule implements Rule
+#[RegisteredRule(level: 3)]
+final class ReturnTypeRule implements Rule
 {
 
 	public function __construct(
@@ -40,16 +40,13 @@ class ReturnTypeRule implements Rule
 		}
 
 		$function = $scope->getFunction();
-		if (
-			!($function instanceof PhpFunctionFromParserNodeReflection)
-			|| $function instanceof PhpMethodFromParserNodeReflection
-		) {
+		if ($function instanceof MethodReflection) {
 			return [];
 		}
 
 		return $this->returnTypeCheck->checkReturnType(
 			$scope,
-			ParametersAcceptorSelector::selectSingle($function->getVariants())->getReturnType(),
+			$function->getReturnType(),
 			$node->expr,
 			$node,
 			sprintf(

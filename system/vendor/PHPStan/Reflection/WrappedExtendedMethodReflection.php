@@ -2,10 +2,15 @@
 
 namespace PHPStan\Reflection;
 
+use PHPStan\PhpDoc\ResolvedPhpDocBlock;
+use PHPStan\Reflection\Php\ExtendedDummyParameter;
 use PHPStan\TrinaryLogic;
+use PHPStan\Type\Generic\TemplateTypeVarianceMap;
+use PHPStan\Type\MixedType;
 use PHPStan\Type\Type;
+use function array_map;
 
-class WrappedExtendedMethodReflection implements ExtendedMethodReflection
+final class WrappedExtendedMethodReflection implements ExtendedMethodReflection
 {
 
 	public function __construct(private MethodReflection $method)
@@ -49,7 +54,51 @@ class WrappedExtendedMethodReflection implements ExtendedMethodReflection
 
 	public function getVariants(): array
 	{
-		return $this->method->getVariants();
+		$variants = [];
+		foreach ($this->method->getVariants() as $variant) {
+			if ($variant instanceof ExtendedParametersAcceptor) {
+				$variants[] = $variant;
+				continue;
+			}
+
+			$variants[] = new ExtendedFunctionVariant(
+				$variant->getTemplateTypeMap(),
+				$variant->getResolvedTemplateTypeMap(),
+				array_map(static fn (ParameterReflection $parameter): ExtendedParameterReflection => $parameter instanceof ExtendedParameterReflection ? $parameter : new ExtendedDummyParameter(
+					$parameter->getName(),
+					$parameter->getType(),
+					$parameter->isOptional(),
+					$parameter->passedByReference(),
+					$parameter->isVariadic(),
+					$parameter->getDefaultValue(),
+					new MixedType(),
+					$parameter->getType(),
+					null,
+					TrinaryLogic::createMaybe(),
+					null,
+					[],
+					null,
+					TrinaryLogic::createNo(),
+				), $variant->getParameters()),
+				$variant->isVariadic(),
+				$variant->getReturnType(),
+				$variant->getReturnType(),
+				new MixedType(),
+				TemplateTypeVarianceMap::createEmpty(),
+			);
+		}
+
+		return $variants;
+	}
+
+	public function getOnlyVariant(): ExtendedParametersAcceptor
+	{
+		return $this->getVariants()[0];
+	}
+
+	public function getNamedArgumentsVariants(): ?array
+	{
+		return null;
 	}
 
 	public function isDeprecated(): TrinaryLogic
@@ -67,9 +116,19 @@ class WrappedExtendedMethodReflection implements ExtendedMethodReflection
 		return $this->method->isFinal();
 	}
 
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return $this->isFinal();
+	}
+
 	public function isInternal(): TrinaryLogic
 	{
 		return $this->method->isInternal();
+	}
+
+	public function isBuiltin(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
 	}
 
 	public function getThrowType(): ?Type
@@ -82,9 +141,24 @@ class WrappedExtendedMethodReflection implements ExtendedMethodReflection
 		return $this->method->hasSideEffects();
 	}
 
+	public function isPure(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function getPureUnlessCallableIsImpureParameters(): array
+	{
+		return [];
+	}
+
 	public function getAsserts(): Assertions
 	{
 		return Assertions::createEmpty();
+	}
+
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean($this->getDeclaringClass()->acceptsNamedArguments());
 	}
 
 	public function getSelfOutType(): ?Type
@@ -95,6 +169,27 @@ class WrappedExtendedMethodReflection implements ExtendedMethodReflection
 	public function returnsByReference(): TrinaryLogic
 	{
 		return TrinaryLogic::createMaybe();
+	}
+
+	public function isAbstract(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getAttributes(): array
+	{
+		return [];
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		// Align with the getAttributes() returning empty
+		return TrinaryLogic::createNo();
+	}
+
+	public function getResolvedPhpDoc(): ?ResolvedPhpDocBlock
+	{
+		return null;
 	}
 
 }

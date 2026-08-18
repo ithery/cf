@@ -3,33 +3,31 @@
 namespace PHPStan\Rules\Comparison;
 
 use PhpParser\Node\Expr;
-use PhpParser\Node\Expr\FuncCall;
-use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Type\BooleanType;
 
-class ConstantConditionRuleHelper
+#[AutowiredService]
+final class ConstantConditionRuleHelper
 {
 
 	public function __construct(
-		private ImpossibleCheckTypeHelper $impossibleCheckTypeHelper,
+		#[AutowiredParameter]
 		private bool $treatPhpDocTypesAsCertain,
 	)
 	{
 	}
 
-	public function shouldReportAlwaysTrueByDefault(Expr $expr): bool
+	private function shouldSkip(Expr $expr): bool
 	{
-		return $expr instanceof Expr\BooleanNot
-			|| $expr instanceof Expr\BinaryOp\BooleanOr
-			|| $expr instanceof Expr\BinaryOp\BooleanAnd
-			|| $expr instanceof Expr\Ternary
-			|| $expr instanceof Expr\Isset_
-			|| $expr instanceof Expr\Empty_;
-	}
+		if (
+			$expr instanceof Expr\BinaryOp\Equal
+			|| $expr instanceof Expr\BinaryOp\NotEqual
+		) {
+			return true;
+		}
 
-	public function shouldSkip(Scope $scope, Expr $expr): bool
-	{
 		if (
 			$expr instanceof Expr\Instanceof_
 			|| $expr instanceof Expr\BinaryOp\Identical
@@ -49,23 +47,12 @@ class ConstantConditionRuleHelper
 			return true;
 		}
 
-		if (
-			$expr instanceof FuncCall
-			|| $expr instanceof MethodCall
-			|| $expr instanceof Expr\StaticCall
-		) {
-			$isAlways = $this->impossibleCheckTypeHelper->findSpecifiedType($scope, $expr);
-			if ($isAlways !== null) {
-				return true;
-			}
-		}
-
 		return false;
 	}
 
 	public function getBooleanType(Scope $scope, Expr $expr): BooleanType
 	{
-		if ($this->shouldSkip($scope, $expr)) {
+		if ($this->shouldSkip($expr)) {
 			return new BooleanType();
 		}
 
@@ -78,7 +65,7 @@ class ConstantConditionRuleHelper
 
 	public function getNativeBooleanType(Scope $scope, Expr $expr): BooleanType
 	{
-		if ($this->shouldSkip($scope, $expr)) {
+		if ($this->shouldSkip($expr)) {
 			return new BooleanType();
 		}
 

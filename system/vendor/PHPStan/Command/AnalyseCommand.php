@@ -3,18 +3,33 @@
 namespace PHPStan\Command;
 
 use OndraM\CiDetector\CiDetector;
-use PHPStan\Analyser\ResultCache\ResultCacheClearer;
+use Override;
+use PHPStan\Analyser\InternalError;
 use PHPStan\Command\ErrorFormatter\BaselineNeonErrorFormatter;
+use PHPStan\Command\ErrorFormatter\BaselinePhpErrorFormatter;
 use PHPStan\Command\ErrorFormatter\ErrorFormatter;
-use PHPStan\Command\ErrorFormatter\TableErrorFormatter;
 use PHPStan\Command\Symfony\SymfonyOutput;
 use PHPStan\Command\Symfony\SymfonyStyle;
+use PHPStan\DependencyInjection\Container;
+use PHPStan\Diagnose\DiagnoseExtension;
+use PHPStan\Diagnose\PHPStanDiagnoseExtension;
 use PHPStan\File\CouldNotWriteFileException;
+use PHPStan\File\FileHelper;
 use PHPStan\File\FileReader;
 use PHPStan\File\FileWriter;
 use PHPStan\File\ParentDirectoryRelativePathHelper;
 use PHPStan\File\PathNotFoundException;
+use PHPStan\File\RelativePathHelper;
+use PHPStan\Fixable\FileChangedException;
+use PHPStan\Fixable\MergeConflictException;
+use PHPStan\Fixable\Patcher;
+use PHPStan\Internal\AgentDetector;
+use PHPStan\Internal\BytesHelper;
+use PHPStan\Internal\ComposerHelper;
+use PHPStan\Internal\DirectoryCreator;
+use PHPStan\Internal\DirectoryCreatorException;
 use PHPStan\ShouldNotHappenException;
+use PHPStan\Turbo\TurboExtensionEnabler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,28 +38,38 @@ use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Throwable;
+use function array_intersect;
+use function array_key_exists;
+use function array_keys;
 use function array_map;
+use function array_reverse;
+use function array_unique;
+use function array_values;
 use function count;
 use function dirname;
+use function filesize;
 use function fopen;
 use function get_class;
 use function implode;
+use function in_array;
 use function is_array;
 use function is_bool;
-use function is_dir;
 use function is_file;
 use function is_string;
-use function mkdir;
 use function pathinfo;
 use function rewind;
 use function sprintf;
+use function str_contains;
 use function stream_get_contents;
 use function strlen;
 use function substr;
 use const PATHINFO_BASENAME;
 use const PATHINFO_EXTENSION;
 
-class AnalyseCommand extends Command
+/**
+ * @phpstan-import-type Trace from InternalError as InternalErrorTrace
+ */
+final class AnalyseCommand extends Command
 {
 
 	private const NAME = 'analyse';
@@ -58,11 +83,13 @@ class AnalyseCommand extends Command
 	 */
 	public function __construct(
 		private array $composerAutoloaderProjectPaths,
+		private float $analysisStartTime,
 	)
 	{
 		parent::__construct();
 	}
 
+	#[Override]
 	protected function configure(): void
 	{
 		$this->setName(self::NAME)
@@ -71,40 +98,46 @@ class AnalyseCommand extends Command
 				new InputArgument('paths', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'Paths with source code to run analysis on'),
 				new InputOption('configuration', 'c', InputOption::VALUE_REQUIRED, 'Path to project configuration file'),
 				new InputOption(self::OPTION_LEVEL, 'l', InputOption::VALUE_REQUIRED, 'Level of rule options - the higher the stricter'),
-				new InputOption(ErrorsConsoleStyle::OPTION_NO_PROGRESS, null, InputOption::VALUE_NONE, 'Do not show progress bar, only results'),
-				new InputOption('debug', null, InputOption::VALUE_NONE, 'Show debug information - which file is analysed, do not catch internal errors'),
+				new InputOption(ErrorsConsoleStyle::OPTION_NO_PROGRESS, mode: InputOption::VALUE_NONE, description: 'Do not show progress bar, only results'),
+				new InputOption('debug', mode: InputOption::VALUE_NONE, description: 'Show debug information - which file is analysed, do not catch internal errors'),
 				new InputOption('autoload-file', 'a', InputOption::VALUE_REQUIRED, 'Project\'s additional autoload file path'),
-				new InputOption('error-format', null, InputOption::VALUE_REQUIRED, 'Format in which to print the result of the analysis', null),
+				new InputOption('error-format', mode: InputOption::VALUE_REQUIRED, description: 'Format in which to print the result of the analysis'),
 				new InputOption('generate-baseline', 'b', InputOption::VALUE_OPTIONAL, 'Path to a file where the baseline should be saved', false),
-				new InputOption('allow-empty-baseline', null, InputOption::VALUE_NONE, 'Do not error out when the generated baseline is empty'),
-				new InputOption('memory-limit', null, InputOption::VALUE_REQUIRED, 'Memory limit for analysis'),
-				new InputOption('xdebug', null, InputOption::VALUE_NONE, 'Allow running with XDebug for debugging purposes'),
-				new InputOption('fix', null, InputOption::VALUE_NONE, 'Launch PHPStan Pro'),
-				new InputOption('watch', null, InputOption::VALUE_NONE, 'Launch PHPStan Pro'),
-				new InputOption('pro', null, InputOption::VALUE_NONE, 'Launch PHPStan Pro'),
+				new InputOption('allow-empty-baseline', mode: InputOption::VALUE_NONE, description: 'Do not error out when the generated baseline is empty'),
+				new InputOption('memory-limit', mode: InputOption::VALUE_REQUIRED, description: 'Memory limit for analysis'),
+				new InputOption('xdebug', mode: InputOption::VALUE_NONE, description: 'Allow running with Xdebug for debugging purposes'),
+				new InputOption('tmp-file', mode: InputOption::VALUE_REQUIRED, description: '(Editor mode) Edited file used in place of --instead-of file'),
+				new InputOption('instead-of', mode: InputOption::VALUE_REQUIRED, description: '(Editor mode) File being replaced by --tmp-file'),
+				new InputOption('fix', mode: InputOption::VALUE_NONE, description: 'Fix auto-fixable errors (experimental)'),
+				new InputOption('watch', mode: InputOption::VALUE_NONE, description: 'Launch PHPStan Pro'),
+				new InputOption('pro', mode: InputOption::VALUE_NONE, description: 'Launch PHPStan Pro'),
+				new InputOption('fail-without-result-cache', mode: InputOption::VALUE_NONE, description: 'Return non-zero exit code when result cache is not used'),
 			]);
 	}
 
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getAliases(): array
 	{
 		return ['analyze'];
 	}
 
+	#[Override]
 	protected function initialize(InputInterface $input, OutputInterface $output): void
 	{
 		if ((bool) $input->getOption('debug')) {
 			$application = $this->getApplication();
 			if ($application === null) {
-				throw new ShouldNotHappenException();
+				return;
 			}
 			$application->setCatchExceptions(false);
 			return;
 		}
 	}
 
+	#[Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		$paths = $input->getArgument('paths');
@@ -114,7 +147,9 @@ class AnalyseCommand extends Command
 		$level = $input->getOption(self::OPTION_LEVEL);
 		$allowXdebug = $input->getOption('xdebug');
 		$debugEnabled = (bool) $input->getOption('debug');
-		$fix = (bool) $input->getOption('fix') || (bool) $input->getOption('watch') || (bool) $input->getOption('pro');
+		$pro = (bool) $input->getOption('watch') || (bool) $input->getOption('pro');
+		$fix = (bool) $input->getOption('fix');
+		$failWithoutResultCache = (bool) $input->getOption('fail-without-result-cache');
 
 		/** @var string|false|null $generateBaselineFile */
 		$generateBaselineFile = $input->getOption('generate-baseline');
@@ -126,12 +161,17 @@ class AnalyseCommand extends Command
 
 		$allowEmptyBaseline = (bool) $input->getOption('allow-empty-baseline');
 
+		$tmpFile = $input->getOption('tmp-file');
+		$insteadOfFile = $input->getOption('instead-of');
+
 		if (
 			!is_array($paths)
 			|| (!is_string($memoryLimit) && $memoryLimit !== null)
 			|| (!is_string($autoloadFile) && $autoloadFile !== null)
 			|| (!is_string($configuration) && $configuration !== null)
 			|| (!is_string($level) && $level !== null)
+			|| (!is_string($tmpFile) && $tmpFile !== null)
+			|| (!is_string($insteadOfFile) && $insteadOfFile !== null)
 			|| (!is_bool($allowXdebug))
 		) {
 			throw new ShouldNotHappenException();
@@ -150,6 +190,9 @@ class AnalyseCommand extends Command
 				$level,
 				$allowXdebug,
 				$debugEnabled,
+				$tmpFile,
+				$insteadOfFile,
+				true,
 			);
 		} catch (InceptionNotSuccessfulException $e) {
 			return 1;
@@ -157,19 +200,34 @@ class AnalyseCommand extends Command
 
 		if ($generateBaselineFile === null && $allowEmptyBaseline) {
 			$inceptionResult->getStdOutput()->getStyle()->error('You must pass the --generate-baseline option alongside --allow-empty-baseline.');
-			return $inceptionResult->handleReturn(1);
+			return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
+		}
+
+		if ($inceptionResult->getEditorModeTmpFile() !== null) {
+			if ($generateBaselineFile !== null) {
+				$inceptionResult->getStdOutput()->getStyle()->error('Editor mode options --tmp-file and --instead-of cannot be used when generating the baseline.');
+				return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
+			}
+			if ($pro) {
+				$inceptionResult->getStdOutput()->getStyle()->error('Editor mode options --tmp-file and --instead-of cannot be used with PHPStan Pro.');
+				return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
+			}
+			if ($fix) {
+				$inceptionResult->getStdOutput()->getStyle()->error('Editor mode options --tmp-file and --instead-of cannot be used with --fix.');
+				return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
+			}
+		}
+
+		if ($fix) {
+			if ($generateBaselineFile !== null) {
+				$inceptionResult->getStdOutput()->getStyle()->error('Errors cannot be fixed when generating the baseline.');
+				return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
+			}
+
+			$inceptionResult->getErrorOutput()->getStyle()->note('The --fix CLI option no longer launches PHPStan Pro. Use --pro instead if you want to launch PHPStan Pro');
 		}
 
 		$errorOutput = $inceptionResult->getErrorOutput();
-		$obsoleteDockerImage = $_SERVER['PHPSTAN_OBSOLETE_DOCKER_IMAGE'] ?? 'false';
-		if ($obsoleteDockerImage === 'true') {
-			$errorOutput->writeLineFormatted('⚠️  You\'re using an obsolete PHPStan Docker image. ⚠️️');
-			$errorOutput->writeLineFormatted('   You can obtain the current one from <fg=cyan>ghcr.io/phpstan/phpstan</>.');
-			$errorOutput->writeLineFormatted('   Read more about it here:');
-			$errorOutput->writeLineFormatted('   <fg=cyan>https://phpstan.org/user-guide/docker</>');
-			$errorOutput->writeLineFormatted('');
-		}
-
 		$errorFormat = $input->getOption('error-format');
 
 		if (!is_string($errorFormat) && $errorFormat !== null) {
@@ -200,29 +258,102 @@ class AnalyseCommand extends Command
 			$baselineExtension = pathinfo($generateBaselineFile, PATHINFO_EXTENSION);
 			if ($baselineExtension === '') {
 				$inceptionResult->getStdOutput()->getStyle()->error(sprintf('Baseline filename must have an extension, %s provided instead.', pathinfo($generateBaselineFile, PATHINFO_BASENAME)));
-				return $inceptionResult->handleReturn(1);
+				return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
 			}
 
-			if ($baselineExtension !== 'neon') {
-				$inceptionResult->getStdOutput()->getStyle()->error(sprintf('Baseline filename extension must be .neon, .%s was used instead.', $baselineExtension));
+			if (!in_array($baselineExtension, ['neon', 'php'], true)) {
+				$inceptionResult->getStdOutput()->getStyle()->error(sprintf('Baseline filename extension must be .neon or .php, .%s was used instead.', $baselineExtension));
 
-				return $inceptionResult->handleReturn(1);
+				return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
 			}
 		}
 
 		try {
 			[$files, $onlyFiles] = $inceptionResult->getFiles();
 		} catch (PathNotFoundException $e) {
+			$this->runDiagnoseExtensions($container, $inceptionResult->getErrorOutput());
 			$inceptionResult->getErrorOutput()->writeLineFormatted(sprintf('<error>%s</error>', $e->getMessage()));
+			return 1;
+		} catch (InceptionNotSuccessfulException) {
+			$this->runDiagnoseExtensions($container, $inceptionResult->getErrorOutput());
 			return 1;
 		}
 
-		/** @var AnalyseApplication  $application */
+		if (count($files) === 0) {
+			$this->runDiagnoseExtensions($container, $inceptionResult->getErrorOutput());
+
+			$inceptionResult->getErrorOutput()->getStyle()->error('No files found to analyse.');
+
+			return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
+		}
+
+		if ($inceptionResult->getEditorModeInsteadOfFile() !== null) {
+			if (!in_array($inceptionResult->getEditorModeInsteadOfFile(), $files, true)) {
+				$inceptionResult->getStdOutput()->getStyle()->error(sprintf('File %s passed to --instead-of is not in analysed project files.', $inceptionResult->getEditorModeInsteadOfFile()));
+				return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
+			}
+		}
+
+		if ($inceptionResult->getEditorModeTmpFile() !== null) {
+			if (in_array($inceptionResult->getEditorModeTmpFile(), $files, true)) {
+				$inceptionResult->getStdOutput()->getStyle()->error(sprintf('File %s passed to --tmp-file is already in analysed project files.', $inceptionResult->getEditorModeInsteadOfFile()));
+				return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
+			}
+		}
+
+		$analysedConfigFiles = array_intersect($files, $container->getParameter('allConfigFiles'));
+		/** @var RelativePathHelper $relativePathHelper */
+		$relativePathHelper = $container->getService('relativePathHelper');
+		foreach ($analysedConfigFiles as $analysedConfigFile) {
+			$fileSize = @filesize($analysedConfigFile);
+			if ($fileSize === false) {
+				continue;
+			}
+
+			if ($fileSize <= 512 * 1024) {
+				continue;
+			}
+
+			$inceptionResult->getErrorOutput()->getStyle()->warning(sprintf(
+				'Configuration file %s (%s) is too big and might slow down PHPStan. Consider adding it to excludePaths.',
+				$relativePathHelper->getRelativePath($analysedConfigFile),
+				BytesHelper::bytes($fileSize),
+			));
+		}
+
+		$incompatibleTurboVersion = TurboExtensionEnabler::getIncompatibleLoadedVersion();
+		if ($incompatibleTurboVersion !== null) {
+			$phpstanVersion = ComposerHelper::getPhpStanVersion();
+			$errorOutput->getStyle()->note(sprintf(
+				'Incompatible version of the phpstan_turbo extension.' . "\n"
+				. 'The loaded extension is version %s but this PHPStan version expects %s.' . "\n"
+				. 'The extension stays inactive and PHPStan runs slower than necessary.' . "\n"
+				. 'Update the extension to the version appropriate for %s.',
+				$incompatibleTurboVersion,
+				TurboExtensionEnabler::EXPECTED_EXTENSION_VERSION,
+				$phpstanVersion === ComposerHelper::UNKNOWN_VERSION ? 'your PHPStan version' : sprintf('PHPStan %s', $phpstanVersion),
+			));
+		}
+
+		if ($pro) {
+			if ($generateBaselineFile !== null) {
+				$inceptionResult->getStdOutput()->getStyle()->error('You cannot pass the --generate-baseline option when running PHPStan Pro.');
+				return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
+			}
+
+			return $this->runFixer($inceptionResult, $container, $onlyFiles, $input, $output, $files);
+		}
+
+		/** @var AnalyseApplication $application */
 		$application = $container->getByType(AnalyseApplication::class);
 
 		$debug = $input->getOption('debug');
 		if (!is_bool($debug)) {
 			throw new ShouldNotHappenException();
+		}
+
+		if ($fix) {
+			$inceptionResult->getErrorOutput()->writeLineFormatted('Analysing files...');
 		}
 
 		try {
@@ -235,6 +366,8 @@ class AnalyseCommand extends Command
 				$debug,
 				$inceptionResult->getProjectConfigFile(),
 				$inceptionResult->getProjectConfigArray(),
+				$inceptionResult->getEditorModeTmpFile(),
+				$inceptionResult->getEditorModeInsteadOfFile(),
 				$input,
 			);
 		} catch (Throwable $t) {
@@ -267,182 +400,278 @@ class AnalyseCommand extends Command
 					$previous = $previous->getPrevious();
 				}
 
-				return $inceptionResult->handleReturn(1);
+				return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
 			}
 
 			throw $t;
 		}
 
-		if ($generateBaselineFile !== null) {
-			if (!$allowEmptyBaseline && !$analysisResult->hasErrors()) {
-				$inceptionResult->getStdOutput()->getStyle()->error('No errors were found during the analysis. Baseline could not be generated.');
-				$inceptionResult->getStdOutput()->writeLineFormatted('To allow generating empty baselines, pass <fg=cyan>--allow-empty-baseline</> option.');
-
-				return $inceptionResult->handleReturn(1);
-			}
-			if ($analysisResult->hasInternalErrors()) {
-				$inceptionResult->getStdOutput()->getStyle()->error('An internal error occurred. Baseline could not be generated. Re-run PHPStan without --generate-baseline to see what\'s going on.');
-
-				return $inceptionResult->handleReturn(1);
-			}
-
-			$baselineFileDirectory = dirname($generateBaselineFile);
-			$baselineErrorFormatter = new BaselineNeonErrorFormatter(new ParentDirectoryRelativePathHelper($baselineFileDirectory));
-
-			$existingBaselineContent = is_file($generateBaselineFile) ? FileReader::read($generateBaselineFile) : '';
-
-			$streamOutput = $this->createStreamOutput();
-			$errorConsoleStyle = new ErrorsConsoleStyle(new StringInput(''), $streamOutput);
-			$baselineOutput = new SymfonyOutput($streamOutput, new SymfonyStyle($errorConsoleStyle));
-			$baselineErrorFormatter->formatErrors($analysisResult, $baselineOutput, $existingBaselineContent);
-
-			$stream = $streamOutput->getStream();
-			rewind($stream);
-			$baselineContents = stream_get_contents($stream);
-			if ($baselineContents === false) {
-				throw new ShouldNotHappenException();
+		/**
+		 * Variable $internalErrorsTuples contains both "internal errors"
+		 * and "errors with non-ignorable exception" as InternalError objects.
+		 */
+		$internalErrorsTuples = [];
+		$internalFileSpecificErrors = [];
+		foreach ($analysisResult->getInternalErrorObjects() as $internalError) {
+			$internalErrorsTuples[$internalError->getMessage()] = [new InternalError(
+				$internalError->getTraceAsString() !== null ? sprintf('Internal error: %s', $internalError->getMessage()) : $internalError->getMessage(),
+				$internalError->getContextDescription(),
+				$internalError->getTrace(),
+				$internalError->getTraceAsString(),
+				shouldReportBug: $internalError->shouldReportBug(),
+			), false];
+		}
+		foreach ($analysisResult->getFileSpecificErrors() as $fileSpecificError) {
+			if (!$fileSpecificError->hasNonIgnorableException()) {
+				continue;
 			}
 
-			if (!is_dir($baselineFileDirectory)) {
-				$mkdirResult = @mkdir($baselineFileDirectory, 0644, true);
-				if ($mkdirResult === false) {
-					$inceptionResult->getStdOutput()->writeLineFormatted(sprintf('Failed to create directory "%s".', $baselineFileDirectory));
-
-					return $inceptionResult->handleReturn(1);
-				}
-			}
-
-			try {
-				FileWriter::write($generateBaselineFile, $baselineContents);
-			} catch (CouldNotWriteFileException $e) {
-				$inceptionResult->getStdOutput()->writeLineFormatted($e->getMessage());
-
-				return $inceptionResult->handleReturn(1);
-			}
-
-			$errorsCount = 0;
-			$unignorableCount = 0;
-			foreach ($analysisResult->getFileSpecificErrors() as $fileSpecificError) {
-				if (!$fileSpecificError->canBeIgnored()) {
-					$unignorableCount++;
-					if ($output->isVeryVerbose()) {
-						$inceptionResult->getStdOutput()->writeLineFormatted('Unignorable could not be added to the baseline:');
-						$inceptionResult->getStdOutput()->writeLineFormatted($fileSpecificError->getMessage());
-						$inceptionResult->getStdOutput()->writeLineFormatted($fileSpecificError->getFile());
-						$inceptionResult->getStdOutput()->writeLineFormatted('');
-					}
-					continue;
-				}
-
-				$errorsCount++;
-			}
-
-			$message = sprintf('Baseline generated with %d %s.', $errorsCount, $errorsCount === 1 ? 'error' : 'errors');
-
+			$message = $fileSpecificError->getMessage();
+			$metadata = $fileSpecificError->getMetadata();
+			$hasStackTrace = false;
 			if (
-				$unignorableCount === 0
-				&& count($analysisResult->getNotFileSpecificErrors()) === 0
+				$fileSpecificError->getIdentifier() === 'phpstan.internal'
+				&& array_key_exists(InternalError::STACK_TRACE_AS_STRING_METADATA_KEY, $metadata)
 			) {
-				$inceptionResult->getStdOutput()->getStyle()->success($message);
-			} else {
-				$inceptionResult->getStdOutput()->getStyle()->warning($message . "\nSome errors could not be put into baseline. Re-run PHPStan and fix them.");
+				$message = sprintf('Internal error: %s', $message);
+				$hasStackTrace = true;
 			}
 
-			return $inceptionResult->handleReturn(0);
+			if (!$hasStackTrace) {
+				if (!array_key_exists($fileSpecificError->getMessage(), $internalFileSpecificErrors)) {
+					$internalFileSpecificErrors[$fileSpecificError->getMessage()] = $fileSpecificError;
+				}
+			}
+
+			$internalErrorsTuples[$fileSpecificError->getMessage()] = [new InternalError(
+				$message,
+				sprintf('analysing file %s', $fileSpecificError->getTraitFilePath() ?? $fileSpecificError->getFilePath()),
+				$metadata[InternalError::STACK_TRACE_METADATA_KEY] ?? [],
+				$metadata[InternalError::STACK_TRACE_AS_STRING_METADATA_KEY] ?? null,
+				shouldReportBug: true,
+			), !$hasStackTrace];
 		}
 
-		if ($fix) {
-			$ciDetector = new CiDetector();
-			if ($ciDetector->isCiDetected()) {
-				$inceptionResult->getStdOutput()->writeLineFormatted('PHPStan Pro can\'t run in CI environment yet. Stay tuned!');
+		$internalErrorsTuples = array_values($internalErrorsTuples);
 
-				return $inceptionResult->handleReturn(1);
-			}
-			$container->getByType(ResultCacheClearer::class)->clearTemporaryCaches();
-			$hasInternalErrors = $analysisResult->hasInternalErrors();
-			$nonIgnorableErrorsByException = [];
-			foreach ($analysisResult->getFileSpecificErrors() as $fileSpecificError) {
-				if (!$fileSpecificError->hasNonIgnorableException()) {
-					continue;
-				}
+		$fileHelper = $container->getByType(FileHelper::class);
 
-				$nonIgnorableErrorsByException[] = $fileSpecificError;
+		/**
+		 * Variable $internalErrors only contains non-file-specific "internal errors".
+		 */
+		$internalErrors = [];
+		foreach ($internalErrorsTuples as [$internalError, $isInFileSpecificErrors]) {
+			if ($isInFileSpecificErrors) {
+				continue;
 			}
 
-			if ($hasInternalErrors || count($nonIgnorableErrorsByException) > 0) {
-				$fixerAnalysisResult = new AnalysisResult(
-					$nonIgnorableErrorsByException,
-					$analysisResult->getInternalErrors(),
-					$analysisResult->getInternalErrors(),
-					[],
-					$analysisResult->getCollectedData(),
-					$analysisResult->isDefaultLevelUsed(),
-					$analysisResult->getProjectConfigFile(),
-					$analysisResult->isResultCacheSaved(),
-				);
-
-				$stdOutput = $inceptionResult->getStdOutput();
-				$stdOutput->getStyle()->error('PHPStan Pro can\'t be launched because of these errors:');
-
-				/** @var TableErrorFormatter $tableErrorFormatter */
-				$tableErrorFormatter = $container->getService('errorFormatter.table');
-				$tableErrorFormatter->formatErrors($fixerAnalysisResult, $stdOutput);
-
-				$stdOutput->writeLineFormatted('Please fix them first and then re-run PHPStan.');
-
-				if ($stdOutput->isDebug()) {
-					$stdOutput->writeLineFormatted(sprintf('hasInternalErrors: %s', $hasInternalErrors ? 'true' : 'false'));
-					$stdOutput->writeLineFormatted(sprintf('nonIgnorableErrorsByExceptionCount: %d', count($nonIgnorableErrorsByException)));
-				}
-
-				return $inceptionResult->handleReturn(1);
-			}
-
-			if (!$analysisResult->isResultCacheSaved() && !$onlyFiles) {
-				// this can happen only if there are some regex-related errors in ignoreErrors configuration
-				$stdOutput = $inceptionResult->getStdOutput();
-				if (count($analysisResult->getFileSpecificErrors()) > 0) {
-					$stdOutput->getStyle()->error('Unknown error. Please report this as a bug.');
-					return $inceptionResult->handleReturn(1);
-				}
-
-				$stdOutput->getStyle()->error('PHPStan Pro can\'t be launched because of these errors:');
-
-				/** @var TableErrorFormatter $tableErrorFormatter */
-				$tableErrorFormatter = $container->getService('errorFormatter.table');
-				$tableErrorFormatter->formatErrors($analysisResult, $stdOutput);
-
-				$stdOutput->writeLineFormatted('Please fix them first and then re-run PHPStan.');
-
-				if ($stdOutput->isDebug()) {
-					$stdOutput->writeLineFormatted('Result cache was not saved.');
-				}
-
-				return $inceptionResult->handleReturn(1);
-			}
-
-			$inceptionResult->handleReturn(0);
-
-			/** @var FixerApplication $fixerApplication */
-			$fixerApplication = $container->getByType(FixerApplication::class);
-
-			return $fixerApplication->run(
-				$inceptionResult->getProjectConfigFile(),
-				$inceptionResult,
-				$input,
-				$output,
-				$analysisResult->getFileSpecificErrors(),
-				$analysisResult->getNotFileSpecificErrors(),
-				count($files),
-				$_SERVER['argv'][0],
+			$internalErrors[] = new InternalError(
+				$this->getMessageFromInternalError($fileHelper, $internalError, $output->getVerbosity()),
+				$internalError->getContextDescription(),
+				$internalError->getTrace(),
+				$internalError->getTraceAsString(),
+				shouldReportBug: $internalError->shouldReportBug(),
 			);
+		}
+
+		if ($generateBaselineFile !== null) {
+			$this->runDiagnoseExtensions($container, $inceptionResult->getErrorOutput(), $analysisResult->getProcessedFiles());
+			if (count($internalErrorsTuples) > 0) {
+				foreach ($internalErrorsTuples as [$internalError]) {
+					$inceptionResult->getStdOutput()->writeLineFormatted($internalError->getMessage());
+					$inceptionResult->getStdOutput()->writeLineFormatted('');
+				}
+
+				$inceptionResult->getStdOutput()->getStyle()->error(sprintf(
+					'%s occurred. Baseline could not be generated.',
+					count($internalErrors) === 1 ? 'An internal error' : 'Internal errors',
+				));
+
+				return $inceptionResult->handleReturn(1, $analysisResult->getPeakMemoryUsageBytes(), $this->analysisStartTime);
+			}
+
+			return $this->generateBaseline($generateBaselineFile, $inceptionResult, $analysisResult, $output, $allowEmptyBaseline, $baselineExtension, $failWithoutResultCache);
 		}
 
 		/** @var ErrorFormatter $errorFormatter */
 		$errorFormatter = $container->getService($errorFormatterServiceName);
 
+		if (count($internalErrorsTuples) > 0) {
+			$analysisResult = new AnalysisResult(
+				array_values($internalFileSpecificErrors),
+				array_map(static fn (InternalError $internalError) => $internalError->getMessage(), $internalErrors),
+				[],
+				[],
+				[],
+				$analysisResult->isDefaultLevelUsed(),
+				$analysisResult->getProjectConfigFile(),
+				$analysisResult->isResultCacheSaved(),
+				$analysisResult->getPeakMemoryUsageBytes(),
+				$analysisResult->isResultCacheUsed(),
+				$analysisResult->getChangedProjectExtensionFilesOutsideOfAnalysedPaths(),
+				$analysisResult->getProcessedFiles(),
+			);
+
+			$exitCode = $errorFormatter->formatErrors($analysisResult, $inceptionResult->getStdOutput());
+
+			$this->runDiagnoseExtensions($container, $inceptionResult->getErrorOutput(), $analysisResult->getProcessedFiles());
+
+			$errorOutput->writeLineFormatted('⚠️  Result is incomplete because of severe errors. ⚠️');
+			$errorOutput->writeLineFormatted('   Fix these errors first and then re-run PHPStan');
+			$errorOutput->writeLineFormatted('   to get all reported errors.');
+			$errorOutput->writeLineFormatted('');
+
+			return $inceptionResult->handleReturn(
+				$exitCode,
+				$analysisResult->getPeakMemoryUsageBytes(),
+				$this->analysisStartTime,
+			);
+		}
+
+		if ($fix) {
+			$fixableErrors = [];
+			foreach ($analysisResult->getFileSpecificErrors() as $fileSpecificError) {
+				if ($fileSpecificError->getFixedErrorDiff() === null) {
+					continue;
+				}
+
+				$fixableErrors[] = $fileSpecificError;
+			}
+
+			$fixableErrorsCount = count($fixableErrors);
+			if ($fixableErrorsCount === 0) {
+				$inceptionResult->getStdOutput()->getStyle()->error('No fixable errors found');
+				$exitCode = 1;
+			} else {
+				$skippedCount = 0;
+				$diffsByFile = [];
+				foreach ($fixableErrors as $fixableError) {
+					$fixFile = $fixableError->getFilePath();
+					if ($fixableError->getTraitFilePath() !== null) {
+						$fixFile = $fixableError->getTraitFilePath();
+					}
+
+					if ($fixableError->getFixedErrorDiff() === null) {
+						throw new ShouldNotHappenException();
+					}
+
+					$diffsByFile[$fixFile][] = $fixableError->getFixedErrorDiff();
+				}
+
+				$inceptionResult->getErrorOutput()->writeLineFormatted('Fixing errors...');
+				$errorOutput->getStyle()->progressStart($fixableErrorsCount);
+
+				$patcher = $container->getByType(Patcher::class);
+				foreach ($diffsByFile as $file => $diffs) {
+					$diffsCount = count($diffs);
+					try {
+						$finalFileContents = $patcher->applyDiffs($file, $diffs);
+						$errorOutput->getStyle()->progressAdvance($diffsCount);
+					} catch (FileChangedException | MergeConflictException) {
+						$skippedCount += $diffsCount;
+						$errorOutput->getStyle()->progressAdvance($diffsCount);
+						continue;
+					}
+
+					FileWriter::write($file, $finalFileContents);
+				}
+
+				$errorOutput->getStyle()->progressFinish();
+
+				if ($skippedCount > 0) {
+					$inceptionResult->getStdOutput()->getStyle()->warning(sprintf(
+						'%d %s fixed, %d %s skipped',
+						$fixableErrorsCount,
+						$fixableErrorsCount === 1 ? 'error' : 'errors',
+						$skippedCount,
+						$skippedCount === 1 ? 'error' : 'errors',
+					));
+				} else {
+					$inceptionResult->getStdOutput()->getStyle()->success(sprintf(
+						'%d %s fixed',
+						$fixableErrorsCount,
+						$fixableErrorsCount === 1 ? 'error' : 'errors',
+					));
+				}
+				$exitCode = 0;
+			}
+		} else {
+			if (AgentDetector::isRunningInAgent() && count($analysisResult->getFileSpecificErrors()) > 0) {
+				$errorOutput->writeLineFormatted('Instructions for interpreting errors');
+				$errorOutput->writeLineFormatted('---------');
+				$errorOutput->writeLineFormatted('');
+				$errorOutput->writeLineFormatted('Each error has an associated identifier, like `argument.type`');
+				$errorOutput->writeLineFormatted('or `return.missing`.');
+				$errorOutput->writeLineFormatted('');
+				$errorOutput->writeLineFormatted('Each error identifier has documentation at URL https://phpstan.org/error-identifiers/<identifier>');
+				$errorOutput->writeLineFormatted('This page contains code example, explanation why is this an error');
+				$errorOutput->writeLineFormatted('and instruction how to fix it.');
+				$errorOutput->writeLineFormatted('Before fixing the error, fetch the documentation page for its identifier.');
+				$errorOutput->writeLineFormatted('');
+				$errorOutput->writeLineFormatted('The error usually indicates a real bug or incorrect type in the code. Fix the underlying cause, do not just make the error go away.');
+				$errorOutput->writeLineFormatted('Do not add `@phpstan-ignore` comments, `@phpstan-ignore-next-line` comments, or baseline entries to suppress the error.');
+				$errorOutput->writeLineFormatted('Do not use assert() or inline @var PHPDoc tag to override PHPStan\'s inferred type.');
+				$errorOutput->writeLineFormatted('Do not add type casts just to silence errors.');
+				$errorOutput->writeLineFormatted('Do not widen parameter or return types just to make the error go away.');
+			}
+			$exitCode = $errorFormatter->formatErrors($analysisResult, $inceptionResult->getStdOutput());
+		}
+
+		if ($exitCode === 0 && $failWithoutResultCache && !$analysisResult->isResultCacheUsed()) {
+			$exitCode = 2;
+		}
+
+		if (
+			$analysisResult->isResultCacheUsed()
+			&& $analysisResult->isResultCacheSaved()
+			&& !$onlyFiles
+			&& $inceptionResult->getProjectConfigArray() !== null
+		) {
+			$projectServicesNotInAnalysedPaths = array_values(array_unique($analysisResult->getChangedProjectExtensionFilesOutsideOfAnalysedPaths()));
+			$projectServiceFileNamesNotInAnalysedPaths = array_keys($analysisResult->getChangedProjectExtensionFilesOutsideOfAnalysedPaths());
+
+			if (count($projectServicesNotInAnalysedPaths) > 0) {
+				$one = count($projectServicesNotInAnalysedPaths) === 1;
+				$errorOutput->writeLineFormatted('<comment>Result cache might not behave correctly.</comment>');
+				$errorOutput->writeLineFormatted(sprintf('You\'re using custom %s in your project config', $one ? 'extension' : 'extensions'));
+				$errorOutput->writeLineFormatted(sprintf('but %s not part of analysed paths:', $one ? 'this extension is' : 'these extensions are'));
+				$errorOutput->writeLineFormatted('');
+				foreach ($projectServicesNotInAnalysedPaths as $service) {
+					$errorOutput->writeLineFormatted(sprintf('- %s', $service));
+				}
+
+				$errorOutput->writeLineFormatted('');
+
+				$errorOutput->writeLineFormatted('When you edit them and re-run PHPStan, the result cache will get stale.');
+
+				$directoriesToAdd = [];
+				foreach ($projectServiceFileNamesNotInAnalysedPaths as $path) {
+					$directoriesToAdd[] = dirname($relativePathHelper->getRelativePath($path));
+				}
+
+				$directoriesToAdd = array_unique($directoriesToAdd);
+				$oneDirectory = count($directoriesToAdd) === 1;
+
+				$errorOutput->writeLineFormatted(sprintf('Add %s to your analysed paths to get rid of this problem:', $oneDirectory ? 'this directory' : 'these directories'));
+
+				$errorOutput->writeLineFormatted('');
+
+				foreach ($directoriesToAdd as $directory) {
+					$errorOutput->writeLineFormatted(sprintf('- %s', $directory));
+				}
+
+				$errorOutput->writeLineFormatted('');
+
+				return $inceptionResult->handleReturn(1, $analysisResult->getPeakMemoryUsageBytes(), $this->analysisStartTime);
+			}
+		}
+
+		$this->runDiagnoseExtensions($container, $inceptionResult->getErrorOutput(), $analysisResult->getProcessedFiles());
+
 		return $inceptionResult->handleReturn(
-			$errorFormatter->formatErrors($analysisResult, $inceptionResult->getStdOutput()),
+			$exitCode,
+			$analysisResult->getPeakMemoryUsageBytes(),
+			$this->analysisStartTime,
 		);
 	}
 
@@ -453,6 +682,206 @@ class AnalyseCommand extends Command
 			throw new ShouldNotHappenException();
 		}
 		return new StreamOutput($resource);
+	}
+
+	private function getMessageFromInternalError(FileHelper $fileHelper, InternalError $internalError, int $verbosity): string
+	{
+		$message = sprintf('%s while %s', $internalError->getMessage(), $internalError->getContextDescription());
+		$hasLarastan = false;
+		$isLaravelLast = false;
+
+		foreach (array_reverse($internalError->getTrace()) as $traceItem) {
+			if ($traceItem['file'] === null) {
+				continue;
+			}
+
+			$file = $fileHelper->normalizePath($traceItem['file'], '/');
+
+			if (str_contains($file, '/larastan/')) {
+				$hasLarastan = true;
+				$isLaravelLast = false;
+				continue;
+			}
+
+			if (!str_contains($file, '/laravel/framework/')) {
+				continue;
+			}
+
+			$isLaravelLast = true;
+		}
+		if ($hasLarastan) {
+			if ($isLaravelLast) {
+				$message .= "\n";
+				$message .= "\n" . 'This message is coming from Laravel Framework itself.';
+				$message .= "\n" . 'Larastan boots up your application in order to provide';
+				$message .= "\n" . 'smarter static analysis of your codebase.';
+				$message .= "\n";
+				$message .= "\n" . 'In order to do that, the environment you run PHPStan in';
+				$message .= "\n" . 'must match the environment you run your application in.';
+				$message .= "\n";
+				$message .= "\n" . 'Make sure you\'ve set your environment variables';
+				$message .= "\n" . 'or the .env file correctly.';
+
+				return $message;
+			}
+
+			$bugReportUrl = 'https://github.com/larastan/larastan/issues/new?template=bug-report.md';
+		} else {
+			$bugReportUrl = 'https://github.com/phpstan/phpstan/issues/new?template=Bug_report.yaml';
+		}
+		if ($internalError->getTraceAsString() !== null) {
+			if (OutputInterface::VERBOSITY_VERBOSE <= $verbosity) {
+				$firstTraceItem = $internalError->getTrace()[0] ?? null;
+				$trace = '';
+				if ($firstTraceItem !== null && $firstTraceItem['file'] !== null && $firstTraceItem['line'] !== null) {
+					$trace = sprintf('## %s(%d)%s', $firstTraceItem['file'], $firstTraceItem['line'], "\n");
+				}
+				$trace .= $internalError->getTraceAsString();
+
+				if ($internalError->shouldReportBug()) {
+					$message .= sprintf('%sPost the following stack trace to %s: %s%s', "\n", $bugReportUrl, "\n", $trace);
+				} else {
+					$message .= sprintf('%s%s', "\n\n", $trace);
+				}
+			} else {
+				if ($internalError->shouldReportBug()) {
+					$message .= sprintf('%sRun PHPStan with -v option and post the stack trace to:%s%s%s', "\n\n", "\n", $bugReportUrl, "\n");
+				} else {
+					$message .= sprintf('%sRun PHPStan with -v option to see the stack trace', "\n");
+				}
+			}
+		}
+
+		return $message;
+	}
+
+	private function generateBaseline(string $generateBaselineFile, InceptionResult $inceptionResult, AnalysisResult $analysisResult, OutputInterface $output, bool $allowEmptyBaseline, string $baselineExtension, bool $failWithoutResultCache): int
+	{
+		if (!$allowEmptyBaseline && !$analysisResult->hasErrors()) {
+			$inceptionResult->getStdOutput()->getStyle()->error('No errors were found during the analysis. Baseline could not be generated.');
+			$inceptionResult->getStdOutput()->writeLineFormatted('To allow generating empty baselines, pass <fg=cyan>--allow-empty-baseline</> option.');
+
+			return $inceptionResult->handleReturn(1, $analysisResult->getPeakMemoryUsageBytes(), $this->analysisStartTime);
+		}
+
+		$streamOutput = $this->createStreamOutput();
+		$errorConsoleStyle = new ErrorsConsoleStyle(new StringInput(''), $streamOutput);
+		$baselineOutput = new SymfonyOutput($streamOutput, new SymfonyStyle($errorConsoleStyle));
+		$baselineFileDirectory = dirname($generateBaselineFile);
+		$baselinePathHelper = new ParentDirectoryRelativePathHelper($baselineFileDirectory);
+		$rawMessageInBaseline = $inceptionResult->getContainer()->getParameter('featureToggles')['rawMessageInBaseline'];
+
+		if ($baselineExtension === 'php') {
+			$baselineErrorFormatter = new BaselinePhpErrorFormatter($baselinePathHelper, $rawMessageInBaseline);
+			$baselineErrorFormatter->formatErrors($analysisResult, $baselineOutput);
+		} else {
+			$baselineErrorFormatter = new BaselineNeonErrorFormatter($baselinePathHelper, $rawMessageInBaseline);
+			$existingBaselineContent = is_file($generateBaselineFile) ? FileReader::read($generateBaselineFile) : '';
+			$baselineErrorFormatter->formatErrors($analysisResult, $baselineOutput, $existingBaselineContent);
+		}
+
+		$stream = $streamOutput->getStream();
+		rewind($stream);
+		$baselineContents = stream_get_contents($stream);
+
+		try {
+			DirectoryCreator::ensureDirectoryExists($baselineFileDirectory, 0644);
+		} catch (DirectoryCreatorException $e) {
+			$inceptionResult->getStdOutput()->writeLineFormatted($e->getMessage());
+
+			return $inceptionResult->handleReturn(1, $analysisResult->getPeakMemoryUsageBytes(), $this->analysisStartTime);
+		}
+
+		try {
+			FileWriter::write($generateBaselineFile, $baselineContents);
+		} catch (CouldNotWriteFileException $e) {
+			$inceptionResult->getStdOutput()->writeLineFormatted($e->getMessage());
+
+			return $inceptionResult->handleReturn(1, $analysisResult->getPeakMemoryUsageBytes(), $this->analysisStartTime);
+		}
+
+		$errorsCount = 0;
+		$unignorableCount = 0;
+		foreach ($analysisResult->getFileSpecificErrors() as $fileSpecificError) {
+			if (!$fileSpecificError->canBeIgnored()) {
+				$unignorableCount++;
+				if ($output->isVeryVerbose()) {
+					$inceptionResult->getStdOutput()->writeLineFormatted('<error>Unignorable errors could not be added to the baseline:</error>');
+					$inceptionResult->getStdOutput()->writeLineFormatted($fileSpecificError->getMessage());
+					$inceptionResult->getStdOutput()->writeLineFormatted($fileSpecificError->getFile());
+					$inceptionResult->getStdOutput()->writeLineFormatted('');
+				}
+				continue;
+			}
+
+			$errorsCount++;
+		}
+
+		$message = sprintf('Baseline generated with %d %s.', $errorsCount, $errorsCount === 1 ? 'error' : 'errors');
+
+		if (
+			$unignorableCount === 0
+			&& count($analysisResult->getNotFileSpecificErrors()) === 0
+		) {
+			$inceptionResult->getStdOutput()->getStyle()->success($message);
+		} else {
+			if ($output->isVeryVerbose()) {
+				$inceptionResult->getStdOutput()->getStyle()->warning($message . "\nSome errors could not be put into baseline.");
+			} else {
+				$inceptionResult->getStdOutput()->getStyle()->warning($message . "\nSome errors could not be put into baseline. Re-run PHPStan with \"-vv\" and fix them.");
+			}
+		}
+
+		$exitCode = 0;
+		if ($failWithoutResultCache && !$analysisResult->isResultCacheUsed()) {
+			$exitCode = 2;
+		}
+
+		return $inceptionResult->handleReturn($exitCode, $analysisResult->getPeakMemoryUsageBytes(), $this->analysisStartTime);
+	}
+
+	/**
+	 * @param string[] $files
+	 */
+	private function runFixer(InceptionResult $inceptionResult, Container $container, bool $onlyFiles, InputInterface $input, OutputInterface $output, array $files): int
+	{
+		$ciDetector = new CiDetector();
+		if ($ciDetector->isCiDetected()) {
+			$inceptionResult->getStdOutput()->writeLineFormatted('PHPStan Pro can\'t run in CI environment yet. Stay tuned!');
+
+			return $inceptionResult->handleReturn(1, null, $this->analysisStartTime);
+		}
+
+		/** @var FixerApplication $fixerApplication */
+		$fixerApplication = $container->getByType(FixerApplication::class);
+
+		return $fixerApplication->run(
+			$inceptionResult,
+			$input,
+			$output,
+			count($files),
+			$_SERVER['argv'][0],
+		);
+	}
+
+	/**
+	 * @param list<string> $processedFiles
+	 */
+	private function runDiagnoseExtensions(Container $container, Output $errorOutput, array $processedFiles = []): void
+	{
+		if (!$errorOutput->isDebug()) {
+			return;
+		}
+
+		/** @var PHPStanDiagnoseExtension $phpstanDiagnoseExtension */
+		$phpstanDiagnoseExtension = $container->getService('phpstanDiagnoseExtension');
+
+		// not using tag for this extension to make sure it's always first
+		$phpstanDiagnoseExtension->print($errorOutput, $processedFiles);
+
+		foreach ($container->getExtensionsCollection(DiagnoseExtension::class)->getAll() as $extension) {
+			$extension->print($errorOutput);
+		}
 	}
 
 }

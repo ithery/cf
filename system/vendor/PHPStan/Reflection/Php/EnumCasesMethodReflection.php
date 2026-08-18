@@ -2,18 +2,20 @@
 
 namespace PHPStan\Reflection\Php;
 
+use PHPStan\PhpDoc\ResolvedPhpDocBlock;
 use PHPStan\Reflection\Assertions;
 use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ExtendedFunctionVariant;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\FunctionVariant;
-use PHPStan\Reflection\ParametersAcceptor;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Generic\TemplateTypeMap;
+use PHPStan\Type\MixedType;
 use PHPStan\Type\Type;
 
-class EnumCasesMethodReflection implements ExtendedMethodReflection
+final class EnumCasesMethodReflection implements ExtendedMethodReflection
 {
 
 	public function __construct(private ClassReflection $declaringClass, private Type $returnType)
@@ -60,20 +62,29 @@ class EnumCasesMethodReflection implements ExtendedMethodReflection
 		return $unitEnum->getNativeMethod('cases');
 	}
 
-	/**
-	 * @return ParametersAcceptor[]
-	 */
 	public function getVariants(): array
 	{
 		return [
-			new FunctionVariant(
+			new ExtendedFunctionVariant(
 				TemplateTypeMap::createEmpty(),
 				TemplateTypeMap::createEmpty(),
 				[],
 				false,
 				$this->returnType,
+				new MixedType(),
+				$this->returnType,
 			),
 		];
+	}
+
+	public function getOnlyVariant(): ExtendedParametersAcceptor
+	{
+		return $this->getVariants()[0];
+	}
+
+	public function getNamedArgumentsVariants(): ?array
+	{
+		return null;
 	}
 
 	public function isDeprecated(): TrinaryLogic
@@ -91,9 +102,19 @@ class EnumCasesMethodReflection implements ExtendedMethodReflection
 		return TrinaryLogic::createYes();
 	}
 
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
 	public function isInternal(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
+	}
+
+	public function isBuiltin(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
 	}
 
 	public function getThrowType(): ?Type
@@ -111,6 +132,11 @@ class EnumCasesMethodReflection implements ExtendedMethodReflection
 		return Assertions::createEmpty();
 	}
 
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean($this->declaringClass->acceptsNamedArguments());
+	}
+
 	public function getSelfOutType(): ?Type
 	{
 		return null;
@@ -119,6 +145,36 @@ class EnumCasesMethodReflection implements ExtendedMethodReflection
 	public function returnsByReference(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
+	}
+
+	public function isAbstract(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isPure(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function getPureUnlessCallableIsImpureParameters(): array
+	{
+		return [];
+	}
+
+	public function getAttributes(): array
+	{
+		return [];
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getResolvedPhpDoc(): ?ResolvedPhpDocBlock
+	{
+		return null;
 	}
 
 }

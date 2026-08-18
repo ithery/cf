@@ -5,6 +5,8 @@ namespace PHPStan\Rules\Functions;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -14,12 +16,16 @@ use function strtolower;
 /**
  * @implements Rule<Node\Expr\FuncCall>
  */
-class CallToNonExistentFunctionRule implements Rule
+#[RegisteredRule(level: 0)]
+final class CallToNonExistentFunctionRule implements Rule
 {
 
 	public function __construct(
 		private ReflectionProvider $reflectionProvider,
+		#[AutowiredParameter]
 		private bool $checkFunctionNameCase,
+		#[AutowiredParameter(ref: '%tips.discoveringSymbols%')]
+		private bool $discoveringSymbolsTip,
 	)
 	{
 	}
@@ -40,8 +46,15 @@ class CallToNonExistentFunctionRule implements Rule
 				return [];
 			}
 
+			$errorBuilder = RuleErrorBuilder::message(sprintf('Function %s not found.', (string) $node->name))
+				->identifier('function.notFound');
+
+			if ($this->discoveringSymbolsTip) {
+				$errorBuilder->discoveringSymbolsTip();
+			}
+
 			return [
-				RuleErrorBuilder::message(sprintf('Function %s not found.', (string) $node->name))->discoveringSymbolsTip()->build(),
+				$errorBuilder->build(),
 			];
 		}
 
@@ -60,7 +73,7 @@ class CallToNonExistentFunctionRule implements Rule
 						'Call to function %s() with incorrect case: %s',
 						$function->getName(),
 						$name,
-					))->build(),
+					))->identifier('function.nameCase')->build(),
 				];
 			}
 		}

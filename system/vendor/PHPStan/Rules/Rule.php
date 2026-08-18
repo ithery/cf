@@ -3,24 +3,41 @@
 namespace PHPStan\Rules;
 
 use PhpParser\Node;
+use PHPStan\Analyser\CollectedDataEmitter;
+use PHPStan\Analyser\NodeCallbackInvoker;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\ExtensionInterface;
 
 /**
+ * This is the interface custom rules implement. To register it in the configuration file
+ * use the `phpstan.rules.rule` service tag:
+ *
+ * ```
+ * services:
+ * 	-
+ *		class: App\MyRule
+ *		tags:
+ *			- phpstan.rules.rule
+ * ```
+ *
+ * Learn more: https://phpstan.org/developing-extensions/rules
+ *
  * @api
- * @phpstan-template TNodeType of Node
+ * @template TNodeType of Node
  */
+#[ExtensionInterface(tag: LazyRegistry::RULE_TAG)]
 interface Rule
 {
 
 	/**
-	 * @phpstan-return class-string<TNodeType>
+	 * @return class-string<TNodeType>
 	 */
 	public function getNodeType(): string;
 
 	/**
-	 * @phpstan-param TNodeType $node
-	 * @return (string|RuleError)[] errors
+	 * @param TNodeType $node
+	 * @return list<IdentifierRuleError>
 	 */
-	public function processNode(Node $node, Scope $scope): array;
+	public function processNode(Node $node, Scope&NodeCallbackInvoker&CollectedDataEmitter $scope): array;
 
 }

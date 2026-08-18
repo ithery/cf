@@ -6,17 +6,19 @@ use DateTime;
 use DateTimeImmutable;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\Constant\ConstantBooleanType;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
 use function count;
 use function date_create;
 use function in_array;
 
-class DateTimeCreateDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class DateTimeCreateDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -30,16 +32,20 @@ class DateTimeCreateDynamicReturnTypeExtension implements DynamicFunctionReturnT
 			return null;
 		}
 
-		$datetime = $scope->getType($functionCall->getArgs()[0]->value);
+		$datetimes = $scope->getType($functionCall->getArgs()[0]->value)->getConstantStrings();
 
-		if (!$datetime instanceof ConstantStringType) {
+		if (count($datetimes) === 0) {
 			return null;
 		}
 
-		$isValid = date_create($datetime->getValue()) !== false;
-
+		$types = [];
 		$className = $functionReflection->getName() === 'date_create' ? DateTime::class : DateTimeImmutable::class;
-		return $isValid ? new ObjectType($className) : new ConstantBooleanType(false);
+		foreach ($datetimes as $constantString) {
+			$isValid = date_create($constantString->getValue()) !== false;
+			$types[] = $isValid ? new ObjectType($className) : new ConstantBooleanType(false);
+		}
+
+		return TypeCombinator::union(...$types);
 	}
 
 }

@@ -2,6 +2,9 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\Type\Generic\TemplateTypeVariance;
 use PHPStan\Type\Traits\LateResolvableTypeTrait;
 use PHPStan\Type\Traits\NonGeneralizableTypeTrait;
@@ -65,17 +68,27 @@ class KeyOfType implements CompoundType, LateResolvableType
 			return $this;
 		}
 
-		return new KeyOfType($type);
+		return new self($type);
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		return new self(
-			$properties['type'],
-		);
+		if (!$right instanceof self) {
+			return $this;
+		}
+
+		$type = $cb($this->type, $right->type);
+
+		if ($this->type === $type) {
+			return $this;
+		}
+
+		return new self($type);
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new GenericTypeNode(new IdentifierTypeNode('key-of'), [$this->type->toPhpDocNode()]);
 	}
 
 }

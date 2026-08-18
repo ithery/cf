@@ -3,43 +3,59 @@
 namespace PHPStan\Rules\PhpDoc;
 
 use PhpParser\Node;
+use PhpParser\NodeAbstract;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
+use PHPStan\Node\VirtualNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\InvalidTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\TypeAliasTagValueNode;
+use PHPStan\PhpDocParser\Ast\Type\InvalidTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function sprintf;
-use function strpos;
+use function str_starts_with;
 
 /**
- * @implements Rule<Node>
+ * @implements Rule<NodeAbstract>
  */
-class InvalidPhpDocTagValueRule implements Rule
+#[RegisteredRule(level: 2)]
+#[ValidatesStubFiles]
+final class InvalidPhpDocTagValueRule implements Rule
 {
 
-	public function __construct(private Lexer $phpDocLexer, private PhpDocParser $phpDocParser)
+	public function __construct(
+		private Lexer $phpDocLexer,
+		private PhpDocParser $phpDocParser,
+	)
 	{
 	}
 
 	public function getNodeType(): string
 	{
-		return Node::class;
+		return NodeAbstract::class;
 	}
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if (
-			!$node instanceof Node\Stmt\ClassLike
-			&& !$node instanceof Node\FunctionLike
-			&& !$node instanceof Node\Stmt\Foreach_
-			&& !$node instanceof Node\Stmt\Property
-			&& !$node instanceof Node\Expr\Assign
-			&& !$node instanceof Node\Expr\AssignRef
-			&& !$node instanceof Node\Stmt\ClassConst
-		) {
+		// mirrored with InvalidPHPStanDocTagRule
+		if ($node instanceof VirtualNode) {
 			return [];
+		}
+		if (!$node instanceof Node\Stmt && !$node instanceof Node\PropertyHook) {
+			return [];
+		}
+		if ($node instanceof Node\Stmt\Expression) {
+			if (
+				!$node->expr instanceof Node\Expr\Assign
+				&& !$node->expr instanceof Node\Expr\AssignRef
+				&& !$node->expr instanceof Node\Expr\AssignOp
+			) {
+				return [];
+			}
 		}
 
 		$docComment = $node->getDocComment();
@@ -53,11 +69,26 @@ class InvalidPhpDocTagValueRule implements Rule
 
 		$errors = [];
 		foreach ($phpDocNode->getTags() as $phpDocTag) {
-			if (!($phpDocTag->value instanceof InvalidTagValueNode)) {
+			if (str_starts_with($phpDocTag->name, '@phan-') || str_starts_with($phpDocTag->name, '@psalm-')) {
 				continue;
 			}
 
-			if (strpos($phpDocTag->name, '@psalm-') === 0) {
+			if ($phpDocTag->value instanceof TypeAliasTagValueNode) {
+				if (!$phpDocTag->value->type instanceof InvalidTypeNode) {
+					continue;
+				}
+
+				$errors[] = RuleErrorBuilder::message(sprintf(
+					'PHPDoc tag %s %s has invalid value: %s',
+					$phpDocTag->name,
+					$phpDocTag->value->alias,
+					$phpDocTag->value->type->getException()->getMessage(),
+				))
+					->line(PhpDocLineHelper::detectLine($node, $phpDocTag))
+					->identifier('phpDoc.parseError')->build();
+
+				continue;
+			} elseif (!($phpDocTag->value instanceof InvalidTagValueNode)) {
 				continue;
 			}
 
@@ -66,7 +97,9 @@ class InvalidPhpDocTagValueRule implements Rule
 				$phpDocTag->name,
 				$phpDocTag->value->value,
 				$phpDocTag->value->exception->getMessage(),
-			))->build();
+			))
+				->line(PhpDocLineHelper::detectLine($node, $phpDocTag))
+				->identifier('phpDoc.parseError')->build();
 		}
 
 		return $errors;

@@ -2,12 +2,15 @@
 
 namespace PHPStan\Node;
 
+use Override;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\ClassLike;
 use PHPStan\Reflection\ClassReflection;
 
-/** @api */
-class InClassNode extends Node\Stmt implements VirtualNode
+/**
+ * @api
+ */
+final class InClassNode extends Node\Stmt implements VirtualNode
 {
 
 	public function __construct(private ClassLike $originalNode, private ClassReflection $classReflection)
@@ -25,6 +28,7 @@ class InClassNode extends Node\Stmt implements VirtualNode
 		return $this->classReflection;
 	}
 
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Stmt_InClassNode';
@@ -33,6 +37,7 @@ class InClassNode extends Node\Stmt implements VirtualNode
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];

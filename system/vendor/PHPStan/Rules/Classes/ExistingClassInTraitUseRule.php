@@ -4,9 +4,13 @@ namespace PHPStan\Rules\Classes;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Rules\ClassCaseSensitivityCheck;
+use PHPStan\Rules\ClassNameCheck;
 use PHPStan\Rules\ClassNameNodePair;
+use PHPStan\Rules\ClassNameUsageLocation;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\ShouldNotHappenException;
@@ -16,12 +20,16 @@ use function sprintf;
 /**
  * @implements Rule<Node\Stmt\TraitUse>
  */
-class ExistingClassInTraitUseRule implements Rule
+#[RegisteredRule(level: 0)]
+#[ValidatesStubFiles]
+final class ExistingClassInTraitUseRule implements Rule
 {
 
 	public function __construct(
-		private ClassCaseSensitivityCheck $classCaseSensitivityCheck,
+		private ClassNameCheck $classCheck,
 		private ReflectionProvider $reflectionProvider,
+		#[AutowiredParameter(ref: '%tips.discoveringSymbols%')]
+		private bool $discoveringSymbolsTip,
 	)
 	{
 	}
@@ -33,19 +41,27 @@ class ExistingClassInTraitUseRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$messages = $this->classCaseSensitivityCheck->checkClassNames(
-			array_map(static fn (Node\Name $traitName): ClassNameNodePair => new ClassNameNodePair((string) $traitName, $traitName), $node->traits),
-		);
-
 		if (!$scope->isInClass()) {
 			throw new ShouldNotHappenException();
 		}
 
 		$classReflection = $scope->getClassReflection();
+
+		$messages = $this->classCheck->checkClassNames(
+			$scope,
+			array_map(static fn (Node\Name $traitName): ClassNameNodePair => new ClassNameNodePair((string) $traitName, $traitName), $node->traits),
+			ClassNameUsageLocation::from(ClassNameUsageLocation::TRAIT_USE, [
+				'currentClassName' => $classReflection->isAnonymous() ? null : $classReflection->getName(),
+			]),
+		);
+
 		if ($classReflection->isInterface()) {
 			if (!$scope->isInTrait()) {
 				foreach ($node->traits as $trait) {
-					$messages[] = RuleErrorBuilder::message(sprintf('Interface %s uses trait %s.', $classReflection->getName(), (string) $trait))->nonIgnorable()->build();
+					$messages[] = RuleErrorBuilder::message(sprintf('Interface %s uses trait %s.', $classReflection->getName(), (string) $trait))
+						->identifier('interface.traitUse')
+						->nonIgnorable()
+						->build();
 				}
 			}
 		} else {
@@ -61,15 +77,32 @@ class ExistingClassInTraitUseRule implements Rule
 			foreach ($node->traits as $trait) {
 				$traitName = (string) $trait;
 				if (!$this->reflectionProvider->hasClass($traitName)) {
-					$messages[] = RuleErrorBuilder::message(sprintf('%s uses unknown trait %s.', $currentName, $traitName))->nonIgnorable()->discoveringSymbolsTip()->build();
+					$errorBuilder = RuleErrorBuilder::message(sprintf('%s uses unknown trait %s.', $currentName, $traitName))
+						->identifier('trait.notFound')
+						->nonIgnorable();
+
+					if ($this->discoveringSymbolsTip) {
+						$errorBuilder->discoveringSymbolsTip();
+					}
+
+					$messages[] = $errorBuilder->build();
 				} else {
 					$reflection = $this->reflectionProvider->getClass($traitName);
 					if ($reflection->isClass()) {
-						$messages[] = RuleErrorBuilder::message(sprintf('%s uses class %s.', $currentName, $reflection->getDisplayName()))->nonIgnorable()->build();
+						$messages[] = RuleErrorBuilder::message(sprintf('%s uses class %s.', $currentName, $reflection->getDisplayName()))
+							->identifier('traitUse.class')
+							->nonIgnorable()
+							->build();
 					} elseif ($reflection->isInterface()) {
-						$messages[] = RuleErrorBuilder::message(sprintf('%s uses interface %s.', $currentName, $reflection->getDisplayName()))->nonIgnorable()->build();
+						$messages[] = RuleErrorBuilder::message(sprintf('%s uses interface %s.', $currentName, $reflection->getDisplayName()))
+							->identifier('traitUse.interface')
+							->nonIgnorable()
+							->build();
 					} elseif ($reflection->isEnum()) {
-						$messages[] = RuleErrorBuilder::message(sprintf('%s uses enum %s.', $currentName, $reflection->getDisplayName()))->nonIgnorable()->build();
+						$messages[] = RuleErrorBuilder::message(sprintf('%s uses enum %s.', $currentName, $reflection->getDisplayName()))
+							->identifier('traitUse.enum')
+							->nonIgnorable()
+							->build();
 					}
 				}
 			}

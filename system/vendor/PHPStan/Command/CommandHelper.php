@@ -2,7 +2,7 @@
 
 namespace PHPStan\Command;
 
-use Closure;
+use Composer\Semver\Semver;
 use Composer\XdebugHandler\XdebugHandler;
 use Nette\DI\Helpers;
 use Nette\DI\InvalidConfigurationException;
@@ -12,24 +12,36 @@ use Nette\InvalidStateException;
 use Nette\Schema\ValidationException;
 use Nette\Utils\AssertionException;
 use Nette\Utils\Strings;
+use PHPStan\Cache\FileCacheStorage;
 use PHPStan\Command\Symfony\SymfonyOutput;
 use PHPStan\Command\Symfony\SymfonyStyle;
 use PHPStan\DependencyInjection\Container;
 use PHPStan\DependencyInjection\ContainerFactory;
 use PHPStan\DependencyInjection\DuplicateIncludedFilesException;
+use PHPStan\DependencyInjection\InvalidExcludePathsException;
 use PHPStan\DependencyInjection\InvalidIgnoredErrorPatternsException;
 use PHPStan\DependencyInjection\LoaderFactory;
+use PHPStan\DependencyInjection\MissingImplementedInterfaceInServiceWithTagException;
 use PHPStan\ExtensionInstaller\GeneratedConfig;
+use PHPStan\File\FileExcluder;
 use PHPStan\File\FileFinder;
 use PHPStan\File\FileHelper;
+use PHPStan\File\ParentDirectoryRelativePathHelper;
+use PHPStan\File\SimpleRelativePathHelper;
+use PHPStan\Internal\ComposerHelper;
+use PHPStan\Internal\DirectoryCreator;
+use PHPStan\Internal\DirectoryCreatorException;
+use PHPStan\PhpDoc\StubFilesProvider;
 use PHPStan\ShouldNotHappenException;
 use ReflectionClass;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
+use function array_filter;
 use function array_key_exists;
 use function array_map;
+use function array_values;
 use function class_exists;
 use function count;
 use function dirname;
@@ -44,18 +56,17 @@ use function is_dir;
 use function is_file;
 use function is_readable;
 use function is_string;
-use function mkdir;
 use function register_shutdown_function;
 use function spl_autoload_functions;
 use function sprintf;
+use function str_contains;
 use function str_repeat;
-use function strpos;
 use function sys_get_temp_dir;
 use const DIRECTORY_SEPARATOR;
 use const E_ERROR;
 use const PHP_VERSION_ID;
 
-class CommandHelper
+final class CommandHelper
 {
 
 	public const DEFAULT_LEVEL = '0';
@@ -79,31 +90,40 @@ class CommandHelper
 		?string $generateBaselineFile,
 		?string $level,
 		bool $allowXdebug,
-		bool $debugEnabled = false,
-		?string $singleReflectionFile = null,
-		?string $singleReflectionInsteadOfFile = null,
-		bool $cleanupContainerCache = true,
+		bool $debugEnabled,
+		?string $singleReflectionFile,
+		?string $singleReflectionInsteadOfFile,
+		bool $cleanupContainerCache,
 	): InceptionResult
 	{
 		$stdOutput = new SymfonyOutput($output, new SymfonyStyle(new ErrorsConsoleStyle($input, $output)));
-
-		/** @var Output $errorOutput */
-		$errorOutput = (static function () use ($input, $output): Output {
-			$symfonyErrorOutput = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
-			return new SymfonyOutput($symfonyErrorOutput, new SymfonyStyle(new ErrorsConsoleStyle($input, $symfonyErrorOutput)));
-		})();
-
-		if ($allowXdebug && !XdebugHandler::isXdebugActive()) {
-			$errorOutput->getStyle()->note('You are running with "--xdebug" enabled, but the Xdebug PHP extension is not active. The process will not halt at breakpoints.');
-		} elseif (!$allowXdebug && XdebugHandler::isXdebugActive()) {
-			$errorOutput->getStyle()->note('The Xdebug PHP extension is active, but "--xdebug" is not used. This may slow down performance and the process will not halt at breakpoints.');
-		}
+		$symfonyErrorOutput = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+		$errorOutput = new SymfonyOutput($symfonyErrorOutput, new SymfonyStyle(new ErrorsConsoleStyle($input, $symfonyErrorOutput)));
 
 		if (!$allowXdebug) {
 			$xdebug = new XdebugHandler('phpstan');
 			$xdebug->setPersistent();
 			$xdebug->check();
 			unset($xdebug);
+		}
+
+		if ($allowXdebug) {
+			if (!XdebugHandler::isXdebugActive()) {
+				$errorOutput->getStyle()->note('You are running with "--xdebug" enabled, but the Xdebug PHP extension is not active. The process will not halt at breakpoints.');
+			} else {
+				$errorOutput->getStyle()->note("You are running with \"--xdebug\" enabled, and the Xdebug PHP extension is active.\nThe process will halt at breakpoints, but PHPStan will run much slower.\nUse this only if you are debugging PHPStan itself or your custom extensions.");
+			}
+		} elseif (XdebugHandler::isXdebugActive()) {
+			$errorOutput->getStyle()->note('The Xdebug PHP extension is active, but "--xdebug" is not used. This may slow down performance and the process will not halt at breakpoints.');
+		} elseif ($debugEnabled) {
+			$v = XdebugHandler::getSkippedVersion();
+			if ($v !== '') {
+				$errorOutput->getStyle()->note(
+					"The Xdebug PHP extension is active, but \"--xdebug\" is not used.\n" .
+					"The process was restarted and it will not halt at breakpoints.\n" .
+					'Use "--xdebug" if you want to halt at breakpoints.',
+				);
+			}
 		}
 
 		if ($memoryLimit !== null) {
@@ -128,7 +148,7 @@ class CommandHelper
 				return;
 			}
 
-			if (strpos($error['message'], 'Allowed memory size') === false) {
+			if (!str_contains($error['message'], 'Allowed memory size')) {
 				return;
 			}
 
@@ -144,7 +164,7 @@ class CommandHelper
 		$currentWorkingDirectoryFileHelper = new FileHelper($currentWorkingDirectory);
 		$currentWorkingDirectory = $currentWorkingDirectoryFileHelper->getWorkingDirectory();
 
-		/** @var array<callable>|false $autoloadFunctionsBefore */
+		/** @var list<callable(string): void>|false $autoloadFunctionsBefore */
 		$autoloadFunctionsBefore = spl_autoload_functions();
 
 		if ($autoloadFile !== null) {
@@ -159,7 +179,15 @@ class CommandHelper
 			})($autoloadFile);
 		}
 		if ($projectConfigFile === null) {
-			foreach (['phpstan.neon', 'phpstan.neon.dist', 'phpstan.dist.neon'] as $discoverableConfigName) {
+			$discoverableConfigNames = [
+				'.phpstan.neon',
+				'phpstan.neon',
+				'.phpstan.neon.dist',
+				'phpstan.neon.dist',
+				'.phpstan.dist.neon',
+				'phpstan.dist.neon',
+			];
+			foreach ($discoverableConfigNames as $discoverableConfigName) {
 				$discoverableConfigFile = $currentWorkingDirectory . DIRECTORY_SEPARATOR . $discoverableConfigName;
 				if (is_file($discoverableConfigFile)) {
 					$projectConfigFile = $discoverableConfigFile;
@@ -175,6 +203,32 @@ class CommandHelper
 			$generateBaselineFile = $currentWorkingDirectoryFileHelper->normalizePath($currentWorkingDirectoryFileHelper->absolutizePath($generateBaselineFile));
 		}
 
+		if ($singleReflectionFile !== null) {
+			$singleReflectionFile = $currentWorkingDirectoryFileHelper->normalizePath($currentWorkingDirectoryFileHelper->absolutizePath($singleReflectionFile));
+			if (!is_file($singleReflectionFile)) {
+				$errorOutput->writeLineFormatted(sprintf('File passed to <fg=cyan>--tmp-file</> option does not exist: <error>%s</error>', $singleReflectionFile));
+				throw new InceptionNotSuccessfulException();
+			}
+
+			if ($singleReflectionInsteadOfFile === null) {
+				$errorOutput->writeLineFormatted('Both <fg=cyan>--tmp-file</> and <fg=cyan>--instead-of</> options must be passed at the same time for editor mode to work.');
+				throw new InceptionNotSuccessfulException();
+			}
+		}
+
+		if ($singleReflectionInsteadOfFile !== null) {
+			$singleReflectionInsteadOfFile = $currentWorkingDirectoryFileHelper->normalizePath($currentWorkingDirectoryFileHelper->absolutizePath($singleReflectionInsteadOfFile));
+			if (!is_file($singleReflectionInsteadOfFile)) {
+				$errorOutput->writeLineFormatted(sprintf('File passed to <fg=cyan>--instead-of</> option does not exist: <error>%s</error>', $singleReflectionInsteadOfFile));
+				throw new InceptionNotSuccessfulException();
+			}
+
+			if ($singleReflectionFile === null) {
+				$errorOutput->writeLineFormatted('Both <fg=cyan>--tmp-file</> and <fg=cyan>--instead-of</> options must be passed at the same time for editor mode to work.');
+				throw new InceptionNotSuccessfulException();
+			}
+		}
+
 		$defaultLevelUsed = false;
 		if ($projectConfigFile === null && $level === null) {
 			$level = self::DEFAULT_LEVEL;
@@ -184,7 +238,10 @@ class CommandHelper
 		$paths = array_map(static fn (string $path): string => $currentWorkingDirectoryFileHelper->normalizePath($currentWorkingDirectoryFileHelper->absolutizePath($path)), $paths);
 
 		$analysedPathsFromConfig = [];
-		$containerFactory = new ContainerFactory($currentWorkingDirectory, true);
+		$containerFactory = new ContainerFactory($currentWorkingDirectory);
+		if ($cleanupContainerCache) {
+			$containerFactory->setJournalContainer();
+		}
 		$projectConfig = null;
 		if ($projectConfigFile !== null) {
 			if (!is_file($projectConfigFile)) {
@@ -197,6 +254,10 @@ class CommandHelper
 				$containerFactory->getRootDirectory(),
 				$containerFactory->getCurrentWorkingDirectory(),
 				$generateBaselineFile,
+				[
+					'[parameters][paths][]',
+					'[parameters][tmpDir]',
+				],
 			))->createLoader();
 
 			try {
@@ -208,6 +269,7 @@ class CommandHelper
 			$defaultParameters = [
 				'rootDir' => $containerFactory->getRootDirectory(),
 				'currentWorkingDirectory' => $containerFactory->getCurrentWorkingDirectory(),
+				'env' => Environment::getCleanedArray(),
 			];
 
 			if (isset($projectConfig['parameters']['tmpDir'])) {
@@ -262,6 +324,43 @@ class CommandHelper
 					$additionalConfigFiles[] = $includedFilePath;
 				}
 			}
+
+			if (
+				count($additionalConfigFiles) > 0
+				&& $generatedConfigReflection->hasConstant('PHPSTAN_VERSION_CONSTRAINT')
+			) {
+				$generatedConfigPhpStanVersionConstraint = $generatedConfigReflection->getConstant('PHPSTAN_VERSION_CONSTRAINT');
+				if ($generatedConfigPhpStanVersionConstraint !== null) {
+					$phpstanSemverVersion = ComposerHelper::getPhpStanVersion();
+					if (
+						$phpstanSemverVersion !== ComposerHelper::UNKNOWN_VERSION
+						&& !str_contains($phpstanSemverVersion, '@')
+						&& !Semver::satisfies($phpstanSemverVersion, $generatedConfigPhpStanVersionConstraint)
+					) {
+						$errorOutput->writeLineFormatted('<error>Running PHPStan with incompatible extensions</error>');
+						$errorOutput->writeLineFormatted('You\'re running PHPStan from a different Composer project');
+						$errorOutput->writeLineFormatted('than the one where you installed extensions.');
+						$errorOutput->writeLineFormatted('');
+						$errorOutput->writeLineFormatted(sprintf('Your PHPStan version is: <fg=red>%s</>', $phpstanSemverVersion));
+						$errorOutput->writeLineFormatted(sprintf('Installed PHPStan extensions support: %s', $generatedConfigPhpStanVersionConstraint));
+
+						$errorOutput->writeLineFormatted('');
+						if (isset($_SERVER['argv'][0]) && is_file($_SERVER['argv'][0])) {
+							$mainScript = $_SERVER['argv'][0];
+							$errorOutput->writeLineFormatted(sprintf('PHPStan is running from: %s', $currentWorkingDirectoryFileHelper->absolutizePath(dirname($mainScript))));
+						}
+
+						$errorOutput->writeLineFormatted(sprintf('Extensions were installed in: %s', dirname($generatedConfigDirectory, 3)));
+						$errorOutput->writeLineFormatted('');
+
+						$simpleRelativePathHelper = new SimpleRelativePathHelper($currentWorkingDirectory);
+						$errorOutput->writeLineFormatted(sprintf('Run PHPStan with <fg=green>%s</> to fix this problem.', $simpleRelativePathHelper->getRelativePath(dirname($generatedConfigDirectory, 3) . '/bin/phpstan')));
+
+						$errorOutput->writeLineFormatted('');
+						throw new InceptionNotSuccessfulException();
+					}
+				}
+			}
 		}
 
 		if (
@@ -272,8 +371,10 @@ class CommandHelper
 		}
 
 		$createDir = static function (string $path) use ($errorOutput): void {
-			if (!is_dir($path) && !@mkdir($path, 0777) && !is_dir($path)) {
-				$errorOutput->writeLineFormatted(sprintf('Cannot create a temp directory %s', $path));
+			try {
+				DirectoryCreator::ensureDirectoryExists($path, 0777);
+			} catch (DirectoryCreatorException $e) {
+				$errorOutput->writeLineFormatted($e->getMessage());
 				throw new InceptionNotSuccessfulException();
 			}
 		};
@@ -295,6 +396,50 @@ class CommandHelper
 				$errorOutput->writeLineFormatted($error);
 				$errorOutput->writeLineFormatted('');
 			}
+
+			$errorOutput->writeLineFormatted('To ignore non-existent paths in ignoreErrors,');
+			$errorOutput->writeLineFormatted('set <fg=cyan>reportUnmatchedIgnoredErrors: false</> in your configuration file.');
+			$errorOutput->writeLineFormatted('');
+
+			throw new InceptionNotSuccessfulException();
+		} catch (MissingImplementedInterfaceInServiceWithTagException $e) {
+			$errorOutput->writeLineFormatted('<error>Invalid service:</error>');
+			$errorOutput->writeLineFormatted($e->getMessage());
+			$errorOutput->writeLineFormatted('');
+
+			throw new InceptionNotSuccessfulException();
+		} catch (InvalidExcludePathsException $e) {
+			$errorOutput->writeLineFormatted(sprintf('<error>Invalid %s in excludePaths:</error>', count($e->getErrors()) === 1 ? 'entry' : 'entries'));
+			foreach ($e->getErrors() as $error) {
+				$errorOutput->writeLineFormatted($error);
+				$errorOutput->writeLineFormatted('');
+			}
+
+			$suggestOptional = $e->getSuggestOptional();
+			if (count($suggestOptional) > 0) {
+				$baselinePathHelper = null;
+				if ($projectConfigFile !== null) {
+					$baselinePathHelper = new ParentDirectoryRelativePathHelper(dirname($projectConfigFile));
+				}
+				$errorOutput->writeLineFormatted('If the excluded path can sometimes exist, append <fg=cyan>(?)</>');
+				$errorOutput->writeLineFormatted('to its config entry to mark it as optional. Example:');
+				$errorOutput->writeLineFormatted('');
+				$errorOutput->writeLineFormatted('<fg=cyan>parameters:</>');
+				$errorOutput->writeLineFormatted("\t<fg=cyan>excludePaths:</>");
+				foreach ($suggestOptional as $key => $suggestOptionalPaths) {
+					$errorOutput->writeLineFormatted(sprintf("\t\t<fg=cyan>%s:</>", $key));
+					foreach ($suggestOptionalPaths as $suggestOptionalPath) {
+						if ($baselinePathHelper === null) {
+							$errorOutput->writeLineFormatted(sprintf("\t\t\t- <fg=cyan>%s (?)</>", $suggestOptionalPath));
+							continue;
+						}
+
+						$errorOutput->writeLineFormatted(sprintf("\t\t\t- <fg=cyan>%s (?)</>", $baselinePathHelper->getRelativePath($suggestOptionalPath)));
+					}
+				}
+				$errorOutput->writeLineFormatted('');
+			}
+
 			throw new InceptionNotSuccessfulException();
 		} catch (ValidationException $e) {
 			foreach ($e->getMessages() as $message) {
@@ -349,12 +494,10 @@ class CommandHelper
 		}
 
 		if ($cleanupContainerCache) {
-			$containerFactory->clearOldContainers($tmpDir);
-		}
-
-		if (count($paths) === 0) {
-			$errorOutput->writeLineFormatted('At least one path must be specified to analyse.');
-			throw new InceptionNotSuccessfulException();
+			$cacheStorage = $container->getService('cacheStorage');
+			if ($cacheStorage instanceof FileCacheStorage) {
+				$cacheStorage->clearUnusedFiles();
+			}
 		}
 
 		/** @var bool|null $customRulesetUsed */
@@ -379,7 +522,7 @@ class CommandHelper
 			self::executeBootstrapFile($bootstrapFileFromArray, $container, $errorOutput, $debugEnabled);
 		}
 
-		/** @var array<callable>|false $autoloadFunctionsAfter */
+		/** @var list<callable(string): void>|false $autoloadFunctionsAfter */
 		$autoloadFunctionsAfter = spl_autoload_functions();
 
 		if ($autoloadFunctionsBefore !== false && $autoloadFunctionsAfter !== false) {
@@ -444,35 +587,26 @@ class CommandHelper
 			throw new InceptionNotSuccessfulException();
 		}
 
-		$excludesAnalyse = $container->getParameter('excludes_analyse');
-		$excludePaths = $container->getParameter('excludePaths');
-		if (count($excludesAnalyse) > 0 && $excludePaths !== null) {
-			$errorOutput->writeLineFormatted(sprintf('Configuration parameters <fg=cyan>excludes_analyse</> and <fg=cyan>excludePaths</> cannot be used at the same time.'));
-			$errorOutput->writeLineFormatted('');
-			$errorOutput->writeLineFormatted(sprintf('Parameter <fg=cyan>excludes_analyse</> has been deprecated so use <fg=cyan>excludePaths</> only from now on.'));
-			$errorOutput->writeLineFormatted('');
-
-			throw new InceptionNotSuccessfulException();
-		} elseif (count($excludesAnalyse) > 0) {
-			$errorOutput->writeLineFormatted('⚠️  You\'re using a deprecated config option <fg=cyan>excludes_analyse</>. ⚠️️');
-			$errorOutput->writeLineFormatted('');
-			$errorOutput->writeLineFormatted(sprintf('Parameter <fg=cyan>excludes_analyse</> has been deprecated so use <fg=cyan>excludePaths</> only from now on.'));
-		}
-
-		$tempResultCachePath = $container->getParameter('tempResultCachePath');
-		$createDir($tempResultCachePath);
-
 		/** @var FileFinder $fileFinder */
 		$fileFinder = $container->getService('fileFinderAnalyse');
 
 		$pathRoutingParser = $container->getService('pathRoutingParser');
 
-		/** @var Closure(): array{string[], bool} $filesCallback */
-		$filesCallback = static function () use ($fileFinder, $pathRoutingParser, $paths): array {
+		$stubFilesProvider = $container->getByType(StubFilesProvider::class);
+
+		$filesCallback = static function () use ($currentWorkingDirectoryFileHelper, $stubFilesProvider, $fileFinder, $pathRoutingParser, $paths, $errorOutput): array {
+			if (count($paths) === 0) {
+				$errorOutput->writeLineFormatted('At least one path must be specified to analyse.');
+				throw new InceptionNotSuccessfulException();
+			}
 			$fileFinderResult = $fileFinder->findFiles($paths);
 			$files = $fileFinderResult->getFiles();
 
 			$pathRoutingParser->setAnalysedFiles($files);
+
+			$stubFilesExcluder = new FileExcluder($currentWorkingDirectoryFileHelper, $stubFilesProvider->getProjectStubFiles());
+
+			$files = array_values(array_filter($files, static fn (string $file) => !$stubFilesExcluder->isExcludedFromAnalysing($file)));
 
 			return [$files, $fileFinderResult->isOnlyFiles()];
 		};
@@ -486,6 +620,8 @@ class CommandHelper
 			$projectConfigFile,
 			$projectConfig,
 			$generateBaselineFile,
+			$singleReflectionFile,
+			$singleReflectionInsteadOfFile,
 		);
 	}
 

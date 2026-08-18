@@ -4,12 +4,12 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
 use PHPStan\Type\Accessory\AccessoryNonFalsyStringType;
 use PHPStan\Type\Constant\ConstantArrayTypeBuilder;
 use PHPStan\Type\Constant\ConstantIntegerType;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\FloatType;
 use PHPStan\Type\IntegerType;
@@ -21,7 +21,8 @@ use function count;
 use function in_array;
 use function preg_match_all;
 
-class SscanfFunctionDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class SscanfFunctionDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -40,11 +41,11 @@ class SscanfFunctionDynamicReturnTypeExtension implements DynamicFunctionReturnT
 			return null;
 		}
 
-		$formatType = $scope->getType($args[1]->value);
-
-		if (!$formatType instanceof ConstantStringType) {
+		$formatType = $scope->getType($args[1]->value)->getConstantStrings();
+		if (count($formatType) !== 1) {
 			return null;
 		}
+		$formatType = $formatType[0];
 
 		if (preg_match_all('/%(\d*)(\[[^\]]+\]|[cdeEfosux]{1})/', $formatType->getValue(), $matches) > 0) {
 			$arrayBuilder = ConstantArrayTypeBuilder::createEmpty();

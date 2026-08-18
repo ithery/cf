@@ -4,7 +4,7 @@ namespace PHPStan\File;
 
 use function count;
 
-class FileMonitorResult
+final class FileMonitorResult
 {
 
 	/**
@@ -16,9 +16,16 @@ class FileMonitorResult
 		private array $newFiles,
 		private array $changedFiles,
 		private array $deletedFiles,
-		private int $totalFilesCount,
 	)
 	{
+	}
+
+	/**
+	 * @return string[]
+	 */
+	public function getChangedFiles(): array
+	{
+		return $this->changedFiles;
 	}
 
 	public function hasAnyChanges(): bool
@@ -26,11 +33,6 @@ class FileMonitorResult
 		return count($this->newFiles) > 0
 			|| count($this->changedFiles) > 0
 			|| count($this->deletedFiles) > 0;
-	}
-
-	public function getTotalFilesCount(): int
-	{
-		return $this->totalFilesCount;
 	}
 
 }

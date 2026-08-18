@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Functions;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\NullsafeCheck;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -11,7 +12,8 @@ use PHPStan\Rules\RuleErrorBuilder;
 /**
  * @implements Rule<Node\Expr\ArrowFunction>
  */
-class ArrowFunctionReturnNullsafeByRefRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ArrowFunctionReturnNullsafeByRefRule implements Rule
 {
 
 	public function __construct(private NullsafeCheck $nullsafeCheck)
@@ -34,7 +36,10 @@ class ArrowFunctionReturnNullsafeByRefRule implements Rule
 		}
 
 		return [
-			RuleErrorBuilder::message('Nullsafe cannot be returned by reference.')->nonIgnorable()->build(),
+			RuleErrorBuilder::message('Nullsafe cannot be returned by reference.')
+				->nonIgnorable()
+				->identifier('nullsafe.byRef')
+				->build(),
 		];
 	}
 

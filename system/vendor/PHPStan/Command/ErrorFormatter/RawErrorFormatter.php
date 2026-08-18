@@ -4,9 +4,12 @@ namespace PHPStan\Command\ErrorFormatter;
 
 use PHPStan\Command\AnalysisResult;
 use PHPStan\Command\Output;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Internal\AgentDetector;
 use function sprintf;
 
-class RawErrorFormatter implements ErrorFormatter
+#[AutowiredService(name: 'errorFormatter.raw')]
+final class RawErrorFormatter implements ErrorFormatter
 {
 
 	public function formatErrors(
@@ -19,13 +22,20 @@ class RawErrorFormatter implements ErrorFormatter
 			$output->writeLineFormatted('');
 		}
 
+		$outputIdentifiers = $output->isVerbose() || AgentDetector::isRunningInAgent();
 		foreach ($analysisResult->getFileSpecificErrors() as $fileSpecificError) {
+			$identifier = '';
+			if ($outputIdentifiers && $fileSpecificError->getIdentifier() !== null) {
+				$identifier = sprintf(' [identifier=%s]', $fileSpecificError->getIdentifier());
+			}
+
 			$output->writeRaw(
 				sprintf(
-					'%s:%d:%s',
+					'%s:%s:%s%s',
 					$fileSpecificError->getFile(),
 					$fileSpecificError->getLine() ?? '?',
 					$fileSpecificError->getMessage(),
+					$identifier,
 				),
 			);
 			$output->writeLineFormatted('');

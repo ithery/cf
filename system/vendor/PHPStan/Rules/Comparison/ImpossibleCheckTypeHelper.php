@@ -8,25 +8,33 @@ use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
+use PHPStan\Analyser\MutatingScope;
 use PHPStan\Analyser\Scope;
 use PHPStan\Analyser\TypeSpecifier;
 use PHPStan\Analyser\TypeSpecifierContext;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\ShouldNotHappenException;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantStringType;
+use PHPStan\Type\Generic\GenericClassStringType;
+use PHPStan\Type\IntersectionType;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
-use PHPStan\Type\TypeUtils;
+use PHPStan\Type\TypeTraverser;
 use PHPStan\Type\TypeWithClassName;
+use PHPStan\Type\UnionType;
 use PHPStan\Type\VerbosityLevel;
-use PHPStan\Type\VoidType;
 use function array_map;
 use function array_pop;
+use function array_unique;
+use function array_values;
 use function count;
 use function implode;
 use function in_array;
@@ -34,45 +42,83 @@ use function is_string;
 use function sprintf;
 use function strtolower;
 
-class ImpossibleCheckTypeHelper
+#[AutowiredService]
+final class ImpossibleCheckTypeHelper
 {
 
-	/**
-	 * @param string[] $universalObjectCratesClasses
-	 */
 	public function __construct(
 		private ReflectionProvider $reflectionProvider,
 		private TypeSpecifier $typeSpecifier,
-		private array $universalObjectCratesClasses,
+		#[AutowiredParameter]
 		private bool $treatPhpDocTypesAsCertain,
-		private bool $nullContextForVoidReturningFunctions,
 	)
 	{
 	}
 
+	/**
+	 * @param list<string> $reasons populated with human-readable explanations of why the
+	 * result is "always false" (empty for the "always true" / inconclusive results)
+	 */
 	public function findSpecifiedType(
 		Scope $scope,
 		Expr $node,
+		array &$reasons = [],
+	): ?bool
+	{
+		$specifiedValue = $this->getSpecifiedType($scope, $node, $reasons);
+		$reasons = array_values(array_unique($reasons));
+
+		/**
+		 * For class_exists()/interface_exists()/trait_exists()/enum_exists() the "always true"
+		 * result is suppressed, because runtime autoload can always fail. "Always false" is still
+		 * reported when the type specifier proves impossibility (e.g. class_exists() on a constant
+		 * string that names an interface).
+		 */
+		if (
+			$specifiedValue === true
+			&& $node instanceof FuncCall
+			&& $node->name instanceof Node\Name
+			&& in_array(strtolower((string) $node->name), [
+				'class_exists',
+				'interface_exists',
+				'trait_exists',
+				'enum_exists',
+			], true)
+		) {
+			return null;
+		}
+
+		return $specifiedValue;
+	}
+
+	/**
+	 * @param list<string> $reasons
+	 */
+	private function getSpecifiedType(
+		Scope $scope,
+		Expr $node,
+		array &$reasons = [],
 	): ?bool
 	{
 		if ($node instanceof FuncCall) {
-			$argsCount = count($node->getArgs());
+			if ($node->isFirstClassCallable()) {
+				return null;
+			}
+			$args = $node->getArgs();
+			$argsCount = count($args);
 			if ($node->name instanceof Node\Name) {
 				$functionName = strtolower((string) $node->name);
 				if ($functionName === 'assert' && $argsCount >= 1) {
-					$assertValue = $scope->getType($node->getArgs()[0]->value)->toBoolean();
-					if (!$assertValue instanceof ConstantBooleanType) {
+					$arg = $args[0]->value;
+					$assertValue = ($this->treatPhpDocTypesAsCertain ? $scope->getType($arg) : $scope->getNativeType($arg))->toBoolean();
+					$assertValueIsTrue = $assertValue->isTrue()->yes();
+					if (! $assertValueIsTrue && ! $assertValue->isFalse()->yes()) {
 						return null;
 					}
 
-					return $assertValue->getValue();
+					return $assertValueIsTrue;
 				}
-				if (in_array($functionName, [
-					'class_exists',
-					'interface_exists',
-					'trait_exists',
-					'enum_exists',
-				], true)) {
+				if ($functionName === 'function_exists') {
 					return null;
 				}
 				if (in_array($functionName, ['count', 'sizeof'], true)) {
@@ -81,8 +127,9 @@ class ImpossibleCheckTypeHelper
 					return null;
 				} elseif ($functionName === 'array_search') {
 					return null;
-				} elseif ($functionName === 'in_array' && $argsCount >= 3) {
-					$haystackType = $scope->getType($node->getArgs()[1]->value);
+				} elseif ($functionName === 'in_array' && $argsCount >= 2) {
+					$haystackArg = $args[1]->value;
+					$haystackType = $this->treatPhpDocTypesAsCertain ? $scope->getType($haystackArg) : $scope->getNativeType($haystackArg);
 					if ($haystackType instanceof MixedType) {
 						return null;
 					}
@@ -91,13 +138,30 @@ class ImpossibleCheckTypeHelper
 						return null;
 					}
 
-					$needleType = $scope->getType($node->getArgs()[0]->value);
+					$needleArg = $args[0]->value;
+					$needleType = $this->treatPhpDocTypesAsCertain ? $scope->getType($needleArg) : $scope->getNativeType($needleArg);
+
+					$isStrictComparison = false;
+					if ($argsCount >= 3) {
+						$strictNodeType = $scope->getType($args[2]->value);
+						$isStrictComparison = $strictNodeType->isTrue()->yes();
+					}
+
+					$isStrictComparison = $isStrictComparison
+						|| $needleType->isEnum()->yes()
+						|| $haystackType->getIterableValueType()->isEnum()->yes();
+
+					if (!$isStrictComparison) {
+						return null;
+					}
+
 					$valueType = $haystackType->getIterableValueType();
-					$constantNeedleTypesCount = count(TypeUtils::getConstantScalars($needleType));
-					$constantHaystackTypesCount = count(TypeUtils::getConstantScalars($valueType));
+					$constantNeedleTypesCount = count($needleType->getFiniteTypes());
+					$constantHaystackTypesCount = count($valueType->getFiniteTypes());
 					$isNeedleSupertype = $needleType->isSuperTypeOf($valueType);
 					if ($haystackType->isConstantArray()->no()) {
 						if ($haystackType->isIterableAtLeastOnce()->yes()) {
+							// In this case the generic implementation via typeSpecifier fails, because the argument types cannot be narrowed down.
 							if ($constantNeedleTypesCount === 1 && $constantHaystackTypesCount === 1) {
 								if ($isNeedleSupertype->yes()) {
 									return true;
@@ -106,8 +170,14 @@ class ImpossibleCheckTypeHelper
 									return false;
 								}
 							}
+
+							return null;
 						}
-						return null;
+
+						if (!$isNeedleSupertype->no()) {
+							// Array might be empty, so in_array can return false
+							return null;
+						}
 					}
 
 					if (!$haystackType instanceof ConstantArrayType || count($haystackType->getValueTypes()) > 0) {
@@ -117,28 +187,46 @@ class ImpossibleCheckTypeHelper
 						}
 
 						if ($isNeedleSupertype->maybe() || $isNeedleSupertype->yes()) {
-							foreach ($haystackArrayTypes as $haystackArrayType) {
-								if ($haystackArrayType instanceof ConstantArrayType) {
-									foreach ($haystackArrayType->getValueTypes() as $i => $haystackArrayValueType) {
-										if ($haystackArrayType->isOptionalKey($i)) {
-											continue;
-										}
+							$needleFiniteTypes = $needleType->getFiniteTypes();
+							if ($needleFiniteTypes === []) {
+								return null;
+							}
 
-										foreach (TypeUtils::getConstantScalars($haystackArrayValueType) as $constantScalarType) {
-											if ($constantScalarType->isSuperTypeOf($needleType)->yes()) {
-												continue 3;
-											}
-										}
-									}
-								} else {
-									foreach (TypeUtils::getConstantScalars($haystackArrayType->getIterableValueType()) as $constantScalarType) {
-										if ($constantScalarType->isSuperTypeOf($needleType)->yes()) {
-											continue 2;
-										}
-									}
+							foreach ($haystackArrayTypes as $haystackArrayType) {
+								$guaranteedValueTypes = [];
+								if (!($haystackArrayType instanceof ConstantArrayType)) {
+									// A general array cannot guarantee any specific value is present.
+									return null;
 								}
 
-								return null;
+								foreach ($haystackArrayType->getValueTypes() as $i => $haystackArrayValueType) {
+									if ($haystackArrayType->isOptionalKey($i)) {
+										continue;
+									}
+
+									$haystackArrayValueFiniteTypes = $haystackArrayValueType->getFiniteTypes();
+									if (count($haystackArrayValueFiniteTypes) !== 1) {
+										continue;
+									}
+
+									$guaranteedValueTypes[] = $haystackArrayValueFiniteTypes[0];
+								}
+
+								// in_array() is only guaranteed true when every possible needle value
+								// is guaranteed to be present in this haystack variant.
+								foreach ($needleFiniteTypes as $needleFiniteType) {
+									$found = false;
+									foreach ($guaranteedValueTypes as $guaranteedValueType) {
+										if ($guaranteedValueType->isSuperTypeOf($needleFiniteType)->yes()) {
+											$found = true;
+											break;
+										}
+									}
+
+									if (!$found) {
+										return null;
+									}
+								}
 							}
 						}
 
@@ -154,8 +242,8 @@ class ImpossibleCheckTypeHelper
 						}
 					}
 				} elseif ($functionName === 'method_exists' && $argsCount >= 2) {
-					$objectType = $scope->getType($node->getArgs()[0]->value);
-					$methodType = $scope->getType($node->getArgs()[1]->value);
+					$objectArg = $args[0]->value;
+					$objectType = $this->treatPhpDocTypesAsCertain ? $scope->getType($objectArg) : $scope->getNativeType($objectArg);
 
 					if ($objectType instanceof ConstantStringType
 						&& !$this->reflectionProvider->hasClass($objectType->getValue())
@@ -163,17 +251,57 @@ class ImpossibleCheckTypeHelper
 						return false;
 					}
 
+					$methodArg = $args[1]->value;
+					$methodType = $this->treatPhpDocTypesAsCertain ? $scope->getType($methodArg) : $scope->getNativeType($methodArg);
+
 					if ($methodType instanceof ConstantStringType) {
 						if ($objectType instanceof ConstantStringType) {
 							$objectType = new ObjectType($objectType->getValue());
 						}
 
-						if ($objectType instanceof TypeWithClassName) {
+						if ($objectType->getObjectClassNames() !== []) {
 							if ($objectType->hasMethod($methodType->getValue())->yes()) {
+								foreach ($objectType->getObjectClassReflections() as $classReflection) {
+									if (!$classReflection->hasNativeMethod($methodType->getValue())) {
+										return null;
+									}
+								}
 								return true;
 							}
 
 							if ($objectType->hasMethod($methodType->getValue())->no()) {
+								return false;
+							}
+						}
+
+						$genericType = TypeTraverser::map($objectType, static function (Type $type, callable $traverse): Type {
+							if ($type instanceof UnionType || $type instanceof IntersectionType) {
+								return $traverse($type);
+							}
+							if ($type instanceof GenericClassStringType) {
+								return $type->getGenericType();
+							}
+							return new MixedType();
+						});
+
+						if ($genericType instanceof TypeWithClassName) {
+							if ($genericType->hasMethod($methodType->getValue())->yes()) {
+								$classReflection = $genericType->getClassReflection();
+								if (
+									$classReflection !== null
+									&& $classReflection->hasNativeMethod($methodType->getValue())
+								) {
+									return true;
+								}
+
+								return null;
+							}
+
+							$classReflection = $genericType->getClassReflection();
+							if (
+								$classReflection !== null
+								&& $classReflection->isFinal()
+								&& $genericType->hasMethod($methodType->getValue())->no()) {
 								return false;
 							}
 						}
@@ -182,7 +310,12 @@ class ImpossibleCheckTypeHelper
 			}
 		}
 
-		$specifiedTypes = $this->typeSpecifier->specifyTypesInCondition($scope, $node, $this->determineContext($scope, $node));
+		if (!$scope instanceof MutatingScope) {
+			throw new ShouldNotHappenException();
+		}
+
+		$typeSpecifierScope = $this->treatPhpDocTypesAsCertain ? $scope : $scope->doNotTreatPhpDocTypesAsCertain();
+		$specifiedTypes = $this->typeSpecifier->specifyTypesInCondition($typeSpecifierScope, $node, $this->determineContext($typeSpecifierScope, $node));
 
 		// don't validate types on overwrite
 		if ($specifiedTypes->shouldOverwrite()) {
@@ -194,11 +327,11 @@ class ImpossibleCheckTypeHelper
 
 		$rootExpr = $specifiedTypes->getRootExpr();
 		if ($rootExpr !== null) {
-			if (self::isSpecified($scope, $node, $rootExpr)) {
+			if (self::isSpecified($typeSpecifierScope, $node, $rootExpr)) {
 				return null;
 			}
 
-			$rootExprType = $scope->getType($rootExpr);
+			$rootExprType = $this->treatPhpDocTypesAsCertain ? $scope->getType($rootExpr) : $scope->getNativeType($rootExpr);
 			if ($rootExprType instanceof ConstantBooleanType) {
 				return $rootExprType->getValue();
 			}
@@ -208,8 +341,36 @@ class ImpossibleCheckTypeHelper
 
 		$results = [];
 
+		$assignedInCallVars = [];
+		if ($node instanceof Expr\CallLike) {
+			foreach ($node->getArgs() as $arg) {
+				$expr = $arg->value;
+				while ($expr instanceof Expr\Assign) {
+					$expr = $expr->expr;
+				}
+				$assignedExpr = $expr;
+
+				$expr = $arg->value;
+				while ($expr instanceof Expr\Assign) {
+					$assignedInCallVars[] = new Expr\Assign(
+						$expr->var,
+						$assignedExpr,
+						$expr->getAttributes(),
+					);
+
+					$expr = $expr->expr;
+				}
+			}
+		}
 		foreach ($sureTypes as $sureType) {
-			if (self::isSpecified($scope, $node, $sureType[0])) {
+			if ($sureType[0] === $node) {
+				// The check's own truthiness carries no information about
+				// whether the check is redundant; the informative narrowing
+				// lives in the argument entries.
+				continue;
+			}
+
+			if (self::isSpecified($typeSpecifierScope, $node, $sureType[0])) {
 				$results[] = TrinaryLogic::createMaybe();
 				continue;
 			}
@@ -223,11 +384,34 @@ class ImpossibleCheckTypeHelper
 			/** @var Type $resultType */
 			$resultType = $sureType[1];
 
-			$results[] = $resultType->isSuperTypeOf($argumentType);
+			foreach ($assignedInCallVars as $assignedInCallVar) {
+				if ($sureType[0] !== $assignedInCallVar->var) {
+					continue;
+				}
+
+				$argumentType = $scope->getType($assignedInCallVar->expr);
+			}
+
+			$isSuperType = $resultType->isSuperTypeOf($argumentType);
+			$results[] = $isSuperType->result;
+			if (!$isSuperType->result->no()) {
+				continue;
+			}
+
+			foreach ($isSuperType->getReasons() as $reason) {
+				$reasons[] = $reason;
+			}
 		}
 
 		foreach ($sureNotTypes as $sureNotType) {
-			if (self::isSpecified($scope, $node, $sureNotType[0])) {
+			if ($sureNotType[0] === $node) {
+				// The check's own truthiness carries no information about
+				// whether the check is redundant; the informative narrowing
+				// lives in the argument entries.
+				continue;
+			}
+
+			if (self::isSpecified($typeSpecifierScope, $node, $sureNotType[0])) {
 				$results[] = TrinaryLogic::createMaybe();
 				continue;
 			}
@@ -241,7 +425,15 @@ class ImpossibleCheckTypeHelper
 			/** @var Type $resultType */
 			$resultType = $sureNotType[1];
 
-			$results[] = $resultType->isSuperTypeOf($argumentType)->negate();
+			$isSuperType = $resultType->isSuperTypeOf($argumentType)->negate();
+			$results[] = $isSuperType->result;
+			if (!$isSuperType->result->no()) {
+				continue;
+			}
+
+			foreach ($isSuperType->getReasons() as $reason) {
+				$reasons[] = $reason;
+			}
 		}
 
 		if (count($results) === 0) {
@@ -249,6 +441,7 @@ class ImpossibleCheckTypeHelper
 		}
 
 		$result = TrinaryLogic::createYes()->and(...$results);
+
 		return $result->maybe() ? null : $result->yes();
 	}
 
@@ -289,7 +482,7 @@ class ImpossibleCheckTypeHelper
 			return '';
 		}
 
-		$descriptions = array_map(static fn (Arg $arg): string => $scope->getType($arg->value)->describe(VerbosityLevel::value()), $args);
+		$descriptions = array_map(fn (Arg $arg): string => ($this->treatPhpDocTypesAsCertain ? $scope->getType($arg->value) : $scope->getNativeType($arg->value))->describe(VerbosityLevel::value()), $args);
 
 		if (count($descriptions) < 3) {
 			return sprintf(' with %s', implode(' and ', $descriptions));
@@ -313,34 +506,32 @@ class ImpossibleCheckTypeHelper
 		return new self(
 			$this->reflectionProvider,
 			$this->typeSpecifier,
-			$this->universalObjectCratesClasses,
 			false,
-			$this->nullContextForVoidReturningFunctions,
 		);
 	}
 
 	private function determineContext(Scope $scope, Expr $node): TypeSpecifierContext
 	{
-		if (!$this->nullContextForVoidReturningFunctions) {
+		if ($node instanceof Expr\CallLike && $node->isFirstClassCallable()) {
 			return TypeSpecifierContext::createTruthy();
 		}
 
 		if ($node instanceof FuncCall && $node->name instanceof Node\Name) {
 			if ($this->reflectionProvider->hasFunction($node->name, $scope)) {
 				$functionReflection = $this->reflectionProvider->getFunction($node->name, $scope);
-				$parametersAcceptor = ParametersAcceptorSelector::selectFromArgs($scope, $node->getArgs(), $functionReflection->getVariants());
-				$returnType = TypeUtils::resolveLateResolvableTypes($parametersAcceptor->getReturnType());
+				$parametersAcceptor = ParametersAcceptorSelector::selectFromArgs($scope, $node->getArgs(), $functionReflection->getVariants(), $functionReflection->getNamedArgumentsVariants());
+				$returnType = $parametersAcceptor->getReturnType();
 
-				return $returnType instanceof VoidType ? TypeSpecifierContext::createNull() : TypeSpecifierContext::createTruthy();
+				return $returnType->isVoid()->yes() ? TypeSpecifierContext::createNull() : TypeSpecifierContext::createTruthy();
 			}
 		} elseif ($node instanceof MethodCall && $node->name instanceof Node\Identifier) {
 			$methodCalledOnType = $scope->getType($node->var);
 			$methodReflection = $scope->getMethodReflection($methodCalledOnType, $node->name->name);
 			if ($methodReflection !== null) {
-				$parametersAcceptor = ParametersAcceptorSelector::selectFromArgs($scope, $node->getArgs(), $methodReflection->getVariants());
-				$returnType = TypeUtils::resolveLateResolvableTypes($parametersAcceptor->getReturnType());
+				$parametersAcceptor = ParametersAcceptorSelector::selectFromArgs($scope, $node->getArgs(), $methodReflection->getVariants(), $methodReflection->getNamedArgumentsVariants());
+				$returnType = $parametersAcceptor->getReturnType();
 
-				return $returnType instanceof VoidType ? TypeSpecifierContext::createNull() : TypeSpecifierContext::createTruthy();
+				return $returnType->isVoid()->yes() ? TypeSpecifierContext::createNull() : TypeSpecifierContext::createTruthy();
 			}
 		} elseif ($node instanceof StaticCall && $node->name instanceof Node\Identifier) {
 			if ($node->class instanceof Node\Name) {
@@ -351,10 +542,10 @@ class ImpossibleCheckTypeHelper
 
 			$staticMethodReflection = $scope->getMethodReflection($calleeType, $node->name->name);
 			if ($staticMethodReflection !== null) {
-				$parametersAcceptor = ParametersAcceptorSelector::selectFromArgs($scope, $node->getArgs(), $staticMethodReflection->getVariants());
-				$returnType = TypeUtils::resolveLateResolvableTypes($parametersAcceptor->getReturnType());
+				$parametersAcceptor = ParametersAcceptorSelector::selectFromArgs($scope, $node->getArgs(), $staticMethodReflection->getVariants(), $staticMethodReflection->getNamedArgumentsVariants());
+				$returnType = $parametersAcceptor->getReturnType();
 
-				return $returnType instanceof VoidType ? TypeSpecifierContext::createNull() : TypeSpecifierContext::createTruthy();
+				return $returnType->isVoid()->yes() ? TypeSpecifierContext::createNull() : TypeSpecifierContext::createTruthy();
 			}
 		}
 

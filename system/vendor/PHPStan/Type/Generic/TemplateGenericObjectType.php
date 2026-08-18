@@ -13,24 +13,29 @@ final class TemplateGenericObjectType extends GenericObjectType implements Templ
 	/** @use TemplateTypeTrait<GenericObjectType> */
 	use TemplateTypeTrait;
 
+	/**
+	 * @param non-empty-string $name
+	 */
 	public function __construct(
 		TemplateTypeScope $scope,
 		TemplateTypeStrategy $templateTypeStrategy,
 		TemplateTypeVariance $templateTypeVariance,
 		string $name,
 		GenericObjectType $bound,
+		?Type $default,
 	)
 	{
-		parent::__construct($bound->getClassName(), $bound->getTypes());
+		parent::__construct($bound->getClassName(), $bound->getTypes(), variances: $bound->getVariances());
 
 		$this->scope = $scope;
 		$this->strategy = $templateTypeStrategy;
 		$this->variance = $templateTypeVariance;
 		$this->name = $name;
 		$this->bound = $bound;
+		$this->default = $default;
 	}
 
-	protected function recreate(string $className, array $types, ?Type $subtractedType): GenericObjectType
+	protected function recreate(string $className, array $types, ?Type $subtractedType, array $variances = []): GenericObjectType
 	{
 		return new self(
 			$this->scope,
@@ -38,6 +43,7 @@ final class TemplateGenericObjectType extends GenericObjectType implements Templ
 			$this->variance,
 			$this->name,
 			$this->getBound(),
+			$this->default,
 		);
 	}
 

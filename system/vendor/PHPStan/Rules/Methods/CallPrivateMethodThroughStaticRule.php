@@ -6,6 +6,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Name;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function sprintf;
@@ -13,7 +14,8 @@ use function sprintf;
 /**
  * @implements Rule<StaticCall>
  */
-class CallPrivateMethodThroughStaticRule implements Rule
+#[RegisteredRule(level: 2)]
+final class CallPrivateMethodThroughStaticRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -36,6 +38,10 @@ class CallPrivateMethodThroughStaticRule implements Rule
 			return [];
 		}
 
+		if ($scope->isInClass() && $scope->getClassReflection()->isFinal()) {
+			return [];
+		}
+
 		$classType = $scope->resolveTypeByName($className);
 		if (!$classType->hasMethod($methodName)->yes()) {
 			return [];
@@ -46,16 +52,15 @@ class CallPrivateMethodThroughStaticRule implements Rule
 			return [];
 		}
 
-		if ($scope->isInClass() && $scope->getClassReflection()->isFinal()) {
-			return [];
-		}
-
 		return [
 			RuleErrorBuilder::message(sprintf(
 				'Unsafe call to private method %s::%s() through static::.',
 				$method->getDeclaringClass()->getDisplayName(),
 				$method->getName(),
-			))->build(),
+			))
+				->line($node->name->getStartLine())
+				->identifier('staticClassAccess.privateMethod')
+				->build(),
 		];
 	}
 

@@ -2,26 +2,35 @@
 
 namespace PHPStan\Rules\Generics;
 
-use PHPStan\Rules\RuleError;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\Generic\GenericObjectType;
+use PHPStan\Type\Generic\GenericStaticType;
 use PHPStan\Type\Generic\TemplateType;
 use PHPStan\Type\Generic\TemplateTypeHelper;
+use PHPStan\Type\Generic\TemplateTypeVariance;
+use PHPStan\Type\Generic\TemplateTypeVarianceMap;
+use PHPStan\Type\Generic\TypeProjectionHelper;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeTraverser;
 use PHPStan\Type\VerbosityLevel;
+use ReflectionClass;
+use function array_filter;
 use function array_keys;
 use function array_values;
 use function count;
 use function implode;
 use function sprintf;
+use function strtolower;
 
-class GenericObjectTypeCheck
+#[AutowiredService]
+final class GenericObjectTypeCheck
 {
 
 	/**
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
 	public function check(
 		Type $phpDocType,
@@ -29,6 +38,8 @@ class GenericObjectTypeCheck
 		string $notEnoughTypesMessage,
 		string $extraTypesMessage,
 		string $typeIsNotSubtypeMessage,
+		string $typeProjectionHasConflictingVarianceMessage,
+		string $typeProjectionIsRedundantMessage,
 	): array
 	{
 		$genericTypes = $this->getGenericTypes($phpDocType);
@@ -39,33 +50,40 @@ class GenericObjectTypeCheck
 				continue;
 			}
 
-			$classLikeDescription = 'class';
-			if ($classReflection->isInterface()) {
-				$classLikeDescription = 'interface';
-			} elseif ($classReflection->isTrait()) {
-				$classLikeDescription = 'trait';
-			} elseif ($classReflection->isEnum()) {
-				$classLikeDescription = 'enum';
-			}
+			$classLikeDescription = strtolower($classReflection->getClassTypeDescription());
 			if (!$classReflection->isGeneric()) {
-				$messages[] = RuleErrorBuilder::message(sprintf($classNotGenericMessage, $genericType->describe(VerbosityLevel::typeOnly()), $classLikeDescription, $classReflection->getDisplayName()))->build();
+				$messages[] = RuleErrorBuilder::message(sprintf($classNotGenericMessage, $genericType->describe(VerbosityLevel::typeOnly()), $classLikeDescription, $classReflection->getDisplayName()))
+					->identifier('generics.notGeneric')
+					->build();
 				continue;
 			}
 
 			$templateTypes = array_values($classReflection->getTemplateTypeMap()->getTypes());
 
 			$genericTypeTypes = $genericType->getTypes();
+			$genericTypeVariances = $genericType->getVariances();
 			$templateTypesCount = count($templateTypes);
 			$genericTypeTypesCount = count($genericTypeTypes);
-			if ($templateTypesCount > $genericTypeTypesCount) {
+			$requiredTemplateTypesCount = count(array_filter($templateTypes, static fn (Type $type) => $type instanceof TemplateType && $type->getDefault() === null));
+			if ($requiredTemplateTypesCount > $genericTypeTypesCount) {
+				$templateTypesList = implode(', ', array_keys($classReflection->getTemplateTypeMap()->getTypes()));
+				if ($requiredTemplateTypesCount !== $templateTypesCount) {
+					$templateTypesList .= sprintf(' (%d-%d required).', $requiredTemplateTypesCount, $templateTypesCount);
+				}
+
 				$messages[] = RuleErrorBuilder::message(sprintf(
 					$notEnoughTypesMessage,
 					$genericType->describe(VerbosityLevel::typeOnly()),
 					$classLikeDescription,
 					$classReflection->getDisplayName(false),
-					implode(', ', array_keys($classReflection->getTemplateTypeMap()->getTypes())),
-				))->build();
+					$templateTypesList,
+				))->identifier('generics.lessTypes')->build();
 			} elseif ($templateTypesCount < $genericTypeTypesCount) {
+				$templateTypesList = implode(', ', array_keys($classReflection->getTemplateTypeMap()->getTypes()));
+				if ($requiredTemplateTypesCount !== $templateTypesCount) {
+					$templateTypesList .= sprintf(' (%d-%d required)', $requiredTemplateTypesCount, $templateTypesCount);
+				}
+
 				$messages[] = RuleErrorBuilder::message(sprintf(
 					$extraTypesMessage,
 					$genericType->describe(VerbosityLevel::typeOnly()),
@@ -73,19 +91,53 @@ class GenericObjectTypeCheck
 					$classLikeDescription,
 					$classReflection->getDisplayName(false),
 					$templateTypesCount,
-					implode(', ', array_keys($classReflection->getTemplateTypeMap()->getTypes())),
-				))->build();
+					$templateTypesList,
+				))->identifier('generics.moreTypes')->build();
 			}
 
-			$templateTypesCount = count($templateTypes);
 			for ($i = 0; $i < $templateTypesCount; $i++) {
 				if (!isset($genericTypeTypes[$i])) {
 					continue;
 				}
 
 				$templateType = $templateTypes[$i];
-				$boundType = TemplateTypeHelper::resolveToBounds($templateType);
 				$genericTypeType = $genericTypeTypes[$i];
+
+				$genericTypeVariance = $genericTypeVariances[$i] ?? TemplateTypeVariance::createInvariant();
+				if ($templateType instanceof TemplateType && !$genericTypeVariance->invariant()) {
+					if ($genericTypeVariance->equals($templateType->getVariance())) {
+						if (
+							// allow ReflectionClass<covariant X>
+							// so that same code works for PHP 8.3 and 8.4+
+							$classReflection->getName() !== ReflectionClass::class
+							|| $templateType->getName() !== 'T'
+						) {
+							$messages[] = RuleErrorBuilder::message(sprintf(
+								$typeProjectionIsRedundantMessage,
+								TypeProjectionHelper::describe($genericTypeType, $genericTypeVariance, VerbosityLevel::typeOnly()),
+								$genericType->describe(VerbosityLevel::typeOnly()),
+								$templateType->describe(VerbosityLevel::typeOnly()),
+								$classLikeDescription,
+								$classReflection->getDisplayName(false),
+							))
+								->identifier('generics.callSiteVarianceRedundant')
+								->tip('You can safely remove the call-site variance annotation.')
+								->build();
+						}
+					} elseif (!$genericTypeVariance->validPosition($templateType->getVariance())) {
+						$messages[] = RuleErrorBuilder::message(sprintf(
+							$typeProjectionHasConflictingVarianceMessage,
+							TypeProjectionHelper::describe($genericTypeType, $genericTypeVariance, VerbosityLevel::typeOnly()),
+							$genericType->describe(VerbosityLevel::typeOnly()),
+							$templateType->getVariance()->describe(),
+							$templateType->describe(VerbosityLevel::typeOnly()),
+							$classLikeDescription,
+							$classReflection->getDisplayName(false),
+						))->identifier('generics.callSiteVarianceConflict')->build();
+					}
+				}
+
+				$boundType = TemplateTypeHelper::resolveToBounds($templateType);
 				if ($boundType->isSuperTypeOf($genericTypeType)->yes()) {
 					if (!$templateType instanceof TemplateType) {
 						continue;
@@ -96,8 +148,17 @@ class GenericObjectTypeCheck
 							continue;
 						}
 
-						$templateTypes[$j] = TemplateTypeHelper::resolveTemplateTypes($templateTypes[$j], $map);
+						$templateTypes[$j] = TemplateTypeHelper::resolveTemplateTypes(
+							$templateTypes[$j],
+							$map,
+							TemplateTypeVarianceMap::createEmpty(),
+							TemplateTypeVariance::createStatic(),
+						);
 					}
+					continue;
+				}
+
+				if ($genericTypeVariance->bivariant()) {
 					continue;
 				}
 
@@ -108,7 +169,7 @@ class GenericObjectTypeCheck
 					$templateType->describe(VerbosityLevel::typeOnly()),
 					$classLikeDescription,
 					$classReflection->getDisplayName(false),
-				))->build();
+				))->identifier('generics.notSubtype')->build();
 			}
 		}
 
@@ -116,15 +177,15 @@ class GenericObjectTypeCheck
 	}
 
 	/**
-	 * @return GenericObjectType[]
+	 * @return list<GenericObjectType|GenericStaticType>
 	 */
 	private function getGenericTypes(Type $phpDocType): array
 	{
 		$genericObjectTypes = [];
 		TypeTraverser::map($phpDocType, static function (Type $type, callable $traverse) use (&$genericObjectTypes): Type {
-			if ($type instanceof GenericObjectType) {
+			if ($type instanceof GenericObjectType || $type instanceof GenericStaticType) {
 				$resolvedType = TemplateTypeHelper::resolveToBounds($type);
-				if (!$resolvedType instanceof GenericObjectType) {
+				if (!$resolvedType instanceof GenericObjectType && !$resolvedType instanceof GenericStaticType) {
 					throw new ShouldNotHappenException();
 				}
 				$genericObjectTypes[] = $resolvedType;

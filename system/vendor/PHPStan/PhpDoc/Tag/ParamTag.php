@@ -4,11 +4,16 @@ namespace PHPStan\PhpDoc\Tag;
 
 use PHPStan\Type\Type;
 
-/** @api */
-class ParamTag implements TypedTag
+/**
+ * @api
+ */
+final class ParamTag implements TypedTag
 {
 
-	public function __construct(private Type $type, private bool $isVariadic)
+	public function __construct(
+		private Type $type,
+		private bool $isVariadic,
+	)
 	{
 	}
 
@@ -22,10 +27,7 @@ class ParamTag implements TypedTag
 		return $this->isVariadic;
 	}
 
-	/**
-	 * @return self
-	 */
-	public function withType(Type $type): TypedTag
+	public function withType(Type $type): self
 	{
 		return new self($type, $this->isVariadic);
 	}

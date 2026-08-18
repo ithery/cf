@@ -2,6 +2,7 @@
 
 namespace PHPStan\Analyser;
 
+use PHPStan\PhpDoc\Tag\TemplateTag;
 use PHPStan\Type\Generic\TemplateTypeMap;
 use PHPStan\Type\Generic\TemplateTypeScope;
 use PHPStan\Type\Type;
@@ -13,22 +14,37 @@ use function explode;
 use function implode;
 use function ltrim;
 use function sprintf;
-use function strpos;
+use function str_starts_with;
 use function strtolower;
 
-/** @api */
-class NameScope
+/**
+ * @api
+ */
+final class NameScope
 {
 
 	private TemplateTypeMap $templateTypeMap;
 
 	/**
 	 * @api
+	 * @param non-empty-string|null $namespace
 	 * @param array<string, string> $uses alias(string) => fullName(string)
 	 * @param array<string, string> $constUses alias(string) => fullName(string)
+	 * @param array<string, TemplateTag> $templateTags
 	 * @param array<string, true> $typeAliasesMap
 	 */
-	public function __construct(private ?string $namespace, private array $uses, private ?string $className = null, private ?string $functionName = null, ?TemplateTypeMap $templateTypeMap = null, private array $typeAliasesMap = [], private bool $bypassTypeAliases = false, private array $constUses = [])
+	public function __construct(
+		private ?string $namespace,
+		private array $uses,
+		private ?string $className = null,
+		private ?string $functionName = null,
+		?TemplateTypeMap $templateTypeMap = null,
+		private array $templateTags = [],
+		private array $typeAliasesMap = [],
+		private bool $bypassTypeAliases = false,
+		private array $constUses = [],
+		private ?string $typeAliasClassName = null,
+	)
 	{
 		$this->templateTypeMap = $templateTypeMap ?? TemplateTypeMap::createEmpty();
 	}
@@ -64,9 +80,14 @@ class NameScope
 		return $this->className;
 	}
 
+	public function getClassNameForTypeAlias(): ?string
+	{
+		return $this->typeAliasClassName ?? $this->className;
+	}
+
 	public function resolveStringName(string $name): string
 	{
-		if (strpos($name, '\\') === 0) {
+		if (str_starts_with($name, '\\')) {
 			return ltrim($name, '\\');
 		}
 
@@ -92,7 +113,7 @@ class NameScope
 	 */
 	public function resolveConstantNames(string $name): array
 	{
-		if (strpos($name, '\\') === 0) {
+		if (str_starts_with($name, '\\')) {
 			return [ltrim($name, '\\')];
 		}
 
@@ -140,12 +161,23 @@ class NameScope
 		return $this->templateTypeMap;
 	}
 
+	/**
+	 * @return array<string, TemplateTag>
+	 */
+	public function getTemplateTags(): array
+	{
+		return $this->templateTags;
+	}
+
 	public function resolveTemplateTypeName(string $name): ?Type
 	{
 		return $this->templateTypeMap->getType($name);
 	}
 
-	public function withTemplateTypeMap(TemplateTypeMap $map): self
+	/**
+	 * @param array<string, TemplateTag> $templateTags
+	 */
+	public function withTemplateTypeMap(TemplateTypeMap $map, array $templateTags): self
 	{
 		if ($map->isEmpty() && $this->templateTypeMap->isEmpty()) {
 			return $this;
@@ -160,6 +192,37 @@ class NameScope
 				$this->templateTypeMap->getTypes(),
 				$map->getTypes(),
 			)),
+			$templateTags,
+			$this->typeAliasesMap,
+			$this->bypassTypeAliases,
+			$this->constUses,
+		);
+	}
+
+	public function withoutNamespaceAndUses(): self
+	{
+		return new self(
+			null,
+			[],
+			$this->className,
+			$this->functionName,
+			$this->templateTypeMap,
+			$this->templateTags,
+			$this->typeAliasesMap,
+			$this->bypassTypeAliases,
+			$this->constUses,
+		);
+	}
+
+	public function withClassName(string $className): self
+	{
+		return new self(
+			$this->namespace,
+			$this->uses,
+			$className,
+			$this->functionName,
+			$this->templateTypeMap,
+			$this->templateTags,
 			$this->typeAliasesMap,
 			$this->bypassTypeAliases,
 			$this->constUses,
@@ -179,6 +242,7 @@ class NameScope
 			$this->className,
 			$this->functionName,
 			$this->templateTypeMap->unsetType($name),
+			$this->templateTags,
 			$this->typeAliasesMap,
 			$this->bypassTypeAliases,
 			$this->constUses,
@@ -187,7 +251,7 @@ class NameScope
 
 	public function bypassTypeAliases(): self
 	{
-		return new self($this->namespace, $this->uses, $this->className, $this->functionName, $this->templateTypeMap, $this->typeAliasesMap, true, $this->constUses);
+		return new self($this->namespace, $this->uses, $this->className, $this->functionName, $this->templateTypeMap, $this->templateTags, $this->typeAliasesMap, true, $this->constUses);
 	}
 
 	public function shouldBypassTypeAliases(): bool
@@ -198,23 +262,6 @@ class NameScope
 	public function hasTypeAlias(string $alias): bool
 	{
 		return array_key_exists($alias, $this->typeAliasesMap);
-	}
-
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): self
-	{
-		return new self(
-			$properties['namespace'],
-			$properties['uses'],
-			$properties['className'],
-			$properties['functionName'],
-			$properties['templateTypeMap'],
-			$properties['typeAliasesMap'],
-			$properties['bypassTypeAliases'],
-			$properties['constUses'],
-		);
 	}
 
 }

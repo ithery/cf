@@ -2,71 +2,104 @@
 
 namespace PHPStan\Rules;
 
-use PhpParser\Node;
-use PhpParser\Node\Expr;
+use PhpParser\Node\Expr\NullsafePropertyFetch;
+use PhpParser\Node\Identifier;
+use PHPStan\Analyser\ExpressionResult;
+use PHPStan\Analyser\IssetabilityResolution;
+use PHPStan\Analyser\MutatingScope;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Rules\Properties\PropertyDescriptor;
-use PHPStan\Rules\Properties\PropertyReflectionFinder;
-use PHPStan\Type\MixedType;
+use PHPStan\Type\NeverType;
 use PHPStan\Type\Type;
 use PHPStan\Type\VerbosityLevel;
-use function is_string;
 use function sprintf;
+use function str_starts_with;
 
-class IssetCheck
+/**
+ * Renders the isset/empty/?? "does it make sense" errors from the single
+ * IssetabilityResolution the engine already computed. The chain is walked and
+ * resolved once (IssetabilityDescriptor::resolve); this only projects the
+ * resolved facts into messages - it never re-walks the AST nor re-resolves types.
+ *
+ * @phpstan-type ErrorIdentifier = 'empty'|'isset'|'nullCoalesce'
+ */
+#[AutowiredService]
+final class IssetCheck
 {
 
 	public function __construct(
 		private PropertyDescriptor $propertyDescriptor,
-		private PropertyReflectionFinder $propertyReflectionFinder,
+		#[AutowiredParameter]
 		private bool $checkAdvancedIsset,
+		#[AutowiredParameter]
 		private bool $treatPhpDocTypesAsCertain,
-		private bool $strictUnnecessaryNullsafePropertyFetch,
 	)
 	{
 	}
 
 	/**
+	 * @param ErrorIdentifier $identifier
 	 * @param callable(Type): ?string $typeMessageCallback
 	 */
-	public function check(Expr $expr, Scope $scope, string $operatorDescription, callable $typeMessageCallback, ?RuleError $error = null): ?RuleError
+	public function check(ExpressionResult $exprResult, Scope $scope, string $operatorDescription, string $identifier, callable $typeMessageCallback): ?IdentifierRuleError
 	{
-		// mirrored in PHPStan\Analyser\MutatingScope::issetCheck()
-		if ($expr instanceof Node\Expr\Variable && is_string($expr->name)) {
-			$hasVariable = $scope->hasVariableType($expr->name);
+		$mutatingScope = $scope->toMutatingScope();
+		$resolution = $exprResult->getIssetabilityResolution($mutatingScope, !$this->treatPhpDocTypesAsCertain);
+
+		return $this->doCheck($resolution, $mutatingScope, $operatorDescription, $identifier, $typeMessageCallback, null);
+	}
+
+	/**
+	 * @param ErrorIdentifier $identifier
+	 * @param callable(Type): ?string $typeMessageCallback
+	 */
+	private function doCheck(IssetabilityResolution $resolution, MutatingScope $scope, string $operatorDescription, string $identifier, callable $typeMessageCallback, ?IdentifierRuleError $error): ?IdentifierRuleError
+	{
+		$link = $resolution->getLink();
+		$inner = $resolution->getInner();
+
+		if ($link->isVariable()) {
+			$hasVariable = $link->getHasVariable();
 			if ($hasVariable->maybe()) {
 				return null;
 			}
 
 			if ($error === null) {
 				if ($hasVariable->yes()) {
-					if ($expr->name === '_SESSION') {
+					if ($link->getVariableName() === '_SESSION') {
 						return null;
 					}
 
-					return $this->generateError(
-						$scope->getVariableType($expr->name),
-						sprintf('Variable $%s %s always exists and', $expr->name, $operatorDescription),
-						$typeMessageCallback,
-					);
+					$type = $link->getValueType();
+					if (!$type instanceof NeverType) {
+						return $this->generateError(
+							$type,
+							sprintf('Variable $%s %s always exists and', $link->getVariableName(), $operatorDescription),
+							$typeMessageCallback,
+							$identifier,
+							'variable',
+						);
+					}
 				}
 
-				return RuleErrorBuilder::message(sprintf('Variable $%s %s is never defined.', $expr->name, $operatorDescription))->build();
+				return RuleErrorBuilder::message(sprintf('Variable $%s %s is never defined.', $link->getVariableName(), $operatorDescription))
+					->identifier(sprintf('%s.variable', $identifier))
+					->build();
 			}
 
 			return $error;
-		} elseif ($expr instanceof Node\Expr\ArrayDimFetch && $expr->dim !== null) {
-			$type = $this->treatPhpDocTypesAsCertain
-				? $scope->getType($expr->var)
-				: $scope->getNativeType($expr->var);
-			$dimType = $this->treatPhpDocTypesAsCertain
-				? $scope->getType($expr->dim)
-				: $scope->getNativeType($expr->dim);
-			$hasOffsetValue = $type->hasOffsetValueType($dimType);
-			if (!$type->isOffsetAccessible()->yes()) {
-				return $error ?? $this->checkUndefined($expr->var, $scope, $operatorDescription);
+		}
+
+		if ($link->isOffset()) {
+			$type = $link->getVarType();
+			if (!$link->getIsOffsetAccessible()->yes()) {
+				return $error ?? $this->checkUndefinedInner($inner, $scope, $operatorDescription, $identifier);
 			}
 
+			$dimType = $link->getDimType();
+			$hasOffsetValue = $link->getHasOffsetValue();
 			if ($hasOffsetValue->no()) {
 				if (!$this->checkAdvancedIsset) {
 					return null;
@@ -79,110 +112,99 @@ class IssetCheck
 						$type->describe(VerbosityLevel::value()),
 						$operatorDescription,
 					),
-				)->build();
+				)->identifier(sprintf('%s.offset', $identifier))->build();
 			}
 
-			// If offset is cannot be null, store this error message and see if one of the earlier offsets is.
+			// If offset cannot be null, store this error message and see if one of the earlier offsets is.
 			// E.g. $array['a']['b']['c'] ?? null; is a valid coalesce if a OR b or C might be null.
-			if ($hasOffsetValue->yes() || $scope->hasExpressionType($expr)->yes()) {
+			if ($hasOffsetValue->yes() || $link->hasExpressionTypeOfExpr()) {
 				if (!$this->checkAdvancedIsset) {
 					return null;
 				}
 
-				$error ??= $this->generateError($type->getOffsetValueType($dimType), sprintf(
+				$error ??= $this->generateError($link->getValueType(), sprintf(
 					'Offset %s on %s %s always exists and',
 					$dimType->describe(VerbosityLevel::value()),
 					$type->describe(VerbosityLevel::value()),
 					$operatorDescription,
-				), $typeMessageCallback);
+				), $typeMessageCallback, $identifier, 'offset');
 
 				if ($error !== null) {
-					return $this->check($expr->var, $scope, $operatorDescription, $typeMessageCallback, $error);
+					return $inner !== null ? $this->doCheck($inner, $scope, $operatorDescription, $identifier, $typeMessageCallback, $error) : $error;
 				}
 			}
 
 			// Has offset, it is nullable
 			return null;
+		}
 
-		} elseif ($expr instanceof Node\Expr\PropertyFetch || $expr instanceof Node\Expr\StaticPropertyFetch) {
+		if ($link->isProperty()) {
+			$reflection = $link->getPropertyReflection();
+			$propertyFetch = $link->getPropertyFetch();
 
-			$propertyReflection = $this->propertyReflectionFinder->findPropertyReflectionFromNode($expr, $scope);
-
-			if ($propertyReflection === null) {
-				if ($expr instanceof Node\Expr\PropertyFetch) {
-					return $this->checkUndefined($expr->var, $scope, $operatorDescription);
-				}
-
-				if ($expr->class instanceof Expr) {
-					return $this->checkUndefined($expr->class, $scope, $operatorDescription);
-				}
-
-				return null;
+			if ($reflection === null || !$link->isReflectionNative()) {
+				return $this->checkUndefinedInner($inner, $scope, $operatorDescription, $identifier);
 			}
 
-			if (!$propertyReflection->isNative()) {
-				if ($expr instanceof Node\Expr\PropertyFetch) {
-					return $this->checkUndefined($expr->var, $scope, $operatorDescription);
+			if ($link->hasNativeType() && !$link->isVirtual()->yes()) {
+				if ($link->isInitializedThisProperty()) {
+					return $this->generateError(
+						$link->getNativeType(),
+						sprintf('%s %s', $this->propertyDescriptor->describeProperty($reflection, $scope, $propertyFetch), $operatorDescription),
+						static function (Type $type) use ($typeMessageCallback): ?string {
+							$originalMessage = $typeMessageCallback($type);
+							if ($originalMessage === null) {
+								return null;
+							}
+
+							if (str_starts_with($originalMessage, 'is not')) {
+								return sprintf('%s nor uninitialized', $originalMessage);
+							}
+
+							return sprintf('%s and initialized', $originalMessage);
+						},
+						$identifier,
+						'initializedProperty',
+					);
 				}
 
-				if ($expr->class instanceof Expr) {
-					return $this->checkUndefined($expr->class, $scope, $operatorDescription);
-				}
-
-				return null;
-			}
-
-			$nativeType = $propertyReflection->getNativeType();
-			if (!$nativeType instanceof MixedType) {
-				if (!$scope->hasExpressionType($expr)->yes()) {
-					if ($expr instanceof Node\Expr\PropertyFetch) {
-						return $this->checkUndefined($expr->var, $scope, $operatorDescription);
-					}
-
-					if ($expr->class instanceof Expr) {
-						return $this->checkUndefined($expr->class, $scope, $operatorDescription);
-					}
-
+				if (
+					!$link->hasExpressionTypeOfFetch()
+					&& $link->nativeReflectionExists()
+					&& !$link->nativeHasDefaultValue()
+					&& (!$link->nativeIsPromoted() || (!$link->nativeIsReadOnly() && !$link->nativeIsHooked()))
+				) {
 					return null;
 				}
 			}
 
-			$propertyDescription = $this->propertyDescriptor->describeProperty($propertyReflection, $expr);
-			$propertyType = $propertyReflection->getWritableType();
+			$propertyDescription = $this->propertyDescriptor->describeProperty($reflection, $scope, $propertyFetch);
+			$propertyType = $reflection->getWritableType();
 			if ($error !== null) {
-				return $error;
+				return $inner !== null
+					? $this->doCheck($inner, $scope, $operatorDescription, $identifier, $typeMessageCallback, $error)
+					: $error;
 			}
 			if (!$this->checkAdvancedIsset) {
-				if ($expr instanceof Node\Expr\PropertyFetch) {
-					return $this->checkUndefined($expr->var, $scope, $operatorDescription);
-				}
-
-				if ($expr->class instanceof Expr) {
-					return $this->checkUndefined($expr->class, $scope, $operatorDescription);
-				}
-
-				return null;
+				return $this->checkUndefinedInner($inner, $scope, $operatorDescription, $identifier);
 			}
 
 			$error = $this->generateError(
-				$propertyReflection->getWritableType(),
+				$propertyType,
 				sprintf('%s (%s) %s', $propertyDescription, $propertyType->describe(VerbosityLevel::typeOnly()), $operatorDescription),
 				$typeMessageCallback,
+				$identifier,
+				'property',
 			);
 
-			if ($error !== null) {
-				if ($expr instanceof Node\Expr\PropertyFetch) {
-					return $this->check($expr->var, $scope, $operatorDescription, $typeMessageCallback, $error);
-				}
-
-				if ($expr->class instanceof Expr) {
-					return $this->check($expr->class, $scope, $operatorDescription, $typeMessageCallback, $error);
-				}
+			if ($error !== null && $inner !== null) {
+				return $this->doCheck($inner, $scope, $operatorDescription, $identifier, $typeMessageCallback, $error);
 			}
 
 			return $error;
 		}
 
+		// leaf - an arbitrary base expression that is not a chain link
 		if ($error !== null) {
 			return $error;
 		}
@@ -191,65 +213,76 @@ class IssetCheck
 			return null;
 		}
 
-		$error = $this->generateError($scope->getType($expr), sprintf('Expression %s', $operatorDescription), $typeMessageCallback);
+		$error = $this->generateError(
+			$link->getValueType(),
+			sprintf('Expression %s', $operatorDescription),
+			$typeMessageCallback,
+			$identifier,
+			'expr',
+		);
 		if ($error !== null) {
 			return $error;
 		}
 
-		if ($expr instanceof Expr\NullsafePropertyFetch) {
-			if (!$this->strictUnnecessaryNullsafePropertyFetch) {
-				return null;
+		if ($link->leafIsNullsafePropertyFetch()) {
+			$leafExpr = $link->getLeafExpr();
+			if ($leafExpr instanceof NullsafePropertyFetch && $leafExpr->name instanceof Identifier) {
+				return RuleErrorBuilder::message(sprintf('Using nullsafe property access "?->%s" %s is unnecessary. Use -> instead.', $leafExpr->name->name, $operatorDescription))
+					->identifier('nullsafe.neverNull')
+					->build();
 			}
 
-			if ($expr->name instanceof Node\Identifier) {
-				return RuleErrorBuilder::message(sprintf('Using nullsafe property access "?->%s" %s is unnecessary. Use -> instead.', $expr->name->name, $operatorDescription))->build();
-			}
-
-			return RuleErrorBuilder::message(sprintf('Using nullsafe property access "?->(Expression)" %s is unnecessary. Use -> instead.', $operatorDescription))->build();
+			return RuleErrorBuilder::message(sprintf('Using nullsafe property access "?->(Expression)" %s is unnecessary. Use -> instead.', $operatorDescription))
+				->identifier('nullsafe.neverNull')
+				->build();
 		}
 
 		return null;
 	}
 
-	private function checkUndefined(Expr $expr, Scope $scope, string $operatorDescription): ?RuleError
+	/**
+	 * @param ErrorIdentifier $identifier
+	 */
+	private function checkUndefinedInner(?IssetabilityResolution $resolution, MutatingScope $scope, string $operatorDescription, string $identifier): ?IdentifierRuleError
 	{
-		if ($expr instanceof Node\Expr\Variable && is_string($expr->name)) {
-			$hasVariable = $scope->hasVariableType($expr->name);
-			if (!$hasVariable->no()) {
+		if ($resolution === null) {
+			return null;
+		}
+
+		$link = $resolution->getLink();
+		$inner = $resolution->getInner();
+
+		if ($link->isVariable()) {
+			if (!$link->getHasVariable()->no()) {
 				return null;
 			}
 
-			return RuleErrorBuilder::message(sprintf('Variable $%s %s is never defined.', $expr->name, $operatorDescription))->build();
+			return RuleErrorBuilder::message(sprintf('Variable $%s %s is never defined.', $link->getVariableName(), $operatorDescription))
+				->identifier(sprintf('%s.variable', $identifier))
+				->build();
 		}
 
-		if ($expr instanceof Node\Expr\ArrayDimFetch && $expr->dim !== null) {
-			$type = $scope->getType($expr->var);
-			$dimType = $scope->getType($expr->dim);
-			$hasOffsetValue = $type->hasOffsetValueType($dimType);
-			if (!$type->isOffsetAccessible()->yes()) {
-				return $this->checkUndefined($expr->var, $scope, $operatorDescription);
+		if ($link->isOffset()) {
+			if (!$link->getIsOffsetAccessible()->yes()) {
+				return $this->checkUndefinedInner($inner, $scope, $operatorDescription, $identifier);
 			}
 
-			if (!$hasOffsetValue->no()) {
-				return $this->checkUndefined($expr->var, $scope, $operatorDescription);
+			if (!$link->getHasOffsetValue()->no()) {
+				return $this->checkUndefinedInner($inner, $scope, $operatorDescription, $identifier);
 			}
 
 			return RuleErrorBuilder::message(
 				sprintf(
 					'Offset %s on %s %s does not exist.',
-					$dimType->describe(VerbosityLevel::value()),
-					$type->describe(VerbosityLevel::value()),
+					$link->getDimType()->describe(VerbosityLevel::value()),
+					$link->getVarType()->describe(VerbosityLevel::value()),
 					$operatorDescription,
 				),
-			)->build();
+			)->identifier(sprintf('%s.offset', $identifier))->build();
 		}
 
-		if ($expr instanceof Expr\PropertyFetch) {
-			return $this->checkUndefined($expr->var, $scope, $operatorDescription);
-		}
-
-		if ($expr instanceof Expr\StaticPropertyFetch && $expr->class instanceof Expr) {
-			return $this->checkUndefined($expr->class, $scope, $operatorDescription);
+		if ($link->isProperty()) {
+			return $this->checkUndefinedInner($inner, $scope, $operatorDescription, $identifier);
 		}
 
 		return null;
@@ -257,8 +290,10 @@ class IssetCheck
 
 	/**
 	 * @param callable(Type): ?string $typeMessageCallback
+	 * @param ErrorIdentifier $identifier
+	 * @param 'variable'|'offset'|'property'|'expr'|'initializedProperty' $identifierSecondPart
 	 */
-	private function generateError(Type $type, string $message, callable $typeMessageCallback): ?RuleError
+	private function generateError(Type $type, string $message, callable $typeMessageCallback, string $identifier, string $identifierSecondPart): ?IdentifierRuleError
 	{
 		$typeMessage = $typeMessageCallback($type);
 		if ($typeMessage === null) {
@@ -267,7 +302,7 @@ class IssetCheck
 
 		return RuleErrorBuilder::message(
 			sprintf('%s %s.', $message, $typeMessage),
-		)->build();
+		)->identifier(sprintf('%s.%s', $identifier, $identifierSecondPart))->build();
 	}
 
 }

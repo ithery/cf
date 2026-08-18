@@ -2,8 +2,13 @@
 
 namespace PHPStan\Type;
 
-use PHPStan\Type\Accessory\AccessoryNumericStringType;
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\TrinaryLogic;
+use PHPStan\Type\Accessory\AccessoryDecimalIntegerStringType;
 use PHPStan\Type\Constant\ConstantArrayType;
+use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\Traits\NonArrayTypeTrait;
 use PHPStan\Type\Traits\NonCallableTypeTrait;
@@ -16,6 +21,7 @@ use PHPStan\Type\Traits\UndecidedBooleanTypeTrait;
 use PHPStan\Type\Traits\UndecidedComparisonTypeTrait;
 
 /** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::isInteger()')]
 class IntegerType implements Type
 {
 
@@ -40,17 +46,24 @@ class IntegerType implements Type
 		return 'int';
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function getConstantStrings(): array
 	{
-		return new self();
+		return [];
 	}
 
 	public function toNumber(): Type
 	{
 		return $this;
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new IntegerType();
+	}
+
+	public function toAbsoluteNumber(): Type
+	{
+		return IntegerRangeType::createAllGreaterThanOrEqualTo(0);
 	}
 
 	public function toFloat(): Type
@@ -67,7 +80,7 @@ class IntegerType implements Type
 	{
 		return new IntersectionType([
 			new StringType(),
-			new AccessoryNumericStringType(),
+			new AccessoryDecimalIntegerStringType(),
 		]);
 	}
 
@@ -77,12 +90,79 @@ class IntegerType implements Type
 			[new ConstantIntegerType(0)],
 			[$this],
 			[1],
+			isList: TrinaryLogic::createYes(),
 		);
 	}
 
 	public function toArrayKey(): Type
 	{
 		return $this;
+	}
+
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		if (!$strictTypes) {
+			return TypeCombinator::union($this, $this->toFloat(), $this->toString(), $this->toBoolean());
+		}
+
+		return TypeCombinator::union($this, $this->toFloat());
+	}
+
+	public function isOffsetAccessLegal(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isNull(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isBoolean(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFloat(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isInteger(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		if ($type->isArray()->yes()) {
+			return new ConstantBooleanType(false);
+		}
+
+		if (
+			$phpVersion->nonNumericStringAndIntegerIsFalseOnLooseComparison()
+			&& $type->isString()->yes()
+			&& $type->isNumericString()->no()
+		) {
+			return new ConstantBooleanType(false);
+		}
+
+		return new BooleanType();
 	}
 
 	public function tryRemove(Type $typeToRemove): ?Type
@@ -104,6 +184,26 @@ class IntegerType implements Type
 		}
 
 		return null;
+	}
+
+	public function getFiniteTypes(): array
+	{
+		return [];
+	}
+
+	public function exponentiate(Type $exponent): Type
+	{
+		return ExponentiateHelper::exponentiate($this, $exponent);
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode('int');
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return false;
 	}
 
 }

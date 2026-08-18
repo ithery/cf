@@ -5,30 +5,40 @@ namespace PHPStan\Rules\Arrays;
 use PhpParser\Node\Expr;
 use PHPStan\Analyser\NullsafeOperatorHelper;
 use PHPStan\Analyser\Scope;
-use PHPStan\Rules\RuleError;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
 use PHPStan\Type\BenevolentUnionType;
 use PHPStan\Type\ErrorType;
+use PHPStan\Type\MixedType;
+use PHPStan\Type\NeverType;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\TypeUtils;
-use PHPStan\Type\UnionType;
 use PHPStan\Type\VerbosityLevel;
+use function count;
 use function sprintf;
 
-class NonexistentOffsetInArrayDimFetchCheck
+#[AutowiredService]
+final class NonexistentOffsetInArrayDimFetchCheck
 {
 
 	public function __construct(
 		private RuleLevelHelper $ruleLevelHelper,
+		#[AutowiredParameter]
 		private bool $reportMaybes,
-		private bool $bleedingEdge,
+		#[AutowiredParameter]
+		private bool $reportPossiblyNonexistentGeneralArrayOffset,
+		#[AutowiredParameter]
+		private bool $reportPossiblyNonexistentConstantArrayOffset,
 	)
 	{
 	}
 
 	/**
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
 	public function check(
 		Scope $scope,
@@ -52,9 +62,25 @@ class NonexistentOffsetInArrayDimFetchCheck
 			return [];
 		}
 
-		if ($type->hasOffsetValueType($dimType)->no()) {
+		$hasOffsetValueType = $type->hasOffsetValueType($dimType);
+
+		if ($hasOffsetValueType->yes()) {
+			return [];
+		}
+
+		if ($hasOffsetValueType->no()) {
+			if ($type->isArray()->yes()) {
+				$validArrayDimType = TypeCombinator::intersect(AllowedArrayKeysTypes::getType(), $dimType);
+				if ($validArrayDimType instanceof NeverType) {
+					// Already reported by InvalidKeyInArrayDimFetchRule
+					return [];
+				}
+			}
+
 			return [
-				RuleErrorBuilder::message(sprintf('Offset %s does not exist on %s.', $dimType->describe(VerbosityLevel::value()), $type->describe(VerbosityLevel::value())))->build(),
+				RuleErrorBuilder::message(sprintf('Offset %s does not exist on %s.', $dimType->describe(count($dimType->getConstantStrings()) > 0 ? VerbosityLevel::precise() : VerbosityLevel::value()), $type->describe(VerbosityLevel::value())))
+					->identifier('offsetAccess.notFound')
+					->build(),
 			];
 		}
 
@@ -66,16 +92,41 @@ class NonexistentOffsetInArrayDimFetchCheck
 			} else {
 				$flattenedTypes = TypeUtils::flattenTypes($type);
 			}
+
+			$validArrayDimType = $dimType instanceof MixedType
+				? $dimType
+				: TypeCombinator::intersect(AllowedArrayKeysTypes::getType(), $dimType);
+
 			foreach ($flattenedTypes as $innerType) {
-				if ($dimType instanceof UnionType) {
-					if ($innerType->hasOffsetValueType($dimType)->no()) {
+				$dimTypeToCheck = $innerType->isArray()->yes() ? $validArrayDimType : $dimType;
+
+				if (
+					$this->reportPossiblyNonexistentGeneralArrayOffset
+					&& $innerType->isArray()->yes()
+					&& !$innerType->isConstantArray()->yes()
+					&& !$innerType->hasOffsetValueType($dimTypeToCheck)->yes()
+				) {
+					$report = true;
+					break;
+				}
+				if ($innerType->isConstantArray()->yes() && !$innerType->hasOffsetValueType($dimTypeToCheck)->yes()) {
+					if ($this->reportPossiblyNonexistentConstantArrayOffset) {
+						$report = true;
+						break;
+					} elseif ($dimTypeToCheck->isConstantScalarValue()->yes()) {
 						$report = true;
 						break;
 					}
-					continue;
 				}
-				foreach (TypeUtils::flattenTypes($dimType) as $innerDimType) {
-					if ($innerType->hasOffsetValueType($innerDimType)->no()) {
+				if ($dimTypeToCheck instanceof BenevolentUnionType) {
+					$flattenedInnerTypes = [$dimTypeToCheck];
+				} else {
+					$flattenedInnerTypes = TypeUtils::flattenTypes($dimTypeToCheck);
+				}
+				foreach ($flattenedInnerTypes as $innerDimType) {
+					if (
+						$innerType->hasOffsetValueType($innerDimType)->no()
+					) {
 						$report = true;
 						break 2;
 					}
@@ -83,13 +134,10 @@ class NonexistentOffsetInArrayDimFetchCheck
 			}
 
 			if ($report) {
-				if ($this->bleedingEdge) {
-					return [
-						RuleErrorBuilder::message(sprintf('Offset %s might not exist on %s.', $dimType->describe(VerbosityLevel::value()), $type->describe(VerbosityLevel::value())))->build(),
-					];
-				}
 				return [
-					RuleErrorBuilder::message(sprintf('Offset %s does not exist on %s.', $dimType->describe(VerbosityLevel::value()), $type->describe(VerbosityLevel::value())))->build(),
+					RuleErrorBuilder::message(sprintf('Offset %s might not exist on %s.', $dimType->describe(count($dimType->getConstantStrings()) > 0 ? VerbosityLevel::precise() : VerbosityLevel::value()), $type->describe(VerbosityLevel::value())))
+						->identifier('offsetAccess.notFound')
+						->build(),
 				];
 			}
 		}

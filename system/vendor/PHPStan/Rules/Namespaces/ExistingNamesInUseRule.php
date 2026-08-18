@@ -4,11 +4,13 @@ namespace PHPStan\Rules\Namespaces;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Rules\ClassCaseSensitivityCheck;
+use PHPStan\Rules\ClassNameCheck;
 use PHPStan\Rules\ClassNameNodePair;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\ShouldNotHappenException;
 use function array_map;
@@ -18,13 +20,17 @@ use function strtolower;
 /**
  * @implements Rule<Node\Stmt\Use_>
  */
-class ExistingNamesInUseRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ExistingNamesInUseRule implements Rule
 {
 
 	public function __construct(
 		private ReflectionProvider $reflectionProvider,
-		private ClassCaseSensitivityCheck $classCaseSensitivityCheck,
+		private ClassNameCheck $classCheck,
+		#[AutowiredParameter]
 		private bool $checkFunctionNameCase,
+		#[AutowiredParameter(ref: '%tips.discoveringSymbols%')]
+		private bool $discoveringSymbolsTip,
 	)
 	{
 	}
@@ -54,12 +60,12 @@ class ExistingNamesInUseRule implements Rule
 			return $this->checkFunctions($node->uses);
 		}
 
-		return $this->checkClasses($node->uses);
+		return $this->checkClasses($scope, $node->uses);
 	}
 
 	/**
-	 * @param Node\Stmt\UseUse[] $uses
-	 * @return RuleError[]
+	 * @param Node\UseItem[] $uses
+	 * @return list<IdentifierRuleError>
 	 */
 	private function checkConstants(array $uses): array
 	{
@@ -69,22 +75,38 @@ class ExistingNamesInUseRule implements Rule
 				continue;
 			}
 
-			$errors[] = RuleErrorBuilder::message(sprintf('Used constant %s not found.', (string) $use->name))->line($use->name->getLine())->discoveringSymbolsTip()->build();
+			$errorBuilder = RuleErrorBuilder::message(sprintf('Used constant %s not found.', (string) $use->name))
+				->line($use->name->getStartLine())
+				->identifier('constant.notFound');
+
+			if ($this->discoveringSymbolsTip) {
+				$errorBuilder->discoveringSymbolsTip();
+			}
+
+			$errors[] = $errorBuilder->build();
 		}
 
 		return $errors;
 	}
 
 	/**
-	 * @param Node\Stmt\UseUse[] $uses
-	 * @return RuleError[]
+	 * @param Node\UseItem[] $uses
+	 * @return list<IdentifierRuleError>
 	 */
 	private function checkFunctions(array $uses): array
 	{
 		$errors = [];
 		foreach ($uses as $use) {
 			if (!$this->reflectionProvider->hasFunction($use->name, null)) {
-				$errors[] = RuleErrorBuilder::message(sprintf('Used function %s not found.', (string) $use->name))->line($use->name->getLine())->discoveringSymbolsTip()->build();
+				$errorBuilder = RuleErrorBuilder::message(sprintf('Used function %s not found.', (string) $use->name))
+					->line($use->name->getStartLine())
+					->identifier('function.notFound');
+
+				if ($this->discoveringSymbolsTip) {
+					$errorBuilder->discoveringSymbolsTip();
+				}
+
+				$errors[] = $errorBuilder->build();
 			} elseif ($this->checkFunctionNameCase) {
 				$functionReflection = $this->reflectionProvider->getFunction($use->name, null);
 				$realName = $functionReflection->getName();
@@ -97,7 +119,10 @@ class ExistingNamesInUseRule implements Rule
 						'Function %s used with incorrect case: %s.',
 						$realName,
 						$usedName,
-					))->line($use->name->getLine())->build();
+					))
+						->line($use->name->getStartLine())
+						->identifier('function.nameCase')
+						->build();
 				}
 			}
 		}
@@ -106,13 +131,15 @@ class ExistingNamesInUseRule implements Rule
 	}
 
 	/**
-	 * @param Node\Stmt\UseUse[] $uses
-	 * @return RuleError[]
+	 * @param Node\UseItem[] $uses
+	 * @return list<IdentifierRuleError>
 	 */
-	private function checkClasses(array $uses): array
+	private function checkClasses(Scope $scope, array $uses): array
 	{
-		return $this->classCaseSensitivityCheck->checkClassNames(
-			array_map(static fn (Node\Stmt\UseUse $use): ClassNameNodePair => new ClassNameNodePair((string) $use->name, $use->name), $uses),
+		return $this->classCheck->checkClassNames(
+			$scope,
+			array_map(static fn (Node\UseItem $use): ClassNameNodePair => new ClassNameNodePair((string) $use->name, $use->name), $uses),
+			null,
 		);
 	}
 

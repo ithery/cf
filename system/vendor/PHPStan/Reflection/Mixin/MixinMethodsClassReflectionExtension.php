@@ -3,16 +3,19 @@
 namespace PHPStan\Reflection\Mixin;
 
 use PHPStan\Analyser\OutOfClassScope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\MethodsClassReflectionExtension;
 use PHPStan\ShouldNotHappenException;
-use PHPStan\Type\TypeUtils;
 use PHPStan\Type\VerbosityLevel;
 use function array_intersect;
 use function count;
 
-class MixinMethodsClassReflectionExtension implements MethodsClassReflectionExtension
+// autoTag: false - wired explicitly in ClassReflectionExtensionRegistry, must not be tagged
+#[AutowiredService(autoTag: false)]
+final class MixinMethodsClassReflectionExtension implements MethodsClassReflectionExtension
 {
 
 	/** @var array<string, array<string, true>> */
@@ -21,7 +24,10 @@ class MixinMethodsClassReflectionExtension implements MethodsClassReflectionExte
 	/**
 	 * @param string[] $mixinExcludeClasses
 	 */
-	public function __construct(private array $mixinExcludeClasses)
+	public function __construct(
+		#[AutowiredParameter]
+		private array $mixinExcludeClasses,
+	)
 	{
 	}
 
@@ -44,7 +50,7 @@ class MixinMethodsClassReflectionExtension implements MethodsClassReflectionExte
 	{
 		$mixinTypes = $classReflection->getResolvedMixinTypes();
 		foreach ($mixinTypes as $type) {
-			if (count(array_intersect(TypeUtils::getDirectClassNames($type), $this->mixinExcludeClasses)) > 0) {
+			if (count(array_intersect($type->getObjectClassNames(), $this->mixinExcludeClasses)) > 0) {
 				continue;
 			}
 
@@ -75,13 +81,21 @@ class MixinMethodsClassReflectionExtension implements MethodsClassReflectionExte
 			return new MixinMethodReflection($method, $static);
 		}
 
-		foreach ($classReflection->getParents() as $parentClass) {
-			$method = $this->findMethod($parentClass, $methodName);
-			if ($method === null) {
+		foreach ($classReflection->getTraits() as $traitClass) {
+			$methodWithDeclaringClass = $this->findMethod($traitClass, $methodName);
+			if ($methodWithDeclaringClass === null) {
 				continue;
 			}
 
-			return $method;
+			return $methodWithDeclaringClass;
+		}
+
+		$parentClass = $classReflection->getParentClass();
+		if ($parentClass !== null) {
+			$method = $this->findMethod($parentClass, $methodName);
+			if ($method !== null) {
+				return $method;
+			}
 		}
 
 		return null;

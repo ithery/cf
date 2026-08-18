@@ -12,11 +12,31 @@ class BenevolentUnionType extends UnionType
 
 	/**
 	 * @api
-	 * @param Type[] $types
+	 * @param list<Type> $types
 	 */
-	public function __construct(array $types)
+	public function __construct(array $types, bool $normalized = false)
 	{
-		parent::__construct($types);
+		parent::__construct($types, $normalized);
+	}
+
+	public function filterTypes(callable $filterCb): Type
+	{
+		$result = parent::filterTypes($filterCb);
+		if (!$result instanceof self && $result instanceof UnionType) {
+			return TypeUtils::toBenevolentUnion($result);
+		}
+
+		return $result;
+	}
+
+	public function tryRemove(Type $typeToRemove): ?Type
+	{
+		$result = parent::tryRemove($typeToRemove);
+		if ($result === null) {
+			return null;
+		}
+
+		return TypeUtils::toBenevolentUnion($result);
 	}
 
 	public function describe(VerbosityLevel $level): string
@@ -26,14 +46,25 @@ class BenevolentUnionType extends UnionType
 
 	protected function unionTypes(callable $getType): Type
 	{
+		$changed = false;
+
 		$resultTypes = [];
 		foreach ($this->getTypes() as $type) {
 			$result = $getType($type);
 			if ($result instanceof ErrorType) {
+				$changed = true;
 				continue;
 			}
 
+			if ($result !== $type) {
+				$changed = true;
+			}
+
 			$resultTypes[] = $result;
+		}
+
+		if (!$changed) {
+			return $this;
 		}
 
 		if (count($resultTypes) === 0) {
@@ -43,14 +74,58 @@ class BenevolentUnionType extends UnionType
 		return TypeUtils::toBenevolentUnion(TypeCombinator::union(...$resultTypes));
 	}
 
+	protected function pickFromTypes(
+		callable $getValues,
+		callable $criteria,
+	): array
+	{
+		$values = [];
+		foreach ($this->getTypes() as $type) {
+			$innerValues = $getValues($type);
+			if ($innerValues === [] && $criteria($type)) {
+				return [];
+			}
+
+			foreach ($innerValues as $innerType) {
+				$values[] = $innerType;
+			}
+		}
+
+		return $values;
+	}
+
+	public function getOffsetValueType(Type $offsetType): Type
+	{
+		$types = [];
+		foreach ($this->getTypes() as $innerType) {
+			$valueType = $innerType->getOffsetValueType($offsetType);
+			if ($valueType instanceof ErrorType) {
+				continue;
+			}
+
+			$types[] = $valueType;
+		}
+
+		if (count($types) === 0) {
+			return new ErrorType();
+		}
+
+		return TypeUtils::toBenevolentUnion(TypeCombinator::union(...$types));
+	}
+
 	protected function unionResults(callable $getResult): TrinaryLogic
 	{
 		return TrinaryLogic::createNo()->lazyOr($this->getTypes(), $getResult);
 	}
 
-	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): TrinaryLogic
+	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): AcceptsResult
 	{
-		return TrinaryLogic::createNo()->lazyOr($this->getTypes(), static fn (Type $innerType) => $acceptingType->accepts($innerType, $strictTypes));
+		$result = AcceptsResult::createNo();
+		foreach ($this->getTypes() as $innerType) {
+			$result = $result->or($acceptingType->accepts($innerType, $strictTypes));
+		}
+
+		return $result;
 	}
 
 	public function inferTemplateTypes(Type $receivedType): TemplateTypeMap
@@ -95,12 +170,14 @@ class BenevolentUnionType extends UnionType
 		return $this;
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		return new self($properties['types']);
+		$newType = parent::traverseSimultaneously($right, $cb);
+		if ($newType === $this) {
+			return $this;
+		}
+
+		return TypeUtils::toBenevolentUnion($newType);
 	}
 
 }

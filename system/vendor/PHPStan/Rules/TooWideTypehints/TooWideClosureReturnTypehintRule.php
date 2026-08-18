@@ -4,21 +4,25 @@ namespace PHPStan\Rules\TooWideTypehints;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\ClosureReturnStatementsNode;
 use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\Type\NullType;
 use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\UnionType;
-use PHPStan\Type\VerbosityLevel;
 use function count;
-use function sprintf;
 
 /**
  * @implements Rule<ClosureReturnStatementsNode>
  */
-class TooWideClosureReturnTypehintRule implements Rule
+#[RegisteredRule(level: 4)]
+final class TooWideClosureReturnTypehintRule implements Rule
 {
+
+	public function __construct(
+		private TooWideTypeCheck $check,
+	)
+	{
+	}
 
 	public function getNodeType(): string
 	{
@@ -27,11 +31,6 @@ class TooWideClosureReturnTypehintRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$closureReturnType = $scope->getAnonymousFunctionReturnType();
-		if ($closureReturnType === null || !$closureReturnType instanceof UnionType) {
-			return [];
-		}
-
 		$closureExpr = $node->getClosureExpr();
 		if ($closureExpr->returnType === null) {
 			return [];
@@ -44,6 +43,11 @@ class TooWideClosureReturnTypehintRule implements Rule
 
 		$returnStatements = $node->getReturnStatements();
 		if (count($returnStatements) === 0) {
+			return [];
+		}
+
+		$closureReturnType = $scope->getFunctionType($closureExpr->returnType, false, false);
+		if (!$closureReturnType instanceof UnionType) {
 			return [];
 		}
 
@@ -61,24 +65,7 @@ class TooWideClosureReturnTypehintRule implements Rule
 			return [];
 		}
 
-		$returnType = TypeCombinator::union(...$returnTypes);
-		if ($returnType instanceof NullType) {
-			return [];
-		}
-
-		$messages = [];
-		foreach ($closureReturnType->getTypes() as $type) {
-			if (!$type->isSuperTypeOf($returnType)->no()) {
-				continue;
-			}
-
-			$messages[] = RuleErrorBuilder::message(sprintf(
-				'Anonymous function never returns %s so it can be removed from the return type.',
-				$type->describe(VerbosityLevel::getRecommendedLevelByType($type)),
-			))->build();
-		}
-
-		return $messages;
+		return $this->check->checkAnonymousFunction(TypeCombinator::union(...$returnTypes), $closureReturnType);
 	}
 
 }

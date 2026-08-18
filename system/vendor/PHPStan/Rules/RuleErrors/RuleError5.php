@@ -8,12 +8,14 @@ use PHPStan\Rules\RuleError;
 /**
  * @internal Use PHPStan\Rules\RuleErrorBuilder instead.
  */
-class RuleError5 implements RuleError, FileRuleError
+final class RuleError5 implements RuleError, FileRuleError
 {
 
 	public string $message;
 
 	public string $file;
+
+	public string $fileDescription;
 
 	public function getMessage(): string
 	{
@@ -23,6 +25,11 @@ class RuleError5 implements RuleError, FileRuleError
 	public function getFile(): string
 	{
 		return $this->file;
+	}
+
+	public function getFileDescription(): string
+	{
+		return $this->fileDescription;
 	}
 
 }

@@ -5,8 +5,10 @@ namespace PHPStan\Node;
 use PhpParser\Node\Expr;
 use PHPStan\Analyser\Scope;
 
-/** @api */
-class MatchExpressionArmBody
+/**
+ * @api
+ */
+final class MatchExpressionArmBody
 {
 
 	public function __construct(private Scope $scope, private Expr $body)

@@ -5,23 +5,31 @@ namespace PHPStan\Rules\Functions;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\VerbosityLevel;
-use function array_values;
 use function count;
 use function sprintf;
 
 /**
  * @implements Rule<Node\Expr\FuncCall>
  */
-class RandomIntParametersRule implements Rule
+#[RegisteredRule(level: 5)]
+final class RandomIntParametersRule implements Rule
 {
 
-	public function __construct(private ReflectionProvider $reflectionProvider, private bool $reportMaybes)
+	public function __construct(
+		private ReflectionProvider $reflectionProvider,
+		private PhpVersion $phpVersion,
+		#[AutowiredParameter]
+		private bool $reportMaybes,
+	)
 	{
 	}
 
@@ -40,7 +48,7 @@ class RandomIntParametersRule implements Rule
 			return [];
 		}
 
-		$args = array_values($node->getArgs());
+		$args = $node->getArgs();
 		if (count($args) < 2) {
 			return [];
 		}
@@ -55,7 +63,16 @@ class RandomIntParametersRule implements Rule
 			return [];
 		}
 
-		$isSmaller = $maxType->isSmallerThan($minType);
+		$isSmaller = $maxType->isSmallerThan($minType, $this->phpVersion);
+
+		if ($isSmaller->maybe() && $this->reportMaybes) {
+			if (
+				$minType instanceof IntegerRangeType && ($minType->getMin() === null || $minType->getMax() === null)
+				|| $maxType instanceof IntegerRangeType && ($maxType->getMin() === null || $maxType->getMax() === null)
+			) {
+				return [];
+			}
+		}
 
 		if ($isSmaller->yes() || $isSmaller->maybe() && $this->reportMaybes) {
 			$message = 'Parameter #1 $min (%s) of function random_int expects lower number than parameter #2 $max (%s).';
@@ -64,7 +81,7 @@ class RandomIntParametersRule implements Rule
 					$message,
 					$minType->describe(VerbosityLevel::value()),
 					$maxType->describe(VerbosityLevel::value()),
-				))->build(),
+				))->identifier('argument.type')->build(),
 			];
 		}
 

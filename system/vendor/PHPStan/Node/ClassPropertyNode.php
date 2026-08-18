@@ -2,35 +2,44 @@
 
 namespace PHPStan\Node;
 
+use Override;
+use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
-use PhpParser\Node\Identifier;
-use PhpParser\Node\Name;
-use PhpParser\Node\Stmt\Class_;
 use PhpParser\NodeAbstract;
+use PHPStan\Reflection\ClassReflection;
 use PHPStan\Type\Type;
 
-/** @api */
-class ClassPropertyNode extends NodeAbstract implements VirtualNode
+/**
+ * @api
+ */
+final class ClassPropertyNode extends NodeAbstract implements VirtualNode
 {
 
+	/**
+	 * @param non-empty-string $name
+	 */
 	public function __construct(
 		private string $name,
 		private int $flags,
-		private Identifier|Name|Node\ComplexType|null $type,
+		private ?Type $type,
 		private ?Expr $default,
 		private ?string $phpDoc,
 		private ?Type $phpDocType,
 		private bool $isPromoted,
-		Node $originalNode,
+		private bool $isPromotedFromTrait,
+		private Node\Stmt\Property|Node\Param $originalNode,
 		private bool $isReadonlyByPhpDoc,
 		private bool $isDeclaredInTrait,
 		private bool $isReadonlyClass,
+		private bool $isAllowedPrivateMutation,
+		private ClassReflection $classReflection,
 	)
 	{
 		parent::__construct($originalNode->getAttributes());
 	}
 
+	/** @return non-empty-string */
 	public function getName(): string
 	{
 		return $this->name;
@@ -51,6 +60,16 @@ class ClassPropertyNode extends NodeAbstract implements VirtualNode
 		return $this->isPromoted;
 	}
 
+	public function isPromotedFromTrait(): bool
+	{
+		return $this->isPromotedFromTrait;
+	}
+
+	public function getOriginalNode(): Node\Stmt\Property|Node\Param
+	{
+		return $this->originalNode;
+	}
+
 	public function getPhpDoc(): ?string
 	{
 		return $this->phpDoc;
@@ -63,28 +82,48 @@ class ClassPropertyNode extends NodeAbstract implements VirtualNode
 
 	public function isPublic(): bool
 	{
-		return ($this->flags & Class_::MODIFIER_PUBLIC) !== 0
-			|| ($this->flags & Class_::VISIBILITY_MODIFIER_MASK) === 0;
+		return ($this->flags & Modifiers::PUBLIC) !== 0
+			|| ($this->flags & Modifiers::VISIBILITY_MASK) === 0;
 	}
 
 	public function isProtected(): bool
 	{
-		return (bool) ($this->flags & Class_::MODIFIER_PROTECTED);
+		return (bool) ($this->flags & Modifiers::PROTECTED);
 	}
 
 	public function isPrivate(): bool
 	{
-		return (bool) ($this->flags & Class_::MODIFIER_PRIVATE);
+		return (bool) ($this->flags & Modifiers::PRIVATE);
+	}
+
+	public function isPrivateSet(): bool
+	{
+		return (bool) ($this->flags & Modifiers::PRIVATE_SET);
+	}
+
+	public function isProtectedSet(): bool
+	{
+		return (bool) ($this->flags & Modifiers::PROTECTED_SET);
+	}
+
+	public function isPublicSet(): bool
+	{
+		return (bool) ($this->flags & Modifiers::PUBLIC_SET);
+	}
+
+	public function isFinal(): bool
+	{
+		return (bool) ($this->flags & Modifiers::FINAL);
 	}
 
 	public function isStatic(): bool
 	{
-		return (bool) ($this->flags & Class_::MODIFIER_STATIC);
+		return (bool) ($this->flags & Modifiers::STATIC);
 	}
 
 	public function isReadOnly(): bool
 	{
-		return (bool) ($this->flags & Class_::MODIFIER_READONLY) || $this->isReadonlyClass;
+		return (bool) ($this->flags & Modifiers::READONLY) || $this->isReadonlyClass;
 	}
 
 	public function isReadOnlyByPhpDoc(): bool
@@ -97,14 +136,35 @@ class ClassPropertyNode extends NodeAbstract implements VirtualNode
 		return $this->isDeclaredInTrait;
 	}
 
-	/**
-	 * @return Identifier|Name|Node\ComplexType|null
-	 */
-	public function getNativeType()
+	public function isAllowedPrivateMutation(): bool
+	{
+		return $this->isAllowedPrivateMutation;
+	}
+
+	public function isAbstract(): bool
+	{
+		return (bool) ($this->flags & Modifiers::ABSTRACT);
+	}
+
+	public function getNativeType(): ?Type
 	{
 		return $this->type;
 	}
 
+	/**
+	 * @return Node\Identifier|Node\Name|Node\ComplexType|null
+	 */
+	public function getNativeTypeNode()
+	{
+		return $this->originalNode->type;
+	}
+
+	public function getClassReflection(): ClassReflection
+	{
+		return $this->classReflection;
+	}
+
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Node_ClassPropertyNode';
@@ -113,9 +173,46 @@ class ClassPropertyNode extends NodeAbstract implements VirtualNode
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];
+	}
+
+	public function hasHooks(): bool
+	{
+		return $this->getHooks() !== [];
+	}
+
+	/**
+	 * @return Node\PropertyHook[]
+	 */
+	public function getHooks(): array
+	{
+		return $this->originalNode->hooks;
+	}
+
+	public function isVirtual(): bool
+	{
+		return $this->classReflection->getNativeProperty($this->name)->isVirtual()->yes();
+	}
+
+	public function isWritable(): bool
+	{
+		return $this->classReflection->getNativeProperty($this->name)->isWritable();
+	}
+
+	public function isReadable(): bool
+	{
+		return $this->classReflection->getNativeProperty($this->name)->isReadable();
+	}
+
+	/**
+	 * @return Node\AttributeGroup[]
+	 */
+	public function getAttrGroups(): array
+	{
+		return $this->originalNode->attrGroups;
 	}
 
 }

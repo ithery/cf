@@ -2,42 +2,25 @@
 
 namespace PHPStan\Command;
 
-use Clue\React\NDJson\Decoder;
-use Clue\React\NDJson\Encoder;
-use PHPStan\Analyser\FileAnalyser;
-use PHPStan\Analyser\NodeScopeResolver;
-use PHPStan\Collectors\Registry as CollectorRegistry;
-use PHPStan\DependencyInjection\Container;
+use Override;
+use PHPStan\Cache\ArenaCache;
 use PHPStan\File\PathNotFoundException;
-use PHPStan\Rules\Registry as RuleRegistry;
+use PHPStan\Parallel\WorkerRunner;
 use PHPStan\ShouldNotHappenException;
-use React\EventLoop\StreamSelectLoop;
-use React\Socket\ConnectionInterface;
-use React\Socket\TcpConnector;
-use React\Stream\ReadableStreamInterface;
-use React\Stream\WritableStreamInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Throwable;
-use function array_fill_keys;
-use function array_filter;
-use function array_values;
-use function count;
-use function defined;
 use function is_array;
 use function is_bool;
 use function is_string;
 use function sprintf;
 
-class WorkerCommand extends Command
+final class WorkerCommand extends Command
 {
 
 	private const NAME = 'worker';
-
-	private int $errorCount = 0;
 
 	/**
 	 * @param string[] $composerAutoloaderProjectPaths
@@ -49,6 +32,7 @@ class WorkerCommand extends Command
 		parent::__construct();
 	}
 
+	#[Override]
 	protected function configure(): void
 	{
 		$this->setName(self::NAME)
@@ -58,15 +42,18 @@ class WorkerCommand extends Command
 				new InputOption('configuration', 'c', InputOption::VALUE_REQUIRED, 'Path to project configuration file'),
 				new InputOption(AnalyseCommand::OPTION_LEVEL, 'l', InputOption::VALUE_REQUIRED, 'Level of rule options - the higher the stricter'),
 				new InputOption('autoload-file', 'a', InputOption::VALUE_REQUIRED, 'Project\'s additional autoload file path'),
-				new InputOption('memory-limit', null, InputOption::VALUE_REQUIRED, 'Memory limit for analysis'),
-				new InputOption('xdebug', null, InputOption::VALUE_NONE, 'Allow running with XDebug for debugging purposes'),
-				new InputOption('port', null, InputOption::VALUE_REQUIRED),
-				new InputOption('identifier', null, InputOption::VALUE_REQUIRED),
-				new InputOption('tmp-file', null, InputOption::VALUE_REQUIRED),
-				new InputOption('instead-of', null, InputOption::VALUE_REQUIRED),
-			]);
+				new InputOption('memory-limit', mode: InputOption::VALUE_REQUIRED, description: 'Memory limit for analysis'),
+				new InputOption('xdebug', mode: InputOption::VALUE_NONE, description: 'Allow running with Xdebug for debugging purposes'),
+				new InputOption('port', mode: InputOption::VALUE_REQUIRED),
+				new InputOption('identifier', mode: InputOption::VALUE_REQUIRED),
+				new InputOption('arena', mode: InputOption::VALUE_REQUIRED),
+				new InputOption('tmp-file', mode: InputOption::VALUE_REQUIRED),
+				new InputOption('instead-of', mode: InputOption::VALUE_REQUIRED),
+			])
+			->setHidden(true);
 	}
 
+	#[Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		$paths = $input->getArgument('paths');
@@ -77,6 +64,9 @@ class WorkerCommand extends Command
 		$allowXdebug = $input->getOption('xdebug');
 		$port = $input->getOption('port');
 		$identifier = $input->getOption('identifier');
+		$arena = $input->getOption('arena');
+		$tmpFile = $input->getOption('tmp-file');
+		$insteadOfFile = $input->getOption('instead-of');
 
 		if (
 			!is_array($paths)
@@ -87,19 +77,11 @@ class WorkerCommand extends Command
 			|| (!is_bool($allowXdebug))
 			|| !is_string($port)
 			|| !is_string($identifier)
+			|| (!is_string($arena) && $arena !== null)
+			|| (!is_string($tmpFile) && $tmpFile !== null)
+			|| (!is_string($insteadOfFile) && $insteadOfFile !== null)
 		) {
 			throw new ShouldNotHappenException();
-		}
-
-		/** @var string|null $tmpFile */
-		$tmpFile = $input->getOption('tmp-file');
-
-		/** @var string|null $insteadOfFile */
-		$insteadOfFile = $input->getOption('instead-of');
-
-		$singleReflectionFile = null;
-		if ($tmpFile !== null) {
-			$singleReflectionFile = $tmpFile;
 		}
 
 		try {
@@ -115,163 +97,60 @@ class WorkerCommand extends Command
 				$level,
 				$allowXdebug,
 				false,
-				$singleReflectionFile,
-				null,
+				$tmpFile,
+				$insteadOfFile,
 				false,
 			);
 		} catch (InceptionNotSuccessfulException $e) {
 			return 1;
 		}
-		$loop = new StreamSelectLoop();
 
 		$container = $inceptionResult->getContainer();
 
-		try {
-			[$analysedFiles] = $inceptionResult->getFiles();
-			$analysedFiles = $this->switchTmpFile($analysedFiles, $insteadOfFile, $tmpFile);
-		} catch (PathNotFoundException $e) {
-			$inceptionResult->getErrorOutput()->writeLineFormatted(sprintf('<error>%s</error>', $e->getMessage()));
-			return 1;
+		// Attach to the run's shared-memory arena (turbo extension only; the
+		// seam is a no-op otherwise) before WorkerRunner sends its hello — the
+		// master unlinks the arena name once every worker has checked in. A
+		// failed attach (late respawn, extension absent) is fine: this worker
+		// just computes everything locally. Forked workers skip this entirely —
+		// they inherit the parent's mapping.
+		if ($arena !== null) {
+			ArenaCache::attach($arena);
 		}
 
-		/** @var NodeScopeResolver $nodeScopeResolver */
-		$nodeScopeResolver = $container->getByType(NodeScopeResolver::class);
-		$nodeScopeResolver->setAnalysedFiles($analysedFiles);
-
-		$analysedFiles = array_fill_keys($analysedFiles, true);
-
-		$tcpConector = new TcpConnector($loop);
-		$tcpConector->connect(sprintf('127.0.0.1:%d', $port))->done(function (ConnectionInterface $connection) use ($container, $identifier, $output, $analysedFiles, $tmpFile, $insteadOfFile): void {
-			// phpcs:disable SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly
-			$jsonInvalidUtf8Ignore = defined('JSON_INVALID_UTF8_IGNORE') ? JSON_INVALID_UTF8_IGNORE : 0;
-			// phpcs:enable
-			$out = new Encoder($connection, $jsonInvalidUtf8Ignore);
-			$in = new Decoder($connection, true, 512, $jsonInvalidUtf8Ignore, $container->getParameter('parallel')['buffer']);
-			$out->write(['action' => 'hello', 'identifier' => $identifier]);
-			$this->runWorker($container, $out, $in, $output, $analysedFiles, $tmpFile, $insteadOfFile);
-		});
-
-		$loop->run();
-
-		if ($this->errorCount > 0) {
-			return 1;
+		// The master published the analysed-file list its job schedule was
+		// built from; walking the analysed paths again would just re-derive
+		// the same list. The parser router must still learn it — that is a
+		// side effect of the walk this shortcut skips. (The router normally
+		// also sees the project stub files the stub excluder later removes;
+		// those are never analysed, so their ignore-collection routing is
+		// unused either way.)
+		$analysedFiles = ArenaCache::lookup('analysed-files');
+		if (is_array($analysedFiles)) {
+			$pathRoutingParser = $container->getService('pathRoutingParser');
+			$pathRoutingParser->setAnalysedFiles($analysedFiles);
+		} else {
+			try {
+				[$analysedFiles] = $inceptionResult->getFiles();
+			} catch (PathNotFoundException $e) {
+				$inceptionResult->getErrorOutput()->writeLineFormatted(sprintf('<error>%s</error>', $e->getMessage()));
+				return 1;
+			} catch (InceptionNotSuccessfulException) {
+				return 1;
+			}
 		}
 
-		return 0;
-	}
+		// Everything after the boot lives in WorkerRunner so a pcntl_fork()-ed
+		// child can reuse it without re-booting (see ParallelAnalyser).
+		$workerRunner = $container->getByType(WorkerRunner::class);
 
-	/**
-	 * @param array<string, true> $analysedFiles
-	 */
-	private function runWorker(
-		Container $container,
-		WritableStreamInterface $out,
-		ReadableStreamInterface $in,
-		OutputInterface $output,
-		array $analysedFiles,
-		?string $tmpFile,
-		?string $insteadOfFile,
-	): void
-	{
-		$handleError = function (Throwable $error) use ($out, $output): void {
-			$this->errorCount++;
-			$output->writeln(sprintf('Error: %s', $error->getMessage()));
-			$out->write([
-				'action' => 'result',
-				'result' => [
-					'errors' => [$error->getMessage()],
-					'dependencies' => [],
-					'filesCount' => 0,
-					'internalErrorsCount' => 1,
-				],
-			]);
-			$out->end();
-		};
-		$out->on('error', $handleError);
-		/** @var FileAnalyser $fileAnalyser */
-		$fileAnalyser = $container->getByType(FileAnalyser::class);
-		/** @var RuleRegistry $ruleRegistry */
-		$ruleRegistry = $container->getByType(RuleRegistry::class);
-		/** @var CollectorRegistry $collectorRegistry */
-		$collectorRegistry = $container->getByType(CollectorRegistry::class);
-		$in->on('data', function (array $json) use ($fileAnalyser, $ruleRegistry, $collectorRegistry, $out, $analysedFiles, $tmpFile, $insteadOfFile, $output): void {
-			$action = $json['action'];
-			if ($action !== 'analyse') {
-				return;
-			}
-
-			$internalErrorsCount = 0;
-			$files = $json['files'];
-			$errors = [];
-			$collectedData = [];
-			$dependencies = [];
-			$exportedNodes = [];
-			foreach ($files as $file) {
-				try {
-					if ($file === $insteadOfFile) {
-						$file = $tmpFile;
-					}
-					$fileAnalyserResult = $fileAnalyser->analyseFile($file, $analysedFiles, $ruleRegistry, $collectorRegistry, null);
-					$fileErrors = $fileAnalyserResult->getErrors();
-					$dependencies[$file] = $fileAnalyserResult->getDependencies();
-					$exportedNodes[$file] = $fileAnalyserResult->getExportedNodes();
-					foreach ($fileErrors as $fileError) {
-						$errors[] = $fileError;
-					}
-					foreach ($fileAnalyserResult->getCollectedData() as $data) {
-						$collectedData[] = $data;
-					}
-				} catch (Throwable $t) {
-					$this->errorCount++;
-					$internalErrorsCount++;
-					$internalErrorMessage = sprintf('Internal error: %s in file %s', $t->getMessage(), $file);
-
-					$bugReportUrl = 'https://github.com/phpstan/phpstan/issues/new?template=Bug_report.md';
-					if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity()) {
-						$internalErrorMessage .= sprintf('%sPost the following stack trace to %s: %s%s', "\n\n", $bugReportUrl, "\n", $t->getTraceAsString());
-					} else {
-						$internalErrorMessage .= sprintf('%sRun PHPStan with -v option and post the stack trace to:%s%s', "\n", "\n", $bugReportUrl);
-					}
-
-					$errors[] = $internalErrorMessage;
-				}
-			}
-
-			$out->write([
-				'action' => 'result',
-				'result' => [
-					'errors' => $errors,
-					'collectedData' => $collectedData,
-					'dependencies' => $dependencies,
-					'exportedNodes' => $exportedNodes,
-					'filesCount' => count($files),
-					'internalErrorsCount' => $internalErrorsCount,
-				]]);
-		});
-		$in->on('error', $handleError);
-	}
-
-	/**
-	 * @param string[] $analysedFiles
-	 * @return string[]
-	 */
-	private function switchTmpFile(
-		array $analysedFiles,
-		?string $insteadOfFile,
-		?string $tmpFile,
-	): array
-	{
-		$analysedFiles = array_values(array_filter($analysedFiles, static function (string $file) use ($insteadOfFile): bool {
-			if ($insteadOfFile === null) {
-				return true;
-			}
-			return $file !== $insteadOfFile;
-		}));
-		if ($tmpFile !== null) {
-			$analysedFiles[] = $tmpFile;
-		}
-
-		return $analysedFiles;
+		return $workerRunner->run(
+			$output,
+			$analysedFiles,
+			(int) $port,
+			$identifier,
+			$tmpFile,
+			$insteadOfFile,
+		);
 	}
 
 }

@@ -5,6 +5,7 @@ namespace PHPStan\Rules\Properties;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function sprintf;
@@ -12,7 +13,8 @@ use function sprintf;
 /**
  * @implements Rule<Node\Expr\StaticPropertyFetch>
  */
-class AccessPrivatePropertyThroughStaticRule implements Rule
+#[RegisteredRule(level: 2)]
+final class AccessPrivatePropertyThroughStaticRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -36,15 +38,12 @@ class AccessPrivatePropertyThroughStaticRule implements Rule
 		}
 
 		$classType = $scope->resolveTypeByName($className);
-		if (!$classType->hasProperty($propertyName)->yes()) {
+		if (!$classType->hasStaticProperty($propertyName)->yes()) {
 			return [];
 		}
 
-		$property = $classType->getProperty($propertyName, $scope);
+		$property = $classType->getStaticProperty($propertyName, $scope);
 		if (!$property->isPrivate()) {
-			return [];
-		}
-		if (!$property->isStatic()) {
 			return [];
 		}
 
@@ -57,7 +56,10 @@ class AccessPrivatePropertyThroughStaticRule implements Rule
 				'Unsafe access to private property %s::$%s through static::.',
 				$property->getDeclaringClass()->getDisplayName(),
 				$propertyName,
-			))->build(),
+			))
+				->line($node->name->getStartLine())
+				->identifier('staticClassAccess.privateProperty')
+				->build(),
 		];
 	}
 

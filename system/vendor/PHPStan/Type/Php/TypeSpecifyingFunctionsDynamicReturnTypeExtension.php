@@ -6,8 +6,9 @@ use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Analyser\TypeSpecifier;
 use PHPStan\Analyser\TypeSpecifierAwareExtension;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Comparison\ImpossibleCheckTypeHelper;
 use PHPStan\Type\Constant\ConstantBooleanType;
@@ -16,17 +17,19 @@ use PHPStan\Type\Type;
 use function count;
 use function in_array;
 
-class TypeSpecifyingFunctionsDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension, TypeSpecifierAwareExtension
+#[AutowiredService]
+final class TypeSpecifyingFunctionsDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension, TypeSpecifierAwareExtension
 {
 
 	private TypeSpecifier $typeSpecifier;
 
 	private ?ImpossibleCheckTypeHelper $helper = null;
 
-	/**
-	 * @param string[] $universalObjectCratesClasses
-	 */
-	public function __construct(private ReflectionProvider $reflectionProvider, private bool $treatPhpDocTypesAsCertain, private array $universalObjectCratesClasses, private bool $nullContextForVoidReturningFunctions)
+	public function __construct(
+		private ReflectionProvider $reflectionProvider,
+		#[AutowiredParameter]
+		private bool $treatPhpDocTypesAsCertain,
+	)
 	{
 	}
 
@@ -38,25 +41,10 @@ class TypeSpecifyingFunctionsDynamicReturnTypeExtension implements DynamicFuncti
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
 	{
 		return in_array($functionReflection->getName(), [
-			'array_is_list',
 			'array_key_exists',
 			'key_exists',
 			'in_array',
-			'is_numeric',
-			'is_int',
-			'is_array',
-			'is_bool',
-			'is_callable',
-			'is_float',
-			'is_double',
-			'is_real',
-			'is_iterable',
-			'is_null',
-			'is_object',
-			'is_scalar',
-			'is_string',
 			'is_subclass_of',
-			'is_countable',
 		], true);
 	}
 
@@ -64,10 +52,10 @@ class TypeSpecifyingFunctionsDynamicReturnTypeExtension implements DynamicFuncti
 		FunctionReflection $functionReflection,
 		FuncCall $functionCall,
 		Scope $scope,
-	): Type
+	): ?Type
 	{
 		if (count($functionCall->getArgs()) === 0) {
-			return ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+			return null;
 		}
 
 		$isAlways = $this->getHelper()->findSpecifiedType(
@@ -75,7 +63,7 @@ class TypeSpecifyingFunctionsDynamicReturnTypeExtension implements DynamicFuncti
 			$functionCall,
 		);
 		if ($isAlways === null) {
-			return ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+			return null;
 		}
 
 		return new ConstantBooleanType($isAlways);
@@ -83,11 +71,7 @@ class TypeSpecifyingFunctionsDynamicReturnTypeExtension implements DynamicFuncti
 
 	private function getHelper(): ImpossibleCheckTypeHelper
 	{
-		if ($this->helper === null) {
-			$this->helper = new ImpossibleCheckTypeHelper($this->reflectionProvider, $this->typeSpecifier, $this->universalObjectCratesClasses, $this->treatPhpDocTypesAsCertain, $this->nullContextForVoidReturningFunctions);
-		}
-
-		return $this->helper;
+		return $this->helper ??= new ImpossibleCheckTypeHelper($this->reflectionProvider, $this->typeSpecifier, $this->treatPhpDocTypesAsCertain);
 	}
 
 }

@@ -2,13 +2,16 @@
 
 namespace PHPStan\Node;
 
+use Override;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Closure;
 use PhpParser\NodeAbstract;
 use PHPStan\Type\ClosureType;
 
-/** @api */
-class InClosureNode extends NodeAbstract implements VirtualNode
+/**
+ * @api
+ */
+final class InClosureNode extends NodeAbstract implements VirtualNode
 {
 
 	private Node\Expr\Closure $originalNode;
@@ -29,6 +32,7 @@ class InClosureNode extends NodeAbstract implements VirtualNode
 		return $this->originalNode;
 	}
 
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Node_InClosureNode';
@@ -37,6 +41,7 @@ class InClosureNode extends NodeAbstract implements VirtualNode
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];

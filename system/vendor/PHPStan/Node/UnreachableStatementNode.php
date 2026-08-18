@@ -2,13 +2,17 @@
 
 namespace PHPStan\Node;
 
+use Override;
 use PhpParser\Node\Stmt;
 
-/** @api */
-class UnreachableStatementNode extends Stmt implements VirtualNode
+/**
+ * @api
+ */
+final class UnreachableStatementNode extends Stmt implements VirtualNode
 {
 
-	public function __construct(private Stmt $originalStatement)
+	/** @param Stmt[] $nextStatements */
+	public function __construct(private Stmt $originalStatement, private array $nextStatements = [])
 	{
 		parent::__construct($originalStatement->getAttributes());
 	}
@@ -18,6 +22,7 @@ class UnreachableStatementNode extends Stmt implements VirtualNode
 		return $this->originalStatement;
 	}
 
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Stmt_UnreachableStatementNode';
@@ -26,9 +31,18 @@ class UnreachableStatementNode extends Stmt implements VirtualNode
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];
+	}
+
+	/**
+	 * @return Stmt[]
+	 */
+	public function getNextStatements(): array
+	{
+		return $this->nextStatements;
 	}
 
 }

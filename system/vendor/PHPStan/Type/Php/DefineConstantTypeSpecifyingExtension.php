@@ -9,12 +9,13 @@ use PHPStan\Analyser\SpecifiedTypes;
 use PHPStan\Analyser\TypeSpecifier;
 use PHPStan\Analyser\TypeSpecifierAwareExtension;
 use PHPStan\Analyser\TypeSpecifierContext;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\FunctionTypeSpecifyingExtension;
 use function count;
 
-class DefineConstantTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
+#[AutowiredService]
+final class DefineConstantTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
 {
 
 	private TypeSpecifier $typeSpecifier;
@@ -42,23 +43,27 @@ class DefineConstantTypeSpecifyingExtension implements FunctionTypeSpecifyingExt
 		TypeSpecifierContext $context,
 	): SpecifiedTypes
 	{
-		$constantName = $scope->getType($node->getArgs()[0]->value);
-		if (
-			!$constantName instanceof ConstantStringType
-			|| $constantName->getValue() === ''
-		) {
+		$args = $node->getArgs();
+		$constantNames = $scope->getType($args[0]->value)->getConstantStrings();
+
+		if (count($constantNames) !== 1 || $constantNames[0]->getValue() === '') {
 			return new SpecifiedTypes([], []);
 		}
 
+		$valueType = $scope->getType($args[1]->value);
+		$finalType = $scope->getConstantExplicitTypeFromConfig(
+			$constantNames[0]->getValue(),
+			$valueType,
+		);
+
 		return $this->typeSpecifier->create(
 			new Node\Expr\ConstFetch(
-				new Node\Name\FullyQualified($constantName->getValue()),
+				new Node\Name\FullyQualified($constantNames[0]->getValue()),
 			),
-			$scope->getType($node->getArgs()[1]->value),
+			$finalType,
 			TypeSpecifierContext::createTruthy(),
-			true,
 			$scope,
-		);
+		)->setAlwaysOverwriteTypes();
 	}
 
 }

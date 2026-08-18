@@ -2,7 +2,8 @@
 
 namespace PHPStan\Type;
 
-use PHPStan\TrinaryLogic;
+use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\Type\Generic\TemplateTypeVariance;
 use PHPStan\Type\Traits\LateResolvableTypeTrait;
 use PHPStan\Type\Traits\NonGeneralizableTypeTrait;
@@ -15,6 +16,14 @@ final class ConditionalType implements CompoundType, LateResolvableType
 
 	use LateResolvableTypeTrait;
 	use NonGeneralizableTypeTrait;
+
+	private ?Type $normalizedIf = null;
+
+	private ?Type $normalizedElse = null;
+
+	private ?Type $subjectWithTargetIntersectedType = null;
+
+	private ?Type $subjectWithTargetRemovedType = null;
 
 	public function __construct(
 		private Type $subject,
@@ -51,7 +60,7 @@ final class ConditionalType implements CompoundType, LateResolvableType
 		return $this->negated;
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof self) {
 			return $this->if->isSuperTypeOf($type->if)
@@ -104,7 +113,13 @@ final class ConditionalType implements CompoundType, LateResolvableType
 
 	public function isResolvable(): bool
 	{
-		return !TypeUtils::containsTemplateType($this->subject) && !TypeUtils::containsTemplateType($this->target);
+		if (!TypeUtils::containsTemplateType($this->subject) && !TypeUtils::containsTemplateType($this->target)) {
+			return true;
+		}
+
+		$isSuperType = $this->target->isSuperTypeOf($this->subject);
+
+		return $isSuperType->yes() || $isSuperType->no();
 	}
 
 	protected function getResult(): Type
@@ -112,42 +127,100 @@ final class ConditionalType implements CompoundType, LateResolvableType
 		$isSuperType = $this->target->isSuperTypeOf($this->subject);
 
 		if ($isSuperType->yes()) {
-			return !$this->negated ? $this->if : $this->else;
+			return !$this->negated ? $this->getNormalizedIf() : $this->getNormalizedElse();
 		}
 
 		if ($isSuperType->no()) {
-			return !$this->negated ? $this->else : $this->if;
+			return !$this->negated ? $this->getNormalizedElse() : $this->getNormalizedIf();
 		}
 
-		return TypeCombinator::union($this->if, $this->else);
+		return TypeCombinator::union(
+			$this->getNormalizedIf(),
+			$this->getNormalizedElse(),
+		);
 	}
 
 	public function traverse(callable $cb): Type
 	{
 		$subject = $cb($this->subject);
 		$target = $cb($this->target);
-		$if = $cb($this->if);
-		$else = $cb($this->else);
+		$if = $cb($this->getNormalizedIf());
+		$else = $cb($this->getNormalizedElse());
 
-		if ($this->subject === $subject && $this->target === $target && $this->if === $if && $this->else === $else) {
+		if (
+			$this->subject === $subject
+			&& $this->target === $target
+			&& $this->getNormalizedIf() === $if
+			&& $this->getNormalizedElse() === $else
+		) {
 			return $this;
 		}
 
 		return new self($subject, $target, $if, $else, $this->negated);
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		return new self(
-			$properties['subject'],
-			$properties['target'],
-			$properties['if'],
-			$properties['else'],
-			$properties['negated'],
+		if (!$right instanceof self) {
+			return $this;
+		}
+
+		$subject = $cb($this->subject, $right->subject);
+		$target = $cb($this->target, $right->target);
+		$if = $cb($this->getNormalizedIf(), $right->getNormalizedIf());
+		$else = $cb($this->getNormalizedElse(), $right->getNormalizedElse());
+
+		if (
+			$this->subject === $subject
+			&& $this->target === $target
+			&& $this->getNormalizedIf() === $if
+			&& $this->getNormalizedElse() === $else
+		) {
+			return $this;
+		}
+
+		return new self($subject, $target, $if, $else, $this->negated);
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new ConditionalTypeNode(
+			$this->subject->toPhpDocNode(),
+			$this->target->toPhpDocNode(),
+			$this->if->toPhpDocNode(),
+			$this->else->toPhpDocNode(),
+			$this->negated,
 		);
+	}
+
+	private function getNormalizedIf(): Type
+	{
+		return $this->normalizedIf ??= TypeTraverser::map(
+			$this->if,
+			fn (Type $type, callable $traverse) => $type === $this->subject
+				? (!$this->negated ? $this->getSubjectWithTargetIntersectedType() : $this->getSubjectWithTargetRemovedType())
+				: $traverse($type),
+		);
+	}
+
+	private function getNormalizedElse(): Type
+	{
+		return $this->normalizedElse ??= TypeTraverser::map(
+			$this->else,
+			fn (Type $type, callable $traverse) => $type === $this->subject
+				? (!$this->negated ? $this->getSubjectWithTargetRemovedType() : $this->getSubjectWithTargetIntersectedType())
+				: $traverse($type),
+		);
+	}
+
+	private function getSubjectWithTargetIntersectedType(): Type
+	{
+		return $this->subjectWithTargetIntersectedType ??= TypeCombinator::intersect($this->subject, $this->target);
+	}
+
+	private function getSubjectWithTargetRemovedType(): Type
+	{
+		return $this->subjectWithTargetRemovedType ??= TypeCombinator::remove($this->subject, $this->target);
 	}
 
 }

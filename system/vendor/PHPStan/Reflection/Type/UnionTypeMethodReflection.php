@@ -2,10 +2,12 @@
 
 namespace PHPStan\Reflection\Type;
 
+use PHPStan\PhpDoc\ResolvedPhpDocBlock;
 use PHPStan\Reflection\Assertions;
 use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ExtendedMethodReflection;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\TrinaryLogic;
@@ -15,8 +17,9 @@ use function array_map;
 use function array_merge;
 use function count;
 use function implode;
+use function is_bool;
 
-class UnionTypeMethodReflection implements ExtendedMethodReflection
+final class UnionTypeMethodReflection implements ExtendedMethodReflection
 {
 
 	/**
@@ -81,6 +84,16 @@ class UnionTypeMethodReflection implements ExtendedMethodReflection
 		return [ParametersAcceptorSelector::combineAcceptors($variants)];
 	}
 
+	public function getOnlyVariant(): ExtendedParametersAcceptor
+	{
+		return $this->getVariants()[0];
+	}
+
+	public function getNamedArgumentsVariants(): ?array
+	{
+		return null;
+	}
+
 	public function isDeprecated(): TrinaryLogic
 	{
 		return TrinaryLogic::lazyExtremeIdentity($this->methods, static fn (MethodReflection $method): TrinaryLogic => $method->isDeprecated());
@@ -113,9 +126,19 @@ class UnionTypeMethodReflection implements ExtendedMethodReflection
 		return TrinaryLogic::lazyExtremeIdentity($this->methods, static fn (MethodReflection $method): TrinaryLogic => $method->isFinal());
 	}
 
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return TrinaryLogic::lazyExtremeIdentity($this->methods, static fn (ExtendedMethodReflection $method): TrinaryLogic => $method->isFinalByKeyword());
+	}
+
 	public function isInternal(): TrinaryLogic
 	{
-		return TrinaryLogic::lazyExtremeIdentity($this->methods, static fn (MethodReflection $method): TrinaryLogic => $method->isInternal());
+		return TrinaryLogic::lazyExtremeIdentity($this->methods, static fn (ExtendedMethodReflection $method): TrinaryLogic => $method->isInternal());
+	}
+
+	public function isBuiltin(): TrinaryLogic
+	{
+		return TrinaryLogic::lazyExtremeIdentity($this->methods, static fn (ExtendedMethodReflection $method): TrinaryLogic => is_bool($method->isBuiltin()) ? TrinaryLogic::createFromBoolean($method->isBuiltin()) : $method->isBuiltin());
 	}
 
 	public function getThrowType(): ?Type
@@ -143,6 +166,16 @@ class UnionTypeMethodReflection implements ExtendedMethodReflection
 		return TrinaryLogic::lazyExtremeIdentity($this->methods, static fn (MethodReflection $method): TrinaryLogic => $method->hasSideEffects());
 	}
 
+	public function isPure(): TrinaryLogic
+	{
+		return TrinaryLogic::lazyExtremeIdentity($this->methods, static fn (ExtendedMethodReflection $method): TrinaryLogic => $method->isPure());
+	}
+
+	public function getPureUnlessCallableIsImpureParameters(): array
+	{
+		return MergedPureUnlessCallableIsImpureParameters::merge($this->methods);
+	}
+
 	public function getDocComment(): ?string
 	{
 		return null;
@@ -150,7 +183,18 @@ class UnionTypeMethodReflection implements ExtendedMethodReflection
 
 	public function getAsserts(): Assertions
 	{
-		return Assertions::createEmpty();
+		$assertions = Assertions::createEmpty();
+
+		foreach ($this->methods as $method) {
+			$assertions = $assertions->intersect($method->getAsserts());
+		}
+
+		return $assertions;
+	}
+
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return TrinaryLogic::lazyExtremeIdentity($this->methods, static fn (ExtendedMethodReflection $method): TrinaryLogic => $method->acceptsNamedArguments());
 	}
 
 	public function getSelfOutType(): ?Type
@@ -161,6 +205,26 @@ class UnionTypeMethodReflection implements ExtendedMethodReflection
 	public function returnsByReference(): TrinaryLogic
 	{
 		return TrinaryLogic::lazyExtremeIdentity($this->methods, static fn (ExtendedMethodReflection $method): TrinaryLogic => $method->returnsByReference());
+	}
+
+	public function isAbstract(): TrinaryLogic
+	{
+		return TrinaryLogic::lazyExtremeIdentity($this->methods, static fn (ExtendedMethodReflection $method): TrinaryLogic => is_bool($method->isAbstract()) ? TrinaryLogic::createFromBoolean($method->isAbstract()) : $method->isAbstract());
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->methods[0]->getAttributes();
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		return TrinaryLogic::lazyExtremeIdentity($this->methods, static fn (ExtendedMethodReflection $method): TrinaryLogic => $method->mustUseReturnValue());
+	}
+
+	public function getResolvedPhpDoc(): ?ResolvedPhpDocBlock
+	{
+		return $this->methods[0]->getResolvedPhpDoc();
 	}
 
 }

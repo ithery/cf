@@ -4,16 +4,18 @@ namespace PHPStan\Reflection\Type;
 
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\Dummy\ChangedTypeMethodReflection;
+use PHPStan\Reflection\ExtendedFunctionVariant;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\FunctionVariant;
-use PHPStan\Reflection\ParameterReflection;
-use PHPStan\Reflection\ParametersAcceptor;
-use PHPStan\Reflection\Php\DummyParameter;
+use PHPStan\Reflection\ExtendedParameterReflection;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
+use PHPStan\Reflection\Php\ExtendedDummyParameter;
 use PHPStan\Reflection\ResolvedMethodReflection;
+use PHPStan\Type\ThisType;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
 use function array_map;
 
-class CallbackUnresolvedMethodPrototypeReflection implements UnresolvedMethodPrototypeReflection
+final class CallbackUnresolvedMethodPrototypeReflection implements UnresolvedMethodPrototypeReflection
 {
 
 	/** @var callable(Type): Type */
@@ -61,10 +63,12 @@ class CallbackUnresolvedMethodPrototypeReflection implements UnresolvedMethodPro
 			return $this->transformedMethod;
 		}
 		$templateTypeMap = $this->resolvedDeclaringClass->getActiveTemplateTypeMap();
+		$callSiteVarianceMap = $this->resolvedDeclaringClass->getCallSiteVarianceMap();
 
 		return $this->transformedMethod = new ResolvedMethodReflection(
 			$this->transformMethodWithStaticType($this->resolvedDeclaringClass, $this->methodReflection),
 			$this->resolveTemplateTypeMapToBounds ? $templateTypeMap->resolveToBounds() : $templateTypeMap,
+			$callSiteVarianceMap,
 		);
 	}
 
@@ -80,22 +84,72 @@ class CallbackUnresolvedMethodPrototypeReflection implements UnresolvedMethodPro
 
 	private function transformMethodWithStaticType(ClassReflection $declaringClass, ExtendedMethodReflection $method): ExtendedMethodReflection
 	{
-		$variants = array_map(fn (ParametersAcceptor $acceptor): ParametersAcceptor => new FunctionVariant(
-			$acceptor->getTemplateTypeMap(),
-			$acceptor->getResolvedTemplateTypeMap(),
-			array_map(fn (ParameterReflection $parameter): ParameterReflection => new DummyParameter(
-				$parameter->getName(),
-				$this->transformStaticType($parameter->getType()),
-				$parameter->isOptional(),
-				$parameter->passedByReference(),
-				$parameter->isVariadic(),
-				$parameter->getDefaultValue(),
-			), $acceptor->getParameters()),
-			$acceptor->isVariadic(),
-			$this->transformStaticType($acceptor->getReturnType()),
-		), $method->getVariants());
+		$selfOutType = $method->getSelfOutType() !== null ? $this->transformStaticType($method->getSelfOutType()) : null;
+		$variantFn = function (ExtendedParametersAcceptor $acceptor) use (&$selfOutType): ExtendedParametersAcceptor {
+			$originalReturnType = $acceptor->getReturnType();
+			$transformedReturnType = $this->transformStaticType($originalReturnType);
+			if ($originalReturnType instanceof ThisType && $selfOutType !== null) {
+				$returnType = TypeCombinator::intersect($selfOutType, $transformedReturnType);
+				$selfOutType = $returnType;
+			} else {
+				$returnType = $transformedReturnType;
+			}
 
-		return new ChangedTypeMethodReflection($declaringClass, $method, $variants);
+			$phpDocReturnType = $acceptor->getPhpDocReturnType();
+			$nativeReturnType = $acceptor->getNativeReturnType();
+
+			return new ExtendedFunctionVariant(
+				$acceptor->getTemplateTypeMap(),
+				$acceptor->getResolvedTemplateTypeMap(),
+				array_map(
+					function (ExtendedParameterReflection $parameter): ExtendedParameterReflection {
+						$originalType = $parameter->getType();
+						$transformedType = $this->transformStaticType($originalType);
+						return new ExtendedDummyParameter(
+							$parameter->getName(),
+							$transformedType,
+							$parameter->isOptional(),
+							$parameter->passedByReference(),
+							$parameter->isVariadic(),
+							$parameter->getDefaultValue(),
+							$parameter->getNativeType(),
+							$originalType->equals($parameter->getPhpDocType()) ? $transformedType : $this->transformStaticType($parameter->getPhpDocType()),
+							$parameter->getOutType() !== null ? $this->transformStaticType($parameter->getOutType()) : null,
+							$parameter->isImmediatelyInvokedCallable(),
+							$parameter->getClosureThisType() !== null ? $this->transformStaticType($parameter->getClosureThisType()) : null,
+							$parameter->getAttributes(),
+							$parameter->getAllowedConstants(),
+							$parameter->isPureUnlessCallableIsImpureParameter(),
+						);
+					},
+					$acceptor->getParameters(),
+				),
+				$acceptor->isVariadic(),
+				$returnType,
+				$originalReturnType->equals($phpDocReturnType) ? $transformedReturnType : $this->transformStaticType($phpDocReturnType),
+				$originalReturnType->equals($nativeReturnType) ? $transformedReturnType : $this->transformStaticType($nativeReturnType),
+				$acceptor->getCallSiteVarianceMap(),
+			);
+		};
+		$variants = array_map($variantFn, $method->getVariants());
+		$namedArgumentVariants = $method->getNamedArgumentsVariants();
+		$namedArgumentVariants = $namedArgumentVariants !== null
+			? array_map($variantFn, $namedArgumentVariants)
+			: null;
+		$throwType = $method->getThrowType();
+		$throwType = $throwType !== null
+			? $this->transformStaticType($throwType)
+			: null;
+
+		return new ChangedTypeMethodReflection(
+			$declaringClass,
+			$method,
+			$variants,
+			$namedArgumentVariants,
+			$selfOutType,
+			$throwType,
+			$method->getAsserts()->mapTypes($this->transformStaticTypeCallback),
+		);
 	}
 
 	private function transformStaticType(Type $type): Type

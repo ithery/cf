@@ -4,17 +4,21 @@ namespace PHPStan\PhpDoc\Tag;
 
 use PHPStan\Type\Type;
 
-/** @api */
-class MethodTag
+/**
+ * @api
+ */
+final class MethodTag
 {
 
 	/**
 	 * @param array<string, MethodTagParameter> $parameters
+	 * @param array<string, TemplateTag> $templateTags
 	 */
 	public function __construct(
 		private Type $returnType,
 		private bool $isStatic,
 		private array $parameters,
+		private array $templateTags,
 	)
 	{
 	}
@@ -35,6 +39,14 @@ class MethodTag
 	public function getParameters(): array
 	{
 		return $this->parameters;
+	}
+
+	/**
+	 * @return array<string, TemplateTag>
+	 */
+	public function getTemplateTags(): array
+	{
+		return $this->templateTags;
 	}
 
 }

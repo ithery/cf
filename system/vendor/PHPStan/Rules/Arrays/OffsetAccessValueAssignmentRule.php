@@ -7,6 +7,7 @@ use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\AssignOp;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
@@ -19,7 +20,8 @@ use function sprintf;
 /**
  * @implements Rule<Expr>
  */
-class OffsetAccessValueAssignmentRule implements Rule
+#[RegisteredRule(level: 3)]
+final class OffsetAccessValueAssignmentRule implements Rule
 {
 
 	public function __construct(private RuleLevelHelper $ruleLevelHelper)
@@ -46,6 +48,10 @@ class OffsetAccessValueAssignmentRule implements Rule
 		}
 
 		$arrayDimFetch = $node->var;
+		$varType = $scope->getType($arrayDimFetch->var);
+		if ($varType->isObject()->no()) {
+			return [];
+		}
 
 		if ($node instanceof Assign || $node instanceof Expr\AssignRef) {
 			$assignedValueType = $scope->getType($node->expr);
@@ -53,7 +59,6 @@ class OffsetAccessValueAssignmentRule implements Rule
 			$assignedValueType = $scope->getType($node);
 		}
 
-		$originalArrayType = $scope->getType($arrayDimFetch->var);
 		$arrayTypeResult = $this->ruleLevelHelper->findTypeToCheck(
 			$scope,
 			$arrayDimFetch->var,
@@ -76,12 +81,14 @@ class OffsetAccessValueAssignmentRule implements Rule
 			return [];
 		}
 
+		$originalArrayType = $scope->getType($arrayDimFetch->var);
+
 		return [
 			RuleErrorBuilder::message(sprintf(
 				'%s does not accept %s.',
 				$originalArrayType->describe(VerbosityLevel::value()),
 				$assignedValueType->describe(VerbosityLevel::typeOnly()),
-			))->build(),
+			))->identifier('offsetAssign.valueType')->build(),
 		];
 	}
 

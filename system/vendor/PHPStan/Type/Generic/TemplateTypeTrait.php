@@ -2,17 +2,27 @@
 
 namespace PHPStan\Type\Generic;
 
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\TrinaryLogic;
-use PHPStan\Type\GeneralizePrecision;
+use PHPStan\Type\AcceptsResult;
+use PHPStan\Type\Accessory\AccessoryLiteralStringType;
+use PHPStan\Type\Constant\ConstantStringType;
+use PHPStan\Type\ErrorType;
 use PHPStan\Type\IntersectionType;
+use PHPStan\Type\IsSuperTypeOfResult;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\NeverType;
+use PHPStan\Type\NullType;
+use PHPStan\Type\RecursionGuard;
 use PHPStan\Type\SubtractableType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\TypeUtils;
 use PHPStan\Type\UnionType;
 use PHPStan\Type\VerbosityLevel;
+use function count;
 use function sprintf;
 
 /**
@@ -21,6 +31,7 @@ use function sprintf;
 trait TemplateTypeTrait
 {
 
+	/** @var non-empty-string */
 	private string $name;
 
 	private TemplateTypeScope $scope;
@@ -32,6 +43,9 @@ trait TemplateTypeTrait
 	/** @var TBound */
 	private Type $bound;
 
+	private ?Type $default;
+
+	/** @return non-empty-string */
 	public function getName(): string
 	{
 		return $this->name;
@@ -48,19 +62,32 @@ trait TemplateTypeTrait
 		return $this->bound;
 	}
 
+	public function getDefault(): ?Type
+	{
+		return $this->default;
+	}
+
 	public function describe(VerbosityLevel $level): string
 	{
 		$basicDescription = function () use ($level): string {
-			// @phpstan-ignore-next-line
+			// @phpstan-ignore booleanAnd.alwaysFalse, instanceof.alwaysFalse, booleanAnd.alwaysFalse, instanceof.alwaysFalse, instanceof.alwaysTrue
 			if ($this->bound instanceof MixedType && $this->bound->getSubtractedType() === null && !$this->bound instanceof TemplateMixedType) {
 				$boundDescription = '';
-			} else { // @phpstan-ignore-line
+			} else {
 				$boundDescription = sprintf(' of %s', $this->bound->describe($level));
 			}
+			$defaultDescription = '';
+			if ($this->default !== null) {
+				$recursionGuard = RecursionGuard::runOnObjectIdentity($this->default, fn () => $this->default->describe($level));
+				if (!$recursionGuard instanceof ErrorType) {
+					$defaultDescription .= sprintf(' = %s', $recursionGuard);
+				}
+			}
 			return sprintf(
-				'%s%s',
+				'%s%s%s',
 				$this->name,
 				$boundDescription,
+				$defaultDescription,
 			);
 		};
 
@@ -78,18 +105,19 @@ trait TemplateTypeTrait
 
 	public function toArgument(): TemplateType
 	{
-		return new self(
+		return TemplateTypeFactory::create(
 			$this->scope,
-			new TemplateTypeArgumentStrategy(),
-			$this->variance,
 			$this->name,
 			TemplateTypeHelper::toArgument($this->getBound()),
+			$this->variance,
+			new TemplateTypeArgumentStrategy(),
+			$this->default !== null ? TemplateTypeHelper::toArgument($this->default) : null,
 		);
 	}
 
-	public function isValidVariance(Type $a, Type $b): TrinaryLogic
+	public function isValidVariance(Type $a, Type $b): IsSuperTypeOfResult
 	{
-		return $this->variance->isValidVariance($a, $b);
+		return $this->variance->isValidVariance($this, $a, $b);
 	}
 
 	public function subtract(Type $typeToRemove): Type
@@ -101,13 +129,14 @@ trait TemplateTypeTrait
 			$removedBound,
 			$this->getVariance(),
 			$this->getStrategy(),
+			$this->getDefault(),
 		);
 	}
 
 	public function getTypeWithoutSubtractedType(): Type
 	{
 		$bound = $this->getBound();
-		if (!$bound instanceof SubtractableType) { // @phpstan-ignore-line
+		if (!$bound instanceof SubtractableType) {
 			return $this;
 		}
 
@@ -117,13 +146,14 @@ trait TemplateTypeTrait
 			$bound->getTypeWithoutSubtractedType(),
 			$this->getVariance(),
 			$this->getStrategy(),
+			$this->getDefault(),
 		);
 	}
 
 	public function changeSubtractedType(?Type $subtractedType): Type
 	{
 		$bound = $this->getBound();
-		if (!$bound instanceof SubtractableType) { // @phpstan-ignore-line
+		if (!$bound instanceof SubtractableType) {
 			return $this;
 		}
 
@@ -133,13 +163,14 @@ trait TemplateTypeTrait
 			$bound->changeSubtractedType($subtractedType),
 			$this->getVariance(),
 			$this->getStrategy(),
+			$this->getDefault(),
 		);
 	}
 
 	public function getSubtractedType(): ?Type
 	{
 		$bound = $this->getBound();
-		if (!$bound instanceof SubtractableType) { // @phpstan-ignore-line
+		if (!$bound instanceof SubtractableType) {
 			return null;
 		}
 
@@ -151,12 +182,16 @@ trait TemplateTypeTrait
 		return $type instanceof self
 			&& $type->scope->equals($this->scope)
 			&& $type->name === $this->name
-			&& $this->bound->equals($type->bound);
+			&& $this->bound->equals($type->bound)
+			&& (
+				($this->default === null && $type->default === null)
+				|| ($this->default !== null && $type->default !== null && $this->default->equals($type->default))
+			);
 	}
 
-	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): TrinaryLogic
+	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): AcceptsResult
 	{
-		/** @var Type $bound */
+		/** @var TBound $bound */
 		$bound = $this->getBound();
 		if (
 			!$acceptingType instanceof $bound
@@ -176,31 +211,31 @@ trait TemplateTypeTrait
 		}
 
 		return $acceptingType->getBound()->accepts($this->getBound(), $strictTypes)
-			->and(TrinaryLogic::createMaybe());
+			->and(new AcceptsResult(TrinaryLogic::createMaybe(), []));
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
 		return $this->strategy->accepts($this, $type, $strictTypes);
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof TemplateType || $type instanceof IntersectionType) {
 			return $type->isSubTypeOf($this);
 		}
 
 		if ($type instanceof NeverType) {
-			return TrinaryLogic::createYes();
+			return IsSuperTypeOfResult::createYes();
 		}
 
 		return $this->getBound()->isSuperTypeOf($type)
-			->and(TrinaryLogic::createMaybe());
+			->and(IsSuperTypeOfResult::createMaybe());
 	}
 
-	public function isSubTypeOf(Type $type): TrinaryLogic
+	public function isSubTypeOf(Type $type): IsSuperTypeOfResult
 	{
-		/** @var Type $bound */
+		/** @var TBound $bound */
 		$bound = $this->getBound();
 		if (
 			!$type instanceof $bound
@@ -220,12 +255,43 @@ trait TemplateTypeTrait
 		}
 
 		return $type->getBound()->isSuperTypeOf($this->getBound())
-			->and(TrinaryLogic::createMaybe());
+			->and(IsSuperTypeOfResult::createMaybe());
 	}
 
 	public function toArrayKey(): Type
 	{
 		return $this;
+	}
+
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		return $this;
+	}
+
+	public function toClassConstantType(ReflectionProvider $reflectionProvider): Type
+	{
+		// `T::class` keeps the template variable visible — express the
+		// result as `class-string<T>&literal-string` rather than the bound
+		// class, regardless of whether `T` has an object bound or not.
+		// Only when the bound is a known final class does the result
+		// collapse to the literal class name (the bound is the only
+		// possible substitution in that case).
+		if ($this->isNull()->yes()) {
+			return new NullType();
+		}
+
+		$classNames = $this->getObjectClassNames();
+		if (count($classNames) === 1 && $reflectionProvider->hasClass($classNames[0])) {
+			$reflection = $reflectionProvider->getClass($classNames[0]);
+			if ($reflection->isFinalByKeyword()) {
+				return new ConstantStringType($reflection->getName(), true);
+			}
+		}
+
+		return new IntersectionType([
+			new GenericClassStringType($this),
+			new AccessoryLiteralStringType(),
+		]);
 	}
 
 	public function inferTemplateTypes(Type $receivedType): TemplateTypeMap
@@ -240,17 +306,34 @@ trait TemplateTypeTrait
 		}
 
 		$map = $this->getBound()->inferTemplateTypes($receivedType);
-		$resolvedBound = TypeUtils::resolveLateResolvableTypes(TemplateTypeHelper::resolveTemplateTypes($this->getBound(), $map));
-		if ($resolvedBound->isSuperTypeOf($receivedType)->yes()) {
-			if ($this->shouldGeneralizeInferredType()) {
-				$generalizedType = $receivedType->generalize(GeneralizePrecision::templateArgument());
-				if ($resolvedBound->isSuperTypeOf($generalizedType)->yes()) {
-					$receivedType = $generalizedType;
-				}
-			}
+		$resolvedBound = TypeUtils::resolveLateResolvableTypes(TemplateTypeHelper::resolveTemplateTypes(
+			$this->getBound(),
+			$map,
+			TemplateTypeVarianceMap::createEmpty(),
+			TemplateTypeVariance::createStatic(),
+		));
+		$boundMatches = $resolvedBound->isSuperTypeOf($receivedType);
+		if ($boundMatches->yes()) {
 			return (new TemplateTypeMap([
 				$this->name => $receivedType,
 			]))->union($map);
+		}
+
+		if ($boundMatches->maybe() && $receivedType instanceof UnionType) {
+			$matchingTypes = [];
+			foreach ($receivedType->getTypes() as $innerType) {
+				if (!$resolvedBound->isSuperTypeOf($innerType)->yes()) {
+					continue;
+				}
+
+				$matchingTypes[] = $innerType;
+			}
+			if (count($matchingTypes) > 0) {
+				$filteredType = TypeCombinator::union(...$matchingTypes);
+				return (new TemplateTypeMap([
+					$this->name => $filteredType,
+				]))->union($map);
+			}
 		}
 
 		return $map;
@@ -271,15 +354,12 @@ trait TemplateTypeTrait
 		return $this->strategy;
 	}
 
-	protected function shouldGeneralizeInferredType(): bool
-	{
-		return true;
-	}
-
 	public function traverse(callable $cb): Type
 	{
 		$bound = $cb($this->getBound());
-		if ($this->getBound() === $bound) {
+		$default = $this->getDefault() !== null ? $cb($this->getDefault()) : null;
+
+		if ($this->getBound() === $bound && $this->getDefault() === $default) {
 			return $this;
 		}
 
@@ -289,30 +369,65 @@ trait TemplateTypeTrait
 			$bound,
 			$this->getVariance(),
 			$this->getStrategy(),
+			$default,
+		);
+	}
+
+	public function traverseSimultaneously(Type $right, callable $cb): Type
+	{
+		if (!$right instanceof TemplateType) {
+			return $this;
+		}
+
+		$bound = $cb($this->getBound(), $right->getBound());
+		$default = $this->getDefault() !== null && $right->getDefault() !== null ? $cb($this->getDefault(), $right->getDefault()) : null;
+
+		if ($this->getBound() === $bound && $this->getDefault() === $default) {
+			return $this;
+		}
+
+		return TemplateTypeFactory::create(
+			$this->getScope(),
+			$this->getName(),
+			$bound,
+			$this->getVariance(),
+			$this->getStrategy(),
+			$default,
 		);
 	}
 
 	public function tryRemove(Type $typeToRemove): ?Type
 	{
-		if ($this->getBound()->isSuperTypeOf($typeToRemove)->yes()) {
-			return $this->subtract($typeToRemove);
+		if ($typeToRemove instanceof TemplateType) {
+			return null;
 		}
 
-		return null;
+		$bound = TypeCombinator::remove($this->getBound(), $typeToRemove);
+		// Value comparison, not identity: remove() returning the very same instance when it
+		// removes nothing is an implementation detail, not part of its contract. The identity
+		// check is only a fast path (equals() has no such shortcut).
+		if ($this->getBound() === $bound || $this->getBound()->equals($bound)) {
+			return null;
+		}
+
+		return TemplateTypeFactory::create(
+			$this->getScope(),
+			$this->getName(),
+			$bound,
+			$this->getVariance(),
+			$this->getStrategy(),
+			$this->getDefault(),
+		);
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function toPhpDocNode(): TypeNode
 	{
-		return new self(
-			$properties['scope'],
-			$properties['strategy'],
-			$properties['variance'],
-			$properties['name'],
-			$properties['bound'],
-		);
+		return new IdentifierTypeNode($this->name);
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return true;
 	}
 
 }

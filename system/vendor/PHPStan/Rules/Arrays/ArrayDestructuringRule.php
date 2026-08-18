@@ -6,14 +6,14 @@ use ArrayAccess;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\Assign;
-use PhpParser\Node\Scalar\LNumber;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Node\Expr\TypeExpr;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
 use PHPStan\Type\Constant\ConstantIntegerType;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\ErrorType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
@@ -24,7 +24,8 @@ use function sprintf;
 /**
  * @implements Rule<Assign>
  */
-class ArrayDestructuringRule implements Rule
+#[RegisteredRule(level: 3)]
+final class ArrayDestructuringRule implements Rule
 {
 
 	public function __construct(
@@ -41,7 +42,7 @@ class ArrayDestructuringRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if (!$node->var instanceof Node\Expr\List_ && !$node->var instanceof Node\Expr\Array_) {
+		if (!$node->var instanceof Node\Expr\List_) {
 			return [];
 		}
 
@@ -53,10 +54,9 @@ class ArrayDestructuringRule implements Rule
 	}
 
 	/**
-	 * @param Node\Expr\List_|Node\Expr\Array_ $var
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
-	private function getErrors(Scope $scope, Expr $var, Expr $expr): array
+	private function getErrors(Scope $scope, Node\Expr\List_ $var, Expr $expr): array
 	{
 		$exprTypeResult = $this->ruleLevelHelper->findTypeToCheck(
 			$scope,
@@ -70,7 +70,9 @@ class ArrayDestructuringRule implements Rule
 		}
 		if (!$exprType->isArray()->yes() && !(new ObjectType(ArrayAccess::class))->isSuperTypeOf($exprType)->yes()) {
 			return [
-				RuleErrorBuilder::message(sprintf('Cannot use array destructuring on %s.', $exprType->describe(VerbosityLevel::typeOnly())))->build(),
+				RuleErrorBuilder::message(sprintf('Cannot use array destructuring on %s.', $exprType->describe(VerbosityLevel::typeOnly())))
+					->identifier('offsetAccess.nonArray')
+					->build(),
 			];
 		}
 
@@ -85,14 +87,10 @@ class ArrayDestructuringRule implements Rule
 			$keyExpr = null;
 			if ($item->key === null) {
 				$keyType = new ConstantIntegerType($i);
-				$keyExpr = new Node\Scalar\LNumber($i);
+				$keyExpr = new Node\Scalar\Int_($i);
 			} else {
 				$keyType = $scope->getType($item->key);
-				if ($keyType instanceof ConstantIntegerType) {
-					$keyExpr = new LNumber($keyType->getValue());
-				} elseif ($keyType instanceof ConstantStringType) {
-					$keyExpr = new Node\Scalar\String_($keyType->getValue());
-				}
+				$keyExpr = new TypeExpr($keyType);
 			}
 
 			$itemErrors = $this->nonexistentOffsetInArrayDimFetchCheck->check(
@@ -103,12 +101,7 @@ class ArrayDestructuringRule implements Rule
 			);
 			$errors = array_merge($errors, $itemErrors);
 
-			if ($keyExpr === null) {
-				$i++;
-				continue;
-			}
-
-			if (!$item->value instanceof Node\Expr\List_ && !$item->value instanceof Node\Expr\Array_) {
+			if (!$item->value instanceof Node\Expr\List_) {
 				$i++;
 				continue;
 			}

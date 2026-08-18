@@ -2,16 +2,19 @@
 
 namespace PHPStan\Reflection\Php\Soap;
 
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\MethodsClassReflectionExtension;
 
-class SoapClientMethodsClassReflectionExtension implements MethodsClassReflectionExtension
+// autoTag: false - wired explicitly in ClassReflectionExtensionRegistry, must not be tagged
+#[AutowiredService(autoTag: false)]
+final class SoapClientMethodsClassReflectionExtension implements MethodsClassReflectionExtension
 {
 
 	public function hasMethod(ClassReflection $classReflection, string $methodName): bool
 	{
-		return $classReflection->getName() === 'SoapClient' || $classReflection->isSubclassOf('SoapClient');
+		return $classReflection->is('SoapClient');
 	}
 
 	public function getMethod(ClassReflection $classReflection, string $methodName): MethodReflection

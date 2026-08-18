@@ -4,29 +4,22 @@ namespace PHPStan\Rules\Api;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
-use PhpParser\NodeVisitor\NodeConnectingVisitor;
 use PHPStan\Analyser\Scope;
-use PHPStan\DependencyInjection\Container;
-use PHPStan\Parser\RichParser;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\ObjectType;
 use function array_keys;
-use function get_class;
 use function in_array;
 use function sprintf;
-use function strpos;
+use function str_starts_with;
 
 /**
  * @implements Rule<MethodCall>
  */
-class NodeConnectingVisitorAttributesRule implements Rule
+#[RegisteredRule(level: 0)]
+final class NodeConnectingVisitorAttributesRule implements Rule
 {
-
-	public function __construct(private Container $container)
-	{
-	}
 
 	public function getNodeType(): string
 	{
@@ -49,50 +42,40 @@ class NodeConnectingVisitorAttributesRule implements Rule
 		if (!isset($args[0])) {
 			return [];
 		}
+
+		$messages = [];
 		$argType = $scope->getType($args[0]->value);
-		if (!$argType instanceof ConstantStringType) {
-			return [];
-		}
-		if (!in_array($argType->getValue(), ['parent', 'previous', 'next'], true)) {
-			return [];
-		}
-		if (!$scope->isInClass()) {
-			return [];
-		}
-
-		$classReflection = $scope->getClassReflection();
-		$hasPhpStanInterface = false;
-		foreach (array_keys($classReflection->getInterfaces()) as $interfaceName) {
-			if (strpos($interfaceName, 'PHPStan\\') !== 0) {
+		foreach ($argType->getConstantStrings() as $constantString) {
+			$argValue = $constantString->getValue();
+			if (!in_array($argValue, ['parent', 'previous', 'next'], true)) {
 				continue;
 			}
 
-			$hasPhpStanInterface = true;
-		}
-
-		if (!$hasPhpStanInterface) {
-			return [];
-		}
-
-		$isVisitorRegistered = false;
-		foreach ($this->container->getServicesByTag(RichParser::VISITOR_SERVICE_TAG) as $service) {
-			if (get_class($service) !== NodeConnectingVisitor::class) {
+			if (!$scope->isInClass()) {
 				continue;
 			}
 
-			$isVisitorRegistered = true;
-			break;
-		}
+			$classReflection = $scope->getClassReflection();
+			$hasPhpStanInterface = false;
+			foreach (array_keys($classReflection->getInterfaces()) as $interfaceName) {
+				if (!str_starts_with($interfaceName, 'PHPStan\\')) {
+					continue;
+				}
 
-		if ($isVisitorRegistered) {
-			return [];
-		}
+				$hasPhpStanInterface = true;
+			}
 
-		return [
-			RuleErrorBuilder::message(sprintf('Node attribute \'%s\' is no longer available.', $argType->getValue()))
+			if (!$hasPhpStanInterface) {
+				continue;
+			}
+
+			$messages[] = RuleErrorBuilder::message(sprintf('Node attribute \'%s\' is no longer available.', $argValue))
+				->identifier('phpParser.nodeConnectingAttribute')
 				->tip('See: https://phpstan.org/blog/preprocessing-ast-for-custom-rules')
-				->build(),
-		];
+				->build();
+		}
+
+		return $messages;
 	}
 
 }

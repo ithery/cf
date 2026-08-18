@@ -2,18 +2,22 @@
 
 namespace PHPStan\Reflection;
 
+use PHPStan\Reflection\Callables\CallableParametersAcceptor;
+use PHPStan\Reflection\Callables\SimpleImpurePoint;
+use PHPStan\TrinaryLogic;
 use PHPStan\Type\Generic\TemplateTypeMap;
+use PHPStan\Type\Generic\TemplateTypeVarianceMap;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\Type;
 
-class InaccessibleMethod implements ParametersAcceptor
+final class InaccessibleMethod implements CallableParametersAcceptor
 {
 
-	public function __construct(private MethodReflection $methodReflection)
+	public function __construct(private ExtendedMethodReflection $methodReflection)
 	{
 	}
 
-	public function getMethod(): MethodReflection
+	public function getMethod(): ExtendedMethodReflection
 	{
 		return $this->methodReflection;
 	}
@@ -28,9 +32,11 @@ class InaccessibleMethod implements ParametersAcceptor
 		return TemplateTypeMap::createEmpty();
 	}
 
-	/**
-	 * @return array<int, ParameterReflection>
-	 */
+	public function getCallSiteVarianceMap(): TemplateTypeVarianceMap
+	{
+		return TemplateTypeVarianceMap::createEmpty();
+	}
+
 	public function getParameters(): array
 	{
 		return [];
@@ -44,6 +50,57 @@ class InaccessibleMethod implements ParametersAcceptor
 	public function getReturnType(): Type
 	{
 		return new MixedType();
+	}
+
+	public function getThrowPoints(): array
+	{
+		return [];
+	}
+
+	public function isPure(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function getImpurePoints(): array
+	{
+		return [
+			new SimpleImpurePoint(
+				'methodCall',
+				'call to unknown method',
+				false,
+			),
+		];
+	}
+
+	public function getInvalidateExpressions(): array
+	{
+		return [];
+	}
+
+	public function getUsedVariables(): array
+	{
+		return [];
+	}
+
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return $this->methodReflection->acceptsNamedArguments();
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function getAsserts(): Assertions
+	{
+		return Assertions::createEmpty();
+	}
+
+	public function isStaticClosure(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
 	}
 
 }

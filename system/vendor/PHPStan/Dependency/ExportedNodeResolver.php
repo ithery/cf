@@ -3,6 +3,7 @@
 namespace PHPStan\Dependency;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -11,6 +12,8 @@ use PHPStan\Dependency\ExportedNode\ExportedAttributeNode;
 use PHPStan\Dependency\ExportedNode\ExportedClassConstantNode;
 use PHPStan\Dependency\ExportedNode\ExportedClassConstantsNode;
 use PHPStan\Dependency\ExportedNode\ExportedClassNode;
+use PHPStan\Dependency\ExportedNode\ExportedConstantNode;
+use PHPStan\Dependency\ExportedNode\ExportedConstantsNode;
 use PHPStan\Dependency\ExportedNode\ExportedEnumCaseNode;
 use PHPStan\Dependency\ExportedNode\ExportedEnumNode;
 use PHPStan\Dependency\ExportedNode\ExportedFunctionNode;
@@ -19,19 +22,28 @@ use PHPStan\Dependency\ExportedNode\ExportedMethodNode;
 use PHPStan\Dependency\ExportedNode\ExportedParameterNode;
 use PHPStan\Dependency\ExportedNode\ExportedPhpDocNode;
 use PHPStan\Dependency\ExportedNode\ExportedPropertiesNode;
+use PHPStan\Dependency\ExportedNode\ExportedPropertyHookNode;
 use PHPStan\Dependency\ExportedNode\ExportedTraitNode;
 use PHPStan\Dependency\ExportedNode\ExportedTraitUseAdaptation;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Node\Printer\ExprPrinter;
+use PHPStan\Node\Printer\NodeTypePrinter;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\FileTypeMapper;
 use function array_map;
-use function implode;
 use function is_string;
+use function sprintf;
 
-class ExportedNodeResolver
+#[AutowiredService]
+final class ExportedNodeResolver
 {
 
-	public function __construct(private FileTypeMapper $fileTypeMapper, private ExprPrinter $exprPrinter)
+	public function __construct(
+		private ReflectionProvider $reflectionProvider,
+		private FileTypeMapper $fileTypeMapper,
+		private ExprPrinter $exprPrinter,
+	)
 	{
 	}
 
@@ -145,7 +157,52 @@ class ExportedNodeResolver
 		}
 
 		if ($node instanceof Node\Stmt\Trait_ && isset($node->namespacedName)) {
-			return new ExportedTraitNode($node->namespacedName->toString());
+			$docComment = $node->getDocComment();
+			$usedTraits = [];
+			$adaptations = [];
+			foreach ($node->getTraitUses() as $traitUse) {
+				foreach ($traitUse->traits as $usedTraitName) {
+					$usedTraits[] = $usedTraitName->toString();
+				}
+				foreach ($traitUse->adaptations as $adaptation) {
+					$adaptations[] = $adaptation;
+				}
+			}
+
+			$className = $node->namespacedName->toString();
+
+			return new ExportedTraitNode(
+				$className,
+				$this->exportPhpDocNode(
+					$fileName,
+					$className,
+					null,
+					$docComment !== null ? $docComment->getText() : null,
+				),
+				$usedTraits,
+				array_map(static function (Node\Stmt\TraitUseAdaptation $adaptation): ExportedTraitUseAdaptation {
+					if ($adaptation instanceof Node\Stmt\TraitUseAdaptation\Alias) {
+						return ExportedTraitUseAdaptation::createAlias(
+							$adaptation->trait !== null ? $adaptation->trait->toString() : null,
+							$adaptation->method->toString(),
+							$adaptation->newModifier,
+							$adaptation->newName !== null ? $adaptation->newName->toString() : null,
+						);
+					}
+
+					if ($adaptation instanceof Node\Stmt\TraitUseAdaptation\Precedence) {
+						return ExportedTraitUseAdaptation::createPrecedence(
+							$adaptation->trait !== null ? $adaptation->trait->toString() : null,
+							$adaptation->method->toString(),
+							array_map(static fn (Name $name): string => $name->toString(), $adaptation->insteadof),
+						);
+					}
+
+					throw new ShouldNotHappenException();
+				}, $adaptations),
+				$this->exportClassStatements($node->stmts, $fileName, $className),
+				$this->exportAttributeNodes($node->attrGroups),
+			);
 		}
 
 		if ($node instanceof Function_) {
@@ -165,62 +222,51 @@ class ExportedNodeResolver
 					$docComment !== null ? $docComment->getText() : null,
 				),
 				$node->byRef,
-				$this->printType($node->returnType),
-				$this->exportParameterNodes($node->params),
+				NodeTypePrinter::printType($node->returnType),
+				$this->exportParameterNodes($node->params, $fileName, null),
 				$this->exportAttributeNodes($node->attrGroups),
 			);
+		}
+
+		if ($node instanceof Node\Stmt\Const_) {
+			$constants = [];
+			foreach ($node->consts as $const) {
+				$constants[] = new ExportedConstantNode(
+					$const->name->toString(),
+					$this->exprPrinter->printExpr($const->value),
+				);
+			}
+
+			return new ExportedConstantsNode($constants);
+		}
+
+		if (
+			$node instanceof Node\Expr\FuncCall
+			&& $node->name instanceof Name
+			&& $node->name->toLowerString() === 'define'
+		) {
+			$args = $node->getArgs();
+			if (
+				isset($args[0], $args[1])
+				&& $args[0]->value instanceof Node\Scalar\String_
+			) {
+				return new ExportedConstantsNode([
+					new ExportedConstantNode(
+						$args[0]->value->value,
+						$this->exprPrinter->printExpr($args[1]->value),
+					),
+				]);
+			}
 		}
 
 		return null;
 	}
 
 	/**
-	 * @param Node\Identifier|Node\Name|Node\ComplexType|null $type
-	 */
-	private function printType($type): ?string
-	{
-		if ($type === null) {
-			return null;
-		}
-
-		if ($type instanceof Node\NullableType) {
-			return '?' . $this->printType($type->type);
-		}
-
-		if ($type instanceof Node\UnionType) {
-			return implode('|', array_map(function ($innerType): string {
-				$printedType = $this->printType($innerType);
-				if ($printedType === null) {
-					throw new ShouldNotHappenException();
-				}
-
-				return $printedType;
-			}, $type->types));
-		}
-
-		if ($type instanceof Node\IntersectionType) {
-			return implode('&', array_map(function ($innerType): string {
-				$printedType = $this->printType($innerType);
-				if ($printedType === null) {
-					throw new ShouldNotHappenException();
-				}
-
-				return $printedType;
-			}, $type->types));
-		}
-
-		if ($type instanceof Node\Identifier || $type instanceof Name) {
-			return $type->toString();
-		}
-
-		throw new ShouldNotHappenException();
-	}
-
-	/**
 	 * @param Node\Param[] $params
 	 * @return ExportedParameterNode[]
 	 */
-	private function exportParameterNodes(array $params): array
+	private function exportParameterNodes(array $params, string $fileName, ?string $className): array
 	{
 		$nodes = [];
 		foreach ($params as $param) {
@@ -241,13 +287,21 @@ class ExportedNodeResolver
 					$type = new Node\NullableType($type);
 				}
 			}
+			$docComment = $param->getDocComment();
 			$nodes[] = new ExportedParameterNode(
 				$param->var->name,
-				$this->printType($type),
+				NodeTypePrinter::printType($type),
 				$param->byRef,
 				$param->variadic,
 				$param->default !== null,
 				$this->exportAttributeNodes($param->attrGroups),
+				$this->exportPhpDocNode(
+					$fileName,
+					$className,
+					null,
+					$docComment !== null ? $docComment->getText() : null,
+				),
+				$param->flags,
 			);
 		}
 
@@ -321,8 +375,8 @@ class ExportedNodeResolver
 					$node->isAbstract(),
 					$node->isFinal(),
 					$node->isStatic(),
-					$this->printType($node->returnType),
-					$this->exportParameterNodes($node->params),
+					NodeTypePrinter::printType($node->returnType),
+					$this->exportParameterNodes($node->params, $fileName, $namespacedName),
 					$this->exportAttributeNodes($node->attrGroups),
 				);
 			}
@@ -335,20 +389,36 @@ class ExportedNodeResolver
 
 			$docComment = $node->getDocComment();
 
+			$names = array_map(static fn (Node\PropertyItem $prop): string => $prop->name->toString(), $node->props);
+			$virtual = false;
+			if ($this->reflectionProvider->hasClass($namespacedName)) {
+				$classReflection = $this->reflectionProvider->getClass($namespacedName);
+				if ($classReflection->hasNativeProperty($names[0])) {
+					$virtual = $classReflection->getNativeProperty($names[0])->isVirtual()->yes();
+				}
+			}
+
 			return new ExportedPropertiesNode(
-				array_map(static fn (Node\Stmt\PropertyProperty $prop): string => $prop->name->toString(), $node->props),
+				$names,
 				$this->exportPhpDocNode(
 					$fileName,
 					$namespacedName,
 					null,
 					$docComment !== null ? $docComment->getText() : null,
 				),
-				$this->printType($node->type),
+				NodeTypePrinter::printType($node->type),
 				$node->isPublic(),
 				$node->isPrivate(),
 				$node->isStatic(),
 				$node->isReadonly(),
+				$node->isAbstract(),
+				$node->isFinal(),
+				$node->isPublicSet(),
+				$node->isProtectedSet(),
+				$node->isPrivateSet(),
+				$virtual,
 				$this->exportAttributeNodes($node->attrGroups),
+				$this->exportPropertyHooks($node->hooks, $fileName, $namespacedName),
 			);
 		}
 
@@ -419,6 +489,43 @@ class ExportedNodeResolver
 					$args,
 				);
 			}
+		}
+
+		return $nodes;
+	}
+
+	/**
+	 * @param Node\PropertyHook[] $hooks
+	 * @return ExportedPropertyHookNode[]
+	 */
+	private function exportPropertyHooks(
+		array $hooks,
+		string $fileName,
+		string $namespacedName,
+	): array
+	{
+		$nodes = [];
+		foreach ($hooks as $hook) {
+			$docComment = $hook->getDocComment();
+			$propertyName = $hook->getAttribute('propertyName');
+			if ($propertyName === null) {
+				continue;
+			}
+			$nodes[] = new ExportedPropertyHookNode(
+				$hook->name->toString(),
+				$this->exportPhpDocNode(
+					$fileName,
+					$namespacedName,
+					sprintf('$%s::%s', $propertyName, $hook->name->toString()),
+					$docComment !== null ? $docComment->getText() : null,
+				),
+				$hook->byRef,
+				$hook->body === null,
+				$hook->isFinal(),
+				$hook->body instanceof Expr,
+				$this->exportParameterNodes($hook->params, $fileName, $namespacedName),
+				$this->exportAttributeNodes($hook->attrGroups),
+			);
 		}
 
 		return $nodes;

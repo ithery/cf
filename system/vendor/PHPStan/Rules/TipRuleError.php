@@ -2,6 +2,10 @@
 
 namespace PHPStan\Rules;
 
+/**
+ * @api
+ * @api-do-not-implement
+ */
 interface TipRuleError extends RuleError
 {
 

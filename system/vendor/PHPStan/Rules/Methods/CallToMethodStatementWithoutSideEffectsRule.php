@@ -5,19 +5,22 @@ namespace PHPStan\Rules\Methods;
 use PhpParser\Node;
 use PHPStan\Analyser\NullsafeOperatorHelper;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Node\NoopExpressionNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
 use PHPStan\Type\ErrorType;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\Type;
-use PHPStan\Type\VoidType;
+use function count;
 use function sprintf;
 
 /**
- * @implements Rule<Node\Stmt\Expression>
+ * @implements Rule<NoopExpressionNode>
  */
-class CallToMethodStatementWithoutSideEffectsRule implements Rule
+#[RegisteredRule(level: 4)]
+final class CallToMethodStatementWithoutSideEffectsRule implements Rule
 {
 
 	public function __construct(private RuleLevelHelper $ruleLevelHelper)
@@ -26,23 +29,30 @@ class CallToMethodStatementWithoutSideEffectsRule implements Rule
 
 	public function getNodeType(): string
 	{
-		return Node\Stmt\Expression::class;
+		return NoopExpressionNode::class;
 	}
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if ($node->expr instanceof Node\Expr\NullsafeMethodCall) {
-			$scope = $scope->filterByTruthyValue(new Node\Expr\BinaryOp\NotIdentical($node->expr->var, new Node\Expr\ConstFetch(new Node\Name('null'))));
-		} elseif (!$node->expr instanceof Node\Expr\MethodCall) {
+		$methodCall = $node->getOriginalExpr();
+		if ($methodCall instanceof Node\Expr\BinaryOp\Pipe) {
+			$methodCall = $methodCall->right;
+		}
+
+		if ($methodCall instanceof Node\Expr\NullsafeMethodCall) {
+			if (!$methodCall->name instanceof Node\Identifier) {
+				return [];
+			}
+			$scope = $scope->filterByTruthyValue(new Node\Expr\BinaryOp\NotIdentical($methodCall->var, new Node\Expr\ConstFetch(new Node\Name('null'))));
+		} elseif ($methodCall instanceof Node\Expr\MethodCall) {
+			if (!$methodCall->name instanceof Node\Identifier) {
+				return [];
+			}
+		} else {
 			return [];
 		}
 
-		$methodCall = $node->expr;
-		if (!$methodCall->name instanceof Node\Identifier) {
-			return [];
-		}
 		$methodName = $methodCall->name->toString();
-
 		$typeResult = $this->ruleLevelHelper->findTypeToCheck(
 			$scope,
 			NullsafeOperatorHelper::getNullsafeShortcircuitedExprRespectingScope($scope, $methodCall->var),
@@ -61,31 +71,24 @@ class CallToMethodStatementWithoutSideEffectsRule implements Rule
 			return [];
 		}
 
-		$method = $calledOnType->getMethod($methodName, $scope);
-		if ($method->hasSideEffects()->no() || $node->expr->isFirstClassCallable()) {
-			if (!$node->expr->isFirstClassCallable()) {
-				$throwsType = $method->getThrowType();
-				if ($throwsType !== null && !$throwsType instanceof VoidType) {
-					return [];
-				}
-			}
-
-			$methodResult = $scope->getType($methodCall);
-			if ($methodResult instanceof NeverType && $methodResult->isExplicit()) {
-				return [];
-			}
-
-			return [
-				RuleErrorBuilder::message(sprintf(
-					'Call to %s %s::%s() on a separate line has no effect.',
-					$method->isStatic() ? 'static method' : 'method',
-					$method->getDeclaringClass()->getDisplayName(),
-					$method->getName(),
-				))->build(),
-			];
+		$methodResult = $scope->getType($methodCall);
+		if ($methodResult instanceof NeverType && $methodResult->isExplicit()) {
+			return [];
 		}
 
-		return [];
+		$method = $calledOnType->getMethod($methodName, $scope);
+		if (count($method->getAsserts()->getAsserts()) > 0) {
+			return [];
+		}
+
+		return [
+			RuleErrorBuilder::message(sprintf(
+				'Call to %s %s::%s() on a separate line has no effect.',
+				$method->isStatic() ? 'static method' : 'method',
+				$method->getDeclaringClass()->getDisplayName(),
+				$method->getName(),
+			))->identifier('method.resultUnused')->build(),
+		];
 	}
 
 }

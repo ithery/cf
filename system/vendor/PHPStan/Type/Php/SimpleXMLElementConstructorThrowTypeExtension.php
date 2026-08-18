@@ -4,21 +4,26 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\StaticCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicStaticMethodThrowTypeExtension;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeUtils;
 use SimpleXMLElement;
 use function count;
+use function extension_loaded;
+use function libxml_use_internal_errors;
 
-class SimpleXMLElementConstructorThrowTypeExtension implements DynamicStaticMethodThrowTypeExtension
+#[AutowiredService]
+final class SimpleXMLElementConstructorThrowTypeExtension implements DynamicStaticMethodThrowTypeExtension
 {
 
 	public function isStaticMethodSupported(MethodReflection $methodReflection): bool
 	{
-		return $methodReflection->getName() === '__construct' && $methodReflection->getDeclaringClass()->getName() === SimpleXMLElement::class;
+		return extension_loaded('simplexml')
+			&& $methodReflection->getName() === '__construct'
+			&& $methodReflection->getDeclaringClass()->getName() === SimpleXMLElement::class;
 	}
 
 	public function getThrowTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): ?Type
@@ -28,16 +33,22 @@ class SimpleXMLElementConstructorThrowTypeExtension implements DynamicStaticMeth
 		}
 
 		$valueType = $scope->getType($methodCall->getArgs()[0]->value);
-		$constantStrings = TypeUtils::getConstantStrings($valueType);
+		$constantStrings = $valueType->getConstantStrings();
 
-		foreach ($constantStrings as $constantString) {
-			try {
-				new SimpleXMLElement($constantString->getValue());
-			} catch (\Exception $e) { // phpcs:ignore
-				return $methodReflection->getThrowType();
+		$internalErrorsOld = libxml_use_internal_errors(true);
+
+		try {
+			foreach ($constantStrings as $constantString) {
+				try {
+					new SimpleXMLElement($constantString->getValue());
+				} catch (\Exception $e) { // phpcs:ignore
+					return $methodReflection->getThrowType();
+				}
+
+				$valueType = TypeCombinator::remove($valueType, $constantString);
 			}
-
-			$valueType = TypeCombinator::remove($valueType, $constantString);
+		} finally {
+			libxml_use_internal_errors($internalErrorsOld);
 		}
 
 		if (!$valueType instanceof NeverType) {

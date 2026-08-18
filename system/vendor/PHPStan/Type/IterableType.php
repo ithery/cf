@@ -2,10 +2,14 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\TrinaryLogic;
+use PHPStan\Type\Enum\EnumCaseObjectType;
 use PHPStan\Type\Generic\GenericObjectType;
 use PHPStan\Type\Generic\TemplateMixedType;
-use PHPStan\Type\Generic\TemplateType;
 use PHPStan\Type\Generic\TemplateTypeMap;
 use PHPStan\Type\Generic\TemplateTypeVariance;
 use PHPStan\Type\Traits\MaybeArrayTypeTrait;
@@ -17,9 +21,11 @@ use PHPStan\Type\Traits\UndecidedBooleanTypeTrait;
 use PHPStan\Type\Traits\UndecidedComparisonCompoundTypeTrait;
 use Traversable;
 use function array_merge;
+use function get_class;
 use function sprintf;
 
 /** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::isIterable()')]
 class IterableType implements CompoundType
 {
 
@@ -49,9 +55,6 @@ class IterableType implements CompoundType
 		return $this->itemType;
 	}
 
-	/**
-	 * @return string[]
-	 */
 	public function getReferencedClasses(): array
 	{
 		return array_merge(
@@ -60,10 +63,25 @@ class IterableType implements CompoundType
 		);
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function getObjectClassNames(): array
+	{
+		return [];
+	}
+
+	public function getObjectClassReflections(): array
+	{
+		return [];
+	}
+
+	public function getConstantStrings(): array
+	{
+		return [];
+	}
+
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
 		if ($type->isConstantArray()->yes() && $type->isIterableAtLeastOnce()->no()) {
-			return TrinaryLogic::createYes();
+			return AcceptsResult::createYes();
 		}
 		if ($type->isIterable()->yes()) {
 			return $this->getIterableValueType()->accepts($type->getIterableValueType(), $strictTypes)
@@ -74,28 +92,28 @@ class IterableType implements CompoundType
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
-		return TrinaryLogic::createNo();
+		return AcceptsResult::createNo();
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
 		}
 
-		return $type->isIterable()
+		return (new IsSuperTypeOfResult($type->isIterable(), []))
 			->and($this->getIterableValueType()->isSuperTypeOf($type->getIterableValueType()))
 			->and($this->getIterableKeyType()->isSuperTypeOf($type->getIterableKeyType()));
 	}
 
-	public function isSuperTypeOfMixed(Type $type): TrinaryLogic
+	public function isSuperTypeOfMixed(Type $type): IsSuperTypeOfResult
 	{
-		return $type->isIterable()
+		return (new IsSuperTypeOfResult($type->isIterable(), []))
 			->and($this->isNestedTypeSuperTypeOf($this->getIterableValueType(), $type->getIterableValueType()))
 			->and($this->isNestedTypeSuperTypeOf($this->getIterableKeyType(), $type->getIterableKeyType()));
 	}
 
-	private function isNestedTypeSuperTypeOf(Type $a, Type $b): TrinaryLogic
+	private function isNestedTypeSuperTypeOf(Type $a, Type $b): IsSuperTypeOfResult
 	{
 		if (!$a instanceof MixedType || !$b instanceof MixedType) {
 			return $a->isSuperTypeOf($b);
@@ -107,52 +125,46 @@ class IterableType implements CompoundType
 
 		if ($a->isExplicitMixed()) {
 			if ($b->isExplicitMixed()) {
-				return TrinaryLogic::createYes();
+				return IsSuperTypeOfResult::createYes();
 			}
 
-			return TrinaryLogic::createMaybe();
+			return IsSuperTypeOfResult::createMaybe();
 		}
 
-		return TrinaryLogic::createYes();
+		return IsSuperTypeOfResult::createYes();
 	}
 
-	public function isSubTypeOf(Type $otherType): TrinaryLogic
+	public function isSubTypeOf(Type $otherType): IsSuperTypeOfResult
 	{
 		if ($otherType instanceof IntersectionType || $otherType instanceof UnionType) {
-			return $otherType->isSuperTypeOf(new UnionType([
-				new ArrayType($this->keyType, $this->itemType),
-				new IntersectionType([
-					new ObjectType(Traversable::class),
-					$this,
-				]),
-			]));
+			return $otherType->isSuperTypeOf($this->toArrayOrTraversable());
 		}
 
 		if ($otherType instanceof self) {
-			$limit = TrinaryLogic::createYes();
+			$limit = IsSuperTypeOfResult::createYes();
 		} else {
-			$limit = TrinaryLogic::createMaybe();
+			$limit = IsSuperTypeOfResult::createMaybe();
 		}
 
 		if ($otherType->isConstantArray()->yes() && $otherType->isIterableAtLeastOnce()->no()) {
-			return TrinaryLogic::createMaybe();
+			return IsSuperTypeOfResult::createMaybe();
 		}
 
 		return $limit->and(
-			$otherType->isIterable(),
+			new IsSuperTypeOfResult($otherType->isIterable(), []),
 			$otherType->getIterableValueType()->isSuperTypeOf($this->itemType),
 			$otherType->getIterableKeyType()->isSuperTypeOf($this->keyType),
 		);
 	}
 
-	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): TrinaryLogic
+	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): AcceptsResult
 	{
-		return $this->isSubTypeOf($acceptingType);
+		return $this->isSubTypeOf($acceptingType)->toAcceptsResult();
 	}
 
 	public function equals(Type $type): bool
 	{
-		if (!$type instanceof self) {
+		if (get_class($type) !== static::class) {
 			return false;
 		}
 
@@ -162,9 +174,8 @@ class IterableType implements CompoundType
 
 	public function describe(VerbosityLevel $level): string
 	{
-		$isMixedKeyType = $this->keyType instanceof MixedType && !$this->keyType instanceof TemplateType;
-		$isMixedItemType = $this->itemType instanceof MixedType && !$this->itemType instanceof TemplateType;
-
+		$isMixedKeyType = $this->keyType instanceof MixedType && $this->keyType->describe(VerbosityLevel::precise()) === 'mixed';
+		$isMixedItemType = $this->itemType instanceof MixedType && $this->itemType->describe(VerbosityLevel::precise()) === 'mixed';
 		if ($isMixedKeyType) {
 			if ($isMixedItemType) {
 				return 'iterable';
@@ -190,6 +201,16 @@ class IterableType implements CompoundType
 		return new ErrorType();
 	}
 
+	public function toBitwiseNotType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toAbsoluteNumber(): Type
+	{
+		return new ErrorType();
+	}
+
 	public function toString(): Type
 	{
 		return new ErrorType();
@@ -210,9 +231,41 @@ class IterableType implements CompoundType
 		return new ArrayType($this->keyType, $this->getItemType());
 	}
 
+	public function toArrayOrTraversable(): Type
+	{
+		return new UnionType([
+			new ArrayType($this->keyType, $this->itemType),
+			new GenericObjectType(Traversable::class, [
+				$this->keyType,
+				$this->itemType,
+			]),
+		]);
+	}
+
 	public function toArrayKey(): Type
 	{
 		return new ErrorType();
+	}
+
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		return TypeCombinator::union(
+			$this,
+			new ArrayType(
+				TypeCombinator::intersect(
+					$this->keyType->toArrayKey(),
+					new UnionType([
+						new IntegerType(),
+						new StringType(),
+					]),
+				),
+				$this->itemType,
+			),
+			new GenericObjectType(Traversable::class, [
+				$this->keyType,
+				$this->itemType,
+			]),
+		);
 	}
 
 	public function isIterable(): TrinaryLogic
@@ -260,12 +313,67 @@ class IterableType implements CompoundType
 		return $this->getItemType();
 	}
 
+	public function isNull(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantScalarValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getConstantScalarTypes(): array
+	{
+		return [];
+	}
+
+	public function getConstantScalarValues(): array
+	{
+		return [];
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isBoolean(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFloat(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isInteger(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
 	public function isString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
 
 	public function isNumericString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isDecimalIntegerString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
@@ -283,6 +391,56 @@ class IterableType implements CompoundType
 	public function isLiteralString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
+	}
+
+	public function isLowercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isClassString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isUppercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return new ObjectWithoutClassType();
+	}
+
+	public function isVoid(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		return new BooleanType();
+	}
+
+	public function getEnumCases(): array
+	{
+		return [];
+	}
+
+	public function getEnumCaseObject(): ?EnumCaseObjectType
+	{
+		return null;
 	}
 
 	public function inferTemplateTypes(Type $receivedType): TemplateTypeMap
@@ -303,9 +461,11 @@ class IterableType implements CompoundType
 
 	public function getReferencedTemplateTypes(TemplateTypeVariance $positionVariance): array
 	{
+		$variance = $positionVariance->compose(TemplateTypeVariance::createCovariant());
+
 		return array_merge(
-			$this->getIterableKeyType()->getReferencedTemplateTypes(TemplateTypeVariance::createCovariant()),
-			$this->getIterableValueType()->getReferencedTemplateTypes(TemplateTypeVariance::createCovariant()),
+			$this->getIterableKeyType()->getReferencedTemplateTypes($variance),
+			$this->getIterableValueType()->getReferencedTemplateTypes($variance),
 		);
 	}
 
@@ -313,6 +473,18 @@ class IterableType implements CompoundType
 	{
 		$keyType = $cb($this->keyType);
 		$itemType = $cb($this->itemType);
+
+		if ($keyType !== $this->keyType || $itemType !== $this->itemType) {
+			return new self($keyType, $itemType);
+		}
+
+		return $this;
+	}
+
+	public function traverseSimultaneously(Type $right, callable $cb): Type
+	{
+		$keyType = $cb($this->keyType, $right->getIterableKeyType());
+		$itemType = $cb($this->itemType, $right->getIterableValueType());
 
 		if ($keyType !== $this->keyType || $itemType !== $this->itemType) {
 			return new self($keyType, $itemType);
@@ -339,12 +511,46 @@ class IterableType implements CompoundType
 		return null;
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function exponentiate(Type $exponent): Type
 	{
-		return new self($properties['keyType'], $properties['itemType']);
+		return new ErrorType();
+	}
+
+	public function getFiniteTypes(): array
+	{
+		return [];
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		$isMixedKeyType = $this->keyType instanceof MixedType && $this->keyType->describe(VerbosityLevel::precise()) === 'mixed';
+		$isMixedItemType = $this->itemType instanceof MixedType && $this->itemType->describe(VerbosityLevel::precise()) === 'mixed';
+
+		if ($isMixedKeyType) {
+			if ($isMixedItemType) {
+				return new IdentifierTypeNode('iterable');
+			}
+
+			return new GenericTypeNode(
+				new IdentifierTypeNode('iterable'),
+				[
+					$this->itemType->toPhpDocNode(),
+				],
+			);
+		}
+
+		return new GenericTypeNode(
+			new IdentifierTypeNode('iterable'),
+			[
+				$this->keyType->toPhpDocNode(),
+				$this->itemType->toPhpDocNode(),
+			],
+		);
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return $this->keyType->hasTemplateOrLateResolvableType() || $this->itemType->hasTemplateOrLateResolvableType();
 	}
 
 }

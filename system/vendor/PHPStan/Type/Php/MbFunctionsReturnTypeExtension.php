@@ -4,6 +4,7 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
@@ -15,14 +16,14 @@ use PHPStan\Type\NeverType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeUtils;
 use PHPStan\Type\UnionType;
 use function array_key_exists;
 use function array_map;
 use function array_unique;
 use function count;
 
-class MbFunctionsReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class MbFunctionsReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	use MbFunctionsReturnTypeExtensionTrait;
@@ -48,14 +49,19 @@ class MbFunctionsReturnTypeExtension implements DynamicFunctionReturnTypeExtensi
 
 	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
 	{
-		$returnType = ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+		$args = $functionCall->getArgs();
+		$returnType = ParametersAcceptorSelector::selectFromArgs(
+			$scope,
+			$args,
+			$functionReflection->getVariants(),
+		)->getReturnType();
 		$positionEncodingParam = $this->encodingPositionMap[$functionReflection->getName()];
 
-		if (count($functionCall->getArgs()) < $positionEncodingParam) {
+		if (count($args) < $positionEncodingParam) {
 			return TypeCombinator::remove($returnType, new BooleanType());
 		}
 
-		$strings = TypeUtils::getConstantStrings($scope->getType($functionCall->getArgs()[$positionEncodingParam - 1]->value));
+		$strings = $scope->getType($args[$positionEncodingParam - 1]->value)->getConstantStrings();
 		$results = array_unique(array_map(fn (ConstantStringType $encoding): bool => $this->isSupportedEncoding($encoding->getValue()), $strings));
 
 		if ($returnType->equals(new UnionType([new StringType(), new BooleanType()]))) {

@@ -6,9 +6,28 @@ use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Analyser\SpecifiedTypes;
 use PHPStan\Analyser\TypeSpecifierContext;
+use PHPStan\Analyser\TypeSpecifierFactory;
+use PHPStan\DependencyInjection\ExtensionInterface;
 use PHPStan\Reflection\FunctionReflection;
 
-/** @api */
+/**
+ * This is the interface type-specifying extensions implement for functions.
+ *
+ * To register it in the configuration file use the `phpstan.typeSpecifier.functionTypeSpecifyingExtension` service tag:
+ *
+ * ```
+ * services:
+ * 	-
+ *		class: App\PHPStan\MyExtension
+ *		tags:
+ *			- phpstan.typeSpecifier.functionTypeSpecifyingExtension
+ * ```
+ *
+ * Learn more: https://phpstan.org/developing-extensions/type-specifying-extensions
+ *
+ * @api
+ */
+#[ExtensionInterface(tag: TypeSpecifierFactory::FUNCTION_TYPE_SPECIFYING_EXTENSION_TAG)]
 interface FunctionTypeSpecifyingExtension
 {
 

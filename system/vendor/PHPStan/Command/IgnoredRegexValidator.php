@@ -12,11 +12,10 @@ use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\VerbosityLevel;
 use function count;
-use function strpos;
 use function strrpos;
 use function substr;
 
-class IgnoredRegexValidator
+final class IgnoredRegexValidator
 {
 
 	public function __construct(
@@ -33,23 +32,21 @@ class IgnoredRegexValidator
 		try {
 			/** @var TreeNode $ast */
 			$ast = $this->parser->parse($regex);
-		} catch (Exception $e) {
-			if (strpos($e->getMessage(), 'Unexpected token "|" (alternation) at line 1') === 0) {
-				return new IgnoredRegexValidatorResult([], false, true, '||', '\|\|');
-			}
-			if (
-				strpos($regex, '()') !== false
-				&& strpos($e->getMessage(), 'Unexpected token ")" (_capturing) at line 1') === 0
-			) {
-				return new IgnoredRegexValidatorResult([], false, true, '()', '\(\)');
-			}
-			return new IgnoredRegexValidatorResult([], false, false);
+		} catch (Exception) {
+			return new IgnoredRegexValidatorResult(ignoredTypes: [], anchorsInTheMiddle: false, allErrorsIgnored: false);
+		}
+
+		if (Strings::match($regex, '~(?<!\\\\)(?:\\\\\\\\)*\|\|~')) {
+			return new IgnoredRegexValidatorResult(ignoredTypes: [], anchorsInTheMiddle: false, allErrorsIgnored: true, wrongSequence: '||', escapedWrongSequence: '\|\|');
+		}
+		if (Strings::match($regex, '~(?<!\\\\)(?:\\\\\\\\)*\(\)~')) {
+			return new IgnoredRegexValidatorResult(ignoredTypes: [], anchorsInTheMiddle: false, allErrorsIgnored: true, wrongSequence: '()', escapedWrongSequence: '\(\)');
 		}
 
 		return new IgnoredRegexValidatorResult(
-			$this->getIgnoredTypes($ast),
-			$this->hasAnchorsInTheMiddle($ast),
-			false,
+			ignoredTypes: $this->getIgnoredTypes($ast),
+			anchorsInTheMiddle: $this->hasAnchorsInTheMiddle($ast),
+			allErrorsIgnored: false,
 		);
 	}
 
@@ -86,15 +83,17 @@ class IgnoredRegexValidator
 				continue;
 			}
 
-			if ($type->describe(VerbosityLevel::typeOnly()) !== $matches[1]) {
-				continue;
-			}
-
 			if ($type instanceof ObjectType) {
 				continue;
 			}
 
-			$types[$type->describe(VerbosityLevel::typeOnly())] = $text;
+			$typeDescription = $type->describe(VerbosityLevel::typeOnly());
+
+			if ($typeDescription !== $matches[1]) {
+				continue;
+			}
+
+			$types[$typeDescription] = $text;
 		}
 
 		return $types;

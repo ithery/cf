@@ -6,8 +6,10 @@ use PHPStan\Analyser\NameScope;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\Type\TypeAlias;
 
-/** @api */
-class TypeAliasTag
+/**
+ * @api
+ */
+final class TypeAliasTag
 {
 
 	public function __construct(

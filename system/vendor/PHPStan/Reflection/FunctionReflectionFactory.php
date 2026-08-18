@@ -11,8 +11,12 @@ interface FunctionReflectionFactory
 {
 
 	/**
-	 * @param Type[] $phpDocParameterTypes
-	 * @param Type[] $phpDocParameterOutTypes
+	 * @param array<string, Type> $phpDocParameterTypes
+	 * @param array<string, Type> $phpDocParameterOutTypes
+	 * @param array<string, bool> $phpDocParameterImmediatelyInvokedCallable
+	 * @param array<string, Type> $phpDocParameterClosureThisTypes
+	 * @param list<AttributeReflection> $attributes
+	 * @param array<string, bool> $phpDocParameterPureUnlessCallableIsImpure
 	 */
 	public function create(
 		ReflectionFunction $reflection,
@@ -23,12 +27,16 @@ interface FunctionReflectionFactory
 		?string $deprecatedDescription,
 		bool $isDeprecated,
 		bool $isInternal,
-		bool $isFinal,
 		?string $filename,
 		?bool $isPure,
 		Assertions $asserts,
+		bool $acceptsNamedArguments,
 		?string $phpDocComment,
 		array $phpDocParameterOutTypes,
+		array $phpDocParameterImmediatelyInvokedCallable,
+		array $phpDocParameterClosureThisTypes,
+		array $attributes,
+		array $phpDocParameterPureUnlessCallableIsImpure,
 	): PhpFunctionReflection;
 
 }

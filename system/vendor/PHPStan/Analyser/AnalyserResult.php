@@ -6,42 +6,49 @@ use PHPStan\Collectors\CollectedData;
 use PHPStan\Dependency\RootExportedNode;
 use function usort;
 
-class AnalyserResult
+/**
+ * @phpstan-import-type LinesToIgnore from FileAnalyserResult
+ * @phpstan-import-type CollectorData from CollectedData
+ */
+final class AnalyserResult
 {
 
-	/** @var list<Error> */
-	private array $unorderedErrors;
+	/** @var list<Error>|null */
+	private ?array $errors = null;
 
 	/**
-	 * @param list<Error> $errors
-	 * @param list<CollectedData> $collectedData
-	 * @param list<string> $internalErrors
+	 * @param list<Error> $unorderedErrors
+	 * @param list<Error> $filteredPhpErrors
+	 * @param list<Error> $allPhpErrors
+	 * @param list<Error> $locallyIgnoredErrors
+	 * @param array<string, LinesToIgnore> $linesToIgnore
+	 * @param array<string, LinesToIgnore> $unmatchedLineIgnores
+	 * @param CollectorData $collectedData
+	 * @param list<InternalError> $internalErrors
 	 * @param array<string, array<string>>|null $dependencies
+	 * @param array<string, array<string>>|null $usedTraitDependencies
+	 * @param array<string, array<string>>|null $packageDependencies
 	 * @param array<string, array<RootExportedNode>> $exportedNodes
+	 * @param list<string> $processedFiles
 	 */
 	public function __construct(
-		private array $errors,
+		private array $unorderedErrors,
+		private array $filteredPhpErrors,
+		private array $allPhpErrors,
+		private array $locallyIgnoredErrors,
+		private array $linesToIgnore,
+		private array $unmatchedLineIgnores,
 		private array $internalErrors,
 		private array $collectedData,
 		private ?array $dependencies,
+		private ?array $usedTraitDependencies,
+		private ?array $packageDependencies,
 		private array $exportedNodes,
 		private bool $reachedInternalErrorsCountLimit,
+		private int $peakMemoryUsageBytes,
+		private array $processedFiles,
 	)
 	{
-		$this->unorderedErrors = $errors;
-
-		usort(
-			$this->errors,
-			static fn (Error $a, Error $b): int => [
-				$a->getFile(),
-				$a->getLine(),
-				$a->getMessage(),
-			] <=> [
-				$b->getFile(),
-				$b->getLine(),
-				$b->getMessage(),
-			],
-		);
 	}
 
 	/**
@@ -57,11 +64,67 @@ class AnalyserResult
 	 */
 	public function getErrors(): array
 	{
+		if (!isset($this->errors)) {
+			$this->errors = $this->unorderedErrors;
+			usort(
+				$this->errors,
+				static fn (Error $a, Error $b): int => [
+					$a->getFile(),
+					$a->getLine(),
+					$a->getMessage(),
+				] <=> [
+					$b->getFile(),
+					$b->getLine(),
+					$b->getMessage(),
+				],
+			);
+		}
+
 		return $this->errors;
 	}
 
 	/**
-	 * @return list<string>
+	 * @return list<Error>
+	 */
+	public function getFilteredPhpErrors(): array
+	{
+		return $this->filteredPhpErrors;
+	}
+
+	/**
+	 * @return list<Error>
+	 */
+	public function getAllPhpErrors(): array
+	{
+		return $this->allPhpErrors;
+	}
+
+	/**
+	 * @return list<Error>
+	 */
+	public function getLocallyIgnoredErrors(): array
+	{
+		return $this->locallyIgnoredErrors;
+	}
+
+	/**
+	 * @return array<string, LinesToIgnore>
+	 */
+	public function getLinesToIgnore(): array
+	{
+		return $this->linesToIgnore;
+	}
+
+	/**
+	 * @return array<string, LinesToIgnore>
+	 */
+	public function getUnmatchedLineIgnores(): array
+	{
+		return $this->unmatchedLineIgnores;
+	}
+
+	/**
+	 * @return list<InternalError>
 	 */
 	public function getInternalErrors(): array
 	{
@@ -69,7 +132,7 @@ class AnalyserResult
 	}
 
 	/**
-	 * @return list<CollectedData>
+	 * @return CollectorData
 	 */
 	public function getCollectedData(): array
 	{
@@ -85,6 +148,22 @@ class AnalyserResult
 	}
 
 	/**
+	 * @return array<string, array<string>>|null
+	 */
+	public function getUsedTraitDependencies(): ?array
+	{
+		return $this->usedTraitDependencies;
+	}
+
+	/**
+	 * @return array<string, array<string>>|null
+	 */
+	public function getPackageDependencies(): ?array
+	{
+		return $this->packageDependencies;
+	}
+
+	/**
 	 * @return array<string, array<RootExportedNode>>
 	 */
 	public function getExportedNodes(): array
@@ -95,6 +174,19 @@ class AnalyserResult
 	public function hasReachedInternalErrorsCountLimit(): bool
 	{
 		return $this->reachedInternalErrorsCountLimit;
+	}
+
+	public function getPeakMemoryUsageBytes(): int
+	{
+		return $this->peakMemoryUsageBytes;
+	}
+
+	/**
+	 * @return list<string>
+	 */
+	public function getProcessedFiles(): array
+	{
+		return $this->processedFiles;
 	}
 
 }

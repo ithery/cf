@@ -12,7 +12,7 @@ use PHPStan\Rules\TipRuleError;
 /**
  * @internal Use PHPStan\Rules\RuleErrorBuilder instead.
  */
-class RuleError95 implements RuleError, LineRuleError, FileRuleError, TipRuleError, IdentifierRuleError, NonIgnorableRuleError
+final class RuleError95 implements RuleError, LineRuleError, FileRuleError, TipRuleError, IdentifierRuleError, NonIgnorableRuleError
 {
 
 	public string $message;
@@ -20,6 +20,8 @@ class RuleError95 implements RuleError, LineRuleError, FileRuleError, TipRuleErr
 	public int $line;
 
 	public string $file;
+
+	public string $fileDescription;
 
 	public string $tip;
 
@@ -38,6 +40,11 @@ class RuleError95 implements RuleError, LineRuleError, FileRuleError, TipRuleErr
 	public function getFile(): string
 	{
 		return $this->file;
+	}
+
+	public function getFileDescription(): string
+	{
+		return $this->fileDescription;
 	}
 
 	public function getTip(): string

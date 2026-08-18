@@ -11,14 +11,16 @@ use PHPStan\Analyser\SpecifiedTypes;
 use PHPStan\Analyser\TypeSpecifier;
 use PHPStan\Analyser\TypeSpecifierAwareExtension;
 use PHPStan\Analyser\TypeSpecifierContext;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\CallableType;
 use PHPStan\Type\Constant\ConstantBooleanType;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\FunctionTypeSpecifyingExtension;
+use function count;
 use function ltrim;
 
-class FunctionExistsFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
+#[AutowiredService]
+final class FunctionExistsFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
 {
 
 	private TypeSpecifier $typeSpecifier;
@@ -29,20 +31,21 @@ class FunctionExistsFunctionTypeSpecifyingExtension implements FunctionTypeSpeci
 		TypeSpecifierContext $context,
 	): bool
 	{
-		return $functionReflection->getName() === 'function_exists' && isset($node->getArgs()[0]) && $context->truthy();
+		return $functionReflection->getName() === 'function_exists' && isset($node->getArgs()[0]) && $context->true();
 	}
 
 	public function specifyTypes(FunctionReflection $functionReflection, FuncCall $node, Scope $scope, TypeSpecifierContext $context): SpecifiedTypes
 	{
 		$argType = $scope->getType($node->getArgs()[0]->value);
-		if ($argType instanceof ConstantStringType) {
+
+		$constantStrings = $argType->getConstantStrings();
+		if (count($constantStrings) === 1) {
 			return $this->typeSpecifier->create(
 				new FuncCall(new FullyQualified('function_exists'), [
-					new Arg(new String_(ltrim($argType->getValue(), '\\'))),
+					new Arg(new String_(ltrim($constantStrings[0]->getValue(), '\\'))),
 				]),
 				new ConstantBooleanType(true),
 				$context,
-				false,
 				$scope,
 			);
 		}
@@ -51,7 +54,6 @@ class FunctionExistsFunctionTypeSpecifyingExtension implements FunctionTypeSpeci
 			$node->getArgs()[0]->value,
 			new CallableType(),
 			$context,
-			false,
 			$scope,
 		);
 	}

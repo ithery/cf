@@ -5,17 +5,24 @@ namespace PHPStan\Command;
 use Closure;
 use PHPStan\Analyser\Analyser;
 use PHPStan\Analyser\AnalyserResult;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Parallel\ParallelAnalyser;
 use PHPStan\Parallel\Scheduler;
 use PHPStan\Process\CpuCoreCounter;
+use PHPStan\ShouldNotHappenException;
+use React\EventLoop\StreamSelectLoop;
 use Symfony\Component\Console\Input\InputInterface;
 use function array_filter;
+use function array_unshift;
 use function array_values;
 use function count;
+use function filesize;
 use function function_exists;
 use function is_file;
+use function memory_get_peak_usage;
 
-class AnalyserRunner
+#[AutowiredService]
+final class AnalyserRunner
 {
 
 	public function __construct(
@@ -31,7 +38,7 @@ class AnalyserRunner
 	 * @param string[] $files
 	 * @param string[] $allAnalysedFiles
 	 * @param Closure(string $file): void|null $preFileCallback
-	 * @param Closure(int ): void|null $postFileCallback
+	 * @param Closure(int, list<string>=): void|null $postFileCallback
 	 */
 	public function runAnalyser(
 		array $files,
@@ -48,23 +55,46 @@ class AnalyserRunner
 	{
 		$filesCount = count($files);
 		if ($filesCount === 0) {
-			return new AnalyserResult([], [], [], [], [], false);
+			return new AnalyserResult(
+				unorderedErrors: [],
+				filteredPhpErrors: [],
+				allPhpErrors: [],
+				locallyIgnoredErrors: [],
+				linesToIgnore: [],
+				unmatchedLineIgnores: [],
+				internalErrors: [],
+				collectedData: [],
+				dependencies: [],
+				usedTraitDependencies: [],
+				packageDependencies: [],
+				exportedNodes: [],
+				reachedInternalErrorsCountLimit: false,
+				peakMemoryUsageBytes: memory_get_peak_usage(true),
+				processedFiles: [],
+			);
 		}
 
-		$schedule = $this->scheduler->scheduleWork($this->cpuCoreCounter->getNumberOfCpuCores(), $files);
-		$mainScript = null;
-		if (isset($_SERVER['argv'][0]) && is_file($_SERVER['argv'][0])) {
-			$mainScript = $_SERVER['argv'][0];
-		}
+		if (!$debug && $allowParallel && function_exists('proc_open')) {
+			$schedule = $this->scheduler->scheduleWork($this->cpuCoreCounter->getNumberOfCpuCores(), $files, static fn (string $file): int => (int) @filesize($file));
 
-		if (
-			!$debug
-			&& $allowParallel
-			&& function_exists('proc_open')
-			&& $mainScript !== null
-			&& $schedule->getNumberOfProcesses() > 0
-		) {
-			return $this->parallelAnalyser->analyse($schedule, $mainScript, $postFileCallback, $projectConfigFile, $tmpFile, $insteadOfFile, $input);
+			$mainScript = null;
+			if (isset($_SERVER['argv'][0]) && is_file($_SERVER['argv'][0])) {
+				$mainScript = $_SERVER['argv'][0];
+			}
+
+			if ($mainScript !== null && $schedule->getNumberOfProcesses() > 0) {
+				$loop = new StreamSelectLoop();
+				$result = null;
+				$promise = $this->parallelAnalyser->analyse($loop, $schedule, $allAnalysedFiles, $mainScript, $postFileCallback, $projectConfigFile, $tmpFile, $insteadOfFile, $input, null);
+				$promise->then(static function (AnalyserResult $tmp) use (&$result): void {
+					$result = $tmp;
+				});
+				$loop->run();
+				if ($result === null) {
+					throw new ShouldNotHappenException();
+				}
+				return $result;
+			}
 		}
 
 		return $this->analyser->analyse(
@@ -86,14 +116,13 @@ class AnalyserRunner
 		?string $tmpFile,
 	): array
 	{
-		$analysedFiles = array_values(array_filter($analysedFiles, static function (string $file) use ($insteadOfFile): bool {
-			if ($insteadOfFile === null) {
-				return true;
-			}
-			return $file !== $insteadOfFile;
-		}));
+		if ($insteadOfFile === null) {
+			return $analysedFiles;
+		}
+		$analysedFiles = array_values(array_filter($analysedFiles, static fn (string $file): bool => $file !== $insteadOfFile));
+
 		if ($tmpFile !== null) {
-			$analysedFiles[] = $tmpFile;
+			array_unshift($analysedFiles, $tmpFile);
 		}
 
 		return $analysedFiles;

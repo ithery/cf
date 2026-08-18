@@ -3,16 +3,25 @@
 namespace PHPStan\Rules\Exceptions;
 
 use PHPStan\Analyser\ThrowPoint;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\TypeUtils;
 use PHPStan\Type\VerbosityLevel;
-use PHPStan\Type\VoidType;
 use function array_map;
 
-class TooWideThrowTypeCheck
+#[AutowiredService]
+final class TooWideThrowTypeCheck
 {
+
+	public function __construct(
+		#[AutowiredParameter(ref: '%exceptions.implicitThrows%')]
+		private bool $implicitThrows,
+	)
+	{
+	}
 
 	/**
 	 * @param ThrowPoint[] $throwPoints
@@ -20,12 +29,12 @@ class TooWideThrowTypeCheck
 	 */
 	public function check(Type $throwType, array $throwPoints): array
 	{
-		if ($throwType instanceof VoidType) {
+		if ($throwType->isVoid()->yes()) {
 			return [];
 		}
 
-		$throwPointType = TypeCombinator::union(...array_map(static function (ThrowPoint $throwPoint): Type {
-			if (!$throwPoint->isExplicit()) {
+		$throwPointType = TypeCombinator::union(...array_map(function (ThrowPoint $throwPoint): Type {
+			if (!$this->implicitThrows && !$throwPoint->isExplicit()) {
 				return new NeverType();
 			}
 

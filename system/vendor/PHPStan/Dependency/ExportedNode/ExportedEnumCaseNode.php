@@ -3,10 +3,11 @@
 namespace PHPStan\Dependency\ExportedNode;
 
 use JsonSerializable;
+use Override;
 use PHPStan\Dependency\ExportedNode;
 use ReturnTypeWillChange;
 
-class ExportedEnumCaseNode implements ExportedNode, JsonSerializable
+final class ExportedEnumCaseNode implements ExportedNode, JsonSerializable
 {
 
 	public function __construct(private string $name, private ?string $value, private ?ExportedPhpDocNode $phpDoc)
@@ -37,9 +38,8 @@ class ExportedEnumCaseNode implements ExportedNode, JsonSerializable
 
 	/**
 	 * @param mixed[] $properties
-	 * @return self
 	 */
-	public static function __set_state(array $properties): ExportedNode
+	public static function __set_state(array $properties): self
 	{
 		return new self(
 			$properties['name'],
@@ -50,9 +50,8 @@ class ExportedEnumCaseNode implements ExportedNode, JsonSerializable
 
 	/**
 	 * @param mixed[] $data
-	 * @return self
 	 */
-	public static function decode(array $data): ExportedNode
+	public static function decode(array $data): self
 	{
 		return new self(
 			$data['name'],
@@ -65,6 +64,7 @@ class ExportedEnumCaseNode implements ExportedNode, JsonSerializable
 	 * @return mixed
 	 */
 	#[ReturnTypeWillChange]
+	#[Override]
 	public function jsonSerialize()
 	{
 		return [

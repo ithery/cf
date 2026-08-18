@@ -4,14 +4,18 @@ namespace PHPStan\Rules\Classes;
 
 use Attribute;
 use PhpParser\Node;
+use PHPStan\Analyser\CollectedDataEmitter;
+use PHPStan\Analyser\NodeCallbackInvoker;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\AttributesCheck;
 use PHPStan\Rules\Rule;
 
 /**
  * @implements Rule<Node\Stmt\ClassConst>
  */
-class ClassConstantAttributesRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ClassConstantAttributesRule implements Rule
 {
 
 	public function __construct(private AttributesCheck $attributesCheck)
@@ -23,7 +27,7 @@ class ClassConstantAttributesRule implements Rule
 		return Node\Stmt\ClassConst::class;
 	}
 
-	public function processNode(Node $node, Scope $scope): array
+	public function processNode(Node $node, Scope&NodeCallbackInvoker&CollectedDataEmitter $scope): array
 	{
 		return $this->attributesCheck->check(
 			$scope,

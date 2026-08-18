@@ -3,34 +3,37 @@
 namespace PHPStan\Analyser;
 
 use PHPStan\ShouldNotHappenException;
-use PHPStan\Type\Type;
+use PHPStan\Turbo\ReferencedByTurboExtension;
+use PHPStan\Turbo\ShadowedByTurboExtension;
 use PHPStan\Type\VerbosityLevel;
 use function count;
 use function implode;
 use function sprintf;
 
-class ConditionalExpressionHolder
+#[ShadowedByTurboExtension(turboClass: 'PHPStanTurbo\ConditionalExpressionHolder', implementation: __DIR__ . '/../../turbo-ext/src/ConditionalExpressionHolder.cpp')]
+#[ReferencedByTurboExtension(key: 'conditionalExpressionHolder')]
+final class ConditionalExpressionHolder
 {
 
 	/**
-	 * @param array<string, Type> $conditionExpressionTypes
+	 * @param array<string, ExpressionTypeHolder> $conditionExpressionTypeHolders
 	 */
 	public function __construct(
-		private array $conditionExpressionTypes,
+		private array $conditionExpressionTypeHolders,
 		private ExpressionTypeHolder $typeHolder,
 	)
 	{
-		if (count($conditionExpressionTypes) === 0) {
+		if (count($conditionExpressionTypeHolders) === 0) {
 			throw new ShouldNotHappenException();
 		}
 	}
 
 	/**
-	 * @return array<string, Type>
+	 * @return array<string, ExpressionTypeHolder>
 	 */
-	public function getConditionExpressionTypes(): array
+	public function getConditionExpressionTypeHolders(): array
 	{
-		return $this->conditionExpressionTypes;
+		return $this->conditionExpressionTypeHolders;
 	}
 
 	public function getTypeHolder(): ExpressionTypeHolder
@@ -41,8 +44,8 @@ class ConditionalExpressionHolder
 	public function getKey(): string
 	{
 		$parts = [];
-		foreach ($this->conditionExpressionTypes as $exprString => $type) {
-			$parts[] = $exprString . '=' . $type->describe(VerbosityLevel::precise());
+		foreach ($this->conditionExpressionTypeHolders as $exprString => $typeHolder) {
+			$parts[] = $exprString . '=' . $typeHolder->getType()->describe(VerbosityLevel::precise());
 		}
 
 		return sprintf(

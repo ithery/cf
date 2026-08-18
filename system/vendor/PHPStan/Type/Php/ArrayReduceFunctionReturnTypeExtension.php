@@ -4,6 +4,7 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\TrinaryLogic;
@@ -13,7 +14,8 @@ use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 use function count;
 
-class ArrayReduceFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class ArrayReduceFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -21,30 +23,31 @@ class ArrayReduceFunctionReturnTypeExtension implements DynamicFunctionReturnTyp
 		return $functionReflection->getName() === 'array_reduce';
 	}
 
-	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
+	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		if (!isset($functionCall->getArgs()[1])) {
-			return ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+		$args = $functionCall->getArgs();
+		if (!isset($args[1])) {
+			return null;
 		}
 
-		$callbackType = $scope->getType($functionCall->getArgs()[1]->value);
+		$callbackType = $scope->getType($args[1]->value);
 		if ($callbackType->isCallable()->no()) {
-			return ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+			return null;
 		}
 
 		$callbackReturnType = ParametersAcceptorSelector::selectFromArgs(
 			$scope,
-			$functionCall->getArgs(),
+			$args,
 			$callbackType->getCallableParametersAcceptors($scope),
 		)->getReturnType();
 
-		if (isset($functionCall->getArgs()[2])) {
-			$initialType = $scope->getType($functionCall->getArgs()[2]->value);
+		if (isset($args[2])) {
+			$initialType = $scope->getType($args[2]->value);
 		} else {
 			$initialType = new NullType();
 		}
 
-		$arraysType = $scope->getType($functionCall->getArgs()[0]->value);
+		$arraysType = $scope->getType($args[0]->value);
 		$constantArrays = $arraysType->getConstantArrays();
 		if (count($constantArrays) > 0) {
 			$onlyEmpty = TrinaryLogic::createYes();

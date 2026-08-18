@@ -7,6 +7,8 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Trait_;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Parser\Parser;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\FileTypeMapper;
@@ -14,7 +16,8 @@ use function array_key_exists;
 use function array_map;
 use function is_string;
 
-class StubPhpDocProvider
+#[AutowiredService(name: 'stubPhpDocProvider')]
+final class StubPhpDocProvider
 {
 
 	/** @var array<string, ResolvedPhpDocBlock|null> */
@@ -58,7 +61,9 @@ class StubPhpDocProvider
 	private array $knownFunctionParameterNames = [];
 
 	public function __construct(
+		#[AutowiredParameter(ref: '@stubParser')]
 		private Parser $parser,
+		#[AutowiredParameter(ref: '@stubFileTypeMapper')]
 		private FileTypeMapper $fileTypeMapper,
 		private StubFilesProvider $stubFilesProvider,
 	)
@@ -146,7 +151,12 @@ class StubPhpDocProvider
 	/**
 	 * @param array<int, string> $positionalParameterNames
 	 */
-	public function findMethodPhpDoc(string $className, string $methodName, array $positionalParameterNames): ?ResolvedPhpDocBlock
+	public function findMethodPhpDoc(
+		string $className,
+		string $implementingClassName,
+		string $methodName,
+		array $positionalParameterNames,
+	): ?ResolvedPhpDocBlock
 	{
 		if (!$this->isKnownClass($className)) {
 			return null;
@@ -168,6 +178,12 @@ class StubPhpDocProvider
 
 			if (!isset($this->knownMethodsParameterNames[$className][$methodName])) {
 				throw new ShouldNotHappenException();
+			}
+
+			if ($className !== $implementingClassName && $resolvedPhpDoc->getNullableNameScope() !== null) {
+				$resolvedPhpDoc = $resolvedPhpDoc->withNameScope(
+					$resolvedPhpDoc->getNullableNameScope()->withClassName($implementingClassName),
+				);
 			}
 
 			$methodParameterNames = $this->knownMethodsParameterNames[$className][$methodName];

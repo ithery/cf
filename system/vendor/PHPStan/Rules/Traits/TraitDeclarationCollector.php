@@ -5,11 +5,13 @@ namespace PHPStan\Rules\Traits;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
 use PHPStan\Collectors\Collector;
+use PHPStan\DependencyInjection\RegisteredCollector;
 
 /**
  * @implements Collector<Node\Stmt\Trait_, array{string, int}>
  */
-class TraitDeclarationCollector implements Collector
+#[RegisteredCollector(level: 4)]
+final class TraitDeclarationCollector implements Collector
 {
 
 	public function getNodeType(): string
@@ -23,7 +25,7 @@ class TraitDeclarationCollector implements Collector
 			return null;
 		}
 
-		return [$node->namespacedName->toString(), $node->getLine()];
+		return [$node->namespacedName->toString(), $node->getStartLine()];
 	}
 
 }

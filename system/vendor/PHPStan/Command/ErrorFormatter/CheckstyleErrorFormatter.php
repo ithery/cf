@@ -5,6 +5,8 @@ namespace PHPStan\Command\ErrorFormatter;
 use PHPStan\Analyser\Error;
 use PHPStan\Command\AnalysisResult;
 use PHPStan\Command\Output;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\File\RelativePathHelper;
 use function count;
 use function htmlspecialchars;
@@ -12,10 +14,14 @@ use function sprintf;
 use const ENT_COMPAT;
 use const ENT_XML1;
 
-class CheckstyleErrorFormatter implements ErrorFormatter
+#[AutowiredService(name: 'errorFormatter.checkstyle')]
+final class CheckstyleErrorFormatter implements ErrorFormatter
 {
 
-	public function __construct(private RelativePathHelper $relativePathHelper)
+	public function __construct(
+		#[AutowiredParameter(ref: '@simpleRelativePathHelper')]
+		private RelativePathHelper $relativePathHelper,
+	)
 	{
 	}
 
@@ -38,9 +44,10 @@ class CheckstyleErrorFormatter implements ErrorFormatter
 
 			foreach ($errors as $error) {
 				$output->writeRaw(sprintf(
-					'  <error line="%d" column="1" severity="error" message="%s" />',
+					'  <error line="%s" column="1" severity="error" message="%s"%s />',
 					$this->escape((string) $error->getLine()),
 					$this->escape($error->getMessage()),
+					$error->getIdentifier() !== null ? sprintf(' source="%s"', $this->escape($error->getIdentifier())) : '',
 				));
 				$output->writeLineFormatted('');
 			}

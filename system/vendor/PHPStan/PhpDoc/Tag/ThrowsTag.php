@@ -4,8 +4,10 @@ namespace PHPStan\PhpDoc\Tag;
 
 use PHPStan\Type\Type;
 
-/** @api */
-class ThrowsTag
+/**
+ * @api
+ */
+final class ThrowsTag
 {
 
 	public function __construct(private Type $type)

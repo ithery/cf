@@ -2,23 +2,27 @@
 
 namespace PHPStan\Reflection\Php;
 
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\Annotations\AnnotationsPropertiesClassReflectionExtension;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Reflection\PropertiesClassReflectionExtension;
 use PHPStan\Reflection\PropertyReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Type\MixedType;
 
-class UniversalObjectCratesClassReflectionExtension
+// autoTag: false - wired explicitly in ClassReflectionExtensionRegistry, must not be tagged
+#[AutowiredService(autoTag: false)]
+final class UniversalObjectCratesClassReflectionExtension
 	implements PropertiesClassReflectionExtension
 {
 
 	/**
-	 * @param string[] $classes
+	 * @param list<string> $classes
 	 */
 	public function __construct(
 		private ReflectionProvider $reflectionProvider,
+		#[AutowiredParameter(ref: '%universalObjectCratesClasses%')]
 		private array $classes,
 		private AnnotationsPropertiesClassReflectionExtension $annotationClassReflection,
 	)
@@ -27,17 +31,29 @@ class UniversalObjectCratesClassReflectionExtension
 
 	public function hasProperty(ClassReflection $classReflection, string $propertyName): bool
 	{
-		return self::isUniversalObjectCrate(
+		return self::isUniversalObjectCrateImplementation(
 			$this->reflectionProvider,
 			$this->classes,
 			$classReflection,
 		);
 	}
 
-	/**
-	 * @param string[] $classes
-	 */
 	public static function isUniversalObjectCrate(
+		ReflectionProvider $reflectionProvider,
+		ClassReflection $classReflection,
+	): bool
+	{
+		return self::isUniversalObjectCrateImplementation(
+			$reflectionProvider,
+			$reflectionProvider->getUniversalObjectCratesClasses(),
+			$classReflection,
+		);
+	}
+
+	/**
+	 * @param list<string> $classes
+	 */
+	private static function isUniversalObjectCrateImplementation(
 		ReflectionProvider $reflectionProvider,
 		array $classes,
 		ClassReflection $classReflection,
@@ -48,10 +64,7 @@ class UniversalObjectCratesClassReflectionExtension
 				continue;
 			}
 
-			if (
-				$classReflection->getName() === $className
-				|| $classReflection->isSubclassOf($className)
-			) {
+			if ($classReflection->is($className)) {
 				return true;
 			}
 		}
@@ -66,18 +79,18 @@ class UniversalObjectCratesClassReflectionExtension
 		}
 
 		if ($classReflection->hasNativeMethod('__get')) {
-			$readableType = ParametersAcceptorSelector::selectSingle($classReflection->getNativeMethod('__get')->getVariants())->getReturnType();
+			$readableType = $classReflection->getNativeMethod('__get')->getOnlyVariant()->getReturnType();
 		} else {
 			$readableType = new MixedType();
 		}
 
 		if ($classReflection->hasNativeMethod('__set')) {
-			$writableType = ParametersAcceptorSelector::selectSingle($classReflection->getNativeMethod('__set')->getVariants())->getParameters()[1]->getType();
+			$writableType = $classReflection->getNativeMethod('__set')->getOnlyVariant()->getParameters()[1]->getType();
 		} else {
 			$writableType = new MixedType();
 		}
 
-		return new UniversalObjectCrateProperty($classReflection, $readableType, $writableType);
+		return new UniversalObjectCrateProperty($propertyName, $classReflection, $readableType, $writableType);
 	}
 
 }

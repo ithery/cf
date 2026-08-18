@@ -3,18 +3,22 @@
 namespace PHPStan\Type\Php;
 
 use DateTimeInterface;
-use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
-use PhpParser\Node\Name\FullyQualified;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use function count;
 
-class DateFormatMethodReturnTypeExtension implements DynamicMethodReturnTypeExtension
+#[AutowiredService]
+final class DateFormatMethodReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {
+
+	public function __construct(private DateFunctionReturnTypeHelper $dateFunctionReturnTypeHelper)
+	{
+	}
 
 	public function getClass(): string
 	{
@@ -32,10 +36,9 @@ class DateFormatMethodReturnTypeExtension implements DynamicMethodReturnTypeExte
 			return new StringType();
 		}
 
-		return $scope->getType(
-			new FuncCall(new FullyQualified('date'), [
-				$methodCall->getArgs()[0],
-			]),
+		return $this->dateFunctionReturnTypeHelper->getTypeFromFormatType(
+			$scope->getType($methodCall->getArgs()[0]->value),
+			true,
 		);
 	}
 

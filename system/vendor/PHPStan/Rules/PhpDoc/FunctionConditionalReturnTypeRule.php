@@ -4,15 +4,18 @@ namespace PHPStan\Rules\PhpDoc;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Node\InFunctionNode;
 use PHPStan\Rules\Rule;
-use PHPStan\ShouldNotHappenException;
 use function count;
 
 /**
  * @implements Rule<InFunctionNode>
  */
-class FunctionConditionalReturnTypeRule implements Rule
+#[RegisteredRule(level: 2)]
+#[ValidatesStubFiles]
+final class FunctionConditionalReturnTypeRule implements Rule
 {
 
 	public function __construct(private ConditionalReturnTypeRuleHelper $helper)
@@ -26,12 +29,8 @@ class FunctionConditionalReturnTypeRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$method = $scope->getFunction();
-		if ($method === null) {
-			throw new ShouldNotHappenException();
-		}
-
-		$variants = $method->getVariants();
+		$function = $node->getFunctionReflection();
+		$variants = $function->getVariants();
 		if (count($variants) !== 1) {
 			return [];
 		}

@@ -10,12 +10,14 @@ use PHPStan\Rules\RuleError;
 /**
  * @internal Use PHPStan\Rules\RuleErrorBuilder instead.
  */
-class RuleError85 implements RuleError, FileRuleError, IdentifierRuleError, NonIgnorableRuleError
+final class RuleError85 implements RuleError, FileRuleError, IdentifierRuleError, NonIgnorableRuleError
 {
 
 	public string $message;
 
 	public string $file;
+
+	public string $fileDescription;
 
 	public string $identifier;
 
@@ -27,6 +29,11 @@ class RuleError85 implements RuleError, FileRuleError, IdentifierRuleError, NonI
 	public function getFile(): string
 	{
 		return $this->file;
+	}
+
+	public function getFileDescription(): string
+	{
+		return $this->fileDescription;
 	}
 
 	public function getIdentifier(): string

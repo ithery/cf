@@ -3,6 +3,8 @@
 namespace PHPStan\Command;
 
 use Nette\Neon\Neon;
+use Nette\Utils\Json;
+use Override;
 use PHPStan\ShouldNotHappenException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,7 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function is_string;
 
-class DumpParametersCommand extends Command
+final class DumpParametersCommand extends Command
 {
 
 	private const NAME = 'dump-parameters';
@@ -25,6 +27,7 @@ class DumpParametersCommand extends Command
 		parent::__construct();
 	}
 
+	#[Override]
 	protected function configure(): void
 	{
 		$this->setName(self::NAME)
@@ -33,11 +36,13 @@ class DumpParametersCommand extends Command
 				new InputOption('configuration', 'c', InputOption::VALUE_REQUIRED, 'Path to project configuration file'),
 				new InputOption(AnalyseCommand::OPTION_LEVEL, 'l', InputOption::VALUE_REQUIRED, 'Level of rule options - the higher the stricter'),
 				new InputOption('autoload-file', 'a', InputOption::VALUE_REQUIRED, 'Project\'s additional autoload file path'),
-				new InputOption('debug', null, InputOption::VALUE_NONE, 'Show debug information - which file is analysed, do not catch internal errors'),
-				new InputOption('memory-limit', null, InputOption::VALUE_REQUIRED, 'Memory limit for clearing result cache'),
+				new InputOption('debug', mode: InputOption::VALUE_NONE, description: 'Show debug information - which file is analysed, do not catch internal errors'),
+				new InputOption('memory-limit', mode: InputOption::VALUE_REQUIRED, description: 'Memory limit for clearing result cache'),
+				new InputOption('json', mode: InputOption::VALUE_NONE, description: 'Dump parameters as JSON instead of NEON'),
 			]);
 	}
 
+	#[Override]
 	protected function initialize(InputInterface $input, OutputInterface $output): void
 	{
 		if ((bool) $input->getOption('debug')) {
@@ -50,12 +55,14 @@ class DumpParametersCommand extends Command
 		}
 	}
 
+	#[Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		$memoryLimit = $input->getOption('memory-limit');
 		$autoloadFile = $input->getOption('autoload-file');
 		$configuration = $input->getOption('configuration');
 		$level = $input->getOption(AnalyseCommand::OPTION_LEVEL);
+		$json = (bool) $input->getOption('json');
 
 		if (
 			(!is_string($memoryLimit) && $memoryLimit !== null)
@@ -70,13 +77,17 @@ class DumpParametersCommand extends Command
 			$inceptionResult = CommandHelper::begin(
 				$input,
 				$output,
-				['.'],
+				[],
 				$memoryLimit,
 				$autoloadFile,
 				$this->composerAutoloaderProjectPaths,
 				$configuration,
 				null,
 				$level,
+				false,
+				false,
+				null,
+				null,
 				false,
 			);
 		} catch (InceptionNotSuccessfulException) {
@@ -92,11 +103,18 @@ class DumpParametersCommand extends Command
 		unset($parameters['productionMode']);
 		unset($parameters['tempDir']);
 		unset($parameters['__validate']);
-		// internal - static reflection
+
+		// internal - editor mode
 		unset($parameters['singleReflectionFile']);
 		unset($parameters['singleReflectionInsteadOfFile']);
 
-		$output->writeln(Neon::encode($parameters, true));
+		if ($json) {
+			$encoded = Json::encode($parameters, Json::PRETTY);
+		} else {
+			$encoded = Neon::encode($parameters, true);
+		}
+
+		$output->writeln($encoded);
 
 		return 0;
 	}

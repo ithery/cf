@@ -3,14 +3,19 @@
 namespace PHPStan\Analyser;
 
 use PhpParser\Node\Name;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\DependencyInjection\Container;
+use PHPStan\Php\ConfiguredPhpVersionRangeHelper;
+use PHPStan\PhpDoc\TypeStringResolver;
 use PHPStan\Reflection\NamespaceAnswerer;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Reflection\ReflectionProvider\ReflectionProviderProvider;
-use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
+use PHPStan\Type\Accessory\AccessoryNonFalsyStringType;
+use PHPStan\Type\ArrayType;
+use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantFloatType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\Constant\ConstantStringType;
-use PHPStan\Type\ConstantType;
 use PHPStan\Type\GeneralizePrecision;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntersectionType;
@@ -21,20 +26,33 @@ use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
 use function array_key_exists;
 use function in_array;
+use function max;
+use function sprintf;
 use const INF;
 use const NAN;
 use const PHP_INT_SIZE;
 
-class ConstantResolver
+#[AutowiredService(factory: '@PHPStan\Analyser\ConstantResolverFactory::create')]
+final class ConstantResolver
 {
+
+	public const PHP_MIN_ANALYZABLE_VERSION_ID = 50207;
 
 	/** @var array<string, true> */
 	private array $currentlyResolving = [];
 
+	/** @var array<string, Type|null> */
+	private array $configuredTypesCache = [];
+
 	/**
 	 * @param string[] $dynamicConstantNames
 	 */
-	public function __construct(private ReflectionProviderProvider $reflectionProviderProvider, private array $dynamicConstantNames)
+	public function __construct(
+		private ReflectionProviderProvider $reflectionProviderProvider,
+		private array $dynamicConstantNames,
+		private ConfiguredPhpVersionRangeHelper $configuredPhpVersionRangeHelper,
+		private ?Container $container,
+	)
 	{
 	}
 
@@ -73,20 +91,78 @@ class ConstantResolver
 		if ($resolvedConstantName === 'PHP_VERSION') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
+
+		$minPhpVersion = null;
+		$maxPhpVersion = null;
+		if (in_array($resolvedConstantName, ['PHP_VERSION_ID', 'PHP_MAJOR_VERSION', 'PHP_MINOR_VERSION', 'PHP_RELEASE_VERSION'], true)) {
+			[$minPhpVersion, $maxPhpVersion] = $this->configuredPhpVersionRangeHelper->getVersionRange();
+		}
+
 		if ($resolvedConstantName === 'PHP_MAJOR_VERSION') {
-			return IntegerRangeType::fromInterval(5, null);
+			$minMajor = 5;
+			$maxMajor = null;
+
+			if ($minPhpVersion !== null) {
+				$minMajor = max($minMajor, $minPhpVersion->getMajorVersionId());
+			}
+			if ($maxPhpVersion !== null) {
+				$maxMajor = $maxPhpVersion->getMajorVersionId();
+			}
+
+			return $this->createInteger($minMajor, $maxMajor);
 		}
 		if ($resolvedConstantName === 'PHP_MINOR_VERSION') {
-			return IntegerRangeType::fromInterval(0, null);
+			$minMinor = 0;
+			$maxMinor = null;
+
+			if (
+				$minPhpVersion !== null
+				&& $maxPhpVersion !== null
+				&& $maxPhpVersion->getMajorVersionId() === $minPhpVersion->getMajorVersionId()
+			) {
+				$minMinor = $minPhpVersion->getMinorVersionId();
+				$maxMinor = $maxPhpVersion->getMinorVersionId();
+			}
+
+			return $this->createInteger($minMinor, $maxMinor);
 		}
 		if ($resolvedConstantName === 'PHP_RELEASE_VERSION') {
-			return IntegerRangeType::fromInterval(0, null);
+			$minRelease = 0;
+			$maxRelease = null;
+
+			if (
+				$minPhpVersion !== null
+				&& $maxPhpVersion !== null
+				&& $maxPhpVersion->getMajorVersionId() === $minPhpVersion->getMajorVersionId()
+				&& $maxPhpVersion->getMinorVersionId() === $minPhpVersion->getMinorVersionId()
+			) {
+				$minRelease = $minPhpVersion->getPatchVersionId();
+				$maxRelease = $maxPhpVersion->getPatchVersionId();
+			}
+
+			return $this->createInteger($minRelease, $maxRelease);
 		}
 		if ($resolvedConstantName === 'PHP_VERSION_ID') {
-			return IntegerRangeType::fromInterval(50207, null);
+			$minVersion = self::PHP_MIN_ANALYZABLE_VERSION_ID;
+			$maxVersion = null;
+			if ($minPhpVersion !== null) {
+				$minVersion = max($minVersion, $minPhpVersion->getVersionId());
+			}
+			if ($maxPhpVersion !== null) {
+				$maxVersion = $maxPhpVersion->getVersionId();
+			}
+
+			return $this->createInteger($minVersion, $maxVersion);
+		}
+		// added in PHP 8.5
+		if ($resolvedConstantName === 'PHP_BUILD_DATE') {
+			return new IntersectionType([
+				new StringType(),
+				new AccessoryNonFalsyStringType(),
+			]);
 		}
 		if ($resolvedConstantName === 'PHP_ZTS') {
 			return new UnionType([
@@ -106,7 +182,7 @@ class ConstantResolver
 		if ($resolvedConstantName === 'PHP_OS') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		if ($resolvedConstantName === 'PHP_OS_FAMILY') {
@@ -132,7 +208,7 @@ class ConstantResolver
 				new ConstantStringType('phpdbg'),
 				new IntersectionType([
 					new StringType(),
-					new AccessoryNonEmptyStringType(),
+					new AccessoryNonFalsyStringType(),
 				]),
 			]);
 		}
@@ -165,61 +241,61 @@ class ConstantResolver
 		if ($resolvedConstantName === 'PHP_EXTENSION_DIR') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		if ($resolvedConstantName === 'PHP_PREFIX') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		if ($resolvedConstantName === 'PHP_BINDIR') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		if ($resolvedConstantName === 'PHP_BINARY') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		if ($resolvedConstantName === 'PHP_MANDIR') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		if ($resolvedConstantName === 'PHP_LIBDIR') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		if ($resolvedConstantName === 'PHP_DATADIR') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		if ($resolvedConstantName === 'PHP_SYSCONFDIR') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		if ($resolvedConstantName === 'PHP_LOCALSTATEDIR') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		if ($resolvedConstantName === 'PHP_CONFIG_FILE_PATH') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		if ($resolvedConstantName === 'PHP_SHLIB_SUFFIX') {
@@ -232,7 +308,7 @@ class ConstantResolver
 			return IntegerRangeType::fromInterval(1, null);
 		}
 		if ($resolvedConstantName === '__COMPILER_HALT_OFFSET__') {
-			return IntegerRangeType::fromInterval(0, null);
+			return IntegerRangeType::fromInterval(1, null);
 		}
 		// core other, https://www.php.net/manual/en/info.constants.php
 		if ($resolvedConstantName === 'PHP_WINDOWS_VERSION_MAJOR') {
@@ -261,7 +337,7 @@ class ConstantResolver
 		if ($resolvedConstantName === 'ICONV_IMPL') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		// libxml, https://www.php.net/manual/en/libxml.constants.php
@@ -271,13 +347,22 @@ class ConstantResolver
 		if ($resolvedConstantName === 'LIBXML_DOTTED_VERSION') {
 			return new IntersectionType([
 				new StringType(),
-				new AccessoryNonEmptyStringType(),
+				new AccessoryNonFalsyStringType(),
 			]);
 		}
 		// openssl, https://www.php.net/manual/en/openssl.constants.php
 		if ($resolvedConstantName === 'OPENSSL_VERSION_NUMBER') {
 			return IntegerRangeType::fromInterval(1, null);
 		}
+
+		// pcre, https://www.php.net/manual/en/pcre.constants.php
+		if ($resolvedConstantName === 'PCRE_VERSION') {
+			return new IntersectionType([
+				new StringType(),
+				new AccessoryNonFalsyStringType(),
+			]);
+		}
+
 		if (in_array($resolvedConstantName, ['STDIN', 'STDOUT', 'STDERR'], true)) {
 			return new ResourceType();
 		}
@@ -291,13 +376,111 @@ class ConstantResolver
 		return null;
 	}
 
+	public function getConfiguredGlobalConstantType(string $constantName): ?Type
+	{
+		if (array_key_exists($constantName, $this->configuredTypesCache)) {
+			return $this->configuredTypesCache[$constantName];
+		}
+
+		$result = null;
+		if (array_key_exists($constantName, $this->dynamicConstantNames)) {
+			$phpdocTypes = $this->dynamicConstantNames[$constantName];
+			if ($this->container !== null) {
+				$typeStringResolver = $this->container->getByType(TypeStringResolver::class);
+				$result = $typeStringResolver->resolve($phpdocTypes, new NameScope(null, [], className: null));
+			}
+		}
+
+		$this->configuredTypesCache[$constantName] = $result;
+
+		return $result;
+	}
+
+	public function getConfiguredClassConstantType(string $className, string $constantName): ?Type
+	{
+		$lookupConstantName = sprintf('%s::%s', $className, $constantName);
+		if (array_key_exists($lookupConstantName, $this->configuredTypesCache)) {
+			return $this->configuredTypesCache[$lookupConstantName];
+		}
+
+		$result = null;
+		if (array_key_exists($lookupConstantName, $this->dynamicConstantNames)) {
+			$phpdocTypes = $this->dynamicConstantNames[$lookupConstantName];
+			if ($this->container !== null) {
+				$typeStringResolver = $this->container->getByType(TypeStringResolver::class);
+				$result = $typeStringResolver->resolve($phpdocTypes, new NameScope(null, [], $className));
+			}
+		}
+
+		$this->configuredTypesCache[$lookupConstantName] = $result;
+
+		return $result;
+	}
+
 	public function resolveConstantType(string $constantName, Type $constantType): Type
 	{
-		if ($constantType instanceof ConstantType && in_array($constantName, $this->dynamicConstantNames, true)) {
-			return $constantType->generalize(GeneralizePrecision::lessSpecific());
+		if ($constantType->isConstantValue()->yes()) {
+			if (array_key_exists($constantName, $this->dynamicConstantNames)) {
+				return $this->getConfiguredGlobalConstantType($constantName) ?? $constantType;
+			}
+			if (in_array($constantName, $this->dynamicConstantNames, true)) {
+				return $this->generalizeDynamicConstantType($constantType);
+			}
 		}
 
 		return $constantType;
+	}
+
+	public function resolveClassConstantType(string $className, string $constantName, Type $constantType, ?Type $nativeType, ?Type $phpDocType): Type
+	{
+		$lookupConstantName = sprintf('%s::%s', $className, $constantName);
+		if (array_key_exists($lookupConstantName, $this->dynamicConstantNames)) {
+			if ($constantType->isConstantValue()->yes()) {
+				$explicitType = $this->getConfiguredClassConstantType($className, $constantName);
+				if ($explicitType !== null) {
+					return $explicitType;
+				}
+			}
+
+			if ($nativeType !== null) {
+				return $nativeType;
+			}
+			return $constantType;
+		}
+
+		if (in_array($lookupConstantName, $this->dynamicConstantNames, true)) {
+			if ($nativeType !== null) {
+				return $nativeType;
+			}
+
+			if ($phpDocType !== null) {
+				return $phpDocType;
+			}
+
+			if ($constantType->isConstantValue()->yes()) {
+				return $this->generalizeDynamicConstantType($constantType);
+			}
+		}
+
+		return $constantType;
+	}
+
+	private function generalizeDynamicConstantType(Type $constantType): Type
+	{
+		$generalized = $constantType->generalize(GeneralizePrecision::lessSpecific());
+		if ($generalized->equals(new ConstantArrayType([], []))) {
+			return new ArrayType(new MixedType(), new MixedType());
+		}
+
+		return $generalized;
+	}
+
+	private function createInteger(?int $min, ?int $max): Type
+	{
+		if ($min !== null && $min === $max) {
+			return new ConstantIntegerType($min);
+		}
+		return IntegerRangeType::fromInterval($min, $max);
 	}
 
 	private function getReflectionProvider(): ReflectionProvider

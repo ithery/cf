@@ -4,17 +4,19 @@ namespace PHPStan\Rules\Api;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function count;
 use function sprintf;
-use function strpos;
+use function str_contains;
 
 /**
  * @implements Rule<Node\Expr\ClassConstFetch>
  */
-class ApiClassConstFetchRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ApiClassConstFetchRule implements Rule
 {
 
 	public function __construct(
@@ -53,7 +55,7 @@ class ApiClassConstFetchRule implements Rule
 			'Accessing %s::%s is not covered by backward compatibility promise. The class might change in a minor PHPStan version.',
 			$classReflection->getDisplayName(),
 			$node->name->toString(),
-		))->tip(sprintf(
+		))->identifier('phpstanApi.classConstant')->tip(sprintf(
 			"If you think it should be covered by backward compatibility promise, open a discussion:\n   %s\n\n   See also:\n   https://phpstan.org/developing-extensions/backward-compatibility-promise",
 			'https://github.com/phpstan/phpstan/discussions',
 		))->build();
@@ -75,7 +77,7 @@ class ApiClassConstFetchRule implements Rule
 					continue;
 				}
 
-				if (strpos($methodDocComment, '@api') === false) {
+				if (!str_contains($methodDocComment, '@api')) {
 					continue;
 				}
 

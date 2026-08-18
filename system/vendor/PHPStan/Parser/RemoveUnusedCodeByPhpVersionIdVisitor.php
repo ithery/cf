@@ -2,28 +2,23 @@
 
 namespace PHPStan\Parser;
 
+use Override;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 use PHPStan\Php\PhpVersion;
 use function count;
 use function version_compare;
 
-class RemoveUnusedCodeByPhpVersionIdVisitor extends NodeVisitorAbstract
+final class RemoveUnusedCodeByPhpVersionIdVisitor extends NodeVisitorAbstract
 {
 
 	public function __construct(private string $phpVersionString)
 	{
 	}
 
-	public function enterNode(Node $node): Node|int|null
+	#[Override]
+	public function enterNode(Node $node): ?Node
 	{
-		if ($node instanceof Node\Stmt\ClassLike) {
-			return null;
-		}
-		if ($node instanceof Node\FunctionLike) {
-			return null;
-		}
-
 		if (!$node instanceof Node\Stmt\If_) {
 			return null;
 		}
@@ -53,8 +48,7 @@ class RemoveUnusedCodeByPhpVersionIdVisitor extends NodeVisitorAbstract
 		$operator = $cond->getOperatorSigil();
 		if ($operator === '===') {
 			$operator = '==';
-		}
-		if ($operator === '!==') {
+		} elseif ($operator === '!==') {
 			$operator = '!=';
 		}
 
@@ -85,7 +79,7 @@ class RemoveUnusedCodeByPhpVersionIdVisitor extends NodeVisitorAbstract
 	private function getOperands(Node\Expr $left, Node\Expr $right): ?array
 	{
 		if (
-			$left instanceof Node\Scalar\LNumber
+			$left instanceof Node\Scalar\Int_
 			&& $right instanceof Node\Expr\ConstFetch
 			&& $right->name->toString() === 'PHP_VERSION_ID'
 		) {
@@ -93,7 +87,7 @@ class RemoveUnusedCodeByPhpVersionIdVisitor extends NodeVisitorAbstract
 		}
 
 		if (
-			$right instanceof Node\Scalar\LNumber
+			$right instanceof Node\Scalar\Int_
 			&& $left instanceof Node\Expr\ConstFetch
 			&& $left->name->toString() === 'PHP_VERSION_ID'
 		) {

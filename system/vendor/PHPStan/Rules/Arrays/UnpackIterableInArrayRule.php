@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Arrays;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\LiteralArrayNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -16,7 +17,8 @@ use function sprintf;
 /**
  * @implements Rule<LiteralArrayNode>
  */
-class UnpackIterableInArrayRule implements Rule
+#[RegisteredRule(level: 3)]
+final class UnpackIterableInArrayRule implements Rule
 {
 
 	public function __construct(
@@ -60,7 +62,7 @@ class UnpackIterableInArrayRule implements Rule
 			$errors[] = RuleErrorBuilder::message(sprintf(
 				'Only iterables can be unpacked, %s given.',
 				$type->describe(VerbosityLevel::typeOnly()),
-			))->line($item->getLine())->build();
+			))->identifier('arrayUnpacking.nonIterable')->line($item->getStartLine())->build();
 		}
 
 		return $errors;

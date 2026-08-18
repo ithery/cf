@@ -2,25 +2,31 @@
 
 namespace PHPStan\Type\Generic;
 
-use PHPStan\TrinaryLogic;
 use PHPStan\Type\CompoundType;
+use PHPStan\Type\IsSuperTypeOfResult;
 use PHPStan\Type\Type;
 
-/** @api */
+/**
+ * @api
+ * @api-do-not-implement
+ */
 interface TemplateType extends CompoundType
 {
 
+	/** @return non-empty-string */
 	public function getName(): string;
 
 	public function getScope(): TemplateTypeScope;
 
 	public function getBound(): Type;
 
+	public function getDefault(): ?Type;
+
 	public function toArgument(): TemplateType;
 
 	public function isArgument(): bool;
 
-	public function isValidVariance(Type $a, Type $b): TrinaryLogic;
+	public function isValidVariance(Type $a, Type $b): IsSuperTypeOfResult;
 
 	public function getVariance(): TemplateTypeVariance;
 

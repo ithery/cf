@@ -2,16 +2,20 @@
 
 namespace PHPStan\Reflection\Dummy;
 
+use PHPStan\PhpDoc\ResolvedPhpDocBlock;
+use PHPStan\Reflection\Assertions;
 use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\FunctionVariant;
-use PHPStan\Reflection\MethodReflection;
+use PHPStan\Reflection\ExtendedFunctionVariant;
+use PHPStan\Reflection\ExtendedMethodReflection;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Generic\TemplateTypeMap;
+use PHPStan\Type\MixedType;
 use PHPStan\Type\Type;
 use PHPStan\Type\VoidType;
 
-class DummyConstructorReflection implements MethodReflection
+final class DummyConstructorReflection implements ExtendedMethodReflection
 {
 
 	public function __construct(private ClassReflection $declaringClass)
@@ -51,14 +55,27 @@ class DummyConstructorReflection implements MethodReflection
 	public function getVariants(): array
 	{
 		return [
-			new FunctionVariant(
+			new ExtendedFunctionVariant(
 				TemplateTypeMap::createEmpty(),
 				null,
 				[],
 				false,
 				new VoidType(),
+				new MixedType(),
+				new MixedType(),
+				null,
 			),
 		];
+	}
+
+	public function getOnlyVariant(): ExtendedParametersAcceptor
+	{
+		return $this->getVariants()[0];
+	}
+
+	public function getNamedArgumentsVariants(): ?array
+	{
+		return null;
 	}
 
 	public function isDeprecated(): TrinaryLogic
@@ -81,6 +98,11 @@ class DummyConstructorReflection implements MethodReflection
 		return TrinaryLogic::createMaybe();
 	}
 
+	public function isBuiltin(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
 	public function getThrowType(): ?Type
 	{
 		return null;
@@ -92,6 +114,62 @@ class DummyConstructorReflection implements MethodReflection
 	}
 
 	public function getDocComment(): ?string
+	{
+		return null;
+	}
+
+	public function getAsserts(): Assertions
+	{
+		return Assertions::createEmpty();
+	}
+
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean($this->declaringClass->acceptsNamedArguments());
+	}
+
+	public function getSelfOutType(): ?Type
+	{
+		return null;
+	}
+
+	public function returnsByReference(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isAbstract(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isPure(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function getPureUnlessCallableIsImpureParameters(): array
+	{
+		return [];
+	}
+
+	public function getAttributes(): array
+	{
+		return [];
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		// Align with the getAttributes() returning empty
+		return TrinaryLogic::createNo();
+	}
+
+	public function getResolvedPhpDoc(): ?ResolvedPhpDocBlock
 	{
 		return null;
 	}

@@ -4,11 +4,13 @@ namespace PHPStan\Rules\Arrays;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Php\PhpVersion;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
 use PHPStan\Type\ErrorType;
-use PHPStan\Type\MixedType;
 use PHPStan\Type\Type;
 use PHPStan\Type\VerbosityLevel;
 use function sprintf;
@@ -16,12 +18,17 @@ use function sprintf;
 /**
  * @implements Rule<Node\Expr\ArrayDimFetch>
  */
-class InvalidKeyInArrayDimFetchRule implements Rule
+#[RegisteredRule(level: 3)]
+final class InvalidKeyInArrayDimFetchRule implements Rule
 {
 
 	public function __construct(
 		private RuleLevelHelper $ruleLevelHelper,
+		private PhpVersion $phpVersion,
+		#[AutowiredParameter]
 		private bool $reportMaybes,
+		#[AutowiredParameter]
+		private bool $reportNonIntStringArrayKey,
 	)
 	{
 	}
@@ -37,31 +44,46 @@ class InvalidKeyInArrayDimFetchRule implements Rule
 			return [];
 		}
 
-		$dimensionType = $scope->getType($node->dim);
-		if ($dimensionType instanceof MixedType) {
-			return [];
-		}
-
 		$varType = $this->ruleLevelHelper->findTypeToCheck(
 			$scope,
 			$node->var,
 			'',
-			static fn (Type $varType): bool => $varType->isArray()->no() || AllowedArrayKeysTypes::getType()->isSuperTypeOf($dimensionType)->yes(),
+			static fn (Type $varType): bool => $varType->isArray()->no(),
 		)->getType();
 
-		if ($varType instanceof ErrorType || $varType->isArray()->no()) {
+		if ($varType instanceof ErrorType) {
 			return [];
 		}
 
-		$isSuperType = AllowedArrayKeysTypes::getType()->isSuperTypeOf($dimensionType);
+		$isArray = $varType->isArray();
+		if ($isArray->no() || ($isArray->maybe() && !$this->reportMaybes)) {
+			return [];
+		}
+
+		$allowedArrayKeys = AllowedArrayKeysTypes::getType($this->phpVersion, $this->reportNonIntStringArrayKey);
+		$dimensionType = $this->ruleLevelHelper->findTypeToCheck(
+			$scope,
+			$node->dim,
+			'',
+			static fn (Type $dimType): bool => $allowedArrayKeys->isSuperTypeOf($dimType)->yes(),
+		)->getType();
+		if ($dimensionType instanceof ErrorType) {
+			return [];
+		}
+
+		$isSuperType = $allowedArrayKeys->isSuperTypeOf($dimensionType);
 		if ($isSuperType->yes() || ($isSuperType->maybe() && !$this->reportMaybes)) {
 			return [];
 		}
 
 		return [
 			RuleErrorBuilder::message(
-				sprintf('%s array key type %s.', $isSuperType->no() ? 'Invalid' : 'Possibly invalid', $dimensionType->describe(VerbosityLevel::typeOnly())),
-			)->build(),
+				sprintf(
+					'%s array key type %s.',
+					$isArray->yes() && $isSuperType->no() ? 'Invalid' : 'Possibly invalid',
+					$dimensionType->describe(VerbosityLevel::typeOnly()),
+				),
+			)->identifier('offsetAccess.invalidOffset')->build(),
 		];
 	}
 

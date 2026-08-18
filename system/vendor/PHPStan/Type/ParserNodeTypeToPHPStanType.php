@@ -13,7 +13,7 @@ use function get_class;
 use function in_array;
 use function strtolower;
 
-class ParserNodeTypeToPHPStanType
+final class ParserNodeTypeToPHPStanType
 {
 
 	/**
@@ -53,7 +53,7 @@ class ParserNodeTypeToPHPStanType
 			$types = [];
 			foreach ($type->types as $intersectionTypeType) {
 				$innerType = self::resolve($intersectionTypeType, $classReflection);
-				if (!$innerType instanceof ObjectType) {
+				if (!$innerType->isObject()->yes()) {
 					return new NeverType();
 				}
 
@@ -93,7 +93,7 @@ class ParserNodeTypeToPHPStanType
 		} elseif ($type === 'mixed') {
 			return new MixedType(true);
 		} elseif ($type === 'never') {
-			return new NeverType(true);
+			return new NonAcceptingNeverType();
 		}
 
 		return new MixedType();

@@ -2,25 +2,24 @@
 
 namespace PHPStan\Reflection\Php;
 
-use PhpParser\Node;
-use PhpParser\Node\Stmt\ClassMethod;
-use PhpParser\Node\Stmt\Declare_;
-use PhpParser\Node\Stmt\Function_;
-use PhpParser\Node\Stmt\Namespace_;
+use PHPStan\BetterReflection\Reflection\Adapter\ReflectionMethod;
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionParameter;
-use PHPStan\Cache\Cache;
-use PHPStan\Parser\FunctionCallStatementFinder;
-use PHPStan\Parser\Parser;
+use PHPStan\DependencyInjection\GenerateFactory;
+use PHPStan\Internal\DeprecatedAttributeHelper;
+use PHPStan\PhpDoc\ResolvedPhpDocBlock;
 use PHPStan\Reflection\Assertions;
+use PHPStan\Reflection\AttributeReflection;
+use PHPStan\Reflection\AttributeReflectionFactory;
 use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ExtendedFunctionVariant;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\FunctionVariantWithPhpDocs;
+use PHPStan\Reflection\ExtendedParameterReflection;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
+use PHPStan\Reflection\InitializerExprContext;
 use PHPStan\Reflection\InitializerExprTypeResolver;
 use PHPStan\Reflection\MethodPrototypeReflection;
-use PHPStan\Reflection\ParameterReflectionWithPhpDocs;
-use PHPStan\Reflection\ParametersAcceptor;
-use PHPStan\Reflection\ParametersAcceptorWithPhpDocs;
+use PHPStan\Reflection\ParameterAllowedConstantsMapProvider;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\ArrayType;
@@ -30,60 +29,69 @@ use PHPStan\Type\IntegerType;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\ObjectWithoutClassType;
 use PHPStan\Type\StringType;
+use PHPStan\Type\ThisType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypehintHelper;
 use PHPStan\Type\VoidType;
 use ReflectionException;
 use function array_map;
 use function explode;
-use function filemtime;
-use function is_bool;
-use function is_file;
-use function sprintf;
+use function in_array;
 use function strtolower;
-use function time;
 use const PHP_VERSION_ID;
 
-/** @api */
-class PhpMethodReflection implements ExtendedMethodReflection
+/**
+ * @api
+ */
+#[GenerateFactory(interface: PhpMethodReflectionFactory::class)]
+final class PhpMethodReflection implements ExtendedMethodReflection
 {
 
-	/** @var PhpParameterReflection[]|null */
+	/** @var list<PhpParameterReflection>|null */
 	private ?array $parameters = null;
 
 	private ?Type $returnType = null;
 
 	private ?Type $nativeReturnType = null;
 
-	/** @var FunctionVariantWithPhpDocs[]|null */
+	/** @var list<ExtendedFunctionVariant>|null */
 	private ?array $variants = null;
 
 	/**
 	 * @param Type[] $phpDocParameterTypes
 	 * @param Type[] $phpDocParameterOutTypes
+	 * @param array<string, TrinaryLogic> $immediatelyInvokedCallableParameters
+	 * @param array<string, Type> $phpDocClosureThisTypeParameters
+	 * @param list<AttributeReflection> $attributes
+	 * @param array<string, bool> $pureUnlessCallableIsImpureParameters
 	 */
 	public function __construct(
 		private InitializerExprTypeResolver $initializerExprTypeResolver,
 		private ClassReflection $declaringClass,
 		private ?ClassReflection $declaringTrait,
-		private BuiltinMethodReflection $reflection,
+		private ReflectionMethod $reflection,
 		private ReflectionProvider $reflectionProvider,
-		private Parser $parser,
-		private FunctionCallStatementFinder $functionCallStatementFinder,
-		private Cache $cache,
+		private AttributeReflectionFactory $attributeReflectionFactory,
+		private ParameterAllowedConstantsMapProvider $allowedConstantsMapProvider,
 		private TemplateTypeMap $templateTypeMap,
 		private array $phpDocParameterTypes,
 		private ?Type $phpDocReturnType,
 		private ?Type $phpDocThrowType,
+		private ?ResolvedPhpDocBlock $resolvedPhpDocBlock,
 		private ?string $deprecatedDescription,
 		private bool $isDeprecated,
 		private bool $isInternal,
 		private bool $isFinal,
 		private ?bool $isPure,
 		private Assertions $asserts,
+		private bool $acceptsNamedArguments,
 		private ?Type $selfOutType,
 		private ?string $phpDocComment,
 		private array $phpDocParameterOutTypes,
+		private array $immediatelyInvokedCallableParameters,
+		private array $phpDocClosureThisTypeParameters,
+		private array $attributes,
+		private array $pureUnlessCallableIsImpureParameters,
 	)
 	{
 	}
@@ -105,11 +113,18 @@ class PhpMethodReflection implements ExtendedMethodReflection
 	{
 		try {
 			$prototypeMethod = $this->reflection->getPrototype();
-			$prototypeDeclaringClass = $this->reflectionProvider->getClass($prototypeMethod->getDeclaringClass()->getName());
+			$prototypeDeclaringClass = $this->declaringClass->getAncestorWithClassName($prototypeMethod->getDeclaringClass()->getName());
+			if ($prototypeDeclaringClass === null) {
+				$prototypeDeclaringClass = $this->reflectionProvider->getClass($prototypeMethod->getDeclaringClass()->getName());
+			}
+
+			if (!$prototypeDeclaringClass->hasNativeMethod($prototypeMethod->getName())) {
+				return $this;
+			}
 
 			$tentativeReturnType = null;
 			if ($prototypeMethod->getTentativeReturnType() !== null) {
-				$tentativeReturnType = TypehintHelper::decideTypeFromReflection($prototypeMethod->getTentativeReturnType());
+				$tentativeReturnType = TypehintHelper::decideTypeFromReflection($prototypeMethod->getTentativeReturnType(), selfClass: $prototypeDeclaringClass);
 			}
 
 			return new MethodPrototypeReflection(
@@ -119,7 +134,7 @@ class PhpMethodReflection implements ExtendedMethodReflection
 				$prototypeMethod->isPrivate(),
 				$prototypeMethod->isPublic(),
 				$prototypeMethod->isAbstract(),
-				$prototypeMethod->isFinal(),
+				$prototypeMethod->isInternal(),
 				$prototypeDeclaringClass->getNativeMethod($prototypeMethod->getName())->getVariants(),
 				$tentativeReturnType,
 			);
@@ -174,131 +189,55 @@ class PhpMethodReflection implements ExtendedMethodReflection
 	}
 
 	/**
-	 * @return ParametersAcceptorWithPhpDocs[]
+	 * @return list<ExtendedParametersAcceptor>
 	 */
 	public function getVariants(): array
 	{
-		if ($this->variants === null) {
-			$this->variants = [
-				new FunctionVariantWithPhpDocs(
-					$this->templateTypeMap,
-					null,
-					$this->getParameters(),
-					$this->isVariadic(),
-					$this->getReturnType(),
-					$this->getPhpDocReturnType(),
-					$this->getNativeReturnType(),
-				),
-			];
-		}
+		return $this->variants ??= [
+			new ExtendedFunctionVariant(
+				$this->templateTypeMap,
+				null,
+				$this->getParameters(),
+				$this->isVariadic(),
+				$this->getReturnType(),
+				$this->getPhpDocReturnType(),
+				$this->getNativeReturnType(),
+			),
+		];
+	}
 
-		return $this->variants;
+	public function getOnlyVariant(): ExtendedParametersAcceptor
+	{
+		return $this->getVariants()[0];
+	}
+
+	public function getNamedArgumentsVariants(): ?array
+	{
+		return null;
 	}
 
 	/**
-	 * @return ParameterReflectionWithPhpDocs[]
+	 * @return list<ExtendedParameterReflection>
 	 */
 	private function getParameters(): array
 	{
-		if ($this->parameters === null) {
-			$this->parameters = array_map(fn (ReflectionParameter $reflection): PhpParameterReflection => new PhpParameterReflection(
-				$this->initializerExprTypeResolver,
-				$reflection,
-				$this->phpDocParameterTypes[$reflection->getName()] ?? null,
-				$this->getDeclaringClass()->getName(),
-				$this->phpDocParameterOutTypes[$reflection->getName()] ?? null,
-			), $this->reflection->getParameters());
-		}
-
-		return $this->parameters;
+		return $this->parameters ??= array_map(fn (ReflectionParameter $reflection): PhpParameterReflection => new PhpParameterReflection(
+			$this->initializerExprTypeResolver,
+			$reflection,
+			$this->phpDocParameterTypes[$reflection->getName()] ?? null,
+			$this->getDeclaringClass(),
+			$this->phpDocParameterOutTypes[$reflection->getName()] ?? null,
+			$this->immediatelyInvokedCallableParameters[$reflection->getName()] ?? TrinaryLogic::createMaybe(),
+			$this->phpDocClosureThisTypeParameters[$reflection->getName()] ?? null,
+			$this->attributeReflectionFactory->fromNativeReflection($reflection->getAttributes(), InitializerExprContext::fromReflectionParameter($reflection)),
+			$this->allowedConstantsMapProvider->getForMethodParameter($this->declaringClass->getName(), $this->reflection->getName(), $reflection->getName()),
+			TrinaryLogic::createFromBoolean($this->pureUnlessCallableIsImpureParameters[$reflection->getName()] ?? false),
+		), $this->reflection->getParameters());
 	}
 
 	private function isVariadic(): bool
 	{
-		$isNativelyVariadic = $this->reflection->isVariadic();
-		$declaringClass = $this->declaringClass;
-		$filename = $this->declaringClass->getFileName();
-		if ($this->declaringTrait !== null) {
-			$declaringClass = $this->declaringTrait;
-			$filename = $this->declaringTrait->getFileName();
-		}
-
-		if (!$isNativelyVariadic && $filename !== null && is_file($filename)) {
-			$modifiedTime = filemtime($filename);
-			if ($modifiedTime === false) {
-				$modifiedTime = time();
-			}
-			$key = sprintf('variadic-method-%s-%s-%s', $declaringClass->getName(), $this->reflection->getName(), $filename);
-			$variableCacheKey = sprintf('%d-v4', $modifiedTime);
-			$cachedResult = $this->cache->load($key, $variableCacheKey);
-			if ($cachedResult === null || !is_bool($cachedResult)) {
-				$nodes = $this->parser->parseFile($filename);
-				$result = $this->callsFuncGetArgs($declaringClass, $nodes);
-				$this->cache->save($key, $variableCacheKey, $result);
-				return $result;
-			}
-
-			return $cachedResult;
-		}
-
-		return $isNativelyVariadic;
-	}
-
-	/**
-	 * @param Node[] $nodes
-	 */
-	private function callsFuncGetArgs(ClassReflection $declaringClass, array $nodes): bool
-	{
-		foreach ($nodes as $node) {
-			if (
-				$node instanceof Node\Stmt\ClassLike
-			) {
-				if (!isset($node->namespacedName)) {
-					continue;
-				}
-				if ($declaringClass->getName() !== (string) $node->namespacedName) {
-					continue;
-				}
-				if ($this->callsFuncGetArgs($declaringClass, $node->stmts)) {
-					return true;
-				}
-				continue;
-			}
-
-			if ($node instanceof ClassMethod) {
-				if ($node->getStmts() === null) {
-					continue; // interface
-				}
-
-				$methodName = $node->name->name;
-				if ($methodName === $this->reflection->getName()) {
-					return $this->functionCallStatementFinder->findFunctionCallInStatements(ParametersAcceptor::VARIADIC_FUNCTIONS, $node->getStmts()) !== null;
-				}
-
-				continue;
-			}
-
-			if ($node instanceof Function_) {
-				continue;
-			}
-
-			if ($node instanceof Namespace_) {
-				if ($this->callsFuncGetArgs($declaringClass, $node->stmts)) {
-					return true;
-				}
-				continue;
-			}
-
-			if (!$node instanceof Declare_ || $node->stmts === null) {
-				continue;
-			}
-
-			if ($this->callsFuncGetArgs($declaringClass, $node->stmts)) {
-				return true;
-			}
-		}
-
-		return false;
+		return $this->reflection->isVariadic();
 	}
 
 	public function isPrivate(): bool
@@ -315,32 +254,29 @@ class PhpMethodReflection implements ExtendedMethodReflection
 	{
 		if ($this->returnType === null) {
 			$name = strtolower($this->getName());
-			if (
-				$name === '__construct'
-				|| $name === '__destruct'
-				|| $name === '__unset'
-				|| $name === '__wakeup'
-				|| $name === '__clone'
-			) {
-				return $this->returnType = TypehintHelper::decideType(new VoidType(), $this->phpDocReturnType);
-			}
-			if ($name === '__tostring') {
-				return $this->returnType = TypehintHelper::decideType(new StringType(), $this->phpDocReturnType);
-			}
-			if ($name === '__isset') {
-				return $this->returnType = TypehintHelper::decideType(new BooleanType(), $this->phpDocReturnType);
-			}
-			if ($name === '__sleep') {
-				return $this->returnType = TypehintHelper::decideType(new ArrayType(new IntegerType(), new StringType()), $this->phpDocReturnType);
-			}
-			if ($name === '__set_state') {
-				return $this->returnType = TypehintHelper::decideType(new ObjectWithoutClassType(), $this->phpDocReturnType);
+			$returnType = $this->reflection->getReturnType();
+			if ($returnType === null) {
+				if (in_array($name, ['__construct', '__destruct', '__unset', '__wakeup', '__clone'], true)) {
+					return $this->returnType = TypehintHelper::decideType(new VoidType(), $this->phpDocReturnType);
+				}
+				if ($name === '__tostring') {
+					return $this->returnType = TypehintHelper::decideType(new StringType(), $this->phpDocReturnType);
+				}
+				if ($name === '__isset') {
+					return $this->returnType = TypehintHelper::decideType(new BooleanType(), $this->phpDocReturnType);
+				}
+				if ($name === '__sleep') {
+					return $this->returnType = TypehintHelper::decideType(new ArrayType(new IntegerType(), new StringType()), $this->phpDocReturnType);
+				}
+				if ($name === '__set_state') {
+					return $this->returnType = TypehintHelper::decideType(new ObjectWithoutClassType(), $this->phpDocReturnType);
+				}
 			}
 
 			$this->returnType = TypehintHelper::decideTypeFromReflection(
-				$this->reflection->getReturnType(),
+				$returnType,
 				$this->phpDocReturnType,
-				$this->declaringClass->getName(),
+				$this->declaringClass,
 			);
 		}
 
@@ -358,15 +294,10 @@ class PhpMethodReflection implements ExtendedMethodReflection
 
 	private function getNativeReturnType(): Type
 	{
-		if ($this->nativeReturnType === null) {
-			$this->nativeReturnType = TypehintHelper::decideTypeFromReflection(
-				$this->reflection->getReturnType(),
-				null,
-				$this->declaringClass->getName(),
-			);
-		}
-
-		return $this->nativeReturnType;
+		return $this->nativeReturnType ??= TypehintHelper::decideTypeFromReflection(
+			$this->reflection->getReturnType(),
+			selfClass: $this->declaringClass,
+		);
 	}
 
 	public function getDeprecatedDescription(): ?string
@@ -375,22 +306,41 @@ class PhpMethodReflection implements ExtendedMethodReflection
 			return $this->deprecatedDescription;
 		}
 
+		if ($this->reflection->isDeprecated()) {
+			$attributes = $this->reflection->getBetterReflection()->getAttributes();
+			return DeprecatedAttributeHelper::getDeprecatedDescription($attributes);
+		}
+
 		return null;
 	}
 
 	public function isDeprecated(): TrinaryLogic
 	{
-		return $this->reflection->isDeprecated()->or(TrinaryLogic::createFromBoolean($this->isDeprecated));
+		if ($this->isDeprecated) {
+			return TrinaryLogic::createYes();
+		}
+
+		return TrinaryLogic::createFromBoolean($this->reflection->isDeprecated());
 	}
 
 	public function isInternal(): TrinaryLogic
 	{
-		return TrinaryLogic::createFromBoolean($this->reflection->isInternal() || $this->isInternal);
+		return TrinaryLogic::createFromBoolean($this->isInternal);
+	}
+
+	public function isBuiltin(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean($this->reflection->isInternal());
 	}
 
 	public function isFinal(): TrinaryLogic
 	{
-		return TrinaryLogic::createFromBoolean($this->reflection->isFinal() || $this->isFinal);
+		return TrinaryLogic::createFromBoolean($this->isFinal || $this->reflection->isFinal());
+	}
+
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean($this->reflection->isFinal());
 	}
 
 	public function isAbstract(): bool
@@ -405,17 +355,18 @@ class PhpMethodReflection implements ExtendedMethodReflection
 
 	public function hasSideEffects(): TrinaryLogic
 	{
-		$name = strtolower($this->getName());
-		$isVoid = $this->getReturnType() instanceof VoidType;
-
 		if (
-			$name !== '__construct'
-			&& $isVoid
+			strtolower($this->getName()) !== '__construct'
+			&& $this->getReturnType()->isVoid()->yes()
 		) {
 			return TrinaryLogic::createYes();
 		}
 		if ($this->isPure !== null) {
 			return TrinaryLogic::createFromBoolean(!$this->isPure);
+		}
+
+		if ((new ThisType($this->declaringClass))->isSuperTypeOf($this->getReturnType())->yes()) {
+			return TrinaryLogic::createYes();
 		}
 
 		return TrinaryLogic::createMaybe();
@@ -424,6 +375,13 @@ class PhpMethodReflection implements ExtendedMethodReflection
 	public function getAsserts(): Assertions
 	{
 		return $this->asserts;
+	}
+
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean(
+			$this->declaringClass->acceptsNamedArguments() && $this->acceptsNamedArguments,
+		);
 	}
 
 	public function getSelfOutType(): ?Type
@@ -438,7 +396,111 @@ class PhpMethodReflection implements ExtendedMethodReflection
 
 	public function returnsByReference(): TrinaryLogic
 	{
-		return $this->reflection->returnsByReference();
+		return TrinaryLogic::createFromBoolean($this->reflection->returnsReference());
+	}
+
+	public function isPure(): TrinaryLogic
+	{
+		if ($this->isPure === null) {
+			return TrinaryLogic::createMaybe();
+		}
+
+		return TrinaryLogic::createFromBoolean($this->isPure);
+	}
+
+	/**
+	 * @return array<string, TrinaryLogic>
+	 */
+	public function getPureUnlessCallableIsImpureParameters(): array
+	{
+		return array_map(static fn (bool $value): TrinaryLogic => TrinaryLogic::createFromBoolean($value), $this->pureUnlessCallableIsImpureParameters);
+	}
+
+	public function changePropertyGetHookPhpDocType(Type $phpDocType): self
+	{
+		return new self(
+			$this->initializerExprTypeResolver,
+			$this->declaringClass,
+			$this->declaringTrait,
+			$this->reflection,
+			$this->reflectionProvider,
+			$this->attributeReflectionFactory,
+			$this->allowedConstantsMapProvider,
+			$this->templateTypeMap,
+			$this->phpDocParameterTypes,
+			$phpDocType,
+			$this->phpDocThrowType,
+			$this->resolvedPhpDocBlock,
+			$this->deprecatedDescription,
+			$this->isDeprecated,
+			$this->isInternal,
+			$this->isFinal,
+			$this->isPure,
+			$this->asserts,
+			$this->acceptsNamedArguments,
+			$this->selfOutType,
+			$this->phpDocComment,
+			$this->phpDocParameterOutTypes,
+			$this->immediatelyInvokedCallableParameters,
+			$this->phpDocClosureThisTypeParameters,
+			$this->attributes,
+			$this->pureUnlessCallableIsImpureParameters,
+		);
+	}
+
+	public function changePropertySetHookPhpDocType(string $parameterName, Type $phpDocType): self
+	{
+		$phpDocParameterTypes = $this->phpDocParameterTypes;
+		$phpDocParameterTypes[$parameterName] = $phpDocType;
+
+		return new self(
+			$this->initializerExprTypeResolver,
+			$this->declaringClass,
+			$this->declaringTrait,
+			$this->reflection,
+			$this->reflectionProvider,
+			$this->attributeReflectionFactory,
+			$this->allowedConstantsMapProvider,
+			$this->templateTypeMap,
+			$phpDocParameterTypes,
+			$this->phpDocReturnType,
+			$this->phpDocThrowType,
+			$this->resolvedPhpDocBlock,
+			$this->deprecatedDescription,
+			$this->isDeprecated,
+			$this->isInternal,
+			$this->isFinal,
+			$this->isPure,
+			$this->asserts,
+			$this->acceptsNamedArguments,
+			$this->selfOutType,
+			$this->phpDocComment,
+			$this->phpDocParameterOutTypes,
+			$this->immediatelyInvokedCallableParameters,
+			$this->phpDocClosureThisTypeParameters,
+			$this->attributes,
+			$this->pureUnlessCallableIsImpureParameters,
+		);
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->attributes;
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		foreach ($this->attributes as $attrib) {
+			if (strtolower($attrib->getName()) === 'nodiscard') {
+				return TrinaryLogic::createYes();
+			}
+		}
+		return TrinaryLogic::createNo();
+	}
+
+	public function getResolvedPhpDoc(): ?ResolvedPhpDocBlock
+	{
+		return $this->resolvedPhpDocBlock;
 	}
 
 }

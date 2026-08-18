@@ -7,12 +7,14 @@ use PhpParser\Node\Expr;
 use PhpParser\Node\Scalar\String_;
 use PhpParser\Node\VarLikeIdentifier;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\Type;
-use PHPStan\Type\TypeUtils;
 use function array_map;
+use function count;
 
-class PropertyReflectionFinder
+#[AutowiredService]
+final class PropertyReflectionFinder
 {
 
 	/**
@@ -25,13 +27,13 @@ class PropertyReflectionFinder
 			if ($propertyFetch->name instanceof Node\Identifier) {
 				$names = [$propertyFetch->name->name];
 			} else {
-				$names = array_map(static fn (ConstantStringType $name): string => $name->getValue(), TypeUtils::getConstantStrings($scope->getType($propertyFetch->name)));
+				$names = array_map(static fn (ConstantStringType $name): string => $name->getValue(), $scope->getType($propertyFetch->name)->getConstantStrings());
 			}
 
 			$reflections = [];
 			$propertyHolderType = $scope->getType($propertyFetch->var);
 			foreach ($names as $name) {
-				$reflection = $this->findPropertyReflection(
+				$reflection = $this->findInstancePropertyReflection(
 					$propertyHolderType,
 					$name,
 					$propertyFetch->name instanceof Expr ? $scope->filterByTruthyValue(new Expr\BinaryOp\Identical(
@@ -58,12 +60,12 @@ class PropertyReflectionFinder
 		if ($propertyFetch->name instanceof VarLikeIdentifier) {
 			$names = [$propertyFetch->name->name];
 		} else {
-			$names = array_map(static fn (ConstantStringType $name): string => $name->getValue(), TypeUtils::getConstantStrings($scope->getType($propertyFetch->name)));
+			$names = array_map(static fn (ConstantStringType $name): string => $name->getValue(), $scope->getType($propertyFetch->name)->getConstantStrings());
 		}
 
 		$reflections = [];
 		foreach ($names as $name) {
-			$reflection = $this->findPropertyReflection(
+			$reflection = $this->findStaticPropertyReflection(
 				$propertyHolderType,
 				$name,
 				$propertyFetch->name instanceof Expr ? $scope->filterByTruthyValue(new Expr\BinaryOp\Identical(
@@ -87,11 +89,18 @@ class PropertyReflectionFinder
 	public function findPropertyReflectionFromNode($propertyFetch, Scope $scope): ?FoundPropertyReflection
 	{
 		if ($propertyFetch instanceof Node\Expr\PropertyFetch) {
-			if (!$propertyFetch->name instanceof Node\Identifier) {
-				return null;
-			}
 			$propertyHolderType = $scope->getType($propertyFetch->var);
-			return $this->findPropertyReflection($propertyHolderType, $propertyFetch->name->name, $scope);
+			if ($propertyFetch->name instanceof Node\Identifier) {
+				return $this->findInstancePropertyReflection($propertyHolderType, $propertyFetch->name->name, $scope);
+			}
+
+			$nameType = $scope->getType($propertyFetch->name);
+			$nameTypeConstantStrings = $nameType->getConstantStrings();
+			if (count($nameTypeConstantStrings) === 1) {
+				return $this->findInstancePropertyReflection($propertyHolderType, $nameTypeConstantStrings[0]->getValue(), $scope);
+			}
+
+			return null;
 		}
 
 		if (!$propertyFetch->name instanceof Node\Identifier) {
@@ -104,16 +113,33 @@ class PropertyReflectionFinder
 			$propertyHolderType = $scope->getType($propertyFetch->class);
 		}
 
-		return $this->findPropertyReflection($propertyHolderType, $propertyFetch->name->name, $scope);
+		return $this->findStaticPropertyReflection($propertyHolderType, $propertyFetch->name->name, $scope);
 	}
 
-	private function findPropertyReflection(Type $propertyHolderType, string $propertyName, Scope $scope): ?FoundPropertyReflection
+	private function findInstancePropertyReflection(Type $propertyHolderType, string $propertyName, Scope $scope): ?FoundPropertyReflection
 	{
-		if (!$propertyHolderType->hasProperty($propertyName)->yes()) {
+		if (!$propertyHolderType->hasInstanceProperty($propertyName)->yes()) {
 			return null;
 		}
 
-		$originalProperty = $propertyHolderType->getProperty($propertyName, $scope);
+		$originalProperty = $propertyHolderType->getInstanceProperty($propertyName, $scope);
+
+		return new FoundPropertyReflection(
+			$originalProperty,
+			$scope,
+			$propertyName,
+			$originalProperty->getReadableType(),
+			$originalProperty->getWritableType(),
+		);
+	}
+
+	private function findStaticPropertyReflection(Type $propertyHolderType, string $propertyName, Scope $scope): ?FoundPropertyReflection
+	{
+		if (!$propertyHolderType->hasStaticProperty($propertyName)->yes()) {
+			return null;
+		}
+
+		$originalProperty = $propertyHolderType->getStaticProperty($propertyName, $scope);
 
 		return new FoundPropertyReflection(
 			$originalProperty,

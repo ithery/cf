@@ -2,8 +2,9 @@
 
 namespace PHPStan\Rules\PhpDoc;
 
-use PHPStan\Reflection\ParametersAcceptor;
-use PHPStan\Rules\RuleError;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\ConditionalType;
 use PHPStan\Type\ConditionalTypeForParameter;
@@ -13,24 +14,53 @@ use PHPStan\Type\Type;
 use PHPStan\Type\TypeTraverser;
 use PHPStan\Type\VerbosityLevel;
 use function array_key_exists;
+use function count;
 use function sprintf;
 use function substr;
 
-class ConditionalReturnTypeRuleHelper
+#[AutowiredService]
+final class ConditionalReturnTypeRuleHelper
 {
 
 	/**
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
-	public function check(ParametersAcceptor $acceptor): array
+	public function check(ExtendedParametersAcceptor $acceptor): array
 	{
-		$templateTypeMap = $acceptor->getTemplateTypeMap();
+		$conditionalTypes = [];
 		$parametersByName = [];
 		foreach ($acceptor->getParameters() as $parameter) {
+			TypeTraverser::map($parameter->getType(), static function (Type $type, callable $traverse) use (&$conditionalTypes): Type {
+				if ($type instanceof ConditionalType || $type instanceof ConditionalTypeForParameter) {
+					$conditionalTypes[] = $type;
+				}
+
+				return $traverse($type);
+			});
+
+			if ($parameter->getOutType() !== null) {
+				TypeTraverser::map($parameter->getOutType(), static function (Type $type, callable $traverse) use (&$conditionalTypes): Type {
+					if ($type instanceof ConditionalType || $type instanceof ConditionalTypeForParameter) {
+						$conditionalTypes[] = $type;
+					}
+
+					return $traverse($type);
+				});
+			}
+
+			if ($parameter->getClosureThisType() !== null) {
+				TypeTraverser::map($parameter->getClosureThisType(), static function (Type $type, callable $traverse) use (&$conditionalTypes): Type {
+					if ($type instanceof ConditionalType || $type instanceof ConditionalTypeForParameter) {
+						$conditionalTypes[] = $type;
+					}
+
+					return $traverse($type);
+				});
+			}
+
 			$parametersByName[$parameter->getName()] = $parameter;
 		}
 
-		$conditionalTypes = [];
 		TypeTraverser::map($acceptor->getReturnType(), static function (Type $type, callable $traverse) use (&$conditionalTypes): Type {
 			if ($type instanceof ConditionalType || $type instanceof ConditionalTypeForParameter) {
 				$conditionalTypes[] = $type;
@@ -46,14 +76,28 @@ class ConditionalReturnTypeRuleHelper
 				if ($subjectType instanceof StaticType) {
 					continue;
 				}
-				if (!$subjectType instanceof TemplateType || $templateTypeMap->getType($subjectType->getName()) === null) {
-					$errors[] = RuleErrorBuilder::message(sprintf('Conditional return type uses subject type %s which is not part of PHPDoc @template tags.', $subjectType->describe(VerbosityLevel::typeOnly())))->build();
+				$templateTypes = [];
+				TypeTraverser::map($subjectType, static function (Type $type, callable $traverse) use (&$templateTypes): Type {
+					if ($type instanceof TemplateType) {
+						$templateTypes[] = $type;
+						return $type;
+					}
+
+					return $traverse($type);
+				});
+
+				if (count($templateTypes) === 0) {
+					$errors[] = RuleErrorBuilder::message(sprintf('Conditional return type uses subject type %s which is not part of PHPDoc @template tags.', $subjectType->describe(VerbosityLevel::typeOnly())))
+						->identifier('conditionalType.subjectNotFound')
+						->build();
 					continue;
 				}
 			} else {
 				$parameterName = substr($conditionalType->getParameterName(), 1);
 				if (!array_key_exists($parameterName, $parametersByName)) {
-					$errors[] = RuleErrorBuilder::message(sprintf('Conditional return type references unknown parameter $%s.', $parameterName))->build();
+					$errors[] = RuleErrorBuilder::message(sprintf('Conditional return type references unknown parameter $%s.', $parameterName))
+						->identifier('parameter.notFound')
+						->build();
 					continue;
 				}
 				$subjectType = $parametersByName[$parameterName]->getType();
@@ -73,7 +117,11 @@ class ConditionalReturnTypeRuleHelper
 				$conditionalType->isNegated()
 					? ($isTargetSuperType->yes() ? 'false' : 'true')
 					: ($isTargetSuperType->yes() ? 'true' : 'false'),
-			))->build();
+			))
+				->identifier(sprintf('conditionalType.always%s', $conditionalType->isNegated()
+					? ($isTargetSuperType->yes() ? 'False' : 'True')
+					: ($isTargetSuperType->yes() ? 'True' : 'False')))
+				->build();
 		}
 
 		return $errors;

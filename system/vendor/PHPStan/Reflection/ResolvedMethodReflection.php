@@ -2,23 +2,35 @@
 
 namespace PHPStan\Reflection;
 
-use PHPStan\Reflection\Php\PhpMethodReflection;
+use PHPStan\PhpDoc\ResolvedPhpDocBlock;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Generic\TemplateTypeHelper;
 use PHPStan\Type\Generic\TemplateTypeMap;
+use PHPStan\Type\Generic\TemplateTypeVariance;
+use PHPStan\Type\Generic\TemplateTypeVarianceMap;
 use PHPStan\Type\Type;
+use function is_bool;
 
-class ResolvedMethodReflection implements ExtendedMethodReflection
+final class ResolvedMethodReflection implements ExtendedMethodReflection
 {
 
-	/** @var ParametersAcceptor[]|null */
+	/** @var list<ExtendedParametersAcceptor>|null */
 	private ?array $variants = null;
+
+	/** @var list<ExtendedParametersAcceptor>|null */
+	private ?array $namedArgumentVariants = null;
 
 	private ?Assertions $asserts = null;
 
 	private Type|false|null $selfOutType = false;
 
-	public function __construct(private ExtendedMethodReflection $reflection, private TemplateTypeMap $resolvedTemplateTypeMap)
+	private ?TrinaryLogic $hasSideEffects = null;
+
+	public function __construct(
+		private ExtendedMethodReflection $reflection,
+		private TemplateTypeMap $resolvedTemplateTypeMap,
+		private TemplateTypeVarianceMap $callSiteVarianceMap,
+	)
 	{
 	}
 
@@ -32,9 +44,6 @@ class ResolvedMethodReflection implements ExtendedMethodReflection
 		return $this->reflection->getPrototype();
 	}
 
-	/**
-	 * @return ParametersAcceptor[]
-	 */
 	public function getVariants(): array
 	{
 		$variants = $this->variants;
@@ -42,32 +51,51 @@ class ResolvedMethodReflection implements ExtendedMethodReflection
 			return $variants;
 		}
 
-		$variants = [];
-		foreach ($this->reflection->getVariants() as $variant) {
-			$variants[] = new ResolvedFunctionVariant(
+		return $this->variants = $this->resolveVariants($this->reflection->getVariants());
+	}
+
+	public function getOnlyVariant(): ExtendedParametersAcceptor
+	{
+		return $this->getVariants()[0];
+	}
+
+	public function getNamedArgumentsVariants(): ?array
+	{
+		$variants = $this->namedArgumentVariants;
+		if ($variants !== null) {
+			return $variants;
+		}
+
+		$innerVariants = $this->reflection->getNamedArgumentsVariants();
+		if ($innerVariants === null) {
+			return null;
+		}
+
+		return $this->namedArgumentVariants = $this->resolveVariants($innerVariants);
+	}
+
+	/**
+	 * @param ExtendedParametersAcceptor[] $variants
+	 * @return list<ResolvedFunctionVariant>
+	 */
+	private function resolveVariants(array $variants): array
+	{
+		$result = [];
+		foreach ($variants as $variant) {
+			$result[] = new ResolvedFunctionVariantWithOriginal(
 				$variant,
 				$this->resolvedTemplateTypeMap,
+				$this->callSiteVarianceMap,
 				[],
 			);
 		}
 
-		$this->variants = $variants;
-
-		return $variants;
+		return $result;
 	}
 
 	public function getDeclaringClass(): ClassReflection
 	{
 		return $this->reflection->getDeclaringClass();
-	}
-
-	public function getDeclaringTrait(): ?ClassReflection
-	{
-		if ($this->reflection instanceof PhpMethodReflection) {
-			return $this->reflection->getDeclaringTrait();
-		}
-
-		return null;
 	}
 
 	public function isStatic(): bool
@@ -105,9 +133,24 @@ class ResolvedMethodReflection implements ExtendedMethodReflection
 		return $this->reflection->isFinal();
 	}
 
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return $this->reflection->isFinalByKeyword();
+	}
+
 	public function isInternal(): TrinaryLogic
 	{
 		return $this->reflection->isInternal();
+	}
+
+	public function isBuiltin(): TrinaryLogic
+	{
+		$builtin = $this->reflection->isBuiltin();
+		if (is_bool($builtin)) {
+			return TrinaryLogic::createFromBoolean($builtin);
+		}
+
+		return $builtin;
 	}
 
 	public function getThrowType(): ?Type
@@ -117,12 +160,32 @@ class ResolvedMethodReflection implements ExtendedMethodReflection
 
 	public function hasSideEffects(): TrinaryLogic
 	{
-		return $this->reflection->hasSideEffects();
+		return $this->hasSideEffects ??= $this->reflection->hasSideEffects();
+	}
+
+	public function isPure(): TrinaryLogic
+	{
+		return $this->reflection->isPure();
+	}
+
+	public function getPureUnlessCallableIsImpureParameters(): array
+	{
+		return $this->reflection->getPureUnlessCallableIsImpureParameters();
 	}
 
 	public function getAsserts(): Assertions
 	{
-		return $this->asserts ??= $this->reflection->getAsserts()->mapTypes(fn (Type $type) => TemplateTypeHelper::resolveTemplateTypes($type, $this->resolvedTemplateTypeMap));
+		return $this->asserts ??= $this->reflection->getAsserts()->mapTypes(fn (Type $type) => TemplateTypeHelper::resolveTemplateTypes(
+			$type,
+			$this->resolvedTemplateTypeMap,
+			$this->callSiteVarianceMap,
+			TemplateTypeVariance::createInvariant(),
+		));
+	}
+
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return $this->reflection->acceptsNamedArguments();
 	}
 
 	public function getSelfOutType(): ?Type
@@ -130,7 +193,12 @@ class ResolvedMethodReflection implements ExtendedMethodReflection
 		if ($this->selfOutType === false) {
 			$selfOutType = $this->reflection->getSelfOutType();
 			if ($selfOutType !== null) {
-				$selfOutType = TemplateTypeHelper::resolveTemplateTypes($selfOutType, $this->resolvedTemplateTypeMap);
+				$selfOutType = TemplateTypeHelper::resolveTemplateTypes(
+					$selfOutType,
+					$this->resolvedTemplateTypeMap,
+					$this->callSiteVarianceMap,
+					TemplateTypeVariance::createInvariant(),
+				);
 			}
 
 			$this->selfOutType = $selfOutType;
@@ -142,6 +210,31 @@ class ResolvedMethodReflection implements ExtendedMethodReflection
 	public function returnsByReference(): TrinaryLogic
 	{
 		return $this->reflection->returnsByReference();
+	}
+
+	public function isAbstract(): TrinaryLogic
+	{
+		$abstract = $this->reflection->isAbstract();
+		if (is_bool($abstract)) {
+			return TrinaryLogic::createFromBoolean($abstract);
+		}
+
+		return $abstract;
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->reflection->getAttributes();
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		return $this->reflection->mustUseReturnValue();
+	}
+
+	public function getResolvedPhpDoc(): ?ResolvedPhpDocBlock
+	{
+		return $this->reflection->getResolvedPhpDoc();
 	}
 
 }

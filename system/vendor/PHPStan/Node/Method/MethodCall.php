@@ -7,8 +7,10 @@ use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\StaticCall;
 use PHPStan\Analyser\Scope;
 
-/** @api */
-class MethodCall
+/**
+ * @api
+ */
+final class MethodCall
 {
 
 	public function __construct(

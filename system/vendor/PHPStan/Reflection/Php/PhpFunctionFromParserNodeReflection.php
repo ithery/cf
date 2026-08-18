@@ -7,38 +7,49 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Function_;
+use PHPStan\Node\NodeScanner;
 use PHPStan\Reflection\Assertions;
+use PHPStan\Reflection\AttributeReflection;
+use PHPStan\Reflection\ExtendedFunctionVariant;
+use PHPStan\Reflection\ExtendedParameterReflection;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\FunctionVariantWithPhpDocs;
-use PHPStan\Reflection\ParameterReflectionWithPhpDocs;
-use PHPStan\Reflection\ParametersAcceptorWithPhpDocs;
 use PHPStan\Reflection\PassedByReference;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Generic\TemplateTypeMap;
+use PHPStan\Type\Generic\TemplateTypeVarianceMap;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypehintHelper;
-use PHPStan\Type\VoidType;
+use function array_map;
 use function array_reverse;
-use function is_array;
 use function is_string;
+use function strtolower;
 
-class PhpFunctionFromParserNodeReflection implements FunctionReflection
+/**
+ * @api
+ */
+class PhpFunctionFromParserNodeReflection implements FunctionReflection, ExtendedParametersAcceptor
 {
 
-	/** @var Function_|ClassMethod */
+	/** @var Function_|ClassMethod|Node\PropertyHook */
 	private Node\FunctionLike $functionLike;
 
-	/** @var FunctionVariantWithPhpDocs[]|null */
+	/** @var list<ExtendedFunctionVariant>|null */
 	private ?array $variants = null;
 
 	/**
-	 * @param Function_|ClassMethod $functionLike
+	 * @param Function_|ClassMethod|Node\PropertyHook $functionLike
 	 * @param Type[] $realParameterTypes
 	 * @param Type[] $phpDocParameterTypes
 	 * @param Type[] $realParameterDefaultValues
+	 * @param array<string, list<AttributeReflection>> $parameterAttributes
 	 * @param Type[] $parameterOutTypes
+	 * @param array<string, bool> $immediatelyInvokedCallableParameters
+	 * @param array<string, Type> $phpDocClosureThisTypeParameters
+	 * @param list<AttributeReflection> $attributes
+	 * @param array<string, bool> $pureUnlessCallableIsImpureParameters
 	 */
 	public function __construct(
 		FunctionLike $functionLike,
@@ -47,21 +58,33 @@ class PhpFunctionFromParserNodeReflection implements FunctionReflection
 		private array $realParameterTypes,
 		private array $phpDocParameterTypes,
 		private array $realParameterDefaultValues,
+		private array $parameterAttributes,
 		private Type $realReturnType,
 		private ?Type $phpDocReturnType,
 		private ?Type $throwType,
 		private ?string $deprecatedDescription,
 		private bool $isDeprecated,
 		private bool $isInternal,
-		private bool $isFinal,
-		private ?bool $isPure,
+		protected ?bool $isPure,
 		private bool $acceptsNamedArguments,
 		private Assertions $assertions,
 		private ?string $phpDocComment,
 		private array $parameterOutTypes,
+		private array $immediatelyInvokedCallableParameters,
+		private array $phpDocClosureThisTypeParameters,
+		private array $attributes,
+		private array $pureUnlessCallableIsImpureParameters,
 	)
 	{
 		$this->functionLike = $functionLike;
+	}
+
+	/**
+	 * @phpstan-assert-if-true PhpMethodFromParserNodeReflection $this
+	 */
+	public function isMethodOrPropertyHook(): bool
+	{
+		return $this instanceof PhpMethodFromParserNodeReflection;
 	}
 
 	protected function getFunctionLike(): FunctionLike
@@ -80,6 +103,11 @@ class PhpFunctionFromParserNodeReflection implements FunctionReflection
 			return $this->functionLike->name->name;
 		}
 
+		if (!$this->functionLike instanceof Function_) {
+			// PropertyHook is handled in PhpMethodFromParserNodeReflection subclass
+			throw new ShouldNotHappenException();
+		}
+
 		if ($this->functionLike->namespacedName === null) {
 			throw new ShouldNotHappenException();
 		}
@@ -87,32 +115,45 @@ class PhpFunctionFromParserNodeReflection implements FunctionReflection
 		return (string) $this->functionLike->namespacedName;
 	}
 
-	/**
-	 * @return ParametersAcceptorWithPhpDocs[]
-	 */
 	public function getVariants(): array
 	{
-		if ($this->variants === null) {
-			$this->variants = [
-				new FunctionVariantWithPhpDocs(
-					$this->templateTypeMap,
-					null,
-					$this->getParameters(),
-					$this->isVariadic(),
-					$this->getReturnType(),
-					$this->phpDocReturnType ?? new MixedType(),
-					$this->realReturnType,
-				),
-			];
-		}
+		return $this->variants ??= [
+			new ExtendedFunctionVariant(
+				$this->getTemplateTypeMap(),
+				$this->getResolvedTemplateTypeMap(),
+				$this->getParameters(),
+				$this->isVariadic(),
+				$this->getReturnType(),
+				$this->getPhpDocReturnType(),
+				$this->getNativeReturnType(),
+			),
+		];
+	}
 
-		return $this->variants;
+	public function getOnlyVariant(): ExtendedParametersAcceptor
+	{
+		return $this;
+	}
+
+	public function getNamedArgumentsVariants(): ?array
+	{
+		return null;
+	}
+
+	public function getTemplateTypeMap(): TemplateTypeMap
+	{
+		return $this->templateTypeMap;
+	}
+
+	public function getResolvedTemplateTypeMap(): TemplateTypeMap
+	{
+		return TemplateTypeMap::createEmpty();
 	}
 
 	/**
-	 * @return ParameterReflectionWithPhpDocs[]
+	 * @return list<ExtendedParameterReflection>
 	 */
-	private function getParameters(): array
+	public function getParameters(): array
 	{
 		$parameters = [];
 		$isOptional = true;
@@ -126,6 +167,21 @@ class PhpFunctionFromParserNodeReflection implements FunctionReflection
 			if (!$parameter->var instanceof Variable || !is_string($parameter->var->name)) {
 				throw new ShouldNotHappenException();
 			}
+
+			if (isset($this->immediatelyInvokedCallableParameters[$parameter->var->name])) {
+				$immediatelyInvokedCallable = TrinaryLogic::createFromBoolean($this->immediatelyInvokedCallableParameters[$parameter->var->name]);
+			} else {
+				$immediatelyInvokedCallable = TrinaryLogic::createMaybe();
+			}
+
+			if (isset($this->phpDocClosureThisTypeParameters[$parameter->var->name])) {
+				$closureThisType = $this->phpDocClosureThisTypeParameters[$parameter->var->name];
+			} else {
+				$closureThisType = null;
+			}
+
+			$pureUnlessCallableIsImpureParameter = TrinaryLogic::createFromBoolean($this->pureUnlessCallableIsImpureParameters[$parameter->var->name] ?? false);
+
 			$parameters[] = new PhpParameterFromParserNodeReflection(
 				$parameter->var->name,
 				$isOptional,
@@ -137,13 +193,17 @@ class PhpFunctionFromParserNodeReflection implements FunctionReflection
 				$this->realParameterDefaultValues[$parameter->var->name] ?? null,
 				$parameter->variadic,
 				$this->parameterOutTypes[$parameter->var->name] ?? null,
+				$immediatelyInvokedCallable,
+				$closureThisType,
+				$this->parameterAttributes[$parameter->var->name] ?? [],
+				$pureUnlessCallableIsImpureParameter,
 			);
 		}
 
 		return array_reverse($parameters);
 	}
 
-	private function isVariadic(): bool
+	public function isVariadic(): bool
 	{
 		foreach ($this->functionLike->getParams() as $parameter) {
 			if ($parameter->variadic) {
@@ -154,9 +214,24 @@ class PhpFunctionFromParserNodeReflection implements FunctionReflection
 		return false;
 	}
 
-	private function getReturnType(): Type
+	public function getReturnType(): Type
 	{
 		return TypehintHelper::decideType($this->realReturnType, $this->phpDocReturnType);
+	}
+
+	public function getPhpDocReturnType(): Type
+	{
+		return $this->phpDocReturnType ?? new MixedType();
+	}
+
+	public function getNativeReturnType(): Type
+	{
+		return $this->realReturnType;
+	}
+
+	public function getCallSiteVarianceMap(): TemplateTypeVarianceMap
+	{
+		return TemplateTypeVarianceMap::createEmpty();
 	}
 
 	public function getDeprecatedDescription(): ?string
@@ -178,15 +253,6 @@ class PhpFunctionFromParserNodeReflection implements FunctionReflection
 		return TrinaryLogic::createFromBoolean($this->isInternal);
 	}
 
-	public function isFinal(): TrinaryLogic
-	{
-		$finalMethod = false;
-		if ($this->functionLike instanceof ClassMethod) {
-			$finalMethod = $this->functionLike->isFinal();
-		}
-		return TrinaryLogic::createFromBoolean($finalMethod || $this->isFinal);
-	}
-
 	public function getThrowType(): ?Type
 	{
 		return $this->throwType;
@@ -194,7 +260,7 @@ class PhpFunctionFromParserNodeReflection implements FunctionReflection
 
 	public function hasSideEffects(): TrinaryLogic
 	{
-		if ($this->getReturnType() instanceof VoidType) {
+		if ($this->getReturnType()->isVoid()->yes()) {
 			return TrinaryLogic::createYes();
 		}
 		if ($this->isPure !== null) {
@@ -211,43 +277,23 @@ class PhpFunctionFromParserNodeReflection implements FunctionReflection
 
 	public function isGenerator(): bool
 	{
-		return $this->nodeIsOrContainsYield($this->functionLike);
+		// the yield scan walks the whole body; reflections for the same node are
+		// recreated per ask, so the answer is memoized on the AST node itself
+		// and lives and dies with the parser-cached AST
+		$cached = $this->functionLike->getAttribute('phpstanIsGenerator');
+		if ($cached !== null) {
+			return $cached;
+		}
+
+		$isGenerator = NodeScanner::nodeIsOrContainsYield($this->functionLike);
+		$this->functionLike->setAttribute('phpstanIsGenerator', $isGenerator);
+
+		return $isGenerator;
 	}
 
-	public function acceptsNamedArguments(): bool
+	public function acceptsNamedArguments(): TrinaryLogic
 	{
-		return $this->acceptsNamedArguments;
-	}
-
-	private function nodeIsOrContainsYield(Node $node): bool
-	{
-		if ($node instanceof Node\Expr\Yield_) {
-			return true;
-		}
-
-		if ($node instanceof Node\Expr\YieldFrom) {
-			return true;
-		}
-
-		foreach ($node->getSubNodeNames() as $nodeName) {
-			$nodeProperty = $node->$nodeName;
-
-			if ($nodeProperty instanceof Node && $this->nodeIsOrContainsYield($nodeProperty)) {
-				return true;
-			}
-
-			if (!is_array($nodeProperty)) {
-				continue;
-			}
-
-			foreach ($nodeProperty as $nodePropertyArrayItem) {
-				if ($nodePropertyArrayItem instanceof Node && $this->nodeIsOrContainsYield($nodePropertyArrayItem)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return TrinaryLogic::createFromBoolean($this->acceptsNamedArguments);
 	}
 
 	public function getAsserts(): Assertions
@@ -263,6 +309,38 @@ class PhpFunctionFromParserNodeReflection implements FunctionReflection
 	public function returnsByReference(): TrinaryLogic
 	{
 		return TrinaryLogic::createFromBoolean($this->functionLike->returnsByRef());
+	}
+
+	public function isPure(): TrinaryLogic
+	{
+		if ($this->isPure === null) {
+			return TrinaryLogic::createMaybe();
+		}
+
+		return TrinaryLogic::createFromBoolean($this->isPure);
+	}
+
+	/**
+	 * @return array<string, TrinaryLogic>
+	 */
+	public function getPureUnlessCallableIsImpureParameters(): array
+	{
+		return array_map(static fn (bool $value): TrinaryLogic => TrinaryLogic::createFromBoolean($value), $this->pureUnlessCallableIsImpureParameters);
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->attributes;
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		foreach ($this->attributes as $attrib) {
+			if (strtolower($attrib->getName()) === 'nodiscard') {
+				return TrinaryLogic::createYes();
+			}
+		}
+		return TrinaryLogic::createNo();
 	}
 
 }

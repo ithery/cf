@@ -2,10 +2,12 @@
 
 namespace PHPStan\Reflection\ReflectionProvider;
 
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\DependencyInjection\Container;
 use PHPStan\Reflection\ReflectionProvider;
 
-class LazyReflectionProviderProvider implements ReflectionProviderProvider
+#[AutowiredService(as: ReflectionProviderProvider::class)]
+final class LazyReflectionProviderProvider implements ReflectionProviderProvider
 {
 
 	public function __construct(private Container $container)

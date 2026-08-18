@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Traits;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\CollectedDataNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -13,7 +14,8 @@ use function strtolower;
 /**
  * @implements Rule<CollectedDataNode>
  */
-class NotAnalysedTraitRule implements Rule
+#[RegisteredRule(level: 4)]
+final class NotAnalysedTraitRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -23,6 +25,10 @@ class NotAnalysedTraitRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
+		if ($node->isOnlyFilesAnalysis()) {
+			return [];
+		}
+
 		$traitDeclarationData = $node->get(TraitDeclarationCollector::class);
 		$traitUseData = $node->get(TraitUseCollector::class);
 
@@ -49,6 +55,7 @@ class NotAnalysedTraitRule implements Rule
 			))
 				->file($file)
 				->line($line)
+				->identifier('trait.unused')
 				->tip('See: https://phpstan.org/blog/how-phpstan-analyses-traits')
 				->build();
 		}

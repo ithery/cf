@@ -4,7 +4,10 @@ namespace PHPStan\PhpDoc\Tag;
 
 use PHPStan\Type\Type;
 
-class SelfOutTypeTag implements TypedTag
+/**
+ * @api
+ */
+final class SelfOutTypeTag implements TypedTag
 {
 
 	public function __construct(private Type $type)
@@ -16,10 +19,7 @@ class SelfOutTypeTag implements TypedTag
 		return $this->type;
 	}
 
-	/**
-	 * @return self
-	 */
-	public function withType(Type $type): TypedTag
+	public function withType(Type $type): self
 	{
 		return new self($type);
 	}

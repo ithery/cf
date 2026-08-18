@@ -2,11 +2,14 @@
 
 namespace PHPStan\Node;
 
+use Override;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\NodeAbstract;
 
-/** @api */
-class LiteralArrayNode extends NodeAbstract implements VirtualNode
+/**
+ * @api
+ */
+final class LiteralArrayNode extends NodeAbstract implements VirtualNode
 {
 
 	/**
@@ -25,6 +28,7 @@ class LiteralArrayNode extends NodeAbstract implements VirtualNode
 		return $this->itemNodes;
 	}
 
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Node_LiteralArray';
@@ -33,6 +37,7 @@ class LiteralArrayNode extends NodeAbstract implements VirtualNode
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];

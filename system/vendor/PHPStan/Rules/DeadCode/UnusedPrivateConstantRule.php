@@ -4,21 +4,30 @@ namespace PHPStan\Rules\DeadCode;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredExtensions;
+use PHPStan\DependencyInjection\ExtensionsCollection;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\ClassConstantsNode;
-use PHPStan\Rules\Constants\AlwaysUsedClassConstantsExtensionProvider;
+use PHPStan\Rules\Constants\AlwaysUsedClassConstantsExtension;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\ShouldNotHappenException;
-use PHPStan\Type\TypeWithClassName;
+use PHPStan\Type\ObjectType;
 use function sprintf;
 
 /**
  * @implements Rule<ClassConstantsNode>
  */
-class UnusedPrivateConstantRule implements Rule
+#[RegisteredRule(level: 4)]
+final class UnusedPrivateConstantRule implements Rule
 {
 
-	public function __construct(private AlwaysUsedClassConstantsExtensionProvider $extensionProvider)
+	/**
+	 * @param ExtensionsCollection<AlwaysUsedClassConstantsExtension> $extensions
+	 */
+	public function __construct(
+		#[AutowiredExtensions(of: AlwaysUsedClassConstantsExtension::class)]
+		private ExtensionsCollection $extensions,
+	)
 	{
 	}
 
@@ -32,11 +41,9 @@ class UnusedPrivateConstantRule implements Rule
 		if (!$node->getClass() instanceof Node\Stmt\Class_ && !$node->getClass() instanceof Node\Stmt\Enum_) {
 			return [];
 		}
-		if (!$scope->isInClass()) {
-			throw new ShouldNotHappenException();
-		}
 
-		$classReflection = $scope->getClassReflection();
+		$classReflection = $node->getClassReflection();
+		$classType = new ObjectType($classReflection->getName(), classReflection: $classReflection);
 
 		$constants = [];
 		foreach ($node->getConstants() as $constant) {
@@ -48,7 +55,7 @@ class UnusedPrivateConstantRule implements Rule
 				$constantName = $const->name->toString();
 
 				$constantReflection = $classReflection->getConstant($constantName);
-				foreach ($this->extensionProvider->getExtensions() as $extension) {
+				foreach ($this->extensions->getAll() as $extension) {
 					if ($extension->isAlwaysUsed($constantReflection)) {
 						continue 2;
 					}
@@ -60,24 +67,35 @@ class UnusedPrivateConstantRule implements Rule
 
 		foreach ($node->getFetches() as $fetch) {
 			$fetchNode = $fetch->getNode();
+
+			$fetchScope = $fetch->getScope();
+			if ($fetchNode->class instanceof Node\Name) {
+				$fetchedOnClass = $fetchScope->resolveTypeByName($fetchNode->class);
+			} else {
+				$fetchedOnClass = $fetchScope->getType($fetchNode->class)->getObjectTypeOrClassStringObjectType();
+			}
+
 			if (!$fetchNode->name instanceof Node\Identifier) {
+				if (!$classType->isSuperTypeOf($fetchedOnClass)->no()) {
+					$constants = [];
+					break;
+				}
 				continue;
 			}
 
-			if ($fetchNode->class instanceof Node\Name) {
-				$fetchScope = $fetch->getScope();
-				$fetchedOnClass = $fetchScope->resolveName($fetchNode->class);
-				if ($fetchedOnClass !== $classReflection->getName()) {
-					continue;
+			$constantReflection = $fetchScope->getConstantReflection($fetchedOnClass, $fetchNode->name->toString());
+			if ($constantReflection === null) {
+				if (!$classType->isSuperTypeOf($fetchedOnClass)->no()) {
+					unset($constants[$fetchNode->name->toString()]);
 				}
-			} else {
-				$classExprType = $fetch->getScope()->getType($fetchNode->class);
-				if (!$classExprType instanceof TypeWithClassName) {
-					continue;
+				continue;
+			}
+
+			if ($constantReflection->getDeclaringClass()->getName() !== $classReflection->getName()) {
+				if (!$classType->isSuperTypeOf($fetchedOnClass)->no()) {
+					unset($constants[$fetchNode->name->toString()]);
 				}
-				if ($classExprType->getClassName() !== $classReflection->getName()) {
-					continue;
-				}
+				continue;
 			}
 
 			unset($constants[$fetchNode->name->toString()]);
@@ -86,14 +104,8 @@ class UnusedPrivateConstantRule implements Rule
 		$errors = [];
 		foreach ($constants as $constantName => $constantNode) {
 			$errors[] = RuleErrorBuilder::message(sprintf('Constant %s::%s is unused.', $classReflection->getDisplayName(), $constantName))
-				->line($constantNode->getLine())
-				->identifier('deadCode.unusedClassConstant')
-				->metadata([
-					'classOrder' => $node->getClass()->getAttribute('statementOrder'),
-					'classDepth' => $node->getClass()->getAttribute('statementDepth'),
-					'classStartLine' => $node->getClass()->getStartLine(),
-					'constantName' => $constantName,
-				])
+				->line($constantNode->getStartLine())
+				->identifier('classConstant.unused')
 				->tip(sprintf('See: %s', 'https://phpstan.org/developing-extensions/always-used-class-constants'))
 				->build();
 		}

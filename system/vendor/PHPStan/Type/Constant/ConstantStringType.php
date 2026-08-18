@@ -5,17 +5,27 @@ namespace PHPStan\Type\Constant;
 use Nette\Utils\RegexpException;
 use Nette\Utils\Strings;
 use PhpParser\Node\Name;
+use PHPStan\Analyser\OutOfClassScope;
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprStringNode;
+use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\Reflection\Callables\FunctionCallableVariant;
+use PHPStan\Reflection\ClassConstantReflection;
 use PHPStan\Reflection\ClassMemberAccessAnswerer;
-use PHPStan\Reflection\ConstantReflection;
 use PHPStan\Reflection\InaccessibleMethod;
-use PHPStan\Reflection\ParametersAcceptor;
+use PHPStan\Reflection\PhpVersionStaticAccessor;
 use PHPStan\Reflection\ReflectionProviderStaticAccessor;
 use PHPStan\Reflection\TrivialParametersAcceptor;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Accessory\AccessoryLiteralStringType;
+use PHPStan\Type\Accessory\AccessoryLowercaseStringType;
 use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
 use PHPStan\Type\Accessory\AccessoryNonFalsyStringType;
+use PHPStan\Type\Accessory\AccessoryNumericStringType;
+use PHPStan\Type\Accessory\AccessoryUppercaseStringType;
+use PHPStan\Type\ClassNameToObjectTypeResult;
 use PHPStan\Type\ClassStringType;
 use PHPStan\Type\CompoundType;
 use PHPStan\Type\ConstantScalarType;
@@ -23,9 +33,12 @@ use PHPStan\Type\ErrorType;
 use PHPStan\Type\GeneralizePrecision;
 use PHPStan\Type\Generic\GenericClassStringType;
 use PHPStan\Type\Generic\TemplateType;
+use PHPStan\Type\InstanceofDeprecated;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntersectionType;
+use PHPStan\Type\IsSuperTypeOfResult;
 use PHPStan\Type\MixedType;
+use PHPStan\Type\NeverType;
 use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\StaticType;
@@ -33,16 +46,24 @@ use PHPStan\Type\StringType;
 use PHPStan\Type\Traits\ConstantScalarTypeTrait;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
+use PHPStan\Type\UnionType;
 use PHPStan\Type\VerbosityLevel;
 use function addcslashes;
+use function array_unique;
+use function array_values;
+use function in_array;
 use function is_float;
 use function is_int;
 use function is_numeric;
 use function key;
 use function strlen;
+use function strtolower;
+use function strtoupper;
 use function substr;
+use function substr_count;
 
 /** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::getConstantStrings()')]
 class ConstantStringType extends StringType implements ConstantScalarType
 {
 
@@ -52,6 +73,11 @@ class ConstantStringType extends StringType implements ConstantScalarType
 	use ConstantScalarToBooleanTrait;
 
 	private ?ObjectType $objectType = null;
+
+	private ?Type $arrayKeyType = null;
+
+	/** @var array<int, string> */
+	private array $cachedDescriptions = [];
 
 	/** @api */
 	public function __construct(private string $value, private bool $isClassString = false)
@@ -64,22 +90,47 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		return $this->value;
 	}
 
-	public function isClassString(): bool
+	public function getConstantStrings(): array
+	{
+		return [$this];
+	}
+
+	public function isClassString(): TrinaryLogic
 	{
 		if ($this->isClassString) {
-			return true;
+			return TrinaryLogic::createYes();
 		}
 
 		$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
 
-		return $reflectionProvider->hasClass($this->value);
+		return TrinaryLogic::createFromBoolean($reflectionProvider->hasClass($this->value));
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		if ($this->isClassString()->yes()) {
+			return new ObjectType($this->value);
+		}
+
+		return new ErrorType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return $this->getClassStringObjectType();
 	}
 
 	public function describe(VerbosityLevel $level): string
 	{
+		$levelValue = $level->getLevelValue();
+
+		if (isset($this->cachedDescriptions[$levelValue])) {
+			return $this->cachedDescriptions[$levelValue];
+		}
+
 		return $level->handle(
 			static fn (): string => 'string',
-			function (): string {
+			function () use ($levelValue): string {
 				$value = $this->value;
 
 				if (!$this->isClassString) {
@@ -90,27 +141,28 @@ class ConstantStringType extends StringType implements ConstantScalarType
 					}
 				}
 
-				return self::export($value);
+				return $this->cachedDescriptions[$levelValue] = self::export($value);
 			},
-			fn (): string => self::export($this->value),
+			fn (): string => $this->cachedDescriptions[$levelValue] = self::export($this->value),
 		);
 	}
 
 	private function export(string $value): string
 	{
-		if (Strings::match($value, '([\000-\037])') !== null) {
+		$escapedValue = addcslashes($value, "\0..\37");
+		if ($escapedValue !== $value) {
 			return '"' . addcslashes($value, "\0..\37\\\"") . '"';
 		}
 
 		return "'" . addcslashes($value, '\\\'') . "'";
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof GenericClassStringType) {
 			$genericType = $type->getGenericType();
 			if ($genericType instanceof MixedType) {
-				return TrinaryLogic::createMaybe();
+				return IsSuperTypeOfResult::createMaybe();
 			}
 			if ($genericType instanceof StaticType) {
 				$genericType = $genericType->getStaticObjectType();
@@ -130,27 +182,27 @@ class ConstantStringType extends StringType implements ConstantScalarType
 
 			// Explicitly handle the uncertainty for Yes & Maybe.
 			if ($isSuperType->yes()) {
-				return TrinaryLogic::createMaybe();
+				return IsSuperTypeOfResult::createMaybe();
 			}
-			return TrinaryLogic::createNo();
+			return IsSuperTypeOfResult::createNo();
 		}
 		if ($type instanceof ClassStringType) {
-			return $this->isClassString() ? TrinaryLogic::createMaybe() : TrinaryLogic::createNo();
+			return $this->isClassString()->yes() ? IsSuperTypeOfResult::createMaybe() : IsSuperTypeOfResult::createNo();
 		}
 
 		if ($type instanceof self) {
-			return $this->value === $type->value ? TrinaryLogic::createYes() : TrinaryLogic::createNo();
+			return $this->value === $type->value ? IsSuperTypeOfResult::createYes() : IsSuperTypeOfResult::createNo();
 		}
 
 		if ($type instanceof parent) {
-			return TrinaryLogic::createMaybe();
+			return IsSuperTypeOfResult::createMaybe();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
 		}
 
-		return TrinaryLogic::createNo();
+		return IsSuperTypeOfResult::createNo();
 	}
 
 	public function isCallable(): TrinaryLogic
@@ -175,10 +227,19 @@ class ConstantStringType extends StringType implements ConstantScalarType
 
 			$classRef = $reflectionProvider->getClass($matches[1]);
 			if ($classRef->hasMethod($matches[2])) {
+				$phpVersion = PhpVersionStaticAccessor::getInstance();
+				if (!$phpVersion->supportsCallableInstanceMethods()) {
+					$method = $classRef->getMethod($matches[2], new OutOfClassScope());
+
+					if (!$method->isStatic()) {
+						return TrinaryLogic::createNo();
+					}
+				}
+
 				return TrinaryLogic::createYes();
 			}
 
-			if (!$classRef->getNativeReflection()->isFinal()) {
+			if (!$classRef->isFinalByKeyword()) {
 				return TrinaryLogic::createMaybe();
 			}
 
@@ -188,17 +249,19 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		return TrinaryLogic::createNo();
 	}
 
-	/**
-	 * @return ParametersAcceptor[]
-	 */
 	public function getCallableParametersAcceptors(ClassMemberAccessAnswerer $scope): array
 	{
+		if ($this->value === '') {
+			return [];
+		}
+
 		$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
 
 		// 'my_function'
 		$functionName = new Name($this->value);
 		if ($reflectionProvider->hasFunction($functionName, null)) {
-			return $reflectionProvider->getFunction($functionName, null)->getVariants();
+			$function = $reflectionProvider->getFunction($functionName, null);
+			return FunctionCallableVariant::createFromVariants($function, $function->getVariants());
 		}
 
 		// 'MyClass::myStaticFunction'
@@ -215,10 +278,10 @@ class ConstantStringType extends StringType implements ConstantScalarType
 					return [new InaccessibleMethod($method)];
 				}
 
-				return $method->getVariants();
+				return FunctionCallableVariant::createFromVariants($method, $method->getVariants());
 			}
 
-			if (!$classReflection->getNativeReflection()->isFinal()) {
+			if (!$classReflection->isFinalByKeyword()) {
 				return [new TrivialParametersAcceptor()];
 			}
 		}
@@ -229,7 +292,6 @@ class ConstantStringType extends StringType implements ConstantScalarType
 	public function toNumber(): Type
 	{
 		if (is_numeric($this->value)) {
-			/** @var mixed $value */
 			$value = $this->value;
 			$value = +$value;
 			if (is_float($value)) {
@@ -240,6 +302,71 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		}
 
 		return new ErrorType();
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new ConstantStringType(~$this->value);
+	}
+
+	public function toObjectTypeForInstanceofCheck(): ClassNameToObjectTypeResult
+	{
+		return new ClassNameToObjectTypeResult(new ObjectType($this->value), false);
+	}
+
+	public function toObjectTypeForIsACheck(Type $objectOrClassType, bool $allowString, bool $allowSameClass): ClassNameToObjectTypeResult
+	{
+		$objectOrClassTypeClassNames = $objectOrClassType->getObjectClassNames();
+		if ($allowString) {
+			foreach ($objectOrClassType->getConstantStrings() as $constantString) {
+				$objectOrClassTypeClassNames[] = $constantString->getValue();
+			}
+			$objectOrClassTypeClassNames = array_values(array_unique($objectOrClassTypeClassNames));
+		}
+
+		$uncertainty = false;
+		if (!$allowSameClass) {
+			if ($objectOrClassTypeClassNames === [$this->value]) {
+				$isSameClass = true;
+				foreach ($objectOrClassType->getObjectClassReflections() as $classReflection) {
+					if (!$classReflection->isFinal()) {
+						$isSameClass = false;
+						break;
+					}
+				}
+
+				if ($isSameClass) {
+					return new ClassNameToObjectTypeResult(new NeverType(), false);
+				}
+			}
+
+			if (
+				// For object, as soon as the exact same type is provided
+				// in the list we cannot be sure of the result
+				in_array($this->value, $objectOrClassTypeClassNames, true)
+				// This also occurs for generic class string
+				|| ($allowString && $objectOrClassTypeClassNames === [] && $objectOrClassType->isSuperTypeOf($this)->yes())
+			) {
+				$uncertainty = true;
+			}
+		}
+
+		if ($allowString) {
+			return new ClassNameToObjectTypeResult(
+				new UnionType([
+					new ObjectType($this->value),
+					new GenericClassStringType(new ObjectType($this->value)),
+				]),
+				$uncertainty,
+			);
+		}
+
+		return new ClassNameToObjectTypeResult(new ObjectType($this->value), $uncertainty);
+	}
+
+	public function toAbsoluteNumber(): Type
+	{
+		return $this->toNumber()->toAbsoluteNumber();
 	}
 
 	public function toInteger(): Type
@@ -254,9 +381,18 @@ class ConstantStringType extends StringType implements ConstantScalarType
 
 	public function toArrayKey(): Type
 	{
+		if ($this->arrayKeyType !== null) {
+			return $this->arrayKeyType;
+		}
+
 		/** @var int|string $offsetValue */
 		$offsetValue = key([$this->value => null]);
-		return is_int($offsetValue) ? new ConstantIntegerType($offsetValue) : new ConstantStringType($offsetValue);
+
+		if ($offsetValue === $this->value) {
+			return $this;
+		}
+
+		return $this->arrayKeyType = is_int($offsetValue) ? new ConstantIntegerType($offsetValue) : new ConstantStringType($offsetValue);
 	}
 
 	public function isString(): TrinaryLogic
@@ -269,6 +405,11 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		return TrinaryLogic::createFromBoolean(is_numeric($this->getValue()));
 	}
 
+	public function isDecimalIntegerString(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean((string) (int) $this->value === $this->value);
+	}
+
 	public function isNonEmptyString(): TrinaryLogic
 	{
 		return TrinaryLogic::createFromBoolean($this->getValue() !== '');
@@ -276,7 +417,7 @@ class ConstantStringType extends StringType implements ConstantScalarType
 
 	public function isNonFalsyString(): TrinaryLogic
 	{
-		return TrinaryLogic::createFromBoolean($this->getValue() !== '' && $this->getValue() !== '0');
+		return TrinaryLogic::createFromBoolean(!in_array($this->getValue(), ['', '0'], true));
 	}
 
 	public function isLiteralString(): TrinaryLogic
@@ -284,12 +425,22 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		return TrinaryLogic::createYes();
 	}
 
+	public function isLowercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean(strtolower($this->value) === $this->value);
+	}
+
+	public function isUppercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean(strtoupper($this->value) === $this->value);
+	}
+
 	public function hasOffsetValueType(Type $offsetType): TrinaryLogic
 	{
-		if ($offsetType instanceof ConstantIntegerType) {
-			return TrinaryLogic::createFromBoolean(
-				$offsetType->getValue() < strlen($this->value),
-			);
+		if ($offsetType->isInteger()->yes()) {
+			$strlen = strlen($this->value);
+			$strLenType = IntegerRangeType::fromInterval(-$strlen, $strlen - 1);
+			return $strLenType->isSuperTypeOf($offsetType)->result;
 		}
 
 		return parent::hasOffsetValueType($offsetType);
@@ -297,12 +448,35 @@ class ConstantStringType extends StringType implements ConstantScalarType
 
 	public function getOffsetValueType(Type $offsetType): Type
 	{
-		if ($offsetType instanceof ConstantIntegerType) {
-			if ($offsetType->getValue() < strlen($this->value)) {
-				return new self($this->value[$offsetType->getValue()]);
+		if ($offsetType->isInteger()->yes()) {
+			$strlen = strlen($this->value);
+			$strLenType = IntegerRangeType::fromInterval(-$strlen, $strlen - 1);
+
+			if ($offsetType instanceof ConstantIntegerType) {
+				if ($strLenType->isSuperTypeOf($offsetType)->yes()) {
+					return new self($this->value[$offsetType->getValue()]);
+				}
+
+				return new ErrorType();
 			}
 
-			return new ErrorType();
+			$intersected = TypeCombinator::intersect($strLenType, $offsetType);
+			if ($intersected instanceof IntegerRangeType) {
+				$finiteTypes = $intersected->getFiniteTypes();
+				if ($finiteTypes === []) {
+					return parent::getOffsetValueType($offsetType);
+				}
+
+				$chars = [];
+				foreach ($finiteTypes as $constantInteger) {
+					$chars[] = new self($this->value[$constantInteger->getValue()]);
+				}
+				if (!$strLenType->isSuperTypeOf($offsetType)->yes()) {
+					$chars[] = new self('');
+				}
+
+				return TypeCombinator::union(...$chars);
+			}
 		}
 
 		return parent::getOffsetValueType($offsetType);
@@ -335,6 +509,11 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		return parent::setOffsetValueType($offsetType, $valueType);
 	}
 
+	public function setExistingOffsetValueType(Type $offsetType, Type $valueType): Type
+	{
+		return parent::setOffsetValueType($offsetType, $valueType);
+	}
+
 	public function append(self $otherString): self
 	{
 		return new self($this->getValue() . $otherString->getValue());
@@ -351,19 +530,30 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		}
 
 		if ($this->getValue() !== '' && $precision->isMoreSpecific()) {
-			if ($this->getValue() !== '0') {
-				return new IntersectionType([
-					new StringType(),
-					new AccessoryNonFalsyStringType(),
-					new AccessoryLiteralStringType(),
-				]);
+			$accessories = [
+				new StringType(),
+				new AccessoryLiteralStringType(),
+			];
+
+			if (is_numeric($this->getValue())) {
+				$accessories[] = new AccessoryNumericStringType();
 			}
 
-			return new IntersectionType([
-				new StringType(),
-				new AccessoryNonEmptyStringType(),
-				new AccessoryLiteralStringType(),
-			]);
+			if ($this->getValue() !== '0') {
+				$accessories[] = new AccessoryNonFalsyStringType();
+			} else {
+				$accessories[] = new AccessoryNonEmptyStringType();
+			}
+
+			if (strtolower($this->getValue()) === $this->getValue()) {
+				$accessories[] = new AccessoryLowercaseStringType();
+			}
+
+			if (strtoupper($this->getValue()) === $this->getValue()) {
+				$accessories[] = new AccessoryUppercaseStringType();
+			}
+
+			return new IntersectionType($accessories);
 		}
 
 		if ($precision->isMoreSpecific()) {
@@ -376,7 +566,7 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		return new StringType();
 	}
 
-	public function getSmallerType(): Type
+	public function getSmallerType(PhpVersion $phpVersion): Type
 	{
 		$subtractedTypes = [
 			new ConstantBooleanType(true),
@@ -395,7 +585,7 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		return TypeCombinator::remove(new MixedType(), TypeCombinator::union(...$subtractedTypes));
 	}
 
-	public function getSmallerOrEqualType(): Type
+	public function getSmallerOrEqualType(PhpVersion $phpVersion): Type
 	{
 		$subtractedTypes = [
 			IntegerRangeType::createAllGreaterThan((float) $this->value),
@@ -408,7 +598,7 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		return TypeCombinator::remove(new MixedType(), TypeCombinator::union(...$subtractedTypes));
 	}
 
-	public function getGreaterType(): Type
+	public function getGreaterType(PhpVersion $phpVersion): Type
 	{
 		$subtractedTypes = [
 			new ConstantBooleanType(false),
@@ -422,7 +612,7 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		return TypeCombinator::remove(new MixedType(), TypeCombinator::union(...$subtractedTypes));
 	}
 
-	public function getGreaterOrEqualType(): Type
+	public function getGreaterOrEqualType(PhpVersion $phpVersion): Type
 	{
 		$subtractedTypes = [
 			IntegerRangeType::createAllSmallerThan((float) $this->value),
@@ -437,7 +627,7 @@ class ConstantStringType extends StringType implements ConstantScalarType
 
 	public function canAccessConstants(): TrinaryLogic
 	{
-		return TrinaryLogic::createFromBoolean($this->isClassString());
+		return $this->isClassString();
 	}
 
 	public function hasConstant(string $constantName): TrinaryLogic
@@ -445,7 +635,7 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		return $this->getObjectType()->hasConstant($constantName);
 	}
 
-	public function getConstant(string $constantName): ConstantReflection
+	public function getConstant(string $constantName): ClassConstantReflection
 	{
 		return $this->getObjectType()->getConstant($constantName);
 	}
@@ -455,12 +645,13 @@ class ConstantStringType extends StringType implements ConstantScalarType
 		return $this->objectType ??= new ObjectType($this->value);
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function toPhpDocNode(): TypeNode
 	{
-		return new self($properties['value'], $properties['isClassString'] ?? false);
+		if (substr_count($this->value, "\n") > 0) {
+			return $this->generalize(GeneralizePrecision::moreSpecific())->toPhpDocNode();
+		}
+
+		return new ConstTypeNode(new ConstExprStringNode($this->value, ConstExprStringNode::SINGLE_QUOTED));
 	}
 
 }

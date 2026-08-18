@@ -2,12 +2,14 @@
 
 namespace PHPStan\PhpDoc;
 
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 
-class PhpDocStringResolver
+#[AutowiredService]
+final class PhpDocStringResolver
 {
 
 	public function __construct(private Lexer $phpDocLexer, private PhpDocParser $phpDocParser)
@@ -18,7 +20,7 @@ class PhpDocStringResolver
 	{
 		$tokens = new TokenIterator($this->phpDocLexer->tokenize($phpDocString));
 		$phpDocNode = $this->phpDocParser->parse($tokens);
-		$tokens->consumeTokenType(Lexer::TOKEN_END); // @phpstan-ignore-line
+		$tokens->consumeTokenType(Lexer::TOKEN_END); // @phpstan-ignore missingType.checkedException
 
 		return $phpDocNode;
 	}

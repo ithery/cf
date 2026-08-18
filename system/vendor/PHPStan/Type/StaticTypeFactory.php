@@ -2,13 +2,16 @@
 
 namespace PHPStan\Type;
 
+use ArrayAccess;
+use PHPStan\Type\Accessory\AccessoryArrayListType;
+use PHPStan\Type\Accessory\NonEmptyArrayType;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantFloatType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\Constant\ConstantStringType;
 
-class StaticTypeFactory
+final class StaticTypeFactory
 {
 
 	public static function falsey(): Type
@@ -16,7 +19,7 @@ class StaticTypeFactory
 		static $falsey;
 
 		if ($falsey === null) {
-			$falsey = new UnionType([
+			$falsey = TypeCombinator::union(
 				new NullType(),
 				new ConstantBooleanType(false),
 				new ConstantIntegerType(0),
@@ -24,7 +27,7 @@ class StaticTypeFactory
 				new ConstantStringType(''),
 				new ConstantStringType('0'),
 				new ConstantArrayType([], []),
-			]);
+			);
 		}
 
 		return $falsey;
@@ -35,10 +38,53 @@ class StaticTypeFactory
 		static $truthy;
 
 		if ($truthy === null) {
-			$truthy = new MixedType(false, self::falsey());
+			$truthy = new MixedType(subtractedType: self::falsey());
 		}
 
 		return $truthy;
+	}
+
+	public static function argv(): Type
+	{
+		return new IntersectionType([
+			new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), new StringType()),
+			new NonEmptyArrayType(),
+			new AccessoryArrayListType(),
+		]);
+	}
+
+	public static function argc(): Type
+	{
+		return IntegerRangeType::fromInterval(1, null);
+	}
+
+	public static function generalOffsetAccessibleType(): Type
+	{
+		static $generalOffsetAccessible;
+
+		if ($generalOffsetAccessible === null) {
+			$generalOffsetAccessible = TypeCombinator::union(
+				new ArrayType(new MixedType(), new MixedType()),
+				new ObjectType(ArrayAccess::class),
+				new NullType(),
+			);
+		}
+
+		return $generalOffsetAccessible;
+	}
+
+	public static function intOffsetAccessibleType(): Type
+	{
+		static $intOffsetAccessible;
+
+		if ($intOffsetAccessible === null) {
+			$intOffsetAccessible = TypeCombinator::union(
+				self::generalOffsetAccessibleType(),
+				new StringType(),
+			);
+		}
+
+		return $intOffsetAccessible;
 	}
 
 }

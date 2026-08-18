@@ -6,6 +6,7 @@ use PhpParser\Node;
 use PhpParser\Node\Expr\Clone_;
 use PhpParser\Node\Expr\Variable;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
@@ -18,7 +19,8 @@ use function sprintf;
 /**
  * @implements Rule<Node\Expr\Clone_>
  */
-class VariableCloningRule implements Rule
+#[RegisteredRule(level: 3)]
+final class VariableCloningRule implements Rule
 {
 
 	public function __construct(private RuleLevelHelper $ruleLevelHelper)
@@ -52,7 +54,7 @@ class VariableCloningRule implements Rule
 					'Cannot clone non-object variable $%s of type %s.',
 					$node->expr->name,
 					$type->describe(VerbosityLevel::typeOnly()),
-				))->build(),
+				))->identifier('clone.nonObject')->build(),
 			];
 		}
 
@@ -60,7 +62,7 @@ class VariableCloningRule implements Rule
 			RuleErrorBuilder::message(sprintf(
 				'Cannot clone %s.',
 				$type->describe(VerbosityLevel::typeOnly()),
-			))->build(),
+			))->identifier('clone.nonObject')->build(),
 		];
 	}
 

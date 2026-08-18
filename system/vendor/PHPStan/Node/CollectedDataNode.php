@@ -2,20 +2,23 @@
 
 namespace PHPStan\Node;
 
+use Override;
 use PhpParser\Node;
 use PhpParser\NodeAbstract;
 use PHPStan\Collectors\CollectedData;
 use PHPStan\Collectors\Collector;
-use function array_key_exists;
 
-/** @api */
-class CollectedDataNode extends NodeAbstract
+/**
+ * @api
+ * @phpstan-import-type CollectorData from CollectedData
+ */
+final class CollectedDataNode extends NodeAbstract implements VirtualNode
 {
 
 	/**
-	 * @param CollectedData[] $collectedData
+	 * @param CollectorData $collectedData
 	 */
-	public function __construct(private array $collectedData)
+	public function __construct(private array $collectedData, private bool $onlyFiles)
 	{
 		parent::__construct([]);
 	}
@@ -29,22 +32,30 @@ class CollectedDataNode extends NodeAbstract
 	public function get(string $collectorType): array
 	{
 		$result = [];
-		foreach ($this->collectedData as $collectedData) {
-			if ($collectedData->getCollectorType() !== $collectorType) {
+		foreach ($this->collectedData as $filePath => $collectedDataPerCollector) {
+			if (!isset($collectedDataPerCollector[$collectorType])) {
 				continue;
 			}
 
-			$filePath = $collectedData->getFilePath();
-			if (!array_key_exists($filePath, $result)) {
-				$result[$filePath] = [];
+			foreach ($collectedDataPerCollector[$collectorType] as $rawData) {
+				$result[$filePath][] = $rawData;
 			}
-
-			$result[$filePath][] = $collectedData->getData();
 		}
 
 		return $result;
 	}
 
+	/**
+	 * Indicates that only files were passed to the analyser, not directory paths.
+	 *
+	 * True being returned strongly suggests that it's a partial analysis, not full project analysis.
+	 */
+	public function isOnlyFilesAnalysis(): bool
+	{
+		return $this->onlyFiles;
+	}
+
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Node_CollectedDataNode';
@@ -53,6 +64,7 @@ class CollectedDataNode extends NodeAbstract
 	/**
 	 * @return array{}
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];

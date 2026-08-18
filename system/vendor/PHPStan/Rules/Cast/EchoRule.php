@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Cast;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
@@ -15,7 +16,8 @@ use function sprintf;
 /**
  * @implements Rule<Node\Stmt\Echo_>
  */
-class EchoRule implements Rule
+#[RegisteredRule(level: 2)]
+final class EchoRule implements Rule
 {
 
 	public function __construct(private RuleLevelHelper $ruleLevelHelper)
@@ -49,7 +51,7 @@ class EchoRule implements Rule
 				'Parameter #%d (%s) of echo cannot be converted to string.',
 				$key + 1,
 				$typeResult->getType()->describe(VerbosityLevel::value()),
-			))->line($expr->getLine())->build();
+			))->identifier('echo.nonString')->line($expr->getStartLine())->build();
 		}
 		return $messages;
 	}

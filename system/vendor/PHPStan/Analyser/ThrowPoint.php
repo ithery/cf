@@ -8,15 +8,17 @@ use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 use Throwable;
 
-/** @api */
-class ThrowPoint
+/**
+ * @api
+ */
+final class ThrowPoint
 {
 
 	/**
 	 * @param Node\Expr|Node\Stmt $node
 	 */
 	private function __construct(
-		private MutatingScope $scope,
+		private Scope $scope,
 		private Type $type,
 		private Node $node,
 		private bool $explicit,
@@ -28,7 +30,7 @@ class ThrowPoint
 	/**
 	 * @param Node\Expr|Node\Stmt $node
 	 */
-	public static function createExplicit(MutatingScope $scope, Type $type, Node $node, bool $canContainAnyThrowable): self
+	public static function createExplicit(Scope $scope, Type $type, Node $node, bool $canContainAnyThrowable): self
 	{
 		return new self($scope, $type, $node, true, $canContainAnyThrowable);
 	}
@@ -36,12 +38,12 @@ class ThrowPoint
 	/**
 	 * @param Node\Expr|Node\Stmt $node
 	 */
-	public static function createImplicit(MutatingScope $scope, Node $node): self
+	public static function createImplicit(Scope $scope, Node $node): self
 	{
-		return new self($scope, new ObjectType(Throwable::class), $node, false, true);
+		return new self($scope, new ObjectType(Throwable::class), $node, explicit: false, canContainAnyThrowable: true);
 	}
 
-	public function getScope(): MutatingScope
+	public function getScope(): Scope
 	{
 		return $this->scope;
 	}

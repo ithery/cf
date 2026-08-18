@@ -4,6 +4,7 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Type\ArrayType;
@@ -15,7 +16,8 @@ use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
 use function count;
 
-class PregFilterFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class PregFilterFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -25,14 +27,19 @@ class PregFilterFunctionReturnTypeExtension implements DynamicFunctionReturnType
 
 	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
 	{
-		$defaultReturn = ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+		$args = $functionCall->getArgs();
+		$defaultReturn = ParametersAcceptorSelector::selectFromArgs(
+			$scope,
+			$args,
+			$functionReflection->getVariants(),
+		)->getReturnType();
 
-		$argsCount = count($functionCall->getArgs());
+		$argsCount = count($args);
 		if ($argsCount < 3) {
 			return $defaultReturn;
 		}
 
-		$subjectType = $scope->getType($functionCall->getArgs()[2]->value);
+		$subjectType = $scope->getType($args[2]->value);
 
 		if ($subjectType->isArray()->yes()) {
 			return new ArrayType(new IntegerType(), new StringType());

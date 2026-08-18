@@ -4,9 +4,13 @@ namespace PHPStan\Rules\Classes;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Rules\ClassCaseSensitivityCheck;
+use PHPStan\Rules\ClassNameCheck;
 use PHPStan\Rules\ClassNameNodePair;
+use PHPStan\Rules\ClassNameUsageLocation;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function array_map;
@@ -15,12 +19,16 @@ use function sprintf;
 /**
  * @implements Rule<Node\Stmt\Interface_>
  */
-class ExistingClassesInInterfaceExtendsRule implements Rule
+#[RegisteredRule(level: 0)]
+#[ValidatesStubFiles]
+final class ExistingClassesInInterfaceExtendsRule implements Rule
 {
 
 	public function __construct(
-		private ClassCaseSensitivityCheck $classCaseSensitivityCheck,
+		private ClassNameCheck $classCheck,
 		private ReflectionProvider $reflectionProvider,
+		#[AutowiredParameter(ref: '%tips.discoveringSymbols%')]
+		private bool $discoveringSymbolsTip,
 	)
 	{
 	}
@@ -32,20 +40,32 @@ class ExistingClassesInInterfaceExtendsRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$messages = $this->classCaseSensitivityCheck->checkClassNames(
+		$currentInterfaceName = (string) $node->namespacedName;
+		$messages = $this->classCheck->checkClassNames(
+			$scope,
 			array_map(static fn (Node\Name $interfaceName): ClassNameNodePair => new ClassNameNodePair((string) $interfaceName, $interfaceName), $node->extends),
+			ClassNameUsageLocation::from(ClassNameUsageLocation::INTERFACE_EXTENDS, [
+				'currentClassName' => $currentInterfaceName,
+			]),
 		);
 
-		$currentInterfaceName = (string) $node->namespacedName;
 		foreach ($node->extends as $extends) {
 			$extendedInterfaceName = (string) $extends;
 			if (!$this->reflectionProvider->hasClass($extendedInterfaceName)) {
 				if (!$scope->isInClassExists($extendedInterfaceName)) {
-					$messages[] = RuleErrorBuilder::message(sprintf(
+					$errorBuilder = RuleErrorBuilder::message(sprintf(
 						'Interface %s extends unknown interface %s.',
 						$currentInterfaceName,
 						$extendedInterfaceName,
-					))->nonIgnorable()->discoveringSymbolsTip()->build();
+					))
+						->identifier('interface.notFound')
+						->nonIgnorable();
+
+					if ($this->discoveringSymbolsTip) {
+						$errorBuilder->discoveringSymbolsTip();
+					}
+
+					$messages[] = $errorBuilder->build();
 				}
 			} else {
 				$reflection = $this->reflectionProvider->getClass($extendedInterfaceName);
@@ -54,19 +74,28 @@ class ExistingClassesInInterfaceExtendsRule implements Rule
 						'Interface %s extends class %s.',
 						$currentInterfaceName,
 						$reflection->getDisplayName(),
-					))->nonIgnorable()->build();
+					))
+						->identifier('interfaceExtends.class')
+						->nonIgnorable()
+						->build();
 				} elseif ($reflection->isTrait()) {
 					$messages[] = RuleErrorBuilder::message(sprintf(
 						'Interface %s extends trait %s.',
 						$currentInterfaceName,
 						$reflection->getDisplayName(),
-					))->nonIgnorable()->build();
+					))
+						->identifier('interfaceExtends.trait')
+						->nonIgnorable()
+						->build();
 				} elseif ($reflection->isEnum()) {
 					$messages[] = RuleErrorBuilder::message(sprintf(
 						'Interface %s extends enum %s.',
 						$currentInterfaceName,
 						$reflection->getDisplayName(),
-					))->nonIgnorable()->build();
+					))
+						->identifier('interfaceExtends.enum')
+						->nonIgnorable()
+						->build();
 				}
 			}
 

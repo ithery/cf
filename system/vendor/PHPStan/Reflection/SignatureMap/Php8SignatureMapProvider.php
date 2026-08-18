@@ -2,12 +2,15 @@
 
 namespace PHPStan\Reflection\SignatureMap;
 
+use PhpParser\Node\AttributeGroup;
+use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Expr\Variable;
-use PhpParser\Node\FunctionLike;
 use PhpParser\Node\Scalar\String_;
+use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Function_;
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionMethod;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Php8StubsMap;
 use PHPStan\PhpDoc\Tag\ParamTag;
@@ -15,11 +18,13 @@ use PHPStan\Reflection\BetterReflection\SourceLocator\FileNodesFetcher;
 use PHPStan\Reflection\InitializerExprContext;
 use PHPStan\Reflection\InitializerExprTypeResolver;
 use PHPStan\Reflection\PassedByReference;
+use PHPStan\Reflection\ReflectionProvider\ReflectionProviderProvider;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\FileTypeMapper;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\ParserNodeTypeToPHPStanType;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\TypehintHelper;
 use ReflectionFunctionAbstract;
 use function array_key_exists;
@@ -30,13 +35,17 @@ use function is_string;
 use function sprintf;
 use function strtolower;
 
-class Php8SignatureMapProvider implements SignatureMapProvider
+#[AutowiredService(as: Php8SignatureMapProvider::class)]
+final class Php8SignatureMapProvider implements SignatureMapProvider
 {
 
 	private const DIRECTORY = __DIR__ . '/../../../vendor/phpstan/php-8-stubs';
 
-	/** @var array<string, array<string, array{ClassMethod, string}>> */
+	/** @var array<lowercase-string, array<lowercase-string, array{ClassMethod, string}>> */
 	private array $methodNodes = [];
+
+	/** @var array<lowercase-string, array<lowercase-string, Type|null>> */
+	private array $constantTypes = [];
 
 	private Php8StubsMap $map;
 
@@ -46,6 +55,7 @@ class Php8SignatureMapProvider implements SignatureMapProvider
 		private FileTypeMapper $fileTypeMapper,
 		private PhpVersion $phpVersion,
 		private InitializerExprTypeResolver $initializerExprTypeResolver,
+		private ReflectionProviderProvider $reflectionProviderProvider,
 	)
 	{
 		$this->map = new Php8StubsMap($phpVersion->getVersionId());
@@ -54,9 +64,6 @@ class Php8SignatureMapProvider implements SignatureMapProvider
 	public function hasMethodSignature(string $className, string $methodName): bool
 	{
 		$lowerClassName = strtolower($className);
-		if ($lowerClassName === 'backedenum') {
-			return false;
-		}
 		if (!array_key_exists($lowerClassName, $this->map->classes)) {
 			return $this->functionSignatureMapProvider->hasMethodSignature($className, $methodName);
 		}
@@ -70,14 +77,29 @@ class Php8SignatureMapProvider implements SignatureMapProvider
 
 	/**
 	 * @return array{ClassMethod, string}|null
-	 * @throws ShouldNotHappenException
 	 */
 	private function findMethodNode(string $className, string $methodName): ?array
 	{
 		$lowerClassName = strtolower($className);
 		$lowerMethodName = strtolower($methodName);
+
+		$this->findClassStubs($className);
 		if (isset($this->methodNodes[$lowerClassName][$lowerMethodName])) {
 			return $this->methodNodes[$lowerClassName][$lowerMethodName];
+		}
+
+		return null;
+	}
+
+	private function findClassStubs(string $className): void
+	{
+		$lowerClassName = strtolower($className);
+
+		if (
+			isset($this->methodNodes[$lowerClassName])
+			|| isset($this->constantTypes[$lowerClassName])
+		) {
+			return;
 		}
 
 		$stubFile = self::DIRECTORY . '/' . $this->map->classes[$lowerClassName];
@@ -92,25 +114,45 @@ class Php8SignatureMapProvider implements SignatureMapProvider
 			throw new ShouldNotHappenException(sprintf('Class %s stub not found in %s.', $className, $stubFile));
 		}
 
+		$this->methodNodes[$lowerClassName] = [];
+		$this->constantTypes[$lowerClassName] = [];
+
+		// find and remember all methods/constants within the stubFile
 		foreach ($class[0]->getNode()->stmts as $stmt) {
-			if (!$stmt instanceof ClassMethod) {
+			if ($stmt instanceof ClassMethod) {
+				if (!$this->isForCurrentVersion($stmt->attrGroups)) {
+					continue;
+				}
+
+				$this->methodNodes[$lowerClassName][$stmt->name->toLowerString()] = [$stmt, $stubFile];
+
 				continue;
 			}
 
-			if ($stmt->name->toLowerString() === $lowerMethodName) {
-				if (!$this->isForCurrentVersion($stmt)) {
+			if (!$stmt instanceof ClassConst) {
+				continue;
+			}
+
+			foreach ($stmt->consts as $const) {
+				if ($stmt->type === null) {
 					continue;
 				}
-				return $this->methodNodes[$lowerClassName][$lowerMethodName] = [$stmt, $stubFile];
+
+				if (!$this->isForCurrentVersion($stmt->attrGroups)) {
+					continue;
+				}
+
+				$this->constantTypes[$lowerClassName][$const->name->toLowerString()] = ParserNodeTypeToPHPStanType::resolve($stmt->type, null);
 			}
 		}
-
-		return null;
 	}
 
-	private function isForCurrentVersion(FunctionLike $functionLike): bool
+	/**
+	 * @param AttributeGroup[] $attrGroups
+	 */
+	private function isForCurrentVersion(array $attrGroups): bool
 	{
-		foreach ($functionLike->getAttrGroups() as $attrGroup) {
+		foreach ($attrGroups as $attrGroup) {
 			foreach ($attrGroup->attrs as $attr) {
 				if ($attr->name->toString() === 'Until') {
 					$arg = $attr->args[0]->value;
@@ -173,7 +215,7 @@ class Php8SignatureMapProvider implements SignatureMapProvider
 			return $this->getMergedSignatures($signature, $functionMapSignatures);
 		}
 
-		return [$signature];
+		return ['positional' => [$signature], 'named' => null];
 	}
 
 	public function getFunctionSignatures(string $functionName, ?string $className, ReflectionFunctionAbstract|null $reflectionFunction): array
@@ -190,7 +232,7 @@ class Php8SignatureMapProvider implements SignatureMapProvider
 			throw new ShouldNotHappenException(sprintf('Function %s stub not found in %s.', $functionName, $stubFile));
 		}
 		foreach ($functions[$lowerName] as $functionNode) {
-			if (!$this->isForCurrentVersion($functionNode->getNode())) {
+			if (!$this->isForCurrentVersion($functionNode->getNode()->getAttrGroups())) {
 				continue;
 			}
 
@@ -201,23 +243,85 @@ class Php8SignatureMapProvider implements SignatureMapProvider
 				return $this->getMergedSignatures($signature, $functionMapSignatures);
 			}
 
-			return [$signature];
+			return ['positional' => [$signature], 'named' => null];
 		}
 
 		throw new ShouldNotHappenException(sprintf('Function %s stub not found in %s.', $functionName, $stubFile));
 	}
 
 	/**
-	 * @param array<int, FunctionSignature> $functionMapSignatures
-	 * @return array<int, FunctionSignature>
+	 * @param array{positional: array<int, FunctionSignature>, named: ?array<int, FunctionSignature>} $functionMapSignatures
+	 * @return array{positional: array<int, FunctionSignature>, named: ?array<int, FunctionSignature>}
 	 */
 	private function getMergedSignatures(FunctionSignature $nativeSignature, array $functionMapSignatures): array
 	{
-		if (count($functionMapSignatures) === 1) {
-			return [$this->mergeSignatures($nativeSignature, $functionMapSignatures[0])];
+		if (count($functionMapSignatures['positional']) === 1) {
+			return ['positional' => [$this->mergeSignatures($nativeSignature, $functionMapSignatures['positional'][0])], 'named' => null];
 		}
 
-		return $functionMapSignatures;
+		if (count($functionMapSignatures['positional']) === 0) {
+			return ['positional' => [], 'named' => null];
+		}
+
+		$nativeParams = $nativeSignature->getParameters();
+		$namedArgumentsVariants = [];
+		$allParamNamesMatchNative = true;
+		foreach ($functionMapSignatures['positional'] as $functionMapSignature) {
+			$isPrevParamVariadic = false;
+			$hasMiddleVariadicParam = false;
+			// avoid weird functions like array_diff_uassoc
+			foreach ($functionMapSignature->getParameters() as $i => $functionParam) {
+				$nativeParam = $nativeParams[$i] ?? null;
+				$allParamNamesMatchNative = $allParamNamesMatchNative && $nativeParam !== null && $functionParam->getName() === $nativeParam->getName();
+				$hasMiddleVariadicParam = $hasMiddleVariadicParam || $isPrevParamVariadic;
+				$isPrevParamVariadic = $functionParam->isVariadic() || (
+					$nativeParam !== null
+						? $nativeParam->isVariadic()
+						: false
+					);
+			}
+
+			if ($hasMiddleVariadicParam) {
+				continue;
+			}
+
+			$parameters = [];
+			foreach ($functionMapSignature->getParameters() as $i => $functionParam) {
+				if (!array_key_exists($i, $nativeParams)) {
+					continue 2;
+				}
+
+				// it seems that variadic parameters cannot be named in native functions/methods.
+				$nativeParam = $nativeParams[$i];
+				if ($nativeParam->isVariadic()) {
+					break;
+				}
+
+				$parameters[] = new ParameterSignature(
+					$nativeParam->getName(),
+					$functionParam->isOptional(),
+					$functionParam->getType(),
+					$functionParam->getNativeType(),
+					$functionParam->passedByReference(),
+					$functionParam->isVariadic(),
+					$functionParam->getDefaultValue() ?? $nativeParam->getDefaultValue(),
+					$functionParam->getOutType() ?? $nativeParam->getOutType(),
+				);
+			}
+
+			$namedArgumentsVariants[] = new FunctionSignature(
+				$parameters,
+				$functionMapSignature->getReturnType(),
+				$functionMapSignature->getNativeReturnType(),
+				$functionMapSignature->isVariadic(),
+			);
+		}
+
+		if ($allParamNamesMatchNative || count($namedArgumentsVariants) === 0) {
+			$namedArgumentsVariants = null;
+		}
+
+		return ['positional' => $functionMapSignatures['positional'], 'named' => $namedArgumentsVariants];
 	}
 
 	private function mergeSignatures(FunctionSignature $nativeSignature, FunctionSignature $functionMapSignature): FunctionSignature
@@ -324,6 +428,13 @@ class Php8SignatureMapProvider implements SignatureMapProvider
 				$phpDocReturnType = $phpDoc->getReturnTag()->getType();
 			}
 		}
+
+		$classReflection = null;
+		if ($className !== null) {
+			$reflectionProvider = $this->reflectionProviderProvider->getReflectionProvider();
+			$classReflection = $reflectionProvider->getClass($className);
+		}
+
 		$parameters = [];
 		$variadic = false;
 		foreach ($function->getParams() as $param) {
@@ -331,11 +442,24 @@ class Php8SignatureMapProvider implements SignatureMapProvider
 			if (!$name instanceof Variable || !is_string($name->name)) {
 				throw new ShouldNotHappenException();
 			}
-			$parameterType = ParserNodeTypeToPHPStanType::resolve($param->type, null);
+			$parameterType = ParserNodeTypeToPHPStanType::resolve($param->type, $classReflection);
+			$phpDocParameterType = $phpDocParameterTypes[$name->name] ?? null;
+
+			if ($param->default instanceof ConstFetch) {
+				$constName = (string) $param->default->name;
+				$loweredConstName = strtolower($constName);
+				if ($loweredConstName === 'null') {
+					$parameterType = TypeCombinator::addNull($parameterType);
+					if ($phpDocParameterType !== null) {
+						$phpDocParameterType = TypeCombinator::addNull($phpDocParameterType);
+					}
+				}
+			}
+
 			$parameters[] = new ParameterSignature(
 				$name->name,
 				$param->default !== null || $param->variadic,
-				TypehintHelper::decideType($parameterType, $phpDocParameterTypes[$name->name] ?? null),
+				TypehintHelper::decideType($parameterType, $phpDocParameterType),
 				$parameterType,
 				$param->byRef ? PassedByReference::createCreatesNewVariable() : PassedByReference::createNo(),
 				$param->variadic,
@@ -349,14 +473,54 @@ class Php8SignatureMapProvider implements SignatureMapProvider
 			$variadic = $variadic || $param->variadic;
 		}
 
-		$returnType = ParserNodeTypeToPHPStanType::resolve($function->getReturnType(), null);
+		$returnType = ParserNodeTypeToPHPStanType::resolve($function->getReturnType(), $classReflection);
 
 		return new FunctionSignature(
 			$parameters,
-			TypehintHelper::decideType($returnType, $phpDocReturnType ?? null),
+			TypehintHelper::decideType($returnType, $phpDocReturnType),
 			$returnType,
 			$variadic,
 		);
+	}
+
+	public function hasClassConstantMetadata(string $className, string $constantName): bool
+	{
+		$lowerClassName = strtolower($className);
+		if (!array_key_exists($lowerClassName, $this->map->classes)) {
+			return false;
+		}
+
+		return $this->findConstantType($className, $constantName) !== null;
+	}
+
+	public function getClassConstantMetadata(string $className, string $constantName): array
+	{
+		$lowerClassName = strtolower($className);
+		if (!array_key_exists($lowerClassName, $this->map->classes)) {
+			throw new ShouldNotHappenException();
+		}
+
+		$type = $this->findConstantType($className, $constantName);
+		if ($type === null) {
+			throw new ShouldNotHappenException();
+		}
+
+		return [
+			'nativeType' => $type,
+		];
+	}
+
+	private function findConstantType(string $className, string $constantName): ?Type
+	{
+		$lowerClassName = strtolower($className);
+		$lowerConstantName = strtolower($constantName);
+
+		$this->findClassStubs($className);
+		if (isset($this->constantTypes[$lowerClassName][$lowerConstantName])) {
+			return $this->constantTypes[$lowerClassName][$lowerConstantName];
+		}
+
+		return null;
 	}
 
 }

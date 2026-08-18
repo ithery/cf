@@ -2,13 +2,22 @@
 
 namespace PHPStan\Analyser;
 
-use PHPStan\Broker\BrokerFactory;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\DependencyInjection\Container;
 use PHPStan\Node\Printer\ExprPrinter;
+use PHPStan\Reflection\MethodsClassReflectionExtension;
+use PHPStan\Reflection\PropertiesClassReflectionExtension;
 use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\Type\DynamicFunctionReturnTypeExtension;
+use PHPStan\Type\DynamicMethodReturnTypeExtension;
+use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
+use PHPStan\Type\FunctionTypeSpecifyingExtension;
+use PHPStan\Type\MethodTypeSpecifyingExtension;
+use PHPStan\Type\StaticMethodTypeSpecifyingExtension;
 use function array_merge;
 
-class TypeSpecifierFactory
+#[AutowiredService(name: 'typeSpecifierFactory')]
+final class TypeSpecifierFactory
 {
 
 	public const FUNCTION_TYPE_SPECIFYING_EXTENSION_TAG = 'phpstan.typeSpecifier.functionTypeSpecifyingExtension';
@@ -21,21 +30,29 @@ class TypeSpecifierFactory
 
 	public function create(): TypeSpecifier
 	{
+		$functionTypeSpecifying = $this->container->getExtensionsCollection(FunctionTypeSpecifyingExtension::class)->getAll();
+		$methodTypeSpecifying = $this->container->getExtensionsCollection(MethodTypeSpecifyingExtension::class)->getAll();
+		$staticMethodTypeSpecifying = $this->container->getExtensionsCollection(StaticMethodTypeSpecifyingExtension::class)->getAll();
+
 		$typeSpecifier = new TypeSpecifier(
 			$this->container->getByType(ExprPrinter::class),
 			$this->container->getByType(ReflectionProvider::class),
-			$this->container->getServicesByTag(self::FUNCTION_TYPE_SPECIFYING_EXTENSION_TAG),
-			$this->container->getServicesByTag(self::METHOD_TYPE_SPECIFYING_EXTENSION_TAG),
-			$this->container->getServicesByTag(self::STATIC_METHOD_TYPE_SPECIFYING_EXTENSION_TAG),
+			$functionTypeSpecifying,
+			$methodTypeSpecifying,
+			$staticMethodTypeSpecifying,
 			$this->container->getParameter('rememberPossiblyImpureFunctionValues'),
+			$this->container,
 		);
 
 		foreach (array_merge(
-			$this->container->getServicesByTag(BrokerFactory::PROPERTIES_CLASS_REFLECTION_EXTENSION_TAG),
-			$this->container->getServicesByTag(BrokerFactory::METHODS_CLASS_REFLECTION_EXTENSION_TAG),
-			$this->container->getServicesByTag(BrokerFactory::DYNAMIC_METHOD_RETURN_TYPE_EXTENSION_TAG),
-			$this->container->getServicesByTag(BrokerFactory::DYNAMIC_STATIC_METHOD_RETURN_TYPE_EXTENSION_TAG),
-			$this->container->getServicesByTag(BrokerFactory::DYNAMIC_FUNCTION_RETURN_TYPE_EXTENSION_TAG),
+			$this->container->getExtensionsCollection(PropertiesClassReflectionExtension::class)->getAll(),
+			$this->container->getExtensionsCollection(MethodsClassReflectionExtension::class)->getAll(),
+			$this->container->getExtensionsCollection(DynamicMethodReturnTypeExtension::class)->getAll(),
+			$this->container->getExtensionsCollection(DynamicStaticMethodReturnTypeExtension::class)->getAll(),
+			$this->container->getExtensionsCollection(DynamicFunctionReturnTypeExtension::class)->getAll(),
+			$functionTypeSpecifying,
+			$methodTypeSpecifying,
+			$staticMethodTypeSpecifying,
 		) as $extension) {
 			if (!($extension instanceof TypeSpecifierAwareExtension)) {
 				continue;

@@ -6,13 +6,17 @@ use Closure;
 use Generator;
 use Iterator;
 use IteratorAggregate;
-use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\Accessory\AccessoryType;
 use PHPStan\Type\CallableType;
+use PHPStan\Type\ClosureType;
 use PHPStan\Type\ConditionalType;
 use PHPStan\Type\ConditionalTypeForParameter;
+use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Generic\GenericObjectType;
+use PHPStan\Type\Generic\GenericStaticType;
 use PHPStan\Type\Generic\TemplateType;
 use PHPStan\Type\Generic\TemplateTypeHelper;
 use PHPStan\Type\IntersectionType;
@@ -20,19 +24,23 @@ use PHPStan\Type\MixedType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeTraverser;
-use PHPStan\Type\TypeWithClassName;
+use PHPStan\Type\UnionType;
+use PHPStan\Type\VerbosityLevel;
 use Traversable;
+use function array_filter;
 use function array_keys;
 use function array_merge;
+use function count;
+use function implode;
 use function in_array;
 use function sprintf;
+use function strtolower;
 
-class MissingTypehintCheck
+#[AutowiredService]
+final class MissingTypehintCheck
 {
 
 	public const MISSING_ITERABLE_VALUE_TYPE_TIP = 'See: https://phpstan.org/blog/solving-phpstan-no-value-type-specified-in-iterable-type';
-
-	public const TURN_OFF_NON_GENERIC_CHECK_TIP = 'You can turn this off by setting <fg=cyan>checkGenericClassInNonGenericObjectType: false</> in your <fg=cyan>%configurationFile%</>.';
 
 	private const ITERABLE_GENERIC_CLASS_NAMES = [
 		Traversable::class,
@@ -45,38 +53,53 @@ class MissingTypehintCheck
 	 * @param string[] $skipCheckGenericClasses
 	 */
 	public function __construct(
-		private ReflectionProvider $reflectionProvider,
-		private bool $disableCheckMissingIterableValueType,
-		private bool $checkMissingIterableValueType,
-		private bool $checkGenericClassInNonGenericObjectType,
+		#[AutowiredParameter]
 		private bool $checkMissingCallableSignature,
+		#[AutowiredParameter(ref: '%featureToggles.skipCheckGenericClasses%')]
 		private array $skipCheckGenericClasses,
+		#[AutowiredParameter(ref: '%featureToggles.checkGenericIterableClasses%')]
+		private bool $checkGenericIterableClasses,
 	)
 	{
 	}
 
 	/**
-	 * @return Type[]
+	 * Each returned string is a fully formatted phrase describing the
+	 * offending type — e.g. `iterable type array` — so callers can drop it
+	 * straight into their error message without further formatting.
+	 *
+	 * @return string[]
 	 */
 	public function getIterableTypesWithMissingValueTypehint(Type $type): array
 	{
-		if (!$this->checkMissingIterableValueType) {
-			if (!$this->disableCheckMissingIterableValueType) {
-				return [];
-			}
-		}
-
-		$iterablesWithMissingValueTypehint = [];
-		TypeTraverser::map($type, function (Type $type, callable $traverse) use (&$iterablesWithMissingValueTypehint): Type {
+		$descriptions = [];
+		TypeTraverser::map($type, function (Type $type, callable $traverse) use (&$descriptions): Type {
 			if ($type instanceof TemplateType) {
 				return $type;
 			}
 			if ($type instanceof AccessoryType) {
 				return $type;
 			}
+			if (
+				$type instanceof IntersectionType
+				&& $type->isCallable()->yes()
+				&& $type->isArray()->yes()
+			) {
+				$nonArrayInner = [];
+				foreach ($type->getTypes() as $innerType) {
+					if ($innerType->isArray()->yes()) {
+						continue;
+					}
+					$nonArrayInner[] = $innerType;
+				}
+				if (count($nonArrayInner) === 1) {
+					return $traverse($nonArrayInner[0]);
+				}
+				return $traverse(new IntersectionType($nonArrayInner));
+			}
 			if ($type instanceof ConditionalType || $type instanceof ConditionalTypeForParameter) {
-				$iterablesWithMissingValueTypehint = array_merge(
-					$iterablesWithMissingValueTypehint,
+				$descriptions = array_merge(
+					$descriptions,
 					$this->getIterableTypesWithMissingValueTypehint($type->getIf()),
 					$this->getIterableTypesWithMissingValueTypehint($type->getElse()),
 				);
@@ -84,44 +107,48 @@ class MissingTypehintCheck
 				return $type;
 			}
 			if ($type->isIterable()->yes()) {
+				if ($type->isConstantArray()->yes()) {
+					$type = TypeTraverser::map($type, static function (Type $type, callable $traverse) {
+						if ($type instanceof UnionType || $type instanceof IntersectionType) {
+							return $traverse($type);
+						}
+
+						if ($type instanceof ConstantArrayType) {
+							$unsealed = $type->getUnsealedTypes();
+							if ($unsealed !== null) {
+								return $traverse($type->dropUnsealedTypes());
+							}
+						}
+
+						return $traverse($type);
+					});
+				}
 				$iterableValue = $type->getIterableValueType();
 				if ($iterableValue instanceof MixedType && !$iterableValue->isExplicitMixed()) {
-					if (
-						$type instanceof TypeWithClassName
-						&& !in_array($type->getClassName(), self::ITERABLE_GENERIC_CLASS_NAMES, true)
-						&& $this->reflectionProvider->hasClass($type->getClassName())
-					) {
-						$classReflection = $this->reflectionProvider->getClass($type->getClassName());
-						if ($classReflection->isGeneric()) {
-							return $type;
-						}
+					$descriptions[] = sprintf('iterable type %s', $type->describe(VerbosityLevel::typeOnly()));
+				}
+				if ($type instanceof IntersectionType) {
+					if ($type->isList()->yes()) {
+						return $traverse($iterableValue);
 					}
-					$iterablesWithMissingValueTypehint[] = $type;
-				}
-				if (!$type instanceof IntersectionType) {
-					return $traverse($type);
-				}
 
-				return $type;
+					return $type;
+				}
 			}
 			return $traverse($type);
 		});
 
-		return $iterablesWithMissingValueTypehint;
+		return $descriptions;
 	}
 
 	/**
-	 * @return array<int, array{string, string[]}>
+	 * @return array<int, array{string, string}>
 	 */
 	public function getNonGenericObjectTypesWithGenericClass(Type $type): array
 	{
-		if (!$this->checkGenericClassInNonGenericObjectType) {
-			return [];
-		}
-
 		$objectTypes = [];
 		TypeTraverser::map($type, function (Type $type, callable $traverse) use (&$objectTypes): Type {
-			if ($type instanceof GenericObjectType) {
+			if ($type instanceof GenericObjectType || $type instanceof GenericStaticType) {
 				$traverse($type);
 				return $type;
 			}
@@ -133,7 +160,13 @@ class MissingTypehintCheck
 				if ($classReflection === null) {
 					return $type;
 				}
-				if (in_array($classReflection->getName(), self::ITERABLE_GENERIC_CLASS_NAMES, true)) {
+				if (
+					$classReflection->getName() === Traversable::class // already covered by getIterableTypesWithMissingValueTypehint
+					|| (
+						!$this->checkGenericIterableClasses &&
+						in_array($classReflection->getName(), self::ITERABLE_GENERIC_CLASS_NAMES, true)
+					)
+				) {
 					// checked by getIterableTypesWithMissingValueTypehint() already
 					return $type;
 				}
@@ -151,9 +184,22 @@ class MissingTypehintCheck
 				if (!$resolvedType instanceof ObjectType) {
 					throw new ShouldNotHappenException();
 				}
+
+				$templateTypes = $classReflection->getTemplateTypeMap()->getTypes();
+				$templateTypesCount = count($templateTypes);
+				$requiredTemplateTypesCount = count(array_filter($templateTypes, static fn (Type $type) => $type instanceof TemplateType && $type->getDefault() === null));
+				if ($requiredTemplateTypesCount === 0) {
+					return $type;
+				}
+
+				$templateTypesList = implode(', ', array_keys($templateTypes));
+				if ($requiredTemplateTypesCount !== $templateTypesCount) {
+					$templateTypesList .= sprintf(' (%d-%d required)', $requiredTemplateTypesCount, $templateTypesCount);
+				}
+
 				$objectTypes[] = [
-					sprintf('%s %s', $classReflection->isInterface() ? 'interface' : 'class', $classReflection->getDisplayName(false)),
-					array_keys($classReflection->getTemplateTypeMap()->getTypes()),
+					sprintf('%s %s', strtolower($classReflection->getClassTypeDescription()), $classReflection->getDisplayName(false)),
+					$templateTypesList,
 				];
 				return $type;
 			}
@@ -176,8 +222,10 @@ class MissingTypehintCheck
 		$result = [];
 		TypeTraverser::map($type, static function (Type $type, callable $traverse) use (&$result): Type {
 			if (
-				($type instanceof CallableType && $type->isCommonCallable()) ||
-				($type instanceof ObjectType && $type->getClassName() === Closure::class)) {
+				($type instanceof CallableType && $type->isCommonCallable())
+				|| ($type instanceof ClosureType && $type->isCommonCallable())
+				|| ($type instanceof ObjectType && $type->getClassName() === Closure::class)
+			) {
 				$result[] = $type;
 			}
 			return $traverse($type);

@@ -3,20 +3,28 @@
 namespace PHPStan\Rules\PhpDoc;
 
 use PhpParser\Node;
+use PhpParser\NodeAbstract;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
+use PHPStan\Node\InPropertyHookNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\FileTypeMapper;
 use PHPStan\Type\ObjectType;
+use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
+use PHPStan\Type\UnionType;
 use PHPStan\Type\VerbosityLevel;
-use PHPStan\Type\VoidType;
 use Throwable;
 use function sprintf;
 
 /**
- * @implements Rule<Node\Stmt>
+ * @implements Rule<NodeAbstract>
  */
-class InvalidThrowsPhpDocValueRule implements Rule
+#[RegisteredRule(level: 2)]
+#[ValidatesStubFiles]
+final class InvalidThrowsPhpDocValueRule implements Rule
 {
 
 	public function __construct(private FileTypeMapper $fileTypeMapper)
@@ -25,18 +33,22 @@ class InvalidThrowsPhpDocValueRule implements Rule
 
 	public function getNodeType(): string
 	{
-		return Node\Stmt::class;
+		return NodeAbstract::class;
 	}
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$docComment = $node->getDocComment();
-		if ($docComment === null) {
+		if ($node instanceof Node\Stmt) {
+			if ($node instanceof Node\Stmt\ClassLike || $node instanceof Node\Stmt\Function_ || $node instanceof Node\Stmt\ClassMethod) {
+				return []; // is handled by virtual nodes
+			}
+		} elseif (!$node instanceof InPropertyHookNode) {
 			return [];
 		}
 
-		if ($node instanceof Node\Stmt\Function_ || $node instanceof Node\Stmt\ClassMethod) {
-			return []; // is handled by virtual nodes
+		$docComment = $node->getDocComment();
+		if ($docComment === null) {
+			return [];
 		}
 
 		$functionName = null;
@@ -57,12 +69,11 @@ class InvalidThrowsPhpDocValueRule implements Rule
 		}
 
 		$phpDocThrowsType = $resolvedPhpDoc->getThrowsTag()->getType();
-		if ((new VoidType())->isSuperTypeOf($phpDocThrowsType)->yes()) {
+		if ($phpDocThrowsType->isVoid()->yes()) {
 			return [];
 		}
 
-		$isThrowsSuperType = (new ObjectType(Throwable::class))->isSuperTypeOf($phpDocThrowsType);
-		if ($isThrowsSuperType->yes()) {
+		if ($this->isThrowsValid($phpDocThrowsType)) {
 			return [];
 		}
 
@@ -70,8 +81,36 @@ class InvalidThrowsPhpDocValueRule implements Rule
 			RuleErrorBuilder::message(sprintf(
 				'PHPDoc tag @throws with type %s is not subtype of Throwable',
 				$phpDocThrowsType->describe(VerbosityLevel::typeOnly()),
-			))->build(),
+			))->identifier('throws.notThrowable')->build(),
 		];
+	}
+
+	private function isThrowsValid(Type $phpDocThrowsType): bool
+	{
+		$throwType = new ObjectType(Throwable::class);
+		if ($phpDocThrowsType instanceof UnionType) {
+			foreach ($phpDocThrowsType->getTypes() as $innerType) {
+				if (!$this->isThrowsValid($innerType)) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		$toIntersectWith = [];
+		foreach ($phpDocThrowsType->getObjectClassReflections() as $classReflection) {
+			if (!$classReflection->isInterface()) {
+				continue;
+			}
+			foreach ($classReflection->getRequireExtendsTags() as $requireExtendsTag) {
+				$toIntersectWith[] = $requireExtendsTag->getType();
+			}
+		}
+
+		return $throwType->isSuperTypeOf(
+			TypeCombinator::intersect($phpDocThrowsType, ...$toIntersectWith),
+		)->yes();
 	}
 
 }

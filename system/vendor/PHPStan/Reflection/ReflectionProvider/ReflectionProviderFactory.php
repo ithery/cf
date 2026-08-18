@@ -2,12 +2,16 @@
 
 namespace PHPStan\Reflection\ReflectionProvider;
 
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ReflectionProvider;
 
-class ReflectionProviderFactory
+#[AutowiredService(name: 'reflectionProviderFactory')]
+final class ReflectionProviderFactory
 {
 
 	public function __construct(
+		#[AutowiredParameter(ref: '@betterReflectionProvider')]
 		private ReflectionProvider $staticReflectionProvider,
 	)
 	{

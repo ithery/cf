@@ -2,21 +2,32 @@
 
 namespace PHPStan\Analyser\ResultCache;
 
-use Nette\DI\Definitions\Statement;
 use Nette\Neon\Neon;
 use PHPStan\Analyser\AnalyserResult;
 use PHPStan\Analyser\Error;
+use PHPStan\Analyser\FileAnalyserResult;
 use PHPStan\Collectors\CollectedData;
 use PHPStan\Command\Output;
+use PHPStan\Dependency\ExportedNode\ExportedTraitNode;
 use PHPStan\Dependency\ExportedNodeFetcher;
+use PHPStan\Dependency\PackageDependencyResolver;
 use PHPStan\Dependency\RootExportedNode;
+use PHPStan\DependencyInjection\AutowiredExtensions;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\ExtensionsCollection;
+use PHPStan\DependencyInjection\GenerateFactory;
+use PHPStan\DependencyInjection\ProjectConfigHelper;
+use PHPStan\ExtensionInstaller\GeneratedConfig;
+use PHPStan\File\CouldNotReadFileException;
+use PHPStan\File\CouldNotWriteFileException;
 use PHPStan\File\FileFinder;
-use PHPStan\File\FileReader;
-use PHPStan\File\FileWriter;
+use PHPStan\File\FileHelper;
+use PHPStan\Internal\ArrayHelper;
 use PHPStan\Internal\ComposerHelper;
 use PHPStan\PhpDoc\StubFilesProvider;
-use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\ShouldNotHappenException;
+use ReflectionClass;
+use ReflectionException;
 use Throwable;
 use function array_diff;
 use function array_fill_keys;
@@ -26,25 +37,40 @@ use function array_keys;
 use function array_merge;
 use function array_unique;
 use function array_values;
+use function class_exists;
 use function count;
+use function error_get_last;
+use function explode;
+use function fclose;
+use function fopen;
+use function fwrite;
 use function get_loaded_extensions;
+use function getenv;
+use function hash_file;
+use function implode;
 use function is_array;
+use function is_dir;
 use function is_file;
-use function is_string;
 use function ksort;
-use function sha1;
+use function microtime;
 use function sort;
 use function sprintf;
-use function str_replace;
+use function str_starts_with;
+use function substr;
 use function time;
 use function unlink;
 use function var_export;
 use const PHP_VERSION_ID;
 
-class ResultCacheManager
+/**
+ * @phpstan-import-type LinesToIgnore from FileAnalyserResult
+ * @phpstan-import-type CollectorData from CollectedData
+ */
+#[GenerateFactory(interface: ResultCacheManagerFactory::class)]
+final class ResultCacheManager
 {
 
-	private const CACHE_VERSION = 'v10-collectedData';
+	private const CACHE_VERSION = 'v13-packageDependencies';
 
 	/** @var array<string, string> */
 	private array $fileHashes = [];
@@ -54,28 +80,49 @@ class ResultCacheManager
 
 	/**
 	 * @param string[] $analysedPaths
+	 * @param string[] $analysedPathsFromConfig
 	 * @param string[] $composerAutoloaderProjectPaths
 	 * @param string[] $bootstrapFiles
 	 * @param string[] $scanFiles
 	 * @param string[] $scanDirectories
+	 * @param list<string|non-empty-list<string>> $parametersNotInvalidatingCache
 	 * @param array<string, string> $fileReplacements
+	 * @param ExtensionsCollection<ResultCacheMetaExtension> $resultCacheMetaExtensions
 	 */
 	public function __construct(
+		#[AutowiredExtensions(of: ResultCacheMetaExtension::class)]
+		private ExtensionsCollection $resultCacheMetaExtensions,
 		private ExportedNodeFetcher $exportedNodeFetcher,
+		#[AutowiredParameter(ref: '@fileFinderScan')]
 		private FileFinder $scanFileFinder,
-		private ReflectionProvider $reflectionProvider,
 		private StubFilesProvider $stubFilesProvider,
+		private FileHelper $fileHelper,
+		private PackageDependencyResolver $packageDependencyResolver,
+		#[AutowiredParameter(ref: '%resultCachePath%')]
 		private string $cacheFilePath,
-		private string $tempResultCachePath,
+		#[AutowiredParameter]
 		private array $analysedPaths,
+		#[AutowiredParameter]
+		private array $analysedPathsFromConfig,
+		#[AutowiredParameter]
 		private array $composerAutoloaderProjectPaths,
+		#[AutowiredParameter]
 		private string $usedLevel,
+		#[AutowiredParameter]
 		private ?string $cliAutoloadFile,
+		#[AutowiredParameter]
 		private array $bootstrapFiles,
+		#[AutowiredParameter]
 		private array $scanFiles,
+		#[AutowiredParameter]
 		private array $scanDirectories,
 		private array $fileReplacements,
+		#[AutowiredParameter(ref: '%resultCacheChecksProjectExtensionFilesDependencies%')]
 		private bool $checkDependenciesOfProjectExtensionFiles,
+		#[AutowiredParameter]
+		private array $parametersNotInvalidatingCache,
+		#[AutowiredParameter(ref: '%resultCacheSkipIfOlderThanDays%')]
+		private int $skipResultCacheIfOlderThanDays,
 	)
 	{
 	}
@@ -84,105 +131,339 @@ class ResultCacheManager
 	 * @param string[] $allAnalysedFiles
 	 * @param mixed[]|null $projectConfigArray
 	 */
-	public function restore(array $allAnalysedFiles, bool $debug, bool $onlyFiles, ?array $projectConfigArray, Output $output, ?string $resultCacheName = null): ResultCache
+	public function restore(array $allAnalysedFiles, bool $debug, bool $onlyFiles, ?array $projectConfigArray, Output $output): ResultCache
 	{
+		$startTime = microtime(true);
+		$currentFileHashes = [];
+		foreach ($allAnalysedFiles as $analysedFile) {
+			if (!is_file($analysedFile)) {
+				continue;
+			}
+			$currentFileHashes[$analysedFile] = $this->getFileHash($analysedFile);
+		}
 		if ($debug) {
-			if ($output->isDebug()) {
+			if ($output->isVeryVerbose()) {
 				$output->writeLineFormatted('Result cache not used because of debug mode.');
 			}
-			return new ResultCache($allAnalysedFiles, true, time(), $this->getMeta($allAnalysedFiles, $projectConfigArray), [], [], [], []);
+			return new ResultCache(
+				filesToAnalyse: $allAnalysedFiles,
+				fullAnalysis: true,
+				lastFullAnalysisTime: time(),
+				meta: $this->getMeta($allAnalysedFiles, $projectConfigArray),
+				errors: [],
+				locallyIgnoredErrors: [],
+				linesToIgnore: [],
+				unmatchedLineIgnores: [],
+				collectedData: [],
+				dependencies: [],
+				usedTraitDependencies: [],
+				packageDependencies: [],
+				exportedNodes: [],
+				projectExtensionFiles: [],
+				currentFileHashes: $currentFileHashes,
+			);
 		}
 		if ($onlyFiles) {
-			if ($output->isDebug()) {
+			if ($output->isVeryVerbose()) {
 				$output->writeLineFormatted('Result cache not used because only files were passed as analysed paths.');
 			}
-			return new ResultCache($allAnalysedFiles, true, time(), $this->getMeta($allAnalysedFiles, $projectConfigArray), [], [], [], []);
+			return new ResultCache(
+				filesToAnalyse: $allAnalysedFiles,
+				fullAnalysis: true,
+				lastFullAnalysisTime: time(),
+				meta: $this->getMeta($allAnalysedFiles, $projectConfigArray),
+				errors: [],
+				locallyIgnoredErrors: [],
+				linesToIgnore: [],
+				unmatchedLineIgnores: [],
+				collectedData: [],
+				dependencies: [],
+				usedTraitDependencies: [],
+				packageDependencies: [],
+				exportedNodes: [],
+				projectExtensionFiles: [],
+				currentFileHashes: $currentFileHashes,
+			);
 		}
 
 		$cacheFilePath = $this->cacheFilePath;
-		if ($resultCacheName !== null) {
-			$tmpCacheFile = $this->tempResultCachePath . '/' . $resultCacheName . '.php';
-			if (is_file($tmpCacheFile)) {
-				$cacheFilePath = $tmpCacheFile;
-			}
-		}
-
 		if (!is_file($cacheFilePath)) {
-			if ($output->isDebug()) {
+			if ($output->isVeryVerbose()) {
 				$output->writeLineFormatted('Result cache not used because the cache file does not exist.');
 			}
-			return new ResultCache($allAnalysedFiles, true, time(), $this->getMeta($allAnalysedFiles, $projectConfigArray), [], [], [], []);
+			return new ResultCache(
+				filesToAnalyse: $allAnalysedFiles,
+				fullAnalysis: true,
+				lastFullAnalysisTime: time(),
+				meta: $this->getMeta($allAnalysedFiles, $projectConfigArray),
+				errors: [],
+				locallyIgnoredErrors: [],
+				linesToIgnore: [],
+				unmatchedLineIgnores: [],
+				collectedData: [],
+				dependencies: [],
+				usedTraitDependencies: [],
+				packageDependencies: [],
+				exportedNodes: [],
+				projectExtensionFiles: [],
+				currentFileHashes: $currentFileHashes,
+			);
 		}
 
 		try {
 			$data = require $cacheFilePath;
 		} catch (Throwable $e) {
-			if ($output->isDebug()) {
+			if ($output->isVeryVerbose()) {
 				$output->writeLineFormatted(sprintf('Result cache not used because an error occurred while loading the cache file: %s', $e->getMessage()));
 			}
 
 			@unlink($cacheFilePath);
 
-			return new ResultCache($allAnalysedFiles, true, time(), $this->getMeta($allAnalysedFiles, $projectConfigArray), [], [], [], []);
+			return new ResultCache(
+				filesToAnalyse: $allAnalysedFiles,
+				fullAnalysis: true,
+				lastFullAnalysisTime: time(),
+				meta: $this->getMeta($allAnalysedFiles, $projectConfigArray),
+				errors: [],
+				locallyIgnoredErrors: [],
+				linesToIgnore: [],
+				unmatchedLineIgnores: [],
+				collectedData: [],
+				dependencies: [],
+				usedTraitDependencies: [],
+				packageDependencies: [],
+				exportedNodes: [],
+				projectExtensionFiles: [],
+				currentFileHashes: $currentFileHashes,
+			);
 		}
 
 		if (!is_array($data)) {
 			@unlink($cacheFilePath);
-			if ($output->isDebug()) {
+			if ($output->isVeryVerbose()) {
 				$output->writeLineFormatted('Result cache not used because the cache file is corrupted.');
 			}
 
-			return new ResultCache($allAnalysedFiles, true, time(), $this->getMeta($allAnalysedFiles, $projectConfigArray), [], [], [], []);
+			return new ResultCache(
+				filesToAnalyse: $allAnalysedFiles,
+				fullAnalysis: true,
+				lastFullAnalysisTime: time(),
+				meta: $this->getMeta($allAnalysedFiles, $projectConfigArray),
+				errors: [],
+				locallyIgnoredErrors: [],
+				linesToIgnore: [],
+				unmatchedLineIgnores: [],
+				collectedData: [],
+				dependencies: [],
+				usedTraitDependencies: [],
+				packageDependencies: [],
+				exportedNodes: [],
+				projectExtensionFiles: [],
+				currentFileHashes: $currentFileHashes,
+			);
 		}
 
 		$meta = $this->getMeta($allAnalysedFiles, $projectConfigArray);
+		$packageDependencies = $data['packageDependencies'] ?? [];
+		$packageSeededFiles = [];
 		if ($this->isMetaDifferent($data['meta'], $meta)) {
-			if ($output->isDebug()) {
-				$output->writeLineFormatted('Result cache not used because the metadata do not match.');
+			$diffs = $this->getMetaKeyDifferences($data['meta'], $meta);
+
+			// If the metadata differ ONLY in the Composer lock/installed files, the generated container
+			// and analysis are unchanged except for code coming from packages whose version actually
+			// changed. Re-analyse just the files depending on a changed package instead of everything;
+			// the existing incremental loop below then propagates to their dependents on signature change.
+			// Any other meta difference, or an undetermined change set (installed.php cannot be parsed),
+			// falls back to a full re-analysis.
+			$changedPackages = array_diff($diffs, ['composerLocks', 'composerInstalled']) === []
+				? $this->packageDependencyResolver->getChangedComposerPackages($data['meta'], $meta)
+				: null;
+
+			if ($changedPackages === null) {
+				if ($output->isVeryVerbose()) {
+					$output->writeLineFormatted('Result cache not used because the metadata do not match: ' . implode(', ', $diffs));
+				}
+				return new ResultCache(
+					filesToAnalyse: $allAnalysedFiles,
+					fullAnalysis: true,
+					lastFullAnalysisTime: time(),
+					meta: $meta,
+					errors: [],
+					locallyIgnoredErrors: [],
+					linesToIgnore: [],
+					unmatchedLineIgnores: [],
+					collectedData: [],
+					dependencies: [],
+					usedTraitDependencies: [],
+					packageDependencies: [],
+					exportedNodes: [],
+					projectExtensionFiles: [],
+					currentFileHashes: $currentFileHashes,
+				);
 			}
-			return new ResultCache($allAnalysedFiles, true, time(), $meta, [], [], [], []);
+
+			if ($changedPackages === []) {
+				// The Composer lock/installed metadata changed but no installed package's version or
+				// reference did (e.g. a composer.lock regenerated with different formatting or dist/time
+				// metadata, common in CI where composer.lock is not committed). Nothing analysis-relevant
+				// changed, so keep the restored cache and fall through to the normal incremental analysis
+				// instead of re-analysing everything.
+				if ($output->isVeryVerbose()) {
+					$output->writeLineFormatted('Composer metadata changed but no package versions changed; keeping the result cache.');
+				}
+			} else {
+				$changedPackagesLookup = array_fill_keys($changedPackages, true);
+				if ($this->changedPackagesProvideContainerClass($projectConfigArray, $changedPackagesLookup)) {
+					// One of the changed packages registers a class in the PHPStan container (a rule,
+					// extension, and so on). Such code can affect the analysis of every file, not just the
+					// files that reference it, so the file-granular re-seed below is not enough - re-analyse
+					// everything.
+					if ($output->isVeryVerbose()) {
+						$output->writeLineFormatted(sprintf(
+							'Composer packages changed (%s) and register a class in the container; re-analysing everything.',
+							implode(', ', $changedPackages),
+						));
+					}
+					return new ResultCache(
+						filesToAnalyse: $allAnalysedFiles,
+						fullAnalysis: true,
+						lastFullAnalysisTime: time(),
+						meta: $meta,
+						errors: [],
+						locallyIgnoredErrors: [],
+						linesToIgnore: [],
+						unmatchedLineIgnores: [],
+						collectedData: [],
+						dependencies: [],
+						usedTraitDependencies: [],
+						packageDependencies: [],
+						exportedNodes: [],
+						projectExtensionFiles: [],
+						currentFileHashes: $currentFileHashes,
+					);
+				}
+
+				if ($output->isVeryVerbose()) {
+					$output->writeLineFormatted(sprintf(
+						'Composer packages changed (%s); re-analysing only the files depending on them.',
+						implode(', ', $changedPackages),
+					));
+				}
+				foreach ($packageDependencies as $packageDependentFile => $filePackages) {
+					foreach ($filePackages as $filePackage) {
+						if (isset($changedPackagesLookup[$filePackage])) {
+							$packageSeededFiles[] = $packageDependentFile;
+							break;
+						}
+					}
+				}
+			}
 		}
 
-		if (time() - $data['lastFullAnalysisTime'] >= 60 * 60 * 24 * 7) {
-			if ($output->isDebug()) {
-				$output->writeLineFormatted('Result cache not used because it\'s more than 7 days since last full analysis.');
+		$daysOldForSkip = $this->skipResultCacheIfOlderThanDays;
+		if (time() - $data['lastFullAnalysisTime'] >= 60 * 60 * 24 * $daysOldForSkip) {
+			if ($output->isVeryVerbose()) {
+				$output->writeLineFormatted(sprintf("Result cache not used because it's more than %d days since last full analysis.", $daysOldForSkip));
 			}
-			// run full analysis if the result cache is older than 7 days
-			return new ResultCache($allAnalysedFiles, true, time(), $meta, [], [], [], []);
+
+			// run full analysis if the result cache is older than X days
+			return new ResultCache(
+				filesToAnalyse: $allAnalysedFiles,
+				fullAnalysis: true,
+				lastFullAnalysisTime: time(),
+				meta: $meta,
+				errors: [],
+				locallyIgnoredErrors: [],
+				linesToIgnore: [],
+				unmatchedLineIgnores: [],
+				collectedData: [],
+				dependencies: [],
+				usedTraitDependencies: [],
+				packageDependencies: [],
+				exportedNodes: [],
+				projectExtensionFiles: [],
+				currentFileHashes: $currentFileHashes,
+			);
 		}
 
-		foreach ($data['projectExtensionFiles'] as $extensionFile => $fileHash) {
+		/**
+		 * @var string $fileHash
+		 * @var bool $isAnalysed
+		 */
+		foreach ($data['projectExtensionFiles'] as $extensionFile => [$fileHash, $isAnalysed]) {
+			if (!$isAnalysed) {
+				continue;
+			}
 			if (!is_file($extensionFile)) {
-				if ($output->isDebug()) {
+				if ($output->isVeryVerbose()) {
 					$output->writeLineFormatted(sprintf('Result cache not used because extension file %s was not found.', $extensionFile));
 				}
-				return new ResultCache($allAnalysedFiles, true, time(), $meta, [], [], [], []);
+				return new ResultCache(
+					filesToAnalyse: $allAnalysedFiles,
+					fullAnalysis: true,
+					lastFullAnalysisTime: time(),
+					meta: $meta,
+					errors: [],
+					locallyIgnoredErrors: [],
+					linesToIgnore: [],
+					unmatchedLineIgnores: [],
+					collectedData: [],
+					dependencies: [],
+					usedTraitDependencies: [],
+					packageDependencies: [],
+					exportedNodes: [],
+					projectExtensionFiles: [],
+					currentFileHashes: $currentFileHashes,
+				);
 			}
 
 			if ($this->getFileHash($extensionFile) === $fileHash) {
 				continue;
 			}
 
-			if ($output->isDebug()) {
+			if ($output->isVeryVerbose()) {
 				$output->writeLineFormatted(sprintf('Result cache not used because extension file %s hash does not match.', $extensionFile));
 			}
 
-			return new ResultCache($allAnalysedFiles, true, time(), $meta, [], [], [], []);
+			return new ResultCache(
+				filesToAnalyse: $allAnalysedFiles,
+				fullAnalysis: true,
+				lastFullAnalysisTime: time(),
+				meta: $meta,
+				errors: [],
+				locallyIgnoredErrors: [],
+				linesToIgnore: [],
+				unmatchedLineIgnores: [],
+				collectedData: [],
+				dependencies: [],
+				usedTraitDependencies: [],
+				packageDependencies: [],
+				exportedNodes: [],
+				projectExtensionFiles: [],
+				currentFileHashes: $currentFileHashes,
+			);
 		}
 
 		$invertedDependencies = $data['dependencies'];
 		$deletedFiles = array_fill_keys(array_keys($invertedDependencies), true);
 		$filesToAnalyse = [];
 		$invertedDependenciesToReturn = [];
+		$invertedUsedTraitDependenciesToReturn = [];
 		$errors = $data['errorsCallback']();
+		$locallyIgnoredErrors = $data['locallyIgnoredErrorsCallback']();
+		$linesToIgnore = $data['linesToIgnore'];
+		$unmatchedLineIgnores = $data['unmatchedLineIgnores'];
 		$collectedData = $data['collectedDataCallback']();
 		$exportedNodes = $data['exportedNodesCallback']();
 		$filteredErrors = [];
+		$filteredLocallyIgnoredErrors = [];
+		$filteredLinesToIgnore = [];
+		$filteredUnmatchedLineIgnores = [];
 		$filteredCollectedData = [];
 		$filteredExportedNodes = [];
 		$newFileAppeared = false;
 
-		foreach ($this->getStubFiles() as $stubFile) {
+		foreach (array_keys($this->getStubFiles()) as $stubFile) {
 			if (!array_key_exists($stubFile, $errors)) {
 				continue;
 			}
@@ -193,6 +474,15 @@ class ResultCacheManager
 		foreach ($allAnalysedFiles as $analysedFile) {
 			if (array_key_exists($analysedFile, $errors)) {
 				$filteredErrors[$analysedFile] = $errors[$analysedFile];
+			}
+			if (array_key_exists($analysedFile, $locallyIgnoredErrors)) {
+				$filteredLocallyIgnoredErrors[$analysedFile] = $locallyIgnoredErrors[$analysedFile];
+			}
+			if (array_key_exists($analysedFile, $linesToIgnore)) {
+				$filteredLinesToIgnore[$analysedFile] = $linesToIgnore[$analysedFile];
+			}
+			if (array_key_exists($analysedFile, $unmatchedLineIgnores)) {
+				$filteredUnmatchedLineIgnores[$analysedFile] = $unmatchedLineIgnores[$analysedFile];
 			}
 			if (array_key_exists($analysedFile, $collectedData)) {
 				$filteredCollectedData[$analysedFile] = $collectedData[$analysedFile];
@@ -213,7 +503,11 @@ class ResultCacheManager
 			$cachedFileHash = $analysedFileData['fileHash'];
 			$dependentFiles = $analysedFileData['dependentFiles'];
 			$invertedDependenciesToReturn[$analysedFile] = $dependentFiles;
-			$currentFileHash = $this->getFileHash($analysedFile);
+			$usedTraitDependentFiles = $analysedFileData['usedTraitDependentFiles'] ?? [];
+			if (count($usedTraitDependentFiles) > 0) {
+				$invertedUsedTraitDependenciesToReturn[$analysedFile] = $usedTraitDependentFiles;
+			}
+			$currentFileHash = $currentFileHashes[$analysedFile];
 
 			if ($cachedFileHash === $currentFileHash) {
 				continue;
@@ -227,6 +521,32 @@ class ResultCacheManager
 			$cachedFileExportedNodes = $filteredExportedNodes[$analysedFile];
 			$exportedNodesChanged = $this->exportedNodesChanged($analysedFile, $cachedFileExportedNodes);
 			if ($exportedNodesChanged === null) {
+				if (count($cachedFileExportedNodes) === 0) {
+					continue;
+				}
+				$hasTraitNode = false;
+				foreach ($cachedFileExportedNodes as $exportedNode) {
+					if ($exportedNode instanceof ExportedTraitNode) {
+						$hasTraitNode = true;
+						break;
+					}
+				}
+
+				if (!$hasTraitNode) {
+					continue;
+				}
+
+				// if the file changed but no exported nodes changed and the file contains a trait
+				// reanalyse files with classes using that trait
+				// but not other dependent files (a body-only change of a non-trait symbol
+				// in the same file does not affect its dependents)
+
+				foreach ($usedTraitDependentFiles as $usedTraitDependentFile) {
+					if (!is_file($usedTraitDependentFile)) {
+						continue;
+					}
+					$filesToAnalyse[] = $usedTraitDependentFile;
+				}
 				continue;
 			}
 
@@ -263,7 +583,47 @@ class ResultCacheManager
 			}
 		}
 
-		return new ResultCache(array_unique($filesToAnalyse), false, $data['lastFullAnalysisTime'], $meta, $filteredErrors, $filteredCollectedData, $invertedDependenciesToReturn, $filteredExportedNodes);
+		foreach ($packageSeededFiles as $packageSeededFile) {
+			if (!is_file($packageSeededFile)) {
+				continue;
+			}
+			$filesToAnalyse[] = $packageSeededFile;
+		}
+
+		$filesToAnalyse = array_unique($filesToAnalyse);
+		$filesToAnalyseCount = count($filesToAnalyse);
+
+		if ($output->isVeryVerbose()) {
+			$elapsed = microtime(true) - $startTime;
+			$elapsedString = $elapsed > 5
+				? sprintf(' in %.1f seconds', $elapsed)
+				: '';
+
+			$output->writeLineFormatted(sprintf(
+				'Result cache restored%s. %d %s will be reanalysed.',
+				$elapsedString,
+				$filesToAnalyseCount,
+				$filesToAnalyseCount === 1 ? 'file' : 'files',
+			));
+		}
+
+		return new ResultCache(
+			filesToAnalyse: $filesToAnalyse,
+			fullAnalysis: false,
+			lastFullAnalysisTime: $data['lastFullAnalysisTime'],
+			meta: $meta,
+			errors: $filteredErrors,
+			locallyIgnoredErrors: $filteredLocallyIgnoredErrors,
+			linesToIgnore: $filteredLinesToIgnore,
+			unmatchedLineIgnores: $filteredUnmatchedLineIgnores,
+			collectedData: $filteredCollectedData,
+			dependencies: $invertedDependenciesToReturn,
+			usedTraitDependencies: $invertedUsedTraitDependenciesToReturn,
+			packageDependencies: $packageDependencies,
+			exportedNodes: $filteredExportedNodes,
+			projectExtensionFiles: $data['projectExtensionFiles'],
+			currentFileHashes: $currentFileHashes,
+		);
 	}
 
 	/**
@@ -274,10 +634,53 @@ class ResultCacheManager
 	{
 		$projectConfig = $currentMeta['projectConfig'];
 		if ($projectConfig !== null) {
+			ksort($currentMeta['projectConfig']);
+
 			$currentMeta['projectConfig'] = Neon::encode($currentMeta['projectConfig']);
 		}
 
 		return $cachedMeta !== $currentMeta;
+	}
+
+	/**
+	 * @param mixed[] $cachedMeta
+	 * @param mixed[] $currentMeta
+	 *
+	 * @return string[]
+	 */
+	private function getMetaKeyDifferences(array $cachedMeta, array $currentMeta): array
+	{
+		// Normalize projectConfig the same way isMetaDifferent() does: the cached value is a
+		// Neon-encoded string while the current one is a raw array, so a plain === would always
+		// report projectConfig as different.
+		$projectConfig = $currentMeta['projectConfig'];
+		if ($projectConfig !== null) {
+			ksort($currentMeta['projectConfig']);
+
+			$currentMeta['projectConfig'] = Neon::encode($currentMeta['projectConfig']);
+		}
+
+		$diffs = [];
+		foreach ($cachedMeta as $key => $value) {
+			if (!array_key_exists($key, $currentMeta)) {
+				$diffs[] = $key;
+				continue;
+			}
+
+			if ($value === $currentMeta[$key]) {
+				continue;
+			}
+
+			$diffs[] = $key;
+		}
+
+		if ($diffs === []) {
+			// when none of the keys is different,
+			// the order of the keys is the problem
+			$diffs[] = 'keyOrder';
+		}
+
+		return $diffs;
 	}
 
 	/**
@@ -309,9 +712,9 @@ class ResultCacheManager
 			return true;
 		}
 
-		foreach ($fileExportedNodes as $i => $fileExportedNode) {
+		foreach ($fileExportedNodes as $i => $fileExportedNodeAgain) {
 			$cachedExportedNode = $cachedFileExportedNodes[$i];
-			if (!$cachedExportedNode->equals($fileExportedNode)) {
+			if (!$cachedExportedNode->equals($fileExportedNodeAgain)) {
 				return false;
 			}
 		}
@@ -319,10 +722,7 @@ class ResultCacheManager
 		return null;
 	}
 
-	/**
-	 * @param bool|string $save
-	 */
-	public function process(AnalyserResult $analyserResult, ResultCache $resultCache, Output $output, bool $onlyFiles, $save): ResultCacheProcessResult
+	public function process(AnalyserResult $analyserResult, ResultCache $resultCache, Output $output, bool $onlyFiles, bool $save): ResultCacheProcessResult
 	{
 		$internalErrors = $analyserResult->getInternalErrors();
 		$freshErrorsByFile = [];
@@ -330,29 +730,54 @@ class ResultCacheManager
 			$freshErrorsByFile[$error->getFilePath()][] = $error;
 		}
 
-		$freshCollectedDataByFile = [];
-		foreach ($analyserResult->getCollectedData() as $collectedData) {
-			$freshCollectedDataByFile[$collectedData->getFilePath()][] = $collectedData;
+		$freshLocallyIgnoredErrorsByFile = [];
+		foreach ($analyserResult->getLocallyIgnoredErrors() as $error) {
+			$freshLocallyIgnoredErrorsByFile[$error->getFilePath()][] = $error;
 		}
 
+		$freshCollectedDataByFile = $analyserResult->getCollectedData();
+
 		$meta = $resultCache->getMeta();
-		$doSave = function (array $errorsByFile, $collectedDataByFile, ?array $dependencies, array $exportedNodes, ?string $resultCacheName) use ($internalErrors, $resultCache, $output, $onlyFiles, $meta): bool {
+		$projectConfigArray = $meta['projectConfig'];
+		if ($projectConfigArray !== null) {
+			$meta['projectConfig'] = Neon::encode($projectConfigArray);
+		}
+		$doSave = function (array $errorsByFile, $locallyIgnoredErrorsByFile, $linesToIgnore, $unmatchedLineIgnores, $collectedDataByFile, ?array $dependencies, ?array $usedTraitDependencies, ?array $packageDependencies, array $exportedNodes, array $projectExtensionFiles) use ($internalErrors, $resultCache, $output, $onlyFiles, $meta): bool {
 			if ($onlyFiles) {
-				if ($output->isDebug()) {
+				if ($output->isVeryVerbose()) {
 					$output->writeLineFormatted('Result cache was not saved because only files were passed as analysed paths.');
 				}
 				return false;
 			}
 			if ($dependencies === null) {
-				if ($output->isDebug()) {
+				if ($output->isVeryVerbose()) {
 					$output->writeLineFormatted('Result cache was not saved because of error in dependencies.');
+				}
+				return false;
+			}
+			if ($usedTraitDependencies === null) {
+				if ($output->isVeryVerbose()) {
+					$output->writeLineFormatted('Result cache was not saved because of error in used trait dependencies.');
+				}
+				return false;
+			}
+			if ($packageDependencies === null) {
+				if ($output->isVeryVerbose()) {
+					$output->writeLineFormatted('Result cache was not saved because of error in package dependencies.');
 				}
 				return false;
 			}
 
 			if (count($internalErrors) > 0) {
-				if ($output->isDebug()) {
+				if ($output->isVeryVerbose()) {
 					$output->writeLineFormatted('Result cache was not saved because of internal errors.');
+				}
+				return false;
+			}
+
+			if (count($this->fileReplacements) > 0) {
+				if ($output->isVeryVerbose()) {
+					$output->writeLineFormatted('Result cache was not saved because of --tmp-file and --instead-of CLI options passed (editor mode).');
 				}
 				return false;
 			}
@@ -363,7 +788,7 @@ class ResultCacheManager
 						continue;
 					}
 
-					if ($output->isDebug()) {
+					if ($output->isVeryVerbose()) {
 						$output->writeLineFormatted(sprintf('Result cache was not saved because of non-ignorable exception: %s', $error->getMessage()));
 					}
 
@@ -371,9 +796,9 @@ class ResultCacheManager
 				}
 			}
 
-			$this->save($resultCache->getLastFullAnalysisTime(), $resultCacheName, $errorsByFile, $collectedDataByFile, $dependencies, $exportedNodes, $meta);
+			$this->save($resultCache->getLastFullAnalysisTime(), $errorsByFile, $locallyIgnoredErrorsByFile, $linesToIgnore, $unmatchedLineIgnores, $collectedDataByFile, $dependencies, $usedTraitDependencies, $packageDependencies, $exportedNodes, $projectExtensionFiles, $resultCache->getCurrentFileHashes(), $meta);
 
-			if ($output->isDebug()) {
+			if ($output->isVeryVerbose()) {
 				$output->writeLineFormatted('Result cache is saved.');
 			}
 
@@ -383,9 +808,13 @@ class ResultCacheManager
 		if ($resultCache->isFullAnalysis()) {
 			$saved = false;
 			if ($save !== false) {
-				$saved = $doSave($freshErrorsByFile, $freshCollectedDataByFile, $analyserResult->getDependencies(), $analyserResult->getExportedNodes(), is_string($save) ? $save : null);
+				$projectExtensionFiles = [];
+				if ($analyserResult->getDependencies() !== null) {
+					$projectExtensionFiles = $this->getProjectExtensionFiles($projectConfigArray, $analyserResult->getDependencies());
+				}
+				$saved = $doSave($freshErrorsByFile, $freshLocallyIgnoredErrorsByFile, $analyserResult->getLinesToIgnore(), $analyserResult->getUnmatchedLineIgnores(), $freshCollectedDataByFile, $analyserResult->getDependencies(), $analyserResult->getUsedTraitDependencies(), $analyserResult->getPackageDependencies(), $analyserResult->getExportedNodes(), $projectExtensionFiles);
 			} else {
-				if ($output->isDebug()) {
+				if ($output->isVeryVerbose()) {
 					$output->writeLineFormatted('Result cache was not saved because it was not requested.');
 				}
 			}
@@ -394,13 +823,38 @@ class ResultCacheManager
 		}
 
 		$errorsByFile = $this->mergeErrors($resultCache, $freshErrorsByFile);
+		$locallyIgnoredErrorsByFile = $this->mergeLocallyIgnoredErrors($resultCache, $freshLocallyIgnoredErrorsByFile);
 		$collectedDataByFile = $this->mergeCollectedData($resultCache, $freshCollectedDataByFile);
-		$dependencies = $this->mergeDependencies($resultCache, $analyserResult->getDependencies());
+		$dependencies = $this->mergeDependencies($resultCache->getDependencies(), $resultCache->getFilesToAnalyse(), $analyserResult->getDependencies());
+		$usedTraitDependencies = $this->mergeDependencies($resultCache->getUsedTraitDependencies(), $resultCache->getFilesToAnalyse(), $analyserResult->getUsedTraitDependencies());
+		$packageDependencies = $this->mergePackageDependencies($resultCache->getPackageDependencies(), $resultCache->getFilesToAnalyse(), $analyserResult->getPackageDependencies());
 		$exportedNodes = $this->mergeExportedNodes($resultCache, $analyserResult->getExportedNodes());
+		$linesToIgnore = $this->mergeLinesToIgnore($resultCache, $analyserResult->getLinesToIgnore());
+		$unmatchedLineIgnores = $this->mergeUnmatchedLineIgnores($resultCache, $analyserResult->getUnmatchedLineIgnores());
 
 		$saved = false;
 		if ($save !== false) {
-			$saved = $doSave($errorsByFile, $collectedDataByFile, $dependencies, $exportedNodes, is_string($save) ? $save : null);
+			$projectExtensionFiles = [];
+			foreach ($resultCache->getProjectExtensionFiles() as $file => [$hash, $isAnalysed, $className]) {
+				if ($isAnalysed) {
+					continue;
+				}
+
+				// keep the same file hashes from the old run
+				// so that the message "When you edit them and re-run PHPStan, the result cache will get stale."
+				// keeps being shown on subsequent runs
+				$projectExtensionFiles[$file] = [$hash, false, $className];
+			}
+			if ($dependencies !== null) {
+				foreach ($this->getProjectExtensionFiles($projectConfigArray, $dependencies) as $file => [$hash, $isAnalysed, $className]) {
+					if (!$isAnalysed) {
+						continue;
+					}
+
+					$projectExtensionFiles[$file] = [$hash, true, $className];
+				}
+			}
+			$saved = $doSave($errorsByFile, $locallyIgnoredErrorsByFile, $linesToIgnore, $unmatchedLineIgnores, $collectedDataByFile, $dependencies, $usedTraitDependencies, $packageDependencies, $exportedNodes, $projectExtensionFiles);
 		}
 
 		$flatErrors = [];
@@ -410,31 +864,44 @@ class ResultCacheManager
 			}
 		}
 
-		$flatCollectedData = [];
-		foreach ($collectedDataByFile as $fileCollectedData) {
-			foreach ($fileCollectedData as $collectedData) {
-				$flatCollectedData[] = $collectedData;
+		$flatLocallyIgnoredErrors = [];
+		foreach ($locallyIgnoredErrorsByFile as $fileErrors) {
+			foreach ($fileErrors as $fileError) {
+				$flatLocallyIgnoredErrors[] = $fileError;
 			}
 		}
 
 		return new ResultCacheProcessResult(new AnalyserResult(
-			$flatErrors,
-			$internalErrors,
-			$flatCollectedData,
-			$dependencies,
-			$exportedNodes,
-			$analyserResult->hasReachedInternalErrorsCountLimit(),
+			unorderedErrors: $flatErrors,
+			filteredPhpErrors: $analyserResult->getFilteredPhpErrors(),
+			allPhpErrors: $analyserResult->getAllPhpErrors(),
+			locallyIgnoredErrors: $flatLocallyIgnoredErrors,
+			linesToIgnore: $linesToIgnore,
+			unmatchedLineIgnores: $unmatchedLineIgnores,
+			internalErrors: $internalErrors,
+			collectedData: $collectedDataByFile,
+			dependencies: $dependencies,
+			usedTraitDependencies: $usedTraitDependencies,
+			packageDependencies: $packageDependencies,
+			exportedNodes: $exportedNodes,
+			reachedInternalErrorsCountLimit: $analyserResult->hasReachedInternalErrorsCountLimit(),
+			peakMemoryUsageBytes: $analyserResult->getPeakMemoryUsageBytes(),
+			processedFiles: $analyserResult->getProcessedFiles(),
 		), $saved);
 	}
 
 	/**
-	 * @param array<string, array<Error>> $freshErrorsByFile
-	 * @return array<string, array<Error>>
+	 * @param array<string, list<Error>> $freshErrorsByFile
+	 * @return array<string, list<Error>>
 	 */
 	private function mergeErrors(ResultCache $resultCache, array $freshErrorsByFile): array
 	{
 		$errorsByFile = $resultCache->getErrors();
 		foreach ($resultCache->getFilesToAnalyse() as $file) {
+			if (array_key_exists($file, $this->fileReplacements)) {
+				unset($errorsByFile[$file]);
+				$file = $this->fileReplacements[$file];
+			}
 			if (!array_key_exists($file, $freshErrorsByFile)) {
 				unset($errorsByFile[$file]);
 				continue;
@@ -446,13 +913,39 @@ class ResultCacheManager
 	}
 
 	/**
-	 * @param array<string, array<CollectedData>> $freshCollectedDataByFile
-	 * @return array<string, array<CollectedData>>
+	 * @param array<string, list<Error>> $freshLocallyIgnoredErrorsByFile
+	 * @return array<string, list<Error>>
+	 */
+	private function mergeLocallyIgnoredErrors(ResultCache $resultCache, array $freshLocallyIgnoredErrorsByFile): array
+	{
+		$errorsByFile = $resultCache->getLocallyIgnoredErrors();
+		foreach ($resultCache->getFilesToAnalyse() as $file) {
+			if (array_key_exists($file, $this->fileReplacements)) {
+				unset($errorsByFile[$file]);
+				$file = $this->fileReplacements[$file];
+			}
+			if (!array_key_exists($file, $freshLocallyIgnoredErrorsByFile)) {
+				unset($errorsByFile[$file]);
+				continue;
+			}
+			$errorsByFile[$file] = $freshLocallyIgnoredErrorsByFile[$file];
+		}
+
+		return $errorsByFile;
+	}
+
+	/**
+	 * @param CollectorData $freshCollectedDataByFile
+	 * @return CollectorData
 	 */
 	private function mergeCollectedData(ResultCache $resultCache, array $freshCollectedDataByFile): array
 	{
 		$collectedDataByFile = $resultCache->getCollectedData();
 		foreach ($resultCache->getFilesToAnalyse() as $file) {
+			if (array_key_exists($file, $this->fileReplacements)) {
+				unset($collectedDataByFile[$file]);
+				$file = $this->fileReplacements[$file];
+			}
 			if (!array_key_exists($file, $freshCollectedDataByFile)) {
 				unset($collectedDataByFile[$file]);
 				continue;
@@ -464,17 +957,18 @@ class ResultCacheManager
 	}
 
 	/**
+	 * @param array<string, array<string>> $resultCacheDependencies
+	 * @param string[] $filesToAnalyse
 	 * @param array<string, array<string>>|null $freshDependencies
 	 * @return array<string, array<string>>|null
 	 */
-	private function mergeDependencies(ResultCache $resultCache, ?array $freshDependencies): ?array
+	private function mergeDependencies(array $resultCacheDependencies, array $filesToAnalyse, ?array $freshDependencies): ?array
 	{
 		if ($freshDependencies === null) {
 			return null;
 		}
 
 		$cachedDependencies = [];
-		$resultCacheDependencies = $resultCache->getDependencies();
 		$filesNoOneIsDependingOn = array_fill_keys(array_keys($resultCacheDependencies), true);
 		foreach ($resultCacheDependencies as $file => $filesDependingOnFile) {
 			foreach ($filesDependingOnFile as $fileDependingOnFile) {
@@ -492,7 +986,11 @@ class ResultCacheManager
 		}
 
 		$newDependencies = $cachedDependencies;
-		foreach ($resultCache->getFilesToAnalyse() as $file) {
+		foreach ($filesToAnalyse as $file) {
+			if (array_key_exists($file, $this->fileReplacements)) {
+				unset($newDependencies[$file]);
+				$file = $this->fileReplacements[$file];
+			}
 			if (!array_key_exists($file, $freshDependencies)) {
 				unset($newDependencies[$file]);
 				continue;
@@ -512,6 +1010,10 @@ class ResultCacheManager
 	{
 		$newExportedNodes = $resultCache->getExportedNodes();
 		foreach ($resultCache->getFilesToAnalyse() as $file) {
+			if (array_key_exists($file, $this->fileReplacements)) {
+				unset($newExportedNodes[$file]);
+				$file = $this->fileReplacements[$file];
+			}
 			if (!array_key_exists($file, $freshExportedNodes)) {
 				unset($newExportedNodes[$file]);
 				continue;
@@ -524,19 +1026,116 @@ class ResultCacheManager
 	}
 
 	/**
-	 * @param array<string, array<Error>> $errors
-	 * @param array<string, array<CollectedData>> $collectedData
+	 * @param array<string, array<string>> $resultCachePackageDependencies
+	 * @param string[] $filesToAnalyse
+	 * @param array<string, array<string>>|null $freshPackageDependencies
+	 * @return array<string, array<string>>|null
+	 */
+	private function mergePackageDependencies(array $resultCachePackageDependencies, array $filesToAnalyse, ?array $freshPackageDependencies): ?array
+	{
+		if ($freshPackageDependencies === null) {
+			return null;
+		}
+
+		$newPackageDependencies = $resultCachePackageDependencies;
+		foreach ($filesToAnalyse as $file) {
+			if (array_key_exists($file, $this->fileReplacements)) {
+				unset($newPackageDependencies[$file]);
+				$file = $this->fileReplacements[$file];
+			}
+			if (!array_key_exists($file, $freshPackageDependencies)) {
+				unset($newPackageDependencies[$file]);
+				continue;
+			}
+
+			$newPackageDependencies[$file] = $freshPackageDependencies[$file];
+		}
+
+		return $newPackageDependencies;
+	}
+
+	/**
+	 * Project package names whose installed version/reference changed between two metadata snapshots,
+	 * or null if the change set cannot be reliably determined (then the caller falls back to a full
+	 * re-analysis rather than risk under-invalidation).
+	 *
+	 * @param mixed[] $cachedMeta
+	 * @param mixed[] $currentMeta
+	 * @return list<string>|null
+	 */
+	/**
+	 * @param array<string, LinesToIgnore> $freshLinesToIgnore
+	 * @return array<string, LinesToIgnore>
+	 */
+	private function mergeLinesToIgnore(ResultCache $resultCache, array $freshLinesToIgnore): array
+	{
+		$newLinesToIgnore = $resultCache->getLinesToIgnore();
+		foreach ($resultCache->getFilesToAnalyse() as $file) {
+			if (array_key_exists($file, $this->fileReplacements)) {
+				unset($newLinesToIgnore[$file]);
+				$file = $this->fileReplacements[$file];
+			}
+			if (!array_key_exists($file, $freshLinesToIgnore)) {
+				unset($newLinesToIgnore[$file]);
+				continue;
+			}
+
+			$newLinesToIgnore[$file] = $freshLinesToIgnore[$file];
+		}
+
+		return $newLinesToIgnore;
+	}
+
+	/**
+	 * @param array<string, LinesToIgnore> $freshUnmatchedLineIgnores
+	 * @return array<string, LinesToIgnore>
+	 */
+	private function mergeUnmatchedLineIgnores(ResultCache $resultCache, array $freshUnmatchedLineIgnores): array
+	{
+		$newUnmatchedLineIgnores = $resultCache->getUnmatchedLineIgnores();
+		foreach ($resultCache->getFilesToAnalyse() as $file) {
+			if (array_key_exists($file, $this->fileReplacements)) {
+				unset($newUnmatchedLineIgnores[$file]);
+				$file = $this->fileReplacements[$file];
+			}
+			if (!array_key_exists($file, $freshUnmatchedLineIgnores)) {
+				unset($newUnmatchedLineIgnores[$file]);
+				continue;
+			}
+
+			$newUnmatchedLineIgnores[$file] = $freshUnmatchedLineIgnores[$file];
+		}
+
+		return $newUnmatchedLineIgnores;
+	}
+
+	/**
+	 * @param array<string, list<Error>> $errors
+	 * @param array<string, list<Error>> $locallyIgnoredErrors
+	 * @param array<string, LinesToIgnore> $linesToIgnore
+	 * @param array<string, LinesToIgnore> $unmatchedLineIgnores
+	 * @param array<string, array<string, list<CollectedData>>> $collectedData
 	 * @param array<string, array<string>> $dependencies
+	 * @param array<string, array<string>> $usedTraitDependencies
+	 * @param array<string, array<string>> $packageDependencies
 	 * @param array<string, array<RootExportedNode>> $exportedNodes
+	 * @param array<string, array{string, bool, string}> $projectExtensionFiles
+	 * @param array<string, string> $currentFileHashes
 	 * @param mixed[] $meta
 	 */
 	private function save(
 		int $lastFullAnalysisTime,
-		?string $resultCacheName,
 		array $errors,
+		array $locallyIgnoredErrors,
+		array $linesToIgnore,
+		array $unmatchedLineIgnores,
 		array $collectedData,
 		array $dependencies,
+		array $usedTraitDependencies,
+		array $packageDependencies,
 		array $exportedNodes,
+		array $projectExtensionFiles,
+		array $currentFileHashes,
 		array $meta,
 	): void
 	{
@@ -546,12 +1145,26 @@ class ResultCacheManager
 			foreach ($fileDependencies as $fileDep) {
 				if (!array_key_exists($fileDep, $invertedDependencies)) {
 					$invertedDependencies[$fileDep] = [
-						'fileHash' => $this->getFileHash($fileDep),
+						'fileHash' => $currentFileHashes[$fileDep] ?? $this->getFileHash($fileDep),
 						'dependentFiles' => [],
 					];
 					unset($filesNoOneIsDependingOn[$fileDep]);
 				}
 				$invertedDependencies[$fileDep]['dependentFiles'][] = $file;
+			}
+		}
+
+		foreach ($usedTraitDependencies as $file => $fileUsedTraitDependencies) {
+			foreach ($fileUsedTraitDependencies as $usedTraitFileDep) {
+				if (!array_key_exists($usedTraitFileDep, $invertedDependencies)) {
+					$invertedDependencies[$usedTraitFileDep] = [
+						'fileHash' => $currentFileHashes[$usedTraitFileDep] ?? $this->getFileHash($usedTraitFileDep),
+						'dependentFiles' => [],
+						'usedTraitDependentFiles' => [],
+					];
+					unset($filesNoOneIsDependingOn[$usedTraitFileDep]);
+				}
+				$invertedDependencies[$usedTraitFileDep]['usedTraitDependentFiles'][] = $file;
 			}
 		}
 
@@ -565,133 +1178,231 @@ class ResultCacheManager
 			}
 
 			$invertedDependencies[$file] = [
-				'fileHash' => $this->getFileHash($file),
+				'fileHash' => $currentFileHashes[$file] ?? $this->getFileHash($file),
 				'dependentFiles' => [],
 			];
 		}
 
 		ksort($errors);
+		ksort($locallyIgnoredErrors);
+		ksort($linesToIgnore);
+		ksort($unmatchedLineIgnores);
 		ksort($collectedData);
 		ksort($invertedDependencies);
+
+		foreach ($collectedData as & $collectedDataPerFile) {
+			ksort($collectedDataPerFile);
+		}
 
 		foreach ($invertedDependencies as $file => $fileData) {
 			$dependentFiles = $fileData['dependentFiles'];
 			sort($dependentFiles);
 			$invertedDependencies[$file]['dependentFiles'] = $dependentFiles;
+
+			$usedTraitDependentFiles = $fileData['usedTraitDependentFiles'] ?? [];
+			if (count($usedTraitDependentFiles) === 0) {
+				continue;
+			}
+
+			sort($usedTraitDependentFiles);
+			$invertedDependencies[$file]['usedTraitDependentFiles'] = $usedTraitDependentFiles;
 		}
-
-		$template = "<?php declare(strict_types = 1);
-
-return [
-	'lastFullAnalysisTime' => %s,
-	'meta' => %s,
-	'projectExtensionFiles' => %s,
-	'errorsCallback' => static function (): array { return %s; },
-	'collectedDataCallback' => static function (): array { return %s; },
-	'dependencies' => %s,
-	'exportedNodesCallback' => static function (): array { return %s; },
-];
-";
 
 		ksort($exportedNodes);
 
 		$file = $this->cacheFilePath;
-		if ($resultCacheName !== null) {
-			$file = $this->tempResultCachePath . '/' . $resultCacheName . '.php';
+
+		// streamed to the file section by section - building the whole
+		// var_export()ed contents in memory at once would take up roughly
+		// twice the size of the resulting file in the main process
+		$handle = @fopen($file, 'w');
+		if ($handle === false) {
+			$error = error_get_last();
+			throw new CouldNotWriteFileException($file, $error !== null ? $error['message'] : 'unknown cause');
 		}
 
-		$projectConfigArray = $meta['projectConfig'];
-		if ($projectConfigArray !== null) {
-			$meta['projectConfig'] = Neon::encode($projectConfigArray);
+		try {
+			$this->writeToHandle($handle, $file, "<?php declare(strict_types = 1);
+
+return [
+	'lastFullAnalysisTime' => " . var_export($lastFullAnalysisTime, true) . ",
+	'meta' => " . var_export($meta, true) . ",
+	'projectExtensionFiles' => " . var_export($projectExtensionFiles, true) . ",
+	'errorsCallback' => static function (): array { return ");
+			$this->streamArrayVarExportToHandle($handle, $file, $errors);
+			$this->writeToHandle($handle, $file, "; },
+	'locallyIgnoredErrorsCallback' => static function (): array { return ");
+			$this->streamArrayVarExportToHandle($handle, $file, $locallyIgnoredErrors);
+			$this->writeToHandle($handle, $file, "; },
+	'linesToIgnore' => ");
+			$this->streamArrayVarExportToHandle($handle, $file, $linesToIgnore);
+			$this->writeToHandle($handle, $file, ",
+	'unmatchedLineIgnores' => ");
+			$this->streamArrayVarExportToHandle($handle, $file, $unmatchedLineIgnores);
+			$this->writeToHandle($handle, $file, ",
+	'collectedDataCallback' => static function (): array { return ");
+			$this->streamArrayVarExportToHandle($handle, $file, $collectedData);
+			$this->writeToHandle($handle, $file, "; },
+	'dependencies' => ");
+			$this->streamArrayVarExportToHandle($handle, $file, $invertedDependencies);
+			$this->writeToHandle($handle, $file, ",
+	'packageDependencies' => ");
+			$this->streamArrayVarExportToHandle($handle, $file, $packageDependencies);
+			$this->writeToHandle($handle, $file, ",
+	'exportedNodesCallback' => static function (): array { return ");
+			$this->streamArrayVarExportToHandle($handle, $file, $exportedNodes);
+			$this->writeToHandle($handle, $file, '; },
+];
+');
+		} finally {
+			fclose($handle);
+		}
+	}
+
+	/**
+	 * @param resource $handle
+	 */
+	private function writeToHandle($handle, string $file, string $contents): void
+	{
+		if (@fwrite($handle, $contents) === false) {
+			$error = error_get_last();
+			throw new CouldNotWriteFileException($file, $error !== null ? $error['message'] : 'unknown cause');
+		}
+	}
+
+	/**
+	 * Streams the var_export() representation of an array to the file entry
+	 * by entry, producing output byte-identical to var_export($values, true).
+	 *
+	 * var_export() builds the whole export in memory even when told to print it,
+	 * so exporting a big section in one call would take up as much memory
+	 * as the resulting file section itself.
+	 *
+	 * Each entry is exported wrapped in a single-entry array whose "array (\n"
+	 * prefix and "\n)" suffix are stripped, yielding the same bytes (including
+	 * indentation) the entry would get inside the full export. Indenting the lines
+	 * of a standalone value export would corrupt multi-line string contents instead.
+	 *
+	 * @param resource $handle
+	 * @param array<mixed> $values
+	 */
+	private function streamArrayVarExportToHandle($handle, string $file, array $values): void
+	{
+		$this->writeToHandle($handle, $file, 'array (');
+		foreach ($values as $key => $value) {
+			$entry = var_export([$key => $value], true);
+			$this->writeToHandle($handle, $file, "\n" . substr($entry, 8, -2));
 		}
 
-		FileWriter::write(
-			$file,
-			sprintf(
-				$template,
-				var_export($lastFullAnalysisTime, true),
-				var_export($meta, true),
-				var_export($this->getProjectExtensionFiles($projectConfigArray, $dependencies), true),
-				var_export($errors, true),
-				var_export($collectedData, true),
-				var_export($invertedDependencies, true),
-				var_export($exportedNodes, true),
-			),
-		);
+		$this->writeToHandle($handle, $file, "\n)");
+	}
+
+	/**
+	 * Whether any of the changed Composer packages registers a class in the PHPStan container (a rule,
+	 * extension, and so on). Such code can affect the analysis of every file, so the file-granular
+	 * package re-seed is not enough and the whole cache must be invalidated.
+	 *
+	 * @param mixed[]|null $projectConfig
+	 * @param array<string, true> $changedPackagesLookup
+	 */
+	private function changedPackagesProvideContainerClass(?array $projectConfig, array $changedPackagesLookup): bool
+	{
+		// Extensions registered directly in the project config (services:/rules:) or via an included
+		// extension neon file: resolve each service class to the package that owns its file.
+		if ($projectConfig !== null) {
+			foreach (ProjectConfigHelper::getServiceClassNames($projectConfig) as $class) {
+				try {
+					// does not use static reflection to reduce file-parsing, like getProjectExtensionFiles()
+					$fileName = (new ReflectionClass($class))->getFileName(); /** @phpstan-ignore argument.type */
+				} catch (ReflectionException) {
+					continue;
+				}
+
+				if ($fileName === false || str_starts_with($fileName, 'phar://')) {
+					continue;
+				}
+
+				$package = $this->packageDependencyResolver->resolvePackage($fileName);
+				if ($package !== null && array_key_exists($package, $changedPackagesLookup)) {
+					return true;
+				}
+			}
+		}
+
+		// Extensions registered through phpstan/extension-installer are not part of the project config;
+		// its generated list is keyed by the extension's Composer package name.
+		if (class_exists('PHPStan\ExtensionInstaller\GeneratedConfig')) {
+			foreach (array_keys(GeneratedConfig::EXTENSIONS) as $package) {
+				if (array_key_exists($package, $changedPackagesLookup)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
 	 * @param mixed[]|null $projectConfig
 	 * @param array<string, mixed> $dependencies
-	 * @return array<string, string>
+	 * @return array<string, array{string, bool, string}>
 	 */
 	private function getProjectExtensionFiles(?array $projectConfig, array $dependencies): array
 	{
 		$this->alreadyProcessed = [];
 		$projectExtensionFiles = [];
 		if ($projectConfig !== null) {
-			$services = array_merge(
-				$projectConfig['services'] ?? [],
-				$projectConfig['rules'] ?? [],
-			);
-			foreach ($services as $service) {
-				$classes = $this->getClassesFromConfigDefinition($service);
-				if (is_array($service)) {
-					foreach (['class', 'factory', 'implement'] as $key) {
-						if (!isset($service[$key])) {
-							continue;
-						}
+			$vendorDirs = [];
+			foreach ($this->composerAutoloaderProjectPaths as $autoloaderProjectPath) {
+				$composer = ComposerHelper::getComposerConfig($autoloaderProjectPath);
+				if ($composer === null) {
+					continue;
+				}
+				$vendorDirectory = ComposerHelper::getVendorDirFromComposerConfig($autoloaderProjectPath, $composer);
+				$vendorDirs[] = $this->fileHelper->normalizePath($vendorDirectory);
+			}
 
-						$classes = array_merge($classes, $this->getClassesFromConfigDefinition($service[$key]));
-					}
+			$classes = ProjectConfigHelper::getServiceClassNames($projectConfig);
+			foreach ($classes as $class) {
+				try {
+					// does not use static reflection to reduce file-parsing
+					$classReflection = new ReflectionClass($class); /** @phpstan-ignore argument.type */
+				} catch (ReflectionException) {
+					continue;
 				}
 
-				foreach (array_unique($classes) as $class) {
-					if (!$this->reflectionProvider->hasClass($class)) {
-						continue;
-					}
+				$fileName = $classReflection->getFileName();
+				if ($fileName === false) {
+					continue;
+				}
 
-					$classReflection = $this->reflectionProvider->getClass($class);
-					$fileName = $classReflection->getFileName();
-					if ($fileName === null) {
-						continue;
-					}
+				if (str_starts_with($fileName, 'phar://')) {
+					continue;
+				}
 
-					$allServiceFiles = $this->getAllDependencies($fileName, $dependencies);
-					foreach ($allServiceFiles as $serviceFile) {
-						if (array_key_exists($serviceFile, $projectExtensionFiles)) {
-							continue;
+				$allServiceFiles = $this->getAllDependencies($fileName, $dependencies);
+				if (count($allServiceFiles) === 0) {
+					$normalizedFileName = $this->fileHelper->normalizePath($fileName);
+					foreach ($vendorDirs as $vendorDir) {
+						if (str_starts_with($normalizedFileName, $vendorDir)) {
+							continue 2;
 						}
-
-						$projectExtensionFiles[$serviceFile] = $this->getFileHash($serviceFile);
 					}
+					$projectExtensionFiles[$fileName] = [$this->getFileHash($fileName), false, $class];
+					continue;
+				}
+
+				foreach ($allServiceFiles as $serviceFile) {
+					if (array_key_exists($serviceFile, $projectExtensionFiles)) {
+						continue;
+					}
+
+					$projectExtensionFiles[$serviceFile] = [$this->getFileHash($serviceFile), true, $class];
 				}
 			}
 		}
 
 		return $projectExtensionFiles;
-	}
-
-	/**
-	 * @param mixed $definition
-	 * @return string[]
-	 */
-	private function getClassesFromConfigDefinition($definition): array
-	{
-		if (is_string($definition)) {
-			return [$definition];
-		}
-
-		if ($definition instanceof Statement) {
-			$entity = $definition->entity;
-			if (is_string($entity)) {
-				return [$entity];
-			} elseif (is_array($entity) && isset($entity[0]) && is_string($entity[0])) {
-				return [$entity[0]];
-			}
-		}
-
-		return [];
 	}
 
 	/**
@@ -730,22 +1441,25 @@ return [
 	 */
 	private function getMeta(array $allAnalysedFiles, ?array $projectConfigArray): array
 	{
-		$extensions = array_values(array_filter(get_loaded_extensions(), static fn (string $extension): bool => $extension !== 'xdebug'));
+		$extensions = array_values(array_filter(get_loaded_extensions(), static fn (string $extension): bool => $extension !== 'xdebug' && $extension !== 'blackfire'));
 		sort($extensions);
 
 		if ($projectConfigArray !== null) {
-			unset($projectConfigArray['parameters']['ignoreErrors']);
-			unset($projectConfigArray['parameters']['tipsOfTheDay']);
-			unset($projectConfigArray['parameters']['parallel']);
-			unset($projectConfigArray['parameters']['internalErrorsCountLimit']);
-			unset($projectConfigArray['parameters']['cache']);
-			unset($projectConfigArray['parameters']['memoryLimitFile']);
-			unset($projectConfigArray['parametersSchema']);
+			foreach ($this->parametersNotInvalidatingCache as $parameterPath) {
+				$pathAsArray = is_array($parameterPath) ? $parameterPath : explode('.', $parameterPath);
+				ArrayHelper::unsetKeyAtPath($projectConfigArray, $pathAsArray);
+			}
+
+			ksort($projectConfigArray);
 		}
+
+		$fnsr = getenv('PHPSTAN_FNSR', true);
 
 		return [
 			'cacheVersion' => self::CACHE_VERSION,
 			'phpstanVersion' => ComposerHelper::getPhpStanVersion(),
+			'fnsr' => $fnsr,
+			'metaExtensions' => $this->getMetaFromPhpStanExtensions(),
 			'phpVersion' => PHP_VERSION_ID,
 			'projectConfig' => $projectConfigArray,
 			'analysedPaths' => $this->analysedPaths,
@@ -768,10 +1482,10 @@ return [
 			return $this->fileHashes[$path];
 		}
 
-		$contents = FileReader::read($path);
-		$contents = str_replace("\r\n", "\n", $contents);
-
-		$hash = sha1($contents);
+		$hash = hash_file('sha256', $path);
+		if ($hash === false) {
+			throw new CouldNotReadFileException($path);
+		}
 		$this->fileHashes[$path] = $hash;
 
 		return $hash;
@@ -784,11 +1498,23 @@ return [
 	private function getScannedFiles(array $allAnalysedFiles): array
 	{
 		$scannedFiles = $this->scanFiles;
-		foreach ($this->scanFileFinder->findFiles($this->scanDirectories)->getFiles() as $file) {
-			$scannedFiles[] = $file;
+		$analysedDirectories = [];
+		foreach (array_merge($this->analysedPaths, $this->analysedPathsFromConfig) as $analysedPath) {
+			if (is_file($analysedPath)) {
+				continue;
+			}
+
+			if (!is_dir($analysedPath)) {
+				continue;
+			}
+
+			$analysedDirectories[] = $analysedPath;
 		}
 
-		$scannedFiles = array_unique($scannedFiles);
+		$directories = array_unique(array_merge($analysedDirectories, $this->scanDirectories));
+		foreach ($this->scanFileFinder->findFiles($directories)->getFiles() as $file) {
+			$scannedFiles[] = $file;
+		}
 
 		$hashes = [];
 		foreach (array_diff($scannedFiles, $allAnalysedFiles) as $file) {
@@ -838,7 +1564,7 @@ return [
 	}
 
 	/**
-	 * @return array<string, string>
+	 * @return array<string, array<mixed>>
 	 */
 	private function getComposerInstalled(): array
 	{
@@ -856,6 +1582,10 @@ return [
 			}
 
 			$installed = require $filePath;
+			if (!is_array($installed)) {
+				throw new ShouldNotHappenException();
+			}
+
 			$rootName = $installed['root']['name'];
 			unset($installed['root']);
 			unset($installed['versions'][$rootName]);
@@ -879,6 +1609,31 @@ return [
 		ksort($stubFiles);
 
 		return $stubFiles;
+	}
+
+	/**
+	 * @return array<string, string>
+	 * @throws ShouldNotHappenException
+	 */
+	private function getMetaFromPhpStanExtensions(): array
+	{
+		$meta = [];
+
+		/** @var ResultCacheMetaExtension $extension */
+		foreach ($this->resultCacheMetaExtensions->getAll() as $extension) {
+			if (array_key_exists($extension->getKey(), $meta)) {
+				throw new ShouldNotHappenException(sprintf(
+					'Duplicate ResultCacheMetaExtension with key "%s" found.',
+					$extension->getKey(),
+				));
+			}
+
+			$meta[$extension->getKey()] = $extension->getHash();
+		}
+
+		ksort($meta);
+
+		return $meta;
 	}
 
 }

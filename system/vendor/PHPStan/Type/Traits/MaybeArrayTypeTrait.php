@@ -39,12 +39,22 @@ trait MaybeArrayTypeTrait
 		return TrinaryLogic::createMaybe();
 	}
 
+	public function getKeysArrayFiltered(Type $filterValueType, TrinaryLogic $strict): Type
+	{
+		return $this->getKeysArray();
+	}
+
 	public function getKeysArray(): Type
 	{
 		return new ErrorType();
 	}
 
 	public function getValuesArray(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function chunkArray(Type $lengthType, TrinaryLogic $preserveKeys): Type
 	{
 		return new ErrorType();
 	}
@@ -69,7 +79,12 @@ trait MaybeArrayTypeTrait
 		return new ErrorType();
 	}
 
-	public function searchArray(Type $needleType): Type
+	public function reverseArray(TrinaryLogic $preserveKeys): Type
+	{
+		return new ErrorType();
+	}
+
+	public function searchArray(Type $needleType, ?TrinaryLogic $strict = null): Type
 	{
 		return new ErrorType();
 	}
@@ -80,6 +95,51 @@ trait MaybeArrayTypeTrait
 	}
 
 	public function shuffleArray(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function sliceArray(Type $offsetType, Type $lengthType, TrinaryLogic $preserveKeys): Type
+	{
+		return new ErrorType();
+	}
+
+	public function spliceArray(Type $offsetType, Type $lengthType, Type $replacementType): Type
+	{
+		return new ErrorType();
+	}
+
+	public function truncateListToSize(Type $sizeType): Type
+	{
+		return new ErrorType();
+	}
+
+	public function makeListMaybe(): Type
+	{
+		return $this;
+	}
+
+	public function mapValueType(callable $cb): Type
+	{
+		return $this;
+	}
+
+	public function mapKeyType(callable $cb): Type
+	{
+		return $this;
+	}
+
+	public function makeAllArrayKeysOptional(): Type
+	{
+		return $this;
+	}
+
+	public function changeKeyCaseArray(?int $case): Type
+	{
+		return new ErrorType();
+	}
+
+	public function filterArrayRemovingFalsey(): Type
 	{
 		return new ErrorType();
 	}

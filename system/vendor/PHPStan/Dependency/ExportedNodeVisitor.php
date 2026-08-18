@@ -2,12 +2,16 @@
 
 namespace PHPStan\Dependency;
 
+use Override;
 use PhpParser\Node;
-use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\ShouldNotHappenException;
 
-class ExportedNodeVisitor extends NodeVisitorAbstract
+// autoTag: false - must not be tagged as a RichParser node visitor
+#[AutowiredService(autoTag: false)]
+final class ExportedNodeVisitor extends NodeVisitorAbstract
 {
 
 	private ?string $fileName = null;
@@ -37,6 +41,7 @@ class ExportedNodeVisitor extends NodeVisitorAbstract
 		return $this->currentNodes;
 	}
 
+	#[Override]
 	public function enterNode(Node $node): ?int
 	{
 		if ($this->fileName === null) {
@@ -52,7 +57,7 @@ class ExportedNodeVisitor extends NodeVisitorAbstract
 			|| $node instanceof Node\Stmt\Function_
 			|| $node instanceof Node\Stmt\Trait_
 		) {
-			return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+			return NodeVisitor::DONT_TRAVERSE_CHILDREN;
 		}
 
 		return null;

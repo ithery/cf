@@ -2,49 +2,74 @@
 
 namespace PHPStan\Analyser;
 
-use PhpParser\Comment;
 use PhpParser\Node;
 use PHPStan\AnalysedCodeException;
 use PHPStan\BetterReflection\NodeCompiler\Exception\UnableToCompileNode;
 use PHPStan\BetterReflection\Reflection\Exception\CircularReference;
-use PHPStan\BetterReflection\Reflection\Exception\NotAClassReflection;
-use PHPStan\BetterReflection\Reflection\Exception\NotAnInterfaceReflection;
 use PHPStan\BetterReflection\Reflector\Exception\IdentifierNotFound;
 use PHPStan\Collectors\CollectedData;
 use PHPStan\Collectors\Registry as CollectorRegistry;
 use PHPStan\Dependency\DependencyResolver;
+use PHPStan\Dependency\PackageDependencyResolver;
+use PHPStan\DependencyInjection\AutowiredExtensions;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\DependencyInjection\ExtensionsCollection;
 use PHPStan\Node\FileNode;
 use PHPStan\Parser\Parser;
 use PHPStan\Parser\ParserErrorsException;
 use PHPStan\Rules\Registry as RuleRegistry;
-use function array_key_exists;
-use function array_keys;
-use function array_merge;
 use function array_unique;
 use function array_values;
+use function count;
 use function error_reporting;
-use function get_class;
+use function hash;
 use function is_dir;
 use function is_file;
 use function restore_error_handler;
 use function set_error_handler;
 use function sprintf;
-use function strpos;
 use const E_DEPRECATED;
+use const E_ERROR;
+use const E_NOTICE;
+use const E_PARSE;
+use const E_STRICT;
+use const E_USER_DEPRECATED;
+use const E_USER_ERROR;
+use const E_USER_NOTICE;
+use const E_USER_WARNING;
+use const E_WARNING;
 
-class FileAnalyser
+/**
+ * @phpstan-import-type CollectorData from CollectedData
+ */
+#[AutowiredService]
+final class FileAnalyser
 {
 
-	/** @var list<Error> */
-	private array $collectedErrors = [];
+	/** @var array<string, Error> */
+	private array $allPhpErrors = [];
 
+	/** @var array<string, Error> */
+	private array $filteredPhpErrors = [];
+
+	/**
+	 * @param ExtensionsCollection<IgnoreErrorExtension> $ignoreErrorExtensions
+	 */
 	public function __construct(
 		private ScopeFactory $scopeFactory,
+		#[AutowiredParameter(ref: '@' . NodeScopeResolver::class)]
 		private NodeScopeResolver $nodeScopeResolver,
+		#[AutowiredParameter(ref: '@defaultAnalysisParser')]
 		private Parser $parser,
 		private DependencyResolver $dependencyResolver,
+		private PackageDependencyResolver $packageDependencyResolver,
+		#[AutowiredExtensions(of: IgnoreErrorExtension::class)]
+		private ExtensionsCollection $ignoreErrorExtensions,
 		private RuleErrorTransformer $ruleErrorTransformer,
-		private bool $reportUnmatchedIgnoredErrors,
+		private LocalIgnoresProcessor $localIgnoresProcessor,
+		#[AutowiredParameter]
+		private bool $reportIgnoresWithoutComments,
 	)
 	{
 	}
@@ -64,252 +89,177 @@ class FileAnalyser
 		/** @var list<Error> $fileErrors */
 		$fileErrors = [];
 
-		/** @var list<CollectedData> $fileCollectedData */
+		/** @var list<string> $processedFiles */
+		$processedFiles = [];
+
+		/** @var list<Error> $locallyIgnoredErrors */
+		$locallyIgnoredErrors = [];
+
+		/** @var CollectorData $fileCollectedData */
 		$fileCollectedData = [];
 
 		$fileDependencies = [];
+		$usedTraitFileDependencies = [];
+		$filePackageDependencies = [];
 		$exportedNodes = [];
+		$linesToIgnore = [];
+		$unmatchedLineIgnores = [];
 		if (is_file($file)) {
 			try {
 				$this->collectErrors($analysedFiles);
 				$parserNodes = $this->parser->parseFile($file);
-				$linesToIgnore = $this->getLinesToIgnoreFromTokens($file, $parserNodes);
-				$temporaryFileErrors = [];
-				$nodeCallback = function (Node $node, Scope $scope) use (&$fileErrors, &$fileCollectedData, &$fileDependencies, &$exportedNodes, $file, $ruleRegistry, $collectorRegistry, $outerNodeCallback, $analysedFiles, &$linesToIgnore, &$temporaryFileErrors): void {
-					if ($node instanceof Node\Stmt\Trait_) {
-						foreach (array_keys($linesToIgnore[$file] ?? []) as $lineToIgnore) {
-							if ($lineToIgnore < $node->getStartLine() || $lineToIgnore > $node->getEndLine()) {
-								continue;
-							}
+				$processedFiles[] = $file;
 
-							unset($linesToIgnore[$file][$lineToIgnore]);
-						}
-					}
-					if ($outerNodeCallback !== null) {
-						$outerNodeCallback($node, $scope);
-					}
-					$uniquedAnalysedCodeExceptionMessages = [];
-					$nodeType = get_class($node);
-					foreach ($ruleRegistry->getRules($nodeType) as $rule) {
-						try {
-							$ruleErrors = $rule->processNode($node, $scope);
-						} catch (AnalysedCodeException $e) {
-							if (isset($uniquedAnalysedCodeExceptionMessages[$e->getMessage()])) {
-								continue;
-							}
-
-							$uniquedAnalysedCodeExceptionMessages[$e->getMessage()] = true;
-							$fileErrors[] = new Error($e->getMessage(), $file, $node->getLine(), $e, null, null, $e->getTip());
-							continue;
-						} catch (IdentifierNotFound $e) {
-							$fileErrors[] = new Error(sprintf('Reflection error: %s not found.', $e->getIdentifier()->getName()), $file, $node->getLine(), $e, null, null, 'Learn more at https://phpstan.org/user-guide/discovering-symbols');
-							continue;
-						} catch (UnableToCompileNode | NotAClassReflection | NotAnInterfaceReflection | CircularReference $e) {
-							$fileErrors[] = new Error(sprintf('Reflection error: %s', $e->getMessage()), $file, $node->getLine(), $e);
-							continue;
-						}
-
-						foreach ($ruleErrors as $ruleError) {
-							$temporaryFileErrors[] = $this->ruleErrorTransformer->transform($ruleError, $scope, $nodeType, $node->getLine());
-						}
-					}
-
-					if ($scope->isInTrait()) {
-						$sameTraitFile = $file === $scope->getTraitReflection()->getFileName();
-						foreach ($this->getLinesToIgnore($node) as $lineToIgnore) {
-							$linesToIgnore[$scope->getFileDescription()][$lineToIgnore] = true;
-							if (!$sameTraitFile) {
-								continue;
-							}
-
-							unset($linesToIgnore[$file][$lineToIgnore]);
-						}
-					}
-
-					foreach ($collectorRegistry->getCollectors($nodeType) as $collector) {
-						try {
-							$collectedData = $collector->processNode($node, $scope);
-						} catch (AnalysedCodeException $e) {
-							if (isset($uniquedAnalysedCodeExceptionMessages[$e->getMessage()])) {
-								continue;
-							}
-
-							$uniquedAnalysedCodeExceptionMessages[$e->getMessage()] = true;
-							$fileErrors[] = new Error($e->getMessage(), $file, $node->getLine(), $e, null, null, $e->getTip());
-							continue;
-						} catch (IdentifierNotFound $e) {
-							$fileErrors[] = new Error(sprintf('Reflection error: %s not found.', $e->getIdentifier()->getName()), $file, $node->getLine(), $e, null, null, 'Learn more at https://phpstan.org/user-guide/discovering-symbols');
-							continue;
-						} catch (UnableToCompileNode | NotAClassReflection | NotAnInterfaceReflection | CircularReference $e) {
-							$fileErrors[] = new Error(sprintf('Reflection error: %s', $e->getMessage()), $file, $node->getLine(), $e);
-							continue;
-						}
-
-						if ($collectedData === null) {
-							continue;
-						}
-
-						$fileCollectedData[] = new CollectedData(
-							$collectedData,
-							$scope->getFile(),
-							get_class($collector),
-						);
-					}
-
-					try {
-						$dependencies = $this->dependencyResolver->resolveDependencies($node, $scope);
-						foreach ($dependencies->getFileDependencies($scope->getFile(), $analysedFiles) as $dependentFile) {
-							$fileDependencies[] = $dependentFile;
-						}
-						if ($dependencies->getExportedNode() !== null) {
-							$exportedNodes[] = $dependencies->getExportedNode();
-						}
-					} catch (AnalysedCodeException) {
-						// pass
-					} catch (IdentifierNotFound) {
-						// pass
-					} catch (UnableToCompileNode | NotAClassReflection | NotAnInterfaceReflection) {
-						// pass
-					}
-				};
-
-				$scope = $this->scopeFactory->create(ScopeContext::create($file));
+				$nodeCallback = new FileAnalyserCallback(
+					$file,
+					$analysedFiles,
+					$ruleRegistry,
+					$collectorRegistry,
+					$outerNodeCallback,
+					$parserNodes,
+					$this->ignoreErrorExtensions->getAll(),
+					$this->parser,
+					$this->dependencyResolver,
+					$this->packageDependencyResolver,
+					$this->ruleErrorTransformer,
+					$processedFiles,
+				);
+				$scope = $this->scopeFactory->create(ScopeContext::create($file), $nodeCallback);
 				$nodeCallback(new FileNode($parserNodes), $scope);
 				$this->nodeScopeResolver->processNodes(
 					$parserNodes,
 					$scope,
 					$nodeCallback,
 				);
-				$unmatchedLineIgnores = $linesToIgnore;
-				foreach ($temporaryFileErrors as $tmpFileError) {
-					$line = $tmpFileError->getLine();
-					if (
-						$line !== null
-						&& $tmpFileError->canBeIgnored()
-						&& array_key_exists($tmpFileError->getFile(), $linesToIgnore)
-						&& array_key_exists($line, $linesToIgnore[$tmpFileError->getFile()])
-					) {
-						unset($unmatchedLineIgnores[$tmpFileError->getFile()][$line]);
-						continue;
-					}
+				$fileErrors = $nodeCallback->getFileErrors();
+				$fileCollectedData = $nodeCallback->getFileCollectedData();
+				$fileDependencies = $nodeCallback->getFileDependencies();
+				$usedTraitFileDependencies = $nodeCallback->getUsedTraitFileDependencies();
+				$filePackageDependencies = $nodeCallback->getPackageDependencies();
+				$exportedNodes = $nodeCallback->getExportedNodes();
+				$linesToIgnore = $nodeCallback->getLinesToIgnore();
+				$unmatchedLineIgnores = $nodeCallback->getUnmatchedLineIgnores();
+				$temporaryFileErrors = $nodeCallback->getTemporaryFileErrors();
+				$processedFiles = $nodeCallback->getProcessedFiles();
 
-					$fileErrors[] = $tmpFileError;
+				if ($this->reportIgnoresWithoutComments) {
+					foreach ($linesToIgnore as $ignoredFile => $lines) {
+						foreach ($lines as $line => $identifiers) {
+							if ($identifiers === null) {
+								$fileErrors[] = (new Error(
+									'Ignoring all errors on a line is not allowed.',
+									$ignoredFile,
+									$line,
+									false,
+									$ignoredFile,
+									null,
+									'Use @phpstan-ignore with an identifier and a comment (in parentheses).',
+								))->withIdentifier('ignore.allLineErrors');
+								unset($linesToIgnore[$ignoredFile][$line]);
+								unset($unmatchedLineIgnores[$ignoredFile][$line]);
+								continue;
+							}
+
+							foreach ($identifiers as $identifier) {
+								if ($identifier['comment'] !== null) {
+									continue;
+								}
+
+								$fileErrors[] = (new Error(
+									sprintf('Ignore with identifier %s has no comment.', $identifier['name']),
+									$ignoredFile,
+									$line,
+									false,
+									$ignoredFile,
+									null,
+									'Explain why this ignore is necessary in parentheses after the identifier.',
+								))->withIdentifier('ignore.noComment');
+								unset($linesToIgnore[$ignoredFile][$line]);
+								unset($unmatchedLineIgnores[$ignoredFile][$line]);
+							}
+						}
+					}
 				}
 
-				if ($this->reportUnmatchedIgnoredErrors) {
-					foreach ($unmatchedLineIgnores as $ignoredFile => $lines) {
-						if ($ignoredFile !== $file) {
-							continue;
-						}
-
-						foreach (array_keys($lines) as $line) {
-							$fileErrors[] = new Error(
-								sprintf('No error to ignore is reported on line %d.', $line),
-								$scope->getFileDescription(),
-								$line,
-								false,
-								$scope->getFile(),
-								null,
-								null,
-								null,
-								null,
-								'ignoredError.unmatchedOnLine',
-							);
-						}
-					}
+				$localIgnoresProcessorResult = $this->localIgnoresProcessor->process(
+					$temporaryFileErrors,
+					$linesToIgnore,
+					$unmatchedLineIgnores,
+				);
+				foreach ($localIgnoresProcessorResult->getFileErrors() as $fileError) {
+					$fileErrors[] = $fileError;
 				}
+				foreach ($localIgnoresProcessorResult->getLocallyIgnoredErrors() as $locallyIgnoredError) {
+					$locallyIgnoredErrors[] = $locallyIgnoredError;
+				}
+				$linesToIgnore = $localIgnoresProcessorResult->getLinesToIgnore();
+				$unmatchedLineIgnores = $localIgnoresProcessorResult->getUnmatchedLineIgnores();
 			} catch (\PhpParser\Error $e) {
-				$fileErrors[] = new Error($e->getMessage(), $file, $e->getStartLine() !== -1 ? $e->getStartLine() : null, $e);
+				$fileErrors[] = (new Error($e->getRawMessage(), $file, $e->getStartLine() !== -1 ? $e->getStartLine() : null, $e))->withIdentifier('phpstan.parse');
 			} catch (ParserErrorsException $e) {
 				foreach ($e->getErrors() as $error) {
-					$fileErrors[] = new Error($error->getMessage(), $e->getParsedFile() ?? $file, $error->getStartLine() !== -1 ? $error->getStartLine() : null, $e);
+					$fileErrors[] = (new Error($error->getMessage(), $e->getParsedFile() ?? $file, $error->getLine() !== -1 ? $error->getStartLine() : null, $e))->withIdentifier('phpstan.parse');
 				}
 			} catch (AnalysedCodeException $e) {
-				$fileErrors[] = new Error($e->getMessage(), $file, null, $e, null, null, $e->getTip());
+				$fileErrors[] = (new Error($e->getMessage(), $file, canBeIgnored: $e, tip: $e->getTip()))
+					->withIdentifier('phpstan.internal')
+					->withMetadata([
+						InternalError::STACK_TRACE_METADATA_KEY => InternalError::prepareTrace($e),
+						InternalError::STACK_TRACE_AS_STRING_METADATA_KEY => $e->getTraceAsString(),
+					]);
 			} catch (IdentifierNotFound $e) {
-				$fileErrors[] = new Error(sprintf('Reflection error: %s not found.', $e->getIdentifier()->getName()), $file, null, $e, null, null, 'Learn more at https://phpstan.org/user-guide/discovering-symbols');
-			} catch (UnableToCompileNode | NotAClassReflection | NotAnInterfaceReflection | CircularReference $e) {
-				$fileErrors[] = new Error(sprintf('Reflection error: %s', $e->getMessage()), $file, null, $e);
+				$fileErrors[] = (new Error(sprintf('Reflection error: %s not found.', $e->getIdentifier()->getName()), $file, canBeIgnored: $e, tip: 'Learn more at https://phpstan.org/user-guide/discovering-symbols'))
+					->withIdentifier('phpstan.reflection')
+					->withMetadata([
+						InternalError::STACK_TRACE_METADATA_KEY => InternalError::prepareTrace($e),
+						InternalError::STACK_TRACE_AS_STRING_METADATA_KEY => $e->getTraceAsString(),
+					]);
+			} catch (UnableToCompileNode | CircularReference $e) {
+				$fileErrors[] = (new Error(sprintf('Reflection error: %s', $e->getMessage()), $file, canBeIgnored: $e))
+					->withIdentifier('phpstan.reflection')
+					->withMetadata([
+						InternalError::STACK_TRACE_METADATA_KEY => InternalError::prepareTrace($e),
+						InternalError::STACK_TRACE_AS_STRING_METADATA_KEY => $e->getTraceAsString(),
+					]);
+			} finally {
+				$this->restoreCollectErrorsHandler();
 			}
 		} elseif (is_dir($file)) {
-			$fileErrors[] = new Error(sprintf('File %s is a directory.', $file), $file, null, false);
+			$fileErrors[] = (new Error(sprintf('File %s is a directory.', $file), $file, canBeIgnored: false))->withIdentifier('phpstan.path');
 		} else {
-			$fileErrors[] = new Error(sprintf('File %s does not exist.', $file), $file, null, false);
+			$fileErrors[] = (new Error(sprintf('File %s does not exist.', $file), $file, canBeIgnored: false))->withIdentifier('phpstan.path');
 		}
 
-		$this->restoreCollectErrorsHandler();
-
-		$fileErrors = array_merge($fileErrors, $this->collectedErrors);
-
-		return new FileAnalyserResult($fileErrors, $fileCollectedData, array_values(array_unique($fileDependencies)), $exportedNodes);
-	}
-
-	/**
-	 * @return int[]
-	 */
-	private function getLinesToIgnore(Node $node): array
-	{
-		$lines = [];
-		if ($node->getDocComment() !== null) {
-			$line = $this->findLineToIgnoreComment($node->getDocComment());
-			if ($line !== null) {
-				$lines[] = $line;
-			}
-		}
-
-		foreach ($node->getComments() as $comment) {
-			$line = $this->findLineToIgnoreComment($comment);
-			if ($line === null) {
+		foreach ($linesToIgnore as $fileKey => $lines) {
+			if (count($lines) > 0) {
 				continue;
 			}
 
-			$lines[] = $line;
+			unset($linesToIgnore[$fileKey]);
 		}
 
-		return $lines;
-	}
-
-	/**
-	 * @param Node[] $nodes
-	 * @return array<string, array<int, true>>
-	 */
-	private function getLinesToIgnoreFromTokens(string $file, array $nodes): array
-	{
-		if (!isset($nodes[0])) {
-			return [];
-		}
-
-		/** @var int[] $tokenLines */
-		$tokenLines = $nodes[0]->getAttribute('linesToIgnore', []);
-		$lines = [];
-		foreach ($tokenLines as $tokenLine) {
-			$lines[$file][$tokenLine] = true;
-		}
-
-		return $lines;
-	}
-
-	private function findLineToIgnoreComment(Comment $comment): ?int
-	{
-		$text = $comment->getText();
-		if ($comment instanceof Comment\Doc) {
-			$line = $comment->getEndLine();
-		} else {
-			if (strpos($text, "\n") === false || strpos($text, '//') === 0) {
-				$line = $comment->getStartLine();
-			} else {
-				$line = $comment->getEndLine();
+		foreach ($unmatchedLineIgnores as $fileKey => $lines) {
+			if (count($lines) > 0) {
+				continue;
 			}
-		}
-		if (strpos($text, '@phpstan-ignore-next-line') !== false) {
-			return $line + 1;
+
+			unset($unmatchedLineIgnores[$fileKey]);
 		}
 
-		if (strpos($text, '@phpstan-ignore-line') !== false) {
-			return $line;
-		}
-
-		return null;
+		return new FileAnalyserResult(
+			$fileErrors,
+			array_values($this->filteredPhpErrors),
+			array_values($this->allPhpErrors),
+			$locallyIgnoredErrors,
+			$fileCollectedData,
+			array_values(array_unique($fileDependencies)),
+			array_values(array_unique($usedTraitFileDependencies)),
+			array_values(array_unique($filePackageDependencies)),
+			$exportedNodes,
+			$linesToIgnore,
+			$unmatchedLineIgnores,
+			$processedFiles,
+		);
 	}
 
 	/**
@@ -317,12 +267,18 @@ class FileAnalyser
 	 */
 	private function collectErrors(array $analysedFiles): void
 	{
-		$this->collectedErrors = [];
+		$this->filteredPhpErrors = [];
+		$this->allPhpErrors = [];
 		set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) use ($analysedFiles): bool {
 			if ((error_reporting() & $errno) === 0) {
 				// silence @ operator
 				return true;
 			}
+
+			$errorMessage = sprintf('%s: %s', $this->getErrorLabel($errno), $errstr);
+			$errorSignature = hash('sha256', sprintf('%s:%s::%s', $errfile, $errline, $errorMessage));
+
+			$this->allPhpErrors[$errorSignature] = (new Error($errorMessage, $errfile, $errline, false))->withIdentifier('phpstan.php');
 
 			if ($errno === E_DEPRECATED) {
 				return true;
@@ -332,7 +288,7 @@ class FileAnalyser
 				return true;
 			}
 
-			$this->collectedErrors[] = new Error($errstr, $errfile, $errline, true);
+			$this->filteredPhpErrors[$errorSignature] = (new Error($errorMessage, $errfile, $errline, $errno === E_USER_DEPRECATED))->withIdentifier('phpstan.php');
 
 			return true;
 		});
@@ -341,6 +297,34 @@ class FileAnalyser
 	private function restoreCollectErrorsHandler(): void
 	{
 		restore_error_handler();
+	}
+
+	private function getErrorLabel(int $errno): string
+	{
+		switch ($errno) {
+			case E_ERROR:
+				return 'Fatal error';
+			case E_WARNING:
+				return 'Warning';
+			case E_PARSE:
+				return 'Parse error';
+			case E_NOTICE:
+				return 'Notice';
+			case E_DEPRECATED:
+				return 'Deprecated';
+			case E_USER_ERROR:
+				return 'User error (E_USER_ERROR)';
+			case E_USER_WARNING:
+				return 'User warning (E_USER_WARNING)';
+			case E_USER_NOTICE:
+				return 'User notice (E_USER_NOTICE)';
+			case E_USER_DEPRECATED:
+				return 'Deprecated (E_USER_DEPRECATED)';
+			case E_STRICT:
+				return 'Strict error (E_STRICT)';
+		}
+
+		return 'Unknown PHP error';
 	}
 
 }

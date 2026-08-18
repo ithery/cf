@@ -5,22 +5,25 @@ namespace PHPStan\Reflection\ReflectionProvider;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ConstantReflection;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\GlobalConstantReflection;
 use PHPStan\Reflection\NamespaceAnswerer;
 use PHPStan\Reflection\ReflectionProvider;
 use function strtolower;
 
-class MemoizingReflectionProvider implements ReflectionProvider
+final class MemoizingReflectionProvider implements ReflectionProvider
 {
 
-	/** @var array<string, bool> */
-	private array $hasClasses = [];
+	/** @var array<lowercase-string, true> */
+	private array $knownClasses = [];
 
-	/** @var array<string, ClassReflection> */
+	/** @var array<string, true> */
+	private array $unknownClasses = [];
+
+	/** @var array<lowercase-string, ClassReflection> */
 	private array $classes = [];
 
-	/** @var array<string, string> */
+	/** @var array<lowercase-string, string> */
 	private array $classNames = [];
 
 	public function __construct(private ReflectionProvider $provider)
@@ -29,41 +32,44 @@ class MemoizingReflectionProvider implements ReflectionProvider
 
 	public function hasClass(string $className): bool
 	{
-		if (isset($this->hasClasses[$className])) {
-			return $this->hasClasses[$className];
+		$lowerClassName = strtolower($className);
+		if (isset($this->knownClasses[$lowerClassName])) {
+			return true;
 		}
 
-		return $this->hasClasses[$className] = $this->provider->hasClass($className);
+		if (isset($this->unknownClasses[$className])) {
+			return false;
+		}
+
+		$result = $this->provider->hasClass($className);
+
+		if ($result) {
+			$this->knownClasses[$lowerClassName] = true;
+		} else {
+			$this->unknownClasses[$className] = true;
+		}
+
+		return $result;
 	}
 
 	public function getClass(string $className): ClassReflection
 	{
-		$lowerClassName = strtolower($className);
-		if (isset($this->classes[$lowerClassName])) {
-			return $this->classes[$lowerClassName];
-		}
-
-		return $this->classes[$lowerClassName] = $this->provider->getClass($className);
+		return $this->classes[strtolower($className)] ??= $this->provider->getClass($className);
 	}
 
 	public function getClassName(string $className): string
 	{
-		$lowerClassName = strtolower($className);
-		if (isset($this->classNames[$lowerClassName])) {
-			return $this->classNames[$lowerClassName];
-		}
-
-		return $this->classNames[$lowerClassName] = $this->provider->getClassName($className);
-	}
-
-	public function supportsAnonymousClasses(): bool
-	{
-		return $this->provider->supportsAnonymousClasses();
+		return $this->classNames[strtolower($className)] ??= $this->provider->getClassName($className);
 	}
 
 	public function getAnonymousClassReflection(Node\Stmt\Class_ $classNode, Scope $scope): ClassReflection
 	{
 		return $this->provider->getAnonymousClassReflection($classNode, $scope);
+	}
+
+	public function getUniversalObjectCratesClasses(): array
+	{
+		return $this->provider->getUniversalObjectCratesClasses();
 	}
 
 	public function hasFunction(Node\Name $nameNode, ?NamespaceAnswerer $namespaceAnswerer): bool
@@ -86,7 +92,7 @@ class MemoizingReflectionProvider implements ReflectionProvider
 		return $this->provider->hasConstant($nameNode, $namespaceAnswerer);
 	}
 
-	public function getConstant(Node\Name $nameNode, ?NamespaceAnswerer $namespaceAnswerer): GlobalConstantReflection
+	public function getConstant(Node\Name $nameNode, ?NamespaceAnswerer $namespaceAnswerer): ConstantReflection
 	{
 		return $this->provider->getConstant($nameNode, $namespaceAnswerer);
 	}

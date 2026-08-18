@@ -2,38 +2,35 @@
 
 namespace PHPStan\Rules\Generics;
 
-use PHPStan\Reflection\ParametersAcceptor;
-use PHPStan\Rules\RuleError;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\Generic\TemplateType;
 use PHPStan\Type\Generic\TemplateTypeVariance;
 use PHPStan\Type\Type;
 use function sprintf;
 
-class VarianceCheck
+#[AutowiredService]
+final class VarianceCheck
 {
 
-	/** @return RuleError[] */
+	/**
+	 * @param 'function'|'method' $identifier
+	 * @return list<IdentifierRuleError>
+	 */
 	public function checkParametersAcceptor(
-		ParametersAcceptor $parametersAcceptor,
+		ExtendedParametersAcceptor $parametersAcceptor,
 		string $parameterTypeMessage,
+		string $parameterOutTypeMessage,
 		string $returnTypeMessage,
 		string $generalMessage,
 		bool $isStatic,
+		bool $isPrivate,
+		string $identifier,
 	): array
 	{
 		$errors = [];
-
-		foreach ($parametersAcceptor->getParameters() as $parameterReflection) {
-			$variance = $isStatic
-				? TemplateTypeVariance::createStatic()
-				: TemplateTypeVariance::createContravariant();
-			$type = $parameterReflection->getType();
-			$message = sprintf($parameterTypeMessage, $parameterReflection->getName());
-			foreach ($this->check($variance, $type, $message) as $error) {
-				$errors[] = $error;
-			}
-		}
 
 		foreach ($parametersAcceptor->getTemplateTypeMap()->getTypes() as $templateType) {
 			if (!$templateType instanceof TemplateType
@@ -47,19 +44,43 @@ class VarianceCheck
 				'Variance annotation is only allowed for type parameters of classes and interfaces, but occurs in template type %s in %s.',
 				$templateType->getName(),
 				$generalMessage,
-			))->build();
+			))->identifier(sprintf('%s.variance', $identifier))->build();
 		}
 
-		$variance = TemplateTypeVariance::createCovariant();
+		if ($isPrivate) {
+			return $errors;
+		}
+
+		$covariant = TemplateTypeVariance::createCovariant();
+		$parameterVariance = TemplateTypeVariance::createContravariant();
+
+		foreach ($parametersAcceptor->getParameters() as $parameterReflection) {
+			$type = $parameterReflection->getType();
+			$message = sprintf($parameterTypeMessage, $parameterReflection->getName());
+			foreach ($this->check($parameterVariance, $type, $message) as $error) {
+				$errors[] = $error;
+			}
+
+			$paramOutType = $parameterReflection->getOutType();
+			if ($paramOutType === null) {
+				continue;
+			}
+
+			$outMessage = sprintf($parameterOutTypeMessage, $parameterReflection->getName());
+			foreach ($this->check($covariant, $paramOutType, $outMessage) as $error) {
+				$errors[] = $error;
+			}
+		}
+
 		$type = $parametersAcceptor->getReturnType();
-		foreach ($this->check($variance, $type, $returnTypeMessage) as $error) {
+		foreach ($this->check($covariant, $type, $returnTypeMessage) as $error) {
 			$errors[] = $error;
 		}
 
 		return $errors;
 	}
 
-	/** @return RuleError[] */
+	/** @return list<IdentifierRuleError> */
 	public function check(TemplateTypeVariance $positionVariance, Type $type, string $messageContext): array
 	{
 		$errors = [];
@@ -77,7 +98,7 @@ class VarianceCheck
 				$referredType->getVariance()->describe(),
 				$reference->getPositionVariance()->describe(),
 				$messageContext,
-			))->build();
+			))->identifier('generics.variance')->build();
 		}
 
 		return $errors;

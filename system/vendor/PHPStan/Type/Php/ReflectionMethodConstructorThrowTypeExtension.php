@@ -4,6 +4,7 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\StaticCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Type\Constant\ConstantStringType;
@@ -16,7 +17,8 @@ use PHPStan\Type\TypeUtils;
 use ReflectionMethod;
 use function count;
 
-class ReflectionMethodConstructorThrowTypeExtension implements DynamicStaticMethodThrowTypeExtension
+#[AutowiredService]
+final class ReflectionMethodConstructorThrowTypeExtension implements DynamicStaticMethodThrowTypeExtension
 {
 
 	public function __construct(private ReflectionProvider $reflectionProvider)
@@ -38,7 +40,7 @@ class ReflectionMethodConstructorThrowTypeExtension implements DynamicStaticMeth
 		$propertyType = $scope->getType($methodCall->getArgs()[1]->value);
 		foreach (TypeUtils::flattenTypes($valueType) as $type) {
 			if ($type instanceof GenericClassStringType) {
-				$classes = $type->getReferencedClasses();
+				$classes = $type->getGenericType()->getObjectClassNames();
 			} elseif (
 				$type instanceof ConstantStringType
 				&& $this->reflectionProvider->hasClass($type->getValue())
@@ -50,7 +52,7 @@ class ReflectionMethodConstructorThrowTypeExtension implements DynamicStaticMeth
 
 			foreach ($classes as $class) {
 				$classReflection = $this->reflectionProvider->getClass($class);
-				foreach (TypeUtils::getConstantStrings($propertyType) as $constantPropertyString) {
+				foreach ($propertyType->getConstantStrings() as $constantPropertyString) {
 					if (!$classReflection->hasMethod($constantPropertyString->getValue())) {
 						return $methodReflection->getThrowType();
 					}
@@ -65,7 +67,7 @@ class ReflectionMethodConstructorThrowTypeExtension implements DynamicStaticMeth
 		}
 
 		// Look for non constantStrings value.
-		foreach (TypeUtils::getConstantStrings($propertyType) as $constantPropertyString) {
+		foreach ($propertyType->getConstantStrings() as $constantPropertyString) {
 			$propertyType = TypeCombinator::remove($propertyType, $constantPropertyString);
 		}
 

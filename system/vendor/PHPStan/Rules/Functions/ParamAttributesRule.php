@@ -4,15 +4,18 @@ namespace PHPStan\Rules\Functions;
 
 use Attribute;
 use PhpParser\Node;
+use PHPStan\Analyser\CollectedDataEmitter;
+use PHPStan\Analyser\NodeCallbackInvoker;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\AttributesCheck;
 use PHPStan\Rules\Rule;
-use function count;
 
 /**
  * @implements Rule<Node\Param>
  */
-class ParamAttributesRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ParamAttributesRule implements Rule
 {
 
 	public function __construct(private AttributesCheck $attributesCheck)
@@ -24,28 +27,19 @@ class ParamAttributesRule implements Rule
 		return Node\Param::class;
 	}
 
-	public function processNode(Node $node, Scope $scope): array
+	public function processNode(Node $node, Scope&NodeCallbackInvoker&CollectedDataEmitter $scope): array
 	{
 		$targetName = 'parameter';
+		$targetType = Attribute::TARGET_PARAMETER;
 		if ($node->flags !== 0) {
 			$targetName = 'parameter or property';
-
-			$propertyTargetErrors = $this->attributesCheck->check(
-				$scope,
-				$node->attrGroups,
-				Attribute::TARGET_PROPERTY,
-				$targetName,
-			);
-
-			if (count($propertyTargetErrors) === 0) {
-				return $propertyTargetErrors;
-			}
+			$targetType |= Attribute::TARGET_PROPERTY;
 		}
 
 		return $this->attributesCheck->check(
 			$scope,
 			$node->attrGroups,
-			Attribute::TARGET_PARAMETER,
+			$targetType,
 			$targetName,
 		);
 	}

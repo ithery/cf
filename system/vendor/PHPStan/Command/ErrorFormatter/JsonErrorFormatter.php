@@ -5,10 +5,12 @@ namespace PHPStan\Command\ErrorFormatter;
 use Nette\Utils\Json;
 use PHPStan\Command\AnalysisResult;
 use PHPStan\Command\Output;
-use function array_key_exists;
+use stdClass;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use function count;
+use function property_exists;
 
-class JsonErrorFormatter implements ErrorFormatter
+final class JsonErrorFormatter implements ErrorFormatter
 {
 
 	public function __construct(private bool $pretty)
@@ -22,19 +24,21 @@ class JsonErrorFormatter implements ErrorFormatter
 				'errors' => count($analysisResult->getNotFileSpecificErrors()),
 				'file_errors' => count($analysisResult->getFileSpecificErrors()),
 			],
-			'files' => [],
+			'files' => new stdClass(),
 			'errors' => [],
 		];
 
+		$tipFormatter = new OutputFormatter(false);
+
 		foreach ($analysisResult->getFileSpecificErrors() as $fileSpecificError) {
 			$file = $fileSpecificError->getFile();
-			if (!array_key_exists($file, $errorsArray['files'])) {
-				$errorsArray['files'][$file] = [
+			if (!property_exists($errorsArray['files'], $file)) {
+				$errorsArray['files']->$file = [
 					'errors' => 0,
 					'messages' => [],
 				];
 			}
-			$errorsArray['files'][$file]['errors']++;
+			$errorsArray['files']->$file['errors']++;
 
 			$message = [
 				'message' => $fileSpecificError->getMessage(),
@@ -43,10 +47,14 @@ class JsonErrorFormatter implements ErrorFormatter
 			];
 
 			if ($fileSpecificError->getTip() !== null) {
-				$message['tip'] = $fileSpecificError->getTip();
+				$message['tip'] = $tipFormatter->format($fileSpecificError->getTip());
 			}
 
-			$errorsArray['files'][$file]['messages'][] = $message;
+			if ($fileSpecificError->getIdentifier() !== null) {
+				$message['identifier'] = $fileSpecificError->getIdentifier();
+			}
+
+			$errorsArray['files']->$file['messages'][] = $message;
 		}
 
 		foreach ($analysisResult->getNotFileSpecificErrors() as $notFileSpecificError) {

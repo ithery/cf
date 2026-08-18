@@ -5,13 +5,15 @@ namespace PHPStan\Rules\Functions;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Closure;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\FunctionDefinitionCheck;
 use PHPStan\Rules\Rule;
 
 /**
  * @implements Rule<Node\Expr\Closure>
  */
-class ExistingClassesInClosureTypehintsRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ExistingClassesInClosureTypehintsRule implements Rule
 {
 
 	public function __construct(private FunctionDefinitionCheck $check)
@@ -29,11 +31,13 @@ class ExistingClassesInClosureTypehintsRule implements Rule
 			$scope,
 			$node->getParams(),
 			$node->getReturnType(),
+			$node->getAttrGroups(),
 			'Parameter $%s of anonymous function has invalid type %s.',
 			'Anonymous function has invalid return type %s.',
 			'Anonymous function uses native union types but they\'re supported only on PHP 8.0 and later.',
 			'Parameter $%s of anonymous function has unresolvable native type.',
 			'Anonymous function has unresolvable native return type.',
+			'Attribute NoDiscard cannot be used on %s anonymous function.',
 		);
 	}
 

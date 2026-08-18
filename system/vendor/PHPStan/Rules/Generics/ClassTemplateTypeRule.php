@@ -4,6 +4,8 @@ namespace PHPStan\Rules\Generics;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Internal\SprintfHelper;
 use PHPStan\Node\InClassNode;
 use PHPStan\Rules\Rule;
@@ -13,7 +15,9 @@ use function sprintf;
 /**
  * @implements Rule<InClassNode>
  */
-class ClassTemplateTypeRule implements Rule
+#[RegisteredRule(level: 2)]
+#[ValidatesStubFiles]
+final class ClassTemplateTypeRule implements Rule
 {
 
 	public function __construct(
@@ -29,10 +33,7 @@ class ClassTemplateTypeRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if (!$scope->isInClass()) {
-			return [];
-		}
-		$classReflection = $scope->getClassReflection();
+		$classReflection = $node->getClassReflection();
 		if (!$classReflection->isClass()) {
 			return [];
 		}
@@ -44,6 +45,7 @@ class ClassTemplateTypeRule implements Rule
 		}
 
 		return $this->templateTypeCheck->check(
+			$scope,
 			$node,
 			TemplateTypeScope::createWithClass($className),
 			$classReflection->getTemplateTags(),
@@ -51,6 +53,9 @@ class ClassTemplateTypeRule implements Rule
 			sprintf('PHPDoc tag @template for %s cannot have existing type alias %%s as its name.', $displayName),
 			sprintf('PHPDoc tag @template %%s for %s has invalid bound type %%s.', $displayName),
 			sprintf('PHPDoc tag @template %%s for %s with bound type %%s is not supported.', $displayName),
+			sprintf('PHPDoc tag @template %%s for %s has invalid default type %%s.', $displayName),
+			sprintf('Default type %%s in PHPDoc tag @template %%s for %s is not subtype of bound type %%s.', $displayName),
+			sprintf('PHPDoc tag @template %%s for %s does not have a default type but follows an optional @template %%s.', $displayName),
 		);
 	}
 

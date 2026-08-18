@@ -4,21 +4,26 @@ namespace PHPStan\Rules\Properties;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Node\PropertyAssignNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
 use function sprintf;
 
 /**
- * @implements Rule<Node\Expr>
+ * @implements Rule<PropertyAssignNode>
  */
-class WritingToReadOnlyPropertiesRule implements Rule
+#[RegisteredRule(level: 0)]
+final class WritingToReadOnlyPropertiesRule implements Rule
 {
 
 	public function __construct(
 		private RuleLevelHelper $ruleLevelHelper,
 		private PropertyDescriptor $propertyDescriptor,
 		private PropertyReflectionFinder $propertyReflectionFinder,
+		#[AutowiredParameter]
 		private bool $checkThisOnly,
 	)
 	{
@@ -26,53 +31,40 @@ class WritingToReadOnlyPropertiesRule implements Rule
 
 	public function getNodeType(): string
 	{
-		return Node\Expr::class;
+		return PropertyAssignNode::class;
 	}
 
 	public function processNode(Node $node, Scope $scope): array
 	{
+		$propertyFetch = $node->getPropertyFetch();
 		if (
-			!$node instanceof Node\Expr\Assign
-			&& !$node instanceof Node\Expr\AssignOp
-			&& !$node instanceof Node\Expr\AssignRef
-		) {
-			return [];
-		}
-
-		if (
-			!($node->var instanceof Node\Expr\PropertyFetch)
-			&& !($node->var instanceof Node\Expr\StaticPropertyFetch)
-		) {
-			return [];
-		}
-
-		if (
-			$node->var instanceof Node\Expr\PropertyFetch
+			$propertyFetch instanceof Node\Expr\PropertyFetch
 			&& $this->checkThisOnly
-			&& !$this->ruleLevelHelper->isThis($node->var->var)
+			&& !$this->ruleLevelHelper->isThis($propertyFetch->var)
 		) {
 			return [];
 		}
 
-		/** @var Node\Expr\PropertyFetch|Node\Expr\StaticPropertyFetch $propertyFetch */
-		$propertyFetch = $node->var;
 		$propertyReflection = $this->propertyReflectionFinder->findPropertyReflectionFromNode($propertyFetch, $scope);
 		if ($propertyReflection === null) {
 			return [];
 		}
 
-		if (!$scope->canAccessProperty($propertyReflection)) {
+		if (!$scope->canWriteProperty($propertyReflection)) {
 			return [];
 		}
 
 		if (!$propertyReflection->isWritable()) {
-			$propertyDescription = $this->propertyDescriptor->describeProperty($propertyReflection, $propertyFetch);
+			$propertyDescription = $this->propertyDescriptor->describeProperty($propertyReflection, $scope, $propertyFetch);
 
 			return [
 				RuleErrorBuilder::message(sprintf(
 					'%s is not writable.',
 					$propertyDescription,
-				))->build(),
+				))
+					->line($propertyFetch->name->getStartLine())
+					->identifier('assign.propertyReadOnly')
+					->build(),
 			];
 		}
 
