@@ -128,7 +128,7 @@ final class CQC_Phpstan_Method_ModelQueryForwardsCallsExtension implements Metho
             return null;
         }
 
-        $parametersAcceptor = $ref->getOnlyVariant();
+        $parametersAcceptor = $ref->getVariants()[0];
 
         if (in_array($methodName, $this->builderHelper->passthru, true)) {
             $returnType = $parametersAcceptor->getReturnType();

@@ -46,7 +46,7 @@ class CQC_Phpstan_Service_Type_RelationDynamicMethodReturnTypeExtension implemen
         Scope $scope
     ): Type {
         /** @var FunctionVariant $functionVariant */
-        $functionVariant = $methodReflection->getOnlyVariant();
+        $functionVariant = $methodReflection->getVariants()[0];
         $returnType = $functionVariant->getReturnType();
 
         if (!$returnType instanceof ObjectType) {

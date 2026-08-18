@@ -27,7 +27,11 @@ class CQC_Phpstan_Service_Type_ModelRelationsDynamicMethodReturnTypeExtension im
     }
 
     public function isMethodSupported(MethodReflection $methodReflection): bool {
-        $variants = $methodReflection->getOnlyVariant();
+        //Antarmuka ekstensi PHPStan mematok parameternya MethodReflection,
+        //sedangkan getOnlyVariant() dideklarasikan pada turunannya yang lebih
+        //spesifik - jadi di sini variannya diambil apa adanya. Method CF tidak
+        //pernah punya varian lebih dari satu.
+        $variants = $methodReflection->getVariants()[0];
 
         $returnType = $variants->getReturnType();
 
@@ -73,7 +77,7 @@ class CQC_Phpstan_Service_Type_ModelRelationsDynamicMethodReturnTypeExtension im
         Scope $scope
     ): Type {
         /** @var ObjectType $returnType */
-        $returnType = $methodReflection->getOnlyVariant()->getReturnType();
+        $returnType = $methodReflection->getVariants()[0]->getReturnType();
 
         /** @var string $relatedModelClassName */
         $relatedModelClassName = $this

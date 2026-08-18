@@ -92,10 +92,10 @@ final class CQC_Phpstan_Method_HigherOrderCollectionProxyExtension implements Me
             public function getVariants(): array {
                 return [
                     new FunctionVariant(
-                        $this->modelMethodReflection->getOnlyVariant()->getTemplateTypeMap(),
-                        $this->modelMethodReflection->getOnlyVariant()->getResolvedTemplateTypeMap(),
-                        $this->modelMethodReflection->getOnlyVariant()->getParameters(),
-                        $this->modelMethodReflection->getOnlyVariant()->isVariadic(),
+                        $this->modelMethodReflection->getVariants()[0]->getTemplateTypeMap(),
+                        $this->modelMethodReflection->getVariants()[0]->getResolvedTemplateTypeMap(),
+                        $this->modelMethodReflection->getVariants()[0]->getParameters(),
+                        $this->modelMethodReflection->getVariants()[0]->isVariadic(),
                         $this->returnType
                     ),
                 ];

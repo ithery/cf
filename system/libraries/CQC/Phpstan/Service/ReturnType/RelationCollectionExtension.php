@@ -44,7 +44,7 @@ final class CQC_Phpstan_Service_ReturnType_RelationCollectionExtension implement
             return false;
         }
 
-        $returnType = $methodReflection->getOnlyVariant()->getReturnType();
+        $returnType = $methodReflection->getVariants()[0]->getReturnType();
 
         if (!in_array(CModel_Collection::class, $returnType->getReferencedClasses(), true)) {
             return false;
@@ -64,7 +64,7 @@ final class CQC_Phpstan_Service_ReturnType_RelationCollectionExtension implement
         /** @var ObjectType $modelType */
         $modelType = $methodReflection->getDeclaringClass()->getActiveTemplateTypeMap()->getType('TRelatedModel');
 
-        $returnType = $methodReflection->getOnlyVariant()->getReturnType();
+        $returnType = $methodReflection->getVariants()[0]->getReturnType();
 
         if (in_array(CModel_Collection::class, $returnType->getReferencedClasses(), true)) {
             $collectionClassName = $this->builderHelper->determineCollectionClassName($modelType->getClassname());
