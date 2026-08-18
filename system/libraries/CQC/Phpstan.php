@@ -9,15 +9,14 @@ class CQC_Phpstan {
      * Versi PHPStan yang didukung.
      *
      * Berjalan pada PHP 7.4 sampai 8.x - diuji langsung di lsphp74 dan 8.2,
-     * 2026-08-18. Tetap di jalur 1.x: 2.x membuang
-     * `ParametersAcceptorSelector::selectSingle()` dan `TypeUtils`, yang
-     * dipakai 11 dari 56 berkas CQC_Phpstan, dan mewajibkan identifier pada
-     * tiap rule. Naik ke sana pekerjaan tersendiri, bukan sekadar mengganti
-     * phar - lihat docs/TODO.md.
+     * 2026-08-18. Dipilih di jalur 2.2 karena itu yang dituntut Larastan 3.10
+     * (`phpstan/phpstan ^2.2.2`) yang jadi acuan porting di
+     * `reference/larastan`, sehingga kode di sana dapat dibandingkan langsung
+     * tanpa menerjemahkan API lebih dulu.
      *
      * @var string
      */
-    const VERSION = '1.12.0';
+    const VERSION = '2.2.8';
 
     /**
      * @var CQC_Phpstan

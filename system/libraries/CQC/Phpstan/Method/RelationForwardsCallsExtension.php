@@ -64,8 +64,7 @@ final class CQC_Phpstan_Method_RelationForwardsCallsExtension implements Methods
     }
 
     /**
-     * @param ClassReflection $classReflection
-     * @param string          $methodName
+     * @param string $methodName
      *
      * @throws MissingMethodFromReflectionException
      * @throws ShouldNotHappenException
@@ -106,7 +105,7 @@ final class CQC_Phpstan_Method_RelationForwardsCallsExtension implements Methods
             return null;
         }
 
-        $parametersAcceptor = ParametersAcceptorSelector::selectSingle($reflection->getVariants());
+        $parametersAcceptor = $reflection->getOnlyVariant();
         $returnType = $parametersAcceptor->getReturnType();
 
         $types = [$relatedModel];

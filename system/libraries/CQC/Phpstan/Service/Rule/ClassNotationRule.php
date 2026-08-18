@@ -6,6 +6,7 @@ use PHPStan\Analyser\Scope;
 use PhpParser\Node\Stmt\Trait_;
 use PhpParser\Node\Stmt\ClassLike;
 use PhpParser\Node\Stmt\Interface_;
+use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Reflection\ReflectionProvider;
 
 /**
@@ -26,7 +27,8 @@ final class CQC_Phpstan_Service_Rule_ClassNotationRule implements Rule {
     }
 
     /**
-     * @return string[] errors
+     * PHPStan 2.x menuntut objek RuleError, bukan teks biasa - rule yang
+     * mengembalikan string mematikan seluruh analisis berkas itu.
      */
     public function processNode(Node $node, Scope $scope): array {
         $messages = [];
@@ -46,14 +48,18 @@ final class CQC_Phpstan_Service_Rule_ClassNotationRule implements Rule {
             }
         } elseif ($node instanceof Trait_) {
             if (!\preg_match('/Trait$/', $name)) {
-                $messages[] = \sprintf('Trait %s should end with "Trait" suffix.', $fqcn);
+                $messages[] = RuleErrorBuilder::message(
+                    \sprintf('Trait %s should end with "Trait" suffix.', $fqcn)
+                )->identifier('cf.traitSuffix')->build();
             }
         } else {
             $classRef = $this->reflectionProvider->getClass($fqcn)->getNativeReflection();
 
             if ($classRef->isSubclassOf(Exception::class)) {
                 if (!\preg_match('/Exception$/', $name)) {
-                    $messages[] = \sprintf('Exception class %s should end with "Exception" suffix.', $fqcn);
+                    $messages[] = RuleErrorBuilder::message(
+                        \sprintf('Exception class %s should end with "Exception" suffix.', $fqcn)
+                    )->identifier('cf.exceptionSuffix')->build();
                 }
             }
         }

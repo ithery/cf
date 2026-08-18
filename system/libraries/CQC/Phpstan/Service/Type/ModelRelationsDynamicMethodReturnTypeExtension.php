@@ -27,7 +27,7 @@ class CQC_Phpstan_Service_Type_ModelRelationsDynamicMethodReturnTypeExtension im
     }
 
     public function isMethodSupported(MethodReflection $methodReflection): bool {
-        $variants = ParametersAcceptorSelector::selectSingle($methodReflection->getVariants());
+        $variants = $methodReflection->getOnlyVariant();
 
         $returnType = $variants->getReturnType();
 
@@ -65,13 +65,7 @@ class CQC_Phpstan_Service_Type_ModelRelationsDynamicMethodReturnTypeExtension im
     }
 
     /**
-     * @param MethodReflection $methodReflection
-     * @param MethodCall       $methodCall
-     * @param Scope            $scope
-     *
      * @throws ShouldNotHappenException
-     *
-     * @return Type
      */
     public function getTypeFromMethodCall(
         MethodReflection $methodReflection,
@@ -79,7 +73,7 @@ class CQC_Phpstan_Service_Type_ModelRelationsDynamicMethodReturnTypeExtension im
         Scope $scope
     ): Type {
         /** @var ObjectType $returnType */
-        $returnType = ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+        $returnType = $methodReflection->getOnlyVariant()->getReturnType();
 
         /** @var string $relatedModelClassName */
         $relatedModelClassName = $this

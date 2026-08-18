@@ -67,12 +67,6 @@ final class CQC_Phpstan_Method_ModelForwardsCallsExtension implements MethodsCla
         return false;
     }
 
-    /**
-     * @param ClassReflection $classReflection
-     * @param string          $methodName
-     *
-     * @return MethodReflection
-     */
     public function getMethod(ClassReflection $classReflection, string $methodName): MethodReflection {
         return $this->cache[$classReflection->getCacheKey() . '-' . $methodName];
     }
@@ -177,7 +171,12 @@ final class CQC_Phpstan_Method_ModelForwardsCallsExtension implements MethodsCla
         if ($builderReflection->hasNativeMethod($methodName)) {
             $reflection = $builderReflection->getNativeMethod($methodName);
 
-            $parametersAcceptor = ParametersAcceptorSelector::selectSingle($this->transformStaticParameters($reflection, $genericBuilderAndModelType));
+            //PHPStan 2.x membuang ParametersAcceptorSelector::selectSingle().
+            //Yang dikembalikan transformStaticParameters() sudah berupa daftar
+            //varian dari satu method, dan method CF tidak pernah punya varian
+            //lebih dari satu - jadi yang pertama memang satu-satunya.
+            $transformedVariants = $this->transformStaticParameters($reflection, $genericBuilderAndModelType);
+            $parametersAcceptor = $transformedVariants[0];
             $returnType = TypeTraverser::map($parametersAcceptor->getReturnType(), static function (Type $type, callable $traverse) use ($genericBuilderAndModelType) {
                 if ($type instanceof TypeWithClassName && $type->getClassName() === CModel_Query::class) {
                     return $genericBuilderAndModelType;

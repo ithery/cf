@@ -30,7 +30,7 @@ final class CQC_Phpstan_Method_HigherOrderCollectionProxyExtension implements Me
 
         $modelMethodReflection = $valueType->getMethod($methodName, new OutOfClassScope());
 
-        $modelMethodReturnType = ParametersAcceptorSelector::selectSingle($modelMethodReflection->getVariants())->getReturnType();
+        $modelMethodReturnType = $modelMethodReflection->getOnlyVariant()->getReturnType();
         $returnType = CQC_Phpstan_Service_Support_HigherOrderCollectionProxyHelper::determineReturnType($methodType->getValue(), $valueType, $modelMethodReturnType);
 
         return new class($classReflection, $methodName, $modelMethodReflection, $returnType) implements MethodReflection {
@@ -92,10 +92,10 @@ final class CQC_Phpstan_Method_HigherOrderCollectionProxyExtension implements Me
             public function getVariants(): array {
                 return [
                     new FunctionVariant(
-                        ParametersAcceptorSelector::selectSingle($this->modelMethodReflection->getVariants())->getTemplateTypeMap(),
-                        ParametersAcceptorSelector::selectSingle($this->modelMethodReflection->getVariants())->getResolvedTemplateTypeMap(),
-                        ParametersAcceptorSelector::selectSingle($this->modelMethodReflection->getVariants())->getParameters(),
-                        ParametersAcceptorSelector::selectSingle($this->modelMethodReflection->getVariants())->isVariadic(),
+                        $this->modelMethodReflection->getOnlyVariant()->getTemplateTypeMap(),
+                        $this->modelMethodReflection->getOnlyVariant()->getResolvedTemplateTypeMap(),
+                        $this->modelMethodReflection->getOnlyVariant()->getParameters(),
+                        $this->modelMethodReflection->getOnlyVariant()->isVariadic(),
                         $this->returnType
                     ),
                 ];

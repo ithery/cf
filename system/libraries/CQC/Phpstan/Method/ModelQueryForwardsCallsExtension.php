@@ -109,9 +109,9 @@ final class CQC_Phpstan_Method_ModelQueryForwardsCallsExtension implements Metho
                         $methodName,
                         $classReflection,
                         $ref,
-                        ParametersAcceptorSelector::selectSingle($ref->getVariants())->getParameters(),
+                        $ref->getOnlyVariant()->getParameters(),
                         new IntegerType(),
-                        ParametersAcceptorSelector::selectSingle($ref->getVariants())->isVariadic()
+                        $ref->getOnlyVariant()->isVariadic()
                     );
                 }
 
@@ -119,16 +119,16 @@ final class CQC_Phpstan_Method_ModelQueryForwardsCallsExtension implements Metho
                     $methodName,
                     $classReflection,
                     $ref,
-                    ParametersAcceptorSelector::selectSingle($ref->getVariants())->getParameters(),
+                    $ref->getOnlyVariant()->getParameters(),
                     new GenericObjectType($classReflection->getName(), [$modelType]),
-                    ParametersAcceptorSelector::selectSingle($ref->getVariants())->isVariadic()
+                    $ref->getOnlyVariant()->isVariadic()
                 );
             }
 
             return null;
         }
 
-        $parametersAcceptor = ParametersAcceptorSelector::selectSingle($ref->getVariants());
+        $parametersAcceptor = $ref->getOnlyVariant();
 
         if (in_array($methodName, $this->builderHelper->passthru, true)) {
             $returnType = $parametersAcceptor->getReturnType();

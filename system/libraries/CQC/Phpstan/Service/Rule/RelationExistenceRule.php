@@ -3,7 +3,6 @@
 use PhpParser\Node;
 use PHPStan\Rules\Rule;
 use PHPStan\Analyser\Scope;
-use PHPStan\Type\TypeUtils;
 use PHPStan\Type\ObjectType;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\StaticCall;
@@ -151,25 +150,23 @@ final class CQC_Phpstan_Service_Rule_RelationExistenceRule implements Rule {
     private function relationNameList($type) {
         $names = [];
 
-        //TypeUtils, bukan Type::getConstantStrings() - yang terakhir baru ada
-        //di PHPStan 2.x sedangkan yang terpasang di sini 1.9
-        $arrays = TypeUtils::getConstantArrays($type);
+        $arrays = $type->getConstantArrays();
 
         if (count($arrays) > 0) {
             foreach ($arrays as $array) {
                 foreach ($array->getKeyTypes() as $keyType) {
-                    foreach (TypeUtils::getConstantStrings($keyType) as $constant) {
+                    foreach ($keyType->getConstantStrings() as $constant) {
                         $names[] = $constant->getValue();
                     }
                 }
                 foreach ($array->getValueTypes() as $valueType) {
-                    foreach (TypeUtils::getConstantStrings($valueType) as $constant) {
+                    foreach ($valueType->getConstantStrings() as $constant) {
                         $names[] = $constant->getValue();
                     }
                 }
             }
         } else {
-            foreach (TypeUtils::getConstantStrings($type) as $constant) {
+            foreach ($type->getConstantStrings() as $constant) {
                 $names[] = $constant->getValue();
             }
         }
@@ -212,7 +209,7 @@ final class CQC_Phpstan_Service_Rule_RelationExistenceRule implements Rule {
                     'Relation %s is not found in %s model.',
                     $relationName,
                     $currentModel->getName()
-                ))->line($node->getLine())->build();
+                ))->identifier('cf.relationNotFound')->line($node->getLine())->build();
             }
 
             $relatedModel = $this->relationParserHelper->findRelatedModelInRelationMethod($relationMethod);

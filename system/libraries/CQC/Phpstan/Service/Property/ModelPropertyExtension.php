@@ -188,7 +188,7 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
                 return false;
             }
 
-            $returnType = ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+            $returnType = $methodReflection->getOnlyVariant()->getReturnType();
 
             if (!(new ObjectType(CModel_Casts_Attribute::class))->isSuperTypeOf($returnType)->yes()) {
                 return false;
@@ -207,9 +207,7 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
         $getter = 'get' . cstr::studly($propertyName) . 'Attribute';
 
         if ($classReflection->hasNativeMethod($getter)) {
-            return ParametersAcceptorSelector::selectSingle(
-                $classReflection->getNativeMethod($getter)->getVariants()
-            )->getReturnType();
+            return $classReflection->getNativeMethod($getter)->getOnlyVariant()->getReturnType();
         }
 
         //gaya CModel_Casts_Attribute: yang dikembalikan pembungkusnya, bukan
@@ -242,7 +240,7 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
             return null;
         }
 
-        $returnType = ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+        $returnType = $methodReflection->getOnlyVariant()->getReturnType();
 
         if (!(new ObjectType(CModel_Relation::class))->isSuperTypeOf($returnType)->yes()) {
             return null;
@@ -255,7 +253,7 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
      * Hasil sebuah relasi bila dibaca sebagai properti.
      */
     private function relationResultType(MethodReflection $methodReflection): Type {
-        $returnType = ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+        $returnType = $methodReflection->getOnlyVariant()->getReturnType();
 
         //model terkait diturunkan dari badan methodnya - tipe kembalian yang
         //ditulis tangan hampir selalu tanpa generik (`@return CModel_Relation_HasMany`)

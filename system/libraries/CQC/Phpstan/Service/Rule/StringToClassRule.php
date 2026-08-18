@@ -4,6 +4,7 @@ use PhpParser\Node;
 use PHPStan\Rules\Rule;
 use PHPStan\Analyser\Scope;
 use PhpParser\Node\Scalar\String_;
+use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Reflection\ReflectionProvider;
 
 /**
@@ -48,7 +49,9 @@ final class CQC_Phpstan_Service_Rule_StringToClassRule implements Rule {
         }
 
         return [
-            \sprintf('Class %s should be written with ::class notation, string found.', $className),
+            RuleErrorBuilder::message(
+                \sprintf('Class %s should be written with ::class notation, string found.', $className)
+            )->identifier('cf.stringToClass')->build(),
         ];
     }
 
