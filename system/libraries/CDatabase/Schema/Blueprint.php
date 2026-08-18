@@ -2,14 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 10:19:43 AM
- */
 class CDatabase_Schema_Blueprint {
     use CTrait_Macroable;
+
     /**
      * The storage engine that should be used for the table.
      *
@@ -19,11 +14,15 @@ class CDatabase_Schema_Blueprint {
 
     /**
      * The default character set that should be used for the table.
+     *
+     * @var string
      */
     public $charset;
 
     /**
      * The collation that should be used for the table.
+     *
+     * @var string
      */
     public $collation;
 
@@ -63,7 +62,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @return void
      */
-    public function __construct($table, Closure $callback = null) {
+    public function __construct($table, ?Closure $callback = null) {
         $this->table = $table;
 
         if (!is_null($callback)) {
@@ -74,12 +73,12 @@ class CDatabase_Schema_Blueprint {
     /**
      * Execute the blueprint against the database.
      *
-     * @param \CDatabase                $connection
+     * @param \CDatabase_Connection     $connection
      * @param \CDatabase_Schema_Grammar $grammar
      *
      * @return void
      */
-    public function build(CDatabase $connection, CDatabase_Schema_Grammar $grammar) {
+    public function build(CDatabase_Connection $connection, CDatabase_Schema_Grammar $grammar) {
         foreach ($this->toSql($connection, $grammar) as $statement) {
             $connection->query($statement);
         }
@@ -88,12 +87,12 @@ class CDatabase_Schema_Blueprint {
     /**
      * Get the raw SQL statements for the blueprint.
      *
-     * @param \CDatabase                $connection
+     * @param \CDatabase_Connection     $connection
      * @param \CDatabase_Schema_Grammar $grammar
      *
      * @return array
      */
-    public function toSql(CDatabase $connection, CDatabase_Schema_Grammar $grammar) {
+    public function toSql(CDatabase_Connection $connection, CDatabase_Schema_Grammar $grammar) {
         $this->addImpliedCommands();
 
         $statements = [];
@@ -302,7 +301,7 @@ class CDatabase_Schema_Blueprint {
      * @return void
      */
     public function dropTimestamps() {
-        $this->dropColumn('created_at', 'updated_at');
+        $this->dropColumn('created', 'updated');
     }
 
     /**
@@ -903,9 +902,9 @@ class CDatabase_Schema_Blueprint {
      * @return void
      */
     public function timestampsTz($precision = 0) {
-        $this->timestampTz('created_at', $precision)->nullable();
+        $this->timestampTz('created', $precision)->nullable();
 
-        $this->timestampTz('updated_at', $precision)->nullable();
+        $this->timestampTz('updated', $precision)->nullable();
     }
 
     /**
@@ -1190,7 +1189,7 @@ class CDatabase_Schema_Blueprint {
      */
     public function removeColumn($name) {
         $this->columns = array_values(array_filter($this->columns, function ($c) use ($name) {
-            return $c['attributes']['name'] != $name;
+            return $c['name'] != $name;
         }));
 
         return $this;

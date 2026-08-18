@@ -2,9 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- */
 final class CDomain {
     public static function path() {
         $dir = DOCROOT . 'data' . DS . 'domain' . DS;
@@ -12,6 +9,11 @@ final class CDomain {
         return $dir;
     }
 
+    /**
+     * @param string $dataName
+     *
+     * @return string
+     */
     public static function getFile($dataName) {
         $file = self::path();
         $file .= $dataName;
@@ -19,6 +21,11 @@ final class CDomain {
         return $file;
     }
 
+    /**
+     * @param string $domain
+     *
+     * @return mixed|null
+     */
     public static function get($domain) {
         $file = self::path() . $domain . EXT;
 
@@ -43,6 +50,12 @@ final class CDomain {
         return null;
     }
 
+    /**
+     * @param string $domain
+     * @param mixed  $data
+     *
+     * @return bool
+     */
     public static function set($domain, $data) {
         $file = self::path() . $domain . EXT;
 
@@ -51,10 +64,26 @@ final class CDomain {
         return true;
     }
 
+    /**
+     * @param string $domain
+     *
+     * @return bool
+     */
+    public static function exists($domain) {
+        $file = self::path() . $domain . EXT;
+        return CFile::exists($file);
+    }
+
+    /**
+     * @param string $domain
+     *
+     * @return bool
+     */
     public static function delete($domain) {
         $file = self::path() . $domain . EXT;
         if (CFile::exists($file)) {
-            CFile::delete($domain);
+            return CFile::delete($file);
         }
+        return false;
     }
 }

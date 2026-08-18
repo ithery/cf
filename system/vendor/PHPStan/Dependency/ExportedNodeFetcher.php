@@ -2,15 +2,18 @@
 
 namespace PHPStan\Dependency;
 
-use PhpParser\Node;
 use PhpParser\NodeTraverser;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Parser\Parser;
 use PHPStan\Parser\ParserErrorsException;
 
-class ExportedNodeFetcher
+#[AutowiredService]
+final class ExportedNodeFetcher
 {
 
 	public function __construct(
+		#[AutowiredParameter(ref: '@defaultAnalysisParser')]
 		private Parser $parser,
 		private ExportedNodeVisitor $visitor,
 	)
@@ -26,7 +29,6 @@ class ExportedNodeFetcher
 		$nodeTraverser->addVisitor($this->visitor);
 
 		try {
-			/** @var Node[] $ast */
 			$ast = $this->parser->parseFile($fileName);
 		} catch (ParserErrorsException) {
 			return [];

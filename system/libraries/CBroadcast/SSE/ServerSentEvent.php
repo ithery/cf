@@ -78,6 +78,7 @@ class CBroadcast_SSE_ServerSentEvent implements Stringable {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $event = $this->propertyString('event');
 

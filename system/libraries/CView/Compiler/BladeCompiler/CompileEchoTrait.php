@@ -1,11 +1,34 @@
 <?php
 
 /**
- * Description of CompileEchoTrait
+ * Description of CompileEchoTrait.
  *
  * @author Hery
  */
 trait CView_Compiler_BladeCompiler_CompileEchoTrait {
+    /**
+     * Custom rendering callbacks for stringable objects.
+     *
+     * @var array
+     */
+    protected $echoHandlers = [];
+
+    /**
+     * Add a handler to be executed before echoing a given class.
+     *
+     * @param string|callable $class
+     * @param null|callable   $handler
+     *
+     * @return void
+     */
+    public function stringable($class, $handler = null) {
+        if ($class instanceof Closure) {
+            list($class, $handler) = [$this->firstClosureParameterType($class), $class];
+        }
+
+        $this->echoHandlers[$class] = $handler;
+    }
+
     /**
      * Compile Blade echos into valid PHP.
      *
@@ -87,9 +110,54 @@ trait CView_Compiler_BladeCompiler_CompileEchoTrait {
         $callback = function ($matches) {
             $whitespace = empty($matches[3]) ? '' : $matches[3] . $matches[3];
 
-            return $matches[1] ? $matches[0] : "<?php echo c::e({$matches[2]}); ?>{$whitespace}";
+            return $matches[1]
+                ? $matches[0]
+                : "<?php echo c::e({$this->wrapInEchoHandler($matches[2])}); ?>{$whitespace}";
         };
 
         return preg_replace_callback($pattern, $callback, $value);
+    }
+
+    /**
+     * Add an instance of the blade echo handler to the start of the compiled string.
+     *
+     * @param string $result
+     *
+     * @return string
+     */
+    protected function addBladeCompilerVariable($result) {
+        return '<?php $__bladeCompiler = CView::blade(); ?>' . $result;
+    }
+
+    /**
+     * Wrap the echoable value in an echo handler if applicable.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    protected function wrapInEchoHandler($value) {
+        $value = cstr::of($value)
+            ->trim()
+            ->when(str_ends_with($value, ';'), function ($str) {
+                return $str->beforeLast(';');
+            });
+
+        return empty($this->echoHandlers) ? $value : '$__bladeCompiler->applyEchoHandler(' . $value . ')';
+    }
+
+    /**
+     * Apply the echo handler for the value if it exists.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public function applyEchoHandler($value) {
+        if (is_object($value) && isset($this->echoHandlers[get_class($value)])) {
+            return call_user_func($this->echoHandlers[get_class($value)], $value);
+        }
+
+        return $value;
     }
 }

@@ -12,15 +12,15 @@
 namespace Symfony\Component\Finder;
 
 use Symfony\Component\Finder\Comparator\DateComparator;
+use Symfony\Component\Finder\Iterator\SortableIterator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
-use Symfony\Component\Finder\Iterator\DateRangeFilterIterator;
-use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
-use Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator;
-use Symfony\Component\Finder\Iterator\FilecontentFilterIterator;
 use Symfony\Component\Finder\Iterator\FilenameFilterIterator;
+use Symfony\Component\Finder\Iterator\DateRangeFilterIterator;
 use Symfony\Component\Finder\Iterator\SizeRangeFilterIterator;
-use Symfony\Component\Finder\Iterator\SortableIterator;
+use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
+use Symfony\Component\Finder\Iterator\FilecontentFilterIterator;
+use Symfony\Component\Finder\Iterator\ExcludeDirectoryFilterIterator;
 
 /**
  * Finder allows to build rules to find files and directories.
@@ -36,29 +36,47 @@ use Symfony\Component\Finder\Iterator\SortableIterator;
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class Finder implements \IteratorAggregate, \Countable {
-
     const IGNORE_VCS_FILES = 1;
+
     const IGNORE_DOT_FILES = 2;
 
     private $mode = 0;
-    private $names = array();
-    private $notNames = array();
-    private $exclude = array();
-    private $filters = array();
-    private $depths = array();
-    private $sizes = array();
+
+    private $names = [];
+
+    private $notNames = [];
+
+    private $exclude = [];
+
+    private $filters = [];
+
+    private $depths = [];
+
+    private $sizes = [];
+
     private $followLinks = false;
+
     private $sort = false;
+
     private $ignore = 0;
-    private $dirs = array();
-    private $dates = array();
-    private $iterators = array();
-    private $contains = array();
-    private $notContains = array();
-    private $paths = array();
-    private $notPaths = array();
+
+    private $dirs = [];
+
+    private $dates = [];
+
+    private $iterators = [];
+
+    private $contains = [];
+
+    private $notContains = [];
+
+    private $paths = [];
+
+    private $notPaths = [];
+
     private $ignoreUnreadableDirs = false;
-    private static $vcsPatterns = array('.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg');
+
+    private static $vcsPatterns = ['.svn', '_svn', 'CVS', '_darcs', '.arch-params', '.monotone', '.bzr', '.git', '.hg'];
 
     public function __construct() {
         $this->ignore = static::IGNORE_VCS_FILES | static::IGNORE_DOT_FILES;
@@ -507,24 +525,25 @@ class Finder implements \IteratorAggregate, \Countable {
      *
      * @param string|array $dirs A directory path or an array of directories
      *
-     * @return $this
-     *
      * @throws \InvalidArgumentException if one of the directories does not exist
+     *
+     * @return $this
      */
     public function in($dirs) {
-        $resolvedDirs = array();
+        $resolvedDirs = [];
 
         foreach ((array) $dirs as $dir) {
             if (is_dir($dir)) {
                 $resolvedDirs[] = $this->normalizeDir($dir);
             } elseif ($glob = glob($dir, (defined('GLOB_BRACE') ? GLOB_BRACE : 0) | GLOB_ONLYDIR)) {
-                $resolvedDirs = array_merge($resolvedDirs, array_map(array($this, 'normalizeDir'), $glob));
+                $resolvedDirs = array_merge($resolvedDirs, array_map([$this, 'normalizeDir'], $glob));
             } else {
                 throw new \InvalidArgumentException(sprintf('The "%s" directory does not exist.', $dir));
             }
         }
 
         $this->dirs = array_merge($this->dirs, $resolvedDirs);
+
         return $this;
     }
 
@@ -533,10 +552,11 @@ class Finder implements \IteratorAggregate, \Countable {
      *
      * This method implements the IteratorAggregate interface.
      *
-     * @return \Iterator|SplFileInfo[] An iterator
-     *
      * @throws \LogicException if the in() method has not been called
+     *
+     * @return \Iterator|SplFileInfo[] An iterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         if (0 === count($this->dirs) && 0 === count($this->iterators)) {
             throw new \LogicException('You must call one of in() or append() methods before iterating over a Finder.');
@@ -565,9 +585,9 @@ class Finder implements \IteratorAggregate, \Countable {
      *
      * @param mixed $iterator
      *
-     * @return $this
-     *
      * @throws \InvalidArgumentException when the given argument is not iterable
+     *
+     * @return $this
      */
     public function append($iterator) {
         if ($iterator instanceof \IteratorAggregate) {
@@ -605,11 +625,12 @@ class Finder implements \IteratorAggregate, \Countable {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return iterator_count($this->getIterator());
     }
 
-    private function searchInDirectory( $dir) {
+    private function searchInDirectory($dir) {
         if (static::IGNORE_VCS_FILES === (static::IGNORE_VCS_FILES & $this->ignore)) {
             $this->exclude = array_merge($this->exclude, self::$vcsPatterns);
         }
@@ -625,15 +646,19 @@ class Finder implements \IteratorAggregate, \Countable {
             switch ($comparator->getOperator()) {
                 case '>':
                     $minDepth = $comparator->getTarget() + 1;
+
                     break;
                 case '>=':
                     $minDepth = $comparator->getTarget();
+
                     break;
                 case '<':
                     $maxDepth = $comparator->getTarget() - 1;
+
                     break;
                 case '<=':
                     $maxDepth = $comparator->getTarget();
+
                     break;
                 default:
                     $minDepth = $maxDepth = $comparator->getTarget();
@@ -704,5 +729,4 @@ class Finder implements \IteratorAggregate, \Countable {
     private function normalizeDir($dir) {
         return rtrim($dir, '/' . \DIRECTORY_SEPARATOR);
     }
-
 }

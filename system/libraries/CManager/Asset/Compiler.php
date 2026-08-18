@@ -2,21 +2,27 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Jul 30, 2020
- */
 class CManager_Asset_Compiler {
     use CTrait_HasOptions;
 
+    /**
+     * @var string[]
+     */
     protected $files;
 
+    /**
+     * @var string
+     */
     protected $outFile;
 
+    /**
+     * @var string
+     */
     protected $type;
 
+    /**
+     * @var int
+     */
     protected $maxImportSize;
 
     /**
@@ -33,8 +39,15 @@ class CManager_Asset_Compiler {
      */
     protected $lastModTimeCompiledAsset = 0;
 
+    /**
+     * @var string
+     */
     protected $separator = "\n";
 
+    /**
+     * @param string[] $files
+     * @param array    $options
+     */
     public function __construct(array $files, $options = []) {
         $files = carr::map($files, function ($script) {
             return preg_replace('/\?.*/', '', $script);
@@ -55,25 +68,33 @@ class CManager_Asset_Compiler {
         $this->determineLastModified();
     }
 
+    /**
+     * @return void
+     */
     protected function determineType() {
         $firstFile = carr::first($this->files);
         $extension = pathinfo($firstFile, PATHINFO_EXTENSION);
         $this->type = strtolower($extension);
     }
 
+    /**
+     * @return void
+     */
     protected function determineOutFile() {
         $firstFile = carr::first($this->files);
         $ymd = date('Ymd', filemtime($firstFile));
-        $basePath = defined('CFPUBLIC') ? DOCROOT . 'public' . DS : DOCROOT;
-        $this->outFile = $basePath . 'compiled/asset/' . $this->type . '/' . $ymd . '/' . md5(implode(':', $this->files)) . '.' . $this->type;
+        $this->outFile = DOCROOT . 'compiled/asset/' . $this->type . '/' . $ymd . '/' . md5(implode(':', $this->files)) . '.' . $this->type;
     }
 
+    /**
+     * @return void
+     */
     protected function determineLastModified() {
         //Set the instance variable to store the last modified time of the newest file
         $this->lastModTimeNewestAsset = 0;
         foreach ($this->files as $file) {
             if (!file_exists($file)) {
-                throw new Exception('Error to compile asseet, ' . $file . ' not exist');
+                throw new Exception('Error to compile asset, ' . $file . ' not exist');
             }
             $mTime = filemtime($file);
             $this->lastModTimeNewestAsset = $mTime > $this->lastModTimeNewestAsset ? $mTime : $this->lastModTimeNewestAsset;
@@ -85,14 +106,23 @@ class CManager_Asset_Compiler {
         }
     }
 
+    /**
+     * @return string
+     */
     protected function outputPath() {
         return 'compiled';
     }
 
+    /**
+     * @return bool
+     */
     public function needToRecompile() {
         return $this->lastModTimeCompiledAsset < $this->lastModTimeNewestAsset;
     }
 
+    /**
+     * @return string
+     */
     public function compile() {
         if ($this->needToRecompile()) {
             $dirname = dirname($this->outFile);

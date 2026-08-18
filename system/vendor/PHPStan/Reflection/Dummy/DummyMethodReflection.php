@@ -2,18 +2,19 @@
 
 namespace PHPStan\Reflection\Dummy;
 
+use PHPStan\PhpDoc\ResolvedPhpDocBlock;
 use PHPStan\Reflection\Assertions;
 use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\ParametersAcceptor;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
 use PHPStan\Reflection\ReflectionProviderStaticAccessor;
 use PHPStan\Reflection\TrivialParametersAcceptor;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Type;
 use stdClass;
 
-class DummyMethodReflection implements ExtendedMethodReflection
+final class DummyMethodReflection implements ExtendedMethodReflection
 {
 
 	public function __construct(private string $name)
@@ -52,14 +53,21 @@ class DummyMethodReflection implements ExtendedMethodReflection
 		return $this;
 	}
 
-	/**
-	 * @return ParametersAcceptor[]
-	 */
 	public function getVariants(): array
 	{
 		return [
 			new TrivialParametersAcceptor(),
 		];
+	}
+
+	public function getOnlyVariant(): ExtendedParametersAcceptor
+	{
+		return $this->getVariants()[0];
+	}
+
+	public function getNamedArgumentsVariants(): ?array
+	{
+		return null;
 	}
 
 	public function isDeprecated(): TrinaryLogic
@@ -77,7 +85,17 @@ class DummyMethodReflection implements ExtendedMethodReflection
 		return TrinaryLogic::createMaybe();
 	}
 
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
 	public function isInternal(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isBuiltin(): TrinaryLogic
 	{
 		return TrinaryLogic::createMaybe();
 	}
@@ -102,6 +120,11 @@ class DummyMethodReflection implements ExtendedMethodReflection
 		return Assertions::createEmpty();
 	}
 
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
 	public function getSelfOutType(): ?Type
 	{
 		return null;
@@ -110,6 +133,37 @@ class DummyMethodReflection implements ExtendedMethodReflection
 	public function returnsByReference(): TrinaryLogic
 	{
 		return TrinaryLogic::createMaybe();
+	}
+
+	public function isAbstract(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isPure(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function getPureUnlessCallableIsImpureParameters(): array
+	{
+		return [];
+	}
+
+	public function getAttributes(): array
+	{
+		return [];
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		// Align with the getAttributes() returning empty
+		return TrinaryLogic::createNo();
+	}
+
+	public function getResolvedPhpDoc(): ?ResolvedPhpDocBlock
+	{
+		return null;
 	}
 
 }

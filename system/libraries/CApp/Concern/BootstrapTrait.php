@@ -2,19 +2,25 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 trait CApp_Concern_BootstrapTrait {
+    /**
+     * @var bool
+     */
     protected static $registerComponentBooted = false;
 
+    /**
+     * @var bool
+     */
     protected static $registerControlBooted = false;
 
+    /**
+     * @var bool
+     */
     protected static $registerBladeBooted = false;
 
+    /**
+     * @return void
+     */
     public static function registerComponent() {
         if (!static::$registerComponentBooted) {
             CComponent_RenameMe_SupportEvents::init();
@@ -97,6 +103,9 @@ trait CApp_Concern_BootstrapTrait {
         }
     }
 
+    /**
+     * @return void
+     */
     public static function registerBlade() {
         if (!static::$registerBladeBooted) {
             CView::blade()->directive('CApp', [CApp_Blade_Directive::class, 'directive']);
@@ -122,9 +131,11 @@ trait CApp_Concern_BootstrapTrait {
         }
     }
 
+    /**
+     * @return void
+     */
     public static function registerControl() {
         if (!static::$registerControlBooted) {
-            CFBenchmark::start('CApp.RegisterControl');
             $manager = CManager::instance();
             $manager->registerControls([
                 'text' => CElement_FormInput_Text::class,
@@ -146,7 +157,9 @@ trait CApp_Concern_BootstrapTrait {
                 'image' => CElement_FormInput_Image::class,
                 'image-ajax' => CElement_FormInput_ImageAjax::class,
                 'multi-image-ajax' => CElement_FormInput_MultipleImageAjax::class,
+                'file' => CElement_FormInput_File::class,
                 'file-ajax' => CElement_FormInput_FileAjax::class,
+                'multi-file-ajax' => CElement_FormInput_MultipleFileAjax::class,
                 'password' => CElement_FormInput_Password::class,
                 'select' => CElement_FormInput_Select::class,
                 'minicolor' => CElement_FormInput_MiniColor::class,
@@ -155,22 +168,19 @@ trait CApp_Concern_BootstrapTrait {
                 'select-tag' => CElement_FormInput_SelectTag::class,
                 'selectsearch' => CElement_FormInput_SelectSearch::class,
                 'checkbox' => CElement_FormInput_Checkbox::class,
-                'checkbox-list' => CFormInputCheckboxList::class,
+                'checkbox-list' => CElement_FormInput_CheckboxList::class,
                 'switcher' => CElement_FormInput_Checkbox_Switcher::class,
                 'summernote' => CElement_FormInput_Textarea_Summernote::class,
                 'radio' => CElement_FormInput_Radio::class,
                 'label' => CElement_FormInput_Label::class,
                 'quill' => CElement_FormInput_Textarea_Quill::class,
-                'file' => CElement_FormInput_File::class,
-                'ckeditor' => CFormInputCKEditor::class,
-                //'filedrop' => CFormInputFileDrop::class,
-                //'slider' => CFormInputSlider::class,
+                'ckeditor' => CElement_FormInput_Textarea_CKEditor::class,
+                // 'filedrop' => CFormInputFileDrop::class,
+                'slider' => CElement_FormInput_Slider::class,
                 //'tooltip' => CFormInputTooltip::class,
                 'fileupload' => CElement_FormInput_MultipleImageAjax::class,
-                'wysiwyg' => CFormInputWysiwyg::class,
             ]);
 
-            CFBenchmark::stop('CApp.RegisterControl');
             static::$registerControlBooted = true;
         }
     }

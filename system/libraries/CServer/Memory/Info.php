@@ -2,57 +2,51 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 6:19:18 PM
- */
 class CServer_Memory_Info {
     /**
-     * Free memory in bytes
+     * Free memory in bytes.
      *
      * @var int
      */
     private $memFree = 0;
 
     /**
-     * Total memory in bytes
+     * Total memory in bytes.
      *
      * @var int
      */
     private $memTotal = 0;
 
     /**
-     * Used memory in bytes
+     * Used memory in bytes.
      *
      * @var int
      */
     private $memUsed = 0;
 
     /**
-     * Used memory by applications in bytes
+     * Used memory by applications in bytes.
      *
      * @var int
      */
     private $memApplication = null;
 
     /**
-     * Used memory for buffers in bytes
+     * Used memory for buffers in bytes.
      *
      * @var int
      */
     private $memBuffer = null;
 
     /**
-     * Used memory for cache in bytes
+     * Used memory for cache in bytes.
      *
      * @var int
      */
     private $memCache = null;
 
     /**
-     * Array with swap devices
+     * Array with swap devices.
      *
      * @see DiskDevice
      *
@@ -61,7 +55,7 @@ class CServer_Memory_Info {
     private $swapDevices = [];
 
     /**
-     * Return percent of used memory
+     * Return percent of used memory.
      *
      * @see CServer_Memory_Info::memUsed
      * @see CServer_Memory_Info::memTotal
@@ -77,7 +71,7 @@ class CServer_Memory_Info {
     }
 
     /**
-     * Return percent of used memory for applications
+     * Return percent of used memory for applications.
      *
      * @see CServer_Memory_Info::memApplication
      * @see CServer_Memory_Info::memTotal
@@ -97,7 +91,7 @@ class CServer_Memory_Info {
     }
 
     /**
-     * Return percent of used memory for cache
+     * Return percent of used memory for cache.
      *
      * @see CServer_Memory_Info::memCache
      * @see CServer_Memory_Info::memTotal
@@ -121,7 +115,7 @@ class CServer_Memory_Info {
     }
 
     /**
-     * Return percent of used memory for buffer
+     * Return percent of used memory for buffer.
      *
      * @see CServer_Memory_Info::memBuffer
      * @see CServer_Memory_Info::memTotal
@@ -151,7 +145,7 @@ class CServer_Memory_Info {
     }
 
     /**
-     * Returns total free swap space
+     * Returns total free swap space.
      *
      * @see CServer_Memory_Info::swapDevices
      * @see DiskDevice::getFree()
@@ -172,7 +166,7 @@ class CServer_Memory_Info {
     }
 
     /**
-     * Returns total swap space
+     * Returns total swap space.
      *
      * @see CServer_Memory_Info::swapDevices
      * @see DiskDevice::getTotal()
@@ -193,7 +187,7 @@ class CServer_Memory_Info {
     }
 
     /**
-     * Returns total used swap space
+     * Returns total used swap space.
      *
      * @see CServer_Memory_Info::swapDevices
      * @see DiskDevice::getUsed()
@@ -214,7 +208,7 @@ class CServer_Memory_Info {
     }
 
     /**
-     * Return percent of total swap space used
+     * Return percent of total swap space used.
      *
      * @see CServer_Memory_Info::getSwapUsed()
      * @see CServer_Memory_Info::getSwapTotal()

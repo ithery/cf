@@ -36,16 +36,16 @@ class CEmail_Markdown {
      * @return void
      */
     public function __construct(array $options = []) {
-        $this->theme = $options['theme'] ?? 'default';
-        $this->loadComponentsFrom($options['paths'] ?? []);
+        $this->theme = carr::get($options, 'theme', 'default');
+        $this->loadComponentsFrom(carr::get($options, 'paths', []));
     }
 
     /**
      * Render the Markdown template into HTML.
      *
-     * @param string                                                 $view
-     * @param array                                                  $data
-     * @param null|\TijsVerkoyen\CssToInlineStyles\CssToInlineStyles $inliner
+     * @param string                          $view
+     * @param array                           $data
+     * @param null|\CParser_CssToInlineStyles $inliner
      *
      * @return \CBase_HtmlString
      */
@@ -65,7 +65,7 @@ class CEmail_Markdown {
                 : 'mail::themes.' . $this->theme;
         }
 
-        return new CBase_HtmlString(($inliner ?: new CssToInlineStyles())->convert(
+        return new CBase_HtmlString(($inliner ?: new CParser_CssToInlineStyles())->convert(
             $contents,
             CView_Factory::instance()->make($theme, $data)->render()
         ));

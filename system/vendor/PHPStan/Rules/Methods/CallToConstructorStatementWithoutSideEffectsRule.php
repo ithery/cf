@@ -4,35 +4,40 @@ namespace PHPStan\Rules\Methods;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Node\NoopExpressionNode;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\NeverType;
-use PHPStan\Type\VoidType;
+use function count;
 use function sprintf;
 
 /**
- * @implements Rule<Node\Stmt\Expression>
+ * @implements Rule<NoopExpressionNode>
  */
-class CallToConstructorStatementWithoutSideEffectsRule implements Rule
+#[RegisteredRule(level: 4)]
+final class CallToConstructorStatementWithoutSideEffectsRule implements Rule
 {
 
-	public function __construct(private ReflectionProvider $reflectionProvider)
+	public function __construct(
+		private ReflectionProvider $reflectionProvider,
+	)
 	{
 	}
 
 	public function getNodeType(): string
 	{
-		return Node\Stmt\Expression::class;
+		return NoopExpressionNode::class;
 	}
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if (!$node->expr instanceof Node\Expr\New_) {
+		$instantiation = $node->getOriginalExpr();
+		if (!$instantiation instanceof Node\Expr\New_) {
 			return [];
 		}
 
-		$instantiation = $node->expr;
 		if (!$instantiation->class instanceof Node\Name) {
 			return [];
 		}
@@ -44,31 +49,31 @@ class CallToConstructorStatementWithoutSideEffectsRule implements Rule
 
 		$classReflection = $this->reflectionProvider->getClass($className);
 		if (!$classReflection->hasConstructor()) {
-			return [];
-		}
-
-		$constructor = $classReflection->getConstructor();
-		if ($constructor->hasSideEffects()->no()) {
-			$throwsType = $constructor->getThrowType();
-			if ($throwsType !== null && !$throwsType instanceof VoidType) {
-				return [];
-			}
-
-			$methodResult = $scope->getType($instantiation);
-			if ($methodResult instanceof NeverType && $methodResult->isExplicit()) {
-				return [];
-			}
-
 			return [
 				RuleErrorBuilder::message(sprintf(
-					'Call to %s::%s() on a separate line has no effect.',
+					'Call to new %s() on a separate line has no effect.',
 					$classReflection->getDisplayName(),
-					$constructor->getName(),
-				))->build(),
+				))->identifier('new.resultUnused')->build(),
 			];
 		}
 
-		return [];
+		$constructor = $classReflection->getConstructor();
+		if (count($constructor->getAsserts()->getAsserts()) > 0) {
+			return [];
+		}
+
+		$methodResult = $scope->getType($instantiation);
+		if ($methodResult instanceof NeverType && $methodResult->isExplicit()) {
+			return [];
+		}
+
+		return [
+			RuleErrorBuilder::message(sprintf(
+				'Call to %s::%s() on a separate line has no effect.',
+				$classReflection->getDisplayName(),
+				$constructor->getName(),
+			))->identifier('new.resultUnused')->build(),
+		];
 	}
 
 }

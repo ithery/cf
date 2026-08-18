@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Jul 28, 2020
- */
 class CCache_TaggedCache extends CCache_Repository {
     use CCache_Trait_RetrievesMultipleKeys {
         putMany as putManyAlias;
@@ -59,7 +53,7 @@ class CCache_TaggedCache extends CCache_Repository {
      * @return void
      */
     public function increment($key, $value = 1) {
-        $this->store->increment($this->itemKey($key), $value);
+        $this->driver->increment($this->itemKey($key), $value);
     }
 
     /**
@@ -71,7 +65,7 @@ class CCache_TaggedCache extends CCache_Repository {
      * @return void
      */
     public function decrement($key, $value = 1) {
-        $this->store->decrement($this->itemKey($key), $value);
+        $this->driver->decrement($this->itemKey($key), $value);
     }
 
     /**

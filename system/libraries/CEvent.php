@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 1, 2018, 12:16:41 PM
- */
 class CEvent {
     protected static $dispatcher;
 
@@ -18,6 +12,7 @@ class CEvent {
         if (self::$dispatcher == null) {
             self::$dispatcher = static::createDispatcher();
         }
+
         return self::$dispatcher;
     }
 
@@ -35,7 +30,7 @@ class CEvent {
      * //@param mixed         $payload
      * //@param bool          $halt
      *
-     * @return array|null
+     * @return null|array
      */
     public static function dispatch() {
         $args = func_get_args();

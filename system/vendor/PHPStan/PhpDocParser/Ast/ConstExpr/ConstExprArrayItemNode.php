@@ -3,17 +3,16 @@
 namespace PHPStan\PhpDocParser\Ast\ConstExpr;
 
 use PHPStan\PhpDocParser\Ast\NodeAttributes;
+use function sprintf;
 
 class ConstExprArrayItemNode implements ConstExprNode
 {
 
 	use NodeAttributes;
 
-	/** @var ConstExprNode|null */
-	public $key;
+	public ?ConstExprNode $key = null;
 
-	/** @var ConstExprNode */
-	public $value;
+	public ConstExprNode $value;
 
 	public function __construct(?ConstExprNode $key, ConstExprNode $value)
 	{
@@ -21,15 +20,28 @@ class ConstExprArrayItemNode implements ConstExprNode
 		$this->value = $value;
 	}
 
-
 	public function __toString(): string
 	{
 		if ($this->key !== null) {
-			return "{$this->key} => {$this->value}";
+			return sprintf('%s => %s', $this->key, $this->value);
 
 		}
 
-		return "{$this->value}";
+		return (string) $this->value;
+	}
+
+	/**
+	 * @param array<string, mixed> $properties
+	 */
+	public static function __set_state(array $properties): self
+	{
+		$instance = new self($properties['key'], $properties['value']);
+		if (isset($properties['attributes'])) {
+			foreach ($properties['attributes'] as $key => $value) {
+				$instance->setAttribute($key, $value);
+			}
+		}
+		return $instance;
 	}
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 /*
  * This file is part of sebastian/diff.
  *
@@ -13,7 +13,6 @@ declare(strict_types = 1);
 namespace SebastianBergmann\Diff;
 
 final class Diff {
-
     /**
      * @var string
      */
@@ -59,5 +58,4 @@ final class Diff {
     public function setChunks(array $chunks) {
         $this->chunks = $chunks;
     }
-
 }

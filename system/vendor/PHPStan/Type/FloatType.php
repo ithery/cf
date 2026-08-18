@@ -2,8 +2,12 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Accessory\AccessoryNumericStringType;
+use PHPStan\Type\Accessory\AccessoryUppercaseStringType;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\Traits\NonArrayTypeTrait;
@@ -19,6 +23,7 @@ use PHPStan\Type\Traits\UndecidedComparisonTypeTrait;
 use function get_class;
 
 /** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::isFloat()')]
 class FloatType implements Type
 {
 
@@ -38,38 +43,50 @@ class FloatType implements Type
 	{
 	}
 
-	/**
-	 * @return string[]
-	 */
 	public function getReferencedClasses(): array
 	{
 		return [];
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function getObjectClassNames(): array
 	{
-		if ($type instanceof self || $type instanceof IntegerType) {
-			return TrinaryLogic::createYes();
+		return [];
+	}
+
+	public function getObjectClassReflections(): array
+	{
+		return [];
+	}
+
+	public function getConstantStrings(): array
+	{
+		return [];
+	}
+
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
+	{
+		if ($type instanceof self || $type->isInteger()->yes()) {
+			return AcceptsResult::createYes();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
-		return TrinaryLogic::createNo();
+		return AcceptsResult::createNo();
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof self) {
-			return TrinaryLogic::createYes();
+			return IsSuperTypeOfResult::createYes();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
 		}
 
-		return TrinaryLogic::createNo();
+		return IsSuperTypeOfResult::createNo();
 	}
 
 	public function equals(Type $type): bool
@@ -83,6 +100,16 @@ class FloatType implements Type
 	}
 
 	public function toNumber(): Type
+	{
+		return $this;
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new IntegerType();
+	}
+
+	public function toAbsoluteNumber(): Type
 	{
 		return $this;
 	}
@@ -101,6 +128,7 @@ class FloatType implements Type
 	{
 		return new IntersectionType([
 			new StringType(),
+			new AccessoryUppercaseStringType(),
 			new AccessoryNumericStringType(),
 		]);
 	}
@@ -111,6 +139,7 @@ class FloatType implements Type
 			[new ConstantIntegerType(0)],
 			[$this],
 			[1],
+			isList: TrinaryLogic::createYes(),
 		);
 	}
 
@@ -119,12 +148,81 @@ class FloatType implements Type
 		return new IntegerType();
 	}
 
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		if (!$strictTypes) {
+			return TypeCombinator::union($this->toInteger(), $this, $this->toString(), $this->toBoolean());
+		}
+
+		return $this;
+	}
+
+	public function isOffsetAccessLegal(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isNull(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantScalarValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getConstantScalarTypes(): array
+	{
+		return [];
+	}
+
+	public function getConstantScalarValues(): array
+	{
+		return [];
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isBoolean(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFloat(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isInteger(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
 	public function isString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
 
 	public function isNumericString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isDecimalIntegerString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
@@ -144,17 +242,74 @@ class FloatType implements Type
 		return TrinaryLogic::createNo();
 	}
 
+	public function isLowercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isClassString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isUppercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function isVoid(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		return new BooleanType();
+	}
+
 	public function traverse(callable $cb): Type
 	{
 		return $this;
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		return new self();
+		return $this;
+	}
+
+	public function exponentiate(Type $exponent): Type
+	{
+		return ExponentiateHelper::exponentiate($this, $exponent);
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode('float');
+	}
+
+	public function getFiniteTypes(): array
+	{
+		return [];
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return false;
 	}
 
 }

@@ -3,11 +3,12 @@
 namespace PHPStan\Dependency\ExportedNode;
 
 use JsonSerializable;
+use Override;
 use PHPStan\Dependency\ExportedNode;
 use ReturnTypeWillChange;
 use function count;
 
-class ExportedAttributeNode implements ExportedNode, JsonSerializable
+final class ExportedAttributeNode implements ExportedNode, JsonSerializable
 {
 
 	/**
@@ -45,9 +46,8 @@ class ExportedAttributeNode implements ExportedNode, JsonSerializable
 
 	/**
 	 * @param mixed[] $properties
-	 * @return self
 	 */
-	public static function __set_state(array $properties): ExportedNode
+	public static function __set_state(array $properties): self
 	{
 		return new self(
 			$properties['name'],
@@ -59,6 +59,7 @@ class ExportedAttributeNode implements ExportedNode, JsonSerializable
 	 * @return mixed
 	 */
 	#[ReturnTypeWillChange]
+	#[Override]
 	public function jsonSerialize()
 	{
 		return [
@@ -72,9 +73,8 @@ class ExportedAttributeNode implements ExportedNode, JsonSerializable
 
 	/**
 	 * @param mixed[] $data
-	 * @return self
 	 */
-	public static function decode(array $data): ExportedNode
+	public static function decode(array $data): self
 	{
 		return new self(
 			$data['name'],

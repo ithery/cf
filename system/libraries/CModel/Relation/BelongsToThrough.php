@@ -73,7 +73,7 @@ class CModel_Relation_BelongsToThrough extends CModel_Relation {
      *
      * @return void
      */
-    protected function performJoins(CModel_Query $query = null) {
+    protected function performJoins(?CModel_Query $query = null) {
         $query = $query ?: $this->query;
 
         foreach ($this->throughParents as $i => $model) {
@@ -86,7 +86,7 @@ class CModel_Relation_BelongsToThrough extends CModel_Relation {
             $query->join($model->getTable(), $first, '=', $second);
 
             if ($this->hasSoftDeletes($model)) {
-                $this->query->whereNull($model->getQualifiedDeletedAtColumn());
+                $this->query->where($model->getQualifiedStatusColumn(), '<>', 0);
             }
         }
     }
@@ -98,7 +98,7 @@ class CModel_Relation_BelongsToThrough extends CModel_Relation {
      *
      * @return string
      */
-    public function getForeignKeyName(CModel $model = null) {
+    public function getForeignKeyName(?CModel $model = null) {
         $model = ($model ? $model : $this->parent);
         $table = explode(' as ', $model->getTable())[0];
 

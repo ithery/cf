@@ -2,12 +2,16 @@
 
 /**
  * Description of System.
- *
- * @author Hery
  */
 abstract class CDevSuite_System {
+    /**
+     * @var CDevSuite_CommandLine
+     */
     public $cli;
 
+    /**
+     * @var CDevSuite_Filesystem
+     */
     public $files;
 
     /**
@@ -38,5 +42,10 @@ abstract class CDevSuite_System {
             ->values()->all();
     }
 
+    /**
+     * Symlink the DevSuite bootstrap script into the user's local bin.
+     *
+     * @return void
+     */
     abstract public function symlinkToUsersBin();
 }

@@ -3,10 +3,75 @@
  * @see CElement_Component_DataTable
  */
 trait CElement_Component_DataTable_Trait_ActionCreationTrait {
+    /**
+     * @param array $options
+     *
+     * @return CElement_Component_Action
+     */
+    public function createAutoRefreshToogleAction($options) {
+        $label = carr::get($options, 'label');
+        $labelStart = 'Start Live';
+        $labelStop = 'Stop Live';
+        if (is_array($label)) {
+            $labelStart = carr::get($options, 'label.start') ?: 'Start Live';
+            $labelStop = carr::get($options, 'label.stop') ?: 'Stop Live';
+        } else {
+            if (is_string($label)) {
+                $labelStart = $label;
+                $labelStop = $label;
+            }
+        }
+
+        $autoRefreshInterval = carr::get($options, 'interval') ?: ($this->autoRefreshInterval ?: 5);
+        $id = carr::get($options, 'id');
+        $act = new CElement_Component_Action($id);
+        $act->setLabel($labelStart);
+        $idAct = $act->id();
+        $act->onClickListener()->addCustomHandler()->setJs("
+            let oTable = $('#" . $this->id . "').data('cappDataTable');
+            if(oTable) {
+                let intervalHandler = $('#" . $this->id . "').data('cappDataTableAutoRefreshHandler');
+                if(intervalHandler) {
+                    clearInterval(intervalHandler);
+                    $('#" . $this->id . "').data('cappDataTableAutoRefreshHandler', null);
+                    $('#" . $idAct . "').html('" . $labelStart . "');
+                } else {
+                    $('#" . $this->id . "').data('cappDataTableAutoRefreshHandler', setInterval( function () {
+                        $('#" . $this->id . "').DataTable().ajax.reload(null, false);
+                    }, " . ((int) $autoRefreshInterval) . " * 1000));
+                    $('#" . $idAct . "').html('" . $labelStop . "');
+                }
+            }
+        ");
+        $act->addJs("
+            setTimeout(function() {
+                let oTable = $('#" . $this->id . "').data('cappDataTable');
+
+                if(oTable) {
+                    let intervalHandler = $('#" . $this->id . "').data('cappDataTableAutoRefreshHandler');
+                    if(intervalHandler) {
+                        $('#" . $idAct . "').html('" . $labelStop . "');
+                    } else {
+                        $('#" . $idAct . "').html('" . $labelStart . "');
+
+                    }
+                }
+            },1);
+        ");
+
+        return $act;
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return CElement_Component_Action
+     */
     public function createExportAction($options) {
         $id = carr::get($options, 'id');
         $options['action'] = CExporter::ACTION_STORE;
-        $act = CElement_Factory::createComponent('Action', $id)->setLabel('Export');
+        $act = new CElement_Component_Action($id);
+        $act->setLabel('Export');
 
         $ajaxMethod = CAjax::createMethod();
         $ajaxMethod->setType('DataTableExporter');
@@ -19,6 +84,11 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         return $act;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function createDownloadUrl($options) {
         /** @var CElement_Component_DataTable $this */
         $exportable = $this->toExportable();
@@ -38,17 +108,28 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         return $downloadUrl;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return CElement_Component_Action
+     */
     public function createDownloadAction($options = []) {
         $id = carr::get($options, 'id');
 
         $options['action'] = CExporter::ACTION_DOWNLOAD;
-        $act = CElement_Factory::createComponent('Action', $id)->setLabel('Export');
+        $act = new CElement_Component_Action($id);
+        $act->setLabel('Export');
         $downloadUrl = $this->createDownloadUrl($options);
         $act->setLink($downloadUrl)->setLinkTarget('_blank');
 
         return $act;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return CElement_Component_Action
+     */
     public function createDownloadProgressAction($options = []) {
         $id = carr::get($options, 'id');
 

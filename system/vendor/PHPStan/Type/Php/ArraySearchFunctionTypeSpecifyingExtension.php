@@ -8,6 +8,7 @@ use PHPStan\Analyser\SpecifiedTypes;
 use PHPStan\Analyser\TypeSpecifier;
 use PHPStan\Analyser\TypeSpecifierAwareExtension;
 use PHPStan\Analyser\TypeSpecifierContext;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\Accessory\NonEmptyArrayType;
 use PHPStan\Type\ArrayType;
@@ -16,7 +17,8 @@ use PHPStan\Type\MixedType;
 use PHPStan\Type\TypeCombinator;
 use function strtolower;
 
-class ArraySearchFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
+#[AutowiredService]
+final class ArraySearchFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
 {
 
 	private TypeSpecifier $typeSpecifier;
@@ -43,11 +45,15 @@ class ArraySearchFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyi
 			return new SpecifiedTypes();
 		}
 
+		$arrayType = $scope->getType($arrayArg);
+		$nonEmptyType = $arrayType->isArray()->yes()
+			? new NonEmptyArrayType()
+			: TypeCombinator::intersect(new ArrayType(new MixedType(), new MixedType()), new NonEmptyArrayType());
+
 		return $this->typeSpecifier->create(
 			$arrayArg,
-			TypeCombinator::intersect(new ArrayType(new MixedType(), new MixedType()), new NonEmptyArrayType()),
+			$nonEmptyType,
 			$context,
-			false,
 			$scope,
 		);
 	}

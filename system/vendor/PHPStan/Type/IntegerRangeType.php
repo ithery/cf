@@ -2,15 +2,26 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
+use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\Reflection\InitializerExprTypeResolver;
 use PHPStan\TrinaryLogic;
+use PHPStan\Type\Accessory\AccessoryDecimalIntegerStringType;
+use PHPStan\Type\Accessory\AccessoryNonFalsyStringType;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use function array_filter;
+use function array_map;
 use function assert;
 use function ceil;
 use function count;
 use function floor;
 use function get_class;
+use function is_float;
 use function is_int;
 use function max;
 use function min;
@@ -44,7 +55,21 @@ class IntegerRangeType extends IntegerType implements CompoundType
 			return new IntegerType();
 		}
 
-		return (new self($min, $max))->shift($shift);
+		$range = (new self($min, $max))->shift($shift);
+		if (!$range instanceof self) {
+			return $range;
+		}
+
+		// Nothing is smaller than the smallest integer, and nothing is bigger than the biggest one,
+		// so an unbounded side that reaches either one holds a single value.
+		if ($range->min === null && $range->max === PHP_INT_MIN) {
+			return new ConstantIntegerType(PHP_INT_MIN);
+		}
+		if ($range->min === PHP_INT_MAX && $range->max === null) {
+			return new ConstantIntegerType(PHP_INT_MAX);
+		}
+
+		return $range;
 	}
 
 	protected static function isDisjoint(?int $minA, ?int $maxA, ?int $minB, ?int $maxB, bool $touchingIsDisjoint = true): bool
@@ -191,20 +216,20 @@ class IntegerRangeType extends IntegerType implements CompoundType
 		return self::fromInterval($min, $max);
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
 		if ($type instanceof parent) {
-			return $this->isSuperTypeOf($type);
+			return $this->isSuperTypeOf($type)->toAcceptsResult();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
-		return TrinaryLogic::createNo();
+		return AcceptsResult::createNo();
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof self || $type instanceof ConstantIntegerType) {
 			if ($type instanceof self) {
@@ -216,48 +241,48 @@ class IntegerRangeType extends IntegerType implements CompoundType
 			}
 
 			if (self::isDisjoint($this->min, $this->max, $typeMin, $typeMax)) {
-				return TrinaryLogic::createNo();
+				return IsSuperTypeOfResult::createNo();
 			}
 
 			if (
 				($this->min === null || $typeMin !== null && $this->min <= $typeMin)
 				&& ($this->max === null || $typeMax !== null && $this->max >= $typeMax)
 			) {
-				return TrinaryLogic::createYes();
+				return IsSuperTypeOfResult::createYes();
 			}
 
-			return TrinaryLogic::createMaybe();
+			return IsSuperTypeOfResult::createMaybe();
 		}
 
 		if ($type instanceof parent) {
-			return TrinaryLogic::createMaybe();
+			return IsSuperTypeOfResult::createMaybe();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
 		}
 
-		return TrinaryLogic::createNo();
+		return IsSuperTypeOfResult::createNo();
 	}
 
-	public function isSubTypeOf(Type $otherType): TrinaryLogic
+	public function isSubTypeOf(Type $otherType): IsSuperTypeOfResult
 	{
 		if ($otherType instanceof parent) {
 			return $otherType->isSuperTypeOf($this);
 		}
 
 		if ($otherType instanceof UnionType) {
-			return $this->isSubTypeOfUnion($otherType);
+			return $this->isSubTypeOfUnionWithReason($otherType);
 		}
 
 		if ($otherType instanceof IntersectionType) {
 			return $otherType->isSuperTypeOf($this);
 		}
 
-		return TrinaryLogic::createNo();
+		return IsSuperTypeOfResult::createNo();
 	}
 
-	private function isSubTypeOfUnion(UnionType $otherType): TrinaryLogic
+	private function isSubTypeOfUnionWithReason(UnionType $otherType): IsSuperTypeOfResult
 	{
 		if ($this->min !== null && $this->max !== null) {
 			$matchingConstantIntegers = array_filter(
@@ -266,16 +291,16 @@ class IntegerRangeType extends IntegerType implements CompoundType
 			);
 
 			if (count($matchingConstantIntegers) === ($this->max - $this->min + 1)) {
-				return TrinaryLogic::createYes();
+				return IsSuperTypeOfResult::createYes();
 			}
 		}
 
-		return TrinaryLogic::createNo()->lazyOr($otherType->getTypes(), fn (Type $innerType) => $this->isSubTypeOf($innerType));
+		return IsSuperTypeOfResult::createNo()->or(...array_map(fn (Type $innerType) => $this->isSubTypeOf($innerType), $otherType->getTypes()));
 	}
 
-	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): TrinaryLogic
+	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): AcceptsResult
 	{
-		return $this->isSubTypeOf($acceptingType);
+		return $this->isSubTypeOf($acceptingType)->toAcceptsResult();
 	}
 
 	public function equals(Type $type): bool
@@ -288,75 +313,115 @@ class IntegerRangeType extends IntegerType implements CompoundType
 		return new IntegerType();
 	}
 
-	public function isSmallerThan(Type $otherType): TrinaryLogic
+	public function isSmallerThan(Type $otherType, PhpVersion $phpVersion): TrinaryLogic
 	{
 		if ($this->min === null) {
 			$minIsSmaller = TrinaryLogic::createYes();
 		} else {
-			$minIsSmaller = (new ConstantIntegerType($this->min))->isSmallerThan($otherType);
+			$minIsSmaller = (new ConstantIntegerType($this->min))->isSmallerThan($otherType, $phpVersion);
 		}
 
 		if ($this->max === null) {
 			$maxIsSmaller = TrinaryLogic::createNo();
 		} else {
-			$maxIsSmaller = (new ConstantIntegerType($this->max))->isSmallerThan($otherType);
+			$maxIsSmaller = (new ConstantIntegerType($this->max))->isSmallerThan($otherType, $phpVersion);
+		}
+
+		// 0 can have different results in contrast to the interval edges, see https://3v4l.org/iGoti
+		$zeroInt = new ConstantIntegerType(0);
+		if (!$zeroInt->isSuperTypeOf($this)->no()) {
+			return TrinaryLogic::extremeIdentity(
+				$zeroInt->isSmallerThan($otherType, $phpVersion),
+				$minIsSmaller,
+				$maxIsSmaller,
+			);
 		}
 
 		return TrinaryLogic::extremeIdentity($minIsSmaller, $maxIsSmaller);
 	}
 
-	public function isSmallerThanOrEqual(Type $otherType): TrinaryLogic
+	public function isSmallerThanOrEqual(Type $otherType, PhpVersion $phpVersion): TrinaryLogic
 	{
 		if ($this->min === null) {
 			$minIsSmaller = TrinaryLogic::createYes();
 		} else {
-			$minIsSmaller = (new ConstantIntegerType($this->min))->isSmallerThanOrEqual($otherType);
+			$minIsSmaller = (new ConstantIntegerType($this->min))->isSmallerThanOrEqual($otherType, $phpVersion);
 		}
 
 		if ($this->max === null) {
 			$maxIsSmaller = TrinaryLogic::createNo();
 		} else {
-			$maxIsSmaller = (new ConstantIntegerType($this->max))->isSmallerThanOrEqual($otherType);
+			$maxIsSmaller = (new ConstantIntegerType($this->max))->isSmallerThanOrEqual($otherType, $phpVersion);
+		}
+
+		// 0 can have different results in contrast to the interval edges, see https://3v4l.org/iGoti
+		$zeroInt = new ConstantIntegerType(0);
+		if (!$zeroInt->isSuperTypeOf($this)->no()) {
+			return TrinaryLogic::extremeIdentity(
+				$zeroInt->isSmallerThanOrEqual($otherType, $phpVersion),
+				$minIsSmaller,
+				$maxIsSmaller,
+			);
 		}
 
 		return TrinaryLogic::extremeIdentity($minIsSmaller, $maxIsSmaller);
 	}
 
-	public function isGreaterThan(Type $otherType): TrinaryLogic
+	public function isGreaterThan(Type $otherType, PhpVersion $phpVersion): TrinaryLogic
 	{
 		if ($this->min === null) {
 			$minIsSmaller = TrinaryLogic::createNo();
 		} else {
-			$minIsSmaller = $otherType->isSmallerThan((new ConstantIntegerType($this->min)));
+			$minIsSmaller = $otherType->isSmallerThan(new ConstantIntegerType($this->min), $phpVersion);
 		}
 
 		if ($this->max === null) {
 			$maxIsSmaller = TrinaryLogic::createYes();
 		} else {
-			$maxIsSmaller = $otherType->isSmallerThan((new ConstantIntegerType($this->max)));
+			$maxIsSmaller = $otherType->isSmallerThan(new ConstantIntegerType($this->max), $phpVersion);
+		}
+
+		// 0 can have different results in contrast to the interval edges, see https://3v4l.org/iGoti
+		$zeroInt = new ConstantIntegerType(0);
+		if (!$zeroInt->isSuperTypeOf($this)->no()) {
+			return TrinaryLogic::extremeIdentity(
+				$otherType->isSmallerThan($zeroInt, $phpVersion),
+				$minIsSmaller,
+				$maxIsSmaller,
+			);
 		}
 
 		return TrinaryLogic::extremeIdentity($minIsSmaller, $maxIsSmaller);
 	}
 
-	public function isGreaterThanOrEqual(Type $otherType): TrinaryLogic
+	public function isGreaterThanOrEqual(Type $otherType, PhpVersion $phpVersion): TrinaryLogic
 	{
 		if ($this->min === null) {
 			$minIsSmaller = TrinaryLogic::createNo();
 		} else {
-			$minIsSmaller = $otherType->isSmallerThanOrEqual((new ConstantIntegerType($this->min)));
+			$minIsSmaller = $otherType->isSmallerThanOrEqual(new ConstantIntegerType($this->min), $phpVersion);
 		}
 
 		if ($this->max === null) {
 			$maxIsSmaller = TrinaryLogic::createYes();
 		} else {
-			$maxIsSmaller = $otherType->isSmallerThanOrEqual((new ConstantIntegerType($this->max)));
+			$maxIsSmaller = $otherType->isSmallerThanOrEqual(new ConstantIntegerType($this->max), $phpVersion);
+		}
+
+		// 0 can have different results in contrast to the interval edges, see https://3v4l.org/iGoti
+		$zeroInt = new ConstantIntegerType(0);
+		if (!$zeroInt->isSuperTypeOf($this)->no()) {
+			return TrinaryLogic::extremeIdentity(
+				$otherType->isSmallerThanOrEqual($zeroInt, $phpVersion),
+				$minIsSmaller,
+				$maxIsSmaller,
+			);
 		}
 
 		return TrinaryLogic::extremeIdentity($minIsSmaller, $maxIsSmaller);
 	}
 
-	public function getSmallerType(): Type
+	public function getSmallerType(PhpVersion $phpVersion): Type
 	{
 		$subtractedTypes = [
 			new ConstantBooleanType(true),
@@ -369,7 +434,7 @@ class IntegerRangeType extends IntegerType implements CompoundType
 		return TypeCombinator::remove(new MixedType(), TypeCombinator::union(...$subtractedTypes));
 	}
 
-	public function getSmallerOrEqualType(): Type
+	public function getSmallerOrEqualType(PhpVersion $phpVersion): Type
 	{
 		$subtractedTypes = [];
 
@@ -380,7 +445,7 @@ class IntegerRangeType extends IntegerType implements CompoundType
 		return TypeCombinator::remove(new MixedType(), TypeCombinator::union(...$subtractedTypes));
 	}
 
-	public function getGreaterType(): Type
+	public function getGreaterType(PhpVersion $phpVersion): Type
 	{
 		$subtractedTypes = [
 			new NullType(),
@@ -398,7 +463,7 @@ class IntegerRangeType extends IntegerType implements CompoundType
 		return TypeCombinator::remove(new MixedType(), TypeCombinator::union(...$subtractedTypes));
 	}
 
-	public function getGreaterOrEqualType(): Type
+	public function getGreaterOrEqualType(PhpVersion $phpVersion): Type
 	{
 		$subtractedTypes = [];
 
@@ -426,6 +491,46 @@ class IntegerRangeType extends IntegerType implements CompoundType
 		}
 
 		return new ConstantBooleanType(false);
+	}
+
+	public function toAbsoluteNumber(): Type
+	{
+		if ($this->min !== null && $this->min >= 0) {
+			return $this;
+		}
+
+		// Negating the smallest integer overflows, so its absolute value is treated as unbounded,
+		// the same way an unbounded lower bound is. This keeps abs(int<min, 0>) and
+		// abs(int<-9223372036854775808, 0>) in agreement.
+		$inversedMin = $this->min !== null && $this->min !== PHP_INT_MIN ? -$this->min : null;
+
+		if ($this->max === null || $this->max >= 0) {
+			return self::fromInterval(0, $inversedMin !== null && $this->max !== null ? max($inversedMin, $this->max) : null);
+		}
+
+		return self::fromInterval(-$this->max, $inversedMin);
+	}
+
+	public function toString(): Type
+	{
+		$finiteTypes = $this->getFiniteTypes();
+		if ($finiteTypes !== []) {
+			return TypeCombinator::union(...$finiteTypes)->toString();
+		}
+
+		$isZero = (new ConstantIntegerType(0))->isSuperTypeOf($this);
+		if ($isZero->no()) {
+			return new IntersectionType([
+				new StringType(),
+				new AccessoryDecimalIntegerStringType(),
+				new AccessoryNonFalsyStringType(),
+			]);
+		}
+
+		return new IntersectionType([
+			new StringType(),
+			new AccessoryDecimalIntegerStringType(),
+		]);
 	}
 
 	/**
@@ -553,12 +658,111 @@ class IntegerRangeType extends IntegerType implements CompoundType
 		return null;
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function exponentiate(Type $exponent): Type
 	{
-		return new self($properties['min'], $properties['max']);
+		if ($exponent instanceof UnionType) {
+			$results = [];
+			foreach ($exponent->getTypes() as $unionType) {
+				$results[] = $this->exponentiate($unionType);
+			}
+			return TypeCombinator::union(...$results);
+		}
+
+		if ($exponent instanceof IntegerRangeType) {
+			$min = null;
+			$max = null;
+			if ($this->getMin() !== null && $exponent->getMin() !== null) {
+				$min = $this->getMin() ** $exponent->getMin();
+			}
+			if ($this->getMax() !== null && $exponent->getMax() !== null) {
+				$max = $this->getMax() ** $exponent->getMax();
+			}
+
+			if (($min !== null || $max !== null) && !is_float($min) && !is_float($max)) {
+				return self::fromInterval($min, $max);
+			}
+		}
+
+		if ($exponent instanceof ConstantScalarType) {
+			$exponentValue = $exponent->getValue();
+			if (is_int($exponentValue)) {
+				$min = null;
+				$max = null;
+				if ($this->getMin() !== null) {
+					$min = $this->getMin() ** $exponentValue;
+				}
+				if ($this->getMax() !== null) {
+					$max = $this->getMax() ** $exponentValue;
+				}
+
+				if (!is_float($min) && !is_float($max)) {
+					return self::fromInterval($min, $max);
+				}
+			}
+		}
+
+		return parent::exponentiate($exponent);
+	}
+
+	/**
+	 * @return list<ConstantIntegerType>
+	 */
+	public function getFiniteTypes(): array
+	{
+		if ($this->min === null || $this->max === null) {
+			return [];
+		}
+
+		$size = $this->max - $this->min;
+		if ($size > InitializerExprTypeResolver::CALCULATE_SCALARS_LIMIT) {
+			return [];
+		}
+
+		$types = [];
+		for ($i = $this->min; $i <= $this->max; $i++) {
+			$types[] = new ConstantIntegerType($i);
+		}
+
+		return $types;
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		if ($this->min === null) {
+			$min = new IdentifierTypeNode('min');
+		} else {
+			$min = new ConstTypeNode(new ConstExprIntegerNode((string) $this->min));
+		}
+
+		if ($this->max === null) {
+			$max = new IdentifierTypeNode('max');
+		} else {
+			$max = new ConstTypeNode(new ConstExprIntegerNode((string) $this->max));
+		}
+
+		return new GenericTypeNode(new IdentifierTypeNode('int'), [$min, $max]);
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		$zeroInt = new ConstantIntegerType(0);
+		if ($zeroInt->isSuperTypeOf($this)->no()) {
+			if ($type->isTrue()->yes()) {
+				return new ConstantBooleanType(true);
+			}
+			if ($type->isFalse()->yes()) {
+				return new ConstantBooleanType(false);
+			}
+		}
+
+		if (
+			$this->isSmallerThan($type, $phpVersion)->yes()
+			|| $this->isGreaterThan($type, $phpVersion)->yes()
+		) {
+			return new ConstantBooleanType(false);
+		}
+
+		return parent::looseCompare($type, $phpVersion);
 	}
 
 }

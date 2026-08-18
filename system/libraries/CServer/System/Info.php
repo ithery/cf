@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 2:18:46 PM
- */
 class CServer_System_Info {
     /**
      * Name of the host where CServer_System runs.

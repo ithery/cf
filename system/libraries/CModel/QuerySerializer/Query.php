@@ -44,7 +44,7 @@ class CModel_QuerySerializer_Query {
 
         unset($payload['connection']);
 
-        return static::unserializeFor(CDatabase::instance($connection)->newQuery(), $payload);
+        return static::unserializeFor(c::db($connection)->newQuery(), $payload);
     }
 
     /**

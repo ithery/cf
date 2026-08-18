@@ -25,30 +25,37 @@ class CModel_Scout_EngineManager extends CBase_ManagerAbstract {
         if (!is_dir($storage)) {
             CFile::makeDirectory($storage, 0755, true);
         }
-        $databaseConfigName = CF::config('model.scout.tntsearch.database', 'default');
-        $databaseConfig = CF::config('database.' . $databaseConfigName);
-        $driver = carr::get($databaseConfig, 'connection.type');
+        $databaseConfigName = CF::config('model.scout.tntsearch.database');
+        if ($databaseConfigName == null) {
+            $databaseConfigName = CF::config('database.default');
+        }
+        $databaseConfig = CF::config('database.connections.' . $databaseConfigName);
+        if (!is_array($databaseConfig)) {
+            //bentuk konfigurasi lama, sebelum ada database.connections
+            $databaseConfig = CF::config('database.' . $databaseConfigName);
+        }
+        $driver = carr::get($databaseConfig, 'driver', carr::get($databaseConfig, 'connection.type'));
         if ($driver == 'mysqli') {
             $driver = 'mysql';
         }
         $tntDbConfig = [
             'driver' => $driver,
-            'host' => carr::get($databaseConfig, 'connection.host'),
-            'database' => carr::get($databaseConfig, 'connection.database'),
-            'username' => carr::get($databaseConfig, 'connection.user'),
-            'password' => carr::get($databaseConfig, 'connection.pass'),
+            'host' => carr::get($databaseConfig, 'host', carr::get($databaseConfig, 'connection.host')),
+            'database' => carr::get($databaseConfig, 'database', carr::get($databaseConfig, 'connection.database')),
+            'username' => carr::get($databaseConfig, 'username', carr::get($databaseConfig, 'connection.user')),
+            'password' => carr::get($databaseConfig, 'password', carr::get($databaseConfig, 'connection.pass')),
         ];
 
         $tnt->loadConfig($config + $tntDbConfig);
+        $tnt->setDatabaseHandle(c::db($databaseConfigName)->getPdo());
+        // $tnt->maxDocs = CF::config('model.scout.tntsearch.maxDocs', 500);
 
-        $tnt->maxDocs = CF::config('model.scout.tntsearch.maxDocs', 500);
-
-        $tnt->fuzziness = CF::config('model.scout.tntsearch.fuzziness', $tnt->fuzziness);
-        $tnt->fuzzy_distance = CF::config('model.scout.tntsearch.fuzzy.distance', $tnt->fuzzy_distance);
-        $tnt->fuzzy_prefix_length = CF::config('model.scout.tntsearch.fuzzy.prefix_length', $tnt->fuzzy_prefix_length);
-        $tnt->fuzzy_max_expansions = CF::config('model.scout.tntsearch.fuzzy.max_expansions', $tnt->fuzzy_max_expansions);
-
-        $tnt->asYouType = CF::config('model.scout.tntsearch.asYouType', $tnt->asYouType);
+        $tnt->setFuzziness(CF::config('model.scout.tntsearch.fuzziness', $tnt->getFuzziness()));
+        $tnt->setFuzzyDistance(CF::config('model.scout.tntsearch.fuzzy.distance', $tnt->getFuzzyDistance()));
+        $tnt->setFuzzyPrefixLength(CF::config('model.scout.tntsearch.fuzzy.prefix_length', $tnt->getFuzzyPrefixLength()));
+        $tnt->setFuzzyMaxExpansions(CF::config('model.scout.tntsearch.fuzzy.max_expansions', $tnt->getFuzzyMaxExpansions()));
+        $tnt->setFuzzyNoLimit(CF::config('model.scout.tntsearch.fuzzy.no_limit', $tnt->getFuzzyNoLimit()));
+        $tnt->asYouType(CF::config('model.scout.tntsearch.asYouType', $tnt->getAsYouType()));
 
         return $tnt;
     }

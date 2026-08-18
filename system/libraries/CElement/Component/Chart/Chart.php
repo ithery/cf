@@ -1,6 +1,9 @@
 <?php
 
 class CElement_Component_Chart_Chart extends CElement_Component_Chart {
+    /**
+     * @return void
+     */
     public function __construct() {
         parent::__construct();
         $this->wrapper = $this->addCanvas()->addClass('cchart cchart-chart');
@@ -8,6 +11,11 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         $this->options = [];
     }
 
+    /**
+     * @param CChart_ChartAbstract $chart
+     *
+     * @return $this
+     */
     public function setChart(CChart_ChartAbstract $chart) {
         parent::setChart($chart);
 
@@ -26,6 +34,11 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         return $this;
     }
 
+    /**
+     * @param CChart_ChartAbstract $chart
+     *
+     * @return string
+     */
     private function normalizeChartPosition(CChart_ChartAbstract $chart) {
         $posMap = [
             CChart::POSITION_BOTTOM => 'bottom',
@@ -37,12 +50,18 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         return carr::get($posMap, $chart->getLegendPosition(), 'bottom');
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         parent::build();
         $this->addClass('cchart-container');
         $this->buildData();
     }
 
+    /**
+     * @return void
+     */
     public function buildData() {
         $temp = $this->data;
         $this->data = [];
@@ -53,54 +72,64 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
         foreach ($temp as $value) {
             $label = carr::get($value, 'label');
 
-            $dataset = [];
-            $dataset['data'] = carr::get($value, 'data', []);
-            $dataset['fill'] = carr::get($value, 'fill', false);
+            $dataset = $value;
 
-            if ($label) {
-                $dataset['label'] = $label;
-            }
+            // $dataset = [];
+            // $dataset['data'] = carr::get($value, 'data', []);
+            // $dataset['fill'] = carr::get($value, 'fill', false);
 
-            $randColor = $this->getColor();
-            $color = carr::get($value, 'color') ?: $randColor;
-            $backgroundColor = carr::get($value, 'backgroundColor') ?: $this->getColor($randColor, 0.2);
-            $tension = carr::get($value, 'tension');
-            // $backgroundColor = $this->getColor($color, 0.2);
-            // if (is_array($dataset['data'])) {
-            //     $color=[];
-            //     $backgroundColor=[];
-            //     foreach ($dataset['data'] as $k => $v) {
-            //         $randColor = $this->getColor();
-            //         $colorTemp = carr::get($value, 'color');
-            //         $backgroundColorTemp = carr::get($value, 'backgroundColor');
-            //         if(is_array($colorTemp)) {
-            //             $colorTemp = carr::get($colorTemp,$k);
-            //         }
-            //         if(is_array($backgroundColorTemp)) {
-            //             $backgroundColorTemp = carr::get($backgroundColorTemp,$k);
-            //         }
-
-            //         $color[] = $colorTemp;
-            //         if(strlen($backgroundColorTemp)==0) {
-            //             $backgroundColorTemp=$this->getColor($colorTemp, 0.2);
-            //         }
-            //         $backgroundColor[] = $backgroundColorTemp;
-            //     }
+            // if ($label) {
+            //     $dataset['label'] = $label;
             // }
-            $dataset['borderColor'] = $color;
-            $dataset['backgroundColor'] = $backgroundColor;
-            if (strlen($tension) > 0) {
-                $dataset['tension'] = $tension;
-            }
+
+            // $randColor = $this->getColor();
+            // $color = carr::get($value, 'color') ?: $randColor;
+            // $backgroundColor = carr::get($value, 'backgroundColor') ?: $this->getColor($randColor, 0.2);
+            // $tension = carr::get($value, 'tension');
+            // // $backgroundColor = $this->getColor($color, 0.2);
+            // // if (is_array($dataset['data'])) {
+            // //     $color=[];
+            // //     $backgroundColor=[];
+            // //     foreach ($dataset['data'] as $k => $v) {
+            // //         $randColor = $this->getColor();
+            // //         $colorTemp = carr::get($value, 'color');
+            // //         $backgroundColorTemp = carr::get($value, 'backgroundColor');
+            // //         if(is_array($colorTemp)) {
+            // //             $colorTemp = carr::get($colorTemp,$k);
+            // //         }
+            // //         if(is_array($backgroundColorTemp)) {
+            // //             $backgroundColorTemp = carr::get($backgroundColorTemp,$k);
+            // //         }
+
+            // //         $color[] = $colorTemp;
+            // //         if(strlen($backgroundColorTemp)==0) {
+            // //             $backgroundColorTemp=$this->getColor($colorTemp, 0.2);
+            // //         }
+            // //         $backgroundColor[] = $backgroundColorTemp;
+            // //     }
+            // // }
+            // $dataset['borderColor'] = $color;
+            // $dataset['backgroundColor'] = $backgroundColor;
+            // if (strlen($tension) > 0) {
+            //     $dataset['tension'] = $tension;
+            // }
 
             $this->data['datasets'][] = $dataset;
         }
     }
 
+    /**
+     * @return array
+     */
     public function buildOptions() {
         return $this->options;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

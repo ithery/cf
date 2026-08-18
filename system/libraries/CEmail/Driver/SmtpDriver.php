@@ -19,7 +19,7 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
             $this->debug = carr::get($options, 'debug');
 
             return $this->sendEmail($to, $subject, $body, $options);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // something failed
             // disconnect if needed
             if ($this->smtpConnection) {
@@ -65,8 +65,9 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
             $smtpOptions = $this->config->getOption('stream');
         }
 
-        $smtpPort = carr::get($options, 'host', $this->config->getOption('port', 25));
-        $smtpHost = carr::get($options, 'port', $this->config->getOption('host'));
+        $smtpPort = carr::get($options, 'port', $this->config->getOption('port', 25));
+
+        $smtpHost = carr::get($options, 'host', $this->config->getOption('host'));
 
         if (empty($smtpHost)) {
             throw new Exception('Must supply a SMTP host and port, none given.');
@@ -85,24 +86,21 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
         }
 
         // Set return path
-        $returnPath = carr::get($options, 'returnPath', carr::get($options, 'from'));
+        $returnPath = carr::get($options, 'returnPath', $this->config->getFrom());
         $this->debug('MAIL FROM:<' . $returnPath . '>');
         $this->debug($this->smtpSend('MAIL FROM:<' . $returnPath . '>', 250));
 
         foreach ([$this->arrayAddresses($to), carr::get($options, 'cc', []), carr::get($options, 'bcc', [])] as $addresses) {
-            if (is_string($addresses)) {
-                $addresses = $this->arrayAddresses(carr::get($options, $addresses, []), true);
-            }
-            foreach ($addresses as $recipient) {
-                $this->debug('RCPT TO:<' . $recipient . '>');
-                $this->debug($this->smtpSend('RCPT TO:<' . $recipient . '>', [250, 251]));
+            $rcpt = $this->formatAddresses($addresses);
+            if (strlen($rcpt) > 0) {
+                $this->debug('RCPT TO:<' . $rcpt . '>');
+                $this->debug($this->smtpSend('RCPT TO:<' . $rcpt . '>', [250, 251]));
             }
         }
 
         // Prepare for data sending
         $this->debug('DATA');
         $this->smtpSend('DATA', 354);
-
         $newLine = $this->newline();
 
         $headers = [];
@@ -114,13 +112,63 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
 
         $lines = explode($this->newline(), $message['header'] . preg_replace('/^\./m', '..$1', $message['body']));
 
-        foreach ($lines as $line) {
-            if (substr($line, 0, 1) === '.') {
-                $line = '.' . $line;
-            }
-            $this->debug(($line . $newLine));
-            fputs($this->smtpConnection, $line . $newLine);
+        $field = substr($lines[0], 0, strpos($lines[0], ':'));
+        $in_headers = false;
+        if (!empty($field) && strpos($field, ' ') === false) {
+            $in_headers = true;
         }
+
+        $MAX_LINE_LENGTH = 998;
+
+        foreach ($lines as $line) {
+            $lines_out = [];
+            if ($in_headers && $line === '') {
+                $in_headers = false;
+            }
+            //Break this line up into several smaller lines if it's too long
+            //Micro-optimisation: isset($str[$len]) is faster than (strlen($str) > $len),
+            while (isset($line[$MAX_LINE_LENGTH])) {
+                //Working backwards, try to find a space within the last MAX_LINE_LENGTH chars of the line to break on
+                //so as to avoid breaking in the middle of a word
+                $pos = strrpos(substr($line, 0, $MAX_LINE_LENGTH), ' ');
+                //Deliberately matches both false and 0
+                if (!$pos) {
+                    //No nice break found, add a hard break
+                    $pos = $MAX_LINE_LENGTH - 1;
+                    $lines_out[] = substr($line, 0, $pos);
+                    $line = substr($line, $pos);
+                } else {
+                    //Break at the found point
+                    $lines_out[] = substr($line, 0, $pos);
+                    //Move along by the amount we dealt with
+                    $line = substr($line, $pos + 1);
+                }
+                //If processing headers add a LWSP-char to the front of new line RFC822 section 3.1.1
+                if ($in_headers) {
+                    $line = "\t" . $line;
+                }
+            }
+            $lines_out[] = $line;
+
+            //Send the lines to the server
+            foreach ($lines_out as $line_out) {
+                //Dot-stuffing as per RFC5321 section 4.5.2
+                //https://tools.ietf.org/html/rfc5321#section-4.5.2
+                if (!empty($line_out) && $line_out[0] === '.') {
+                    $line_out = '.' . $line_out;
+                }
+                $this->debug(($line_out . "\r\n"));
+                fwrite($this->smtpConnection, $line_out . "\r\n");
+            }
+        }
+
+        // foreach ($lines as $line) {
+        //     if (substr($line, 0, 1) === '.') {
+        //         $line = '.' . $line;
+        //     }
+        //     $this->debug(($line . $newLine));
+        //     fwrite($this->smtpConnection, $line . $newLine);
+        // }
 
         // Finish the message
         $this->debug('.');
@@ -144,10 +192,12 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
         if (!empty($this->smtpConnection)) {
             return;
         }
-
+        $protocol = 'tcp';
+        $secure = $this->config->getSecure();
+        $protocol = $this->config->getProtocol();
         // add a transport if not given
         if (strpos($smtpHost, '://') === false) {
-            $smtpHost = 'tcp://' . $smtpHost;
+            $smtpHost = $protocol . '://' . $smtpHost;
         }
 
         $context = stream_context_create();
@@ -170,21 +220,22 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
 
         // Clear the smtp response
         $this->debug($this->smtpGetResponse());
+
         // Just say hello!
         try {
             $this->debug('EHLO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
-            $this->debug($this->smtpSend('EHLO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'), 250));
+            $this->debug($this->smtpSend('EHLO' . ' ' . $this->getServerName(), 250));
             //$this->smtpSend('EHLO' . ' ' . 'localhost.local', 250);
         } catch (CEmail_Exception_SmtpCommandFailureException $e) {
             // Didn't work? Try HELO
             $this->debug('HELO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
-            $this->debug($this->smtpSend('HELO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'), 250));
+            $this->debug($this->smtpSend('HELO' . ' ' . $this->getServerName(), 250));
             //$this->smtpSend('HELO' . ' ' . 'localhost.local', 250);
         }
 
         // Enable TLS encryption if needed, and we're connecting using TCP
-        $secure = $this->config->getSecure();
-        if ($secure == 'tls') {
+
+        if ($secure == 'tls' && $protocol != 'tls') {
             try {
                 $this->debug('STARTTLS');
                 $this->debug($this->smtpSend('STARTTLS', 220));
@@ -198,11 +249,11 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
             // Say hello again, the service list might be updated (see RFC 3207 section 4.2)
             try {
                 $this->debug('EHLO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
-                $this->debug($this->smtpSend('EHLO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'), 250));
+                $this->debug($this->smtpSend('EHLO' . ' ' . $this->getServerName(), 250));
             } catch (CEmail_Exception_SmtpCommandFailureException $e) {
                 // Didn't work? Try HELO
                 $this->debug('HELO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'));
-                $this->debug($this->smtpSend('HELO' . ' ' . c::request()->server('SERVER_NAME', 'localhost.local'), 250));
+                $this->debug($this->smtpSend('HELO' . ' ' . $this->getServerName(), 250));
             }
         }
 
@@ -221,7 +272,13 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
      */
     protected function smtpDisconnect() {
         $this->debug('QUIT');
-        $this->debug($this->smtpSend('QUIT', false));
+
+        try {
+            $this->debug($this->smtpSend('QUIT', false));
+        } catch (Exception $ex) {
+            $this->debug('Error on Disconnect:' . $ex->getMessage());
+        }
+
         fclose($this->smtpConnection);
         $this->smtpConnection = null;
     }
@@ -261,15 +318,15 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
      * @param string|bool|string $expecting    The expected response
      * @param bool               $returnNumber Set to true to return the status number
      *
-     * @throws \CEmail_Exception_SmtpCommandFailureException when the command failed an expecting is not set to false
-     * @throws \CEmail_Exception_SmtpTimeoutException        SMTP connection timed out
+     * @throws CEmail_Exception_SmtpCommandFailureException when the command failed an expecting is not set to false
+     * @throws CEmail_Exception_SmtpTimeoutException        SMTP connection timed out
      *
      * @return mixed Result or result number, false when expecting is false
      */
     protected function smtpSend($data, $expecting, $returnNumber = false) {
         !is_array($expecting) and $expecting !== false and $expecting = [$expecting];
         stream_set_timeout($this->smtpConnection, $this->getTimeout());
-        if (!fputs($this->smtpConnection, $data . $this->newline())) {
+        if (!fwrite($this->smtpConnection, $data . "\r\n")) {
             if ($expecting === false) {
                 return false;
             }
@@ -299,6 +356,12 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
         return $response;
     }
 
+    protected function getServerName() {
+        $serverName = $this->config->getOption('domain', c::request()->server('SERVER_NAME', 'localhost.local'));
+
+        return $serverName;
+    }
+
     protected function getTimeout() {
         return $this->config->getOption('timeout', 5);
     }
@@ -306,7 +369,7 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
     /**
      * Get SMTP response.
      *
-     * @throws \CEmail_Exception_SmtpTimeoutException
+     * @throws CEmail_Exception_SmtpTimeoutException
      *
      * @return string SMTP response
      */
@@ -333,12 +396,12 @@ class CEmail_Driver_SmtpDriver extends CEmail_DriverAbstract {
     }
 
     public function newline() {
-        return $this->config->getOption('newline', PHP_EOL);
+        return $this->config->getOption('newline', "\r\n");
     }
 
     public function debug($message) {
         if ($this->debug) {
-            cdbg::d($message);
+            CLogger::debug($message);
         }
     }
 }

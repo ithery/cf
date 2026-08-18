@@ -41,7 +41,6 @@ class CHTTP_Middleware_CleanInput {
             }
 
             // Warn the developer about register globals
-            CF::log(CLogger::DEBUG, 'Disable register_globals! It is evil and deprecated: http://php.net/register_globals');
         }
     }
 

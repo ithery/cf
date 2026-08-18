@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 16, 2019, 3:57:35 AM
- */
 class CDaemon_Worker_Call {
     public $return;
 
@@ -31,7 +25,7 @@ class CDaemon_Worker_Call {
 
     public $time = [];
 
-    public function __construct($id, $method = null, array $args = null) {
+    public function __construct($id, $method = null, ?array $args = null) {
         $this->id = $id;
         $this->method = $method;
         $this->args = $args;
@@ -40,7 +34,7 @@ class CDaemon_Worker_Call {
     }
 
     /**
-     * Determine the time this call spent (or has spent thus far) in RUNNING state
+     * Determine the time this call spent (or has spent thus far) in RUNNING state.
      *
      * @return int|mixed
      */
@@ -56,7 +50,7 @@ class CDaemon_Worker_Call {
     }
 
     /**
-     * Merge in data from the supplied $call into this call
+     * Merge in data from the supplied $call into this call.
      *
      * @param CDaemon_Worker_Call $call
      *
@@ -66,11 +60,12 @@ class CDaemon_Worker_Call {
         // This could end up being more sophisticated and complex.
         // But for now, the only modifications to this struct in the worker are timestamps at status changes.
         $this->time[CDaemon_Worker_MediatorAbstract::CALLED] = $call->time[CDaemon_Worker_MediatorAbstract::CALLED];
+
         return $this;
     }
 
     /**
-     * Active calls
+     * Active calls.
      *
      * @return bool
      */
@@ -90,6 +85,7 @@ class CDaemon_Worker_Call {
         }
         unset($this->args, $this->return);
         $this->gc = true;
+
         return true;
     }
 
@@ -111,7 +107,7 @@ class CDaemon_Worker_Call {
     }
 
     /**
-     * Prepare the Call struct to be passed back to the CDaemon_Worker_MediatorAbstract::call() method for another go-around
+     * Prepare the Call struct to be passed back to the CDaemon_Worker_MediatorAbstract::call() method for another go-around.
      *
      * @return void
      */
@@ -132,11 +128,13 @@ class CDaemon_Worker_Call {
     public function returned($return, $microtime = null) {
         $this->return = $return;
         $this->updateSize();
+
         return $this->status(CDaemon_Worker_MediatorAbstract::RETURNED, $microtime);
     }
 
     public function running($microtime = null) {
         $this->pid = getmypid();
+
         return $this->status(CDaemon_Worker_MediatorAbstract::RUNNING, $microtime);
     }
 
@@ -149,7 +147,7 @@ class CDaemon_Worker_Call {
     }
 
     /**
-     * Get the appropriate queue based on the current status
+     * Get the appropriate queue based on the current status.
      *
      * @return int
      */
@@ -167,6 +165,7 @@ class CDaemon_Worker_Call {
         }
         $this->status = $status;
         $this->time[$status] = $microtime;
+
         return $this;
     }
 

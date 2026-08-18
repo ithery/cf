@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 17, 2019, 11:31:24 PM
- */
 abstract class CObservable_ListenerAbstract {
     use CObservable_Listener_Trait_HandlerTrait;
 

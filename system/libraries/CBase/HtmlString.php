@@ -1,11 +1,8 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
+use Illuminate\Contracts\Support\Htmlable;
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- */
-class CBase_HtmlString implements CInterface_Htmlable {
+class CBase_HtmlString implements Htmlable {
     /**
      * The HTML string.
      *
@@ -39,7 +36,7 @@ class CBase_HtmlString implements CInterface_Htmlable {
      * @return bool
      */
     public function isEmpty() {
-        return $this->html === '';
+        return ($this->html ?? '') === '';
     }
 
     /**
@@ -56,7 +53,8 @@ class CBase_HtmlString implements CInterface_Htmlable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
-        return $this->toHtml();
+        return $this->toHtml() ?? '';
     }
 }

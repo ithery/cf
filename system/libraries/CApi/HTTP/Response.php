@@ -1,10 +1,6 @@
 <?php
 
-use Illuminate\Http\JsonResponse;
-use Dingo\Api\Event\ResponseIsMorphing;
-use Dingo\Api\Event\ResponseWasMorphed;
-use Dingo\Api\Transformer\Factory as TransformerFactory;
-use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 class CApi_HTTP_Response extends CHTTP_Response {
@@ -76,7 +72,7 @@ class CApi_HTTP_Response extends CHTTP_Response {
      *
      * @return void
      */
-    public function __construct($content, $status = 200, $headers = [], CApi_Transformer_Binding $binding = null) {
+    public function __construct($content, $status = 200, $headers = [], ?CApi_Transformer_Binding $binding = null) {
         parent::__construct($content, $status, $headers);
 
         $this->binding = $binding;
@@ -94,7 +90,7 @@ class CApi_HTTP_Response extends CHTTP_Response {
     }
 
     /**
-     * Make an API response from an existing Illuminate response.
+     * Make an API response from an existing HTTP response.
      *
      * @param \CHTTP_Response $old
      *
@@ -166,7 +162,7 @@ class CApi_HTTP_Response extends CHTTP_Response {
             $this->content = $formatter->formatModel($this->content);
         } elseif ($this->content instanceof CModel_Collection) {
             $this->content = $formatter->formatModelCollection($this->content);
-        } elseif (is_array($this->content) || $this->content instanceof ArrayObject || $this->content instanceof CInterface_Arrayable) {
+        } elseif (is_array($this->content) || $this->content instanceof ArrayObject || $this->content instanceof Arrayable) {
             $this->content = $formatter->formatArray($this->content);
         } else {
             if (!empty($defaultContentType)) {

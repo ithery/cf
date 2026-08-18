@@ -1,12 +1,22 @@
 <?php
 
 class CNotification_Channel_EmailChannel extends CNotification_ChannelAbstract {
+    /**
+     * @param array $config
+     */
     public function __construct($config = []) {
         parent::__construct($config);
         $this->channelName = 'Email';
     }
 
+    /**
+     * @param mixed $data
+     * @param mixed $logNotificationModel
+     *
+     * @return mixed
+     */
     protected function handleMessage($data, $logNotificationModel) {
+        $mailer = carr::get($data, 'mailer');
         $to = carr::get($data, 'recipient');
         $subject = carr::get($data, 'subject');
         $message = carr::get($data, 'message');
@@ -22,17 +32,11 @@ class CNotification_Channel_EmailChannel extends CNotification_ChannelAbstract {
                 $options['bcc'] = $bcc;
                 $options['attachments'] = $attachment;
                 $senderOptions = $options;
-                // $emailConfig = CF::config('notification.email');
-                // $vendor = carr::get($emailConfig, 'vendor');
-                // if ($vendor) {
-                //     $senderOptions['driver'] = $vendor;
-                //     $password = CF::config('vendor.' . $vendor . '.key');
-                //     if ($password) {
-                //         $senderOptions['password'] = $password;
-                //     }
-                // }
-
-                $sender = CEmail::sender($senderOptions);
+                if ($mailer) {
+                    $sender = CEmail::mailer($mailer);
+                } else {
+                    $sender = CEmail::sender($senderOptions);
+                }
 
                 $response = $sender->send($to, $subject, $message, $options);
             } catch (Exception $ex) {
@@ -47,6 +51,9 @@ class CNotification_Channel_EmailChannel extends CNotification_ChannelAbstract {
         return $response;
     }
 
+    /**
+     * @return void
+     */
     protected function sendEmail() {
     }
 }

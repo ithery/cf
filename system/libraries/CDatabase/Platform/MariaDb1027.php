@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:46:25 AM
- */
 final class CDatabase_Platform_MariaDb1027 extends CDatabase_Platform_MySql {
     /**
      * @inheritdoc

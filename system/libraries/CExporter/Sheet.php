@@ -4,6 +4,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Chart\Chart;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Illuminate\Contracts\Support\Arrayable;
 use PhpOffice\PhpSpreadsheet\Shared\StringHelper;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
@@ -12,6 +13,7 @@ use PhpOffice\PhpSpreadsheet\Cell\Cell as SpreadsheetCell;
 class CExporter_Sheet {
     use CExporter_Trait_DelegatedMacroableTrait,
         CExporter_Trait_HasEventBusTrait;
+
     /**
      * @var int
      */
@@ -329,6 +331,12 @@ class CExporter_Sheet {
             $this->autoSize();
         }
 
+        if ($sheetExport instanceof CExporter_Concern_WithColumnWidths) {
+            foreach ($sheetExport->columnWidths() as $column => $width) {
+                $this->worksheet->getColumnDimension($column)->setAutoSize(false)->setWidth($width);
+            }
+        }
+
         if ($sheetExport instanceof CExporter_Concern_WithStyles) {
             $styles = $sheetExport->styles($this->worksheet);
             if (is_array($styles)) {
@@ -551,11 +559,11 @@ class CExporter_Sheet {
     public static function mapArraybleRow($row) {
         // When dealing with eloquent models, we'll skip the relations
         // as we won't be able to display them anyway.
-        if (method_exists($row, 'attributesToArray')) {
+        if (is_object($row) && method_exists($row, 'attributesToArray')) {
             return $row->attributesToArray();
         }
 
-        if ($row instanceof CInterface_Arrayable) {
+        if ($row instanceof Arrayable) {
             return $row->toArray();
         }
 

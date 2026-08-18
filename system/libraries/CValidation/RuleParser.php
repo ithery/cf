@@ -66,7 +66,7 @@ class CValidation_RuleParser {
 
                 unset($rules[$key]);
             } else {
-                $rules[$key] = $this->explodeExplicitRule($rule);
+                $rules[$key] = $this->explodeExplicitRule($rule, $key);
             }
         }
 
@@ -77,37 +77,55 @@ class CValidation_RuleParser {
      * Explode the explicit rule into an array if necessary.
      *
      * @param mixed $rule
+     * @param mixed $attribute
      *
      * @return array
      */
-    protected function explodeExplicitRule($rule) {
+    protected function explodeExplicitRule($rule, $attribute) {
         if (is_string($rule)) {
             return explode('|', $rule);
-        } elseif (is_object($rule)) {
-            return [$this->prepareRule($rule)];
         }
 
-        return array_map([$this, 'prepareRule'], $rule);
+        if (is_object($rule)) {
+            return carr::wrap($this->prepareRule($rule, $attribute));
+        }
+
+        return array_map(
+            [$this, 'prepareRule'],
+            $rule,
+            array_fill((int) array_key_first($rule), count($rule), $attribute)
+        );
     }
 
     /**
      * Prepare the given rule for the Validator.
      *
      * @param mixed $rule
+     * @param mixed $attribute
      *
      * @return mixed
      */
-    protected function prepareRule($rule) {
+    protected function prepareRule($rule, $attribute) {
         if ($rule instanceof Closure) {
             $rule = new CValidation_ClosureValidationRule($rule);
         }
-
+        if ($rule instanceof CValidation_Contract_InvokableRuleInterface || $rule instanceof CValidation_Contract_ValidationRuleInterface) {
+            $rule = CValidation_InvokableValidationRule::make($rule);
+        }
         if (!is_object($rule)
             || $rule instanceof CValidation_RuleInterface
             || ($rule instanceof CValidation_Rule_Exists && $rule->queryCallbacks())
             || ($rule instanceof CValidation_Rule_Unique && $rule->queryCallbacks())
         ) {
             return $rule;
+        }
+
+        if ($rule instanceof CValidation_NestedRules) {
+            return $rule->compile(
+                $attribute,
+                $this->data[$attribute] ?? null,
+                carr::dot($this->data)
+            )->rules[$attribute];
         }
 
         return (string) $rule;
@@ -130,9 +148,21 @@ class CValidation_RuleParser {
         foreach ($data as $key => $value) {
             if (cstr::startsWith($key, $attribute) || (bool) preg_match('/^' . $pattern . '\z/', $key)) {
                 foreach ((array) $rules as $rule) {
-                    $this->implicitAttributes[$attribute][] = $key;
+                    if ($rule instanceof CValidation_NestedRules) {
+                        $compiled = $rule->compile($key, $value, $data);
 
-                    $results = $this->mergeRules($results, $key, $rule);
+                        $this->implicitAttributes = array_merge_recursive(
+                            $compiled->implicitAttributes,
+                            $this->implicitAttributes,
+                            [$attribute => [$key]]
+                        );
+
+                        $results = $this->mergeRules($results, $compiled->rules);
+                    } else {
+                        $this->implicitAttributes[$attribute][] = $key;
+
+                        $results = $this->mergeRules($results, $key, $rule);
+                    }
                 }
             }
         }
@@ -175,10 +205,10 @@ class CValidation_RuleParser {
      * @return array
      */
     protected function mergeRulesForAttribute($results, $attribute, $rules) {
-        $merge = carr::head($this->explodeRules([$rules]));
+        $merge = c::head($this->explodeRules([$rules]));
 
         $results[$attribute] = array_merge(
-            isset($results[$attribute]) ? $this->explodeExplicitRule($results[$attribute]) : [],
+            isset($results[$attribute]) ? $this->explodeExplicitRule($results[$attribute], $attribute) : [],
             $merge
         );
 
@@ -250,13 +280,18 @@ class CValidation_RuleParser {
      * @return array
      */
     protected static function parseParameters($rule, $parameter) {
-        $rule = strtolower($rule);
+        return static::ruleIsRegex($rule) ? [$parameter] : str_getcsv($parameter);
+    }
 
-        if (in_array($rule, ['regex', 'not_regex', 'notregex'], true)) {
-            return [$parameter];
-        }
-
-        return str_getcsv($parameter);
+    /**
+     * Determine if the rule is a regular expression.
+     *
+     * @param string $rule
+     *
+     * @return bool
+     */
+    protected static function ruleIsRegex($rule) {
+        return in_array(strtolower($rule), ['regex', 'not_regex', 'notregex'], true);
     }
 
     /**
@@ -275,5 +310,37 @@ class CValidation_RuleParser {
             default:
                 return $rule;
         }
+    }
+
+    /**
+     * Expand and conditional rules in the given array of rules.
+     *
+     * @param array $rules
+     * @param array $data
+     *
+     * @return array
+     */
+    public static function filterConditionalRules($rules, array $data = []) {
+        return c::collect($rules)->mapWithKeys(function ($attributeRules, $attribute) use ($data) {
+            if (!is_array($attributeRules)
+                && !$attributeRules instanceof CValidation_ConditionalRules
+            ) {
+                return [$attribute => $attributeRules];
+            }
+
+            if ($attributeRules instanceof CValidation_ConditionalRules) {
+                return [$attribute => $attributeRules->passes($data)
+                                ? array_filter($attributeRules->rules($data))
+                                : array_filter($attributeRules->defaultRules($data)), ];
+            }
+
+            return [$attribute => c::collect($attributeRules)->map(function ($rule) use ($data) {
+                if (!$rule instanceof CValidation_ConditionalRules) {
+                    return [$rule];
+                }
+
+                return $rule->passes($data) ? $rule->rules($data) : $rule->defaultRules($data);
+            })->filter()->flatten(1)->values()->all()];
+        })->all();
     }
 }

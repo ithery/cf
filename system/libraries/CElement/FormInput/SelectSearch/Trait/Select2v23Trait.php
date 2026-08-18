@@ -4,10 +4,27 @@
  * @see CElement_FormInput_SelectSearch
  */
 trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
+    /**
+     * Legacy select2 v2.3 markup: a plain `<input type="text">` that
+     * select2 v2.3's ajax-driven autocomplete attaches to.
+     *
+     * @param int $indent
+     *
+     * @return string
+     */
     public function htmlSelect2v23($indent = 0) {
         return '<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled validate[]" value="' . $this->value . '">';
     }
 
+    /**
+     * Initializes select2 v2.3 (the `formatResult`/`formatSelection`
+     * ajax-select API, as opposed to the newer `templateResult`/
+     * `templateSelection` used by {@see CElement_FormInput_SelectSearch::js()}).
+     *
+     * @param int $indent
+     *
+     * @return string
+     */
     public function jsSelect2v23($indent = 0) {
         if ($this->value > 0) {
             $this->autoSelect = true;
@@ -17,15 +34,16 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
         $strSelection = $this->formatSelection;
         $strResult = $this->formatResult;
 
-        $strSelection = $this->generateSelect2Template($strSelection);
-        $strResult = $this->generateSelect2Template($strResult);
-
-        if (strlen($strResult) == 0) {
-            $searchFieldText = c::value(carr::first($this->searchField));
-            if (strlen($searchFieldText) > 0) {
-                $strResult = "'+item." . $searchFieldText . "+'";
-            }
+        if ($strSelection instanceof CFunction_SerializableClosure || $strSelection instanceof \Opis\Closure\SerializableClosure) {
+            $strSelection = '';
         }
+
+        if ($strResult instanceof CFunction_SerializableClosure || $strResult instanceof \Opis\Closure\SerializableClosure) {
+            $strResult = '';
+        }
+
+        $strSelection = $this->generateSelect2Template($strSelection);
+
         if (strlen($strSelection) == 0) {
             $searchFieldText = c::value(carr::first($this->searchField));
             if (strlen($searchFieldText) > 0) {
@@ -33,7 +51,17 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
             }
         }
 
-        $strResult = preg_replace("/[\r\n]+/", '', $strResult);
+        if (is_string($strResult)) {
+            $strResult = $this->generateSelect2Template($strResult);
+            if (strlen($strResult) == 0) {
+                $searchFieldText = c::value(carr::first($this->searchField));
+                if (strlen($searchFieldText) > 0) {
+                    $strResult = "'+item." . $searchFieldText . "+'";
+                }
+            }
+            $strResult = preg_replace("/[\r\n]+/", '', $strResult);
+        }
+
         $placeholder = $this->placeholder;
         $strJsChange = '';
         if ($this->submit_onchange) {
@@ -47,6 +75,11 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
             foreach ($selectedRows as $index => $selectedRow) {
                 if ($selectedRow != null) {
                     $row = $selectedRow;
+                    $model = null;
+                    if ($row instanceof CModel) {
+                        $model = $row;
+                        $row = $this->modelToSelect2Array($model);
+                    }
                     if (is_object($row)) {
                         $row = (array) $row;
                     }
@@ -56,11 +89,33 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
                             $row[$k] = $valueCallback($row, $k, $v);
                         }
                     }
+                    $formatResult = $this->formatResult;
+                    if ($formatResult instanceof CFunction_SerializableClosure || $formatResult instanceof \Opis\Closure\SerializableClosure) {
+                        $formatResult = $formatResult->__invoke($model ?: $row);
+                        if ($formatResult instanceof CRenderable) {
+                            $data['cappFormatResult'] = $formatResult->html();
+                            $data['cappFormatResultIsHtml'] = true;
+                        } else {
+                            $data['cappFormatResult'] = $formatResult;
+                            $data['cappFormatResultIsHtml'] = c::isHtml($formatResult);
+                        }
+                    }
+                    $formatSelection = $this->formatSelection;
+                    if ($formatSelection instanceof CFunction_SerializableClosure || $formatSelection instanceof \Opis\Closure\SerializableClosure) {
+                        $formatSelection = $formatSelection->__invoke($model ?: $row);
+                        if ($formatSelection instanceof CRenderable) {
+                            $row['cappFormatSelection'] = $formatSelection->html();
+                            $row['cappFormatSelectionIsHtml'] = true;
+                        } else {
+                            $row['cappFormatSelection'] = $formatSelection;
+                            $row['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
+                        }
+                    }
                     $selectedData[] = $row;
                 }
             }
         }
-
+        /** @phpstan-ignore-next-line */
         if ($selectedData && is_array($selectedData) && count($selectedData) > 0) {
             if (!$this->multiple) {
                 $selectedData = carr::first($selectedData);

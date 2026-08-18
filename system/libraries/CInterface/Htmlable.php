@@ -1,16 +1,8 @@
 <?php
-
-defined('SYSPATH') or die('No direct access allowed.');
+use Illuminate\Contracts\Support\Htmlable;
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
+ * @deprecated 1.8 use Illuminate\Contracts\Support\Htmlable
  */
-interface CInterface_Htmlable {
-    /**
-     * Get content as a string of HTML.
-     *
-     * @return string
-     */
-    public function toHtml();
+interface CInterface_Htmlable extends Htmlable {
 }

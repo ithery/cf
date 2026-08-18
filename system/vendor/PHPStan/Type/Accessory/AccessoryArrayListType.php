@@ -2,13 +2,21 @@
 
 namespace PHPStan\Type\Accessory;
 
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\TrinaryLogic;
+use PHPStan\Type\AcceptsResult;
+use PHPStan\Type\ArrayType;
+use PHPStan\Type\BooleanType;
 use PHPStan\Type\CompoundType;
 use PHPStan\Type\Constant\ConstantFloatType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\ErrorType;
+use PHPStan\Type\InstanceofDeprecated;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntersectionType;
+use PHPStan\Type\IsSuperTypeOfResult;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\Traits\MaybeCallableTypeTrait;
 use PHPStan\Type\Traits\NonGeneralizableTypeTrait;
@@ -18,10 +26,11 @@ use PHPStan\Type\Traits\NonRemoveableTypeTrait;
 use PHPStan\Type\Traits\UndecidedBooleanTypeTrait;
 use PHPStan\Type\Traits\UndecidedComparisonCompoundTypeTrait;
 use PHPStan\Type\Type;
-use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\UnionType;
 use PHPStan\Type\VerbosityLevel;
 
+/** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::isList()')]
 class AccessoryArrayListType implements CompoundType, AccessoryType
 {
 
@@ -33,13 +42,22 @@ class AccessoryArrayListType implements CompoundType, AccessoryType
 	use NonRemoveableTypeTrait;
 	use NonGeneralizableTypeTrait;
 
-	private static bool $enabled = false;
-
+	/** @api */
 	public function __construct()
 	{
 	}
 
 	public function getReferencedClasses(): array
+	{
+		return [];
+	}
+
+	public function getObjectClassNames(): array
+	{
+		return [];
+	}
+
+	public function getObjectClassReflections(): array
 	{
 		return [];
 	}
@@ -54,44 +72,61 @@ class AccessoryArrayListType implements CompoundType, AccessoryType
 		return [];
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function getConstantStrings(): array
 	{
+		return [];
+	}
+
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
+	{
+		$isList = $type->isList();
+
+		if ($isList->yes()) {
+			return AcceptsResult::createYes();
+		}
+
 		if ($type instanceof CompoundType) {
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
-		return $type->isArray()
-			->and($type->isList());
+		return new AcceptsResult($isList, []);
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($this->equals($type)) {
-			return TrinaryLogic::createYes();
+			return IsSuperTypeOfResult::createYes();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
 		}
 
-		return $type->isArray()
-			->and($type->isList());
+		return new IsSuperTypeOfResult($type->isList(), []);
 	}
 
-	public function isSubTypeOf(Type $otherType): TrinaryLogic
+	public function isSubTypeOf(Type $otherType): IsSuperTypeOfResult
 	{
 		if ($otherType instanceof UnionType || $otherType instanceof IntersectionType) {
 			return $otherType->isSuperTypeOf($this);
 		}
 
-		return $otherType->isArray()
-			->and($otherType->isList())
-			->and($otherType instanceof self ? TrinaryLogic::createYes() : TrinaryLogic::createMaybe());
+		if ($otherType instanceof self) {
+			return new IsSuperTypeOfResult(
+				TrinaryLogic::createYes(),
+				[],
+			);
+		}
+
+		return new IsSuperTypeOfResult(
+			$otherType->isList()->and(TrinaryLogic::createMaybe()),
+			[],
+		);
 	}
 
-	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): TrinaryLogic
+	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): AcceptsResult
 	{
-		return $this->isSubTypeOf($acceptingType);
+		return $this->isSubTypeOf($acceptingType)->toAcceptsResult();
 	}
 
 	public function equals(Type $type): bool
@@ -109,9 +144,14 @@ class AccessoryArrayListType implements CompoundType, AccessoryType
 		return TrinaryLogic::createYes();
 	}
 
+	public function isOffsetAccessLegal(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
 	public function hasOffsetValueType(Type $offsetType): TrinaryLogic
 	{
-		return $this->getIterableKeyType()->isSuperTypeOf($offsetType)->and(TrinaryLogic::createMaybe());
+		return $this->getIterableKeyType()->isSuperTypeOf($offsetType)->result->and(TrinaryLogic::createMaybe());
 	}
 
 	public function getOffsetValueType(Type $offsetType): Type
@@ -128,6 +168,11 @@ class AccessoryArrayListType implements CompoundType, AccessoryType
 		return new ErrorType();
 	}
 
+	public function setExistingOffsetValueType(Type $offsetType, Type $valueType): Type
+	{
+		return $this;
+	}
+
 	public function unsetOffset(Type $offsetType): Type
 	{
 		if ($this->hasOffsetValueType($offsetType)->no()) {
@@ -137,12 +182,22 @@ class AccessoryArrayListType implements CompoundType, AccessoryType
 		return new ErrorType();
 	}
 
+	public function getKeysArrayFiltered(Type $filterValueType, TrinaryLogic $strict): Type
+	{
+		return $this->getKeysArray();
+	}
+
 	public function getKeysArray(): Type
 	{
 		return $this;
 	}
 
 	public function getValuesArray(): Type
+	{
+		return $this;
+	}
+
+	public function chunkArray(Type $lengthType, TrinaryLogic $preserveKeys): Type
 	{
 		return $this;
 	}
@@ -171,7 +226,16 @@ class AccessoryArrayListType implements CompoundType, AccessoryType
 		return $this;
 	}
 
-	public function searchArray(Type $needleType): Type
+	public function reverseArray(TrinaryLogic $preserveKeys): Type
+	{
+		if ($preserveKeys->no()) {
+			return $this;
+		}
+
+		return new MixedType();
+	}
+
+	public function searchArray(Type $needleType, ?TrinaryLogic $strict = null): Type
 	{
 		return new MixedType();
 	}
@@ -184,6 +248,69 @@ class AccessoryArrayListType implements CompoundType, AccessoryType
 	public function shuffleArray(): Type
 	{
 		return $this;
+	}
+
+	public function sliceArray(Type $offsetType, Type $lengthType, TrinaryLogic $preserveKeys): Type
+	{
+		if ($preserveKeys->no()) {
+			return $this;
+		}
+
+		if ((new ConstantIntegerType(0))->isSuperTypeOf($offsetType)->yes()) {
+			return $this;
+		}
+
+		return new MixedType();
+	}
+
+	public function spliceArray(Type $offsetType, Type $lengthType, Type $replacementType): Type
+	{
+		return $this;
+	}
+
+	public function truncateListToSize(Type $sizeType): Type
+	{
+		// List-ness survives a count narrowing — the resulting array is
+		// still a list, just of a constrained size.
+		return $this;
+	}
+
+	public function makeListMaybe(): Type
+	{
+		// This accessory is the list assertion itself; weakening the
+		// list-ness to "maybe" means the accessory no longer applies.
+		// Returning `MixedType` lets the enclosing `IntersectionType` drop
+		// it via `TypeCombinator::intersect` while preserving the rest.
+		return new MixedType();
+	}
+
+	public function mapValueType(callable $cb): Type
+	{
+		// Mapping values doesn't disturb list-ness.
+		return $this;
+	}
+
+	public function mapKeyType(callable $cb): Type
+	{
+		return $this;
+	}
+
+	public function makeAllArrayKeysOptional(): Type
+	{
+		// Marking keys optional in an arbitrary list keeps it a list.
+		return $this;
+	}
+
+	public function changeKeyCaseArray(?int $case): Type
+	{
+		// List keys are integers; case-folding leaves them alone.
+		return $this;
+	}
+
+	public function filterArrayRemovingFalsey(): Type
+	{
+		// Filtering creates gaps in the integer-key sequence — list-ness lost.
+		return new MixedType();
 	}
 
 	public function isIterable(): TrinaryLogic
@@ -251,12 +378,67 @@ class AccessoryArrayListType implements CompoundType, AccessoryType
 		return TrinaryLogic::createYes();
 	}
 
+	public function isNull(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isConstantScalarValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getConstantScalarTypes(): array
+	{
+		return [];
+	}
+
+	public function getConstantScalarValues(): array
+	{
+		return [];
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isBoolean(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFloat(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isInteger(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
 	public function isString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
 
 	public function isNumericString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isDecimalIntegerString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
@@ -276,25 +458,75 @@ class AccessoryArrayListType implements CompoundType, AccessoryType
 		return TrinaryLogic::createNo();
 	}
 
+	public function isLowercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isClassString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isUppercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function isVoid(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		return new BooleanType();
+	}
+
 	public function toNumber(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toAbsoluteNumber(): Type
 	{
 		return new ErrorType();
 	}
 
 	public function toInteger(): Type
 	{
-		return TypeCombinator::union(
+		return new UnionType([
 			new ConstantIntegerType(0),
 			new ConstantIntegerType(1),
-		);
+		]);
 	}
 
 	public function toFloat(): Type
 	{
-		return TypeCombinator::union(
+		return new UnionType([
 			new ConstantFloatType(0.0),
 			new ConstantFloatType(1.0),
-		);
+		]);
 	}
 
 	public function toString(): Type
@@ -304,7 +536,7 @@ class AccessoryArrayListType implements CompoundType, AccessoryType
 
 	public function toArray(): Type
 	{
-		return new MixedType();
+		return $this;
 	}
 
 	public function toArrayKey(): Type
@@ -312,33 +544,44 @@ class AccessoryArrayListType implements CompoundType, AccessoryType
 		return new ErrorType();
 	}
 
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		return $this;
+	}
+
 	public function traverse(callable $cb): Type
 	{
 		return $this;
 	}
 
-	public static function __set_state(array $properties): Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		return new self();
+		return $this;
 	}
 
-	public static function setListTypeEnabled(bool $enabled): void
+	public function exponentiate(Type $exponent): Type
 	{
-		self::$enabled = $enabled;
+		return new ErrorType();
 	}
 
-	public static function isListTypeEnabled(): bool
+	public function getFiniteTypes(): array
 	{
-		return self::$enabled;
+		return [];
 	}
 
-	public static function intersectWith(Type $type): Type
+	public function getDefaultBaseType(): Type
 	{
-		if (self::$enabled) {
-			return TypeCombinator::intersect($type, new self());
-		}
+		return new ArrayType(new MixedType(), new MixedType());
+	}
 
-		return $type;
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode('list');
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return false;
 	}
 
 }

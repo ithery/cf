@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 class CModel_Relation_HasManyThrough extends CModel_Relation {
     use CModel_Relation_Trait_InteractsWithDictionary;
 
@@ -108,7 +110,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      *
      * @return void
      */
-    protected function performJoin(CModel_Query $query = null) {
+    protected function performJoin(?CModel_Query $query = null) {
         $query = $query ?: $this->query;
 
         $farKey = $this->getQualifiedFarKeyName();
@@ -248,6 +250,44 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     }
 
     /**
+     * Get the first record matching the attributes. If the record is not found, create it.
+     *
+     * @param array $attributes
+     * @param array $values
+     *
+     * @return \CModel
+     */
+    public function firstOrCreate(array $attributes = [], array $values = []) {
+        if (!is_null($instance = (clone $this)->where($attributes)->first())) {
+            return $instance;
+        }
+
+        return $this->createOrFirst(array_merge($attributes, $values));
+    }
+
+    /**
+     * Attempt to create the record. If a unique constraint violation occurs, attempt to find the matching record.
+     *
+     * @param array $attributes
+     * @param array $values
+     *
+     * @return \CModel
+     */
+    public function createOrFirst(array $attributes = [], array $values = []) {
+        try {
+            return $this->getQuery()->withSavepointIfNeeded(function () use ($attributes, $values) {
+                return $this->create(array_merge($attributes, $values));
+            });
+        } catch (CDatabase_Exception_UniqueConstraintViolationException $exception) {
+            if ($result = $this->where($attributes)->first()) {
+                return $result;
+            }
+
+            throw $exception;
+        }
+    }
+
+    /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
      * @param array $attributes
@@ -315,7 +355,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      *
      * @return \CModel|static|mixed
      */
-    public function firstOr($columns = ['*'], Closure $callback = null) {
+    public function firstOr($columns = ['*'], ?Closure $callback = null) {
         if ($columns instanceof Closure) {
             $callback = $columns;
 
@@ -338,7 +378,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @return null|\CModel|\CModel_Collection
      */
     public function find($id, $columns = ['*']) {
-        if (is_array($id) || $id instanceof CInterface_Arrayable) {
+        if (is_array($id) || $id instanceof Arrayable) {
             return $this->findMany($id, $columns);
         }
 
@@ -358,7 +398,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @return \CModel_Collection
      */
     public function findMany($ids, $columns = ['*']) {
-        $ids = $ids instanceof CInterface_Arrayable ? $ids->toArray() : $ids;
+        $ids = $ids instanceof Arrayable ? $ids->toArray() : $ids;
         if (empty($ids)) {
             return $this->getRelated()->newCollection();
         }
@@ -382,7 +422,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     public function findOrFail($id, $columns = ['*']) {
         $result = $this->find($id, $columns);
 
-        $id = $id instanceof CInterface_Arrayable ? $id->toArray() : $id;
+        $id = $id instanceof Arrayable ? $id->toArray() : $id;
         if (is_array($id)) {
             if (count($result) == count(array_unique($id))) {
                 return $result;
@@ -403,7 +443,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      *
      * @return \CModel|\CModel_Collection|mixed
      */
-    public function findOr($id, $columns = ['*'], Closure $callback = null) {
+    public function findOr($id, $columns = ['*'], ?Closure $callback = null) {
         if ($columns instanceof Closure) {
             $callback = $columns;
 
@@ -412,7 +452,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
 
         $result = $this->find($id, $columns);
 
-        $id = $id instanceof CInterface_Arrayable ? $id->toArray() : $id;
+        $id = $id instanceof Arrayable ? $id->toArray() : $id;
 
         if (is_array($id)) {
             if (count($result) === count(array_unique($id))) {

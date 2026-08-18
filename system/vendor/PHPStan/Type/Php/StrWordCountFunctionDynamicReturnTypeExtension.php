@@ -4,6 +4,7 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\ArrayType;
 use PHPStan\Type\Constant\ConstantBooleanType;
@@ -15,8 +16,10 @@ use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
 use function count;
+use function in_array;
 
-class StrWordCountFunctionDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class StrWordCountFunctionDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -33,14 +36,14 @@ class StrWordCountFunctionDynamicReturnTypeExtension implements DynamicFunctionR
 		$argsCount = count($functionCall->getArgs());
 		if ($argsCount === 1) {
 			return new IntegerType();
-		} elseif ($argsCount === 2 || $argsCount === 3) {
+		} elseif (in_array($argsCount, [2, 3], true)) {
 			$formatType = $scope->getType($functionCall->getArgs()[1]->value);
 			if ($formatType instanceof ConstantIntegerType) {
 				$val = $formatType->getValue();
 				if ($val === 0) {
 					// return word count
 					return new IntegerType();
-				} elseif ($val === 1 || $val === 2) {
+				} elseif (in_array($val, [1, 2], true)) {
 					// return [word] or [offset => word]
 					return new ArrayType(new IntegerType(), new StringType());
 				}

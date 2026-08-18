@@ -33,7 +33,7 @@ class CVendor_OneSignal_Apps extends CVendor_OneSignal_AbstractApi {
      * @param string $id ID of your application
      */
     public function getOne($id) {
-        $request = $this->createRequest('GET', "/apps/${id}");
+        $request = $this->createRequest('GET', "/apps/{$id}");
         $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getUserAuthKey()}");
 
         return $this->client->sendRequest($request);
@@ -80,7 +80,7 @@ class CVendor_OneSignal_Apps extends CVendor_OneSignal_AbstractApi {
     public function update($id, array $data) {
         $resolvedData = $this->resolverFactory->createAppResolver()->resolve($data);
 
-        $request = $this->createRequest('PUT', "/apps/${id}");
+        $request = $this->createRequest('PUT', "/apps/{$id}");
         $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getUserAuthKey()}");
         $request = $request->withHeader('Content-Type', 'application/json');
         $request = $request->withBody($this->createStream($resolvedData));
@@ -97,7 +97,7 @@ class CVendor_OneSignal_Apps extends CVendor_OneSignal_AbstractApi {
     public function createSegment($appId, array $data) {
         $resolvedData = $this->resolverFactory->createSegmentResolver()->resolve($data);
 
-        $request = $this->createRequest('POST', "/apps/${appId}/segments");
+        $request = $this->createRequest('POST', "/apps/{$appId}/segments");
         $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
         $request = $request->withHeader('Content-Type', 'application/json');
         $request = $request->withBody($this->createStream($resolvedData));
@@ -114,7 +114,7 @@ class CVendor_OneSignal_Apps extends CVendor_OneSignal_AbstractApi {
      * @param string $segmentId Segment ID
      */
     public function deleteSegment($appId, $segmentId) {
-        $request = $this->createRequest('DELETE', "/apps/${appId}/segments/${segmentId}");
+        $request = $this->createRequest('DELETE', "/apps/{$appId}/segments/{$segmentId}");
         $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
 
         return $this->client->sendRequest($request);
@@ -131,7 +131,7 @@ class CVendor_OneSignal_Apps extends CVendor_OneSignal_AbstractApi {
 
         $queryString = preg_replace('/%5B\d+%5D/', '%5B%5D', http_build_query($resolvedData));
 
-        $request = $this->createRequest('GET', "/apps/${appId}/outcomes?${queryString}");
+        $request = $this->createRequest('GET', "/apps/{$appId}/outcomes?{$queryString}");
         $request = $request->withHeader('Authorization', "Basic {$this->client->getConfig()->getApplicationAuthKey()}");
 
         return $this->client->sendRequest($request);

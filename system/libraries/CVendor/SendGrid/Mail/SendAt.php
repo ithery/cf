@@ -81,6 +81,7 @@ class CVendor_SendGrid_Mail_SendAt implements \JsonSerializable {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->getSendAt();
     }

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 2:46:55 AM
- */
 trait CQueue_Trait_DispatchableTrait {
     /**
      * Dispatch the job with the given arguments.
@@ -100,5 +94,16 @@ trait CQueue_Trait_DispatchableTrait {
      */
     public static function withChain($chain) {
         return new CQueue_PendingChain(static::class, $chain);
+    }
+
+    /**
+     * Create a new pending job dispatch instance.
+     *
+     * @param mixed $job
+     *
+     * @return \CQueue_PendingDispatch
+     */
+    protected static function newPendingDispatch($job) {
+        return new CQueue_PendingDispatch($job);
     }
 }

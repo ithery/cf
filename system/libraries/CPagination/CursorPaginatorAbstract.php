@@ -498,6 +498,7 @@ abstract class CPagination_CursorPaginatorAbstract implements CInterface_Htmlabl
      *
      * @return \ArrayIterator|\Traversable
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return $this->items->getIterator();
     }
@@ -578,6 +579,7 @@ abstract class CPagination_CursorPaginatorAbstract implements CInterface_Htmlabl
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key): mixed {
         return $this->items->get($key);
     }
@@ -631,6 +633,7 @@ abstract class CPagination_CursorPaginatorAbstract implements CInterface_Htmlabl
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->render();
     }

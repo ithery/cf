@@ -8,13 +8,15 @@ use PHPStan\Analyser\SpecifiedTypes;
 use PHPStan\Analyser\TypeSpecifier;
 use PHPStan\Analyser\TypeSpecifierAwareExtension;
 use PHPStan\Analyser\TypeSpecifierContext;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\Accessory\NonEmptyArrayType;
 use PHPStan\Type\FunctionTypeSpecifyingExtension;
 use function count;
 use function in_array;
 
-class CountFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
+#[AutowiredService]
+final class CountFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
 {
 
 	private TypeSpecifier $typeSpecifier;
@@ -41,7 +43,7 @@ class CountFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExte
 			return new SpecifiedTypes([], []);
 		}
 
-		return $this->typeSpecifier->create($node->getArgs()[0]->value, new NonEmptyArrayType(), $context, false, $scope);
+		return $this->typeSpecifier->create($node->getArgs()[0]->value, new NonEmptyArrayType(), $context, $scope);
 	}
 
 	public function setTypeSpecifier(TypeSpecifier $typeSpecifier): void

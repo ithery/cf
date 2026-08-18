@@ -10,9 +10,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CTrait_Controller_Application_Server_PhpInfo {
     public function phpinfo() {
-        $app = CApp::instance();
+        $app = c::app();
 
-        $app->title(clang::__('PHP Info'));
+        $app->title(c::__('PHP Info'));
 
         $html = CView::factory('cresenity/phpinfo/index');
         $html = $html->render();

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 12, 2019, 5:38:20 PM
- */
 class CDaemon_Process {
     public $pid;
 
@@ -41,11 +35,12 @@ class CDaemon_Process {
         } else {
             $timeout = 30;
         }
+
         return $timeout;
     }
 
     /**
-     * Stop the process, using whatever means necessary, and possibly return a textual description
+     * Stop the process, using whatever means necessary, and possibly return a textual description.
      *
      * @return bool|string
      */
@@ -56,8 +51,10 @@ class CDaemon_Process {
         }
         if (time() > $this->stop_time + $this->timeout()) {
             $this->kill();
+
             return "Worker Process '{$this->pid}' Shutdown Timeout: Killing...";
         }
+
         return null;
     }
 

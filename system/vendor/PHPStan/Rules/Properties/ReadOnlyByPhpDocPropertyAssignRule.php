@@ -4,13 +4,15 @@ namespace PHPStan\Rules\Properties;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\PropertyAssignNode;
 use PHPStan\Reflection\ConstructorsHelper;
 use PHPStan\Reflection\MethodReflection;
+use PHPStan\Reflection\Php\PhpMethodFromParserNodeReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\ShouldNotHappenException;
-use PHPStan\Type\ThisType;
+use PHPStan\Type\TypeUtils;
 use function in_array;
 use function sprintf;
 use function strtolower;
@@ -18,7 +20,8 @@ use function strtolower;
 /**
  * @implements Rule<PropertyAssignNode>
  */
-class ReadOnlyByPhpDocPropertyAssignRule implements Rule
+#[RegisteredRule(level: 3)]
+final class ReadOnlyByPhpDocPropertyAssignRule implements Rule
 {
 
 	public function __construct(
@@ -40,6 +43,23 @@ class ReadOnlyByPhpDocPropertyAssignRule implements Rule
 			return [];
 		}
 
+		$inCloneWith = (bool) $propertyFetch->getAttribute('inCloneWith', false);
+		if ($inCloneWith) {
+			return [];
+		}
+
+		$inFunction = $scope->getFunction();
+		if (
+			$inFunction instanceof PhpMethodFromParserNodeReflection
+			&& $inFunction->isPropertyHook()
+			&& $propertyFetch->var instanceof Node\Expr\Variable
+			&& $propertyFetch->var->name === 'this'
+			&& $propertyFetch->name instanceof Node\Identifier
+			&& $inFunction->getHookedPropertyName() === $propertyFetch->name->toString()
+		) {
+			return [];
+		}
+
 		$errors = [];
 		$reflections = $this->propertyReflectionFinder->findPropertyReflectionsFromNode($propertyFetch, $scope);
 		foreach ($reflections as $propertyReflection) {
@@ -47,7 +67,7 @@ class ReadOnlyByPhpDocPropertyAssignRule implements Rule
 			if ($nativeReflection === null) {
 				continue;
 			}
-			if (!$scope->canAccessProperty($propertyReflection)) {
+			if (!$scope->canWriteProperty($propertyReflection)) {
 				continue;
 			}
 			if (!$nativeReflection->isReadOnlyByPhpDoc() || $nativeReflection->isReadOnly()) {
@@ -57,13 +77,19 @@ class ReadOnlyByPhpDocPropertyAssignRule implements Rule
 			$declaringClass = $nativeReflection->getDeclaringClass();
 
 			if (!$scope->isInClass()) {
-				$errors[] = RuleErrorBuilder::message(sprintf('@readonly property %s::$%s is assigned outside of its declaring class.', $declaringClass->getDisplayName(), $propertyReflection->getName()))->build();
+				$errors[] = RuleErrorBuilder::message(sprintf('@readonly property %s::$%s is assigned outside of its declaring class.', $declaringClass->getDisplayName(), $propertyReflection->getName()))
+					->line($propertyFetch->name->getStartLine())
+					->identifier('property.readOnlyByPhpDocAssignOutOfClass')
+					->build();
 				continue;
 			}
 
 			$scopeClassReflection = $scope->getClassReflection();
 			if ($scopeClassReflection->getName() !== $declaringClass->getName()) {
-				$errors[] = RuleErrorBuilder::message(sprintf('@readonly property %s::$%s is assigned outside of its declaring class.', $declaringClass->getDisplayName(), $propertyReflection->getName()))->build();
+				$errors[] = RuleErrorBuilder::message(sprintf('@readonly property %s::$%s is assigned outside of its declaring class.', $declaringClass->getDisplayName(), $propertyReflection->getName()))
+					->line($propertyFetch->name->getStartLine())
+					->identifier('property.readOnlyByPhpDocAssignOutOfClass')
+					->build();
 				continue;
 			}
 
@@ -76,8 +102,11 @@ class ReadOnlyByPhpDocPropertyAssignRule implements Rule
 				in_array($scopeMethod->getName(), $this->constructorsHelper->getConstructors($scopeClassReflection), true)
 				|| strtolower($scopeMethod->getName()) === '__unserialize'
 			) {
-				if (!$scope->getType($propertyFetch->var) instanceof ThisType) {
-					$errors[] = RuleErrorBuilder::message(sprintf('@readonly property %s::$%s is not assigned on $this.', $declaringClass->getDisplayName(), $propertyReflection->getName()))->build();
+				if (TypeUtils::findThisType($scope->getType($propertyFetch->var)) === null) {
+					$errors[] = RuleErrorBuilder::message(sprintf('@readonly property %s::$%s is not assigned on $this.', $declaringClass->getDisplayName(), $propertyReflection->getName()))
+						->line($propertyFetch->name->getStartLine())
+						->identifier('property.readOnlyByPhpDocAssignNotOnThis')
+						->build();
 				}
 
 				continue;
@@ -87,7 +116,14 @@ class ReadOnlyByPhpDocPropertyAssignRule implements Rule
 				continue;
 			}
 
-			$errors[] = RuleErrorBuilder::message(sprintf('@readonly property %s::$%s is assigned outside of the constructor.', $declaringClass->getDisplayName(), $propertyReflection->getName()))->build();
+			if ($node->isArrayAccessOffsetWrite($scope)) {
+				continue;
+			}
+
+			$errors[] = RuleErrorBuilder::message(sprintf('@readonly property %s::$%s is assigned outside of the constructor.', $declaringClass->getDisplayName(), $propertyReflection->getName()))
+				->line($propertyFetch->name->getStartLine())
+				->identifier('property.readOnlyByPhpDocAssignNotInConstructor')
+				->build();
 		}
 
 		return $errors;

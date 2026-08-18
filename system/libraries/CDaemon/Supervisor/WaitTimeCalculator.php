@@ -69,10 +69,10 @@ class CDaemon_Supervisor_WaitTimeCalculator {
     /**
      * Get all of the queue names.
      *
-     * @param \Illuminate\Support\Collection $supervisors
-     * @param null|string                    $queue
+     * @param \CCollection $supervisors
+     * @param null|string  $queue
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     protected function queueNames($supervisors, $queue = null) {
         $queues = $supervisors->map(function ($supervisor) {
@@ -85,8 +85,8 @@ class CDaemon_Supervisor_WaitTimeCalculator {
     /**
      * Get the total process count for a given queue.
      *
-     * @param \Illuminate\Support\Collection $allSupervisors
-     * @param string                         $queue
+     * @param \CCollection $allSupervisors
+     * @param string       $queue
      *
      * @return int
      */
@@ -126,7 +126,9 @@ class CDaemon_Supervisor_WaitTimeCalculator {
      * @return float
      */
     protected function timeToClearFor($connection, $queue) {
-        $size = $this->queue->connection($connection)->readyNow($queue);
+        $connection = $this->queue->connection($connection);
+        /** @var CDaemon_Supervisor_Queue_RedisQueue $connection */
+        $size = $connection->readyNow($queue);
 
         return $size * $this->metrics->runtimeForQueue($queue);
     }

@@ -2,9 +2,11 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\PhpDocParser\Ast\Type\ThisTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\ReflectionProviderStaticAccessor;
-use PHPStan\TrinaryLogic;
+use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\Type\Constant\ConstantStringType;
 use function sprintf;
 
 /** @api */
@@ -32,7 +34,7 @@ class ThisType extends StaticType
 		return sprintf('$this(%s)', $this->getStaticObjectType()->describe($level));
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof self) {
 			return $this->getStaticObjectType()->isSuperTypeOf($type);
@@ -44,7 +46,7 @@ class ThisType extends StaticType
 
 		$parent = new parent($this->getClassReflection(), $this->getSubtractedType());
 
-		return $parent->isSuperTypeOf($type)->and(TrinaryLogic::createMaybe());
+		return $parent->isSuperTypeOf($type)->and(IsSuperTypeOfResult::createMaybe());
 	}
 
 	public function changeSubtractedType(?Type $subtractedType): Type
@@ -71,17 +73,32 @@ class ThisType extends StaticType
 		return $this;
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
-		if ($reflectionProvider->hasClass($properties['baseClass'])) {
-			return new self($reflectionProvider->getClass($properties['baseClass']), $properties['subtractedType'] ?? null);
+		if ($this->getSubtractedType() === null) {
+			return $this;
 		}
 
-		return new ErrorType();
+		return new self($this->getClassReflection());
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new ThisTypeNode();
+	}
+
+	public function toClassConstantType(ReflectionProvider $reflectionProvider): Type
+	{
+		// `$this` in a `final` class is pinned to that one class, so
+		// `$this::class` collapses to its literal name. For non-final
+		// classes `$this` could still be a subclass, so fall back to the
+		// `class-string<$this>` projection from the parent.
+		$reflection = $this->getClassReflection();
+		if ($reflection->isFinalByKeyword()) {
+			return new ConstantStringType($reflection->getName(), true);
+		}
+
+		return parent::toClassConstantType($reflectionProvider);
 	}
 
 }

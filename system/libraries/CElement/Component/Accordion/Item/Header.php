@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 7, 2018, 5:27:51 AM
- */
 class CElement_Component_Accordion_Item_Header extends CElement_Component {
     use CTrait_Element_Property_Icon,
         CTrait_Element_Property_Title;
@@ -17,17 +11,28 @@ class CElement_Component_Accordion_Item_Header extends CElement_Component {
      */
     protected $actions;
 
+    /**
+     * @var string
+     */
     protected $targetBody = '';
 
-    public function __construct($id) {
+    /**
+     * @param null|string $id
+     *
+     * @return void
+     */
+    public function __construct($id = null) {
         parent::__construct($id);
 
         $this->addClass('component-accordion-item-header card-header');
     }
 
+    /**
+     * @return CElement_List_ActionList
+     */
     public function actions() {
         if ($this->actions == null) {
-            $this->actions = CElement_Factory::createList('ActionList', $this->parent->id . '_header');
+            $this->actions = new CElement_List_ActionList($this->parent->id . '_header');
             $this->actions->setStyle('widget-action')->addClass('float-right pull-right');
             $this->add($this->actions);
         }
@@ -35,6 +40,11 @@ class CElement_Component_Accordion_Item_Header extends CElement_Component {
         return $this->actions;
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CElement_Component_Action
+     */
     public function addAction($id = '') {
         $action = CElement_Factory::createComponent('Action', $id);
         $this->actions()->add($action);
@@ -42,10 +52,18 @@ class CElement_Component_Accordion_Item_Header extends CElement_Component {
         return $action;
     }
 
+    /**
+     * @param string $targetBody
+     *
+     * @return void
+     */
     public function setTargetBody($targetBody) {
         $this->targetBody = $targetBody;
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         if (strlen($this->icon) > 0) {
             $this->addSpan()->addClass('icon')->addIcon($this->icon);

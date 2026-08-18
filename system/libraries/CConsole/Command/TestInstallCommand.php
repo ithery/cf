@@ -66,7 +66,7 @@ class CConsole_Command_TestInstallCommand extends CConsole_Command {
                 if (!CFile::isDirectory(dirname($binPath))) {
                     CFile::makeDirectory(dirname($binPath), 0755, true);
                 }
-                copy('http://cpanel.ittron.co.id/application/devcloud/default/data/bin/phpunit/phpunit', $binPath);
+                copy('https://devcloud.cresenity.com/application/devcloud/default/data/bin/phpunit/phpunit', $binPath);
                 $this->info($binPath . ' downloaded');
             } catch (Exception $ex) {
                 $errCode++;

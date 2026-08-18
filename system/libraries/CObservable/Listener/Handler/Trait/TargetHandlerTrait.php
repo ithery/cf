@@ -2,20 +2,21 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 1:36:31 PM
- */
 trait CObservable_Listener_Handler_Trait_TargetHandlerTrait {
     /**
-     * Id of handler targeted renderable
+     * Id of handler targeted renderable.
      *
      * @var string
      */
     protected $target;
 
+    /**
+     * Set the target of the handler.
+     *
+     * @param string|CObservable|CRenderable $target
+     *
+     * @return $this
+     */
     public function setTarget($target) {
         if ($target instanceof CObservable) {
             if (get_class($this) == CObservable_Listener_Handler_ReloadHandler::class) {

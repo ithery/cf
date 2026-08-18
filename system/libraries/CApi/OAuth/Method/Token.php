@@ -1,6 +1,9 @@
 <?php
 use Nyholm\Psr7\Response as Psr7Response;
 
+/**
+ * @see https://github.com/laravel/passport
+ */
 class CApi_OAuth_Method_Token extends CApi_OAuth_MethodAbstract {
     use CApi_OAuth_Trait_HandleOAuthErrorTrait;
     use CApi_OAuth_Trait_FactoryTrait;

@@ -3,127 +3,41 @@
 namespace PHPStan\Reflection;
 
 use PhpParser\Node\Expr;
-use PHPStan\BetterReflection\NodeCompiler\Exception\UnableToCompileNode;
-use PHPStan\BetterReflection\Reflection\Adapter\ReflectionClassConstant;
-use PHPStan\TrinaryLogic;
+use PHPStan\PhpDoc\ResolvedPhpDocBlock;
 use PHPStan\Type\Type;
-use const NAN;
 
-class ClassConstantReflection implements ConstantReflection
+/**
+ * Reflection for a class constant.
+ *
+ * Combines ClassMemberReflection (declaring class, visibility) with
+ * ConstantReflection (name, value type, deprecation) and adds class-constant-specific
+ * features: the value expression AST, final modifier, and separate PHPDoc/native types.
+ *
+ * PHP 8.3+ supports native type declarations on class constants, so this interface
+ * provides both PHPDoc and native type accessors (similar to property reflection).
+ *
+ * This is the return type of Type::getConstant() and Scope::getConstantReflection().
+ *
+ * @api
+ * @api-do-not-implement
+ */
+interface ClassConstantReflection extends ClassMemberReflection, ConstantReflection
 {
 
-	private ?Type $valueType = null;
+	public function getValueExpr(): Expr;
 
-	public function __construct(
-		private InitializerExprTypeResolver $initializerExprTypeResolver,
-		private ClassReflection $declaringClass,
-		private ReflectionClassConstant $reflection,
-		private ?Type $phpDocType,
-		private ?string $deprecatedDescription,
-		private bool $isDeprecated,
-		private bool $isInternal,
-	)
-	{
-	}
+	public function isFinal(): bool;
 
-	public function getName(): string
-	{
-		return $this->reflection->getName();
-	}
+	public function isFinalByKeyword(): bool;
 
-	public function getFileName(): ?string
-	{
-		return $this->declaringClass->getFileName();
-	}
+	public function hasPhpDocType(): bool;
 
-	/**
-	 * @deprecated Use getValueExpr()
-	 * @return mixed
-	 */
-	public function getValue()
-	{
-		try {
-			return $this->reflection->getValue();
-		} catch (UnableToCompileNode) {
-			return NAN;
-		}
-	}
+	public function getPhpDocType(): ?Type;
 
-	public function getValueExpr(): Expr
-	{
-		return $this->reflection->getValueExpression();
-	}
+	public function hasNativeType(): bool;
 
-	public function hasPhpDocType(): bool
-	{
-		return $this->phpDocType !== null;
-	}
+	public function getNativeType(): ?Type;
 
-	public function getValueType(): Type
-	{
-		if ($this->valueType === null) {
-			if ($this->phpDocType === null) {
-				$this->valueType = $this->initializerExprTypeResolver->getType($this->getValueExpr(), InitializerExprContext::fromClassReflection($this->declaringClass));
-			} else {
-				$this->valueType = $this->phpDocType;
-			}
-		}
-
-		return $this->valueType;
-	}
-
-	public function getDeclaringClass(): ClassReflection
-	{
-		return $this->declaringClass;
-	}
-
-	public function isStatic(): bool
-	{
-		return true;
-	}
-
-	public function isPrivate(): bool
-	{
-		return $this->reflection->isPrivate();
-	}
-
-	public function isPublic(): bool
-	{
-		return $this->reflection->isPublic();
-	}
-
-	public function isFinal(): bool
-	{
-		return $this->reflection->isFinal();
-	}
-
-	public function isDeprecated(): TrinaryLogic
-	{
-		return TrinaryLogic::createFromBoolean($this->isDeprecated);
-	}
-
-	public function getDeprecatedDescription(): ?string
-	{
-		if ($this->isDeprecated) {
-			return $this->deprecatedDescription;
-		}
-
-		return null;
-	}
-
-	public function isInternal(): TrinaryLogic
-	{
-		return TrinaryLogic::createFromBoolean($this->isInternal);
-	}
-
-	public function getDocComment(): ?string
-	{
-		$docComment = $this->reflection->getDocComment();
-		if ($docComment === false) {
-			return null;
-		}
-
-		return $docComment;
-	}
+	public function getResolvedPhpDoc(): ?ResolvedPhpDocBlock;
 
 }

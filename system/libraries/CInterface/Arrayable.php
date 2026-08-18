@@ -1,18 +1,8 @@
 <?php
-
-defined('SYSPATH') or die('No direct access allowed.');
+use Illuminate\Contracts\Support\Arrayable;
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2018, 11:16:18 PM
+ * @deprecated 1.8 use Illuminate\Contracts\Support\Arrayable
  */
-interface CInterface_Arrayable {
-    /**
-     * Get the instance as an array.
-     *
-     * @return array
-     */
-    public function toArray();
+interface CInterface_Arrayable extends Arrayable {
 }

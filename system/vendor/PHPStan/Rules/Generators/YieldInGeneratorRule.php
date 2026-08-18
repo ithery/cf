@@ -4,7 +4,8 @@ namespace PHPStan\Rules\Generators;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
-use PHPStan\Reflection\ParametersAcceptorSelector;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\TrinaryLogic;
@@ -15,10 +16,14 @@ use function sprintf;
 /**
  * @implements Rule<Node\Expr>
  */
-class YieldInGeneratorRule implements Rule
+#[RegisteredRule(level: 3)]
+final class YieldInGeneratorRule implements Rule
 {
 
-	public function __construct(private bool $reportMaybes)
+	public function __construct(
+		#[AutowiredParameter]
+		private bool $reportMaybes,
+	)
 	{
 	}
 
@@ -38,9 +43,14 @@ class YieldInGeneratorRule implements Rule
 		if ($anonymousFunctionReturnType !== null) {
 			$returnType = $anonymousFunctionReturnType;
 		} elseif ($scopeFunction !== null) {
-			$returnType = ParametersAcceptorSelector::selectSingle($scopeFunction->getVariants())->getReturnType();
+			$returnType = $scopeFunction->getReturnType();
 		} else {
-			return [RuleErrorBuilder::message('Yield can be used only inside a function.')->build()];
+			return [
+				RuleErrorBuilder::message('Yield can be used only inside a function.')
+					->identifier('generator.outOfFunction')
+					->nonIgnorable()
+					->build(),
+			];
 		}
 
 		if ($returnType instanceof MixedType) {
@@ -66,7 +76,7 @@ class YieldInGeneratorRule implements Rule
 			RuleErrorBuilder::message(sprintf(
 				'Yield can be used only with these return types: %s.',
 				'Generator, Iterator, Traversable, iterable',
-			))->build(),
+			))->identifier('generator.returnType')->build(),
 		];
 	}
 

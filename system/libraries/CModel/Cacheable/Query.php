@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 4:03:03 PM
- */
-
-/**
  * @mixin CModel_Query
  */
 class CModel_Cacheable_Query extends CModel_Query {

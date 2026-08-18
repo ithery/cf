@@ -46,6 +46,9 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
      */
     private static $instance = null;
 
+    /**
+     * CApp_SEO_JsonLd constructor.
+     */
     private function __construct() {
         $this->config = CF::config('seo.twitter');
 
@@ -203,7 +206,9 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     }
 
     /**
-     * @inheritdoc
+     * @param string|array $image
+     *
+     * @return static
      */
     public function setImage($image) {
         $this->images = [$image];

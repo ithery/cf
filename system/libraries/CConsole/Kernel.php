@@ -60,7 +60,7 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      *
      * @return void
      */
-    public function __construct(CEvent_Dispatcher $events = null) {
+    public function __construct(?CEvent_Dispatcher $events = null) {
         if (!defined('CFCLI_BINARY')) {
             define('CFCLI_BINARY', 'cf');
         }
@@ -70,7 +70,6 @@ class CConsole_Kernel implements CConsole_KernelInterface {
         }
         $this->events = $events;
 
-        CBootstrap::instance()->boot();
         CF::booted(function () {
             if (!CF::isTesting()) {
                 $this->rerouteSymfonyCommandEvents();

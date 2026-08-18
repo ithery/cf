@@ -67,7 +67,7 @@ class CParser_HtmlParser_Tokenizer {
      */
     protected $decodeEntities = false;
 
-    public function __construct($options = [], CParser_HtmlParser_TokenizerCallbackInterface $callbacks = null) {
+    public function __construct($options = [], ?CParser_HtmlParser_TokenizerCallbackInterface $callbacks = null) {
         $this->xmlMode = carr::get($options, 'xmlMode', false);
         $this->decodeEntities = carr::get($options, 'decodeEntities', false);
         $this->callbacks = $callbacks;

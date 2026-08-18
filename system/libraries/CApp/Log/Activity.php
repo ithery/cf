@@ -2,20 +2,29 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 16, 2019, 2:40:46 AM
- */
-
 use CApp_Base as Base;
+use CApp_Navigation_Helper as NavHelper;
 
 class CApp_Log_Activity {
-    public static function populate($description, $data) {
+    /**
+     * Mencatat satu aktivitas.
+     *
+     * `$extra` disediakan supaya aplikasi dapat menambahkan kolomnya sendiri —
+     * devcloud memakainya untuk `team_id`, yang menentukan siapa boleh membaca
+     * catatan itu kembali. Modelnya dikembalikan agar pemanggil dapat
+     * menambahkan sesuatu tanpa membangun ulang seluruh isinya.
+     *
+     * @param string $description
+     * @param array  $data
+     * @param array  $extra       kolom tambahan milik aplikasi
+     *
+     * @return CModel
+     */
+    public static function populate($description, $data, array $extra = []) {
         $modelName = CF::config('app.model.log_activity', CApp_Model_LogActivity::class);
         $model = new $modelName();
-        $nav = cnav::nav();
+        /** @var CModel $model */
+        $nav = NavHelper::nav();
         $navName = '';
         $navLabel = '';
         $actionName = '';
@@ -58,7 +67,7 @@ class CApp_Log_Activity {
         $model->fill([
             'org_id' => $orgId,
             'app_id' => $appId,
-            'session_id' => CSession::instance()->id(),
+            'session_id' => c::session()->getId(),
             'remote_addr' => CHTTP::request()->ip(),
             'user_agent' => CHTTP::request()->userAgent(),
             'browser' => CApp::browserName(),
@@ -76,26 +85,42 @@ class CApp_Log_Activity {
             'action' => $actionName,
             'action_label' => $actionLabel,
             'createdby' => $username,
-        ]);
+        ] + $extra);
         $data = static::normalizeDataForJsonEncoding($data);
         $model->data = json_encode($data);
 
         $model->activity_date = c::now();
         $model->description = $description;
         $model->save();
+
+        return $model;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
     protected static function normalizeDataForJsonEncoding($data) {
         foreach ($data as $dataIndex => $record) {
-            $beforeData = carr::get($record, 'before');
-            $afterData = carr::get($record, 'after');
+            //bentuk before/after hanya ada pada pencatatan perubahan baris;
+            //peristiwa yang dicatat langsung berisi apa saja, dan dulu tiap
+            //baris seperti itu memicu dua peringatan foreach atas null
+            $beforeData = carr::get($record, 'before', []);
+            $afterData = carr::get($record, 'after', []);
+            if (!is_array($beforeData)) {
+                $beforeData = [];
+            }
+            if (!is_array($afterData)) {
+                $afterData = [];
+            }
             foreach ($beforeData as $beforeIndex => $value) {
-                if ($value instanceof CCarbon || $value instanceof CarbonV3\Carbon || $value instanceof CarbonLegacy\Carbon) {
+                if ($value instanceof CCarbon || $value instanceof CarbonLegacy\Carbon) {
                     $data[$dataIndex]['before'][$beforeIndex] = (string) $value;
                 }
             }
             foreach ($afterData as $afterIndex => $value) {
-                if ($value instanceof CCarbon || $value instanceof CarbonV3\Carbon || $value instanceof CarbonLegacy\Carbon) {
+                if ($value instanceof CCarbon || $value instanceof CarbonLegacy\Carbon) {
                     $data[$dataIndex]['after'][$afterIndex] = (string) $value;
                 }
             }

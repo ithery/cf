@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteLinksCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteLinksCommand extends CConsole_Command_DevSuiteCommand {
     /**
@@ -11,9 +9,15 @@ class CConsole_Command_DevSuite_DevSuiteLinksCommand extends CConsole_Command_De
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_LinksCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Link_LinksCommand::class;
 
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:links';
 
+    /**
+     * @var string
+     */
     protected $description = 'Display all of the registered Devsuite links';
 }

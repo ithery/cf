@@ -2,7 +2,10 @@
 
 namespace PHPStan\Command;
 
-/** @api */
+/**
+ * @api
+ * @api-do-not-implement
+ */
 interface Output
 {
 
@@ -16,6 +19,10 @@ interface Output
 
 	public function isVerbose(): bool;
 
+	public function isVeryVerbose(): bool;
+
 	public function isDebug(): bool;
+
+	public function isDecorated(): bool;
 
 }

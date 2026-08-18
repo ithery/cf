@@ -6,7 +6,7 @@ final class CComparator_Differ_Exception_ConfigurationException extends InvalidA
         string $expected,
         $value,
         int $code = 0,
-        Exception $previous = null
+        ?Exception $previous = null
     ) {
         parent::__construct(
             sprintf(

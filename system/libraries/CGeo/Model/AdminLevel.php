@@ -61,6 +61,7 @@ final class CGeo_Model_AdminLevel {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->getName();
     }

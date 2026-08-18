@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 2:59:26 AM
- */
 class CContainer_BoundMethod {
     /**
      * Call the given Closure / class@method and inject its dependencies.
@@ -15,17 +9,18 @@ class CContainer_BoundMethod {
      * @param CContainer_Container $container
      * @param callable|string      $callback
      * @param array                $parameters
-     * @param string|null          $defaultMethod
-     *
-     * @return mixed
+     * @param null|string          $defaultMethod
      *
      * @throws \ReflectionException
      * @throws \InvalidArgumentException
+     *
+     * @return mixed
      */
     public static function call($container, $callback, array $parameters = [], $defaultMethod = null) {
         if (static::isCallableWithAtSign($callback) || $defaultMethod) {
             return static::callClass($container, $callback, $parameters, $defaultMethod);
         }
+
         return static::callBoundMethod($container, $callback, function () use ($container, $callback, $parameters) {
             return call_user_func_array(
                 $callback,
@@ -40,11 +35,11 @@ class CContainer_BoundMethod {
      * @param CContainer_Container $container
      * @param string               $target
      * @param array                $parameters
-     * @param string|null          $defaultMethod
-     *
-     * @return mixed
+     * @param null|string          $defaultMethod
      *
      * @throws \InvalidArgumentException
+     *
+     * @return mixed
      */
     protected static function callClass($container, $target, array $parameters = [], $defaultMethod = null) {
         $segments = explode('@', $target);
@@ -55,6 +50,7 @@ class CContainer_BoundMethod {
         if (is_null($method)) {
             throw new InvalidArgumentException('Method not provided.');
         }
+
         return static::call(
             $container,
             [$container->make($segments[0]), $method],
@@ -82,6 +78,7 @@ class CContainer_BoundMethod {
         if ($container->hasMethodBinding($method)) {
             return $container->callMethodBinding($method, $callback[0]);
         }
+
         return $default instanceof Closure ? $default() : $default;
     }
 
@@ -94,6 +91,7 @@ class CContainer_BoundMethod {
      */
     protected static function normalizeMethod($callback) {
         $class = is_string($callback[0]) ? $callback[0] : get_class($callback[0]);
+
         return "{$class}@{$callback[1]}";
     }
 
@@ -104,15 +102,16 @@ class CContainer_BoundMethod {
      * @param callable|string      $callback
      * @param array                $parameters
      *
-     * @return array
-     *
      * @throws \ReflectionException
+     *
+     * @return array
      */
     protected static function getMethodDependencies($container, $callback, array $parameters = []) {
         $dependencies = [];
         foreach (static::getCallReflector($callback)->getParameters() as $parameter) {
             static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies);
         }
+
         return array_merge($dependencies, $parameters);
     }
 
@@ -121,14 +120,20 @@ class CContainer_BoundMethod {
      *
      * @param callable|string $callback
      *
-     * @return \ReflectionFunctionAbstract
-     *
      * @throws \ReflectionException
+     *
+     * @return \ReflectionFunctionAbstract
      */
     protected static function getCallReflector($callback) {
         if (is_string($callback) && strpos($callback, '::') !== false) {
             $callback = explode('::', $callback);
+        } elseif (is_object($callback) && !$callback instanceof Closure) {
+            // Objek invokable: yang dipanggil sebenarnya __invoke miliknya, dan
+            // itu yang harus direfleksi. Tanpa cabang ini ReflectionFunction
+            // menerima objek dan menolaknya.
+            $callback = [$callback, '__invoke'];
         }
+
         return is_array($callback) ? new ReflectionMethod($callback[0], $callback[1]) : new ReflectionFunction($callback);
     }
 
@@ -143,14 +148,16 @@ class CContainer_BoundMethod {
      * @return void
      */
     protected static function addDependencyForCallParameter($container, $parameter, array &$parameters, &$dependencies) {
+        $className = CBase_Reflector::getParameterClassName($parameter);
+
         if (array_key_exists($parameter->name, $parameters)) {
             $dependencies[] = $parameters[$parameter->name];
             unset($parameters[$parameter->name]);
-        } elseif ($parameter->getClass() && array_key_exists($parameter->getClass()->name, $parameters)) {
-            $dependencies[] = $parameters[$parameter->getClass()->name];
-            unset($parameters[$parameter->getClass()->name]);
-        } elseif ($parameter->getClass()) {
-            $dependencies[] = $container->make($parameter->getClass()->name);
+        } elseif ($className && array_key_exists($className, $parameters)) {
+            $dependencies[] = $parameters[$className];
+            unset($parameters[$className]);
+        } elseif ($className) {
+            $dependencies[] = $container->make($className);
         } elseif ($parameter->isDefaultValueAvailable()) {
             $dependencies[] = $parameter->getDefaultValue();
         }

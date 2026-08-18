@@ -1,6 +1,8 @@
 <?php
 
 class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearch_Processor {
+    use CElement_FormInput_SelectSearch_Trait_SelectSearchUtilsTrait;
+
     public function process() {
         $q = $this->query();
 
@@ -9,7 +11,7 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
 
         $searchField = $this->searchField();
 
-        $db = CDatabase::instance();
+        $db = c::db();
 
         $term = '';
         $limit = '';
@@ -134,32 +136,13 @@ class CAjax_Engine_SelectSearch_Processor_Query extends CAjax_Engine_SelectSearc
                 }
                 $p[$k] = ($v == null) ? '' : $v;
             }
-            if (strlen($keyField) > 0 && !isset($p['id'])) {
+            if (strlen($keyField) > 0 && isset($p[$keyField])) {
                 $p['id'] = carr::get($row, $keyField);
             }
 
-            $formatResult = $this->formatResult();
-            if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
-                $formatResult = $formatResult->__invoke($row);
-                if ($formatResult instanceof CRenderable) {
-                    $p['cappFormatResult'] = $formatResult->html();
-                    $p['cappFormatResultIsHtml'] = true;
-                } else {
-                    $p['cappFormatResult'] = $formatResult;
-                    $p['cappFormatResultIsHtml'] = c::isHtml($formatResult);
-                }
-            }
-            $formatSelection = $this->formatSelection();
-            if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
-                $formatSelection = $formatSelection->__invoke($row);
-                if ($formatSelection instanceof CRenderable) {
-                    $p['cappFormatSelection'] = $formatSelection->html();
-                    $p['cappFormatSelectionIsHtml'] = true;
-                } else {
-                    $p['cappFormatSelection'] = $formatSelection;
-                    $p['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
-                }
-            }
+            $p = $this->addCAppFormatToData($this->formatResult(), $p, $row, 'result');
+
+            $p = $this->addCAppFormatToData($this->formatSelection(), $p, $row, 'selection');
 
             return $p;
         });

@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Arrays;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\InForeachNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -16,7 +17,8 @@ use function sprintf;
 /**
  * @implements Rule<InForeachNode>
  */
-class IterableInForeachRule implements Rule
+#[RegisteredRule(level: 3)]
+final class IterableInForeachRule implements Rule
 {
 
 	public function __construct(private RuleLevelHelper $ruleLevelHelper)
@@ -49,7 +51,7 @@ class IterableInForeachRule implements Rule
 			RuleErrorBuilder::message(sprintf(
 				'Argument of an invalid type %s supplied for foreach, only iterables are supported.',
 				$type->describe(VerbosityLevel::typeOnly()),
-			))->line($originalNode->expr->getLine())->build(),
+			))->identifier('foreach.nonIterable')->line($originalNode->expr->getStartLine())->build(),
 		];
 	}
 

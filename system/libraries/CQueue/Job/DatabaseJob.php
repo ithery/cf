@@ -2,13 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 6:02:05 AM
- */
-class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInterface {
+class CQueue_Job_DatabaseJob extends CQueue_AbstractJob {
     /**
      * The database queue instance.
      *
@@ -33,12 +27,6 @@ class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInt
      * @param string                     $queue
      *
      * @return void
-     */
-
-    /**
-     * The database primary Key.
-     *
-     * @var \stdClass
      */
     public function __construct(CContainer_Container $container, CQueue_Queue_DatabaseQueue $database, $job, $connectionName, $queue) {
         $this->job = $job;

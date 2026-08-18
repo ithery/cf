@@ -14,6 +14,7 @@ class CResources_Decode {
         for ($i = 0; $i < strlen($temp); $i++) {
             $result .= $temp[$i] ^ $salt[$i % self::DIGIT];
         }
+
         return $result;
     }
 }

@@ -84,6 +84,7 @@ class CVendor_Firebase_Messaging_Notification implements \JsonSerializable {
         return $this->imageUrl;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return \array_filter([
             'title' => $this->title,

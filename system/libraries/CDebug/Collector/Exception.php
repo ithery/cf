@@ -1,11 +1,21 @@
 <?php
 
 class CDebug_Collector_Exception extends CDebug_CollectorAbstract {
+    /**
+     * @param Throwable $exception
+     *
+     * @return bool
+     */
     protected function shouldCollect($exception) {
-        return $exception instanceof Exception && (!$exception instanceof CDebug_Contract_ShouldNotCollectException);
+        return $exception instanceof Throwable && (!$exception instanceof CDebug_Contract_ShouldNotCollectException);
     }
 
-    public function collect($exception) {
+    /**
+     * @param Throwable $exception
+     *
+     * @return array
+     */
+    public function collect(Throwable $exception) {
         if (!CF::config('collector.exception')) {
             return null;
         }
@@ -18,6 +28,13 @@ class CDebug_Collector_Exception extends CDebug_CollectorAbstract {
         return $data;
     }
 
+    /**
+     * Get data from exception object.
+     *
+     * @param Throwable $exception
+     *
+     * @return array
+     */
     public function getDataFromException($exception) {
         $app = CApp::instance();
         $route = c::request()->route();
@@ -40,10 +57,10 @@ class CDebug_Collector_Exception extends CDebug_CollectorAbstract {
         $data['datetime'] = date('Y-m-d H:i:s');
         $data['appId'] = $app->appId();
         $data['appCode'] = $app->code();
-        $data['user'] = CApp_Base::username();
-        $data['role'] = CApp_Base::roleName();
-        $data['orgId'] = CApp_Base::orgId();
-        $data['orgCode'] = CApp_Base::orgCode();
+        $data['user'] = c::base()->username();
+        $data['role'] = c::base()->roleName();
+        $data['orgId'] = c::base()->orgId();
+        $data['orgCode'] = c::base()->orgCode();
         $data['error'] = $error;
         $data['message'] = $message;
         $data['uuid'] = $uuid;

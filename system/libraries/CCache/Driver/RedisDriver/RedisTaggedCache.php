@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Jul 28, 2020
- */
 class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
     /**
      * Forever reference key.
@@ -28,7 +22,7 @@ class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
      *
      * @param string                                    $key
      * @param mixed                                     $value
-     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     * @param null|\DateTimeInterface|\DateInterval|int $ttl
      *
      * @return bool
      */

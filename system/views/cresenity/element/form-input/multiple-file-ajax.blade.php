@@ -27,7 +27,7 @@
         background:#fff;
     }
 
-    .multi-image-ajax .div-img{
+    .multi-image-ajax .div-img,  .multi-image-ajax .div-file{
         border: 0px;
         width: auto;
         height: 100px;
@@ -107,13 +107,14 @@
             $input_name = carr::get($f, 'input_name');
             $input_value = carr::get($f, 'input_value');
             $file_url = carr::get($f, 'file_url');
+            $file_name = carr::get($f, 'file_name');
             $isImage = false;
             $pathParts = pathinfo($file_url);
             $ext = carr::get($pathParts,'extension');
             $imgExtensions = array("jpg", "jpeg", "png", "gif");
 
             if (in_array($ext, $imgExtensions)) {
-                if (getimagesize($file_url)) {
+                if (@getimagesize($file_url)) {
                     $isImage = true;
                 }
             }
@@ -143,6 +144,7 @@
                         <label><?php echo $controlLabel; ?>:</label><input type="{{ $control }}" name="{{ $name }}_custom_control[{{ $input_name }}][{{ $controlName }}]" value="{{ $control_value }}"  >
                     </div>
                 @endforeach
+                <p class="multi-image-ajax-filename">{{ $file_name }}</p>
                 <a class="multi-image-ajax-remove">@lang('element/file.remove')</a>
             </div>
         @endforeach
@@ -156,12 +158,13 @@
 
     (function ($) {
         $(function () {
+            const asFileAjax = {{ $asFileAjax  ? 'true' : 'false'}};
             const errorMessageLimitFile = '@lang("element/file.errorMessageLimitFile",["limit" => $limitFile])';
             const errorMessageMaxUploadSize = '@lang("element/file.errorMessageMaxUploadSize",["sizeMB" => $maxUploadSize])';
             const removeLabel = "@lang('element/file.remove')";
             const elementId = "{{ $id }}";
             var haveCropper = {{ ($cropper != null) ? 'true' : 'false'  }};
-            const maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
+            const maxUploadSize = {{  $maxUploadSize  }} * 1024 * 1024;
             const readerOnLoadResolver = (child, file, reader) =>{
                 return $.proxy(function (file, fileList, event) {
                     var filesize = event.total;
@@ -211,13 +214,13 @@
                 } else {
                     container.removeClass('disabled');
                 }
-                $("#<?= $id ?>").trigger('change');
+                $("#" + elementId).trigger('change');
             }
             fileChanged();
             // Remove File
             function fileUploadRemove(e) {
 
-                $('#container-<?php echo $id ?> .multi-image-ajax-remove').click(function (e) {
+                $('#container-' + elementId + ' .multi-image-ajax-remove').click(function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -341,6 +344,8 @@
                     div_cc.append(cc);
                     div.append(div_cc);
                 @endforeach
+                var filenameLabel = $("<p>").addClass("multi-image-ajax-filename").html(name);
+                div.append(filenameLabel);
                 @if($removeLink)
                     var remove = $("<a>").addClass("multi-image-ajax-remove").html("@lang('element/file.remove')");
                     div.append(remove);
@@ -349,25 +354,33 @@
                 fileList.append(div.addClass("loading"));
                 fileUploadRemove();
                 var data = new FormData();
-                data.append("<?php echo $name; ?>[]", imageData);
+                data.append("{{ $name }}[]", imageData);
 
-                data.append('<?php echo $ajaxName; ?>_filename[]', file.name);
+                data.append('{{ $ajaxName }}_filename[]', file.name);
                 var xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
-                        var dataFile = JSON.parse(this.responseText);
-                        div.removeClass("loading");
-                        div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[]\" value=" + dataFile.fileId + ">");
-                        if(file.type.match("image.*")){
-                            img.attr('src', data.url);
-                        }
-                        index++;
-                        fileChanged();
+                        var response = JSON.parse(this.responseText);
+                        cresenity.handleJsonResponse(response, function (dataFile) {
+                            div.removeClass("loading");
+                            if(asFileAjax) {
+                                div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[]\" value=" + JSON.stringify(dataFile) + ">");
+                            } else {
+                                div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[]\" value=" + dataFile.fileId + ">");
+                            }
+
+                            if(file.type.match("image.*")){
+                                img.attr('src', data.url);
+                            }
+                            index++;
+                            fileChanged();
+                        });
                     } else if (this.readyState == 4 && this.status != 200) {
+                        cresenity.message('error', 'File Upload Failed');
                         //div.remove();
                     }
                 };
-                xhr.open("post", "<?php echo $ajaxUrl; ?>");
+                xhr.open("post", "{{ $ajaxUrl }}");
                 xhr.send(data);
             }
 

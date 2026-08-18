@@ -4,16 +4,22 @@ namespace PHPStan\Command\ErrorFormatter;
 
 use PHPStan\Command\AnalysisResult;
 use PHPStan\Command\Output;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\File\RelativePathHelper;
 use function htmlspecialchars;
 use function sprintf;
 use const ENT_COMPAT;
 use const ENT_XML1;
 
-class JunitErrorFormatter implements ErrorFormatter
+#[AutowiredService(name: 'errorFormatter.junit')]
+final class JunitErrorFormatter implements ErrorFormatter
 {
 
-	public function __construct(private RelativePathHelper $relativePathHelper)
+	public function __construct(
+		#[AutowiredParameter(ref: '@simpleRelativePathHelper')]
+		private RelativePathHelper $relativePathHelper,
+	)
 	{
 	}
 
@@ -37,16 +43,16 @@ class JunitErrorFormatter implements ErrorFormatter
 			$result .= $this->createTestCase(
 				sprintf('%s:%s', $fileName, (string) $fileSpecificError->getLine()),
 				'ERROR',
-				$this->escape($fileSpecificError->getMessage()),
+				$fileSpecificError->getMessage(),
 			);
 		}
 
 		foreach ($analysisResult->getNotFileSpecificErrors() as $notFileSpecificError) {
-			$result .= $this->createTestCase('General error', 'ERROR', $this->escape($notFileSpecificError));
+			$result .= $this->createTestCase('General error', 'ERROR', $notFileSpecificError);
 		}
 
 		foreach ($analysisResult->getWarnings() as $warning) {
-			$result .= $this->createTestCase('Warning', 'WARNING', $this->escape($warning));
+			$result .= $this->createTestCase('Warning', 'WARNING', $warning);
 		}
 
 		if (!$analysisResult->hasErrors()) {

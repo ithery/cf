@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 1:03:54 PM
+ * @see CDebug_DebugBar
  */
 class CDebug {
     const COLLECTOR_TYPE_DEPRECATED = 'deprecated';
@@ -22,11 +19,11 @@ class CDebug {
     /**
      * @param array $options
      *
-     * @return CDebug_Bar
+     * @return CDebug_DebugBar
      */
     public static function bar($options = []) {
         if (self::$bar == null) {
-            self::$bar = new CDebug_Bar($options);
+            self::$bar = new CDebug_DebugBar($options);
         } else {
             self::$bar->setOptions($options);
         }

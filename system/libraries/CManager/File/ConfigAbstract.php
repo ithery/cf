@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 28, 2019, 3:00:12 AM
- */
 abstract class CManager_File_ConfigAbstract {
     protected $options;
 

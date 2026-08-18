@@ -5,6 +5,9 @@
  *
  * @author Hery
  */
+
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -12,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class CHTTP_Kernel {
     use CHTTP_Trait_OutputBufferTrait,
         CHTTP_Concern_KernelRouting;
+
     /**
      * The application's middleware stack.
      *
@@ -140,7 +144,6 @@ class CHTTP_Kernel {
 
     public function handle(CHTTP_Request $request) {
         CHTTP::setRequest($request);
-        CBootstrap::instance()->boot();
         $response = null;
 
         if ($response = CF::isDownForMaintenance()) {
@@ -259,8 +262,8 @@ class CHTTP_Kernel {
         } elseif ($response instanceof CModel && $response->wasRecentlyCreated) {
             $response = new CHTTP_JsonResponse($response, 201);
         } elseif (!$response instanceof SymfonyResponse
-            && ($response instanceof CInterface_Arrayable
-            || $response instanceof CInterface_Jsonable
+            && ($response instanceof Arrayable
+            || $response instanceof Jsonable
             || $response instanceof ArrayObject
             || $response instanceof JsonSerializable
             || is_array($response))

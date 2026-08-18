@@ -3,11 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 1, 2018, 11:48:25 PM
- *
  * @method CJavascript_Statement_JQuery toggle()
  */
 class CJavascript_Statement_JQuery extends CJavascript_Statement {

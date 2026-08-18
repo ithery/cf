@@ -2,18 +2,12 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Oct 21, 2019, 9:20:25 PM
- */
 use MongoDB\BSON\Binary;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
 
 /**
- * @method static  CModel_MongoDB_Query|static raw($expression = null)
+ * @method static CModel_MongoDB_Query|static raw($expression = null)
  */
 abstract class CModel_MongoDB_Model extends CModel {
     use CModel_MongoDB_Trait_HybridRelationsTrait;
@@ -66,6 +60,7 @@ abstract class CModel_MongoDB_Model extends CModel {
         } elseif ($value instanceof Binary) {
             return (string) $value->getData();
         }
+
         return $value;
     }
 
@@ -88,6 +83,7 @@ abstract class CModel_MongoDB_Model extends CModel {
         if (!$value instanceof DateTime) {
             $value = parent::asDateTime($value);
         }
+
         return new UTCDateTime($value->getTimestamp() * 1000);
     }
 
@@ -99,6 +95,7 @@ abstract class CModel_MongoDB_Model extends CModel {
         if ($value instanceof UTCDateTime) {
             return CCarbon::createFromTimestamp($value->toDateTime()->getTimestamp());
         }
+
         return parent::asDateTime($value);
     }
 
@@ -138,6 +135,7 @@ abstract class CModel_MongoDB_Model extends CModel {
         if (method_exists($this, $key) && !method_exists(self::class, $key)) {
             return $this->getRelationValue($key);
         }
+
         return parent::getAttribute($key);
     }
 
@@ -149,6 +147,7 @@ abstract class CModel_MongoDB_Model extends CModel {
         if (cstr::contains($key, '.')) {
             return carr::get($this->attributes, $key);
         }
+
         return parent::getAttributeFromArray($key);
     }
 
@@ -166,8 +165,10 @@ abstract class CModel_MongoDB_Model extends CModel {
                 $value = $this->fromDateTime($value);
             }
             carr::set($this->attributes, $key, $value);
+
             return;
         }
+
         return parent::setAttribute($key, $value);
     }
 
@@ -193,6 +194,7 @@ abstract class CModel_MongoDB_Model extends CModel {
                 carr::set($attributes, $key, (string) $this->asDateTime(carr::get($attributes, $key)));
             }
         }
+
         return $attributes;
     }
 
@@ -220,11 +222,13 @@ abstract class CModel_MongoDB_Model extends CModel {
         if ($this->isDateAttribute($key)) {
             $current = $current instanceof UTCDateTime ? $this->asDateTime($current) : $current;
             $original = $original instanceof UTCDateTime ? $this->asDateTime($original) : $original;
+
             return $current == $original;
         }
         if ($this->hasCast($key)) {
             return $this->castAttribute($key, $current) === $this->castAttribute($key, $original);
         }
+
         return is_numeric($current) && is_numeric($original) && strcmp((string) $current, (string) $original) === 0;
     }
 
@@ -260,8 +264,10 @@ abstract class CModel_MongoDB_Model extends CModel {
             $values = carr::wrap($values);
             $query = $this->setKeysForSaveQuery($this->newQuery());
             $this->pushAttributeValues($column, $values, $unique);
+
             return $query->push($column, $values, $unique);
         }
+
         return parent::push();
     }
 
@@ -278,6 +284,7 @@ abstract class CModel_MongoDB_Model extends CModel {
         $values = carr::wrap($values);
         $query = $this->setKeysForSaveQuery($this->newQuery());
         $this->pullAttributeValues($column, $values);
+
         return $query->pull($column, $values);
     }
 
@@ -347,7 +354,9 @@ abstract class CModel_MongoDB_Model extends CModel {
     }
 
     /**
-     * @inheritdoc
+     * @param CDatabase_Query_Builder $query
+     *
+     * @return CModel_MongoDB_Query
      */
     public function newEloquentBuilder($query) {
         return new CModel_MongoDB_Query($query);
@@ -391,6 +400,7 @@ abstract class CModel_MongoDB_Model extends CModel {
                 }
             }
         }
+
         return array_unique($relations);
     }
 
@@ -404,6 +414,7 @@ abstract class CModel_MongoDB_Model extends CModel {
         if ($parentRelation = $this->getParentRelation()) {
             unset($relations[$parentRelation->getQualifiedForeignKeyName()]);
         }
+
         return $relations;
     }
 
@@ -432,6 +443,7 @@ abstract class CModel_MongoDB_Model extends CModel {
         if ($method == 'unset') {
             return call_user_func_array([$this, 'drop'], $parameters);
         }
+
         return parent::__call($method, $parameters);
     }
 }

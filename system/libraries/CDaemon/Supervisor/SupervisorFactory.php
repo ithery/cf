@@ -8,7 +8,7 @@ class CDaemon_Supervisor_SupervisorFactory {
      *
      * @return \CDaemon_Supervisor_Supervisor
      */
-    public function make(CDaemon_Supervisor_SupervisorOptions $options) {
+    public static function make(CDaemon_Supervisor_SupervisorOptions $options) {
         return new CDaemon_Supervisor_Supervisor($options);
     }
 }

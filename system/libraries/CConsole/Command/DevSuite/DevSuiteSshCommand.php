@@ -1,9 +1,7 @@
 <?php
 
 /**
- * Description of DevSuiteSshListCommand.
- *
- * @author Hery
+ * Description of DevSuiteSshCommand.
  */
 class CConsole_Command_DevSuite_DevSuiteSshCommand extends CConsole_Command_DevSuiteCommand {
     /**
@@ -11,7 +9,10 @@ class CConsole_Command_DevSuite_DevSuiteSshCommand extends CConsole_Command_DevS
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_SshCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Ssh_Command::class;
 
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:ssh';
 }

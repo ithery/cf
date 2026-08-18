@@ -4,6 +4,7 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\BenevolentUnionType;
 use PHPStan\Type\Constant\ConstantBooleanType;
@@ -13,7 +14,8 @@ use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
 
-class Base64DecodeDynamicFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class Base64DecodeDynamicFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -27,18 +29,19 @@ class Base64DecodeDynamicFunctionReturnTypeExtension implements DynamicFunctionR
 		Scope $scope,
 	): Type
 	{
-		if (!isset($functionCall->getArgs()[1])) {
+		$args = $functionCall->getArgs();
+		if (!isset($args[1])) {
 			return new StringType();
 		}
 
-		$argType = $scope->getType($functionCall->getArgs()[1]->value);
+		$argType = $scope->getType($args[1]->value);
 
 		if ($argType instanceof MixedType) {
 			return new BenevolentUnionType([new StringType(), new ConstantBooleanType(false)]);
 		}
 
-		$isTrueType = (new ConstantBooleanType(true))->isSuperTypeOf($argType);
-		$isFalseType = (new ConstantBooleanType(false))->isSuperTypeOf($argType);
+		$isTrueType = $argType->isTrue();
+		$isFalseType = $argType->isFalse();
 		$compareTypes = $isTrueType->compareTo($isFalseType);
 		if ($compareTypes === $isTrueType) {
 			return new UnionType([new StringType(), new ConstantBooleanType(false)]);

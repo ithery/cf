@@ -51,6 +51,7 @@ class CAuth_Recaller {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function valid() {
         return $this->properString() && $this->hasAllSegments();
     }

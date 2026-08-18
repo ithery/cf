@@ -8,26 +8,35 @@ use PHPStan\BetterReflection\SourceLocator\Type\AggregateSourceLocator;
 use PHPStan\BetterReflection\SourceLocator\Type\Composer\Psr\Psr0Mapping;
 use PHPStan\BetterReflection\SourceLocator\Type\Composer\Psr\Psr4Mapping;
 use PHPStan\BetterReflection\SourceLocator\Type\SourceLocator;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\File\CouldNotReadFileException;
 use PHPStan\File\FileReader;
 use PHPStan\Internal\ComposerHelper;
-use function array_filter;
+use PHPStan\Php\PhpVersion;
 use function array_key_exists;
 use function array_map;
 use function array_merge;
 use function array_merge_recursive;
+use function array_reverse;
 use function count;
 use function dirname;
+use function glob;
+use function is_array;
 use function is_dir;
 use function is_file;
+use function is_string;
+use function str_contains;
+use const GLOB_ONLYDIR;
 
-class ComposerJsonAndInstalledJsonSourceLocatorMaker
+#[AutowiredService]
+final class ComposerJsonAndInstalledJsonSourceLocatorMaker
 {
 
 	public function __construct(
 		private OptimizedDirectorySourceLocatorRepository $optimizedDirectorySourceLocatorRepository,
 		private OptimizedPsrAutoloaderLocatorFactory $optimizedPsrAutoloaderLocatorFactory,
 		private OptimizedDirectorySourceLocatorFactory $optimizedDirectorySourceLocatorFactory,
+		private PhpVersion $phpVersion,
 	)
 	{
 	}
@@ -67,8 +76,6 @@ class ComposerJsonAndInstalledJsonSourceLocatorMaker
 				$this->packagePrefixPath($installedJsonDirectoryPath, $package, $vendorDirectory),
 			), $installed),
 		);
-		$classMapFiles = array_filter($classMapPaths, 'is_file');
-		$classMapDirectories = array_filter($classMapPaths, 'is_dir');
 		$filePaths = array_merge(
 			$this->prefixPaths($this->packageToFilePaths($composer), $projectInstallationPath . '/'),
 			$dev ? $this->prefixPaths($this->packageToFilePaths($composer, 'autoload-dev'), $projectInstallationPath . '/') : [],
@@ -105,16 +112,18 @@ class ComposerJsonAndInstalledJsonSourceLocatorMaker
 			)),
 		);
 
-		foreach ($classMapDirectories as $classMapDirectory) {
-			if (!is_dir($classMapDirectory)) {
+		$files = [];
+		foreach ($classMapPaths as $classMapPath) {
+			if (is_dir($classMapPath)) {
+				$locators[] = $this->optimizedDirectorySourceLocatorRepository->getOrCreate($classMapPath);
 				continue;
 			}
-			$locators[] = $this->optimizedDirectorySourceLocatorRepository->getOrCreate($classMapDirectory);
+			if (!is_file($classMapPath)) {
+				continue;
+			}
+			$files[] = $classMapPath;
 		}
-
-		$files = [];
-
-		foreach (array_merge($classMapFiles, $filePaths) as $file) {
+		foreach ($filePaths as $file) {
 			if (!is_file($file)) {
 				continue;
 			}
@@ -122,7 +131,40 @@ class ComposerJsonAndInstalledJsonSourceLocatorMaker
 		}
 
 		if (count($files) > 0) {
-			$locators[] = $this->optimizedDirectorySourceLocatorFactory->createByFiles($files);
+			$locators[] = $this->optimizedDirectorySourceLocatorFactory->createByFiles($files, 'odsl-installed-files');
+		}
+
+		$binDir = ComposerHelper::getBinDirFromComposerConfig($projectInstallationPath, $composer);
+		$phpunitBridgeDir = $binDir . '/.phpunit';
+		if (!is_dir($vendorDirectory . '/phpunit/phpunit') && is_dir($phpunitBridgeDir)) {
+			// from https://github.com/composer/composer/blob/8ff237afb61b8766efa576b8ae1cc8560c8aed96/phpstan/locate-phpunit-autoloader.php
+			$bestDirFound = null;
+			$phpunitBridgeDirectories = glob($phpunitBridgeDir . '/phpunit-*', GLOB_ONLYDIR);
+			if ($phpunitBridgeDirectories !== false) {
+				foreach (array_reverse($phpunitBridgeDirectories) as $dir) {
+					$bestDirFound = $dir;
+					if ($this->phpVersion->getVersionId() >= 80100 && str_contains($dir, 'phpunit-10')) {
+						break;
+					}
+					if ($this->phpVersion->getVersionId() >= 80000) {
+						if (str_contains($dir, 'phpunit-9')) {
+							break;
+						}
+						continue;
+					}
+
+					if (str_contains($dir, 'phpunit-8') || str_contains($dir, 'phpunit-7')) {
+						break;
+					}
+				}
+
+				if ($bestDirFound !== null) {
+					$phpunitBridgeLocator = $this->create($bestDirFound);
+					if ($phpunitBridgeLocator !== null) {
+						$locators[] = $phpunitBridgeLocator;
+					}
+				}
+			}
 		}
 
 		return new AggregateSourceLocator($locators);
@@ -135,7 +177,19 @@ class ComposerJsonAndInstalledJsonSourceLocatorMaker
 	 */
 	private function packageToPsr4AutoloadNamespaces(array $package, string $autoloadSection = 'autoload'): array
 	{
-		return array_map(static fn ($namespacePaths): array => (array) $namespacePaths, $package[$autoloadSection]['psr-4'] ?? []);
+		$psr4 = $package[$autoloadSection]['psr-4'] ?? [];
+		if (!is_array($psr4)) {
+			return []; // skip on invalid data
+		}
+		foreach ($psr4 as $key => $namespacePaths) {
+			$stringArray = $this->toStringArray($namespacePaths);
+			if (!is_string($key) || $stringArray === null) {
+				return []; // skip on invalid data
+			}
+
+			$psr4[$key] = $stringArray;
+		}
+		return $psr4;
 	}
 
 	/**
@@ -145,7 +199,19 @@ class ComposerJsonAndInstalledJsonSourceLocatorMaker
 	 */
 	private function packageToPsr0AutoloadNamespaces(array $package, string $autoloadSection = 'autoload'): array
 	{
-		return array_map(static fn ($namespacePaths): array => (array) $namespacePaths, $package[$autoloadSection]['psr-0'] ?? []);
+		$psr0 = $package[$autoloadSection]['psr-0'] ?? [];
+		if (!is_array($psr0)) {
+			return []; // skip on invalid data
+		}
+		foreach ($psr0 as $key => $namespacePaths) {
+			$stringArray = $this->toStringArray($namespacePaths);
+			if (!is_string($key) || $stringArray === null) {
+				return []; // skip on invalid data
+			}
+
+			$psr0[$key] = $stringArray;
+		}
+		return $psr0;
 	}
 
 	/**
@@ -155,7 +221,7 @@ class ComposerJsonAndInstalledJsonSourceLocatorMaker
 	 */
 	private function packageToClassMapPaths(array $package, string $autoloadSection = 'autoload'): array
 	{
-		return $package[$autoloadSection]['classmap'] ?? [];
+		return $this->toStringArray($package[$autoloadSection]['classmap'] ?? []) ?? [];
 	}
 
 	/**
@@ -165,7 +231,7 @@ class ComposerJsonAndInstalledJsonSourceLocatorMaker
 	 */
 	private function packageToFilePaths(array $package, string $autoloadSection = 'autoload'): array
 	{
-		return $package[$autoloadSection]['files'] ?? [];
+		return $this->toStringArray($package[$autoloadSection]['files'] ?? []) ?? [];
 	}
 
 	/**
@@ -215,6 +281,24 @@ class ComposerJsonAndInstalledJsonSourceLocatorMaker
 	private function prefixPaths(array $paths, string $prefix): array
 	{
 		return array_map(static fn (string $path): string => $prefix . $path, $paths);
+	}
+
+	/**
+	 * @param array<mixed>|string $stringOrArray
+	 * @return array<string>|null
+	 */
+	private function toStringArray(array|string $stringOrArray): ?array
+	{
+		if (is_string($stringOrArray)) {
+			return (array) $stringOrArray;
+		}
+
+		foreach ($stringOrArray as $stringOrArrayItem) {
+			if (!is_string($stringOrArrayItem)) {
+				return null;
+			}
+		}
+		return $stringOrArray;
 	}
 
 }

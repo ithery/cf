@@ -10,14 +10,14 @@ class CElement_FormInput_EditorJs_BlockHandler {
     const DEFAULT_ARRAY_KEY = '-';
 
     /**
-     * @var CElement_FormInput_EditorJs_EditorConfig
+     * @var null|CElement_FormInput_EditorJs_ConfigLoader
      */
     private $rules = null;
 
     /**
      * BlockHandler constructor.
      *
-     * @param string $configuration
+     * @param null|string $configuration
      *
      * @throws CElement_FormInput_EditorJs_EditorJsException
      */
@@ -41,7 +41,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
          * Default action for blocks that are not mentioned in a configuration.
          */
         if (!array_key_exists($blockType, $this->rules->tools)) {
-            throw new CElement_FormInput_EditorJs_EditorJsException("Tool `${blockType}` not found in the configuration");
+            throw new CElement_FormInput_EditorJs_EditorJsException('Tool `' . $blockType . '` not found in the configuration');
         }
 
         $rule = $this->rules->tools[$blockType];
@@ -58,7 +58,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
      *
      * @throws CElement_FormInput_EditorJs_EditorJsException
      *
-     * @return array|bool
+     * @return array
      */
     public function sanitizeBlock($blockType, $blockData, $blockTunes = []) {
         $rule = $this->rules->tools[$blockType];
@@ -87,7 +87,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
         foreach ($rules as $key => $value) {
             if (($key != CElement_FormInput_EditorJs_BlockHandler::DEFAULT_ARRAY_KEY) && (isset($value['required']) ? $value['required'] : true)) {
                 if (!isset($blockData[$key])) {
-                    throw new CElement_FormInput_EditorJs_EditorJsException("Not found required param `${key}`");
+                    throw new CElement_FormInput_EditorJs_EditorJsException("Not found required param `{$key}`");
                 }
             }
         }
@@ -97,7 +97,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
          */
         foreach ($blockData as $key => $value) {
             if (!is_integer($key) && !isset($rules[$key])) {
-                throw new CElement_FormInput_EditorJs_EditorJsException("Found extra param `${key}`");
+                throw new CElement_FormInput_EditorJs_EditorJsException("Found extra param `{$key}`");
             }
         }
 
@@ -123,7 +123,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
              */
             if (isset($rule['canBeOnly'])) {
                 if (!in_array($value, $rule['canBeOnly'])) {
-                    throw new CElement_FormInput_EditorJs_EditorJsException("Option '${key}' with value `${value}` has invalid value. Check canBeOnly param.");
+                    throw new CElement_FormInput_EditorJs_EditorJsException("Option '{$key}' with value `{$value}` has invalid value. Check canBeOnly param.");
                 }
 
                 // Do not perform additional elements validation in any case
@@ -145,7 +145,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
             switch ($elementType) {
                 case 'string':
                     if (!is_string($value)) {
-                        throw new CElement_FormInput_EditorJs_EditorJsException("Option '${key}' with value `${value}` must be string");
+                        throw new CElement_FormInput_EditorJs_EditorJsException("Option '{$key}' with value `{$value}` must be string");
                     }
 
                     break;
@@ -153,7 +153,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
                 case 'integer':
                 case 'int':
                     if (!is_integer($value)) {
-                        throw new CElement_FormInput_EditorJs_EditorJsException("Option '${key}' with value `${value}` must be integer");
+                        throw new CElement_FormInput_EditorJs_EditorJsException("Option '{$key}' with value `{$value}` must be integer");
                     }
 
                     break;
@@ -166,13 +166,13 @@ class CElement_FormInput_EditorJs_BlockHandler {
                 case 'boolean':
                 case 'bool':
                     if (!is_bool($value)) {
-                        throw new CElement_FormInput_EditorJs_EditorJsException("Option '${key}' with value `${value}` must be boolean");
+                        throw new CElement_FormInput_EditorJs_EditorJsException("Option '{$key}' with value `{$value}` must be boolean");
                     }
 
                     break;
 
                 default:
-                    throw new CElement_FormInput_EditorJs_EditorJsException("Unhandled type `${elementType}`");
+                    throw new CElement_FormInput_EditorJs_EditorJsException("Unhandled type `{$elementType}`");
             }
         }
 
@@ -230,7 +230,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
     /**
      * Create and return new default purifier.
      *
-     * @param $allowedTags
+     * @param string $allowedTags
      *
      * @return \HTMLPurifier
      */
@@ -253,6 +253,8 @@ class CElement_FormInput_EditorJs_BlockHandler {
 
     /**
      * Initialize HTML Purifier with default settings.
+     *
+     * @return \HTMLPurifier_Config
      */
     private function getDefaultPurifier() {
         $sanitizer = \HTMLPurifier_Config::createDefault();
@@ -290,7 +292,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
     /**
      * Expand shortified tool settings.
      *
-     * @param $rule – tool settings
+     * @param array|string $rule – tool settings
      *
      * @throws CElement_FormInput_EditorJs_EditorJsException
      *
@@ -308,7 +310,7 @@ class CElement_FormInput_EditorJs_BlockHandler {
                 $expandedRule = ['type' => 'string', 'canBeOnly' => $rule];
             }
         } else {
-            throw new CElement_FormInput_EditorJs_EditorJsException("Cannot determine element type of the rule `${rule}`.");
+            throw new CElement_FormInput_EditorJs_EditorJsException("Cannot determine element type of the rule `{$rule}`.");
         }
 
         return $expandedRule;

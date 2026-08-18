@@ -4,6 +4,8 @@ namespace PHPStan\Rules\Generics;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Node\InClassNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -13,7 +15,9 @@ use function sprintf;
 /**
  * @implements Rule<InClassNode>
  */
-class EnumTemplateTypeRule implements Rule
+#[RegisteredRule(level: 2)]
+#[ValidatesStubFiles]
+final class EnumTemplateTypeRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -23,10 +27,7 @@ class EnumTemplateTypeRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if (!$scope->isInClass()) {
-			return [];
-		}
-		$classReflection = $scope->getClassReflection();
+		$classReflection = $node->getClassReflection();
 		if (!$classReflection->isEnum()) {
 			return [];
 		}
@@ -39,7 +40,9 @@ class EnumTemplateTypeRule implements Rule
 		$className = $classReflection->getDisplayName();
 
 		return [
-			RuleErrorBuilder::message(sprintf('Enum %s has PHPDoc @template tag%s but enums cannot be generic.', $className, $templateTagsCount === 1 ? '' : 's'))->build(),
+			RuleErrorBuilder::message(sprintf('Enum %s has PHPDoc @template tag%s but enums cannot be generic.', $className, $templateTagsCount === 1 ? '' : 's'))
+				->identifier('enum.generic')
+				->build(),
 		];
 	}
 

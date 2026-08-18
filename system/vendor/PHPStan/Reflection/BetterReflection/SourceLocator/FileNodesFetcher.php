@@ -2,17 +2,20 @@
 
 namespace PHPStan\Reflection\BetterReflection\SourceLocator;
 
-use PhpParser\Node;
 use PhpParser\NodeTraverser;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\File\FileReader;
 use PHPStan\Parser\Parser;
 use PHPStan\Parser\ParserErrorsException;
 
-class FileNodesFetcher
+#[AutowiredService]
+final class FileNodesFetcher
 {
 
 	public function __construct(
 		private CachingVisitor $cachingVisitor,
+		#[AutowiredParameter(ref: '@defaultAnalysisParser')]
 		private Parser $parser,
 	)
 	{
@@ -26,7 +29,6 @@ class FileNodesFetcher
 		$contents = FileReader::read($fileName);
 
 		try {
-			/** @var Node[] $ast */
 			$ast = $this->parser->parseFile($fileName);
 		} catch (ParserErrorsException) {
 			return new FetchedNodesResult([], [], []);

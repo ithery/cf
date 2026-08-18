@@ -64,6 +64,7 @@ class CServer_SMTP_Network_StreamSocket extends CServer_SMTP_Network_AbstractSoc
     /**
      * @return null|CServer_SMTP_Network_StreamSocket
      */
+    #[\ReturnTypeWillChange]
     public function accept() {
         $handle = @stream_socket_accept($this->getHandle(), 2);
         if ($handle !== false) {

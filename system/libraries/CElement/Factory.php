@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Factory for instantiating CElement elements, components, lists, form inputs, views and templates.
+ */
 class CElement_Factory {
     /**
      * @param string $tag
@@ -42,14 +45,10 @@ class CElement_Factory {
                 $class_name = 'CElement_Element_' . ucfirst($tag);
 
                 return new $class_name($id);
-
-                break;
             default:
                 throw new CApp_Exception(c::__('element [:tag] not found', ['tag' => $tag]));
-
-                break;
         }
-
+        /** @phpstan-ignore-next-line */
         return false;
     }
 
@@ -125,23 +124,6 @@ class CElement_Factory {
      *
      * @throws CElement_Exception
      *
-     * @return \CElement_Composite
-     */
-    public static function createComposite($name, $id = '') {
-        $className = 'CElement_Composite_' . $name;
-        if (!class_exists($className)) {
-            throw new CElement_Exception(c::__('composite element [:name] not found', ['name' => $name]));
-        }
-
-        return new $className($id);
-    }
-
-    /**
-     * @param string $name
-     * @param string $id   optional
-     *
-     * @throws CElement_Exception
-     *
      * @return \CElement_List
      */
     public static function createList($name, $id = '') {
@@ -155,6 +137,12 @@ class CElement_Factory {
         return new $className($id);
     }
 
+    /**
+     * @param string $componentName
+     * @param string $id
+     *
+     * @return \CElement_ViewComponent
+     */
     public static function createViewComponent($componentName, $id) {
         return new CElement_ViewComponent($id, $componentName);
     }
@@ -171,7 +159,12 @@ class CElement_Factory {
         return CManager::instance()->createControl($id, $type);
     }
 
+    /**
+     * @param string|null $id
+     *
+     * @return \CElement_PseudoElement
+     */
     public static function createPseudoElement($id = null) {
-        return new CElement_PseudoElement();
+        return new CElement_PseudoElement($id);
     }
 }

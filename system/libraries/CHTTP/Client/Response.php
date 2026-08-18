@@ -1,9 +1,25 @@
 <?php
+use GuzzleHttp\Psr7\StreamWrapper;
 
 class CHTTP_Client_Response implements ArrayAccess {
+    use CHTTP_Client_Trait_DeterminesStatusCodeTrait;
     use CTrait_Macroable {
         __call as macroCall;
     }
+
+    /**
+     * The request cookies.
+     *
+     * @var \GuzzleHttp\Cookie\CookieJar
+     */
+    public $cookies;
+
+    /**
+     * The transfer stats for the request.
+     *
+     * @var null|\GuzzleHttp\TransferStats
+     */
+    public $transferStats;
 
     /**
      * The underlying PSR response.
@@ -18,6 +34,13 @@ class CHTTP_Client_Response implements ArrayAccess {
      * @var array
      */
     protected $decoded;
+
+    /**
+     * The length at which request exceptions will be truncated.
+     *
+     * @var null|int<1, max>|false
+     */
+    protected $truncateExceptionsAt = null;
 
     /**
      * Create a new response instance.
@@ -80,6 +103,28 @@ class CHTTP_Client_Response implements ArrayAccess {
     }
 
     /**
+     * Get the JSON decoded body of the response as a fluent object.
+     *
+     * @param null|string $key
+     *
+     * @return \CBase_Fluent
+     */
+    public function fluent($key = null) {
+        return new CBase_Fluent((array) $this->json($key));
+    }
+
+    /**
+     * Get the body of the response as a PHP resource.
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return resource
+     */
+    public function resource() {
+        return StreamWrapper::getResource($this->response->getBody());
+    }
+
+    /**
      * Get a header from the response.
      *
      * @param string $header
@@ -136,39 +181,12 @@ class CHTTP_Client_Response implements ArrayAccess {
     }
 
     /**
-     * Determine if the response code was "OK".
-     *
-     * @return bool
-     */
-    public function ok() {
-        return $this->status() === 200;
-    }
-
-    /**
      * Determine if the response was a redirect.
      *
      * @return bool
      */
     public function redirect() {
         return $this->status() >= 300 && $this->status() < 400;
-    }
-
-    /**
-     * Determine if the response was a 401 "Unauthorized" response.
-     *
-     * @return bool
-     */
-    public function unauthorized() {
-        return $this->status() === 401;
-    }
-
-    /**
-     * Determine if the response was a 403 "Forbidden" response.
-     *
-     * @return bool
-     */
-    public function forbidden() {
-        return $this->status() === 403;
     }
 
     /**
@@ -258,7 +276,19 @@ class CHTTP_Client_Response implements ArrayAccess {
      */
     public function toException() {
         if ($this->failed()) {
-            return new CHTTP_Client_Exception_RequestException($this);
+            $originalTruncateAt = CHTTP_Client_Exception_RequestException::$truncateAt;
+
+            try {
+                if ($this->truncateExceptionsAt !== null) {
+                    $this->truncateExceptionsAt === false
+                        ? CHTTP_Client_Exception_RequestException::dontTruncate()
+                        : CHTTP_Client_Exception_RequestException::truncateAt($this->truncateExceptionsAt);
+                }
+
+                return new CHTTP_Client_Exception_RequestException($this);
+            } finally {
+                CHTTP_Client_Exception_RequestException::$truncateAt = $originalTruncateAt;
+            }
         }
     }
 
@@ -295,7 +325,147 @@ class CHTTP_Client_Response implements ArrayAccess {
      * @return $this
      */
     public function throwIf($condition) {
-        return $condition ? $this->throw() : $this;
+        return c::value($condition, $this) ? $this->throw(func_get_args()[1] ?? null) : $this;
+    }
+
+    /**
+     * Throw an exception if the response status code matches the given code.
+     *
+     * @param callable|int $statusCode
+     *
+     * @throws \CHTTP_Client_Exception_RequestException
+     *
+     * @return $this
+     */
+    public function throwIfStatus($statusCode) {
+        if (is_callable($statusCode) && $statusCode($this->status(), $this)) {
+            return $this->throw();
+        }
+
+        return $this->status() === $statusCode ? $this->throw() : $this;
+    }
+
+    /**
+     * Throw an exception unless the response status code matches the given code.
+     *
+     * @param callable|int $statusCode
+     *
+     * @throws \CHTTP_Client_Exception_RequestException
+     *
+     * @return $this
+     */
+    public function throwUnlessStatus($statusCode) {
+        if (is_callable($statusCode)) {
+            return $statusCode($this->status(), $this) ? $this : $this->throw();
+        }
+
+        return $this->status() === $statusCode ? $this : $this->throw();
+    }
+
+    /**
+     * Throw an exception if the response status code is a 4xx level code.
+     *
+     * @throws \CHTTP_Client_Exception_RequestException
+     *
+     * @return $this
+     */
+    public function throwIfClientError() {
+        return $this->clientError() ? $this->throw() : $this;
+    }
+
+    /**
+     * Throw an exception if the response status code is a 5xx level code.
+     *
+     * @throws \CHTTP_Client_Exception_RequestException
+     *
+     * @return $this
+     */
+    public function throwIfServerError() {
+        return $this->serverError() ? $this->throw() : $this;
+    }
+
+    /**
+     * Indicate that request exceptions should be truncated to the given length.
+     *
+     * @param int<1, max> $length
+     *
+     * @return $this
+     */
+    public function truncateExceptionsAt(int $length) {
+        $this->truncateExceptionsAt = $length;
+
+        return $this;
+    }
+
+    /**
+     * Indicate that request exceptions should not be truncated.
+     *
+     * @return $this
+     */
+    public function dontTruncateExceptions() {
+        $this->truncateExceptionsAt = false;
+
+        return $this;
+    }
+
+    /**
+     * Dump the content from the response.
+     *
+     * @param null|string $key
+     *
+     * @return $this
+     */
+    public function dump($key = null) {
+        $content = $this->body();
+
+        $json = json_decode($content);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $content = $json;
+        }
+
+        if (!is_null($key)) {
+            c::dump(c::get($content, $key));
+        } else {
+            c::dump($content);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Dump the content from the response and end the script.
+     *
+     * @param null|string $key
+     *
+     * @return never
+     */
+    public function dd($key = null) {
+        $this->dump($key);
+
+        exit(1);
+    }
+
+    /**
+     * Dump the headers from the response.
+     *
+     * @return $this
+     */
+    public function dumpHeaders() {
+        c::dump($this->headers());
+
+        return $this;
+    }
+
+    /**
+     * Dump the headers from the response and end the script.
+     *
+     * @return never
+     */
+    public function ddHeaders() {
+        $this->dumpHeaders();
+
+        exit(1);
     }
 
     /**
@@ -316,6 +486,7 @@ class CHTTP_Client_Response implements ArrayAccess {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset): mixed {
         return $this->json()[$offset];
     }
@@ -352,6 +523,7 @@ class CHTTP_Client_Response implements ArrayAccess {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->body();
     }

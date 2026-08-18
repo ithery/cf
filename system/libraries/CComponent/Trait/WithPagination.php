@@ -1,16 +1,9 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 30, 2020 
- * @license Ittron Global Teknologi
- */
 trait CComponent_Trait_WithPagination {
-
     public $page = 1;
-    
 
     public function getQueryString() {
         return array_merge(['page' => ['except' => 1]], $this->queryString);
@@ -60,5 +53,4 @@ trait CComponent_Trait_WithPagination {
         // from within the original component mount run.
         return CHTTP::request()->query('page', $this->page);
     }
-
 }

@@ -7,6 +7,7 @@
 namespace OpenApi\Analysers;
 
 use OpenApi\Analysis;
+use OpenApi\Annotations as OA;
 use OpenApi\Context;
 use OpenApi\Generator;
 
@@ -26,6 +27,9 @@ class ReflectionAnalyser implements AnalyserInterface
     /** @var Generator|null */
     protected $generator;
 
+    /**
+     * @param array<AnnotationFactoryInterface> $annotationFactories
+     */
     public function __construct(array $annotationFactories = [])
     {
         $this->annotationFactories = $annotationFactories;
@@ -85,9 +89,10 @@ class ReflectionAnalyser implements AnalyserInterface
         $contextType = $rc->isInterface() ? 'interface' : ($rc->isTrait() ? 'trait' : ((method_exists($rc, 'isEnum') && $rc->isEnum()) ? 'enum' : 'class'));
         $context = new Context([
             $contextType => $rc->getShortName(),
-            'namespace' => $rc->getNamespaceName() ?: Generator::UNDEFINED,
-            'comment' => $rc->getDocComment() ?: Generator::UNDEFINED,
-            'filename' => $rc->getFileName() ?: Generator::UNDEFINED,
+            'namespace' => $rc->getNamespaceName() ?: null,
+            'uses' => $details['uses'],
+            'comment' => $rc->getDocComment() ?: null,
+            'filename' => $rc->getFileName() ?: null,
             'line' => $rc->getStartLine(),
             'annotations' => [],
             'scanned' => $details,
@@ -103,7 +108,7 @@ class ReflectionAnalyser implements AnalyserInterface
             'context' => $context,
         ];
         $normaliseClass = function (string $name): string {
-            return '\\' . $name;
+            return '\\' . ltrim($name, '\\');
         };
         if ($parentClass = $rc->getParentClass()) {
             $definition['extends'] = $normaliseClass($parentClass->getName());
@@ -119,8 +124,8 @@ class ReflectionAnalyser implements AnalyserInterface
             if (in_array($method->name, $details['methods'])) {
                 $definition['methods'][$method->getName()] = $ctx = new Context([
                     'method' => $method->getName(),
-                    'comment' => $method->getDocComment() ?: Generator::UNDEFINED,
-                    'filename' => $method->getFileName() ?: Generator::UNDEFINED,
+                    'comment' => $method->getDocComment() ?: null,
+                    'filename' => $method->getFileName() ?: null,
                     'line' => $method->getStartLine(),
                     'annotations' => [],
                 ], $context);
@@ -134,7 +139,7 @@ class ReflectionAnalyser implements AnalyserInterface
             if (in_array($property->name, $details['properties'])) {
                 $definition['properties'][$property->getName()] = $ctx = new Context([
                     'property' => $property->getName(),
-                    'comment' => $property->getDocComment() ?: Generator::UNDEFINED,
+                    'comment' => $property->getDocComment() ?: null,
                     'annotations' => [],
                 ], $context);
                 if ($property->isStatic()) {
@@ -152,6 +157,27 @@ class ReflectionAnalyser implements AnalyserInterface
                 }
                 foreach ($this->annotationFactories as $annotationFactory) {
                     $analysis->addAnnotations($annotationFactory->build($property, $ctx), $ctx);
+                }
+            }
+        }
+
+        foreach ($rc->getReflectionConstants() as $constant) {
+            foreach ($this->annotationFactories as $annotationFactory) {
+                $definition['constants'][$constant->getName()] = $ctx = new Context([
+                    'constant' => $constant->getName(),
+                    'comment' => $constant->getDocComment() ?: null,
+                    'annotations' => [],
+                ], $context);
+                foreach ($annotationFactory->build($constant, $ctx) as $annotation) {
+                    if ($annotation instanceof OA\Property) {
+                        if (Generator::isDefault($annotation->property)) {
+                            $annotation->property = $constant->getName();
+                        }
+                        if (Generator::isDefault($annotation->const)) {
+                            $annotation->const = $constant->getValue();
+                        }
+                        $analysis->addAnnotation($annotation, $ctx);
+                    }
                 }
             }
         }

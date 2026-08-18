@@ -4,14 +4,19 @@ namespace PHPStan\Rules\Functions;
 
 use Attribute;
 use PhpParser\Node;
+use PHPStan\Analyser\CollectedDataEmitter;
+use PHPStan\Analyser\NodeCallbackInvoker;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Node\InFunctionNode;
 use PHPStan\Rules\AttributesCheck;
 use PHPStan\Rules\Rule;
 
 /**
- * @implements Rule<Node\Stmt\Function_>
+ * @implements Rule<InFunctionNode>
  */
-class FunctionAttributesRule implements Rule
+#[RegisteredRule(level: 0)]
+final class FunctionAttributesRule implements Rule
 {
 
 	public function __construct(private AttributesCheck $attributesCheck)
@@ -20,14 +25,14 @@ class FunctionAttributesRule implements Rule
 
 	public function getNodeType(): string
 	{
-		return Node\Stmt\Function_::class;
+		return InFunctionNode::class;
 	}
 
-	public function processNode(Node $node, Scope $scope): array
+	public function processNode(Node $node, Scope&NodeCallbackInvoker&CollectedDataEmitter $scope): array
 	{
 		return $this->attributesCheck->check(
 			$scope,
-			$node->attrGroups,
+			$node->getOriginalNode()->attrGroups,
 			Attribute::TARGET_FUNCTION,
 			'function',
 		);

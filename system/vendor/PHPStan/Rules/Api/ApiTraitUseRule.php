@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Api;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -12,7 +13,8 @@ use function sprintf;
 /**
  * @implements Rule<Node\Stmt\TraitUse>
  */
-class ApiTraitUseRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ApiTraitUseRule implements Rule
 {
 
 	public function __construct(
@@ -48,7 +50,7 @@ class ApiTraitUseRule implements Rule
 			$errors[] = RuleErrorBuilder::message(sprintf(
 				'Using %s is not covered by backward compatibility promise. The trait might change in a minor PHPStan version.',
 				$traitReflection->getDisplayName(),
-			))->tip($tip)->build();
+			))->identifier('phpstanApi.trait')->tip($tip)->build();
 		}
 
 		return $errors;

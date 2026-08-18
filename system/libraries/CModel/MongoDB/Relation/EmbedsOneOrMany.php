@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 6, 2019, 5:11:31 PM
- */
 abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
     /**
      * The local key of the parent model.
@@ -79,6 +73,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
             $model->setParentRelation($this);
             $model->setRelation($relation, $results);
         }
+
         return $models;
     }
 
@@ -98,6 +93,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->getEmbedded());
     }
@@ -111,6 +107,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
      */
     public function save(CModel_MongoDB_Model $model) {
         $model->setParentRelation($this);
+
         return $model->save() ? $model : false;
     }
 
@@ -125,6 +122,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
         foreach ($models as $model) {
             $this->save($model);
         }
+
         return $models;
     }
 
@@ -142,6 +140,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
         $instance = $this->related->newInstance($attributes);
         $instance->setParentRelation($this);
         $instance->save();
+
         return $instance;
     }
 
@@ -157,6 +156,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
         foreach ($records as $record) {
             $instances[] = $this->create($record);
         }
+
         return $instances;
     }
 
@@ -179,6 +179,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
                 $id = $id->getKey();
             }
         }
+
         return $ids;
     }
 
@@ -190,6 +191,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
         $attributes = $this->parent->getAttributes();
         // Get embedded models form parent attributes.
         $embedded = isset($attributes[$this->localKey]) ? (array) $attributes[$this->localKey] : null;
+
         return $embedded;
     }
 
@@ -236,6 +238,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
         if (count($models) > 0) {
             $models = $this->eagerLoadRelations($models);
         }
+
         return $this->related->newCollection($models);
     }
 
@@ -259,6 +262,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
         $model->setRelation($this->foreignKey, $this->parent);
         // If you remove this, you will get segmentation faults!
         $model->setHidden(array_merge($model->getHidden(), [$this->foreignKey]));
+
         return $model;
     }
 
@@ -309,6 +313,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
         if ($parentRelation = $this->getParentRelation()) {
             return $parentRelation->getPathHierarchy($glue) . $glue . $this->localKey;
         }
+
         return $this->localKey;
     }
 
@@ -319,6 +324,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
         if ($parentRelation = $this->getParentRelation()) {
             return $parentRelation->getPathHierarchy() . '.' . $this->parent->getKeyName();
         }
+
         return $this->parent->getKeyName();
     }
 
@@ -332,7 +338,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
     }
 
     /**
-     * Return update values
+     * Return update values.
      *
      * @param $array
      * @param string $prepend
@@ -344,6 +350,7 @@ abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
         foreach ($array as $key => $value) {
             $results[$prepend . $key] = $value;
         }
+
         return $results;
     }
 

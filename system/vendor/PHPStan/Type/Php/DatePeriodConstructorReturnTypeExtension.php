@@ -8,6 +8,7 @@ use DateTimeInterface;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Name;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
 use PHPStan\Type\Generic\GenericObjectType;
@@ -17,7 +18,8 @@ use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use function strtolower;
 
-class DatePeriodConstructorReturnTypeExtension implements DynamicStaticMethodReturnTypeExtension
+#[AutowiredService]
+final class DatePeriodConstructorReturnTypeExtension implements DynamicStaticMethodReturnTypeExtension
 {
 
 	public function getClass(): string
@@ -30,28 +32,29 @@ class DatePeriodConstructorReturnTypeExtension implements DynamicStaticMethodRet
 		return $methodReflection->getName() === '__construct';
 	}
 
-	public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): Type
+	public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): ?Type
 	{
-		if (!isset($methodCall->getArgs()[0])) {
-			return new ObjectType(DatePeriod::class);
-		}
-
 		if (!$methodCall->class instanceof Name) {
-			return new ObjectType(DatePeriod::class);
+			return null;
 		}
 
 		$className = $scope->resolveName($methodCall->class);
 		if (strtolower($className) !== 'dateperiod') {
-			return new ObjectType($className);
+			return null;
 		}
 
-		$firstArgType = $scope->getType($methodCall->getArgs()[0]->value);
+		$args = $methodCall->getArgs();
+		if (!isset($args[0])) {
+			return null;
+		}
+
+		$firstArgType = $scope->getType($args[0]->value);
 		if ($firstArgType->isString()->yes()) {
 			$firstArgType = new ObjectType(DateTime::class);
 		}
 		$thirdArgType = null;
-		if (isset($methodCall->getArgs()[2])) {
-			$thirdArgType = $scope->getType($methodCall->getArgs()[2]->value);
+		if (isset($args[2])) {
+			$thirdArgType = $scope->getType($args[2]->value);
 		}
 
 		if (!$thirdArgType instanceof Type) {
@@ -70,7 +73,7 @@ class DatePeriodConstructorReturnTypeExtension implements DynamicStaticMethodRet
 			]);
 		}
 
-		if ((new IntegerType())->isSuperTypeOf($thirdArgType)->yes()) {
+		if ($thirdArgType->isInteger()->yes()) {
 			return new GenericObjectType(DatePeriod::class, [
 				$firstArgType,
 				new NullType(),
@@ -78,7 +81,7 @@ class DatePeriodConstructorReturnTypeExtension implements DynamicStaticMethodRet
 			]);
 		}
 
-		return new ObjectType(DatePeriod::class);
+		return null;
 	}
 
 }

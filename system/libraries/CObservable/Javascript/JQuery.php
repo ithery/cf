@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 5:38:11 PM
- */
 class CObservable_Javascript_JQuery {
     use CObservable_Javascript_JQuery_Trait_ActionsTrait,
         CObservable_Javascript_JQuery_Trait_EventsTrait,

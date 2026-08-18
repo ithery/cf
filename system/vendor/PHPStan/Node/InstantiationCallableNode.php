@@ -2,11 +2,14 @@
 
 namespace PHPStan\Node;
 
+use Override;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Name;
 
-/** @api */
-class InstantiationCallableNode extends Expr implements VirtualNode
+/**
+ * @api
+ */
+final class InstantiationCallableNode extends Expr implements VirtualNode
 {
 
 	public function __construct(private Name|Expr $class, private Expr\New_ $originalNode)
@@ -27,6 +30,7 @@ class InstantiationCallableNode extends Expr implements VirtualNode
 		return $this->originalNode;
 	}
 
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Node_InstantiationCallableNode';
@@ -35,6 +39,7 @@ class InstantiationCallableNode extends Expr implements VirtualNode
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];

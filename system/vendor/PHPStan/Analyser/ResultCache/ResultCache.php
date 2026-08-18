@@ -3,19 +3,31 @@
 namespace PHPStan\Analyser\ResultCache;
 
 use PHPStan\Analyser\Error;
+use PHPStan\Analyser\FileAnalyserResult;
 use PHPStan\Collectors\CollectedData;
 use PHPStan\Dependency\RootExportedNode;
 
-class ResultCache
+/**
+ * @phpstan-import-type LinesToIgnore from FileAnalyserResult
+ * @phpstan-import-type CollectorData from CollectedData
+ */
+final class ResultCache
 {
 
 	/**
 	 * @param string[] $filesToAnalyse
 	 * @param mixed[] $meta
-	 * @param array<string, array<Error>> $errors
-	 * @param array<string, array<CollectedData>> $collectedData
+	 * @param array<string, list<Error>> $errors
+	 * @param array<string, list<Error>> $locallyIgnoredErrors
+	 * @param array<string, LinesToIgnore> $linesToIgnore
+	 * @param array<string, LinesToIgnore> $unmatchedLineIgnores
+	 * @param CollectorData $collectedData
 	 * @param array<string, array<string>> $dependencies
+	 * @param array<string, array<string>> $usedTraitDependencies
+	 * @param array<string, array<string>> $packageDependencies
 	 * @param array<string, array<RootExportedNode>> $exportedNodes
+	 * @param array<string, array{string, bool, string}> $projectExtensionFiles
+	 * @param array<string, string> $currentFileHashes
 	 */
 	public function __construct(
 		private array $filesToAnalyse,
@@ -23,9 +35,16 @@ class ResultCache
 		private int $lastFullAnalysisTime,
 		private array $meta,
 		private array $errors,
+		private array $locallyIgnoredErrors,
+		private array $linesToIgnore,
+		private array $unmatchedLineIgnores,
 		private array $collectedData,
 		private array $dependencies,
+		private array $usedTraitDependencies,
+		private array $packageDependencies,
 		private array $exportedNodes,
+		private array $projectExtensionFiles,
+		private array $currentFileHashes,
 	)
 	{
 	}
@@ -57,7 +76,7 @@ class ResultCache
 	}
 
 	/**
-	 * @return array<string, array<Error>>
+	 * @return array<string, list<Error>>
 	 */
 	public function getErrors(): array
 	{
@@ -65,7 +84,31 @@ class ResultCache
 	}
 
 	/**
-	 * @return array<string, array<CollectedData>>
+	 * @return array<string, list<Error>>
+	 */
+	public function getLocallyIgnoredErrors(): array
+	{
+		return $this->locallyIgnoredErrors;
+	}
+
+	/**
+	 * @return array<string, LinesToIgnore>
+	 */
+	public function getLinesToIgnore(): array
+	{
+		return $this->linesToIgnore;
+	}
+
+	/**
+	 * @return array<string, LinesToIgnore>
+	 */
+	public function getUnmatchedLineIgnores(): array
+	{
+		return $this->unmatchedLineIgnores;
+	}
+
+	/**
+	 * @return CollectorData
 	 */
 	public function getCollectedData(): array
 	{
@@ -81,11 +124,43 @@ class ResultCache
 	}
 
 	/**
+	 * @return array<string, array<string>>
+	 */
+	public function getUsedTraitDependencies(): array
+	{
+		return $this->usedTraitDependencies;
+	}
+
+	/**
+	 * @return array<string, array<string>>
+	 */
+	public function getPackageDependencies(): array
+	{
+		return $this->packageDependencies;
+	}
+
+	/**
 	 * @return array<string, array<RootExportedNode>>
 	 */
 	public function getExportedNodes(): array
 	{
 		return $this->exportedNodes;
+	}
+
+	/**
+	 * @return array<string, array{string, bool, string}>
+	 */
+	public function getProjectExtensionFiles(): array
+	{
+		return $this->projectExtensionFiles;
+	}
+
+	/**
+	 * @return array<string, string>
+	 */
+	public function getCurrentFileHashes(): array
+	{
+		return $this->currentFileHashes;
 	}
 
 }

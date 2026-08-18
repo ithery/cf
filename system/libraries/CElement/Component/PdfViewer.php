@@ -2,17 +2,20 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 29, 2019, 6:43:28 PM
- */
 class CElement_Component_PdfViewer extends CElement_Component {
     use CTrait_Element_Property_Width,
         CTrait_Element_Property_Height;
+
+    /**
+     * @var string|null
+     */
     protected $pdfUrl;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id = '') {
         parent::__construct($id);
         $this->tag = 'iframe';
@@ -20,6 +23,9 @@ class CElement_Component_PdfViewer extends CElement_Component {
         $this->height = '500px';
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         $url = curl::base() . 'cresenity/pdf?file=' . $this->pdfUrl;
         $this->setAttr('src', $url);
@@ -29,6 +35,11 @@ class CElement_Component_PdfViewer extends CElement_Component {
         $this->setAttr('height', $this->height);
     }
 
+    /**
+     * @param string $url
+     *
+     * @return $this
+     */
     public function setPdfUrl($url) {
         $this->pdfUrl = $url;
 

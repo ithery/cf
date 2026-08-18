@@ -1,12 +1,9 @@
 <?php
 
 /**
- * Description of CXMPP
+ * Description of CXMPP.
  *
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since May 30, 2020
+ * @deprecated 1.8
  */
 class CXMPP {
 }

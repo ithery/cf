@@ -4,15 +4,17 @@ namespace PHPStan\Rules\Variables;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Node\IssetExpressionNode;
 use PHPStan\Rules\IssetCheck;
 use PHPStan\Rules\Rule;
-use PHPStan\Type\NullType;
 use PHPStan\Type\Type;
 
 /**
- * @implements Rule<Node\Expr\Isset_>
+ * @implements Rule<IssetExpressionNode>
  */
-class IssetRule implements Rule
+#[RegisteredRule(level: 1)]
+final class IssetRule implements Rule
 {
 
 	public function __construct(private IssetCheck $issetCheck)
@@ -21,15 +23,15 @@ class IssetRule implements Rule
 
 	public function getNodeType(): string
 	{
-		return Node\Expr\Isset_::class;
+		return IssetExpressionNode::class;
 	}
 
 	public function processNode(Node $node, Scope $scope): array
 	{
 		$messages = [];
-		foreach ($node->vars as $var) {
-			$error = $this->issetCheck->check($var, $scope, 'in isset()', static function (Type $type): ?string {
-				$isNull = (new NullType())->isSuperTypeOf($type);
+		foreach ($node->getVarResults() as $varResult) {
+			$error = $this->issetCheck->check($varResult, $scope, 'in isset()', 'isset', static function (Type $type): ?string {
+				$isNull = $type->isNull();
 				if ($isNull->maybe()) {
 					return null;
 				}

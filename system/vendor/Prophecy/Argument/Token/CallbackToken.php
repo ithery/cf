@@ -68,6 +68,7 @@ class CallbackToken implements TokenInterface
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return 'callback()';

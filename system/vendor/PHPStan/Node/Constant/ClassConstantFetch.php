@@ -5,8 +5,10 @@ namespace PHPStan\Node\Constant;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PHPStan\Analyser\Scope;
 
-/** @api */
-class ClassConstantFetch
+/**
+ * @api
+ */
+final class ClassConstantFetch
 {
 
 	public function __construct(private ClassConstFetch $node, private Scope $scope)

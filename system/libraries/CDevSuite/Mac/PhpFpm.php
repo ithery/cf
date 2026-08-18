@@ -2,16 +2,26 @@
 
 /**
  * Description of PhpFpm.
- *
- * @author Hery
  */
 class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
+    /**
+     * @var CDevSuite_CommandLine
+     */
     public $cli;
 
+    /**
+     * @var CDevSuite_Filesystem
+     */
     public $files;
 
+    /**
+     * @var CDevSuite_Brew
+     */
     public $brew;
 
+    /**
+     * @var array
+     */
     public $taps = [
         'homebrew/homebrew-core'
     ];
@@ -136,11 +146,13 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
             $version === 'php' ? CDevSuite_Brew::LATEST_PHP_VERSION : $version
         );
 
-        return $versionNormalized === '5.6' ? BREW_PREFIX . '/etc/php/5.6/php-fpm.conf' : BREW_PREFIX . "/etc/php/${versionNormalized}/php-fpm.d/devsuite-fpm.conf";
+        return $versionNormalized === '5.6' ? BREW_PREFIX . '/etc/php/5.6/php-fpm.conf' : BREW_PREFIX . "/etc/php/{$versionNormalized}/php-fpm.d/devsuite-fpm.conf";
     }
 
     /**
      * Only stop running php services.
+     *
+     * @return void
      */
     public function stopRunning() {
         $this->brew->stopService(
@@ -155,7 +167,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
     /**
      * Use a specific version of php.
      *
-     * @param $version
+     * @param string $version
      *
      * @return string
      */
@@ -183,7 +195,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
     /**
      * Validate the requested version to be sure we can support it.
      *
-     * @param $version
+     * @param string $version
      *
      * @return string
      */

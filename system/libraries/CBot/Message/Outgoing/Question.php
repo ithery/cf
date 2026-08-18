@@ -109,6 +109,7 @@ class CBot_Message_Outgoing_Question implements JsonSerializable, CBot_Contract_
     /**
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->toArray();
     }

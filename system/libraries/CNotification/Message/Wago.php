@@ -1,11 +1,17 @@
 <?php
 
 class CNotification_Message_Wago extends CNotification_MessageAbstract {
+    /**
+     * @return array
+     */
     public function send() {
         $token = $this->getOption('token', carr::get($this->config, 'token'));
 
         $message = $this->getOption('message');
         $imageUrl = $this->getOption('imageUrl');
+        $mimeType = $this->getOption('mimeType');
+        $fileName = $this->getOption('fileName');
+        $documentUrl = $this->getOption('documentUrl');
         $scheduleAt = $this->getOption('scheduleAt');
         $recipient = $this->getOption('recipient');
 
@@ -14,6 +20,15 @@ class CNotification_Message_Wago extends CNotification_MessageAbstract {
         $options = [];
         if ($imageUrl) {
             $options['imageUrl'] = $imageUrl;
+        }
+        if ($documentUrl) {
+            $options['documentUrl'] = $documentUrl;
+        }
+        if ($mimeType) {
+            $options['mimeType'] = $mimeType;
+        }
+        if ($fileName) {
+            $options['fileName'] = $fileName;
         }
         if ($scheduleAt) {
             $options['scheduleAt'] = $scheduleAt;

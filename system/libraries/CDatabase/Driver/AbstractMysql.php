@@ -2,17 +2,11 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:46:25 AM
- */
 abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implements CDatabase_Driver_VersionAwarePlatformInterface, CDatabase_Driver_ServerInfoAwareInterface {
     /**
      * @inheritdoc
      */
-    public function getDatabase(CDatabase $db) {
+    public function getDatabase(CDatabase_Connection $db) {
         $params = $db->config();
 
         $dbname = carr::get($params, 'connection.database');

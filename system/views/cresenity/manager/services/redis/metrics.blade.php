@@ -11,7 +11,7 @@ if (!isset($data)) {
 $id = uniqid();
 @endphp
 <div x-data="redisMetric()">
-    <canvas id="{{ $id }}" style="width:100%; height:100%; min-height:400px"></canvas>
+    <canvas id="{{ $id }}" style="width:100%; height:400px;"></canvas>
 </div>
 
 @CAppPushScript
@@ -28,16 +28,16 @@ $id = uniqid();
             pollingUrl: '{{ $pollingUrl }}',
             init() {
                 if(window.cresenity) {
+                    this.initChart();
                     this.fillData();
                     this.refreshPeriodically();
-                    this.initChart();
-                    cresenity.on('reload:success',()=> this.destroy());
+                    cresenity.on('reload:success',() => this.destroy());
                 } else {
                     window.addEventListener('cresenity:loaded',()=>{
+                        this.initChart();
                         this.fillData();
                         this.refreshPeriodically();
-                        this.initChart();
-                        cresenity.on('reload:success',()=> this.destroy());
+                        cresenity.on('reload:success',() => this.destroy());
                     });
                 }
 
@@ -49,20 +49,20 @@ $id = uniqid();
 
                     options: {
                         scales: {
-                            xAxes: [{
+                            xAxis: {
                                 display: true,
                                 scaleLabel: {
                                     display: true,
                                     labelString: 'Time'
                                 }
-                            }],
-                            yAxes: [{
+                            },
+                            yAxis: {
                                 display: true,
                                 scaleLabel: {
                                     display: true,
                                     labelString: 'MB'
                                 }
-                            }]
+                            }
                         },
                         legend: {
                             display: true
@@ -97,7 +97,7 @@ $id = uniqid();
                 if(this.collection.labels.length>this.maxData) {
                     this.collection.labels = this.collection.labels.slice(-1 * this.maxData);
                 }
-                let index=0;
+                let index = 0;
                 for(let i in this.datasets) {
 
                     if(this.collection.datasets.length < index+1) {
@@ -115,7 +115,7 @@ $id = uniqid();
                     }
                     index++;
                 }
-                console.log(this.collection);
+
                 this.chart.data.labels = this.collection.labels;
                 this.chart.data.datasets = this.collection.datasets;
                 this.chart.update();

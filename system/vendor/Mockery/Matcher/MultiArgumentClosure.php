@@ -41,6 +41,7 @@ class MultiArgumentClosure extends MatcherAbstract implements ArgumentListMatche
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return '<MultiArgumentClosure===true>';

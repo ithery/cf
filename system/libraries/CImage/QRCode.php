@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Description of QRCode.
- *
- * @author ittron
- */
 class CImage_QRCode {
     use CImage_QRCode_Trait_QRCodePropertyTrait;
 

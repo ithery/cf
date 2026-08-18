@@ -12,7 +12,6 @@ trait CTrait_Controller_Application_QC_UnitTest {
 
     public function index() {
         $app = c::app();
-        $db = CDatabase::instance();
 
         $app->title($this->getTitle());
         $actionContainer = $app->addDiv()->addClass('action-container mb-3');
@@ -42,7 +41,6 @@ trait CTrait_Controller_Application_QC_UnitTest {
         if ($request == null) {
             $request = CApp_Base::getRequest();
         }
-        $db = CDatabase::instance();
         $listUnitTest = $qcManager->unitTests();
         $dataUnitTest = [];
         $groupTab = carr::get($_GET, 'group');
@@ -82,7 +80,6 @@ trait CTrait_Controller_Application_QC_UnitTest {
         if ($request == null) {
             $request = CApp_Base::getRequest();
         }
-        $db = CDatabase::instance();
         $group = carr::get($request, 'group');
         $listUnitTest = $qcManager->unitTests($group);
         $dataUnitTest = [];

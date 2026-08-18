@@ -1,36 +1,38 @@
 <?php
 
 /**
- * Class to manage file rotation
- *
- * @package CLogger\Rotator
+ * Class to manage file rotation.
  */
 class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
     /**
-     * Number of copies to keep, defaults to 10
+     * Number of copies to keep, defaults to 10.
      *
      * @var int
      */
     protected $keepNumber = 10;
 
     /**
-     * Filesize to rotate files on (in bytes)
+     * Filesize to rotate files on (in bytes).
      *
      * @var int
      */
     protected $sizeToRotate = 1024 * 1024;
 
     /**
-     * Set the number of old copies to keep
+     * Set the number of old copies to keep.
      *
      * @param $number
+     *
+     * @return CLogger_Rotator_Rotate
      */
     public function keep($number) {
         $this->keepNumber = $number;
+
+        return $this;
     }
 
     /**
-     * Return number of old copies to keep
+     * Return number of old copies to keep.
      *
      * @return int
      */
@@ -39,40 +41,50 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
     }
 
     /**
-     * Set the filesize to rotate files on
+     * Set the filesize to rotate files on.
      *
      * @param string $size Define as an number with a string suffix indicating the unit measurement, e.g. 5MB
      *
-     * @return CLogger_Rotator_Rotate
-     *
      * @throws CLogger_Rotator_Exception_RotateException
+     *
+     * @return CLogger_Rotator_Rotate
      */
     public function size($size) {
-        if (!preg_match('/^(\d+)\s?(B|KB|MB|GB)$/i', $size, $m)) {
-            throw new CLogger_Rotator_Exception_RotateException('You must define size in the format 10B|KB|MB|GB');
+        if (is_string($size)) {
+            if (!preg_match('/^(\d+)\s?(B|KB|MB|GB)$/i', $size, $m)) {
+                throw new CLogger_Rotator_Exception_RotateException('You must define size in the format 10B|KB|MB|GB');
+            }
+
+            switch (strtoupper($m[2])) {
+                case 'B':
+                    $size = $m[1];
+
+                    break;
+                case 'KB':
+                    $size = $m[1] * 1024;
+
+                    break;
+                case 'MB':
+                    $size = $m[1] * 1024 * 1024;
+
+                    break;
+                case 'GB':
+                    $size = $m[1] * 1024 * 1024 * 1024;
+
+                    break;
+            }
         }
-        if ($m[1] === 0) {
+        $size = (int) $size;
+        if ($size === 0) {
             throw new CLogger_Rotator_Exception_RotateException('You must define a non-zero size to rotate files on');
         }
-        switch (strtoupper($m[2])) {
-            case 'B':
-                $this->sizeToRotate = $m[1];
-                break;
-            case 'KB':
-                $this->sizeToRotate = $m[1] * 1024;
-                break;
-            case 'MB':
-                $this->sizeToRotate = $m[1] * 1024 * 1024;
-                break;
-            case 'GB':
-                $this->sizeToRotate = $m[1] * 1024 * 1024 * 1024;
-                break;
-        }
+        $this->sizeToRotate = $size;
+
         return $this;
     }
 
     /**
-     * Return filesize to rotate files on (in bytes)
+     * Return filesize to rotate files on (in bytes).
      *
      * @return int
      */
@@ -86,7 +98,7 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
      * @return bool
      */
     public function hasSizeToRotate() {
-        return (is_int($this->getSizeToRotate()) && $this->getSizeToRotate() !== 0);
+        return is_int($this->getSizeToRotate()) && $this->getSizeToRotate() !== 0;
     }
 
     public function forceRotate() {
@@ -94,14 +106,14 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
     }
 
     /**
-     * Run the file rotation
+     * Run the file rotation.
      *
      * @param bool $checkSize
      *
-     * @return array Array of files which have been rotated
-     *
      * @throws CLogger_Rotator_Exception_FilenameFormatException
      * @throws RotateException
+     *
+     * @return array Array of files which have been rotated
      */
     public function run($checkSize = true) {
         if (!$this->hasFilenameFormat()) {
@@ -151,6 +163,7 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
                 $rotated[] = $file->getPath() . '/' . $file->getBasename();
             }
         }
+
         return $rotated;
     }
 }

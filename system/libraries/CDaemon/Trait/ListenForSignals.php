@@ -19,6 +19,12 @@ trait CDaemon_Trait_ListenForSignals {
         pcntl_signal(SIGTERM, function () {
             $this->pendingSignals['terminate'] = 'terminate';
         });
+        pcntl_signal(SIGQUIT, function () {
+            $this->pendingSignals['terminate'] = 'terminate';
+        });
+        pcntl_signal(SIGINT, function () {
+            $this->pendingSignals['terminate'] = 'terminate';
+        });
 
         pcntl_signal(SIGUSR1, function () {
             $this->pendingSignals['restart'] = 'restart';

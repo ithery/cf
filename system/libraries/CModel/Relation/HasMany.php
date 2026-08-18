@@ -4,6 +4,9 @@
  * Class CModel_Relation_HasMany.
  *
  * @template TRelatedModel of \CModel
+ * @template TDeclaringModel of \CModel
+ *
+ * @extends \CModel_Relation_HasOneOrMany<TRelatedModel, TDeclaringModel, \CModel_Collection<int, TRelatedModel>>
  *
  * @method null|CModel|CModel_Collection|static                find($id, $columns = ['*'])                                                              Find a model by its primary key.
  * @method CModel_Collection                                   findMany($ids, $columns = ['*'])                                                         Find a model by its primary key.

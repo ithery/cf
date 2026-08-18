@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2019, 4:33:16 AM
- */
 trait CColor_Trait_ColorInfoTrait {
     public static $dictionary = [
         'monochrome' => [

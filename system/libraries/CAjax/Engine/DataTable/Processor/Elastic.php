@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 8, 2018, 2:58:23 AM
- */
 class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Processor {
     public function process() {
         $data = $this->data;

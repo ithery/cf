@@ -78,12 +78,10 @@ class CVendor {
     }
 
     /**
-     * @param array $options
-     *
      * @return \CVendor_Namecheap
      */
-    public static function namecheap($options) {
-        return new CVendor_Namecheap($options);
+    public static function namecheap() {
+        return new CVendor_Namecheap();
     }
 
     /**
@@ -102,6 +100,15 @@ class CVendor {
      */
     public static function xendit($options) {
         return new CVendor_Xendit($options);
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return \CVendor_OneBrick
+     */
+    public static function oneBrick($options = []) {
+        return new CVendor_OneBrick($options);
     }
 
     /**
@@ -151,17 +158,59 @@ class CVendor {
     }
 
     /**
-     * @param string $apiKey
-     * @param array  $options
+     * @param string     $apiKey
+     * @param array      $options
+     * @param null|mixed $apiSecret
      *
      * @return \CVendor_SendGrid
      */
-    public static function sendGrid($apiKey = null, $options = []) {
-        if (strlen($apiKey) == 0) {
-            $apiKey = ccfg::get('smtp_password');
+    /**
+     * Klien REST Mailjet.
+     *
+     * Autentikasinya sepasang nilai, sama dengan kredensial SMTP relainya:
+     * API Key sebagai nama pengguna dan Secret Key sebagai kata sandi.
+     *
+     * @param null|string $apiKey
+     * @param null|string $apiSecret
+     * @param array       $options
+     *
+     * @return \CVendor_Mailjet
+     */
+    public static function mailjet($apiKey = null, $apiSecret = null, $options = []) {
+        if ($apiKey == null) {
+            $apiKey = CF::config('vendor.mailjet.apiKey');
         }
-        if (strlen($apiKey) == 0) {
+        if ($apiSecret == null) {
+            $apiSecret = CF::config('vendor.mailjet.apiSecret');
+        }
+
+        return new CVendor_Mailjet($apiKey, $apiSecret, is_array($options) ? $options : []);
+    }
+
+    /**
+     * @param null|string $apiKey
+     * @param array       $options
+     *
+     * @return \CVendor_MailerSend
+     */
+    public static function mailerSend($apiKey = null, $options = []) {
+        if ($apiKey == null) {
+            $apiKey = CF::config('vendor.mailersend.apiKey');
+        }
+        if (!is_array($options)) {
+            $options = [];
+        }
+        $options['api_key'] = $apiKey;
+
+        return new CVendor_MailerSend($options);
+    }
+
+    public static function sendGrid($apiKey = null, $options = []) {
+        if ($apiKey == null) {
             $apiKey = CF::config('vendor.sendgrid.apiKey');
+        }
+        if ($apiKey == null) {
+            $apiKey = CF::config('app.smtp_password');
         }
 
         return new CVendor_SendGrid($apiKey, $options);
@@ -210,14 +259,14 @@ class CVendor {
     /**
      * @param array $options
      *
-     * @return \CVendor_Firebase
+     * @return \Kreait\Firebase\Factory
      */
     public static function firebase($options = null) {
         if (!is_array($options)) {
             $options = CF::config('vendor.firebase');
         }
 
-        return new CVendor_Firebase($options);
+        return CVendor_Firebase::create($options);
     }
 
     /**
@@ -239,5 +288,47 @@ class CVendor {
      */
     public static function tugasHarian() {
         return new CBase_ForwarderStaticClass(CVendor_TugasHarian::class);
+    }
+
+    /**
+     * @return \CVendor_BCA
+     */
+    public static function bca() {
+        return new CBase_ForwarderStaticClass(CVendor_BCA::class);
+    }
+
+    /**
+     * @return \CVendor_WhatsApp|CBase_ForwarderStaticClass
+     */
+    public static function whatsApp() {
+        return new CBase_ForwarderStaticClass(CVendor_WhatsApp::class);
+    }
+
+    /**
+     * @return \CVendor_Figma|CBase_ForwarderStaticClass
+     */
+    public static function figma() {
+        return new CBase_ForwarderStaticClass(CVendor_Figma::class);
+    }
+
+    /**
+     * @return \CVendor_Qontak|CBase_ForwarderStaticClass
+     */
+    public static function qontak() {
+        return new CBase_ForwarderStaticClass(CVendor_Qontak::class);
+    }
+
+    /**
+     * @return \CVendor_Dropbox|CBase_ForwarderStaticClass
+     */
+    public static function dropbox() {
+        return new CBase_ForwarderStaticClass(CVendor_Dropbox::class);
+    }
+
+    /**
+     * @return \CVendor_Kataai|CBase_ForwarderStaticClass
+     */
+    public static function kataai() {
+        return new CBase_ForwarderStaticClass(CVendor_Kataai::class);
     }
 }

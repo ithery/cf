@@ -2,20 +2,14 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 22, 2018, 4:00:17 PM
- */
 class CProfiler {
-    protected static $enabled = false;
-
     use CProfiler_Trait_PopulateBenchmarkTrait,
         CProfiler_Trait_PopulateCookiesTrait,
         CProfiler_Trait_PopulateSessionTrait,
         CProfiler_Trait_PopulatePostTrait,
         CProfiler_Trait_PopulateDatabaseTrait;
+
+    protected static $enabled = false;
 
     public static function enable() {
         static::$enabled = true;

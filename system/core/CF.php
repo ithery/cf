@@ -26,7 +26,7 @@ final class CF {
     /**
      * Logger Instance.
      *
-     * @var CLogger logging object
+     * @var CLogger_Manager logging object
      */
     public static $logger;
 
@@ -65,6 +65,18 @@ final class CF {
      */
     private static $sharedAppCode = [];
 
+    /**
+     * Shared app code declared by each application, keyed by app code.
+     *
+     * @var array
+     */
+    private static $declaredSharedAppCode = [];
+
+    /**
+     * Force appCode for CF.
+     *
+     * @var string
+     */
     private static $forceAppCode = null;
 
     /**
@@ -104,12 +116,29 @@ final class CF {
         return static::environment() === CBase::ENVIRONMENT_PRODUCTION;
     }
 
-    public static function environment() {
+    public static function getEnvironment() {
         if (defined('IN_PRODUCTION') && IN_PRODUCTION) {
             return CBase::ENVIRONMENT_PRODUCTION;
         }
 
         return c::env('ENVIRONMENT', CBase::ENVIRONMENT_DEVELOPMENT);
+    }
+
+    /**
+     * Check CF is running on development.
+     *
+     * @param string|string[] ...$environments
+     *
+     * @return bool|string
+     */
+    public static function environment(...$environments) {
+        if (count($environments) > 0) {
+            $patterns = is_array($environments[0]) ? $environments[0] : $environments;
+
+            return cstr::is($patterns, self::getEnvironment());
+        }
+
+        return self::getEnvironment();
     }
 
     /**
@@ -165,42 +194,12 @@ final class CF {
         // Start the environment setup benchmark
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
 
-        // Define CF error constant
-        define('E_CF', 42);
-
-        // Define 404 error constant
-        define('E_PAGE_NOT_FOUND', 43);
-
-        // Define database error constant
-        define('E_DATABASE_ERROR', 44);
-
         // Set autoloader
         spl_autoload_register(['CF', 'autoLoad']);
 
         // Set and test the logger instance, we need to know whats wrong when CF Fail
-        self::$logger = CLogger::instance();
+        self::$logger = CLogger::logger();
 
-        // Disable notices and "strict" errors
-        $ER = error_reporting(~E_NOTICE & ~E_STRICT);
-
-        if (function_exists('date_default_timezone_set')) {
-            $timezone = self::config('app.timezone');
-
-            // Set default timezone, due to increased validation of date settings
-            // which cause massive amounts of E_NOTICEs to be generated in PHP 5.2+
-            date_default_timezone_set(empty($timezone) ? date_default_timezone_get() : $timezone);
-        }
-
-        // Restore error reporting
-        error_reporting($ER);
-
-        // Load locales
-        $locale = self::config('app.locale');
-
-        // Set locale information
-        self::$locale = setlocale(LC_ALL, $locale);
-        // Set locale information
-        self::$fallbackLocale = self::config('app.fallback_locale');
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
         self::fireCallbacks(self::$bootingCallbacks);
         static::loadBootstrapFiles();
@@ -246,7 +245,7 @@ final class CF {
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_application_bootstrap');
 
         //try to locate bootstrap files for org
-        if (strlen(CF::orgCode()) > 0) {
+        if (strlen((string) CF::orgCode()) > 0) {
             $bootstrapPath .= CF::orgCode() . DS;
             if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
                 include $bootstrapPath . 'bootstrap' . EXT;
@@ -277,6 +276,8 @@ final class CF {
      *
      * @throws CHTTP_Exception_NotFoundHttpException
      *
+     * @deprecated 1.8 use c::abort(404)
+     *
      * @return void
      */
     public static function show404($page = false, $template = false) {
@@ -284,8 +285,8 @@ final class CF {
     }
 
     /**
-     * @param type $directory
-     * @param type $domain
+     * @param string      $directory
+     * @param null|string $domain
      *
      * @return string
      */
@@ -377,7 +378,7 @@ final class CF {
      */
     public static function paths($domain = null, $forceReload = false, $withShared = true) {
         if ($domain == null) {
-            $domain = CF::domain($domain);
+            $domain = CF::domain();
         }
         $isDiffAppCode = false;
         if (CF::appCode() != CF::appCode($domain)) {
@@ -432,24 +433,14 @@ final class CF {
     /**
      * Get a config item or group.
      *
-     * @param mixed      $group
+     * @param mixed      $key
      * @param null|mixed $default
      * @param mixed      $required
      *
      * @return CConfig|mixed
      */
-    public static function config($group, $default = null, $required = true) {
-        $path = null;
-        if (strpos($group, '.') !== false) {
-            // Split the config group and path
-            list($group, $path) = explode('.', $group, 2);
-        }
-
-        $config = CConfig::instance($group);
-
-        $value = $config->get($path, $default);
-
-        return $value;
+    public static function config($key, $default = null, $required = true) {
+        return CConfig::repository()->get($key, $default);
     }
 
     /**
@@ -457,12 +448,13 @@ final class CF {
      *
      * @param string $level
      * @param string $message
+     * @param mixed  $context
      *
      * @return void
      */
-    public static function log($level, $message) {
+    public static function log($level, $message, $context = []) {
         if (class_exists('CLogger')) {
-            CLogger::instance()->add($level, $message);
+            CLogger::instance()->log($level, $message, $context);
         }
     }
 
@@ -478,6 +470,7 @@ final class CF {
         if (class_exists($class, false)) {
             return true;
         }
+
         if (($prefix = strpos($class, '_')) > 0) {
             // Find the class suffix
             $prefix = substr($class, 0, $prefix);
@@ -678,7 +671,11 @@ final class CF {
      * @return string
      */
     public static function cliDomain() {
-        $domain = static::cliAppCode() . '.test';
+        $domain = null;
+        if (static::cliAppCode()) {
+            $domain = static::cliAppCode() . '.test';
+        }
+
         if (defined('CFCLI_APPCODE')) {
             return constant('CFCLI_APPCODE') . '.test';
         }
@@ -699,7 +696,11 @@ final class CF {
             return constant('CFCLI_APPCODE');
         }
         if (CF::isTesting()) {
-            foreach ($_SERVER['argv'] as $argv) {
+            $serverArgv = $_SERVER['argv'];
+            if (!is_array($serverArgv)) {
+                $serverArgv = [$serverArgv];
+            }
+            foreach ($serverArgv as $argv) {
                 if (substr($argv, -strlen('phpunit.xml')) === (string) 'phpunit.xml') {
                     if (file_exists($argv)) {
                         $content = file_get_contents($argv);
@@ -711,27 +712,18 @@ final class CF {
                 }
             }
         }
-        if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
-            foreach ($_SERVER['argv'] as $argv) {
-                if (is_string($argv)) {
-                    if (strncmp($argv, 'app:', strlen('app:')) === 0) {
-                        return substr($argv, 4);
-                    }
-                }
-            }
-        }
-        $domain = null;
-        if (file_exists(static::CFCLI_CURRENT_APPCODE_FILE)) {
-            $domain = trim(file_get_contents(static::CFCLI_CURRENT_APPCODE_FILE));
-        }
 
-        return $domain;
+        return null;
     }
 
     public static function domain() {
         $domain = '';
         if (CF::isTesting()) {
-            foreach ($_SERVER['argv'] as $argv) {
+            $serverArgv = $_SERVER['argv'];
+            if (!is_array($serverArgv)) {
+                $serverArgv = [$serverArgv];
+            }
+            foreach ($serverArgv as $argv) {
                 if (substr($argv, -strlen('phpunit.xml')) === (string) 'phpunit.xml') {
                     if (file_exists($argv)) {
                         $content = file_get_contents($argv);
@@ -748,16 +740,8 @@ final class CF {
             if (defined('CFCLI_APPCODE')) {
                 return constant('CFCLI_APPCODE') . '.test';
             }
+
             if (static::isCFCli() || static::isTesting()) {
-                if (isset($_SERVER['argv']) && is_array($_SERVER['argv'])) {
-                    foreach ($_SERVER['argv'] as $argv) {
-                        if (is_string($argv)) {
-                            if (strncmp($argv, 'app:', strlen('app:')) === 0) {
-                                return substr($argv, 4) . '.local';
-                            }
-                        }
-                    }
-                }
                 $domain = static::cliDomain();
             } else {
                 if (isset($_SERVER['argv'][2])) {
@@ -832,6 +816,7 @@ final class CF {
                     if (static::isFile($path . $search)) {
                         // A matching file has been found
                         $found = $path . $search;
+
                         // Stop searching
                         break;
                     }
@@ -877,6 +862,9 @@ final class CF {
     public static function data($domain = null) {
         $domain = $domain == null ? self::domain() : $domain;
 
+        if (is_null($domain)) {
+            return [];
+        }
         if (!isset(self::$data[$domain])) {
             self::$data[$domain] = CFData::domain($domain);
             if (self::$data[$domain] == null) {
@@ -903,6 +891,21 @@ final class CF {
     }
 
     /**
+     * Whether the current request entrypoint lives inside an app's own
+     * folder (`application/{app}/...`) rather than the shared front
+     * controller. Used by {@see appCode()} to resolve app identity when
+     * there's no domain/Host header to look up (e.g. CLI, or an app-embedded
+     * entrypoint).
+     *
+     * @return bool
+     */
+    public static function isIndexInApp() {
+        $relativeIndex = str_replace(DOCROOT, '', CFINDEX);
+
+        return strpos($relativeIndex, 'application/') !== false;
+    }
+
+    /**
      * Get application code for domain.
      *
      * @param null|mixed $domain
@@ -913,6 +916,17 @@ final class CF {
         if (static::$forceAppCode) {
             return static::$forceAppCode;
         }
+        if (self::isIndexInApp()) {
+            $relativeIndex = str_replace(DOCROOT, '', CFINDEX);
+            $paths = explode('/', $relativeIndex);
+            if ($paths[0] == 'application') {
+                return $paths[1];
+            }
+        }
+        if (defined('CF_APPCODE')) {
+            return constant('CF_APPCODE');
+        }
+
         if (CF::isCFCli() || CF::isTesting()) {
             if (CF::cliAppCode()) {
                 return CF::cliAppCode();
@@ -922,7 +936,7 @@ final class CF {
         $data = self::data($domain);
 
         $appCode = isset($data['app_code']) ? $data['app_code'] : null;
-        if ($appCode == null) {
+        if ($appCode == null && CF::domain()) {
             if (substr(CF::domain(), -5) === '.test') {
                 $appCode = substr(CF::domain(), 0, -5);
             }
@@ -983,9 +997,48 @@ final class CF {
             $data['shared_app_code'] = [];
         }
 
-        $data['shared_app_code'] = array_merge($data['shared_app_code'], self::$sharedAppCode);
+        $data['shared_app_code'] = array_merge(
+            $data['shared_app_code'],
+            self::declaredSharedApp($domain),
+            self::$sharedAppCode
+        );
 
-        return isset($data['shared_app_code']) ? $data['shared_app_code'] : [];
+        return array_values(array_unique($data['shared_app_code']));
+    }
+
+    /**
+     * Get the shared application code declared by the application itself.
+     *
+     * The file is read before any configuration is loaded, so an application
+     * whose config refers to a class of the application it shares with can be
+     * resolved. Registering the same code with addSharedApp() from the
+     * application bootstrap is too late for that: by then every config file
+     * has already been evaluated.
+     *
+     * @param string $domain
+     *
+     * @return array
+     */
+    protected static function declaredSharedApp($domain = null) {
+        $appCode = self::appCode($domain);
+        if (strlen((string) $appCode) == 0) {
+            return [];
+        }
+
+        if (!isset(self::$declaredSharedAppCode[$appCode])) {
+            $declared = [];
+            $file = DOCROOT . 'application' . DS . $appCode . DS . 'shared' . EXT;
+            if (file_exists($file)) {
+                $declared = require $file;
+                if (!is_array($declared)) {
+                    $declared = [];
+                }
+            }
+
+            self::$declaredSharedAppCode[$appCode] = $declared;
+        }
+
+        return self::$declaredSharedAppCode[$appCode];
     }
 
     /**
@@ -1038,7 +1091,7 @@ final class CF {
     public static function appPath($domain = null) {
         $appCode = static::appCode($domain);
 
-        return DOCROOT . 'application/' . $appCode . '/';
+        return DOCROOT . 'application' . DS . $appCode;
     }
 
     /**
@@ -1086,6 +1139,7 @@ final class CF {
      */
     public static function setLocale($locale) {
         static::$locale = $locale;
+        // setlocale(LC_ALL, $locale);
         CTranslation::translator()->setLocale($locale);
         CCarbon::setLocale($locale);
         CEvent::dispatch('cf.locale.updated');
@@ -1098,9 +1152,9 @@ final class CF {
      *
      * @return void
      */
-    public function setFallbackLocale($fallbackLocale) {
-        // static::$fallbackLocale = $fallbackLocale;
-        // CTranslation::translator()->setFallback($locale);
+    public static function setFallbackLocale($fallbackLocale) {
+        static::$fallbackLocale = $fallbackLocale;
+        CTranslation::translator()->setFallback($fallbackLocale);
     }
 
     /**
@@ -1124,7 +1178,7 @@ final class CF {
      * @return bool
      */
     public static function isDevSuite() {
-        return substr(CF::domain(), -strlen('.test')) === '.test';
+        return substr(CF::domain(), strlen('.test') * -1) === '.test';
     }
 
     /**
@@ -1134,7 +1188,7 @@ final class CF {
      */
     public static function isTesting() {
         if (defined('CFTesting')
-            || (is_array($_SERVER) && isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] == 'testing')
+            || (is_array($_SERVER) && isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] === 'testing')
         ) {
             return true;
         }
@@ -1204,33 +1258,86 @@ final class CF {
         static::$internalCache = [];
     }
 
+    const MAINTENANCE_COOKIE = 'cf_maintenance_bypass';
+
+    const MAINTENANCE_UP = 'up';
+
+    const MAINTENANCE_DOWN = 'down';
+
+    const MAINTENANCE_BYPASS = 'bypass';
+
+    const MAINTENANCE_GRANT = 'grant';
+
+    /**
+     * Determine if the application is down for maintenance.
+     *
+     * @return false|CHTTP_Response
+     */
     public static function isDownForMaintenance() {
         $file = CF::findFile('data', 'down');
+        if ($file == null) {
+            return false;
+        }
 
-        if ($file != null) {
-            $data = @include $file;
-            $viewName = 'system.maintenance';
-            $down = false;
-            if (is_array($data)) {
-                $down = carr::get($data, 'down', true);
-                if ($down) {
-                    $request = CHTTP::request();
+        $data = @include $file;
+        $request = CHTTP::request();
+        $decision = self::maintenanceDecision($data, (string) $request->path(), (array) $request->cookie());
 
-                    if (isset($request->cookie()[carr::get($data, 'cookie', '')])) {
-                        return false;
-                    }
-                    $viewName = carr::get($data, 'view', $viewName);
-                }
+        if ($decision == self::MAINTENANCE_UP || $decision == self::MAINTENANCE_BYPASS) {
+            return false;
+        }
+
+        if ($decision == self::MAINTENANCE_GRANT) {
+            return c::redirect(curl::base())->withCookie(
+                CHTTP::cookie()->make(self::MAINTENANCE_COOKIE, (string) carr::get($data, 'secret'), 60 * 12)
+            );
+        }
+
+        return c::response()->view(carr::get($data, 'view', 'system.maintenance'), ['data' => $data], 503);
+    }
+
+    /**
+     * Resolve the maintenance decision from configuration and request values.
+     *
+     * @param mixed  $data   contents of `down.php`
+     * @param string $path   request path
+     * @param array  $cookie request cookies
+     *
+     * @return string one of the `MAINTENANCE_*` constants
+     */
+    public static function maintenanceDecision($data, $path, array $cookie = []) {
+        if (!is_array($data) || !carr::get($data, 'down', false)) {
+            return self::MAINTENANCE_UP;
+        }
+
+        $secret = (string) carr::get($data, 'secret', '');
+        if (strlen($secret) > 0) {
+            if (trim((string) $path, '/') === $secret) {
+                return self::MAINTENANCE_GRANT;
             }
 
-            if ($down) {
-                return c::response()->view($viewName, ['data' => $data], 503);
+            $value = (string) carr::get($cookie, self::MAINTENANCE_COOKIE, '');
+            if (strlen($value) > 0 && hash_equals($secret, $value)) {
+                return self::MAINTENANCE_BYPASS;
             }
         }
 
-        return false;
+        $legacy = (string) carr::get($data, 'cookie', '');
+        if (strlen($legacy) > 0 && array_key_exists($legacy, $cookie)) {
+            return self::MAINTENANCE_BYPASS;
+        }
+
+        return self::MAINTENANCE_DOWN;
     }
 
+    /**
+     * Run callback with specific appCode.
+     *
+     * @param string   $appCode
+     * @param callable $callback
+     *
+     * @return mixed
+     */
     public static function asAppCode($appCode, $callback) {
         if (is_callable($callback)) {
             $domain = CF::domain();

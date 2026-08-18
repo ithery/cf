@@ -1,5 +1,5 @@
 (function ($) {
-    var csscls = PhpDebugBar.utils.makecsscls('phpdebugbar-widgets-');
+    var csscls = window.PhpDebugBar.utils.makecsscls('phpdebugbar-widgets-');
 
     /**
      * Widget for the displaying cache events
@@ -7,8 +7,8 @@
      * Options:
      *  - data
      */
-    var CacheWidget = (PhpDebugBar.Widgets.CacheWidget =
-        PhpDebugBar.Widgets.TimelineWidget.extend({
+    window.CFCacheWidget = (window.PhpDebugBar.Widgets.CFCacheWidget =
+        window.PhpDebugBar.Widgets.TimelineWidget.extend({
             tagName: 'ul',
 
             className: csscls('timeline cache'),
@@ -19,6 +19,7 @@
                 $.ajax({
                     url: $(el).attr('data-url'),
                     type: 'DELETE',
+                    // eslint-disable-next-line no-unused-vars
                     success: function (result) {
                         $(el).fadeOut(200);
                     }
@@ -26,7 +27,8 @@
             },
 
             render: function () {
-                CacheWidget.__super__.render.apply(this);
+                // eslint-disable-next-line no-underscore-dangle
+                window.CFCacheWidget.__super__.render.apply(this);
 
                 this.bindAttr('data', function (data) {
                     if (data.measures) {
@@ -60,4 +62,4 @@
                 });
             }
         }));
-})(PhpDebugBar.$);
+}(window.PhpDebugBar.$));

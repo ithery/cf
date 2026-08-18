@@ -3,14 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2018, 5:55:30 AM
+ * @see CElement_Component_DataTable
  */
 trait CTrait_Element_ActionList_Header {
     /**
-     * @var CElement_List_ActionList
+     * @var null|CElement_List_ActionList
      */
     protected $headerActionList;
 
@@ -40,7 +37,7 @@ trait CTrait_Element_ActionList_Header {
     public function addHeaderAction($id = null) {
         $rowAct = $id;
         if (!($id instanceof CElement_Component_Action)) {
-            $rowAct = CElement_Factory::createComponent('Action', $id);
+            $rowAct = new CElement_Component_Action($id);
         }
         $this->getHeaderActionList()->add($rowAct);
 

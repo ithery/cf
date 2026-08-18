@@ -27,6 +27,7 @@ final class CVendor_Firebase_Request_CreateUser implements CVendor_Firebase_Requ
     /**
      * @return array<string, mixed>
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->prepareJsonSerialize();
     }

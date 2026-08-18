@@ -2,11 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *ž@since Nov 29, 2020
- */
 trait CComponent_Concern_InteractsWithPropertiesTrait {
     public function handleHydrateProperty($property, $value) {
         $newValue = $value;
@@ -71,7 +66,7 @@ trait CComponent_Concern_InteractsWithPropertiesTrait {
         return $data;
     }
 
-    public function getInitializedPropertyValue(\ReflectionProperty $property) {
+    public function getInitializedPropertyValue(ReflectionProperty $property) {
         // Ensures typed property is initialized in PHP >=7.4, if so, return its value,
         // if not initialized, return null (as expected in earlier PHP Versions)
         if (method_exists($property, 'isInitialized') && !$property->isInitialized($this)) {
@@ -116,11 +111,11 @@ trait CComponent_Concern_InteractsWithPropertiesTrait {
 
     public function propertyIsPublicAndNotDefinedOnBaseClass($propertyName) {
         return c::collect((new \ReflectionClass($this))->getProperties(\ReflectionMethod::IS_PUBLIC))
-                        ->reject(function ($property) {
-                            return $property->class === self::class;
-                        })
-                        ->pluck('name')
-                        ->search($propertyName) !== false;
+            ->reject(function ($property) {
+                return $property->class === self::class;
+            })
+            ->pluck('name')
+            ->search($propertyName) !== false;
     }
 
     public function fill($values) {

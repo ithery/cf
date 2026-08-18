@@ -6,6 +6,7 @@ use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\File\CouldNotReadFileException;
 use PHPStan\File\FileReader;
 use PHPStan\Rules\Rule;
@@ -13,12 +14,13 @@ use PHPStan\Rules\RuleErrorBuilder;
 use function dirname;
 use function is_dir;
 use function is_file;
-use function strpos;
+use function str_starts_with;
 
 /**
  * @implements Rule<Node\Stmt\Namespace_>
  */
-class PhpStanNamespaceIn3rdPartyPackageRule implements Rule
+#[RegisteredRule(level: 0)]
+final class PhpStanNamespaceIn3rdPartyPackageRule implements Rule
 {
 
 	public function __construct(private ApiRuleHelper $apiRuleHelper)
@@ -46,12 +48,13 @@ class PhpStanNamespaceIn3rdPartyPackageRule implements Rule
 		}
 
 		$packageName = $composerJson['name'] ?? null;
-		if ($packageName !== null && strpos($packageName, 'phpstan/') === 0) {
+		if ($packageName !== null && str_starts_with($packageName, 'phpstan/')) {
 			return [];
 		}
 
 		return [
 			RuleErrorBuilder::message('Declaring PHPStan namespace is not allowed in 3rd party packages.')
+				->identifier('phpstanApi.phpstanNamespace')
 				->tip("See:\n   https://phpstan.org/developing-extensions/backward-compatibility-promise")
 				->build(),
 		];

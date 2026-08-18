@@ -2,10 +2,8 @@
 
 class CNotification_Channel_CustomChannel extends CNotification_ChannelAbstract {
     /**
-     * @var \Opis\Closure\SerializableClosure
+     * @param array $config
      */
-    protected $messageHandler = null;
-
     public function __construct($config = []) {
         parent::__construct($config);
 
@@ -13,16 +11,11 @@ class CNotification_Channel_CustomChannel extends CNotification_ChannelAbstract 
     }
 
     /**
-     * @param Closure $messageHandler
+     * @param mixed $data
+     * @param mixed $logNotificationModel
      *
-     * @return $this
+     * @return mixed
      */
-    public function setMessageHandler($messageHandler) {
-        $this->messageHandler = new \Opis\Closure\SerializableClosure($messageHandler);
-
-        return $this;
-    }
-
     protected function handleMessage($data, $logNotificationModel) {
         return $this->messageHandler->__invoke($data, $logNotificationModel);
     }

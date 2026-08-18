@@ -3,11 +3,16 @@
 namespace PHPStan\Collectors;
 
 use JsonSerializable;
+use Override;
 use PhpParser\Node;
 use ReturnTypeWillChange;
 
-/** @api */
-class CollectedData implements JsonSerializable
+/**
+ * @api
+ *
+ * @phpstan-type CollectorData = array<string, array<class-string<Collector<Node, mixed>>, list<mixed>>>
+ */
+final class CollectedData implements JsonSerializable
 {
 
 	/**
@@ -49,6 +54,7 @@ class CollectedData implements JsonSerializable
 	 * @return mixed
 	 */
 	#[ReturnTypeWillChange]
+	#[Override]
 	public function jsonSerialize()
 	{
 		return [

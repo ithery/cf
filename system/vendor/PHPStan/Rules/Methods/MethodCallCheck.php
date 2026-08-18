@@ -2,41 +2,51 @@
 
 namespace PHPStan\Rules\Methods;
 
+use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\Name\FullyQualified;
 use PHPStan\Analyser\NullsafeOperatorHelper;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Internal\SprintfHelper;
-use PHPStan\Reflection\MethodReflection;
+use PHPStan\Reflection\ExtendedMethodReflection;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Rules\RuleError;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
 use PHPStan\Type\ErrorType;
+use PHPStan\Type\StaticType;
 use PHPStan\Type\Type;
 use PHPStan\Type\VerbosityLevel;
 use function count;
 use function sprintf;
 use function strtolower;
 
-class MethodCallCheck
+#[AutowiredService]
+final class MethodCallCheck
 {
 
 	public function __construct(
 		private ReflectionProvider $reflectionProvider,
 		private RuleLevelHelper $ruleLevelHelper,
+		#[AutowiredParameter]
 		private bool $checkFunctionNameCase,
+		#[AutowiredParameter]
 		private bool $reportMagicMethods,
 	)
 	{
 	}
 
 	/**
-	 * @return array{RuleError[], MethodReflection|null}
+	 * @return array{list<IdentifierRuleError>, ExtendedMethodReflection|null}
 	 */
 	public function check(
 		Scope $scope,
 		string $methodName,
 		Expr $var,
+		Identifier|Expr $astName,
 	): array
 	{
 		$typeResult = $this->ruleLevelHelper->findTypeToCheck(
@@ -50,14 +60,22 @@ class MethodCallCheck
 		if ($type instanceof ErrorType) {
 			return [$typeResult->getUnknownClassErrors(), null];
 		}
-		if (!$type->canCallMethods()->yes()) {
+
+		$typeForDescribe = $type;
+		if ($type instanceof StaticType) {
+			$typeForDescribe = $type->getStaticObjectType();
+		}
+		if (!$type->canCallMethods()->yes() || $type->isClassString()->yes()) {
 			return [
 				[
 					RuleErrorBuilder::message(sprintf(
 						'Cannot call method %s() on %s.',
 						$methodName,
-						$type->describe(VerbosityLevel::typeOnly()),
-					))->build(),
+						$typeForDescribe->describe(VerbosityLevel::typeOnly()),
+					))
+						->line($astName->getStartLine())
+						->identifier('method.nonObject')
+						->build(),
 				],
 				null,
 			];
@@ -91,7 +109,10 @@ class MethodCallCheck
 									'Call to private method %s() of parent class %s.',
 									$methodReflection->getName(),
 									$parentClassReflection->getDisplayName(),
-								))->build(),
+								))
+									->line($astName->getStartLine())
+									->identifier('method.private')
+									->build(),
 							],
 							$methodReflection,
 						];
@@ -101,13 +122,27 @@ class MethodCallCheck
 				}
 			}
 
+			if ($astName instanceof Expr) {
+				$methodExistsExpr = new Expr\FuncCall(new FullyQualified('method_exists'), [
+					new Arg($var),
+					new Arg($astName),
+				]);
+
+				if ($scope->getType($methodExistsExpr)->isTrue()->yes()) {
+					return [[], null];
+				}
+			}
+
 			return [
 				[
 					RuleErrorBuilder::message(sprintf(
 						'Call to an undefined method %s::%s().',
-						$type->describe(VerbosityLevel::typeOnly()),
+						$typeForDescribe->describe(VerbosityLevel::typeOnly()),
 						$methodName,
-					))->build(),
+					))
+						->line($astName->getStartLine())
+						->identifier('method.notFound')
+						->build(),
 				],
 				null,
 			];
@@ -123,7 +158,10 @@ class MethodCallCheck
 				$methodReflection->isPrivate() ? 'private' : 'protected',
 				$methodReflection->getName(),
 				$declaringClass->getDisplayName(),
-			))->build();
+			))
+				->line($astName->getStartLine())
+				->identifier(sprintf('method.%s', $methodReflection->isPrivate() ? 'private' : 'protected'))
+				->build();
 		}
 
 		if (
@@ -133,7 +171,10 @@ class MethodCallCheck
 		) {
 			$errors[] = RuleErrorBuilder::message(
 				sprintf('Call to method %s with incorrect case: %s', $messagesMethodName, $methodName),
-			)->build();
+			)
+				->line($astName->getStartLine())
+				->identifier('method.nameCase')
+				->build();
 		}
 
 		return [$errors, $methodReflection];

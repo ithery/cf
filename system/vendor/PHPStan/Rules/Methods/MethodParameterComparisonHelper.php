@@ -2,17 +2,20 @@
 
 namespace PHPStan\Rules\Methods;
 
+use PHPStan\Analyser\CollectedDataEmitter;
+use PHPStan\Analyser\NodeCallbackInvoker;
+use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Php\PhpVersion;
-use PHPStan\Reflection\MethodPrototypeReflection;
-use PHPStan\Reflection\ParameterReflectionWithPhpDocs;
-use PHPStan\Reflection\ParametersAcceptorSelector;
+use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ExtendedMethodReflection;
 use PHPStan\Reflection\Php\PhpMethodFromParserNodeReflection;
-use PHPStan\Rules\RuleError;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\ArrayType;
+use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\IterableType;
 use PHPStan\Type\MixedType;
-use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\VerbosityLevel;
@@ -22,7 +25,8 @@ use function array_slice;
 use function count;
 use function sprintf;
 
-class MethodParameterComparisonHelper
+#[AutowiredService]
+final class MethodParameterComparisonHelper
 {
 
 	public function __construct(private PhpVersion $phpVersion)
@@ -30,16 +34,21 @@ class MethodParameterComparisonHelper
 	}
 
 	/**
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
-	public function compare(MethodPrototypeReflection $prototype, PhpMethodFromParserNodeReflection $method, bool $ignorable = false): array
+	public function compare(
+		ExtendedMethodReflection $prototype,
+		ClassReflection $prototypeDeclaringClass,
+		PhpMethodFromParserNodeReflection $method,
+		Scope&NodeCallbackInvoker&CollectedDataEmitter $scope,
+		bool $ignorable,
+	): array
 	{
-		/** @var RuleError[] $messages */
+		/** @var list<IdentifierRuleError> $messages */
 		$messages = [];
 		$prototypeVariant = $prototype->getVariants()[0];
 
-		$methodVariant = ParametersAcceptorSelector::selectSingle($method->getVariants());
-		$methodParameters = $methodVariant->getParameters();
+		$methodParameters = $method->getParameters();
 
 		$prototypeAfterVariadic = false;
 		foreach ($prototypeVariant->getParameters() as $i => $prototypeParameter) {
@@ -48,11 +57,11 @@ class MethodParameterComparisonHelper
 					'Method %s::%s() overrides method %s::%s() but misses parameter #%d $%s.',
 					$method->getDeclaringClass()->getDisplayName(),
 					$method->getName(),
-					$prototype->getDeclaringClass()->getDisplayName(),
+					$prototypeDeclaringClass->getDisplayName(true),
 					$prototype->getName(),
 					$i + 1,
 					$prototypeParameter->getName(),
-				));
+				))->identifier('parameter.missing');
 
 				if (! $ignorable) {
 					$error->nonIgnorable();
@@ -64,6 +73,17 @@ class MethodParameterComparisonHelper
 			}
 
 			$methodParameter = $methodParameters[$i];
+			if ($prototype->acceptsNamedArguments()->yes()) {
+				if ($prototypeParameter->getName() !== $methodParameter->getName()) {
+					$scope->emitCollectedData(OverridingMethodRenamesParameterCollector::class, [
+						$prototypeDeclaringClass->getName(),
+						$prototype->getName(),
+						$method->getDeclaringClass()->getName(),
+						$prototypeParameter->getName(),
+						$methodParameter->getName(),
+					]);
+				}
+			}
 			if ($prototypeParameter->passedByReference()->no()) {
 				if (!$methodParameter->passedByReference()->no()) {
 					$error = RuleErrorBuilder::message(sprintf(
@@ -74,9 +94,9 @@ class MethodParameterComparisonHelper
 						$method->getName(),
 						$i + 1,
 						$prototypeParameter->getName(),
-						$prototype->getDeclaringClass()->getDisplayName(),
+						$prototypeDeclaringClass->getDisplayName(true),
 						$prototype->getName(),
-					));
+					))->identifier('parameter.byRef');
 
 					if (! $ignorable) {
 						$error->nonIgnorable();
@@ -93,9 +113,9 @@ class MethodParameterComparisonHelper
 					$method->getName(),
 					$i + 1,
 					$prototypeParameter->getName(),
-					$prototype->getDeclaringClass()->getDisplayName(),
+					$prototypeDeclaringClass->getDisplayName(true),
 					$prototype->getName(),
-				));
+				))->identifier('parameter.notByRef');
 
 				if (! $ignorable) {
 					$error->nonIgnorable();
@@ -115,7 +135,7 @@ class MethodParameterComparisonHelper
 								$methodParameter->getName(),
 								$method->getDeclaringClass()->getDisplayName(),
 								$method->getName(),
-							));
+							))->identifier('parameter.notOptional');
 
 							if (! $ignorable) {
 								$error->nonIgnorable();
@@ -134,9 +154,9 @@ class MethodParameterComparisonHelper
 							$method->getName(),
 							$i + 1,
 							$prototypeParameter->getName(),
-							$prototype->getDeclaringClass()->getDisplayName(),
+							$prototypeDeclaringClass->getDisplayName(true),
 							$prototype->getName(),
-						));
+						))->identifier('parameter.notVariadic');
 
 						if (! $ignorable) {
 							$error->nonIgnorable();
@@ -152,7 +172,7 @@ class MethodParameterComparisonHelper
 							$methodParameter->getName(),
 							$method->getDeclaringClass()->getDisplayName(),
 							$method->getName(),
-						));
+						))->identifier('parameter.notVariadic');
 
 						if (! $ignorable) {
 							$error->nonIgnorable();
@@ -165,9 +185,6 @@ class MethodParameterComparisonHelper
 				if ($this->phpVersion->supportsLessOverridenParametersWithVariadic()) {
 					$remainingPrototypeParameters = array_slice($prototypeVariant->getParameters(), $i);
 					foreach ($remainingPrototypeParameters as $j => $remainingPrototypeParameter) {
-						if (!$remainingPrototypeParameter instanceof ParameterReflectionWithPhpDocs) {
-							continue;
-						}
 						if ($methodParameter->getNativeType()->isSuperTypeOf($remainingPrototypeParameter->getNativeType())->yes()) {
 							continue;
 						}
@@ -182,9 +199,9 @@ class MethodParameterComparisonHelper
 							$i + $j + 1,
 							$remainingPrototypeParameter->getName(),
 							$remainingPrototypeParameter->getNativeType()->describe(VerbosityLevel::typeOnly()),
-							$prototype->getDeclaringClass()->getDisplayName(),
+							$prototypeDeclaringClass->getDisplayName(true),
 							$prototype->getName(),
-						));
+						))->identifier('method.childParameterType');
 
 						if (! $ignorable) {
 							$error->nonIgnorable();
@@ -202,9 +219,9 @@ class MethodParameterComparisonHelper
 					$method->getName(),
 					$i + 1,
 					$prototypeParameter->getName(),
-					$prototype->getDeclaringClass()->getDisplayName(),
+					$prototypeDeclaringClass->getDisplayName(true),
 					$prototype->getName(),
-				));
+				))->identifier('parameter.variadic');
 
 				if (! $ignorable) {
 					$error->nonIgnorable();
@@ -224,9 +241,9 @@ class MethodParameterComparisonHelper
 					$method->getName(),
 					$i + 1,
 					$prototypeParameter->getName(),
-					$prototype->getDeclaringClass()->getDisplayName(),
+					$prototypeDeclaringClass->getDisplayName(true),
 					$prototype->getName(),
-				));
+				))->identifier('parameter.notOptional');
 
 				if (! $ignorable) {
 					$error->nonIgnorable();
@@ -236,10 +253,6 @@ class MethodParameterComparisonHelper
 			}
 
 			$methodParameterType = $methodParameter->getNativeType();
-
-			if (!$prototypeParameter instanceof ParameterReflectionWithPhpDocs) {
-				continue;
-			}
 
 			$prototypeParameterType = $prototypeParameter->getNativeType();
 			if (!$this->phpVersion->supportsParameterTypeWidening()) {
@@ -254,9 +267,9 @@ class MethodParameterComparisonHelper
 						$i + 1,
 						$prototypeParameter->getName(),
 						$prototypeParameterType->describe(VerbosityLevel::typeOnly()),
-						$prototype->getDeclaringClass()->getDisplayName(),
+						$prototypeDeclaringClass->getDisplayName(true),
 						$prototype->getName(),
-					));
+					))->identifier('method.childParameterType');
 
 					if (! $ignorable) {
 						$error->nonIgnorable();
@@ -282,9 +295,9 @@ class MethodParameterComparisonHelper
 					$i + 1,
 					$prototypeParameter->getName(),
 					$prototypeParameterType->describe(VerbosityLevel::typeOnly()),
-					$prototype->getDeclaringClass()->getDisplayName(),
+					$prototypeDeclaringClass->getDisplayName(true),
 					$prototype->getName(),
-				));
+				))->identifier('method.childParameterType');
 
 				if (! $ignorable) {
 					$error->nonIgnorable();
@@ -302,9 +315,9 @@ class MethodParameterComparisonHelper
 					$i + 1,
 					$prototypeParameter->getName(),
 					$prototypeParameterType->describe(VerbosityLevel::typeOnly()),
-					$prototype->getDeclaringClass()->getDisplayName(),
+					$prototypeDeclaringClass->getDisplayName(true),
 					$prototype->getName(),
-				));
+				))->identifier('method.childParameterType');
 
 				if (! $ignorable) {
 					$error->nonIgnorable();
@@ -334,7 +347,7 @@ class MethodParameterComparisonHelper
 					$methodParameter->getName(),
 					$method->getDeclaringClass()->getDisplayName(),
 					$method->getName(),
-				));
+				))->identifier('parameter.notVariadic');
 
 				if (! $ignorable) {
 					$error->nonIgnorable();
@@ -355,21 +368,19 @@ class MethodParameterComparisonHelper
 				$methodParameter->getName(),
 				$method->getDeclaringClass()->getDisplayName(),
 				$method->getName(),
-			));
+			))->identifier('parameter.notOptional');
 
 			if (! $ignorable) {
 				$error->nonIgnorable();
 			}
 
 			$messages[] = $error->build();
-
-			continue;
 		}
 
 		return $messages;
 	}
 
-	public function isParameterTypeCompatible(Type $methodParameterType, Type $prototypeParameterType, bool $supportsContravariance): bool
+	private function isParameterTypeCompatible(Type $methodParameterType, Type $prototypeParameterType, bool $supportsContravariance): bool
 	{
 		return $this->isTypeCompatible($methodParameterType, $prototypeParameterType, $supportsContravariance, false);
 	}
@@ -402,7 +413,10 @@ class MethodParameterComparisonHelper
 				if ($prototypeParameterType instanceof ArrayType) {
 					return true;
 				}
-				if ($prototypeParameterType instanceof ObjectType && $prototypeParameterType->getClassName() === Traversable::class) {
+				if ($prototypeParameterType instanceof ConstantArrayType) {
+					return true;
+				}
+				if ($prototypeParameterType->isObject()->yes() && $prototypeParameterType->getObjectClassNames() === [Traversable::class]) {
 					return true;
 				}
 			}

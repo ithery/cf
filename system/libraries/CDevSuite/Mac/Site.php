@@ -2,8 +2,6 @@
 
 /**
  * Description of Site.
- *
- * @author Hery
  */
 class CDevSuite_Mac_Site extends CDevSuite_Site {
     /**
@@ -450,6 +448,11 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
         ));
     }
 
+    /**
+     * Unsecure all currently secured sites.
+     *
+     * @return void
+     */
     public function unsecureAll() {
         $tld = $this->config->read()['tld'];
 
@@ -632,6 +635,11 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
         $this->removeLoopbackPlist();
     }
 
+    /**
+     * Get the configured loopback address.
+     *
+     * @return string
+     */
     public function devsuiteLoopback() {
         return $this->config->read()['loopback'];
     }

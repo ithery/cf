@@ -11,42 +11,35 @@
  *
  * PHP version 5
  *
- * @category  Crypt
- * @package   DSA
  * @author    Jim Wigginton <terrafrost@php.net>
  * @copyright 2015 Jim Wigginton
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @link      http://phpseclib.sourceforge.net
  */
 
+declare(strict_types=1);
+
 namespace phpseclib3\Crypt\DSA\Formats\Keys;
 
-use ParagonIE\ConstantTime\Base64;
 use phpseclib3\Common\Functions\Strings;
 use phpseclib3\Exception\BadConfigurationException;
+use phpseclib3\Exception\UnexpectedValueException;
 use phpseclib3\Math\BigInteger;
 
 /**
  * XML Formatted DSA Key Handler
  *
- * @package DSA
  * @author  Jim Wigginton <terrafrost@php.net>
- * @access  public
  */
 abstract class XML
 {
     /**
      * Break a public or private key down into its constituent components
-     *
-     * @access public
-     * @param string $key
-     * @param string $password optional
-     * @return array
      */
-    public static function load($key, $password = '')
+    public static function load(string $key, ?string $password = null): array
     {
         if (!Strings::is_stringable($key)) {
-            throw new \UnexpectedValueException('Key should be a string - not a ' . gettype($key));
+            throw new UnexpectedValueException('Key should be a string - not a ' . gettype($key));
         }
 
         if (!class_exists('DOMDocument')) {
@@ -61,7 +54,7 @@ abstract class XML
         }
         if (!$dom->loadXML($key)) {
             libxml_use_internal_errors($use_errors);
-            throw new \UnexpectedValueException('Key does not appear to contain XML');
+            throw new UnexpectedValueException('Key does not appear to contain XML');
         }
         $xpath = new \DOMXPath($dom);
         $keys = ['p', 'q', 'g', 'y', 'j', 'seed', 'pgencounter'];
@@ -71,7 +64,7 @@ abstract class XML
             if (!$temp->length) {
                 continue;
             }
-            $value = new BigInteger(Base64::decode($temp->item(0)->nodeValue), 256);
+            $value = new BigInteger(Strings::base64_decode($temp->item(0)->nodeValue), 256);
             switch ($key) {
                 case 'p': // a prime modulus meeting the [DSS] requirements
                     // Parameters P, Q, and G can be public and common to a group of users. They might be known
@@ -102,7 +95,7 @@ abstract class XML
         libxml_use_internal_errors($use_errors);
 
         if (!isset($components['y'])) {
-            throw new \UnexpectedValueException('Key is missing y component');
+            throw new UnexpectedValueException('Key is missing y component');
         }
 
         switch (true) {
@@ -119,21 +112,14 @@ abstract class XML
      * Convert a public key to the appropriate format
      *
      * See https://www.w3.org/TR/xmldsig-core/#sec-DSAKeyValue
-     *
-     * @access public
-     * @param \phpseclib3\Math\BigInteger $p
-     * @param \phpseclib3\Math\BigInteger $q
-     * @param \phpseclib3\Math\BigInteger $g
-     * @param \phpseclib3\Math\BigInteger $y
-     * @return string
      */
-    public static function savePublicKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y)
+    public static function savePublicKey(BigInteger $p, BigInteger $q, BigInteger $g, BigInteger $y): string
     {
         return "<DSAKeyValue>\r\n" .
-               '  <P>' . Base64::encode($p->toBytes()) . "</P>\r\n" .
-               '  <Q>' . Base64::encode($q->toBytes()) . "</Q>\r\n" .
-               '  <G>' . Base64::encode($g->toBytes()) . "</G>\r\n" .
-               '  <Y>' . Base64::encode($y->toBytes()) . "</Y>\r\n" .
+               '  <P>' . Strings::base64_encode($p->toBytes()) . "</P>\r\n" .
+               '  <Q>' . Strings::base64_encode($q->toBytes()) . "</Q>\r\n" .
+               '  <G>' . Strings::base64_encode($g->toBytes()) . "</G>\r\n" .
+               '  <Y>' . Strings::base64_encode($y->toBytes()) . "</Y>\r\n" .
                '</DSAKeyValue>';
     }
 }

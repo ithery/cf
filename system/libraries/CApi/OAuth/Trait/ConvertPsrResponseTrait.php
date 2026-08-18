@@ -2,7 +2,7 @@
 
 trait CApi_OAuth_Trait_ConvertPsrResponseTrait {
     /**
-     * Convert a PSR7 response to a Illuminate Response.
+     * Convert a PSR7 response to a CHTTP_Response.
      *
      * @param \Psr\Http\Message\ResponseInterface $psrResponse
      *

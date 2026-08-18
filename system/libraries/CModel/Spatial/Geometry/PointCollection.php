@@ -8,12 +8,18 @@ abstract class CModel_Spatial_Geometry_PointCollection extends CModel_Spatial_Ge
      */
     protected $collectionItemType = CModel_Spatial_Geometry_Point::class;
 
+    /**
+     * Returns a string representation of the points in the collection as a comma-separated list of pairs of longitude and latitude values.
+     *
+     * @return string The string representation of the points in the collection
+     */
     public function toPairList() {
         return implode(',', array_map(function (CModel_Spatial_Geometry_Point $point) {
             return $point->toPair();
         }, $this->items));
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->validateItemType($value);
 

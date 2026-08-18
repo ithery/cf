@@ -11,19 +11,16 @@ class DatabaseAbstractSchemaGrammarTest extends TestCase {
         $grammar = new class() extends CDatabase_Schema_Grammar {
         };
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('This database driver does not support creating databases.');
-
-        $grammar->compileCreateDatabase('foo', m::mock(Connection::class));
+        $this->assertSame(
+            'create database "foo"',
+            $grammar->compileCreateDatabase('foo', m::mock(CDatabase_Connection::class))
+        );
     }
 
     public function testDropDatabaseIfExists() {
         $grammar = new class() extends CDatabase_Schema_Grammar {
         };
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('This database driver does not support dropping databases.');
-
-        $grammar->compileDropDatabaseIfExists('foo');
+        $this->assertSame('drop database if exists "foo"', $grammar->compileDropDatabaseIfExists('foo'));
     }
 }

@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteSshListCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteSshListCommand extends CConsole_Command_DevSuiteCommand {
     /**
@@ -11,6 +9,10 @@ class CConsole_Command_DevSuite_DevSuiteSshListCommand extends CConsole_Command_
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_SshListCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Ssh_ListCommand::class;
+
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:ssh:list';
 }

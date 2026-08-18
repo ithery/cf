@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Renderable;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -45,7 +48,7 @@ class CHTTP_Response extends SymfonyResponse {
             $this->header('Content-Type', 'application/json');
 
             $content = $this->morphToJson($content);
-        } elseif ($content instanceof CInterface_Renderable) {
+        } elseif ($content instanceof Renderable) {
             // If this content implements the "Renderable" interface then we will call the
             // render method on the object so we will avoid any "__toString" exceptions
             // that might be thrown and have their errors obscured by PHP's handling.
@@ -65,8 +68,8 @@ class CHTTP_Response extends SymfonyResponse {
      * @return bool
      */
     protected function shouldBeJson($content) {
-        return $content instanceof CInterface_Arrayable
-                || $content instanceof CInterface_Jsonable
+        return $content instanceof Arrayable
+                || $content instanceof Jsonable
                 || $content instanceof ArrayObject
                 || $content instanceof JsonSerializable
                 || is_array($content);
@@ -80,9 +83,9 @@ class CHTTP_Response extends SymfonyResponse {
      * @return string
      */
     protected function morphToJson($content) {
-        if ($content instanceof CInterface_Jsonable) {
+        if ($content instanceof Jsonable) {
             return $content->toJson();
-        } elseif ($content instanceof CInterface_Arrayable) {
+        } elseif ($content instanceof Arrayable) {
             return json_encode($content->toArray());
         }
 

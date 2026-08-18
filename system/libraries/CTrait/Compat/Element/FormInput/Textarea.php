@@ -16,6 +16,7 @@ trait CTrait_Compat_Element_FormInput_Textarea {
      * @deprecated since version 1.2, use setCol
      */
     public function set_col($col) {
+        /** @var CElement_FormInput_Textarea $this */
         return $this->setCol($col);
     }
 
@@ -25,6 +26,7 @@ trait CTrait_Compat_Element_FormInput_Textarea {
      * @deprecated since version 1.2 , use setRow
      */
     public function set_row($row) {
+        /** @var CElement_FormInput_Textarea $this */
         return $this->setRow($row);
     }
 
@@ -34,6 +36,7 @@ trait CTrait_Compat_Element_FormInput_Textarea {
      * @deprecated since version 1.2, use setPlaceholder
      */
     public function set_placeholder($placeholder) {
+        /** @var CElement_FormInput_Textarea $this */
         return $this->setPlaceholder($placeholder);
     }
 }

@@ -109,6 +109,13 @@ class CElement_Component_Blockly_BlockHelper {
 
     const COLOUR_BLEND = 'colour_blend';
 
+    /**
+     * @param string $blockName
+     *
+     * @throws Exception
+     *
+     * @return string
+     */
     public static function renderBlock($blockName) {
         $renderFunctionName = 'render' . carr::reduce(explode('_', $blockName), function ($output, $value) {
             return $output . ucfirst(cstr::camel($value));
@@ -120,42 +127,78 @@ class CElement_Component_Blockly_BlockHelper {
         throw new Exception('No function ' . $renderFunctionName . ' is defined in BlockHelper');
     }
 
+    /**
+     * @return string
+     */
     public static function renderControlsIf() {
         return '<block type="controls_if"></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderLogicCompare() {
         return '<block type="logic_compare"></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderLogicOperation() {
         return '<block type="logic_operation"></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderLogicNegate() {
         return '<block type="logic_negate"></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderLogicBoolean() {
         return '<block type="logic_boolean"></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderLogicNull() {
         return '<block type="logic_null"></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderLogicTernary() {
         return '<block type="logic_ternary"></block>';
     }
 
+    /**
+     * @param int $num
+     *
+     * @return string
+     */
     public static function renderControlsRepeatExt($num = 10) {
         return '<block type="controls_repeat_ext"><value name="TIMES"><shadow type="math_number"><field name="NUM">' . $num . '</field></shadow></value></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderControlsWhileUntil() {
         return '<block type="controls_whileUntil"></block>';
     }
 
+    /**
+     * @param int $from
+     * @param int $to
+     * @param int $by
+     *
+     * @return string
+     */
     public static function renderControlsFor($from = 1, $to = 10, $by = 1) {
         return '<block type="controls_for">
         <value name="FROM">
@@ -176,20 +219,37 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderControlsForEach() {
         return '<block type="controls_forEach"></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderControlsFlowStatements() {
         return '<block type="controls_flow_statements"></block>';
     }
 
+    /**
+     * @param int $number
+     *
+     * @return string
+     */
     public static function renderMathNumber($number = 123) {
         return '<block type="math_number">
         <field name="NUM">' . $number . '</field>
       </block>';
     }
 
+    /**
+     * @param int $a
+     * @param int $b
+     *
+     * @return string
+     */
     public static function renderMathArithmetic($a = 1, $b = 1) {
         return '<block type="math_arithmetic">
         <value name="A">
@@ -205,6 +265,11 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param int $number
+     *
+     * @return string
+     */
     public static function renderMathSingle($number = 9) {
         return '<block type="math_single">
         <value name="NUM">
@@ -215,6 +280,11 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param int $number
+     *
+     * @return string
+     */
     public static function renderMathTrig($number = 45) {
         return '<block type="math_trig">
         <value name="NUM">
@@ -225,10 +295,18 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderMathConstant() {
         return '<block type="math_constant"></block>';
     }
 
+    /**
+     * @param int $numberToCheck
+     *
+     * @return string
+     */
     public static function renderMathNumberProperty($numberToCheck = 0) {
         return '<block type="math_number_property">
         <value name="NUMBER_TO_CHECK">
@@ -239,9 +317,15 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param float $num
+     *
+     * @return string
+     */
     public static function renderMathRound($num = 3.1) {
-        return '<block type="math_number_property">
-        <value name="NUMBER_TO_CHECK">
+        return '<block type="math_round">
+        <field name="OP">ROUND</field>
+        <value name="NUM">
           <shadow type="math_number">
             <field name="NUM">' . $num . '</field>
           </shadow>
@@ -249,10 +333,19 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderMathOnList() {
         return '<block type="math_on_list"></block>';
     }
 
+    /**
+     * @param int $dividend
+     * @param int $divisor
+     *
+     * @return string
+     */
     public static function renderMathModulo($dividend = 64, $divisor = 10) {
         return '<block type="math_modulo">
         <value name="DIVIDEND">
@@ -268,6 +361,13 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param int $value
+     * @param int $low
+     * @param int $high
+     *
+     * @return string
+     */
     public static function renderMathConstrain($value = 50, $low = 1, $high = 100) {
         return '<block type="math_constrain">
         <value name="VALUE">
@@ -288,6 +388,12 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param int $from
+     * @param int $to
+     *
+     * @return string
+     */
     public static function renderMathRandomInt($from = 1, $to = 100) {
         return '<block type="math_random_int">
         <value name="FROM">
@@ -303,10 +409,19 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderMathRandomFloat() {
         return '<block type="math_random_float"></block>';
     }
 
+    /**
+     * @param int $x
+     * @param int $y
+     *
+     * @return string
+     */
     public static function renderMathAtan2($x = 1, $y = 1) {
         return '<block type="math_atan2">
         <value name="X">
@@ -322,14 +437,25 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderText() {
         return '<block type="text"></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderTextJoin() {
         return '<block type="text_join"></block>';
     }
 
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
     public static function renderTextAppend($text = '') {
         return '<block type="text_append">
         <value name="TEXT">
@@ -338,6 +464,11 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
     public static function renderTextLength($text = 'abc') {
         return ' <block type="text_length">
         <value name="VALUE">
@@ -348,6 +479,11 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
     public static function renderTextIsEmpty($text = '') {
         return '<block type="text_isEmpty">
         <value name="VALUE">
@@ -358,6 +494,11 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
     public static function renderTextIndexOf($text = 'abc') {
         return '<block type="text_indexOf">
         <value name="VALUE">
@@ -373,6 +514,9 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderTextCharAt() {
         return '<block type="text_charAt">
         <value name="VALUE">
@@ -383,6 +527,9 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderTextGetSubstring() {
         return '<block type="text_getSubstring">
         <value name="STRING">
@@ -393,6 +540,9 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderTextChangeCase() {
         return '<block type="text_changeCase">
         <value name="TEXT">
@@ -403,6 +553,11 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
     public static function renderTextTrim($text = 'abc') {
         return '<block type="text_trim">
         <value name="TEXT">
@@ -413,6 +568,11 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
     public static function renderTextPrint($text = 'abc') {
         return '<block type="text_print">
         <value name="TEXT">
@@ -423,6 +583,11 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param string $text
+     *
+     * @return string
+     */
     public static function renderTextPromptExt($text = 'abc') {
         return '<block type="text_prompt_ext">
         <value name="TEXT">
@@ -433,12 +598,20 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderListsCreateWith() {
         return '<block type="lists_create_with">
         <mutation items="0"></mutation>
       </block>';
     }
 
+    /**
+     * @param int $num
+     *
+     * @return string
+     */
     public static function renderListsRepeat($num = 5) {
         return '<block type="lists_repeat">
         <value name="NUM">
@@ -449,14 +622,23 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderListsLength() {
         return '<block type="lists_length"></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderListsIsEmpty() {
         return '<block type="lists_isEmpty"></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderListsIndexOf() {
         return '<block type="lists_indexOf">
         <value name="VALUE">
@@ -467,6 +649,9 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderListsGetIndex() {
         return '<block type="lists_getIndex">
         <value name="VALUE">
@@ -477,6 +662,9 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderListsSetIndex() {
         return '<block type="lists_setIndex">
         <value name="LIST">
@@ -487,6 +675,9 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderListsGetSublist() {
         return '<block type="lists_getSublist">
         <value name="LIST">
@@ -497,6 +688,11 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param string $delimiter
+     *
+     * @return string
+     */
     public static function renderListsSplit($delimiter = ',') {
         return '<block type="lists_split">
         <value name="DELIM">
@@ -507,18 +703,34 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderListsSort() {
         return '<block type="lists_sort"></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderColourPicker() {
         return '<block type="colour_picker"></block>';
     }
 
+    /**
+     * @return string
+     */
     public static function renderColourRandom() {
         return '<block type="colour_random"></block>';
     }
 
+    /**
+     * @param int $red
+     * @param int $green
+     * @param int $blue
+     *
+     * @return string
+     */
     public static function renderColourRgb($red = 100, $green = 50, $blue = 0) {
         return '<block type="colour_rgb">
         <value name="RED">
@@ -539,6 +751,13 @@ class CElement_Component_Blockly_BlockHelper {
       </block>';
     }
 
+    /**
+     * @param string $colour1
+     * @param string $colour2
+     * @param float $ratio
+     *
+     * @return string
+     */
     public static function renderColourBlend($colour1 = '#ff0000', $colour2 = '#3333ff', $ratio = 0.5) {
         return '<block type="colour_blend">
         <value name="COLOUR1">

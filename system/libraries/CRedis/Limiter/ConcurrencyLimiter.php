@@ -97,7 +97,7 @@ class CRedis_Limiter_ConcurrencyLimiter {
             return $this->name . $i;
         }, range(1, $this->maxLocks));
 
-        return $this->redis->doEval(...array_merge(
+        return $this->redis->eval(...array_merge(
             [$this->lockScript(), count($slots)],
             array_merge($slots, [$this->name, $this->releaseAfter, $id])
         ));
@@ -133,7 +133,7 @@ LUA;
      * @return void
      */
     protected function release($key, $id) {
-        $this->redis->doEval($this->releaseScript(), 1, $key, $id);
+        $this->redis->eval($this->releaseScript(), 1, $key, $id);
     }
 
     /**

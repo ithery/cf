@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 12, 2019, 4:15:09 PM
- */
 class CDaemon_Helper {
     /**
      * @var int
@@ -34,7 +28,7 @@ class CDaemon_Helper {
      */
     public function releaseLock($lockFile) {
         if (!array_key_exists($lockFile, $this->lockHandles)) {
-            throw new Exception("Lock NOT held - bug? Lockfile: ${lockFile}");
+            throw new Exception("Lock NOT held - bug? Lockfile: {$lockFile}");
         }
         if ($this->lockHandles[$lockFile]) {
             ftruncate($this->lockHandles[$lockFile], 0);
@@ -153,6 +147,10 @@ class CDaemon_Helper {
 
     public static function getPidFile($className) {
         return static::pidPath() . $className . '.pid';
+    }
+
+    public static function getSupervisorPidFile($className, $name) {
+        return static::pidPath() . $className . DS . $name . '.pid';
     }
 
     public static function getLogFileList($className) {

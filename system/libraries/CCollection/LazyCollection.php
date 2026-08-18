@@ -191,6 +191,15 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
     }
 
     /**
+     * Determine if the collection contains a single item.
+     *
+     * @return bool
+     */
+    public function containsOneItem() {
+        return $this->count() === 1;
+    }
+
+    /**
      * Cross join the given iterables, returning all possible permutations.
      *
      * @param array ...$arrays
@@ -340,7 +349,7 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
      *
      * @return static
      */
-    public function filter(callable $callback = null) {
+    public function filter(?callable $callback = null) {
         if (is_null($callback)) {
             $callback = function ($value) {
                 return (bool) $value;
@@ -364,7 +373,7 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
      *
      * @return mixed
      */
-    public function first(callable $callback = null, $default = null) {
+    public function first(?callable $callback = null, $default = null) {
         $iterator = $this->getIterator();
 
         if (is_null($callback)) {
@@ -382,6 +391,33 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
         }
 
         return c::value($default);
+    }
+
+    /**
+     * Get the first item in the collection but throw an exception if no matching items exist.
+     *
+     * @param mixed $key
+     * @param mixed $operator
+     * @param mixed $value
+     *
+     * @throws CCollection_Exception_ItemNotFoundException
+     *
+     * @return mixed
+     */
+    public function firstOrFail($key = null, $operator = null, $value = null) {
+        $filter = func_num_args() > 1
+            ? $this->operatorForWhere(...func_get_args())
+            : $key;
+
+        $placeholder = new stdClass();
+
+        $item = $this->first($filter, $placeholder);
+
+        if ($item === $placeholder) {
+            throw new CCollection_Exception_ItemNotFoundException();
+        }
+
+        return $item;
     }
 
     /**
@@ -498,6 +534,29 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
     }
 
     /**
+     * Determine if any of the keys exist in the collection.
+     *
+     * @param mixed $key
+     *
+     * @return bool
+     */
+    public function hasAny($key) {
+        if ($this->isEmpty()) {
+            return false;
+        }
+
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $value) {
+            if ($this->has($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param string      $value
@@ -573,7 +632,7 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
      *
      * @return mixed
      */
-    public function last(callable $callback = null, $default = null) {
+    public function last(?callable $callback = null, $default = null) {
         $needle = $placeholder = new stdClass();
 
         foreach ($this as $key => $value) {
@@ -627,6 +686,19 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
             foreach ($this as $key => $value) {
                 yield $key => $callback($value, $key);
             }
+        });
+    }
+
+    /**
+     * Run a map over each of the items, transforming them using the given transform method(s).
+     *
+     * @param mixed $transforms
+     *
+     * @return static
+     */
+    public function mapTransform($transforms) {
+        return $this->map(function ($item) use ($transforms) {
+            return c::manager()->transform()->call($transforms, $item);
         });
     }
 
@@ -890,6 +962,64 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
      */
     public function shuffle($seed = null) {
         return $this->passthru('shuffle', func_get_args());
+    }
+
+    /**
+     * Slide a window of a given size over the items, with a given step.
+     *
+     * @param int $size
+     * @param int $step
+     *
+     * @return static
+     */
+    public function sliding($size = 2, $step = 1) {
+        return new static(function () use ($size, $step) {
+            $iterator = $this->getIterator();
+
+            $chunk = [];
+
+            while ($iterator->valid()) {
+                $chunk[$iterator->key()] = $iterator->current();
+
+                if (count($chunk) == $size) {
+                    yield (new static($chunk))->tap(function () use (&$chunk, $step) {
+                        $chunk = array_slice($chunk, $step, null, true);
+                    });
+
+                    // If the step is bigger than the size, skip the items in the gap.
+                    for ($i = 1; $i <= $step - $size && $iterator->valid(); $i++) {
+                        $iterator->next();
+                    }
+                }
+
+                $iterator->next();
+            }
+        });
+    }
+
+    /**
+     * Get the first item in the collection but throw an exception if no items exist or more than one item exists.
+     *
+     * @param mixed $key
+     * @param mixed $operator
+     * @param mixed $value
+     *
+     * @throws CCollection_Exception_ItemNotFoundException
+     * @throws CCollection_Exception_MultipleItemsFoundException
+     *
+     * @return mixed
+     */
+    public function sole($key = null, $operator = null, $value = null) {
+        $filter = func_num_args() > 1
+            ? $this->operatorForWhere(...func_get_args())
+            : $key;
+
+        return $this
+            ->unless($filter == null)
+            ->filter($filter)
+            ->take(2)
+            ->collect()
+            ->sole();
     }
 
     /**
@@ -1237,6 +1367,15 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
     }
 
     /**
+     * Flatten a multi-dimensional associative array with dots.
+     *
+     * @return static
+     */
+    public function dot() {
+        return $this->passthru('dot', []);
+    }
+
+    /**
      * Convert a flatten "dot" notation array into an expanded array.
      *
      * @return static
@@ -1280,6 +1419,15 @@ class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contrac
                 yield $item;
             }
         });
+    }
+
+    /**
+     * Get a base Support collection instance from this collection.
+     *
+     * @return CCollection
+     */
+    public function toBase() {
+        return new CCollection($this);
     }
 
     /**

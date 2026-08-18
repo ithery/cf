@@ -7,10 +7,10 @@ use Nette\Utils\Strings;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\Type\Constant\ConstantStringType;
-use PHPStan\Type\TypeUtils;
+use PHPStan\Type\Regex\RegexExpressionHelper;
 use function in_array;
 use function sprintf;
 use function str_starts_with;
@@ -19,8 +19,15 @@ use function strtolower;
 /**
  * @implements Rule<Node\Expr\FuncCall>
  */
-class RegularExpressionPatternRule implements Rule
+#[RegisteredRule(level: 0)]
+final class RegularExpressionPatternRule implements Rule
 {
+
+	public function __construct(
+		private RegexExpressionHelper $regexExpressionHelper,
+	)
+	{
+	}
 
 	public function getNodeType(): string
 	{
@@ -38,7 +45,7 @@ class RegularExpressionPatternRule implements Rule
 				continue;
 			}
 
-			$errors[] = RuleErrorBuilder::message(sprintf('Regex pattern is invalid: %s', $errorMessage))->build();
+			$errors[] = RuleErrorBuilder::message(sprintf('Regex pattern is invalid: %s', $errorMessage))->identifier('regexp.pattern')->build();
 		}
 
 		return $errors;
@@ -65,51 +72,48 @@ class RegularExpressionPatternRule implements Rule
 
 		$patternStrings = [];
 
-		foreach (TypeUtils::getConstantStrings($patternType) as $constantStringType) {
-			if (
-				!in_array($functionName, [
-					'preg_match',
-					'preg_match_all',
-					'preg_split',
-					'preg_grep',
-					'preg_replace',
-					'preg_replace_callback',
-					'preg_filter',
-				], true)
-			) {
-				continue;
+		if (
+			in_array($functionName, [
+				'preg_match',
+				'preg_match_all',
+				'preg_split',
+				'preg_grep',
+				'preg_replace',
+				'preg_replace_callback',
+				'preg_filter',
+			], true)
+		) {
+			if ($patternNode instanceof Node\Expr\BinaryOp\Concat) {
+				$patternType = $this->regexExpressionHelper->resolvePatternConcat($patternNode, $scope);
 			}
-
-			$patternStrings[] = $constantStringType->getValue();
+			foreach ($patternType->getConstantStrings() as $constantStringType) {
+				$patternStrings[] = $constantStringType->getValue();
+			}
 		}
 
-		foreach ($patternType->getConstantArrays() as $constantArrayType) {
-			if (
-				in_array($functionName, [
-					'preg_replace',
-					'preg_replace_callback',
-					'preg_filter',
-				], true)
-			) {
+		if (
+			in_array($functionName, [
+				'preg_replace',
+				'preg_replace_callback',
+				'preg_filter',
+			], true)
+		) {
+			foreach ($patternType->getConstantArrays() as $constantArrayType) {
 				foreach ($constantArrayType->getValueTypes() as $arrayKeyType) {
-					if (!$arrayKeyType instanceof ConstantStringType) {
-						continue;
+					foreach ($arrayKeyType->getConstantStrings() as $constantString) {
+						$patternStrings[] = $constantString->getValue();
 					}
-
-					$patternStrings[] = $arrayKeyType->getValue();
 				}
 			}
+		}
 
-			if ($functionName !== 'preg_replace_callback_array') {
-				continue;
-			}
-
-			foreach ($constantArrayType->getKeyTypes() as $arrayKeyType) {
-				if (!$arrayKeyType instanceof ConstantStringType) {
-					continue;
+		if ($functionName === 'preg_replace_callback_array') {
+			foreach ($patternType->getConstantArrays() as $constantArrayType) {
+				foreach ($constantArrayType->getKeyTypes() as $arrayKeyType) {
+					foreach ($arrayKeyType->getConstantStrings() as $constantString) {
+						$patternStrings[] = $constantString->getValue();
+					}
 				}
-
-				$patternStrings[] = $arrayKeyType->getValue();
 			}
 		}
 

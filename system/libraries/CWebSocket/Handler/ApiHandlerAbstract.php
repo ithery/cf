@@ -63,7 +63,7 @@ abstract class CWebSocket_Handler_ApiHandlerAbstract implements HttpServerInterf
      *
      * @return void
      */
-    public function onOpen(ConnectionInterface $connection, RequestInterface $request = null) {
+    public function onOpen(ConnectionInterface $connection, ?RequestInterface $request = null) {
         $this->request = $request;
 
         $this->contentLength = $this->findContentLength($request->getHeaders());

@@ -4,36 +4,43 @@ namespace PHPStan\Analyser;
 
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Reflection\MethodReflection;
-use PHPStan\Reflection\ParametersAcceptor;
+use PHPStan\Reflection\ParameterReflection;
+use PHPStan\Reflection\Php\PhpFunctionFromParserNodeReflection;
+use PHPStan\Type\ClosureType;
 
 interface InternalScopeFactory
 {
 
 	/**
-	 * @param ExpressionTypeHolder[] $expressionTypes
+	 * @param array<string, ExpressionTypeHolder> $expressionTypes
+	 * @param array<string, ExpressionTypeHolder> $nativeExpressionTypes
 	 * @param array<string, ConditionalExpressionHolder[]> $conditionalExpressions
-	 * @param array<string, true> $currentlyAssignedExpressions
+	 * @param list<non-empty-string> $inClosureBindScopeClasses
+	 * @param array<string, bool> $currentlyAssignedExpressions
 	 * @param array<string, true> $currentlyAllowedUndefinedExpressions
-	 * @param ExpressionTypeHolder[] $nativeExpressionTypes
-	 * @param array<MethodReflection|FunctionReflection> $inFunctionCallsStack
+	 * @param list<array{FunctionReflection|MethodReflection|null, ParameterReflection|null}> $inFunctionCallsStack
 	 */
 	public function create(
 		ScopeContext $context,
 		bool $declareStrictTypes = false,
-		FunctionReflection|MethodReflection|null $function = null,
+		PhpFunctionFromParserNodeReflection|null $function = null,
 		?string $namespace = null,
 		array $expressionTypes = [],
+		array $nativeExpressionTypes = [],
 		array $conditionalExpressions = [],
-		?string $inClosureBindScopeClass = null,
-		?ParametersAcceptor $anonymousFunctionReflection = null,
+		array $inClosureBindScopeClasses = [],
+		?ClosureType $anonymousFunctionReflection = null,
 		bool $inFirstLevelStatement = true,
 		array $currentlyAssignedExpressions = [],
 		array $currentlyAllowedUndefinedExpressions = [],
-		array $nativeExpressionTypes = [],
 		array $inFunctionCallsStack = [],
 		bool $afterExtractCall = false,
-		?Scope $parentScope = null,
+		?MutatingScope $parentScope = null,
 		bool $nativeTypesPromoted = false,
 	): MutatingScope;
+
+	public function toFiberFactory(): self;
+
+	public function toMutatingFactory(): self;
 
 }

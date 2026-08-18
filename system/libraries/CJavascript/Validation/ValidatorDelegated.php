@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 14, 2019, 1:20:13 PM
- */
 class CJavascript_Validation_ValidatorDelegated {
     use CJavascript_Validation_Trait_AccessProtectedTrait;
 

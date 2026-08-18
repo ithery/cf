@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 4:31:49 AM
- */
 abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
     use CTrait_Helper_InteractsWithTime;
 
@@ -300,7 +294,7 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
      */
     protected function enqueueUsing($job, $payload, $queue, $delay, $callback) {
         if ($this->shouldDispatchAfterCommit($job)) {
-            $transactionManager = c::db()->getTransactionManager();
+            $transactionManager = CDatabase::transactionManager();
 
             return $transactionManager->addCallback(
                 function () use ($payload, $queue, $delay, $callback, $job) {

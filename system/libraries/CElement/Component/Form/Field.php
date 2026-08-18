@@ -3,67 +3,130 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 17, 2018, 2:29:43 AM
+ * Renders a form field wrapper: label + control(s) + optional info text, wrapped
+ * in a `.control-group.form-group` div, around whatever child control element(s)
+ * are added to it.
  */
 class CElement_Component_Form_Field extends CElement_Component {
     use CTrait_Compat_Element_Form_Field;
     use CTrait_Element_Property_Label;
     use CTrait_Element_Property_Tooltip;
 
+    /**
+     * Extra CSS classes added to the outer group div.
+     *
+     * @var array
+     */
     protected $groupClasses = [];
 
-    protected $group_id = '';
+    /**
+     * @var string
+     */
+    protected $groupId = '';
 
-    protected $group_custom_css = [];
+    /**
+     * Custom CSS style declarations for the outer group div, keyed by property name.
+     *
+     * @var array
+     */
+    protected $groupCustomCss = [];
 
-    protected $show_label = [];
+    /**
+     * @var bool
+     */
+    protected $showLabel = [];
 
-    protected $label_size = [];
+    /**
+     * One of 'small', 'medium', 'large', 'none', or a numeric value.
+     *
+     * @var int|string
+     */
+    protected $labelSize = [];
 
+    /**
+     * @var bool
+     */
     protected $fullwidth = [];
 
+    /**
+     * @var string
+     */
     protected $infoText = '';
 
-    protected $label_class = [];
+    /**
+     * Extra CSS classes added to the label element.
+     *
+     * @var array
+     */
+    protected $labelClass = [];
 
-    protected $control_class = [];
+    /**
+     * Extra CSS classes added to the control wrapper.
+     *
+     * @var array
+     */
+    protected $controlClass = [];
 
-    protected $style_form_group;
+    /**
+     * @var null|string
+     */
+    protected $styleFormGroup;
 
-    protected $inline_without_default;
+    /**
+     * @var string
+     */
+    protected $inlineWithoutDefault;
 
+    /**
+     * @var bool
+     */
     protected $labelRequired = false;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id = '') {
         parent::__construct($id);
         $this->tag = 'div';
         $this->label = '';
-        $this->show_label = true;
-        $this->label_size = 'medium';
+        $this->showLabel = true;
+        $this->labelSize = 'medium';
         $this->infoText = '';
         $this->fullwidth = false;
-        $this->group_id = '';
+        $this->groupId = '';
         $this->groupClasses = [];
-        $this->group_custom_css = [];
-        $this->style_form_group = null;
-        $this->inline_without_default = 'inline_without_default';
+        $this->groupCustomCss = [];
+        $this->styleFormGroup = null;
+        $this->inlineWithoutDefault = 'inline_without_default';
         $this->labelRequired = false;
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         // @phpstan-ignore-next-line
         return new static($id);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setLabelRequired($bool = true) {
         $this->labelRequired = $bool;
 
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function toArray() {
         $data = [];
         $control_data = array_merge_recursive($data, parent::toArray());
@@ -87,6 +150,11 @@ class CElement_Component_Form_Field extends CElement_Component {
         return $data;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -95,14 +163,14 @@ class CElement_Component_Form_Field extends CElement_Component {
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
         }
-        $custom_css = $this->custom_css;
-        $custom_css = $this->renderStyle($custom_css);
-        if (strlen($custom_css) > 0) {
-            $custom_css = ' style="' . $custom_css . '"';
+        $customCss = $this->custom_css;
+        $customCss = $this->renderStyle($customCss);
+        if (strlen($customCss) > 0) {
+            $customCss = ' style="' . $customCss . '"';
         }
-        $addition_attribute = '';
+        $additionAttribute = '';
         foreach ($this->attr as $k => $v) {
-            $addition_attribute .= ' ' . $k . '="' . $v . '"';
+            $additionAttribute .= ' ' . $k . '="' . $v . '"';
         }
 
         $labelRequiredHtml = '';
@@ -111,23 +179,23 @@ class CElement_Component_Form_Field extends CElement_Component {
         }
 
         $classFormField = 'control-group form-group';
-        $label_class = '';
-        $control_class = '';
+        $labelClass = '';
+        $controlClass = '';
 
         $groupIdAttr = '';
-        if (strlen($this->group_id) > 0) {
-            $groupIdAttr = 'id="' . $this->group_id . '" ';
+        if (strlen($this->groupId) > 0) {
+            $groupIdAttr = 'id="' . $this->groupId . '" ';
         }
 
-        $label_class .= ' ' . implode(' ', $this->label_class);
-        $control_class .= ' ' . implode(' ', $this->control_class);
-        $html->appendln('<div ' . $groupIdAttr . ' class="' . $classFormField . ' ' . $classes . '" ' . $custom_css . $addition_attribute . '>')->incIndent();
-        if ($this->show_label) {
+        $labelClass .= ' ' . implode(' ', $this->labelClass);
+        $controlClass .= ' ' . implode(' ', $this->controlClass);
+        $html->appendln('<div ' . $groupIdAttr . ' class="' . $classFormField . ' ' . $classes . '" ' . $customCss . $additionAttribute . '>')->incIndent();
+        if ($this->showLabel) {
             if ($this->tooltip) {
                 $this->tooltip->addClass('ml-1');
             }
             $tooltipHtml = $this->tooltip ? $this->tooltip->html() : '';
-            $html->appendln('<label id="' . $this->id . '" class="form-label ' . $label_class . ' control-label">' . $labelRequiredHtml . $this->label . $tooltipHtml . '</label>')->br();
+            $html->appendln('<label id="' . $this->id . '" class="form-label ' . $labelClass . ' control-label">' . $labelRequiredHtml . $this->label . $tooltipHtml . '</label>')->br();
         }
 
         $html->appendln('<div class="controls">')->incIndent()->br();
@@ -145,6 +213,11 @@ class CElement_Component_Form_Field extends CElement_Component {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = CStringBuilder::factory()->setIndent($indent);
 
@@ -160,80 +233,138 @@ class CElement_Component_Form_Field extends CElement_Component {
         return $js->text();
     }
 
-    public function setStyleFormGroup($style_form_group) {
-        $this->style_form_group = $style_form_group;
+    /**
+     * @param null|string $styleFormGroup
+     *
+     * @return $this
+     */
+    public function setStyleFormGroup($styleFormGroup) {
+        $this->styleFormGroup = $styleFormGroup;
 
         return $this;
     }
 
+    /**
+     * @param string $id
+     *
+     * @return $this
+     */
     public function setGroupId($id) {
-        $this->group_id = $id;
+        $this->groupId = $id;
 
         return $this;
     }
 
+    /**
+     * @param string $class
+     *
+     * @return $this
+     */
     public function addGroupClass($class) {
         $this->groupClasses[] = $class;
 
         return $this;
     }
 
+    /**
+     * @param string $key
+     * @param string $val
+     *
+     * @return $this
+     */
     public function groupCustomCss($key, $val) {
-        $this->group_custom_css[$key] = $val;
+        $this->groupCustomCss[$key] = $val;
 
         return $this;
     }
 
+    /**
+     * @param int|string $size one of 'small', 'medium', 'large', 'none', or a numeric value
+     *
+     * @return $this
+     */
     public function setLabelSize($size) {
         if (in_array($size, ['small', 'medium', 'large', 'none']) || is_numeric($size)) {
-            $this->label_size = $size;
+            $this->labelSize = $size;
         }
 
         return $this;
     }
 
+    /**
+     * @param string $infoText
+     *
+     * @return $this
+     */
     public function setInfoText($infoText) {
         $this->infoText = $infoText;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function showLabel() {
-        $this->show_label = true;
+        $this->showLabel = true;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function hideLabel() {
-        $this->show_label = false;
+        $this->showLabel = false;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function styleFormInline() {
-        $this->style_form_group = 'inline';
+        $this->styleFormGroup = 'inline';
 
         return $this;
     }
 
-    public function addLabelClass($label_class) {
-        $this->label_class[] = $label_class;
+    /**
+     * @param string $labelClass
+     *
+     * @return $this
+     */
+    public function addLabelClass($labelClass) {
+        $this->labelClass[] = $labelClass;
 
         return $this;
     }
 
-    public function addControlClass($control_class) {
-        $this->control_class[] = $control_class;
+    /**
+     * @param string $controlClass
+     *
+     * @return $this
+     */
+    public function addControlClass($controlClass) {
+        $this->controlClass[] = $controlClass;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getInlineWithoutDefault() {
-        return $this->inline_without_default;
+        return $this->inlineWithoutDefault;
     }
 
-    public function setInlineWithoutDefault($inline_without_default) {
-        $this->inline_without_default = $inline_without_default;
+    /**
+     * @param string $inlineWithoutDefault
+     *
+     * @return $this
+     */
+    public function setInlineWithoutDefault($inlineWithoutDefault) {
+        $this->inlineWithoutDefault = $inlineWithoutDefault;
 
         return $this;
     }

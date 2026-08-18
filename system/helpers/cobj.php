@@ -1,9 +1,12 @@
 <?php
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated 1.6, use c::get
+ */
 class cobj {
     /**
-     * Get property value from object with safe implementation
+     * Get property value from object with safe implementation.
      *
      * @param object $object
      * @param string $key

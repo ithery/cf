@@ -1084,7 +1084,7 @@ class CManager_Asset_SCSS_Compiler {
                 list(, $name, $argValues, $content) = $child;
                 $mixin = $this->get(self::$namespaces['mixin'] . $name, false);
                 if (!$mixin) {
-                    $this->throwError("Undefined mixin ${name}");
+                    $this->throwError("Undefined mixin {$name}");
                 }
 
                 $callingScope = $this->env;
@@ -1133,7 +1133,7 @@ class CManager_Asset_SCSS_Compiler {
                 list(, $value, $pos) = $child;
                 $line = $this->parser->getLineNo($pos);
                 $value = $this->compileValue($this->reduce($value, true));
-                fwrite(STDERR, "Line ${line} DEBUG: ${value}\n");
+                fwrite(STDERR, "Line {$line} DEBUG: {$value}\n");
 
                 break;
             default:
@@ -1205,12 +1205,12 @@ class CManager_Asset_SCSS_Compiler {
                 // 1. op_[op name]_[left type]_[right type]
                 // 2. op_[left type]_[right type] (passing the op as first arg
                 // 3. op_[op name]
-                $fn = "op_${opName}_${ltype}_${rtype}";
+                $fn = "op_{$opName}_{$ltype}_{$rtype}";
                 if (is_callable([$this, $fn])
-                    || (($fn = "op_${ltype}_${rtype}")
+                    || (($fn = "op_{$ltype}_{$rtype}")
                     && is_callable([$this, $fn])
                     && $passOp = true)
-                    || (($fn = "op_${opName}")
+                    || (($fn = "op_{$opName}")
                     && is_callable([$this, $fn])
                     && $genOp = true)
                 ) {
@@ -1458,7 +1458,7 @@ class CManager_Asset_SCSS_Compiler {
             case 'function':
                 $args = !empty($value[2]) ? $this->compileValue($value[2]) : '';
 
-                return "{$value[1]}(${args})";
+                return "{$value[1]}({$args})";
             case 'list':
                 $value = $this->extractInterpolation($value);
                 if ($value[0] != 'list') {
@@ -1475,7 +1475,7 @@ class CManager_Asset_SCSS_Compiler {
                     $filtered[] = $this->compileValue($item);
                 }
 
-                return implode("${delim} ", $filtered);
+                return implode("{$delim} ", $filtered);
             case 'interpolated':
                 //node created by extractInterpolation
                 list(, $interpolate, $left, $right) = $value;
@@ -1509,7 +1509,7 @@ class CManager_Asset_SCSS_Compiler {
             case 'null':
                 return 'null';
             default:
-                $this->throwError("unknown value type: ${type}");
+                $this->throwError("unknown value type: {$type}");
         }
     }
 
@@ -1697,7 +1697,7 @@ class CManager_Asset_SCSS_Compiler {
             } elseif (!empty($default)) {
                 $val = $default;
             } else {
-                $this->throwError("Missing argument ${name}");
+                $this->throwError("Missing argument {$name}");
             }
 
             $this->set($name, $this->reduce($val, true), true);
@@ -1790,7 +1790,7 @@ class CManager_Asset_SCSS_Compiler {
             $parser->insertComments = true;
 
             if (!$parser->valueList($value)) {
-                throw new Exception("failed to parse passed in variable ${name}: ${strValue}");
+                throw new Exception("failed to parse passed in variable {$name}: {$strValue}");
             }
 
             $this->set($name, $value);

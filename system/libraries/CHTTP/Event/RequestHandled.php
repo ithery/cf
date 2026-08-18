@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Description of RequestHandled
- *
- * @author Hery
- */
 class CHTTP_Event_RequestHandled {
     /**
      * The request instance.

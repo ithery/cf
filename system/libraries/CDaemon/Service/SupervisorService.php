@@ -1,6 +1,6 @@
 <?php
 
-class CDaemon_Service_SupervisorService extends CDaemon_ServiceAbstract {
+abstract class CDaemon_Service_SupervisorService extends CDaemon_ServiceAbstract {
     protected $loopInterval = 0.1;
 
     protected $environment = 'development';
@@ -11,7 +11,7 @@ class CDaemon_Service_SupervisorService extends CDaemon_ServiceAbstract {
             return CDaemon::log('A master supervisor is already running on this machine.');
         }
 
-        $master = (new CDaemon_Supervisor_MasterSupervisor())->handleOutputUsing(function ($type, $line) {
+        $master = (new CDaemon_Supervisor_MasterSupervisor(get_class($this)))->handleOutputUsing(function ($type, $line) {
             CDaemon::log($line);
         });
         $environment = CF::config('daemon.supervisor.env', CF::config('app.env', 'development'));

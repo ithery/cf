@@ -1,0 +1,34 @@
+<?php
+
+class {{ class }} extends CTesting_Browser_Page {
+    /**
+     * Get the URL for the page.
+     *
+     * @return string
+     */
+    public function url() {
+        return '/';
+    }
+
+    /**
+     * Assert that the browser is on the page.
+     *
+     * @param CTesting_Browser $browser
+     *
+     * @return void
+     */
+    public function assert(CTesting_Browser $browser) {
+        $browser->assertPathIs($this->url());
+    }
+
+    /**
+     * Get the element shortcuts for the page.
+     *
+     * @return array
+     */
+    public function elements() {
+        return [
+            '@element' => '#selector',
+        ];
+    }
+}

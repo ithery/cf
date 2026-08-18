@@ -7,17 +7,17 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\MockObject\Rule;
 
 use function sprintf;
-use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\Exception\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class InvokedCount extends InvocationOrder
-{
+final class InvokedCount extends InvocationOrder {
     /**
      * @var int
      */
@@ -26,23 +26,19 @@ final class InvokedCount extends InvocationOrder
     /**
      * @param int $expectedCount
      */
-    public function __construct($expectedCount)
-    {
+    public function __construct($expectedCount) {
         $this->expectedCount = $expectedCount;
     }
 
-    public function isNever()
-    {
+    public function isNever() {
         return $this->expectedCount === 0;
     }
 
-    public function toString()
-    {
+    public function toString() {
         return 'invoked ' . $this->expectedCount . ' time(s)';
     }
 
-    public function matches(BaseInvocation $invocation)
-    {
+    public function matches(BaseInvocation $invocation) {
         return true;
     }
 
@@ -52,15 +48,14 @@ final class InvokedCount extends InvocationOrder
      *
      * @throws ExpectationFailedException
      */
-    public function verify()
-    {
+    public function verify() {
         $count = $this->getInvocationCount();
 
         if ($count !== $this->expectedCount) {
             throw new ExpectationFailedException(
                 sprintf(
-                    'Method was expected to be called %d times, ' .
-                    'actually called %d times.',
+                    'Method was expected to be called %d times, '
+                    . 'actually called %d times.',
                     $this->expectedCount,
                     $count
                 )
@@ -71,8 +66,7 @@ final class InvokedCount extends InvocationOrder
     /**
      * @throws ExpectationFailedException
      */
-    protected function invokedDo(BaseInvocation $invocation)
-    {
+    protected function invokedDo(BaseInvocation $invocation) {
         $count = $this->getInvocationCount();
 
         if ($count > $this->expectedCount) {

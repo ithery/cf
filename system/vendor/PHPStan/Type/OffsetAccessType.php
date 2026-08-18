@@ -2,11 +2,13 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\PhpDocParser\Ast\Type\OffsetAccessTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\PhpDocParser\Printer\Printer;
 use PHPStan\Type\Generic\TemplateTypeVariance;
 use PHPStan\Type\Traits\LateResolvableTypeTrait;
 use PHPStan\Type\Traits\NonGeneralizableTypeTrait;
 use function array_merge;
-use function sprintf;
 
 /** @api */
 final class OffsetAccessType implements CompoundType, LateResolvableType
@@ -30,6 +32,16 @@ final class OffsetAccessType implements CompoundType, LateResolvableType
 		);
 	}
 
+	public function getObjectClassNames(): array
+	{
+		return [];
+	}
+
+	public function getObjectClassReflections(): array
+	{
+		return [];
+	}
+
 	public function getReferencedTemplateTypes(TemplateTypeVariance $positionVariance): array
 	{
 		return array_merge(
@@ -47,11 +59,9 @@ final class OffsetAccessType implements CompoundType, LateResolvableType
 
 	public function describe(VerbosityLevel $level): string
 	{
-		return sprintf(
-			'%s[%s]',
-			$this->type->describe($level),
-			$this->offset->describe($level),
-		);
+		$printer = new Printer();
+
+		return $printer->print($this->toPhpDocNode());
 	}
 
 	public function isResolvable(): bool
@@ -77,17 +87,30 @@ final class OffsetAccessType implements CompoundType, LateResolvableType
 			return $this;
 		}
 
-		return new OffsetAccessType($type, $offset);
+		return new self($type, $offset);
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		return new self(
-			$properties['type'],
-			$properties['offset'],
+		if (!$right instanceof self) {
+			return $this;
+		}
+
+		$type = $cb($this->type, $right->type);
+		$offset = $cb($this->offset, $right->offset);
+
+		if ($this->type === $type && $this->offset === $offset) {
+			return $this;
+		}
+
+		return new self($type, $offset);
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new OffsetAccessTypeNode(
+			$this->type->toPhpDocNode(),
+			$this->offset->toPhpDocNode(),
 		);
 	}
 

@@ -49,7 +49,7 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
      *
      * @return void
      */
-    public function __construct(CEvent_DispatcherInterface $events = null) {
+    public function __construct(?CEvent_DispatcherInterface $events = null) {
         parent::__construct('CF Framework', CF_VERSION);
 
         if ($events == null) {
@@ -67,7 +67,7 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
     /**
      * @inheritdoc
      */
-    public function run(InputInterface $input = null, OutputInterface $output = null) {
+    public function run(?InputInterface $input = null, ?OutputInterface $output = null) {
         $commandName = $this->getCommandName(
             $input = $input ?: new ArgvInput()
         );

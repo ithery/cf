@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 17, 2019, 11:23:04 PM
- */
 trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
     protected $method;
 

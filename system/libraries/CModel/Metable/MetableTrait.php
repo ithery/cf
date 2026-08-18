@@ -4,6 +4,7 @@
  * Trait for giving Eloquent models the ability to handle Meta.
  *
  * @property CCollection|CModel_Metable_Meta[] $meta
+ * @property array $defaultMetaValues optional, fallback values returned by getMeta() when no Meta row exists for a key - only read if the host model declares this property
  *
  * @method static CModel_Query|static whereHasMeta($key)
  * @method static CModel_Query|static whereDoesntHaveMeta($key)
@@ -18,9 +19,18 @@
  */
 trait CModel_Metable_MetableTrait {
     /**
-     * @var CCollection|CModel_Metable_Meta[]
+     * @var CCollection|array<string, CModel_Metable_Meta>
      */
     private $indexedMetaCollection;
+
+    /**
+     * Register a deleted model event with the dispatcher.
+     *
+     * @param \Closure|string $callback
+     *
+     * @return void
+     */
+    abstract public static function deleted($callback);
 
     /**
      * Initialize the trait.
@@ -93,7 +103,7 @@ trait CModel_Metable_MetableTrait {
         } else {
             // otherwise insert manually.
             // Clear local cache to speed things up since we will reload it afterwards
-            $this->unsetRelation('meta');
+            $this->unsetRelations();
             foreach ($metaDictionary as $key => $value) {
                 $this->setMeta($key, $value);
             }
@@ -444,7 +454,7 @@ trait CModel_Metable_MetableTrait {
         $direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
         $field = $q->getQuery()->getGrammar()->wrap("{$table}.value");
 
-        $q->orderByRaw("cast({$field} as decimal) ${direction}");
+        $q->orderByRaw("cast({$field} as decimal) {$direction}");
     }
 
     /**
@@ -501,7 +511,12 @@ trait CModel_Metable_MetableTrait {
     }
 
     /**
-     * @inheritdoc
+     * Get the value of a given attribute.
+     *
+     * @param string $relation
+     * @param string $value
+     *
+     * @return $this
      */
     public function setRelation($relation, $value) {
         if ($relation == 'meta') {

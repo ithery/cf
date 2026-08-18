@@ -2,13 +2,13 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2018, 1:54:30 AM
- */
 class CManager_Asset_Helper {
+    /**
+     * @param string $file
+     * @param bool   $withHttp
+     *
+     * @return string
+     */
     public static function urlCssFile($file, $withHttp = false) {
         //return CResource::instance('css')->url($file);
         $docroot = str_replace(DS, '/', DOCROOT);
@@ -31,6 +31,12 @@ class CManager_Asset_Helper {
         return $file;
     }
 
+    /**
+     * @param CManager_Asset_File_JsFile|string $file
+     * @param bool                              $withHttp
+     *
+     * @return string
+     */
     public static function urlJsFile($file, $withHttp = false) {
         if ($file instanceof CManager_Asset_File_JsFile) {
             return $file->getUrl();
@@ -56,6 +62,12 @@ class CManager_Asset_Helper {
         return $file;
     }
 
+    /**
+     * @param string $file
+     * @param int    $interval
+     *
+     * @return int
+     */
     public static function getFileVersion($file, $interval = 0) {
         $version = filemtime($file);
         if ($interval) {
@@ -67,6 +79,12 @@ class CManager_Asset_Helper {
         return $version;
     }
 
+    /**
+     * @param string $file
+     * @param array  $mediaPaths
+     *
+     * @return string
+     */
     public static function fullpathCssFile($file, $mediaPaths = []) {
         foreach ($mediaPaths as $dir) {
             $path = $dir . 'css' . DS . $file;

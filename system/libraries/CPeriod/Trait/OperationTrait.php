@@ -1,5 +1,18 @@
 <?php
-/** @mixin Period */
+/**
+ * @property CCarbon            $startDate
+ * @property CCarbon            $endDate
+ * @property CCarbon            $includedStart
+ * @property CCarbon            $includedEnd
+ * @property CPeriod_Precision  $precision
+ * @property CPeriod_Boundaries $boundaries
+ * @property DateInterval       $interval
+ *
+ * @method void            ensurePrecisionMatches(CPeriod $other)
+ * @method static static   make($start, $end, $precision = null, $boundaries = null, $format = null)
+ *
+ * @mixin CPeriod
+ */
 trait CPeriod_Trait_OperationTrait {
     /**
      * @param CPeriod $period
@@ -19,15 +32,15 @@ trait CPeriod_Trait_OperationTrait {
 
         if ($this->includedStart() >= $period->includedEnd()) {
             return static::make(
-                $period->includedEnd()->add($this->interval),
-                $this->includedStart()->sub($this->interval),
+                $period->includedEnd()->copy()->add($this->interval),
+                $this->includedStart()->copy()->sub($this->interval),
                 $this->precision()
             );
         }
 
         return static::make(
-            $this->includedEnd()->add($this->interval),
-            $period->includedStart()->sub($this->interval),
+            $this->includedEnd()->copy()->add($this->interval),
+            $period->includedStart()->copy()->sub($this->interval),
             $this->precision()
         );
     }
@@ -61,7 +74,6 @@ trait CPeriod_Trait_OperationTrait {
         }
 
         return CPeriod_Factory::makeWithBoundaries(
-            static::class,
             $includedStart,
             $includedEnd,
             $this->precision(),
@@ -114,7 +126,7 @@ trait CPeriod_Trait_OperationTrait {
     }
 
     /**
-     * @param \CPeriod|iterable $other
+     * @param CPeriod ...$others
      *
      * @return \CPeriod_Collection|static[]
      */
@@ -140,7 +152,7 @@ trait CPeriod_Trait_OperationTrait {
         if ($this->includedStart() < $other->includedStart()) {
             $collection[] = CPeriod_Factory::makeWithBoundaries(
                 $this->includedStart(),
-                $other->includedStart()->sub($this->interval),
+                $other->includedStart()->copy()->sub($this->interval),
                 $this->precision(),
                 $this->boundaries()
             );
@@ -148,7 +160,7 @@ trait CPeriod_Trait_OperationTrait {
 
         if ($this->includedEnd() > $other->includedEnd()) {
             $collection[] = CPeriod_Factory::makeWithBoundaries(
-                $other->includedEnd()->add($this->interval),
+                $other->includedEnd()->copy()->add($this->interval),
                 $this->includedEnd(),
                 $this->precision(),
                 $this->boundaries()
@@ -203,9 +215,9 @@ trait CPeriod_Trait_OperationTrait {
     public function renew() {
         $length = $this->includedStart->diff($this->includedEnd);
 
-        $start = $this->includedEnd->add($this->interval);
+        $start = $this->includedEnd->copy()->add($this->interval);
 
-        $end = $start->add($length);
+        $end = $start->copy()->add($length);
 
         return static::make($start, $end, $this->precision, $this->boundaries);
     }

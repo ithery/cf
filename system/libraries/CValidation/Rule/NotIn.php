@@ -37,6 +37,7 @@ class CValidation_Rule_NotIn {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $values = array_map(function ($value) {
             return '"' . str_replace('"', '""', $value) . '"';

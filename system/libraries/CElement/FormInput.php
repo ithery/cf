@@ -1,17 +1,26 @@
 <?php
 
 /**
- * Description of CElement_FormInput.
- *
- * @author Hery
+ * Base class for form input elements (text, select, checkbox, etc).
  */
 class CElement_FormInput extends CElement_Element {
     use CTrait_Compat_Element_FormInput;
 
+    /**
+     * @var string
+     */
     protected $name;
 
+    /**
+     * @var string
+     */
     protected $type;
 
+    /**
+     * Whether to submit the closest form on change/changeDate.
+     *
+     * @var bool
+     */
     protected $submit_onchange;
 
     /**
@@ -19,8 +28,14 @@ class CElement_FormInput extends CElement_Element {
      */
     protected $value;
 
+    /**
+     * @var string
+     */
     protected $size;
 
+    /**
+     * @var bool
+     */
     protected $ajax;
 
     /**
@@ -28,12 +43,26 @@ class CElement_FormInput extends CElement_Element {
      */
     protected $list;
 
+    /**
+     * @var CElement_Component_Form_FieldValidation
+     */
     protected $validation;
 
+    /**
+     * @var bool
+     */
     protected $disabled;
 
+    /**
+     * @var bool
+     */
     protected $readonly;
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id = null) {
         parent::__construct($id);
 
@@ -54,103 +83,145 @@ class CElement_FormInput extends CElement_Element {
         $this->validation = new CElement_Component_Form_FieldValidation();
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setSubmitOnChange($bool = true) {
         $this->submit_onchange = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setAjax($bool = true) {
         $this->ajax = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setDisabled($bool = true) {
         $this->disabled = $bool;
 
         return $this;
     }
 
+    /**
+     * @param string $size
+     *
+     * @return $this
+     */
     public function setSize($size) {
         $this->size = $size;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setReadonly($bool = true) {
         $this->readonly = $bool;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getFieldId() {
         return $this->id;
     }
 
+    /**
+     * @param mixed $val
+     *
+     * @return $this
+     */
     public function setValue($val) {
         $this->value = $val;
 
         return $this;
     }
 
+    /**
+     * @param array $list
+     *
+     * @return $this
+     */
     public function setList($list) {
         $this->list = $list;
 
         return $this;
     }
 
+    /**
+     * @param string $val
+     *
+     * @return $this
+     */
     public function setName($val) {
         $this->name = $val;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return $this
+     */
     public function addValidation($name, $value = '') {
-        if (strlen($value) == 0) {
-            $value = $name;
-        }
         $this->validation->addValidation($name, $value);
 
         return $this;
     }
 
+    /**
+     * Get the Laravel-style validation rules (eg. ['required', 'min:5']) declared
+     * on this field via addValidation(), used by CElement_Component_Form to build
+     * its Form::setValidation() rules array.
+     *
+     * @return array
+     */
+    public function getValidationRules() {
+        return $this->validation->rules();
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
     public function setType($type) {
         $this->type = $type;
 
         return $this;
     }
 
-    public function setOnText($text) {
-        $this->onText = $text;
-
-        return $this;
-    }
-
-    public function setOffText($text) {
-        $this->offText = $text;
-
-        return $this;
-    }
-
-    public function setChecked($bool) {
-        $this->checked = $bool;
-
-        return $this;
-    }
-
-    public function showUpdown() {
-        $this->showupdown = true;
-
-        return $this;
-    }
-
-    public function hideUpdown() {
-        $this->showupdown = false;
-
-        return $this;
-    }
-
+    /**
+     * @return array
+     */
     public function toArray() {
         $data = [];
         if ($this->disabled) {
@@ -167,6 +238,9 @@ class CElement_FormInput extends CElement_Element {
         return $data;
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         parent::build();
 
@@ -181,6 +255,11 @@ class CElement_FormInput extends CElement_Element {
         }
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = '';
         if ($this->submit_onchange) {
@@ -204,9 +283,12 @@ class CElement_FormInput extends CElement_Element {
         return $js;
     }
 
+    /**
+     * @return string
+     */
     protected function htmlAttr() {
         $htmlAttr = parent::htmlAttr();
-        $nameAttr = ' name="' . $this->name . '"';
+        $nameAttr = ' name="' . c::e($this->name) . '"';
 
         return $htmlAttr . $nameAttr;
     }

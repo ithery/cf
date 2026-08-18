@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 2, 2019, 2:57:28 AM
- */
 class COptional implements ArrayAccess {
     use CTrait_Macroable {
         __call as macroCall;
@@ -70,6 +64,7 @@ class COptional implements ArrayAccess {
      *
      * @return bool
      */
+    #[ReturnTypeWillChange]
     public function offsetExists($key) {
         return carr::accessible($this->value) && carr::exists($this->value, $key);
     }
@@ -81,6 +76,7 @@ class COptional implements ArrayAccess {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return carr::get($this->value, $key);
     }
@@ -93,6 +89,7 @@ class COptional implements ArrayAccess {
      *
      * @return void
      */
+    #[ReturnTypeWillChange]
     public function offsetSet($key, $value) {
         if (carr::accessible($this->value)) {
             $this->value[$key] = $value;
@@ -106,6 +103,7 @@ class COptional implements ArrayAccess {
      *
      * @return void
      */
+    #[ReturnTypeWillChange]
     public function offsetUnset($key) {
         if (carr::accessible($this->value)) {
             unset($this->value[$key]);

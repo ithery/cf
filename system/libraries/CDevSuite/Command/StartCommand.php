@@ -2,10 +2,15 @@
 
 /**
  * Description of StartCommand
- *
- * @author Hery
  */
 class CDevSuite_Command_StartCommand extends CDevSuite_CommandAbstract {
+    /**
+     * Restart the DevSuite services (PHP-FPM, nginx, and Acrylic on Windows).
+     *
+     * @param CConsole_Command $cfCommand
+     *
+     * @return void
+     */
     public function run(CConsole_Command $cfCommand) {
         CDevSuite::phpFpm()->restart();
         CDevSuite::nginx()->restart();

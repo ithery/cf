@@ -6,19 +6,23 @@ use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Array_;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name;
+use PhpParser\Node\Name\FullyQualified;
 use PHPStan\Analyser\Scope;
 use PHPStan\Analyser\SpecifiedTypes;
 use PHPStan\Analyser\TypeSpecifier;
 use PHPStan\Analyser\TypeSpecifierAwareExtension;
 use PHPStan\Analyser\TypeSpecifierContext;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\CallableType;
+use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\FunctionTypeSpecifyingExtension;
 use function count;
 use function strtolower;
 
-class IsCallableFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
+#[AutowiredService]
+final class IsCallableFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
 {
 
 	private TypeSpecifier $typeSpecifier;
@@ -51,18 +55,23 @@ class IsCallableFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyin
 			&& $valueType->isConstantArray()->yes()
 			&& !$valueType->isCallable()->no()
 		) {
-			if ($value->items[0] === null || $value->items[1] === null) {
-				throw new ShouldNotHappenException();
-			}
-
 			$functionCall = new FuncCall(new Name('method_exists'), [
 				new Arg($value->items[0]->value),
 				new Arg($value->items[1]->value),
 			]);
-			return $this->methodExistsExtension->specifyTypes($functionReflection, $functionCall, $scope, $context);
+			$methodExistsTypes = $this->methodExistsExtension->specifyTypes($functionReflection, $functionCall, $scope, $context);
+
+			return $methodExistsTypes->unionWith($this->typeSpecifier->create(
+				new FuncCall(new FullyQualified('is_callable'), [
+					new Arg($value),
+				]),
+				new ConstantBooleanType(true),
+				$context,
+				$scope,
+			));
 		}
 
-		return $this->typeSpecifier->create($value, new CallableType(), $context, false, $scope);
+		return $this->typeSpecifier->create($value, new CallableType(), $context, $scope);
 	}
 
 	public function setTypeSpecifier(TypeSpecifier $typeSpecifier): void

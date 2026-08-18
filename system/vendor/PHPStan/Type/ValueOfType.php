@@ -2,9 +2,14 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\Type\Generic\TemplateType;
 use PHPStan\Type\Generic\TemplateTypeVariance;
 use PHPStan\Type\Traits\LateResolvableTypeTrait;
 use PHPStan\Type\Traits\NonGeneralizableTypeTrait;
+use function count;
 use function sprintf;
 
 /** @api */
@@ -46,6 +51,36 @@ final class ValueOfType implements CompoundType, LateResolvableType
 
 	protected function getResult(): Type
 	{
+		if ($this->type->isEnum()->yes()) {
+			$enumCases = $this->type->getEnumCases();
+			if (
+				$enumCases === []
+				&& $this->type instanceof TemplateType
+				&& (new ObjectType('BackedEnum'))->isSuperTypeOf($this->type->getBound())->yes()
+			) {
+				return new UnionType([new IntegerType(), new StringType()]);
+			}
+
+			$valueTypes = [];
+			foreach ($enumCases as $enumCase) {
+				$valueType = $enumCase->getBackingValueType();
+				if ($valueType === null) {
+					continue;
+				}
+
+				$valueTypes[] = $valueType;
+			}
+
+			if (count($valueTypes) === 0) {
+				return new NeverType();
+			}
+			if (count($valueTypes) === 1) {
+				return $valueTypes[0];
+			}
+
+			return new UnionType($valueTypes);
+		}
+
 		return $this->type->getIterableValueType();
 	}
 
@@ -60,17 +95,27 @@ final class ValueOfType implements CompoundType, LateResolvableType
 			return $this;
 		}
 
-		return new ValueOfType($type);
+		return new self($type);
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		return new self(
-			$properties['type'],
-		);
+		if (!$right instanceof self) {
+			return $this;
+		}
+
+		$type = $cb($this->type, $right->type);
+
+		if ($this->type === $type) {
+			return $this;
+		}
+
+		return new self($type);
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new GenericTypeNode(new IdentifierTypeNode('value-of'), [$this->type->toPhpDocNode()]);
 	}
 
 }

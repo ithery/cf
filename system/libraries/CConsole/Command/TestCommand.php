@@ -1,38 +1,27 @@
 <?php
 
 /**
- * Description of TestCommand.
- *
  * @author Hery
+ *
+ * @final
  */
-use Dotenv\Parser\Parser;
-use Dotenv\Store\StoreBuilder;
+
 use Symfony\Component\Process\Process;
-use Dotenv\Exception\InvalidPathException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 
-/**
- * @final
- */
 class CConsole_Command_TestCommand extends CConsole_Command {
     /**
-     * The name and signature of the console command.
-     *
      * @var string
      */
     protected $signature = 'test {phpunitArgs?*} {--without-tty : Disable output to TTY}';
 
     /**
-     * The console command description.
-     *
      * @var string
      */
     protected $description = 'Run the application tests';
 
     /**
-     * The arguments to be used while calling phpunit.
-     *
      * @var array
      */
     protected $arguments = [
@@ -40,11 +29,6 @@ class CConsole_Command_TestCommand extends CConsole_Command {
         'CTesting_PhpUnit_Printer',
     ];
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct() {
         parent::__construct();
 
@@ -52,18 +36,15 @@ class CConsole_Command_TestCommand extends CConsole_Command {
     }
 
     /**
-     * Execute the console command.
-     *
      * @return mixed
      */
     public function handle() {
         if ((int) \PHPUnit\Runner\Version::id()[0] < 9) {
-            throw new RuntimeException('Running Collision ^5.0 artisan test command requires PHPUnit ^9.0.');
+            throw new RuntimeException('Running cf test command requires PHPUnit ^9.0.');
         }
-        //$options = array_slice(isset($_SERVER['argv']) ? $_SERVER['argv'] : [], $this->option('without-tty') ? 3 : 2);
-        $options = [];
-        $phpunitArgs = carr::get($this->input->getArguments(), 'phpunitArgs');
 
+        $options = [];
+        $phpunitArgs = $this->rawPhpunitArgs();
 
         $commands = array_merge(
             $this->binary(),
@@ -74,7 +55,6 @@ class CConsole_Command_TestCommand extends CConsole_Command {
             )
         );
 
-        //$this->clearEnv();
         $process = (new Process($commands))->setTimeout(null);
 
         try {
@@ -95,15 +75,59 @@ class CConsole_Command_TestCommand extends CConsole_Command {
     }
 
     /**
-     * Get the PHP binary to execute.
+     * Symfony's ArgvInput::bind() aborts entirely (leaving every declared
+     * argument unbound) the moment it hits an option this command's
+     * signature doesn't declare - e.g. `--filter=X`, which phpunit
+     * understands but this command doesn't. ignoreValidationErrors() only
+     * suppresses the resulting exception, it doesn't make binding lenient,
+     * so $this->input->getArguments()['phpunitArgs'] silently comes back
+     * empty whenever such an option is present, and every phpunit arg
+     * meant to scope the run (--filter, a specific test file, etc.) is
+     * lost - the run then executes the *entire* configured test suite
+     * instead of the intended subset.
+     *
+     * Read the raw argv directly instead, everything after this command's
+     * own name, so each token (recognized by Symfony or not) reaches
+     * phpunit verbatim.
      *
      * @return array
      */
-    protected function binary() {
-        $command = class_exists(\Pest\Laravel\PestServiceProvider::class)
-            ? c::fixPath(CF::appDir()) . 'vendor/pestphp/pest/bin/pest'
-            : c::fixPath(CF::appDir()) . 'vendor/phpunit/phpunit/phpunit';
+    protected function rawPhpunitArgs() {
+        $argv = carr::get($_SERVER, 'argv', []);
+        $index = array_search($this->getName(), $argv, true);
+        if ($index === false) {
+            return carr::get($this->input->getArguments(), 'phpunitArgs', []);
+        }
 
+        $rawArgs = array_slice($argv, $index + 1);
+
+        return array_values(array_filter($rawArgs, function ($arg) {
+            return $arg !== '--without-tty';
+        }));
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isFrameworkContext() {
+        return !defined('CFCLI_APPCODE') || CF::cliAppCode() === null;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getBasePath() {
+        if ($this->isFrameworkContext()) {
+            return c::fixPath(DOCROOT);
+        }
+
+        return c::fixPath(CF::appDir());
+    }
+
+    /**
+     * @return array
+     */
+    protected function binary() {
         $command = DOCROOT . '.bin' . DS . 'phpunit' . DS . 'phpunit';
 
         if ('phpdbg' === PHP_SAPI) {
@@ -123,8 +147,6 @@ class CConsole_Command_TestCommand extends CConsole_Command {
     }
 
     /**
-     * Get the array of arguments for running PHPUnit.
-     *
      * @param array $options
      *
      * @return array
@@ -134,8 +156,9 @@ class CConsole_Command_TestCommand extends CConsole_Command {
             return !cstr::startsWith($option, '--env=');
         }));
 
-        if (!file_exists($file = c::fixPath(CF::appDir()) . 'phpunit.xml')) {
-            $file = c::fixPath(CF::appDir()) . 'phpunit.xml.dist';
+        $basePath = $this->getBasePath();
+        if (!file_exists($file = $basePath . 'phpunit.xml')) {
+            $file = $basePath . 'phpunit.xml.dist';
         }
         if (!file_exists($file)) {
             throw new Exception('File not found:' . $file);
@@ -146,63 +169,25 @@ class CConsole_Command_TestCommand extends CConsole_Command {
         return array_merge(['-c', $file], $options);
     }
 
+    /**
+     * @param array $options
+     *
+     * @return array
+     */
     protected function reformatOptionsPath(array $options) {
+        if ($this->isFrameworkContext()) {
+            $testsPath = DOCROOT . 'tests' . DS;
+        } else {
+            $testsPath = c::appRoot() . 'default/tests/';
+        }
+
         foreach ($options as $key => $option) {
-            $rootPath = c::appRoot();
-            $path = $rootPath . 'default/tests/' . $option;
+            $path = $testsPath . $option;
             if (CFile::isDirectory($path) || CFile::isFile($path)) {
                 $options[$key] = $path;
             }
         }
 
         return $options;
-    }
-
-    /**
-     * Clears any set Environment variables set by Laravel if the --env option is empty.
-     *
-     * @return void
-     */
-    protected function clearEnv() {
-        if (!$this->option('env')) {
-            // $vars = self::getEnvironmentVariables(
-            //     // @phpstan-ignore-next-line
-            //     $this->laravel->environmentPath(),
-            //     // @phpstan-ignore-next-line
-            //     $this->laravel->environmentFile()
-            // );
-
-            // $repository = CEnv::getRepository();
-
-            // foreach ($vars as $name) {
-            //     $repository->clear($name);
-            // }
-        }
-    }
-
-    /**
-     * @param string $path
-     * @param string $file
-     *
-     * @return array
-     */
-    protected static function getEnvironmentVariables($path, $file) {
-        try {
-            $content = StoreBuilder::createWithNoNames()
-                ->addPath($path)
-                ->addName($file)
-                ->make()
-                ->read();
-        } catch (InvalidPathException $e) {
-            return [];
-        }
-
-        $vars = [];
-
-        foreach ((new Parser())->parse($content) as $entry) {
-            $vars[] = $entry->getName();
-        }
-
-        return $vars;
     }
 }

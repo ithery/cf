@@ -24,6 +24,12 @@ class Controller_Demo_Elements_Widget extends \Cresenity\Demo\Controller {
         $widget->setHeaderActionStyle('btn-dropdown');
         $widget->add('Widget Content Here');
 
+        $app->addDiv()->addClass('border-1 p-3 mb-3');
+        $app->addH5()->add('Collapsible Widget');
+
+        $widget = $app->addWidget()->setTitle('Collapsible Widget')->setCollapse();
+        $widget->add('Widget Content Here');
+
         return $app;
     }
 }

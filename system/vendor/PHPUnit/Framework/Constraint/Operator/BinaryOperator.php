@@ -74,6 +74,7 @@ abstract class BinaryOperator extends Operator {
     /**
      * Counts the number of constraint elements.
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         $count = 0;
 

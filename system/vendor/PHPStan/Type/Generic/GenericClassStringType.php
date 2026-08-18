@@ -2,11 +2,18 @@
 
 namespace PHPStan\Type\Generic;
 
-use PHPStan\TrinaryLogic;
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\Reflection\ReflectionProviderStaticAccessor;
+use PHPStan\Type\AcceptsResult;
+use PHPStan\Type\ClassNameToObjectTypeResult;
 use PHPStan\Type\ClassStringType;
 use PHPStan\Type\CompoundType;
 use PHPStan\Type\Constant\ConstantStringType;
+use PHPStan\Type\InstanceofDeprecated;
 use PHPStan\Type\IntersectionType;
+use PHPStan\Type\IsSuperTypeOfResult;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\ObjectType;
@@ -15,12 +22,13 @@ use PHPStan\Type\StaticType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\UnionType;
 use PHPStan\Type\VerbosityLevel;
+use function count;
 use function sprintf;
 
 /** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::isClassStringType() and Type::getClassStringObjectType()')]
 class GenericClassStringType extends ClassStringType
 {
 
@@ -40,20 +48,51 @@ class GenericClassStringType extends ClassStringType
 		return $this->type;
 	}
 
+	public function toObjectTypeForInstanceofCheck(): ClassNameToObjectTypeResult
+	{
+		// `class-string<X>` narrows to `X` for the comparison target, but
+		// the actual runtime class can be any subclass of `X` — keep
+		// uncertainty so the caller falls back to `BooleanType` instead
+		// of a definite yes when `$x instanceof Y` and `Y === X`.
+		return new ClassNameToObjectTypeResult($this->getGenericType(), true);
+	}
+
+	public function toObjectTypeForIsACheck(Type $objectOrClassType, bool $allowString, bool $allowSameClass): ClassNameToObjectTypeResult
+	{
+		if ($allowString) {
+			return new ClassNameToObjectTypeResult(
+				TypeCombinator::union($this->getGenericType(), $this),
+				false,
+			);
+		}
+
+		return new ClassNameToObjectTypeResult($this->getGenericType(), false);
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		return $this->getGenericType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return $this->getClassStringObjectType();
+	}
+
 	public function describe(VerbosityLevel $level): string
 	{
 		return sprintf('%s<%s>', parent::describe($level), $this->type->describe($level));
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
 		if ($type instanceof CompoundType) {
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
 		if ($type instanceof ConstantStringType) {
-			if (!$type->isClassString()) {
-				return TrinaryLogic::createNo();
+			if (!$type->isClassString()->yes()) {
+				return AcceptsResult::createNo();
 			}
 
 			$objectType = new ObjectType($type->getValue());
@@ -62,15 +101,15 @@ class GenericClassStringType extends ClassStringType
 		} elseif ($type instanceof ClassStringType) {
 			$objectType = new ObjectWithoutClassType();
 		} elseif ($type instanceof StringType) {
-			return TrinaryLogic::createMaybe();
+			return AcceptsResult::createMaybe();
 		} else {
-			return TrinaryLogic::createNo();
+			return AcceptsResult::createNo();
 		}
 
 		return $this->type->accepts($objectType, $strictTypes);
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
@@ -79,7 +118,7 @@ class GenericClassStringType extends ClassStringType
 		if ($type instanceof ConstantStringType) {
 			$genericType = $this->type;
 			if ($genericType instanceof MixedType) {
-				return TrinaryLogic::createYes();
+				return IsSuperTypeOfResult::createYes();
 			}
 
 			if ($genericType instanceof StaticType) {
@@ -98,23 +137,35 @@ class GenericClassStringType extends ClassStringType
 				$isSuperType = $genericType->isSuperTypeOf($objectType);
 			}
 
-			if (!$type->isClassString()) {
-				$isSuperType = $isSuperType->and(TrinaryLogic::createMaybe());
+			if (!$type->isClassString()->yes()) {
+				$isSuperType = $isSuperType->and(IsSuperTypeOfResult::createMaybe());
 			}
 
 			return $isSuperType;
 		} elseif ($type instanceof self) {
 			return $this->type->isSuperTypeOf($type->type);
+		} elseif ($type instanceof ClassStringType) {
+			return $this->type->isSuperTypeOf(new ObjectWithoutClassType());
 		} elseif ($type instanceof StringType) {
-			return TrinaryLogic::createMaybe();
+			return IsSuperTypeOfResult::createMaybe();
 		}
 
-		return TrinaryLogic::createNo();
+		return IsSuperTypeOfResult::createNo();
 	}
 
 	public function traverse(callable $cb): Type
 	{
 		$newType = $cb($this->type);
+		if ($newType === $this->type) {
+			return $this;
+		}
+
+		return new self($newType);
+	}
+
+	public function traverseSimultaneously(Type $right, callable $cb): Type
+	{
+		$newType = $cb($this->type, $right->getClassStringObjectType());
 		if ($newType === $this->type) {
 			return $this;
 		}
@@ -132,7 +183,7 @@ class GenericClassStringType extends ClassStringType
 			$typeToInfer = new ObjectType($receivedType->getValue());
 		} elseif ($receivedType instanceof self) {
 			$typeToInfer = $receivedType->type;
-		} elseif ($receivedType instanceof ClassStringType) {
+		} elseif ($receivedType->isClassString()->yes()) {
 			$typeToInfer = $this->type;
 			if ($typeToInfer instanceof TemplateType) {
 				$typeToInfer = $typeToInfer->getBound();
@@ -170,32 +221,65 @@ class GenericClassStringType extends ClassStringType
 		return true;
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function toPhpDocNode(): TypeNode
 	{
-		return new self($properties['type']);
+		return new GenericTypeNode(
+			new IdentifierTypeNode('class-string'),
+			[
+				$this->type->toPhpDocNode(),
+			],
+		);
 	}
 
 	public function tryRemove(Type $typeToRemove): ?Type
 	{
-		if ($typeToRemove instanceof ConstantStringType && $typeToRemove->isClassString()) {
+		if ($typeToRemove instanceof ConstantStringType && $typeToRemove->isClassString()->yes()) {
 			$generic = $this->getGenericType();
 
-			if ($generic instanceof TypeWithClassName) {
-				$classReflection = $generic->getClassReflection();
-				if (
-					$classReflection !== null
-					&& $classReflection->isFinal()
-					&& $generic->getClassName() === $typeToRemove->getValue()
-				) {
-					return new NeverType();
+			$genericObjectClassNames = $generic->getObjectClassNames();
+			$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
+
+			if (count($genericObjectClassNames) === 1) {
+				if ($reflectionProvider->hasClass($genericObjectClassNames[0])) {
+					$classReflection = $reflectionProvider->getClass($genericObjectClassNames[0]);
+					if ($classReflection->isFinal() && $genericObjectClassNames[0] === $typeToRemove->getValue()) {
+						return new NeverType();
+					}
+
+					if ($classReflection->getAllowedSubTypes() !== null) {
+						$objectTypeToRemove = new ObjectType($typeToRemove->getValue());
+						$remainingType = TypeCombinator::remove($generic, $objectTypeToRemove);
+						if ($remainingType instanceof NeverType) {
+							return new NeverType();
+						}
+
+						if (!$remainingType->equals($generic)) {
+							return new self($remainingType);
+						}
+					}
+				}
+			} elseif (count($genericObjectClassNames) > 1) {
+				$objectTypeToRemove = new ObjectType($typeToRemove->getValue());
+				if ($reflectionProvider->hasClass($typeToRemove->getValue())) {
+					$classReflection = $reflectionProvider->getClass($typeToRemove->getValue());
+					if ($classReflection->isFinal()) {
+						$remainingType = TypeCombinator::remove($generic, $objectTypeToRemove);
+						if ($remainingType instanceof NeverType) {
+							return new NeverType();
+						}
+
+						return new self($remainingType);
+					}
 				}
 			}
 		}
 
 		return parent::tryRemove($typeToRemove);
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return $this->type->hasTemplateOrLateResolvableType();
 	}
 
 }

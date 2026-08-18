@@ -2,16 +2,11 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Oct 21, 2019, 9:31:14 PM
- */
 use MongoDB\BSON\Regex;
 use MongoDB\BSON\Binary;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
+use MongoDB\Collection as MongoCollection;
 
 class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
     /**
@@ -120,20 +115,12 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
     ];
 
     /**
-     * Check if we need to return Collections instead of plain arrays (laravel >= 5.3 ).
-     *
-     * @var bool
-     */
-    protected $useCollections;
-
-    /**
      * @inheritdoc
      */
-    public function __construct(CDatabase $connection, CDatabase_Query_Processor_MongoDB $processor) {
-        $this->grammar = new CDatabase_Query_Grammar_MongoDB();
+    public function __construct(CDatabase_Connection $connection, CDatabase_Query_Processor_MongoDBProcessor $processor) {
+        $this->grammar = new CDatabase_Query_Grammar_MongoDBGrammar();
         $this->connection = $connection;
         $this->processor = $processor;
-        $this->useCollections = true;
     }
 
     /**
@@ -199,47 +186,69 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function cursor($columns = []) {
+        $result = $this->getFresh($columns, true);
+        if ($result instanceof CCollection_LazyCollection) {
+            return $result;
+        }
+
+        throw new RuntimeException('Query not compatible with cursor');
+    }
+
+    /**
      * Execute the query as a fresh "select" statement.
      *
      * @param array $columns
+     * @param bool  $returnLazy
      *
-     * @return array|static[]|Collection
+     * @return array|static[]|CCollection|CCollection_LazyCollection
      */
-    public function getFresh($columns = []) {
+    public function getFresh($columns = [], $returnLazy = false) {
         // If no columns have been specified for the select statement, we will set them
         // here to either the passed columns, or the standard default of retrieving
         // all of the columns on the table using the "wildcard" column character.
         if ($this->columns === null) {
             $this->columns = $columns;
         }
+
         // Drop all columns if * is present, MongoDB does not work this way.
         if (in_array('*', $this->columns)) {
             $this->columns = [];
         }
+
         // Compile wheres
         $wheres = $this->compileWheres();
+
         // Use MongoDB's aggregation framework when using grouping or aggregation functions.
-        if ($this->groups || $this->aggregate || $this->paginating) {
+        if ($this->groups || $this->aggregate) {
             $group = [];
             $unwinds = [];
+
             // Add grouping columns to the $group part of the aggregation pipeline.
             if ($this->groups) {
                 foreach ($this->groups as $column) {
                     $group['_id'][$column] = '$' . $column;
+
                     // When grouping, also add the $last operator to each grouped field,
                     // this mimics MySQL's behaviour a bit.
                     $group[$column] = ['$last' => '$' . $column];
                 }
+
                 // Do the same for other columns that are selected.
                 foreach ($this->columns as $column) {
                     $key = str_replace('.', '_', $column);
+
                     $group[$key] = ['$last' => '$' . $column];
                 }
             }
+
             // Add aggregation functions to the $group part of the aggregation pipeline,
             // these may override previous aggregations.
             if ($this->aggregate) {
                 $function = $this->aggregate['function'];
+
                 foreach ($this->aggregate['columns'] as $column) {
                     // Add unwind if a subdocument array should be aggregated
                     // column: subarray.price => {$unwind: '$subarray'}
@@ -247,38 +256,56 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
                         $unwinds[] = $splitColumns[0];
                         $column = implode('.', $splitColumns);
                     }
-                    // Translate count into sum.
-                    if ($function == 'count') {
+
+                    // Null coalense only > 7.2
+
+                    $aggregations = c::blank($this->aggregate['columns']) ? [] : $this->aggregate['columns'];
+
+                    if (in_array('*', $aggregations) && $function == 'count') {
+                        // When ORM is paginating, count doesnt need a aggregation, just a cursor operation
+                        // elseif added to use this only in pagination
+                        // https://docs.mongodb.com/manual/reference/method/cursor.count/
+                        // count method returns int
+
+                        $totalResults = $this->collection->count($wheres);
+                        // Preserving format expected by framework
+                        $results = [
+                            [
+                                '_id' => null,
+                                'aggregate' => $totalResults,
+                            ],
+                        ];
+
+                        return new CCollection($results);
+                    } elseif ($function == 'count') {
+                        // Translate count into sum.
                         $group['aggregate'] = ['$sum' => 1];
                     } else {
-                        // Pass other functions directly.
                         $group['aggregate'] = ['$' . $function => '$' . $column];
                     }
                 }
             }
-            // When using pagination, we limit the number of returned columns
-            // by adding a projection.
-            if ($this->paginating) {
-                foreach ($this->columns as $column) {
-                    $this->projections[$column] = 1;
-                }
-            }
+
             // The _id field is mandatory when using grouping.
             if ($group && empty($group['_id'])) {
                 $group['_id'] = null;
             }
+
             // Build the aggregation pipeline.
             $pipeline = [];
             if ($wheres) {
                 $pipeline[] = ['$match' => $wheres];
             }
+
             // apply unwinds for subdocument array aggregation
             foreach ($unwinds as $unwind) {
                 $pipeline[] = ['$unwind' => '$' . $unwind];
             }
+
             if ($group) {
                 $pipeline[] = ['$group' => $group];
             }
+
             // Apply order and limit
             if ($this->orders) {
                 $pipeline[] = ['$sort' => $this->orders];
@@ -292,71 +319,94 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             if ($this->projections) {
                 $pipeline[] = ['$project' => $this->projections];
             }
+
             $options = [
                 'typeMap' => ['root' => 'array', 'document' => 'array'],
             ];
+
             // Add custom query options
             if (count($this->options)) {
                 $options = array_merge($options, $this->options);
             }
+
+            $options = $this->inheritConnectionOptions($options);
+
             // Execute aggregation
             $results = iterator_to_array($this->collection->aggregate($pipeline, $options));
+
             // Return results
-            return $this->useCollections ? new CCollection($results) : $results;
+            return new CCollection($results);
         } elseif ($this->distinct) {
             // Distinct query
             // Return distinct results directly
             $column = isset($this->columns[0]) ? $this->columns[0] : '_id';
-            // Execute distinct
-            if ($wheres) {
-                $result = $this->collection->distinct($column, $wheres);
-            } else {
-                $result = $this->collection->distinct($column);
-            }
 
-            return $this->useCollections ? new CCollection($result) : $result;
+            $options = $this->inheritConnectionOptions();
+
+            // Execute distinct
+            $result = $this->collection->distinct($column, $wheres ?: [], $options);
+
+            return new CCollection($result);
         } else {
             // Normal query
             $columns = [];
+
             // Convert select columns to simple projections.
             foreach ($this->columns as $column) {
                 $columns[$column] = true;
             }
+
             // Add custom projections.
             if ($this->projections) {
                 $columns = array_merge($columns, $this->projections);
             }
             $options = [];
+
             // Apply order, offset, limit and projection
             if ($this->timeout) {
-                $options['maxTimeMS'] = $this->timeout;
+                $options['maxTimeMS'] = $this->timeout * 1000;
             }
             if ($this->orders) {
                 $options['sort'] = $this->orders;
             }
             if ($this->offset) {
-                $options['skip'] = (int) $this->offset;
+                $options['skip'] = $this->offset;
             }
             if ($this->limit) {
-                $options['limit'] = (int) $this->limit;
+                $options['limit'] = $this->limit;
+            }
+            if ($this->hint) {
+                $options['hint'] = $this->hint;
             }
             if ($columns) {
                 $options['projection'] = $columns;
             }
-            // if ($this->hint)    $cursor->hint($this->hint);
+
             // Fix for legacy support, converts the results to arrays instead of objects.
             $options['typeMap'] = ['root' => 'array', 'document' => 'array'];
+
             // Add custom query options
             if (count($this->options)) {
                 $options = array_merge($options, $this->options);
             }
 
+            $options = $this->inheritConnectionOptions($options);
+
             // Execute query and get MongoCursor
             $cursor = $this->collection->find($wheres, $options);
+
+            if ($returnLazy) {
+                return CCollection_LazyCollection::make(function () use ($cursor) {
+                    foreach ($cursor as $item) {
+                        yield $item;
+                    }
+                });
+            }
+
             // Return results as an array with numeric keys
             $results = iterator_to_array($cursor, false);
 
-            return $this->useCollections ? new CCollection($results) : $results;
+            return new CCollection($results);
         }
     }
 
@@ -386,19 +436,25 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function aggregate($function, $columns = []) {
         $this->aggregate = compact('function', 'columns');
+
         $previousColumns = $this->columns;
+
         // We will also back up the select bindings since the select clause will be
         // removed when performing the aggregate function. Once the query is run
         // we will add the bindings back onto this query so they can get used.
         $previousSelectBindings = $this->bindings['select'];
+
         $this->bindings['select'] = [];
+
         $results = $this->get($columns);
+
         // Once we have executed the query, we will reset the aggregate property so
         // that more select queries can be executed against the database without
         // the aggregate value getting in the way when the grammar builds it.
         $this->aggregate = null;
         $this->columns = $previousColumns;
         $this->bindings['select'] = $previousSelectBindings;
+
         if (isset($results[0])) {
             $result = (array) $results[0];
 
@@ -432,10 +488,11 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if (is_string($direction)) {
             $direction = (strtolower($direction) == 'asc' ? 1 : -1);
         }
+
         if ($column == 'natural') {
             $this->orders['$natural'] = $direction;
         } else {
-            $this->orders[$column] = $direction;
+            $this->orders[(string) $column] = $direction;
         }
 
         return $this;
@@ -453,6 +510,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function whereAll($column, array $values, $boolean = 'and', $not = false) {
         $type = 'all';
+
         $this->wheres[] = compact('column', 'type', 'boolean', 'values', 'not');
 
         return $this;
@@ -461,8 +519,9 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
     /**
      * @inheritdoc
      */
-    public function whereBetween($column, array $values, $boolean = 'and', $not = false) {
+    public function whereBetween($column, $values, $boolean = 'and', $not = false) {
         $type = 'between';
+
         $this->wheres[] = compact('column', 'type', 'boolean', 'values', 'not');
 
         return $this;
@@ -484,6 +543,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         // Since every insert gets treated like a batch insert, we will have to detect
         // if the user is inserting a single document or an array of documents.
         $batch = true;
+
         foreach ($values as $value) {
             // As soon as we find a value that is not an array we assume the user is
             // inserting a single document.
@@ -493,11 +553,14 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
                 break;
             }
         }
+
         if (!$batch) {
             $values = [$values];
         }
-        // Batch insert
-        $result = $this->collection->insertMany($values);
+
+        $options = $this->inheritConnectionOptions();
+
+        $result = $this->collection->insertMany($values, $options);
 
         return 1 == (int) $result->isAcknowledged();
     }
@@ -506,11 +569,15 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      * @inheritdoc
      */
     public function insertGetId(array $values, $sequence = null) {
-        $result = $this->collection->insertOne($values);
+        $options = $this->inheritConnectionOptions();
+
+        $result = $this->collection->insertOne($values, $options);
+
         if (1 == (int) $result->isAcknowledged()) {
             if ($sequence === null) {
                 $sequence = '_id';
             }
+
             // Return id
             return $sequence == '_id' ? $result->getInsertedId() : $values[$sequence];
         }
@@ -525,6 +592,8 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             $values = ['$set' => $values];
         }
 
+        $options = $this->inheritConnectionOptions($options);
+
         return $this->performUpdate($values, $options);
     }
 
@@ -533,14 +602,19 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function increment($column, $amount = 1, array $extra = [], array $options = []) {
         $query = ['$inc' => [$column => $amount]];
+
         if (!empty($extra)) {
             $query['$set'] = $extra;
         }
+
         // Protect
         $this->where(function ($query) use ($column) {
             $query->where($column, 'exists', false);
+
             $query->orWhereNotNull($column);
         });
+
+        $options = $this->inheritConnectionOptions($options);
 
         return $this->performUpdate($query, $options);
     }
@@ -571,6 +645,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function pluck($column, $key = null) {
         $results = $this->get($key === null ? [$column] : [$column, $key]);
+
         // Convert ObjectID's to strings
         if ($key == '_id') {
             $results = $results->map(function ($item) {
@@ -579,9 +654,10 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
                 return $item;
             });
         }
+
         $p = carr::pluck($results, $column, $key);
 
-        return $this->useCollections ? new CCollection($p) : $p;
+        return new CCollection($p);
     }
 
     /**
@@ -594,8 +670,12 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if ($id !== null) {
             $this->where('_id', '=', $id);
         }
+
         $wheres = $this->compileWheres();
-        $result = $this->collection->DeleteMany($wheres);
+        $options = $this->inheritConnectionOptions();
+
+        $result = $this->collection->deleteMany($wheres, $options);
+
         if (1 == (int) $result->isAcknowledged()) {
             return $result->getDeletedCount();
         }
@@ -608,7 +688,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function from($collection, $as = null) {
         if ($collection) {
-            $this->collection = $this->connection->driver()->getCollection($collection);
+            $this->collection = $this->connection->getCollection($collection);
         }
 
         return parent::from($collection);
@@ -618,9 +698,10 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      * @inheritdoc
      */
     public function truncate() {
-        $result = $this->collection->drop();
+        $options = $this->inheritConnectionOptions();
+        $result = $this->collection->deleteMany([], $options);
 
-        return 1 == (int) $result->ok;
+        return 1 === (int) $result->isAcknowledged();
     }
 
     /**
@@ -711,10 +792,13 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if (!is_array($columns)) {
             $columns = [$columns];
         }
+
         $fields = [];
+
         foreach ($columns as $column) {
             $fields[$column] = 1;
         }
+
         $query = ['$unset' => $fields];
 
         return $this->performUpdate($query);
@@ -724,7 +808,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      * @inheritdoc
      */
     public function newQuery() {
-        return new static($this->connection, $this->processor);
+        return new self($this->connection, $this->processor);
     }
 
     /**
@@ -740,6 +824,9 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if (!array_key_exists('multiple', $options)) {
             $options['multiple'] = true;
         }
+
+        $options = $this->inheritConnectionOptions($options);
+
         $wheres = $this->compileWheres();
         $result = $this->collection->UpdateMany($wheres, $query, $options);
         if (1 == (int) $result->isAcknowledged()) {
@@ -760,6 +847,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         if (is_string($id) && strlen($id) === 24 && ctype_xdigit($id)) {
             return new ObjectID($id);
         }
+
         if (is_string($id) && strlen($id) === 16 && preg_match('~[^\x20-\x7E\t\r\n]~', $id) > 0) {
             return new Binary($id, Binary::TYPE_UUID);
         }
@@ -772,15 +860,17 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and') {
         $params = func_get_args();
+
         // Remove the leading $ from operators.
         if (func_num_args() == 3) {
             $operator = &$params[1];
+
             if (cstr::startsWith($operator, '$')) {
                 $operator = substr($operator, 1);
             }
         }
 
-        return call_user_func_array('parent::where', $params);
+        return parent::where(...$params);
     }
 
     /**
@@ -788,15 +878,18 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      *
      * @return array
      */
-    protected function compileWheres() {
+    protected function compileWheres(): array {
         // The wheres to compile.
         $wheres = $this->wheres ?: [];
+
         // We will add all compiled wheres to this array.
         $compiled = [];
+
         foreach ($wheres as $i => &$where) {
             // Make sure the operator is in lowercase.
             if (isset($where['operator'])) {
                 $where['operator'] = strtolower($where['operator']);
+
                 // Operator conversions
                 $convert = [
                     'regexp' => 'regex',
@@ -808,10 +901,12 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
                     'centersphere' => 'centerSphere',
                     'uniquedocs' => 'uniqueDocs',
                 ];
+
                 if (array_key_exists($where['operator'], $convert)) {
                     $where['operator'] = $convert[$where['operator']];
                 }
             }
+
             // Convert id's.
             if (isset($where['column']) && ($where['column'] == '_id' || cstr::endsWith($where['column'], '._id'))) {
                 // Multiple values.
@@ -824,35 +919,39 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
                     $where['value'] = $this->convertKey($where['value']);
                 }
             }
+
             // Convert DateTime values to UTCDateTime.
             if (isset($where['value'])) {
                 if (is_array($where['value'])) {
                     array_walk_recursive($where['value'], function (&$item, $key) {
-                        if ($item instanceof DateTime) {
-                            $item = new UTCDateTime($item->getTimestamp() * 1000);
+                        if ($item instanceof DateTimeInterface) {
+                            $item = new UTCDateTime($item->format('Uv'));
                         }
                     });
                 } else {
-                    if ($where['value'] instanceof DateTime) {
-                        $where['value'] = new UTCDateTime($where['value']->getTimestamp() * 1000);
+                    if ($where['value'] instanceof DateTimeInterface) {
+                        $where['value'] = new UTCDateTime($where['value']->format('Uv'));
                     }
                 }
             } elseif (isset($where['values'])) {
                 array_walk_recursive($where['values'], function (&$item, $key) {
-                    if ($item instanceof DateTime) {
-                        $item = new UTCDateTime($item->getTimestamp() * 1000);
+                    if ($item instanceof DateTimeInterface) {
+                        $item = new UTCDateTime($item->format('Uv'));
                     }
                 });
             }
+
             // The next item in a "chain" of wheres devices the boolean of the
             // first item. So if we see that there are multiple wheres, we will
             // use the operator of the next where.
             if ($i == 0 && count($wheres) > 1 && $where['boolean'] == 'and') {
                 $where['boolean'] = $wheres[$i + 1]['boolean'];
             }
+
             // We use different methods to compile different wheres.
             $method = "compileWhere{$where['type']}";
             $result = $this->{$method}($where);
+
             // Wrap the where with an $or operator.
             if ($where['boolean'] == 'or') {
                 $result = ['$or' => [$result]];
@@ -861,6 +960,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
                 // to make nested wheres work.
                 $result = ['$and' => [$result]];
             }
+
             // Merge the compiled where with the others.
             $compiled = array_merge_recursive($compiled, $result);
         }
@@ -886,6 +986,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     protected function compileWhereBasic(array $where) {
         extract($where);
+
         // Replace like or not like with a Regex instance.
         if (in_array($operator, ['like', 'not like'])) {
             if ($operator === 'not like') {
@@ -893,8 +994,10 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             } else {
                 $operator = '=';
             }
+
             // Convert to regular expression.
             $regex = preg_replace('#(^|[^\\\])%#', '$1.*', preg_quote($value));
+
             // Convert like to regular expression.
             if (!cstr::startsWith($value, '%')) {
                 $regex = '^' . $regex;
@@ -902,6 +1005,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
             if (!cstr::endsWith($value, '%')) {
                 $regex .= '$';
             }
+
             $value = new Regex($regex, 'i');
         } elseif (in_array($operator, ['regexp', 'not regexp', 'regex', 'not regex'])) {
             // Manipulate regexp operations.
@@ -912,12 +1016,14 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
                 $regstr = substr($value, 1, -(strlen($flag) + 1));
                 $value = new Regex($regstr, $flag);
             }
+
             // For inverse regexp operations, we can just use the $not operator
             // and pass it a Regex instence.
             if (cstr::startsWith($operator, 'not')) {
                 $operator = 'not';
             }
         }
+
         if (!isset($operator) || $operator == '=') {
             $query = [$column => $value];
         } elseif (array_key_exists($operator, $this->conversion)) {
@@ -993,6 +1099,7 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
      */
     protected function compileWhereBetween(array $where) {
         extract($where);
+
         if ($not) {
             return [
                 '$or' => [
@@ -1021,6 +1128,76 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
     /**
      * @param array $where
      *
+     * @return array
+     */
+    protected function compileWhereDate(array $where) {
+        extract($where);
+
+        $where['operator'] = $operator;
+        $where['value'] = $value;
+
+        return $this->compileWhereBasic($where);
+    }
+
+    /**
+     * @param array $where
+     *
+     * @return array
+     */
+    protected function compileWhereMonth(array $where) {
+        extract($where);
+
+        $where['operator'] = $operator;
+        $where['value'] = $value;
+
+        return $this->compileWhereBasic($where);
+    }
+
+    /**
+     * @param array $where
+     *
+     * @return array
+     */
+    protected function compileWhereDay(array $where) {
+        extract($where);
+
+        $where['operator'] = $operator;
+        $where['value'] = $value;
+
+        return $this->compileWhereBasic($where);
+    }
+
+    /**
+     * @param array $where
+     *
+     * @return array
+     */
+    protected function compileWhereYear(array $where) {
+        extract($where);
+
+        $where['operator'] = $operator;
+        $where['value'] = $value;
+
+        return $this->compileWhereBasic($where);
+    }
+
+    /**
+     * @param array $where
+     *
+     * @return array
+     */
+    protected function compileWhereTime(array $where) {
+        extract($where);
+
+        $where['operator'] = $operator;
+        $where['value'] = $value;
+
+        return $this->compileWhereBasic($where);
+    }
+
+    /**
+     * @param array $where
+     *
      * @return mixed
      */
     protected function compileWhereRaw(array $where) {
@@ -1038,6 +1215,17 @@ class CDatabase_Query_Builder_MongoDBBuilder extends CDatabase_Query_Builder {
         $this->options = $options;
 
         return $this;
+    }
+
+    /**
+     * Apply the connection's session to options if it's not already specified.
+     */
+    private function inheritConnectionOptions(array $options = []): array {
+        if (!isset($options['session']) && ($session = $this->connection->getSession())) {
+            $options['session'] = $session;
+        }
+
+        return $options;
     }
 
     /**

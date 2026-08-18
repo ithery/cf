@@ -1,17 +1,31 @@
 <?php
 
 class CFConsole {
+    /**
+     * The commands that are available to the console application.
+     *
+     * @var array
+     */
     public static $commands = [];
 
+    /**
+     * The default commands that are always available.
+     *
+     * @var array
+     */
     public static $defaultCommands = [
         CConsole_Command_VersionCommand::class,
-        CConsole_Command_StatusCommand::class,
+        CConsole_Command_AboutCommand::class,
         CConsole_Command_ServeCommand::class,
         CConsole_Command_TinkerCommand::class,
         CConsole_Command_KeyGenerateCommand::class,
         CConsole_Command_ComposerCommand::class,
         CConsole_Command_EnvironmentCommand::class,
         CConsole_Command_Database_DbCommand::class,
+        CConsole_Command_Database_ExplainCommand::class,
+        CConsole_Command_Database_MonitorCommand::class,
+        CConsole_Command_Database_ShowCommand::class,
+        CConsole_Command_Database_SchemaCommand::class,
         CConsole_Command_Api_JWTSecretCommand::class,
         CConsole_Command_Api_OAuth_KeyCommand::class,
         CConsole_Command_Api_OAuth_ClientCommand::class,
@@ -60,8 +74,24 @@ class CFConsole {
         CConsole_Command_DevSuite_DevSuiteSshCommand::class,
         CConsole_Command_DevSuite_DevSuiteSshListCommand::class,
         CConsole_Command_DevSuite_DevSuiteSshCreateCommand::class,
-        CConsole_Command_DevSuite_DevSuiteDeployInitCommand::class,
-        CConsole_Command_DevSuite_DevSuiteDeployRunCommand::class,
+        CConsole_Command_DevCloud_DevCloudLoginCommand::class,
+        CConsole_Command_DevCloud_DevCloudTeamsCommand::class,
+        CConsole_Command_DevCloud_DevCloudTeamSwitchCommand::class,
+        CConsole_Command_DevCloud_App_DevCloudAppInfoCommand::class,
+        CConsole_Command_DevCloud_Project_DevCloudProjectCreateCommand::class,
+        CConsole_Command_DevCloud_Git_DevCloudGitCreateCommand::class,
+        CConsole_Command_DevCloud_App_DevCloudAppCreateCommand::class,
+        CConsole_Command_DevCloud_Database_DevCloudDatabaseCreateDevCommand::class,
+        CConsole_Command_DevCloud_App_DevCloudAppScaffoldCommand::class,
+        CConsole_Command_DevCloud_Server_Command_DevCloudServerCommandListCommand::class,
+        CConsole_Command_DevCloud_Server_Command_DevCloudServerCommandRunCommand::class,
+        CConsole_Command_DevCloud_Server_DevCloudServerListCommand::class,
+        CConsole_Command_DevCloud_Server_DevCloudServerStatusCommand::class,
+        CConsole_Command_DevCloud_Server_DevCloudServerWebServerCommand::class,
+        CConsole_Command_DevCloud_Server_Vhost_DevCloudServerVhostListCommand::class,
+        CConsole_Command_DevCloud_Server_Service_DevCloudServerServiceControlCommand::class,
+        CConsole_Command_DevCloud_Collector_DevCloudCollectorExceptionCommand::class,
+        CConsole_Command_DevCloud_Collector_DevCloudCollectorExceptionListCommand::class,
         CConsole_Command_Make_MakeControllerCommand::class,
         CConsole_Command_Make_MakeModelCommand::class,
         CConsole_Command_Make_MakeConfigCommand::class,
@@ -69,26 +99,49 @@ class CFConsole {
         CConsole_Command_Make_MakeThemeCommand::class,
         CConsole_Command_Make_MakeTestCommand::class,
         CConsole_Command_Model_ModelListCommand::class,
+        CConsole_Command_Model_ModelShowCommand::class,
         CConsole_Command_Model_ModelTablesCommand::class,
         CConsole_Command_Model_ModelUpdateCommand::class,
-        CConsole_Command_App_AppCreateCommand::class,
-        CConsole_Command_App_AppPresetCommand::class,
-        CConsole_Command_App_AppPresetAdminCommand::class,
+        CConsole_Command_Asset_GoogleFontsFetchCommand::class,
+        CConsole_Command_App_AppInitCommand::class,
         CConsole_Command_App_AppCodeCommand::class,
         CConsole_Command_TestInstallCommand::class,
         CConsole_Command_TestCommand::class,
+        CConsole_Command_NpmCommand::class,
         CConsole_Command_Phpstan_InstallCommand::class,
         CConsole_Command_PhpstanCommand::class,
         CConsole_Command_Phpstan_ClearCommand::class,
         CConsole_Command_Phpcs_InstallCommand::class,
+        CConsole_Command_Phpcs_ConfigCommand::class,
         CConsole_Command_PhpcsCommand::class,
         CConsole_Command_Phpcs_FixCommand::class,
         CConsole_Command_Phpcsfixer_InstallCommand::class,
+        CConsole_Command_Phpcsfixer_FormatCommand::class,
+        CConsole_Command_Phpcsfixer_ConfigCommand::class,
         CConsole_Command_PhpcsfixerCommand::class,
         CWebSocket_Console_Command_StartServer::class,
-        CTesting_Console_ChromeDriverCommand::class,
+        CTesting_Browser_Console_ChromeDriverCommand::class,
+        CTesting_Browser_Console_BrowserCommand::class,
+        CTesting_Browser_Console_BrowserFailsCommand::class,
+        CTesting_Browser_Console_PurgeCommand::class,
+        CTesting_Browser_Console_InstallCommand::class,
+        CTesting_Browser_Console_MakeCommand::class,
+        CTesting_Browser_Console_PageCommand::class,
+        CTesting_Browser_Console_ComponentCommand::class,
+        CConsole_Command_Server_Monitor_ListenCommand::class,
+        CConsole_Command_Docs_PhpDoc_InstallCommand::class,
+        CConsole_Command_Docs_PhpDoc_GenerateCommand::class,
+        CConsole_Command_Docs_ApiGen_InstallCommand::class,
+        CConsole_Command_Docs_ApiGen_GenerateCommand::class,
+        CConsole_Command_CF_TestCommand::class,
+
     ];
 
+    /**
+     * Execute the console application.
+     *
+     * @return void
+     */
     public static function execute() {
         $kernel = new CConsole_Kernel();
         $commands = array_merge(static::$defaultCommands, static::$commands);
@@ -106,6 +159,13 @@ class CFConsole {
         exit($status);
     }
 
+    /**
+     * Add a command class to the console application.
+     *
+     * @param string|array $classArray
+     *
+     * @return void
+     */
     public static function addCommand($classArray) {
         $classArray = carr::wrap($classArray);
         foreach ($classArray as $class) {

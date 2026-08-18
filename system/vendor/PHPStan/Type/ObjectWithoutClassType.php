@@ -2,14 +2,17 @@
 
 namespace PHPStan\Type;
 
-use PHPStan\TrinaryLogic;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\Type\Enum\EnumCaseObjectType;
 use PHPStan\Type\Traits\NonGeneralizableTypeTrait;
 use PHPStan\Type\Traits\NonGenericTypeTrait;
 use PHPStan\Type\Traits\ObjectTypeTrait;
+use PHPStan\Type\Traits\SubstractableTypeTrait;
 use PHPStan\Type\Traits\UndecidedComparisonTypeTrait;
-use function sprintf;
 
 /** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::isObject()')]
 class ObjectWithoutClassType implements SubtractableType
 {
 
@@ -17,6 +20,7 @@ class ObjectWithoutClassType implements SubtractableType
 	use NonGenericTypeTrait;
 	use UndecidedComparisonTypeTrait;
 	use NonGeneralizableTypeTrait;
+	use SubstractableTypeTrait;
 
 	private ?Type $subtractedType;
 
@@ -32,26 +36,38 @@ class ObjectWithoutClassType implements SubtractableType
 		$this->subtractedType = $subtractedType;
 	}
 
-	/**
-	 * @return string[]
-	 */
 	public function getReferencedClasses(): array
 	{
 		return [];
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function getObjectClassNames(): array
+	{
+		return [];
+	}
+
+	public function getObjectClassReflections(): array
+	{
+		return [];
+	}
+
+	public function getClassStringType(): Type
+	{
+		return new ClassStringType();
+	}
+
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
 		if ($type instanceof CompoundType) {
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
-		return TrinaryLogic::createFromBoolean(
-			$type instanceof self || $type instanceof TypeWithClassName,
+		return AcceptsResult::createFromBoolean(
+			$type instanceof self || $type instanceof ObjectShapeType || $type->getObjectClassNames() !== [],
 		);
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
@@ -59,27 +75,31 @@ class ObjectWithoutClassType implements SubtractableType
 
 		if ($type instanceof self) {
 			if ($this->subtractedType === null) {
-				return TrinaryLogic::createYes();
+				return IsSuperTypeOfResult::createYes();
 			}
 			if ($type->subtractedType !== null) {
 				$isSuperType = $type->subtractedType->isSuperTypeOf($this->subtractedType);
 				if ($isSuperType->yes()) {
-					return TrinaryLogic::createYes();
+					return $isSuperType;
 				}
 			}
 
-			return TrinaryLogic::createMaybe();
+			return IsSuperTypeOfResult::createMaybe();
 		}
 
-		if ($type instanceof TypeWithClassName) {
-			if ($this->subtractedType === null) {
-				return TrinaryLogic::createYes();
-			}
-
-			return $this->subtractedType->isSuperTypeOf($type)->negate();
+		if ($type instanceof ObjectShapeType) {
+			return IsSuperTypeOfResult::createYes();
 		}
 
-		return TrinaryLogic::createNo();
+		if ($type->getObjectClassNames() === []) {
+			return IsSuperTypeOfResult::createNo();
+		}
+
+		if ($this->subtractedType === null) {
+			return IsSuperTypeOfResult::createYes();
+		}
+
+		return $this->subtractedType->isSuperTypeOf($type)->negate();
 	}
 
 	public function equals(Type $type): bool
@@ -108,15 +128,18 @@ class ObjectWithoutClassType implements SubtractableType
 		return $level->handle(
 			static fn (): string => 'object',
 			static fn (): string => 'object',
-			function () use ($level): string {
-				$description = 'object';
-				if ($this->subtractedType !== null) {
-					$description .= sprintf('~%s', $this->subtractedType->describe($level));
-				}
-
-				return $description;
-			},
+			fn (): string => 'object' . $this->describeSubtractedType($this->subtractedType, $level),
 		);
+	}
+
+	public function getEnumCases(): array
+	{
+		return [];
+	}
+
+	public function getEnumCaseObject(): ?EnumCaseObjectType
+	{
+		return null;
 	}
 
 	public function subtract(Type $type): Type
@@ -157,21 +180,52 @@ class ObjectWithoutClassType implements SubtractableType
 		return $this;
 	}
 
-	public function tryRemove(Type $typeToRemove): ?Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		if ($this->isSuperTypeOf($typeToRemove)->yes()) {
-			return $this->subtract($typeToRemove);
+		if ($this->subtractedType === null) {
+			return $this;
 		}
 
-		return null;
+		return new self();
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function tryRemove(Type $typeToRemove): ?Type
 	{
-		return new self($properties['subtractedType'] ?? null);
+		// object is the top of the object hierarchy, so removal is exactly the
+		// subtraction - also when an earlier subtraction already lowered
+		// isSuperTypeOf() from yes to maybe, which used to remove nothing at all
+		if ($this->isSuperTypeOf($typeToRemove)->no()) {
+			return null;
+		}
+
+		return $this->subtract($typeToRemove);
+	}
+
+	public function exponentiate(Type $exponent): Type
+	{
+		if (!$exponent instanceof NeverType && !$this->isSuperTypeOf($exponent)->no()) {
+			return TypeCombinator::union($this, $exponent);
+		}
+
+		return new BenevolentUnionType([
+			new FloatType(),
+			new IntegerType(),
+		]);
+	}
+
+	public function getFiniteTypes(): array
+	{
+		return [];
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode('object');
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return false;
 	}
 
 }

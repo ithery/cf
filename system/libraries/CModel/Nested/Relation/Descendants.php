@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 24, 2018, 2:22:24 PM
- */
 class CModel_Nested_Relation_Descendants extends CModel_Nested_Relation {
     /**
      * Set the base constraints on the relation query.
@@ -22,15 +16,15 @@ class CModel_Nested_Relation_Descendants extends CModel_Nested_Relation {
     }
 
     /**
-     * @param QueryBuilder $query
-     * @param Model        $model
+     * @param CModel_Nested_Query $query
+     * @param CModel              $model
      */
     protected function addEagerConstraint($query, $model) {
         $query->orWhereDescendantOf($model);
     }
 
     /**
-     * @param Model $model
+     * @param CModel $model
      * @param $related
      *
      * @return mixed

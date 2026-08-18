@@ -58,4 +58,17 @@ abstract class CView_CompilerAbstract {
 
         return CFile::lastModified($path) >= CFile::lastModified($compiled);
     }
+
+    /**
+     * Create the compiled file directory if necessary.
+     *
+     * @param string $path
+     *
+     * @return void
+     */
+    protected function ensureCompiledDirectoryExists($path) {
+        if (!CFile::exists(dirname($path))) {
+            CFile::makeDirectory(dirname($path), 0777, true, true);
+        }
+    }
 }

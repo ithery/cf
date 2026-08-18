@@ -4,10 +4,13 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\Accessory\AccessoryLiteralStringType;
+use PHPStan\Type\Accessory\AccessoryLowercaseStringType;
 use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
 use PHPStan\Type\Accessory\AccessoryNonFalsyStringType;
+use PHPStan\Type\Accessory\AccessoryUppercaseStringType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntersectionType;
@@ -15,7 +18,8 @@ use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use function count;
 
-class StrPadFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class StrPadFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -44,15 +48,20 @@ class StrPadFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExte
 			$accessoryTypes[] = new AccessoryNonEmptyStringType();
 		}
 
-		if ($inputType->isLiteralString()->yes()) {
-			if (count($args) < 3) {
-				$accessoryTypes[] = new AccessoryLiteralStringType();
-			} else {
-				$padStringType = $scope->getType($args[2]->value);
-				if ($padStringType->isLiteralString()->yes()) {
-					$accessoryTypes[] = new AccessoryLiteralStringType();
-				}
-			}
+		if (count($args) < 3) {
+			$padStringType = null;
+		} else {
+			$padStringType = $scope->getType($args[2]->value);
+		}
+
+		if ($inputType->isLiteralString()->yes() && ($padStringType === null || $padStringType->isLiteralString()->yes())) {
+			$accessoryTypes[] = new AccessoryLiteralStringType();
+		}
+		if ($inputType->isLowercaseString()->yes() && ($padStringType === null || $padStringType->isLowercaseString()->yes())) {
+			$accessoryTypes[] = new AccessoryLowercaseStringType();
+		}
+		if ($inputType->isUppercaseString()->yes() && ($padStringType === null || $padStringType->isUppercaseString()->yes())) {
+			$accessoryTypes[] = new AccessoryUppercaseStringType();
 		}
 
 		if (count($accessoryTypes) > 0) {

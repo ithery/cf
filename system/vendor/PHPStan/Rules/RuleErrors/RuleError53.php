@@ -10,12 +10,14 @@ use PHPStan\Rules\RuleError;
 /**
  * @internal Use PHPStan\Rules\RuleErrorBuilder instead.
  */
-class RuleError53 implements RuleError, FileRuleError, IdentifierRuleError, MetadataRuleError
+final class RuleError53 implements RuleError, FileRuleError, IdentifierRuleError, MetadataRuleError
 {
 
 	public string $message;
 
 	public string $file;
+
+	public string $fileDescription;
 
 	public string $identifier;
 
@@ -30,6 +32,11 @@ class RuleError53 implements RuleError, FileRuleError, IdentifierRuleError, Meta
 	public function getFile(): string
 	{
 		return $this->file;
+	}
+
+	public function getFileDescription(): string
+	{
+		return $this->fileDescription;
 	}
 
 	public function getIdentifier(): string

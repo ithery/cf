@@ -3,14 +3,14 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @property      string  $name
- * @property      string  $createdby
- * @property      string  $updatedby
- * @property      CCarbon $created
- * @property      CCarbon $updated
- * @property      int     $status
- * @property      int     $depth
- * @property-read int     $role_id
+ * @property      string                                                    $name
+ * @property      null|string                                               $createdby
+ * @property      null|string                                               $updatedby
+ * @property      null|string|CCarbon|\Carbon\Carbon|\CarbonV3\Carbonstring $created
+ * @property      null|string|CCarbon|\Carbon\Carbon|\CarbonV3\Carbonstring $updated
+ * @property      int                                                       $status
+ * @property      int                                                       $depth
+ * @property-read int                                                       $role_id
  *
  * @method static CModel_Collection byAccess(string $permitWithoutWildcard)
  * @method static CModel_Collection byAnyAccess(string $permitWithoutWildcard)
@@ -23,6 +23,9 @@ trait CApp_Model_Trait_Roles {
      */
     private $cachePermissions;
 
+    /**
+     * @param array $attributes
+     */
     public function __construct(array $attributes = []) {
         parent::__construct($attributes);
         $this->primaryKey = 'role_id';
@@ -37,16 +40,34 @@ trait CApp_Model_Trait_Roles {
         return $this->belongsTo(CApp_Model_Org::class)->withTrashed();
     }
 
+    /**
+     * @return CModel_Relation_HasMany
+     */
     public function rolePermission() {
         return $this->hasMany(c::app()->auth()->getRolePermisionModelClass());
     }
 
+    /**
+     * Query scope for filtering roles that have a given permission.
+     *
+     * @param CModel_Query $q
+     * @param string       $permission
+     *
+     * @return void
+     */
     public function scopeWhereHasPermission(CModel_Query $q, $permission) {
         $q->whereHas('rolePermission', function ($q) use ($permission) {
             $q->where('name', '=', $permission);
         });
     }
 
+    /**
+     * @param null|int|string             $rootId
+     * @param null|int|string             $orgId
+     * @param null|array|callable|string  $type
+     *
+     * @return CCollection
+     */
     public function getDescendantsTree($rootId = null, $orgId = null, $type = null) {
         /** @var CApp_Model_Roles $this */
         $root = $this;

@@ -7,6 +7,9 @@ use Symfony\Component\Finder\Finder;
 use OpenApi\Generator as OpenApiGenerator;
 use Symfony\Component\Yaml\Dumper as YamlDumper;
 
+/**
+ * @see https://github.com/zircote/swagger-php
+ */
 class CApi_Docs_Generator {
     protected const SCAN_OPTION_PROCESSORS = 'processors';
 
@@ -45,6 +48,9 @@ class CApi_Docs_Generator {
      */
     protected $yamlDocsFile;
 
+    /**
+     * @var array
+     */
     protected $constants;
 
     /**
@@ -61,6 +67,21 @@ class CApi_Docs_Generator {
      * @var array
      */
     protected $excludedDirs;
+
+    /**
+     * @var string
+     */
+    protected $basePath;
+
+    /**
+     * @var CApi_Docs_SecurityDefinition
+     */
+    protected $security;
+
+    /**
+     * @var bool
+     */
+    protected $yamlCopyRequired;
 
     /**
      * @param array                        $pathsConfig
@@ -173,15 +194,15 @@ class CApi_Docs_Generator {
      */
     protected function setProcessors(OpenApiGenerator $generator): void {
         $processorClasses = carr::get($this->scanOptions, self::SCAN_OPTION_PROCESSORS, []);
-        $processors = [];
+        $processors = $generator->getProcessors();
 
-        foreach ($generator->getProcessors() as $processor) {
-            $processors[] = $processor;
-            if ($processor instanceof \OpenApi\Processors\BuildPaths) {
-                foreach ($processorClasses as $customProcessor) {
-                    $processors[] = new $customProcessor();
-                }
-            }
+        // Appended after all built-in processors (including MergeJsonContent),
+        // so a custom processor sees fully-normalized paths/responses/schemas
+        // instead of raw @OA\JsonContent shorthand - avoids creating a
+        // duplicate MediaType when it needs to read/augment an existing
+        // response's JSON schema.
+        foreach ($processorClasses as $customProcessor) {
+            $processors[] = new $customProcessor();
         }
 
         if (!empty($processors)) {
@@ -219,7 +240,7 @@ class CApi_Docs_Generator {
     /**
      * Generate servers section or basePath depending on Swagger version.
      *
-     * @return $this
+     * @return self
      */
     protected function populateServers(): self {
         if ($this->basePath !== null) {

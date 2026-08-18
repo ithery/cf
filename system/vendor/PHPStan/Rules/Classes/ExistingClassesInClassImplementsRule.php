@@ -4,9 +4,13 @@ namespace PHPStan\Rules\Classes;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Rules\ClassCaseSensitivityCheck;
+use PHPStan\Rules\ClassNameCheck;
 use PHPStan\Rules\ClassNameNodePair;
+use PHPStan\Rules\ClassNameUsageLocation;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function array_map;
@@ -15,12 +19,16 @@ use function sprintf;
 /**
  * @implements Rule<Node\Stmt\Class_>
  */
-class ExistingClassesInClassImplementsRule implements Rule
+#[RegisteredRule(level: 0)]
+#[ValidatesStubFiles]
+final class ExistingClassesInClassImplementsRule implements Rule
 {
 
 	public function __construct(
-		private ClassCaseSensitivityCheck $classCaseSensitivityCheck,
+		private ClassNameCheck $classCheck,
 		private ReflectionProvider $reflectionProvider,
+		#[AutowiredParameter(ref: '%tips.discoveringSymbols%')]
+		private bool $discoveringSymbolsTip,
 	)
 	{
 	}
@@ -32,24 +40,36 @@ class ExistingClassesInClassImplementsRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$messages = $this->classCaseSensitivityCheck->checkClassNames(
-			array_map(static fn (Node\Name $interfaceName): ClassNameNodePair => new ClassNameNodePair((string) $interfaceName, $interfaceName), $node->implements),
-		);
-
 		$currentClassName = null;
 		if (isset($node->namespacedName)) {
 			$currentClassName = (string) $node->namespacedName;
 		}
 
+		$messages = $this->classCheck->checkClassNames(
+			$scope,
+			array_map(static fn (Node\Name $interfaceName): ClassNameNodePair => new ClassNameNodePair((string) $interfaceName, $interfaceName), $node->implements),
+			ClassNameUsageLocation::from(ClassNameUsageLocation::CLASS_IMPLEMENTS, [
+				'currentClassName' => $currentClassName,
+			]),
+		);
+
 		foreach ($node->implements as $implements) {
 			$implementedClassName = (string) $implements;
 			if (!$this->reflectionProvider->hasClass($implementedClassName)) {
 				if (!$scope->isInClassExists($implementedClassName)) {
-					$messages[] = RuleErrorBuilder::message(sprintf(
+					$errorBuilder = RuleErrorBuilder::message(sprintf(
 						'%s implements unknown interface %s.',
 						$currentClassName !== null ? sprintf('Class %s', $currentClassName) : 'Anonymous class',
 						$implementedClassName,
-					))->nonIgnorable()->discoveringSymbolsTip()->build();
+					))
+						->identifier('interface.notFound')
+						->nonIgnorable();
+
+					if ($this->discoveringSymbolsTip) {
+						$errorBuilder->discoveringSymbolsTip();
+					}
+
+					$messages[] = $errorBuilder->build();
 				}
 			} else {
 				$reflection = $this->reflectionProvider->getClass($implementedClassName);
@@ -58,19 +78,28 @@ class ExistingClassesInClassImplementsRule implements Rule
 						'%s implements class %s.',
 						$currentClassName !== null ? sprintf('Class %s', $currentClassName) : 'Anonymous class',
 						$reflection->getDisplayName(),
-					))->nonIgnorable()->build();
+					))
+						->identifier('classImplements.class')
+						->nonIgnorable()
+						->build();
 				} elseif ($reflection->isTrait()) {
 					$messages[] = RuleErrorBuilder::message(sprintf(
 						'%s implements trait %s.',
 						$currentClassName !== null ? sprintf('Class %s', $currentClassName) : 'Anonymous class',
 						$reflection->getDisplayName(),
-					))->nonIgnorable()->build();
+					))
+						->identifier('classImplements.trait')
+						->nonIgnorable()
+						->build();
 				} elseif ($reflection->isEnum()) {
 					$messages[] = RuleErrorBuilder::message(sprintf(
 						'%s implements enum %s.',
 						$currentClassName !== null ? sprintf('Class %s', $currentClassName) : 'Anonymous class',
 						$reflection->getDisplayName(),
-					))->nonIgnorable()->build();
+					))
+						->identifier('classImplements.enum')
+						->nonIgnorable()
+						->build();
 				}
 			}
 		}

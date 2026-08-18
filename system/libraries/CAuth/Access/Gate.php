@@ -78,7 +78,7 @@ final class CAuth_Access_Gate implements CAuth_Contract_GateInterface {
         array $policies = [],
         array $beforeCallbacks = [],
         array $afterCallbacks = [],
-        callable $guessPolicyNamesUsingCallback = null
+        ?callable $guessPolicyNamesUsingCallback = null
     ) {
         $this->policies = $policies;
         $this->abilities = $abilities;
@@ -146,7 +146,7 @@ final class CAuth_Access_Gate implements CAuth_Contract_GateInterface {
      *
      * @return $this
      */
-    public function resource($name, $class, array $abilities = null) {
+    public function resource($name, $class, ?array $abilities = null) {
         $abilities = $abilities ?: [
             'viewAny' => 'viewAny',
             'view' => 'view',

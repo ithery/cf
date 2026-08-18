@@ -17,14 +17,23 @@ class CManager_DataProviderParameter {
         $this->sortData = $sortData;
     }
 
+    /**
+     * @return array
+     */
     public function getSearchAndData() {
         return $this->searchAndData;
     }
 
+    /**
+     * @return array
+     */
     public function getSearchOrData() {
         return $this->searchOrData;
     }
 
+    /**
+     * @return array
+     */
     public function getSortData() {
         return $this->sortData;
     }

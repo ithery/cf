@@ -19,7 +19,7 @@ class CVendor_LiteSpeed_Node_FileLine {
     }
 
     public function addEndComment($note1) {
-        $this->note1 .= "${note1}\n";
+        $this->note1 .= "{$note1}\n";
     }
 
     public function debugStr() {

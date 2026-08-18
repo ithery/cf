@@ -1,12 +1,7 @@
 <?php
 
 /**
- * Description of Client
- *
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since May 30, 2020
+ * @deprecated 1.8
  */
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -59,13 +54,14 @@ class CXMPP_Ejabberd_Client {
     /**
      * @param CXMPP_Ejabberd_CommandAbstract
      *
-     * @return null|\Psr\Http\Message\StreamInterface
-     *
      * @throws EjabberdException
+     *
+     * @return null|\Psr\Http\Message\StreamInterface
      */
     public function execute(CXMPP_Ejabberd_CommandAbstract $command) {
         $result = null;
         $commandName = $command->getCommandName();
+
         try {
             $request = [
                 'headers' => [
@@ -96,6 +92,7 @@ class CXMPP_Ejabberd_Client {
         if ($response->hasError()) {
             throw $response->throwException();
         }
+
         return $response->data();
     }
 

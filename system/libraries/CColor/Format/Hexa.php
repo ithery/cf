@@ -102,6 +102,7 @@ class CColor_Format_Hexa extends CColor_FormatAbstract {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         list($r, $g, $b, $a) = $this->values();
 

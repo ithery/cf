@@ -1,6 +1,9 @@
 <?php
 
 class CApi_Docs_GeneratorFactory {
+    /**
+     * @var string
+     */
     protected $group;
 
     /**
@@ -78,10 +81,15 @@ class CApi_Docs_GeneratorFactory {
      */
     protected $constants;
 
+    /**
+     * Create a new API generator factory instance.
+     *
+     * @param string $group
+     */
     public function __construct($group) {
         $this->group = $group;
 
-        $config = CF::config('api.groups.' . $this->group . 'docs');
+        $config = CF::config('api.groups.' . $this->group . '.docs');
         $this->annotationDirs = carr::get($config, 'path.annotations', []);
         $this->excludeDirs = carr::get($config, 'path.excludes', []);
         $this->outputDir = carr::get($config, 'path.output.directory', '');
@@ -100,12 +108,22 @@ class CApi_Docs_GeneratorFactory {
         $this->yamlCopyRequired = carr::get($config, 'generate_yaml', false);
     }
 
+    /**
+     * @param string $path
+     *
+     * @return $this
+     */
     public function addAnnotationDir($path) {
         $this->annotationDirs[] = $path;
 
         return $this;
     }
 
+    /**
+     * @param string $path
+     *
+     * @return $this
+     */
     public function addExcludeDir($path) {
         $this->excludeDirs[] = $path;
 
@@ -142,6 +160,19 @@ class CApi_Docs_GeneratorFactory {
 
     public function setConstants(array $constants) {
         $this->constants = $constants;
+
+        return $this;
+    }
+
+    /**
+     * Set the security schemes for the generator.
+     *
+     * @param array $securitySchemes
+     *
+     * @return $this
+     */
+    public function setSecuritySchemes($securitySchemes) {
+        $this->securitySchemes = $securitySchemes;
 
         return $this;
     }

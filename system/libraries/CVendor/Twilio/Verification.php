@@ -21,7 +21,7 @@ class CVendor_Twilio_Verification {
      *
      * @throws \Twilio\Exceptions\ConfigurationException
      */
-    public function __construct($client, string $verificationSid = null) {
+    public function __construct($client, ?string $verificationSid = null) {
         $this->client = $client;
         $this->verificationSid = $verificationSid;
     }

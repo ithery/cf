@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 28, 2019, 9:34:34 PM
- */
 class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
     /**
      * @var CModel
@@ -30,6 +24,7 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
         $args = func_get_args();
         $model = $args[0];
         $attributes = array_slice($args, 1);
+
         return new self($model, $attributes);
     }
 
@@ -50,26 +45,31 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
         $this->model = $model;
         if (is_array($attributes)) {
             $this->attributes = CModel_Search_SearchableAttribute::createMany($attributes);
+
             return;
         }
         if (is_string($attributes)) {
             $this->attributes = CModel_Search_SearchableAttribute::create($attributes);
+
             return;
         }
         if (is_callable($attributes)) {
             $callable = $attributes;
             $callable($this);
+
             return;
         }
     }
 
     public function addSearchableAttribute($attribute, $partial = true) {
         $this->attributes[] = CModel_Search_SearchableAttribute::create($attribute, $partial);
+
         return $this;
     }
 
     public function addExactSearchableAttribute($attribute) {
         $this->attributes[] = CModel_Search_SearchableAttribute::createExact($attribute);
+
         return $this;
     }
 
@@ -78,6 +78,7 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
         if (property_exists($model, 'searchableType')) {
             return $model->searchableType;
         }
+
         return $model->getTable();
     }
 
@@ -95,6 +96,7 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
         if ($page != null && $perPage != null) {
             return $query->paginate($perPage, ['*'], 'page', $page);
         }
+
         return $query->get();
     }
 

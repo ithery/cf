@@ -4,7 +4,7 @@ namespace PHPStan\Reflection;
 
 use PHPStan\Type\Type;
 
-class MethodPrototypeReflection implements ClassMemberReflection
+final class MethodPrototypeReflection implements ClassMemberReflection
 {
 
 	/**
@@ -17,7 +17,7 @@ class MethodPrototypeReflection implements ClassMemberReflection
 		private bool $isPrivate,
 		private bool $isPublic,
 		private bool $isAbstract,
-		private bool $isFinal,
+		private bool $isInternal,
 		private array $variants,
 		private ?Type $tentativeReturnType,
 	)
@@ -54,9 +54,9 @@ class MethodPrototypeReflection implements ClassMemberReflection
 		return $this->isAbstract;
 	}
 
-	public function isFinal(): bool
+	public function isInternal(): bool
 	{
-		return $this->isFinal;
+		return $this->isInternal;
 	}
 
 	public function getDocComment(): ?string

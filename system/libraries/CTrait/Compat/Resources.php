@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2018, 5:40:40 AM
- */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Resources {
     /**
@@ -24,10 +18,10 @@ trait CTrait_Compat_Resources {
     /**
      * @deprecated since version 1.2, please use function getPath
      *
-     * @param type $filename
-     * @param type $size
+     * @param string $filename
+     * @param string $size
      *
-     * @return type
+     * @return string
      */
     public static function get_path($filename, $size = null) {
         return self::getPath($filename, $size);
@@ -58,6 +52,7 @@ trait CTrait_Compat_Resources {
     public static function get_all_file($org_code, $app_code, $resource_type, $depth = 0) {
         $root_directory = DOCROOT . 'application' . DS . $app_code . DS . 'default' . DS . 'resources' . DS . $org_code . DS . $resource_type;
         $files = CResources::scanDirectory($root_directory);
+
         return $files;
     }
 }

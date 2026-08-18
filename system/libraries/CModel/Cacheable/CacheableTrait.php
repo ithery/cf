@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 3:57:34 PM
- */
 trait CModel_Cacheable_CacheableTrait {
     /**
      * Register an updated model event with the dispatcher.
@@ -83,6 +77,7 @@ trait CModel_Cacheable_CacheableTrait {
             is_dir($dir) || mkdir($dir);
             file_put_contents($file, null);
         }
+
         return json_decode(file_get_contents($file), true) ?: [];
     }
 
@@ -95,13 +90,14 @@ trait CModel_Cacheable_CacheableTrait {
      */
     protected static function flushCacheKeys($modelName) {
         $flushedKeys = [];
-        $keysFile = storage_path('framework/cache/data/rinvex.cacheable.json');
+        $keysFile = storage_path('temp/'.CF::appCode().'/model/keys.cacheable.json');
         $cacheKeys = static::getCacheKeys($keysFile);
         if (isset($cacheKeys[$modelName])) {
             $flushedKeys = $cacheKeys[$modelName];
             unset($cacheKeys[$modelName]);
             file_put_contents($keysFile, json_encode($cacheKeys));
         }
+
         return $flushedKeys;
     }
 
@@ -114,6 +110,7 @@ trait CModel_Cacheable_CacheableTrait {
      */
     public function setCacheLifetime($cacheLifetime) {
         $this->cacheLifetime = $cacheLifetime;
+
         return $this;
     }
 
@@ -135,13 +132,14 @@ trait CModel_Cacheable_CacheableTrait {
      */
     public function setCacheDriver($cacheDriver) {
         $this->cacheDriver = $cacheDriver;
+
         return $this;
     }
 
     /**
      * Get the model cache driver.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getCacheDriver() {
         return $this->cacheDriver ? $this->cacheDriver : null;
@@ -192,6 +190,7 @@ trait CModel_Cacheable_CacheableTrait {
         // event set individually instead of catching event for all the models.
         $event = "model.{$event}: " . static::class;
         $method = $halt ? 'until' : 'dispatch';
+
         return static::$dispatcher->{$method}($event, static::class);
     }
 
@@ -203,6 +202,7 @@ trait CModel_Cacheable_CacheableTrait {
     public function resetCacheConfig() {
         !$this->cacheDriver || $this->cacheDriver = null;
         !$this->cacheLifetime || $this->cacheLifetime = -1;
+
         return $this;
     }
 
@@ -234,6 +234,7 @@ trait CModel_Cacheable_CacheableTrait {
             'unionOrders' => $query->unionOrders,
             'lock' => $query->lock,
         ];
+
         return md5(json_encode([
             $vars,
             $columns,
@@ -267,6 +268,7 @@ trait CModel_Cacheable_CacheableTrait {
 
         if (method_exists(app('cache')->getStore(), 'tags')) {
             $result = $lifetime === -1 ? app('cache')->tags($modelName)->rememberForever($cacheKey, $closure) : app('cache')->tags($modelName)->remember($cacheKey, $lifetime, $closure);
+
             return $result;
         }
         $result = $lifetime === -1 ? app('cache')->rememberForever($cacheKey, $closure) : app('cache')->remember($cacheKey, $lifetime, $closure);
@@ -274,6 +276,7 @@ trait CModel_Cacheable_CacheableTrait {
         static::storeCacheKey($modelName, $cacheKey);
         // We're done, let's clean up!
         $this->resetCacheConfig();
+
         return $result;
     }
 

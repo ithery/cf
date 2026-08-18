@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DatabaseSessionHandler
+ * Description of DatabaseSessionHandler.
  *
  * @author Hery
  */
@@ -27,7 +27,7 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
      *
      * @var int
      */
-    protected $minutes;
+    protected $seconds;
 
     /**
      * The existence state of the session.
@@ -39,37 +39,40 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
     /**
      * Create a new database session handler instance.
      *
-     * @param \CDatabase $connection
-     * @param string     $table
-     * @param int        $seconds
+     * @param \CDatabase_Connection $connection
+     * @param string                $table
+     * @param int                   $seconds
      *
      * @return void
      */
-    public function __construct(CDatabase $connection, $table, $seconds) {
+    public function __construct(CDatabase_Connection $connection, $table, $seconds) {
         $this->table = $table;
         $this->seconds = $seconds;
         $this->connection = $connection;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function open($savePath, $sessionName) {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function close() {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function read($sessionId) {
-        $session = (object) $this->getQuery()->find($sessionId);
+        $session = (object) $this->getQuery()->where('key', '=', $sessionId)->first();
 
         if ($this->expired($session)) {
             $this->exists = true;
@@ -93,14 +96,16 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     protected function expired($session) {
         return isset($session->last_activity)
-            && $session->last_activity < CCarbon::now()->subMinutes($this->minutes)->getTimestamp();
+            && $session->last_activity < CCarbon::now()->subSeconds($this->seconds)->getTimestamp();
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function write($sessionId, $data) {
         $payload = $this->getDefaultPayload($data);
 
@@ -120,16 +125,21 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
     /**
      * Perform an insert operation on the session ID.
      *
-     * @param string $sessionId
-     * @param string $payload
+     * @param string               $sessionId
+     * @param array<string, mixed> $payload
      *
-     * @return bool|null
+     * @return null|bool
      */
     protected function performInsert($sessionId, $payload) {
         try {
-            return $this->getQuery()->insert(carr::set($payload, 'id', $sessionId));
+            carr::set($payload, 'key', $sessionId);
+            carr::set($payload, 'created', c::now());
+            carr::set($payload, 'updated', c::now());
+
+            return $this->getQuery()->insert($payload);
         } catch (CDatabase_Exception_QueryException $e) {
-            $this->performUpdate($sessionId, $payload);
+            throw $e;
+            //$this->performUpdate($sessionId, $payload);
         }
     }
 
@@ -142,7 +152,9 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
      * @return int
      */
     protected function performUpdate($sessionId, $payload) {
-        return $this->getQuery()->where('id', $sessionId)->update($payload);
+        carr::set($payload, 'updated', c::now());
+
+        return $this->getQuery()->where('key', $sessionId)->update($payload);
     }
 
     /**
@@ -158,10 +170,6 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
             'last_activity' => $this->currentTime(),
         ];
 
-        if (!$this->container) {
-            return $payload;
-        }
-
         return c::tap($payload, function (&$payload) {
             $this->addUserInformation($payload)
                 ->addRequestInformation($payload);
@@ -176,9 +184,7 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
      * @return $this
      */
     protected function addUserInformation(&$payload) {
-        if ($this->container->bound(Guard::class)) {
-            $payload['user_id'] = $this->userId();
-        }
+        $payload['user_id'] = $this->userId();
 
         return $this;
     }
@@ -189,7 +195,7 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
      * @return mixed
      */
     protected function userId() {
-        return $this->container->make(Guard::class)->id();
+        return c::app()->auth()->id();
     }
 
     /**
@@ -200,12 +206,10 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
      * @return $this
      */
     protected function addRequestInformation(&$payload) {
-        if ($this->container->bound('request')) {
-            $payload = array_merge($payload, [
-                'ip_address' => $this->ipAddress(),
-                'user_agent' => $this->userAgent(),
-            ]);
-        }
+        $payload = array_merge($payload, [
+            'ip_address' => $this->ipAddress(),
+            'user_agent' => $this->userAgent(),
+        ]);
 
         return $this;
     }
@@ -216,7 +220,7 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
      * @return string
      */
     protected function ipAddress() {
-        return $this->container->make('request')->ip();
+        return c::request()->ip();
     }
 
     /**
@@ -225,21 +229,23 @@ class CSession_Handler_DatabaseSessionHandler implements SessionHandlerInterface
      * @return string
      */
     protected function userAgent() {
-        return substr((string) $this->container->make('request')->header('User-Agent'), 0, 500);
+        return substr((string) c::request()->header('User-Agent'), 0, 500);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function destroy($sessionId) {
-        $this->getQuery()->where('id', $sessionId)->delete();
+        $this->getQuery()->where('key', $sessionId)->delete();
 
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function gc($lifetime) {
         $this->getQuery()->where('last_activity', '<=', $this->currentTime() - $lifetime)->delete();
     }

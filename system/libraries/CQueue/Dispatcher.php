@@ -2,13 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 2:49:31 AM
- */
 class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
+    use CQueue_Trait_ResolvesQueueRoutesTrait;
+
     /**
      * The container implementation.
      *
@@ -45,6 +41,13 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     protected $queueResolver;
 
     /**
+     * Indicates if dispatching after response is disabled.
+     *
+     * @var bool
+     */
+    protected $allowsDispatchingAfterResponses = true;
+
+    /**
      * Create a new command dispatcher instance.
      *
      * @param CContainer_ContainerInterface $container
@@ -52,7 +55,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      *
      * @return void
      */
-    public function __construct(CContainer_ContainerInterface $container, Closure $queueResolver = null) {
+    public function __construct(CContainer_ContainerInterface $container, ?Closure $queueResolver = null) {
         $this->container = $container;
         $this->queueResolver = $queueResolver;
         $this->pipeline = new CQueue_Pipeline($container);
@@ -211,7 +214,8 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      * @return mixed
      */
     public function dispatchToQueue($command) {
-        $connection = $command->connection ? $command->connection : null;
+        //apa yang ditulis job sendiri menang; rute hanya mengisi yang kosong
+        $connection = $command->connection ? $command->connection : $this->resolveConnectionFromQueueRoute($command);
         $queue = call_user_func($this->queueResolver, $connection);
 
         if (!$queue instanceof CQueue_QueueInterface) {
@@ -233,11 +237,14 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      * @return mixed
      */
     protected function pushCommandToQueue($queue, $command) {
-        if (isset($command->queue, $command->delay)) {
-            return $queue->laterOn($command->queue, $command->delay, $command);
+        //sama seperti connection: yang ditulis job sendiri menang
+        $queueName = isset($command->queue) ? $command->queue : $this->resolveQueueFromQueueRoute($command);
+
+        if ($queueName !== null && isset($command->delay)) {
+            return $queue->laterOn($queueName, $command->delay, $command);
         }
-        if (isset($command->queue)) {
-            return $queue->pushOn($command->queue, $command);
+        if ($queueName !== null) {
+            return $queue->pushOn($queueName, $command);
         }
         if (isset($command->delay)) {
             return $queue->later($command->delay, $command);
@@ -255,6 +262,12 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      * @return void
      */
     public function dispatchAfterResponse($command, $handler = null) {
+        if (!$this->allowsDispatchingAfterResponses) {
+            $this->dispatchSync($command);
+
+            return;
+        }
+
         CF::terminating(function () use ($command, $handler) {
             $this->dispatchNow($command, $handler);
         });
@@ -282,6 +295,28 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      */
     public function map(array $map) {
         $this->handlers = array_merge($this->handlers, $map);
+
+        return $this;
+    }
+
+    /**
+     * Allow dispatching after responses.
+     *
+     * @return $this
+     */
+    public function withDispatchingAfterResponses() {
+        $this->allowsDispatchingAfterResponses = true;
+
+        return $this;
+    }
+
+    /**
+     * Disable dispatching after responses.
+     *
+     * @return $this
+     */
+    public function withoutDispatchingAfterResponses() {
+        $this->allowsDispatchingAfterResponses = false;
 
         return $this;
     }

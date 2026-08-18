@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 2, 2019, 1:30:53 AM
- */
 class CResources_Exception_InvalidPathGenerator extends CResources_Exception {
     public static function doesntExist($class) {
         return new static("Class {$class} doesn't exist");
@@ -25,6 +19,6 @@ class CResources_Exception_InvalidPathGenerator extends CResources_Exception {
     public static function doesNotImplementPathGenerator($class) {
         $pathGeneratorClass = CResources_PathGeneratorInterface::class;
 
-        return new static("Path generator class `{$class}` must implement `${pathGeneratorClass}}`");
+        return new static("Path generator class `{$class}` must implement `{$pathGeneratorClass}}`");
     }
 }

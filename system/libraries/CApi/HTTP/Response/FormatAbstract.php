@@ -82,7 +82,7 @@ abstract class CApi_HTTP_Response_FormatAbstract {
     /**
      * Format an array or instance implementing Arrayable.
      *
-     * @param array|\CInterface_Arrayable $content
+     * @param array|\Illuminate\Contracts\Support\Arrayable $content
      *
      * @return string
      */

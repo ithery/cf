@@ -3,9 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see CManager_Transform_MethodExecutor
  * @see CManager_Transform_Parser
  * @since Feb 17, 2018, 12:52:11 AM
@@ -26,7 +23,7 @@ trait CTrait_Element_Transform {
         //serialize when closure
         foreach ($transform as $key => $t) {
             if ($t instanceof Closure) {
-                $transform[$key] = new \Opis\Closure\SerializableClosure($t);
+                $transform[$key] = new CFunction_SerializableClosure($t);
             }
         }
         $this->transforms = array_merge(

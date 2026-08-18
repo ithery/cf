@@ -2,10 +2,13 @@
 
 /**
  * Description of DependencyChecker.
- *
- * @author Hery
  */
 class CDevSuite_Bootstrap_MacBootstrapper_DependencyChecker extends CDevSuite_Bootstrap_Bootstrapper {
+    /**
+     * Check Mac/PHP/Homebrew compatibility.
+     *
+     * @return void
+     */
     public function bootstrap() {
         /**
          * Check the system's compatibility with DevSuite.

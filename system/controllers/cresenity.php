@@ -4,15 +4,11 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class Controller_Cresenity extends CController {
     public function index() {
-        return c::redirect();
+        return c::abort(404);
     }
 
     public function cron() {
         CCron::run();
-    }
-
-    public function task() {
-        CJob::cliRunner();
     }
 
     /**
@@ -25,6 +21,22 @@ class Controller_Cresenity extends CController {
     public function daemon() {
         try {
             CDaemon::cliRunner();
+        } catch (CDaemon_Exception_AlreadyRunningException $ex) {
+            //do nothing when exception is already running
+        }
+    }
+
+    public function supervisor() {
+        try {
+            CDaemon::cliSupervisorRunner();
+        } catch (CDaemon_Exception_AlreadyRunningException $ex) {
+            //do nothing when exception is already running
+        }
+    }
+
+    public function worker() {
+        try {
+            CDaemon::cliWorkerRunner();
         } catch (CDaemon_Exception_AlreadyRunningException $ex) {
             //do nothing when exception is already running
         }
@@ -46,7 +58,6 @@ class Controller_Cresenity extends CController {
     public function ajax() {
         $args = func_get_args();
         $method = carr::get($args, 0);
-        $app = CApp::instance();
         $filename = $method . '.tmp';
         $file = CTemporary::getPath('ajax', $filename);
 
@@ -56,21 +67,15 @@ class Controller_Cresenity extends CController {
             //throw new Exception(c::__('failed to get temporary file :filename', ['filename' => $file]));
         }
         $json = $disk->get($file);
-
+        CDebug::variable('cf-ajax', $json);
         $ajaxMethod = CAjax::createMethod($json)->setArgs($args);
 
         $response = $ajaxMethod->executeEngine();
+        if (!($response instanceof Symfony\Component\HttpFoundation\Response)) {
+            $response = c::response($response);
+        }
 
         return $response;
-    }
-
-    public function api(...$methods) {
-        if (c::blank($methods)) {
-            return c::response('CF API');
-        }
-        $data = CApp::api()->exec(...$methods);
-
-        return c::response()->json($data);
     }
 
     public function captcha() {
@@ -96,14 +101,14 @@ class Controller_Cresenity extends CController {
         $rand_string = rand(1000, 9999);
         imagestring($my_image, 5, $x, $y, $rand_string, 0x000000);
 
-        $session = CSession::instance();
-        $session->set('captcha', md5($rand_string) . 'a4xn');
+        $session = c::session();
+        $session->set('capp-captcha', md5($rand_string) . 'a4xn');
 
         imagejpeg($my_image);
         imagedestroy($my_image);
     }
 
-    public function noimage($width = 200, $height = 150, $bg_color = 'EFEFEF', $txt_color = 'AAAAAA', $text = 'NO IMAGE') {
+    public function noimage($width = 200, $height = 150, $bgColor = 'EFEFEF', $txtColor = 'AAAAAA', $text = 'NO IMAGE') {
         if (strlen($text) > 0) {
             $text = urldecode($text);
         }
@@ -118,23 +123,37 @@ class Controller_Cresenity extends CController {
         }
         $image = imagecreate($width, $height);
         //Making of colors, we are changing HEX to RGB
-        $bg_color = imagecolorallocate($image, base_convert(substr($bg_color, 0, 2), 16, 10), base_convert(substr($bg_color, 2, 2), 16, 10), base_convert(substr($bg_color, 4, 2), 16, 10));
+        $bgColor = imagecolorallocate($image, base_convert(substr($bgColor, 0, 2), 16, 10), base_convert(substr($bgColor, 2, 2), 16, 10), base_convert(substr($bgColor, 4, 2), 16, 10));
 
-        $txt_color = imagecolorallocate($image, base_convert(substr($txt_color, 0, 2), 16, 10), base_convert(substr($txt_color, 2, 2), 16, 10), base_convert(substr($txt_color, 4, 2), 16, 10));
+        $txtColor = imagecolorallocate($image, base_convert(substr($txtColor, 0, 2), 16, 10), base_convert(substr($txtColor, 2, 2), 16, 10), base_convert(substr($txtColor, 4, 2), 16, 10));
 
         //Fill the background color
-        imagefill($image, 0, 0, $bg_color);
-        //Calculating font size
-        $fontsize = ($width > $height) ? ($height / 10) : ($width / 10);
-        if ($width < 100) {
-            $fontsize = 1;
+        imagefill($image, 0, 0, $bgColor);
+
+        $fontFile = CManager_FontManager::getArialFontPath();
+        $maxWidth = $width * 0.7;   // teks maksimal 80% lebar gambar
+        $maxHeight = $height * 0.4; // teks maksimal 40% tinggi gambar
+        $fontSize = 10;
+        while (true) {
+            $box = imagettfbbox($fontSize, 0, $fontFile, $text);
+            $textWidth = abs($box[2] - $box[0]);
+            $textHeight = abs($box[5] - $box[1]);
+
+            if ($textWidth > $maxWidth || $textHeight > $maxHeight) {
+                $fontSize--;
+
+                break;
+            }
+            $fontSize++;
         }
-        $line_number = 1;
-        $total_lines = 1;
-        $center_x = ceil((imagesx($image) - (imagefontwidth($fontsize) * strlen($text))) / 2);
-        $center_y = ceil(((imagesy($image) - (imagefontheight($fontsize) * $total_lines)) / 2) + (($line_number - 1) * imagefontheight($fontsize)));
-        //Inserting Text
-        imagestring($image, $fontsize, $center_x, $center_y, $text, $txt_color);
+        // Hitung posisi tengah
+        $box = imagettfbbox($fontSize, 0, $fontFile, $text);
+        $textWidth = abs($box[2] - $box[0]);
+        $textHeight = abs($box[5] - $box[1]);
+        $x = ($width - $textWidth) / 2;
+        $y = ($height + $textHeight) / 2;
+        // Render teks
+        imagettftext($image, $fontSize, 0, $x, $y, $txtColor, $fontFile, $text);
 
         //Tell the browser what kind of file is come in
         $headers = [
@@ -168,9 +187,9 @@ class Controller_Cresenity extends CController {
     }
 
     public function avatar($method = 'initials') {
-        if (!function_exists('gd_info')) {
-            throw new Exception('GD Library extension must be installed/enabled to use avatar endpoint.');
-        }
+        // if (!function_exists('gd_info')) {
+        //     throw new Exception('GD Library extension must be installed/enabled to use avatar endpoint.');
+        // }
         if (!function_exists('finfo_buffer')) {
             throw new Exception('PHP fileinfo extension must be installed/enabled to use avatar endpoint.');
         }
@@ -183,7 +202,7 @@ class Controller_Cresenity extends CController {
                 break;
         }
 
-        $avatarApi = CImage::avatar()->api($engineName);
+        $avatarApi = CImage::avatar($engineName)->api();
         /*
         if (!isset($_GET['noheader'])) {
             header('Content-type: image/png');
@@ -252,9 +271,6 @@ class Controller_Cresenity extends CController {
     }
 
     public function upload($method = 'temp') {
-        $orgId = CApp_Base::orgId();
-        $db = CDatabase::instance();
-
         $filesInput = $_FILES;
         $fileId = '';
         $fileIdPreview = '';
@@ -366,7 +382,6 @@ class Controller_Cresenity extends CController {
 
     public function clear() {
         CView::blade()->clearCompiled();
-        CHTTP_FileServeDriver::clearPublic();
     }
 
     public function broadcast($method = null) {
@@ -390,6 +405,11 @@ class Controller_Cresenity extends CController {
         return $this->version();
     }
 
+    /**
+     * @param string $method
+     *
+     * @return \CApp
+     */
     public function cache($method) {
         if ($method == 'delete') {
             $key = c::request()->key;
@@ -468,6 +488,11 @@ class Controller_Cresenity extends CController {
         return $responseFactory->toResponse($request);
     }
 
+    /**
+     * @param string $method
+     *
+     * @return \CApp
+     */
     public function auth($method) {
         if ($method == 'ping') {
             $appCode = c::request()->appCode;
@@ -493,5 +518,17 @@ class Controller_Cresenity extends CController {
         }
 
         return c::abort(404);
+    }
+
+    public function tus() {
+        $server = CStorage::tus()->createServer();
+        // $entityBody = file_get_contents('php://input');
+        // print_r(c::request()->headers);
+        // die;
+
+        $server->setApiPath('/cresenity/tus');
+        $response = $server->serve(); // return an TusPhpS3\Http\Response
+
+        return $response;
     }
 }

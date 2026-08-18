@@ -63,6 +63,9 @@ class CApi_OAuth_Model_OAuthClient extends CModel {
      * @return CModel_Relation_BelongsTo
      */
     public function user() {
+        if ($this->user_type) {
+            return $this->morphTo('user');
+        }
         $provider = $this->provider ?: CF::config('auth.guards.api.provider');
 
         return $this->belongsTo(

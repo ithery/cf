@@ -5,18 +5,19 @@ namespace PHPStan\Rules\Functions;
 use Generator;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\InArrowFunctionNode;
 use PHPStan\Rules\FunctionReturnTypeCheck;
 use PHPStan\Rules\Rule;
 use PHPStan\ShouldNotHappenException;
+use PHPStan\Type\NeverType;
 use PHPStan\Type\ObjectType;
-use PHPStan\Type\Type;
-use PHPStan\Type\VoidType;
 
 /**
  * @implements Rule<InArrowFunctionNode>
  */
-class ArrowFunctionReturnTypeRule implements Rule
+#[RegisteredRule(level: 3)]
+final class ArrowFunctionReturnTypeRule implements Rule
 {
 
 	public function __construct(private FunctionReturnTypeCheck $returnTypeCheck)
@@ -34,13 +35,22 @@ class ArrowFunctionReturnTypeRule implements Rule
 			throw new ShouldNotHappenException();
 		}
 
-		/** @var Type $returnType */
 		$returnType = $scope->getAnonymousFunctionReturnType();
 		$generatorType = new ObjectType(Generator::class);
 
 		$originalNode = $node->getOriginalNode();
-		$isVoidSuperType = (new VoidType())->isSuperTypeOf($returnType);
+		$isVoidSuperType = $returnType->isVoid();
 		if ($originalNode->returnType === null && $isVoidSuperType->yes()) {
+			return [];
+		}
+
+		$exprType = $scope->getType($originalNode->expr);
+		if (
+			$returnType instanceof NeverType
+			&& $returnType->isExplicit()
+			&& $exprType instanceof NeverType
+			&& $exprType->isExplicit()
+		) {
 			return [];
 		}
 

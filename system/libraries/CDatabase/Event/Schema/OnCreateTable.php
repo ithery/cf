@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 1, 2018, 1:03:05 PM
- */
-
-/**
  * Event used when SQL queries for creating tables are generated inside CDatabase_Platform.
  */
 class CDatabase_Event_Schema_OnCreateTable extends CDatabase_Event_Schema {
@@ -90,6 +83,7 @@ class CDatabase_Event_Schema_OnCreateTable extends CDatabase_Event_Schema {
         } else {
             $this->sql[] = $sql;
         }
+
         return $this;
     }
 

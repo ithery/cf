@@ -53,7 +53,7 @@ final class CComparator_Differ {
      *
      * @return string
      */
-    public function diff($from, $to, CComparator_Differ_LongestCommonSubsequenceCalculatorInterface $lcs = null) {
+    public function diff($from, $to, ?CComparator_Differ_LongestCommonSubsequenceCalculatorInterface $lcs = null) {
         $diff = $this->diffToArray(
             $this->normalizeDiffInput($from),
             $this->normalizeDiffInput($to),
@@ -79,7 +79,7 @@ final class CComparator_Differ {
      *
      * @return array
      */
-    public function diffToArray($from, $to, CComparator_Differ_LongestCommonSubsequenceCalculatorInterface $lcs = null) {
+    public function diffToArray($from, $to, ?CComparator_Differ_LongestCommonSubsequenceCalculatorInterface $lcs = null) {
         if (is_string($from)) {
             $from = $this->splitStringByLines($from);
         } elseif (!is_array($from)) {

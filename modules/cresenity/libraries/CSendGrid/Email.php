@@ -1,12 +1,7 @@
 <?php
 
 /**
- * Description of Email
- *
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 7, 2018, 12:31:48 PM
+ * @deprecated 1.8
  */
 class CSendGrid_Email implements \JsonSerializable {
     private $name;

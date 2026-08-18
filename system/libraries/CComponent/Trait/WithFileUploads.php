@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 30, 2020
- */
 trait CComponent_Trait_WithFileUploads {
     public function startUpload($name, $fileInfo, $isMultiple) {
         if (CComponent_FileUploadConfiguration::isUsingS3()) {
@@ -53,6 +47,7 @@ trait CComponent_Trait_WithFileUploads {
             if ($genericValidationMessage === 'validation.uploaded') {
                 $genericValidationMessage = "The {$name} failed to upload.";
             }
+
             throw CValidation_Exception::withMessages([$name => $genericValidationMessage]);
         }
 
@@ -72,6 +67,7 @@ trait CComponent_Trait_WithFileUploads {
             $this->syncInput($name, array_values(array_filter($uploads, function ($upload) use ($tmpFilename) {
                 if ($upload->getFilename() === $tmpFilename) {
                     $upload->delete();
+
                     return false;
                 }
 

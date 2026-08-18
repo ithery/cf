@@ -1,15 +1,7 @@
 <?php
 
-use Opis\Closure\SerializableClosure;
-
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 27, 2019, 10:18:47 PM
- */
 trait CApp_Concern_BreadcrumbTrait {
     /**
      * @var bool
@@ -26,6 +18,11 @@ trait CApp_Concern_BreadcrumbTrait {
      */
     private $breadcrumbCallback = null;
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function showBreadcrumb($bool = true) {
         $this->showBreadcrumb = $bool;
 
@@ -48,6 +45,9 @@ trait CApp_Concern_BreadcrumbTrait {
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getBreadcrumb() {
         $breadcrumb = $this->breadcrumb;
         if ($this->breadcrumbCallback != null) {
@@ -57,6 +57,25 @@ trait CApp_Concern_BreadcrumbTrait {
         return $breadcrumb;
     }
 
+    /**
+     * @return bool
+     */
+    public function isShowBreadcrumb() {
+        return $this->showBreadcrumb;
+    }
+
+    /**
+     * @return null|Closure
+     */
+    public function getBreadcrumbCallback() {
+        return $this->breadcrumbCallback;
+    }
+
+    /**
+     * @param null|Closure $callback
+     *
+     * @return CApp
+     */
     public function setBreadcrumbCallback($callback) {
         $this->breadcrumbCallback = c::toSerializableClosure($callback);
 

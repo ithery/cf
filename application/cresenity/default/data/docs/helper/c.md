@@ -1,89 +1,240 @@
 # Helper c
 
-### c::abort
+The `c` helper class provides convenient static methods for common framework operations.
 
-Fungsi abort throws CHTTP_Exception yang akan dirender oleh exception handler
+### c::app
+
+Returns the `CApp` singleton instance:
 
 ```php
-c::abort(403);
+$app = c::app();
 ```
 
-Kita dapat juga mem-provide exception's message dan custom HTTP response headers yang akan dikirim ke browser:
+### c::request
+
+Returns the current `CHTTP_Request` instance, or a specific input value:
 
 ```php
+$request = c::request();
+$name = c::request('name');
+$name = c::request('name', 'default');
+$data = c::request(['name', 'email']);
+```
+
+### c::config
+
+Returns a configuration value using dot notation:
+
+```php
+$appName = c::config('app.title');
+$debug = c::config('core.debug', false);
+```
+
+### c::env
+
+Returns an environment variable from `env.php`:
+
+```php
+$dbHost = c::env('MYSQL_HOST', '127.0.0.1');
+```
+
+### c::auth
+
+Returns the authentication guard:
+
+```php
+$user = c::auth()->user();
+if (c::auth()->check()) { }
+```
+
+### c::view
+
+Returns a view instance:
+
+```php
+return c::view('dashboard', ['title' => 'Home']);
+```
+
+### c::response
+
+Returns a response instance. With no arguments, returns the response factory:
+
+```php
+return c::response('OK');
+return c::response()->json(['status' => 'ok']);
+return c::response()->view('error', [], 500);
+```
+
+### c::redirect
+
+Returns a redirect response:
+
+```php
+return c::redirect('home');
+return c::redirect()->back();
+```
+
+### c::url
+
+Generates a URL for the given path:
+
+```php
+$url = c::url('admin/user/edit/' . $id);
+```
+
+### c::abort
+
+Throws an HTTP exception that will be rendered by the exception handler:
+
+```php
+c::abort(404);
 c::abort(403, 'Unauthorized.', $headers);
 ```
 
-### c::abortIf()
+### c::abortIf
 
-fungsi abortIf throws HTTP exception jika parameter boolean expression bernilai `true`:
-
-```php
-c::abortIf(! Auth::havePermission('admin'), 403);
-```
-
-Seperti fungsi abort, Kita dapat juga mem-provide exception's message pada parameter ketiga dan custom HTTP response headers pada parameter keempat.
-
-### c::abortUnless()
-
-fungsi abortUnless throws HTTP exception jika parameter boolean expression bernilai `false`:
+Throws an HTTP exception if the given condition is `true`:
 
 ```php
-c::abortUnless(Auth::havePermission('admin'), 403);
+c::abortIf(!$user->isAdmin(), 403);
 ```
 
-Seperti fungsi abort, Kita dapat juga mem-provide exception's message pada parameter ketiga dan custom HTTP response headers pada parameter keempat.
+### c::abortUnless
+
+Throws an HTTP exception if the given condition is `false`:
+
+```php
+c::abortUnless($user->isAdmin(), 403);
+```
+
+### c::collect
+
+Creates a new `CCollection` instance:
+
+```php
+$collection = c::collect([1, 2, 3]);
+```
 
 ### c::e
 
-The `c::e` function runs PHP's `htmlspecialchars` function with the `double_encode` option set to `true` by default:
-```php
-    echo c::e('<html>foo</html>');
+Runs `htmlspecialchars` with double encoding enabled:
 
-    // &lt;html&gt;foo&lt;/html&gt;
+```php
+echo c::e('<html>foo</html>');
+// &lt;html&gt;foo&lt;/html&gt;
 ```
 
-### c::pregReplaceArray
-The `c::pregReplaceArray` function replaces a given pattern in the string sequentially using an array:
+### c::json
+
+Encodes a value as JSON, suitable for embedding in HTML attributes:
+
 ```php
-    $string = 'The event will take place between :start and :end';
+$json = c::json(['key' => 'value']);
+```
 
-    $replaced = c::pregReplaceArray('/:[a-z_]+/', ['8:30', '9:00'], $string);
+### c::media
 
-    // The event will take place between 8:30 and 9:00
+Returns the URL for a media asset:
+
+```php
+$url = c::media('img/logo.png');
 ```
 
 ### c::str
 
-The `c::str` function returns a new `CBase_Stringable` instance of the given string. This function is equivalent to the `cstr::of` method:
-```php
-    $string = c::str('Cresenity')->append(' Framework');
+Returns a `CBase_Stringable` instance for fluent string manipulation:
 
-    // 'Cresenity Framework'
-```
-If no argument is provided to the `c::str` function, the function returns an instance of `cstr`:
 ```php
-    $snake = c::str()->snake('FooBar');
-
-    // 'foo_bar'
+$string = c::str('Cresenity')->append(' Framework');
+// 'Cresenity Framework'
 ```
 
-### `c::trans()`
+Without arguments, returns the `cstr` class:
 
-The `c::trans` function translates the given translation key using your localization files:
 ```php
-    echo c::trans('messages.welcome');
+$snake = c::str()->snake('FooBar');
+// 'foo_bar'
 ```
-If the specified translation key does not exist, the `c::trans` function will return the given key. So, using the example above, the `c::trans` function would return `messages.welcome` if the translation key does not exist.
 
-### c::__
+### c::trans / c::__
 
-The `c::__` is an alias of `c::trans`
+Translates the given key using localization files. `c::__` is an alias of `c::trans`:
+
+```php
+echo c::__('Welcome');
+echo c::__('Hello, :name', ['name' => 'John']);
+echo c::trans('messages.welcome');
+```
 
 ### c::transChoice
 
-The `c::transChoice` function translates the given translation key with inflection:
+Translates with pluralization:
+
 ```php
-    echo trans_choice('messages.notifications', $unreadCount);
+echo c::transChoice('messages.notifications', $count);
 ```
-If the specified translation key does not exist, the `c::transChoice` function will return the given key. So, using the example above, the `c::transChoice` function would return `messages.notifications` if the translation key does not exist.
+
+### c::pregReplaceArray
+
+Replaces a pattern sequentially using an array:
+
+```php
+$string = 'Between :start and :end';
+$result = c::pregReplaceArray('/:[a-z_]+/', ['8:30', '9:00'], $string);
+// 'Between 8:30 and 9:00'
+```
+
+### c::dispatch
+
+Dispatches a job to the queue:
+
+```php
+c::dispatch(new MyJob($data));
+```
+
+### c::now
+
+Returns the current datetime as a Carbon instance:
+
+```php
+$now = c::now();
+$formatted = c::now()->format('Y-m-d');
+```
+
+### c::optional
+
+Allows accessing properties on an object that may be null:
+
+```php
+$name = c::optional($user)->name;
+// Returns null instead of error if $user is null
+```
+
+### c::validator
+
+Creates a validator instance:
+
+```php
+$validated = c::validator()->validate($data, [
+    'name' => 'required',
+    'email' => 'required|email',
+]);
+```
+
+### c::db
+
+Returns the database connection:
+
+```php
+$db = c::db();
+$results = c::db()->query('SELECT * FROM users');
+```
+
+### c::div
+
+Creates a new `CElement_Element_Div` instance:
+
+```php
+$div = c::div();
+$div->add('Content');
+```

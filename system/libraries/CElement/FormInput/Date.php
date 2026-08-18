@@ -2,27 +2,47 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 24, 2018, 3:56:10 PM
- */
 class CElement_FormInput_Date extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Date;
 
+    /**
+     * @var string
+     */
     protected $dateFormat;
 
-    protected $have_button;
+    /**
+     * @var bool
+     */
+    protected $haveButton;
 
+    /**
+     * @var string
+     */
     protected $startDate;
 
+    /**
+     * @var string
+     */
     protected $endDate;
 
+    /**
+     * Days of week disabled in the picker, as lowercase day names or their
+     * numeric (`0`-`6`, Sunday-Saturday) equivalents.
+     *
+     * @var array
+     */
     protected $disableDay;
 
+    /**
+     * @var bool
+     */
     protected $inline;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -37,7 +57,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
         $this->type = 'date';
         $this->dateFormat = c::formatter()->getDateFormat();
 
-        $this->have_button = false;
+        $this->haveButton = false;
         $this->startDate = '';
         $this->endDate = '';
         $this->disableDay = [];
@@ -45,12 +65,32 @@ class CElement_FormInput_Date extends CElement_FormInput {
         $this->addClass('form-control');
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return static
+     */
+    public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
+        return new static($id);
+    }
+
+    /**
+     * @param string $str
+     *
+     * @return $this
+     */
     public function setStartDate($str) {
         $this->startDate = $str;
 
         return $this;
     }
 
+    /**
+     * @param string $str
+     *
+     * @return $this
+     */
     public function setEndDate($str) {
         $this->endDate = $str;
 
@@ -75,12 +115,22 @@ class CElement_FormInput_Date extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param string $str
+     *
+     * @return $this
+     */
     public function setDateFormat($str) {
         $this->dateFormat = $str;
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -109,23 +159,33 @@ class CElement_FormInput_Date extends CElement_FormInput {
             $custom_css = ' style="' . $custom_css . '"';
         }
 
-        if ($this->have_button) {
+        if ($this->haveButton) {
             $html->appendln('<div class="input-append date" id="dp3" data-date="' . $this->value . '" data-date-format="' . $this->dateFormat . '">
-                        <input class="input-unstyled ' . $classes . $this->validation->validationClass() . '" size="16" type="text" name="' . $this->name . '"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '" value="' . $this->value . '"' . $disabled . $readonly . $addition_attribute . $custom_css . '>
+                        <input class="input-unstyled ' . $classes . '" size="16" type="text" name="' . $this->name . '"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '" value="' . $this->value . '"' . $disabled . $readonly . $addition_attribute . $custom_css . '>
                         <span class="add-on"><i class="icon-th"></i></span>
                     </div>')->br();
         } else {
-            $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="datepicker input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . c::formatter()->formatDate($this->value, $this->dateFormat) . '"' . $disabled . $readonly . $addition_attribute . $custom_css . '>')->br();
+            $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="datepicker input-unstyled' . $classes . '" value="' . c::formatter()->formatDate($this->value, $this->dateFormat) . '"' . $disabled . $readonly . $addition_attribute . $custom_css . '>')->br();
         }
         //$html->appendln('<input type="text" name="'.$this->name.'"  data-date-format="'.$this->dateFormat.'" id="'.$this->id.'" class="datepicker input-unstyled'.$classes.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.$custom_css.'>')->br();
 
         return $html->text();
     }
 
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
     protected function getTranslation($key) {
         return c::__('element/date.datepicker.' . $key);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $jsLanguages = "$.fn.datepicker.dates['custom'] = {
             days: [
@@ -244,7 +304,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
         $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
 
-        if ($this->have_button) {
+        if ($this->haveButton) {
             $js->append("$('#" . $this->id . "').parent().datepicker(" . $option . ');')->br();
         } else {
             $js->append("$('#" . $this->id . "').datepicker(" . $option . ');')->br();

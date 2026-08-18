@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 3:09:11 PM
- */
 class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Handler {
     use CTrait_Compat_Handler_Driver_Dialog,
         CObservable_Listener_Handler_Trait_AjaxHandlerTrait,
@@ -15,30 +9,60 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         CObservable_Listener_Handler_Trait_CloseHandlerTrait,
         CTrait_Element_Property_Title;
 
+    /**
+     * @var string
+     */
     protected $content;
 
+    /**
+     * @var array
+     */
     protected $param;
 
+    /**
+     * @var array
+     */
     protected $actions;
 
+    /**
+     * @var array
+     */
     protected $param_inputs;
 
+    /**
+     * @var array
+     */
     protected $param_request;
 
+    /**
+     * @var bool
+     */
     protected $isSidebar;
 
+    /**
+     * @var bool
+     */
     protected $isFull;
 
+    /**
+     * @var string
+     */
     protected $modalClass;
 
+    /**
+     * @var mixed
+     */
     protected $backdrop;
 
+    /**
+     * @param CObservable_Listener $listener
+     */
     public function __construct($listener) {
         parent::__construct($listener);
         $this->name = 'Dialog';
         $this->method = 'get';
         $this->target = '';
-        $this->content = CHandlerElement::factory();
+        $this->content = CObservable_HandlerElement::factory();
         $this->actions = CElement_List_ActionList::factory();
         $this->param_inputs = [];
         $this->param_request = [];
@@ -59,12 +83,22 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         return $this;
     }
 
+    /**
+     * @param string $class
+     *
+     * @return $this
+     */
     public function setModalClass($class) {
         $this->modalClass = $class;
 
         return $this;
     }
 
+    /**
+     * @param mixed $backdrop
+     *
+     * @return $this
+     */
     public function setBackdrop($backdrop) {
         $this->backdrop = $backdrop;
 
@@ -93,6 +127,11 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         return $this;
     }
 
+    /**
+     * @param string $method
+     *
+     * @return $this
+     */
     public function setMethod($method) {
         $this->method = $method;
 
@@ -161,7 +200,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
             $this->js_class = $this->js_class_manual;
         }
         if (strlen($this->js_class) > 0 && $this->js_class != 'cresenity') {
-            if ($this->content instanceof CHandlerElement) {
+            if ($this->content instanceof CObservable_HandlerElement) {
                 $content = $this->content->html();
             } else {
                 $content = $this->content;

@@ -63,7 +63,7 @@ class CDatabase_Schema_Grammar_ChangeColumn {
             $column = static::getDoctrineColumn($table, $fluent);
 
             // Here we will spin through each fluent column definition and map it to the proper
-            // Doctrine column definitions - which is necessary because Laravel and Doctrine
+            // Doctrine column definitions - which is necessary because CF and Doctrine
             // use some different terminology for various column attributes on the tables.
             foreach ($fluent->getAttributes() as $key => $value) {
                 if (!is_null($option = static::mapFluentOptionToDoctrine($key))) {

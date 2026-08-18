@@ -4,17 +4,17 @@ namespace PHPStan\Reflection\Type;
 
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\Dummy\ChangedTypePropertyReflection;
-use PHPStan\Reflection\PropertyReflection;
+use PHPStan\Reflection\ExtendedPropertyReflection;
 use PHPStan\Reflection\ResolvedPropertyReflection;
 use PHPStan\Type\Type;
 
-class CallbackUnresolvedPropertyPrototypeReflection implements UnresolvedPropertyPrototypeReflection
+final class CallbackUnresolvedPropertyPrototypeReflection implements UnresolvedPropertyPrototypeReflection
 {
 
 	/** @var callable(Type): Type */
 	private $transformStaticTypeCallback;
 
-	private ?PropertyReflection $transformedProperty = null;
+	private ?ExtendedPropertyReflection $transformedProperty = null;
 
 	private ?self $cachedDoNotResolveTemplateTypeMapToBounds = null;
 
@@ -22,7 +22,7 @@ class CallbackUnresolvedPropertyPrototypeReflection implements UnresolvedPropert
 	 * @param callable(Type): Type $transformStaticTypeCallback
 	 */
 	public function __construct(
-		private PropertyReflection $propertyReflection,
+		private ExtendedPropertyReflection $propertyReflection,
 		private ClassReflection $resolvedDeclaringClass,
 		private bool $resolveTemplateTypeMapToBounds,
 		callable $transformStaticTypeCallback,
@@ -45,21 +45,23 @@ class CallbackUnresolvedPropertyPrototypeReflection implements UnresolvedPropert
 		);
 	}
 
-	public function getNakedProperty(): PropertyReflection
+	public function getNakedProperty(): ExtendedPropertyReflection
 	{
 		return $this->propertyReflection;
 	}
 
-	public function getTransformedProperty(): PropertyReflection
+	public function getTransformedProperty(): ExtendedPropertyReflection
 	{
 		if ($this->transformedProperty !== null) {
 			return $this->transformedProperty;
 		}
 		$templateTypeMap = $this->resolvedDeclaringClass->getActiveTemplateTypeMap();
+		$callSiteVarianceMap = $this->resolvedDeclaringClass->getCallSiteVarianceMap();
 
 		return $this->transformedProperty = new ResolvedPropertyReflection(
 			$this->transformPropertyWithStaticType($this->resolvedDeclaringClass, $this->propertyReflection),
 			$this->resolveTemplateTypeMapToBounds ? $templateTypeMap->resolveToBounds() : $templateTypeMap,
+			$callSiteVarianceMap,
 		);
 	}
 
@@ -73,12 +75,28 @@ class CallbackUnresolvedPropertyPrototypeReflection implements UnresolvedPropert
 		);
 	}
 
-	private function transformPropertyWithStaticType(ClassReflection $declaringClass, PropertyReflection $property): PropertyReflection
+	private function transformPropertyWithStaticType(ClassReflection $declaringClass, ExtendedPropertyReflection $property): ExtendedPropertyReflection
 	{
-		$readableType = $this->transformStaticType($property->getReadableType());
-		$writableType = $this->transformStaticType($property->getWritableType());
+		$readableType = $property->getReadableType();
+		$transformedReadableType = $this->transformStaticType($property->getReadableType());
 
-		return new ChangedTypePropertyReflection($declaringClass, $property, $readableType, $writableType);
+		$writableType = $property->getWritableType();
+		if ($readableType->equals($writableType)) {
+			$transformedWritableType = $transformedReadableType;
+		} else {
+			$transformedWritableType = $this->transformStaticType($writableType);
+		}
+		$phpDocType = $property->getPhpDocType();
+		$transformedPhpDocType = $this->transformStaticType($phpDocType);
+
+		$nativeType = $property->getNativeType();
+		if ($phpDocType->equals($nativeType)) {
+			$transformedNativeType = $transformedPhpDocType;
+		} else {
+			$transformedNativeType = $this->transformStaticType($property->getNativeType());
+		}
+
+		return new ChangedTypePropertyReflection($declaringClass, $property, $transformedReadableType, $transformedWritableType, $transformedPhpDocType, $transformedNativeType);
 	}
 
 	private function transformStaticType(Type $type): Type

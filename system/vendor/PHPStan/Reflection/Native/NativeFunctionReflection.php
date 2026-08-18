@@ -3,13 +3,16 @@
 namespace PHPStan\Reflection\Native;
 
 use PHPStan\Reflection\Assertions;
+use PHPStan\Reflection\AttributeReflection;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorWithPhpDocs;
+use PHPStan\ShouldNotHappenException;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Type;
-use PHPStan\Type\VoidType;
+use function count;
+use function strtolower;
 
-class NativeFunctionReflection implements FunctionReflection
+final class NativeFunctionReflection implements FunctionReflection
 {
 
 	private Assertions $assertions;
@@ -17,17 +20,22 @@ class NativeFunctionReflection implements FunctionReflection
 	private TrinaryLogic $returnsByReference;
 
 	/**
-	 * @param ParametersAcceptorWithPhpDocs[] $variants
+	 * @param list<ExtendedParametersAcceptor> $variants
+	 * @param list<ExtendedParametersAcceptor>|null $namedArgumentsVariants
+	 * @param list<AttributeReflection> $attributes
 	 */
 	public function __construct(
 		private string $name,
 		private array $variants,
+		private ?array $namedArgumentsVariants,
 		private ?Type $throwType,
 		private TrinaryLogic $hasSideEffects,
 		private bool $isDeprecated,
-		?Assertions $assertions = null,
-		private ?string $phpDocComment = null,
-		?TrinaryLogic $returnsByReference = null,
+		?Assertions $assertions,
+		private ?string $phpDocComment,
+		?TrinaryLogic $returnsByReference,
+		private bool $acceptsNamedArguments,
+		private array $attributes,
 	)
 	{
 		$this->assertions = $assertions ?? Assertions::createEmpty();
@@ -44,12 +52,24 @@ class NativeFunctionReflection implements FunctionReflection
 		return null;
 	}
 
-	/**
-	 * @return ParametersAcceptorWithPhpDocs[]
-	 */
 	public function getVariants(): array
 	{
 		return $this->variants;
+	}
+
+	public function getOnlyVariant(): ExtendedParametersAcceptor
+	{
+		$variants = $this->getVariants();
+		if (count($variants) !== 1) {
+			throw new ShouldNotHappenException();
+		}
+
+		return $variants[0];
+	}
+
+	public function getNamedArgumentsVariants(): ?array
+	{
+		return $this->namedArgumentsVariants;
 	}
 
 	public function getThrowType(): ?Type
@@ -72,11 +92,6 @@ class NativeFunctionReflection implements FunctionReflection
 		return TrinaryLogic::createNo();
 	}
 
-	public function isFinal(): TrinaryLogic
-	{
-		return TrinaryLogic::createNo();
-	}
-
 	public function hasSideEffects(): TrinaryLogic
 	{
 		if ($this->isVoid()) {
@@ -86,10 +101,24 @@ class NativeFunctionReflection implements FunctionReflection
 		return $this->hasSideEffects;
 	}
 
+	public function isPure(): TrinaryLogic
+	{
+		if ($this->hasSideEffects()->yes()) {
+			return TrinaryLogic::createNo();
+		}
+
+		return $this->hasSideEffects->negate();
+	}
+
+	public function getPureUnlessCallableIsImpureParameters(): array
+	{
+		return [];
+	}
+
 	private function isVoid(): bool
 	{
 		foreach ($this->variants as $variant) {
-			if (!$variant->getReturnType() instanceof VoidType) {
+			if (!$variant->getReturnType()->isVoid()->yes()) {
 				return false;
 			}
 		}
@@ -115,6 +144,26 @@ class NativeFunctionReflection implements FunctionReflection
 	public function returnsByReference(): TrinaryLogic
 	{
 		return $this->returnsByReference;
+	}
+
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean($this->acceptsNamedArguments);
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->attributes;
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		foreach ($this->attributes as $attrib) {
+			if (strtolower($attrib->getName()) === 'nodiscard') {
+				return TrinaryLogic::createYes();
+			}
+		}
+		return TrinaryLogic::createNo();
 	}
 
 }

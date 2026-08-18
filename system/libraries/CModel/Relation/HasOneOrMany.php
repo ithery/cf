@@ -5,6 +5,8 @@
  * @extends CModel_Relation<TRelatedModel>
  */
 abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
+    use CModel_Relation_Trait_InteractsWithDictionary;
+
     /**
      * The foreign key of the parent model.
      *
@@ -73,9 +75,11 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      */
     public function addConstraints() {
         if (static::$constraints) {
-            $this->query->where($this->foreignKey, '=', $this->getParentKey());
+            $query = $this->getRelationQuery();
 
-            $this->query->whereNotNull($this->foreignKey);
+            $query->where($this->foreignKey, '=', $this->getParentKey());
+
+            $query->whereNotNull($this->foreignKey);
         }
     }
 
@@ -89,9 +93,11 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
     public function addEagerConstraints(array $models) {
         $whereIn = $this->whereInMethod($this->parent, $this->localKey);
 
-        $this->query->{$whereIn}(
+        $this->whereInEager(
+            $whereIn,
             $this->foreignKey,
-            $this->getKeys($models, $this->localKey)
+            $this->getKeys($models, $this->localKey),
+            $this->getRelationQuery()
         );
     }
 
@@ -138,7 +144,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
         // link them up with their children using the keyed dictionary to make the
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $model->getAttribute($this->localKey)])) {
+            if (isset($dictionary[$key = $this->getDictionaryKey($model->getAttribute($this->localKey))])) {
                 $model->setRelation(
                     $relation,
                     $this->getRelationValue($dictionary, $key, $type)
@@ -175,7 +181,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
         $foreign = $this->getForeignKeyName();
 
         return $results->mapToDictionary(function ($result) use ($foreign) {
-            return [$result->{$foreign} => $result];
+            return [$this->getDictionaryKey($result->{$foreign}) => $result];
         })->all();
     }
 
@@ -263,6 +269,19 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
     }
 
     /**
+     * Attach a model instance without raising any events to the parent model.
+     *
+     * @param \CModel $model
+     *
+     * @return \CModel|false
+     */
+    public function saveQuietly(CModel $model) {
+        return CModel::withoutEvents(function () use ($model) {
+            return $this->save($model);
+        });
+    }
+
+    /**
      * Attach a collection of models to the parent instance.
      *
      * @param iterable|array $models
@@ -275,6 +294,19 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
         }
 
         return $models;
+    }
+
+    /**
+     * Attach a collection of models to the parent instance without raising any events to the parent model.
+     *
+     * @param iterable $models
+     *
+     * @return iterable
+     */
+    public function saveManyQuietly($models) {
+        return CModel::withoutEvents(function () use ($models) {
+            return $this->saveMany($models);
+        });
     }
 
     /**
@@ -293,6 +325,45 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
     }
 
     /**
+     * Create a new instance of the related model without raising any events to the parent model.
+     *
+     * @param array $attributes
+     *
+     * @return \CModel
+     */
+    public function createQuietly(array $attributes = []) {
+        return CModel::withoutEvents(function () use ($attributes) {
+            return $this->create($attributes);
+        });
+    }
+
+    /**
+     * Create a new instance of the related model. Allow mass-assignment.
+     *
+     * @param array $attributes
+     *
+     * @return \CModel
+     */
+    public function forceCreate(array $attributes = []) {
+        $attributes[$this->getForeignKeyName()] = $this->getParentKey();
+
+        return $this->related->forceCreate($attributes);
+    }
+
+    /**
+     * Create a new instance of the related model with mass assignment without raising model events.
+     *
+     * @param array $attributes
+     *
+     * @return \CModel
+     */
+    public function forceCreateQuietly(array $attributes = []) {
+        return CModel::withoutEvents(function () use ($attributes) {
+            return $this->forceCreate($attributes);
+        });
+    }
+
+    /**
      * Create a Collection of new instances of the related model.
      *
      * @param array $records
@@ -307,6 +378,19 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
         }
 
         return $instances;
+    }
+
+    /**
+     * Create a Collection of new instances of the related model without raising any events to the parent model.
+     *
+     * @param array $records
+     *
+     * @return \CModel_Collection
+     */
+    public function createManyQuietly($records) {
+        return CModel::withoutEvents(function () use ($records) {
+            return $this->createMany($records);
+        });
     }
 
     /**

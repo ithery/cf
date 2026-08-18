@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 24, 2018, 2:20:56 PM
- */
 abstract class CModel_Nested_Relation extends CModel_Relation {
     /**
      * @var CModel_Nested_Query
@@ -49,7 +43,7 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
 
     /**
      * @param CModel_Nested_Query $query
-     * @param Model               $model
+     * @param CModel               $model
      *
      * @return void
      */

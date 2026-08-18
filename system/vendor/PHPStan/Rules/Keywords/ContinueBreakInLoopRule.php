@@ -5,16 +5,19 @@ namespace PHPStan\Rules\Keywords;
 use PhpParser\Node;
 use PhpParser\Node\Stmt;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Parser\ParentStmtTypesVisitor;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function array_reverse;
+use function in_array;
 use function sprintf;
 
 /**
  * @implements Rule<Stmt>
  */
-class ContinueBreakInLoopRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ContinueBreakInLoopRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -28,36 +31,35 @@ class ContinueBreakInLoopRule implements Rule
 			return [];
 		}
 
-		if (!$node->num instanceof Node\Scalar\LNumber) {
+		if (!$node->num instanceof Node\Scalar\Int_) {
 			$value = 1;
 		} else {
 			$value = $node->num->value;
 		}
 
-		$parentStmtTypes = array_reverse($node->getAttribute(ParentStmtTypesVisitor::ATTRIBUTE_NAME));
+		$parentStmtTypes = array_reverse($node->getAttribute(ParentStmtTypesVisitor::ATTRIBUTE_NAME, []));
 		foreach ($parentStmtTypes as $parentStmtType) {
 			if ($parentStmtType === Stmt\Case_::class) {
 				continue;
 			}
-			if (
-				$parentStmtType === Stmt\Function_::class
-				|| $parentStmtType === Stmt\ClassMethod::class
-				|| $parentStmtType === Node\Expr\Closure::class
-			) {
+			if ($parentStmtType === Node\Expr\Closure::class) {
 				return [
 					RuleErrorBuilder::message(sprintf(
 						'Keyword %s used outside of a loop or a switch statement.',
 						$node instanceof Stmt\Continue_ ? 'continue' : 'break',
-					))->nonIgnorable()->build(),
+					))
+						->nonIgnorable()
+						->identifier(sprintf('%s.outOfLoop', $node instanceof Stmt\Continue_ ? 'continue' : 'break'))
+						->build(),
 				];
 			}
-			if (
-				$parentStmtType === Stmt\For_::class
-				|| $parentStmtType === Stmt\Foreach_::class
-				|| $parentStmtType === Stmt\Do_::class
-				|| $parentStmtType === Stmt\While_::class
-				|| $parentStmtType === Stmt\Switch_::class
-			) {
+			if (in_array($parentStmtType, [
+				Stmt\For_::class,
+				Stmt\Foreach_::class,
+				Stmt\Do_::class,
+				Stmt\While_::class,
+				Stmt\Switch_::class,
+			], true)) {
 				$value--;
 			}
 			if ($value === 0) {
@@ -70,7 +72,10 @@ class ContinueBreakInLoopRule implements Rule
 				RuleErrorBuilder::message(sprintf(
 					'Keyword %s used outside of a loop or a switch statement.',
 					$node instanceof Stmt\Continue_ ? 'continue' : 'break',
-				))->nonIgnorable()->build(),
+				))
+					->nonIgnorable()
+					->identifier(sprintf('%s.outOfLoop', $node instanceof Stmt\Continue_ ? 'continue' : 'break'))
+					->build(),
 			];
 		}
 

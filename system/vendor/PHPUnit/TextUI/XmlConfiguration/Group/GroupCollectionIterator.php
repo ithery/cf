@@ -33,26 +33,32 @@ final class GroupCollectionIterator implements Countable, Iterator {
         $this->groups = $groups->asArray();
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return iterator_count($this);
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind() {
         $this->position = 0;
     }
 
+    #[\ReturnTypeWillChange]
     public function valid() {
         return $this->position < count($this->groups);
     }
 
+    #[\ReturnTypeWillChange]
     public function key() {
         return $this->position;
     }
 
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->groups[$this->position];
     }
 
+    #[\ReturnTypeWillChange]
     public function next() {
         $this->position++;
     }

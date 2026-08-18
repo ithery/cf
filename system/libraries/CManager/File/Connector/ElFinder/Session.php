@@ -2,45 +2,39 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 28, 2019, 3:10:32 AM
- */
 class CManager_File_Connector_ElFinder_Session implements CManager_File_Connector_ElFinder_SessionInterface {
     /**
-     * A flag of session started
+     * A flag of session started.
      *
-     * @var boolean
+     * @var bool
      */
     protected $started = false;
 
     /**
-     * To fix PHP bug that duplicate Set-Cookie header to be sent
+     * To fix PHP bug that duplicate Set-Cookie header to be sent.
      *
-     * @var boolean
+     * @var bool
      *
      * @see        https://bugs.php.net/bug.php?id=75554
      */
     protected $fixCookieRegist = false;
 
     /**
-     * Array of session keys of this instance
+     * Array of session keys of this instance.
      *
      * @var array
      */
     protected $keys = [];
 
     /**
-     * Is enabled base64encode
+     * Is enabled base64encode.
      *
-     * @var boolean
+     * @var bool
      */
     protected $base64encode = false;
 
     /**
-     * Default options array
+     * Default options array.
      *
      * @var array
      */
@@ -53,7 +47,7 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
     ];
 
     /**
-     * Constractor
+     * Constractor.
      *
      * @param array $opts The options
      *
@@ -71,7 +65,7 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function get($key, $empty = null) {
         $closed = false;
@@ -117,7 +111,7 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function start() {
         if ($this->fixCookieRegist === true) {
@@ -141,11 +135,11 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
     }
 
     /**
-     * Get variable reference of $_SESSION
+     * Get variable reference of $_SESSION.
      *
      * @param string $key key of $_SESSION array
      *
-     * @return mixed|null
+     * @return null|mixed
      */
     protected function &getSessionRef($key) {
         $session = null;
@@ -178,15 +172,16 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
                 $session = &$_SESSION[$cat][$name];
             }
         }
+
         return $session;
     }
 
     /**
-     * Base64 decode of session val
+     * Base64 decode of session val.
      *
      * @param $data
      *
-     * @return bool|mixed|string|null
+     * @return null|bool|mixed|string
      */
     protected function decodeData($data) {
         if ($this->base64encode) {
@@ -200,11 +195,12 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
                 $data = null;
             }
         }
+
         return $data;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function close() {
         if ($this->started) {
@@ -222,7 +218,7 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function set($key, $data) {
         $closed = false;
@@ -244,7 +240,7 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
     }
 
     /**
-     * Base64 encode for session val
+     * Base64 encode for session val.
      *
      * @param $data
      *
@@ -254,11 +250,12 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
         if ($this->base64encode) {
             $data = base64_encode(serialize($data));
         }
+
         return $data;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function remove($key) {
         $closed = false;
@@ -296,7 +293,7 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
     }
 
     /**
-     * Session error handler (Only for suppression of error at session start)
+     * Session error handler (Only for suppression of error at session start).
      *
      * @param $errno
      * @param $errstr

@@ -28,4 +28,12 @@ return [
 
         ]
     ],
+    'alpine' => [
+        'ui' => [
+            'debug' => true
+        ]
+    ],
+    'style' => [
+        'enable' => false,
+    ],
 ];

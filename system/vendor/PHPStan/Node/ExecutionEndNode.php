@@ -2,16 +2,19 @@
 
 namespace PHPStan\Node;
 
+use Override;
 use PhpParser\Node;
 use PhpParser\NodeAbstract;
 use PHPStan\Analyser\StatementResult;
 
-/** @api */
-class ExecutionEndNode extends NodeAbstract implements VirtualNode
+/**
+ * @api
+ */
+final class ExecutionEndNode extends NodeAbstract implements VirtualNode
 {
 
 	public function __construct(
-		private Node $node,
+		private Node\Stmt $node,
 		private StatementResult $statementResult,
 		private bool $hasNativeReturnTypehint,
 	)
@@ -19,7 +22,7 @@ class ExecutionEndNode extends NodeAbstract implements VirtualNode
 		parent::__construct($node->getAttributes());
 	}
 
-	public function getNode(): Node
+	public function getNode(): Node\Stmt
 	{
 		return $this->node;
 	}
@@ -34,6 +37,7 @@ class ExecutionEndNode extends NodeAbstract implements VirtualNode
 		return $this->hasNativeReturnTypehint;
 	}
 
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Node_ExecutionEndNode';
@@ -42,6 +46,7 @@ class ExecutionEndNode extends NodeAbstract implements VirtualNode
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];

@@ -2,10 +2,13 @@
 
 /**
  * Description of DevSuiteBootstrapper.
- *
- * @author Hery
  */
 class CDevSuite_Bootstrap_DevSuiteBootstrapper extends CDevSuite_Bootstrap_Bootstrapper {
+    /**
+     * Normalize environment variables and relocate the config directory if needed.
+     *
+     * @return void
+     */
     public function bootstrap() {
         if (!isset($_SERVER['HOME']) && isset($_SERVER['USERPROFILE'])) {
             $_SERVER['HOME'] = $_SERVER['USERPROFILE'];

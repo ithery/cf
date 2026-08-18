@@ -25,6 +25,8 @@ class CurlMultiHandler
     private $handles = [];
     private $delays = [];
     private $maxHandles;
+    /** @var resource */
+    private $_mh;
 
     /**
      * This handler accepts the following options:
@@ -45,6 +47,9 @@ class CurlMultiHandler
     {
         if (isset($options['mh'])) {
             $this->_mh = $options['mh'];
+        } else {
+            // let __get() lazily create it, same as before $_mh was declared
+            unset($this->_mh);
         }
         $this->factory = isset($options['handle_factory'])
             ? $options['handle_factory'] : new CurlFactory();

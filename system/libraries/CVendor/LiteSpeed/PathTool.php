@@ -53,7 +53,7 @@ class CVendor_LiteSpeed_PathTool {
 
     public static function createFile($path, &$err, $attrName = '') {
         if (file_exists($path)) {
-            $err = is_file($path) ? "Already exists ${path}" : "name conflicting with an existing directory ${path}";
+            $err = is_file($path) ? "Already exists {$path}" : "name conflicting with an existing directory {$path}";
 
             return false;
         }
@@ -89,14 +89,14 @@ class CVendor_LiteSpeed_PathTool {
             if (is_dir($path)) {
                 return true;
             } else {
-                $err = "${path} is not a directory";
+                $err = "{$path} is not a directory";
 
                 return false;
             }
         }
         $parent = substr($path, 0, (strrpos($path, '/')));
         if (strlen($parent) <= 1) {
-            $err = "invalid path: ${path}";
+            $err = "invalid path: {$path}";
 
             return false;
         }
@@ -107,7 +107,7 @@ class CVendor_LiteSpeed_PathTool {
         if (mkdir($path, $mode)) {
             return true;
         } else {
-            $err = "fail to create directory ${path}";
+            $err = "fail to create directory {$path}";
 
             return false;
         }

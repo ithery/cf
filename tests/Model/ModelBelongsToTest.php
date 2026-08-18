@@ -1,8 +1,11 @@
 <?php
 use Mockery as m;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 
 class ModelBelongsToTest extends TestCase {
+    use MockeryPHPUnitIntegration;
+
     protected $builder;
 
     protected $related;
@@ -94,6 +97,7 @@ class ModelBelongsToTest extends TestCase {
         $result2->shouldReceive('getAttribute')->with('id')->andReturn(2);
         $result3 = m::mock(stdClass::class);
         $result3->shouldReceive('getAttribute')->with('id')->andReturn(new class() {
+            #[\ReturnTypeWillChange]
             public function __toString() {
                 return '3';
             }
@@ -104,6 +108,7 @@ class ModelBelongsToTest extends TestCase {
         $model2->foreign_key = 2;
         $model3 = new ModelBelongsToModelStub();
         $model3->foreign_key = new class() {
+            #[\ReturnTypeWillChange]
             public function __toString() {
                 return '3';
             }

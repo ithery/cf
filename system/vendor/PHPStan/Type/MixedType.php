@@ -3,14 +3,17 @@
 namespace PHPStan\Type;
 
 use ArrayAccess;
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\Reflection\ClassConstantReflection;
 use PHPStan\Reflection\ClassMemberAccessAnswerer;
-use PHPStan\Reflection\ConstantReflection;
-use PHPStan\Reflection\Dummy\DummyConstantReflection;
+use PHPStan\Reflection\Dummy\DummyClassConstantReflection;
 use PHPStan\Reflection\Dummy\DummyMethodReflection;
 use PHPStan\Reflection\Dummy\DummyPropertyReflection;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\ParametersAcceptor;
-use PHPStan\Reflection\PropertyReflection;
+use PHPStan\Reflection\ExtendedPropertyReflection;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Reflection\TrivialParametersAcceptor;
 use PHPStan\Reflection\Type\CallbackUnresolvedMethodPrototypeReflection;
 use PHPStan\Reflection\Type\CallbackUnresolvedPropertyPrototypeReflection;
@@ -18,18 +21,27 @@ use PHPStan\Reflection\Type\UnresolvedMethodPrototypeReflection;
 use PHPStan\Reflection\Type\UnresolvedPropertyPrototypeReflection;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Accessory\AccessoryArrayListType;
+use PHPStan\Type\Accessory\AccessoryDecimalIntegerStringType;
 use PHPStan\Type\Accessory\AccessoryLiteralStringType;
+use PHPStan\Type\Accessory\AccessoryLowercaseStringType;
 use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
 use PHPStan\Type\Accessory\AccessoryNonFalsyStringType;
 use PHPStan\Type\Accessory\AccessoryNumericStringType;
+use PHPStan\Type\Accessory\AccessoryUppercaseStringType;
 use PHPStan\Type\Accessory\OversizedArrayType;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantBooleanType;
+use PHPStan\Type\Constant\ConstantFloatType;
+use PHPStan\Type\Constant\ConstantIntegerType;
+use PHPStan\Type\Constant\ConstantStringType;
+use PHPStan\Type\Enum\EnumCaseObjectType;
 use PHPStan\Type\Generic\TemplateMixedType;
 use PHPStan\Type\Generic\TemplateType;
 use PHPStan\Type\Traits\NonGeneralizableTypeTrait;
 use PHPStan\Type\Traits\NonGenericTypeTrait;
+use PHPStan\Type\Traits\SubstractableTypeTrait;
 use PHPStan\Type\Traits\UndecidedComparisonCompoundTypeTrait;
+use function get_class;
 use function sprintf;
 
 /** @api */
@@ -39,6 +51,7 @@ class MixedType implements CompoundType, SubtractableType
 	use NonGenericTypeTrait;
 	use UndecidedComparisonCompoundTypeTrait;
 	use NonGeneralizableTypeTrait;
+	use SubstractableTypeTrait;
 
 	private ?Type $subtractedType;
 
@@ -55,10 +68,17 @@ class MixedType implements CompoundType, SubtractableType
 		$this->subtractedType = $subtractedType;
 	}
 
-	/**
-	 * @return string[]
-	 */
 	public function getReferencedClasses(): array
+	{
+		return [];
+	}
+
+	public function getObjectClassNames(): array
+	{
+		return [];
+	}
+
+	public function getObjectClassReflections(): array
 	{
 		return [];
 	}
@@ -73,65 +93,86 @@ class MixedType implements CompoundType, SubtractableType
 		return [];
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function getConstantStrings(): array
 	{
-		return TrinaryLogic::createYes();
+		return [];
 	}
 
-	public function isSuperTypeOfMixed(MixedType $type): TrinaryLogic
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
+	{
+		return AcceptsResult::createYes();
+	}
+
+	public function isSuperTypeOfMixed(MixedType $type): IsSuperTypeOfResult
 	{
 		if ($this->subtractedType === null) {
 			if ($this->isExplicitMixed) {
 				if ($type->isExplicitMixed) {
-					return TrinaryLogic::createYes();
+					return IsSuperTypeOfResult::createYes();
 				}
-				return TrinaryLogic::createMaybe();
+				return IsSuperTypeOfResult::createMaybe();
 			}
 
-			return TrinaryLogic::createYes();
+			return IsSuperTypeOfResult::createYes();
 		}
 
 		if ($type->subtractedType === null) {
-			return TrinaryLogic::createMaybe();
+			return IsSuperTypeOfResult::createMaybe();
 		}
 
 		$isSuperType = $type->subtractedType->isSuperTypeOf($this->subtractedType);
 		if ($isSuperType->yes()) {
 			if ($this->isExplicitMixed) {
 				if ($type->isExplicitMixed) {
-					return TrinaryLogic::createYes();
+					return IsSuperTypeOfResult::createYes();
 				}
-				return TrinaryLogic::createMaybe();
+				return IsSuperTypeOfResult::createMaybe();
 			}
 
-			return TrinaryLogic::createYes();
+			return IsSuperTypeOfResult::createYes();
 		}
 
-		return TrinaryLogic::createMaybe();
+		return IsSuperTypeOfResult::createMaybe();
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($this->subtractedType === null || $type instanceof NeverType) {
-			return TrinaryLogic::createYes();
+			return IsSuperTypeOfResult::createYes();
 		}
 
 		if ($type instanceof self) {
 			if ($type->subtractedType === null) {
-				return TrinaryLogic::createMaybe();
+				return IsSuperTypeOfResult::createMaybe();
 			}
 			$isSuperType = $type->subtractedType->isSuperTypeOf($this->subtractedType);
 			if ($isSuperType->yes()) {
-				return TrinaryLogic::createYes();
+				return $isSuperType;
 			}
 
-			return TrinaryLogic::createMaybe();
+			return IsSuperTypeOfResult::createMaybe();
 		}
 
-		return $this->subtractedType->isSuperTypeOf($type)->negate();
+		$result = $this->subtractedType->isSuperTypeOf($type)->negate();
+		if ($result->no()) {
+			return IsSuperTypeOfResult::createNo([
+				sprintf(
+					'Type %s has already been eliminated from %s.',
+					$this->subtractedType->describe(VerbosityLevel::precise()),
+					$this->describe(VerbosityLevel::typeOnly()),
+				),
+			]);
+		}
+
+		return $result;
 	}
 
 	public function setOffsetValueType(?Type $offsetType, Type $valueType, bool $unionValues = true): Type
+	{
+		return new self($this->isExplicitMixed);
+	}
+
+	public function setExistingOffsetValueType(Type $offsetType, Type $valueType): Type
 	{
 		return new self($this->isExplicitMixed);
 	}
@@ -144,13 +185,18 @@ class MixedType implements CompoundType, SubtractableType
 		return $this;
 	}
 
+	public function getKeysArrayFiltered(Type $filterValueType, TrinaryLogic $strict): Type
+	{
+		return $this->getKeysArray();
+	}
+
 	public function getKeysArray(): Type
 	{
 		if ($this->isArray()->no()) {
 			return new ErrorType();
 		}
 
-		return AccessoryArrayListType::intersectWith(new ArrayType(new IntegerType(), new UnionType([new IntegerType(), new StringType()])));
+		return new IntersectionType([new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), new UnionType([new IntegerType(), new StringType()])), new AccessoryArrayListType()]);
 	}
 
 	public function getValuesArray(): Type
@@ -159,7 +205,16 @@ class MixedType implements CompoundType, SubtractableType
 			return new ErrorType();
 		}
 
-		return AccessoryArrayListType::intersectWith(new ArrayType(new IntegerType(), new MixedType($this->isExplicitMixed)));
+		return new IntersectionType([new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), new MixedType($this->isExplicitMixed)), new AccessoryArrayListType()]);
+	}
+
+	public function chunkArray(Type $lengthType, TrinaryLogic $preserveKeys): Type
+	{
+		if ($this->isArray()->no()) {
+			return new ErrorType();
+		}
+
+		return new IntersectionType([new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), new MixedType($this->isExplicitMixed)), new AccessoryArrayListType()]);
 	}
 
 	public function fillKeysArray(Type $valueType): Type
@@ -198,13 +253,22 @@ class MixedType implements CompoundType, SubtractableType
 		return new ArrayType(new MixedType($this->isExplicitMixed), new MixedType($this->isExplicitMixed));
 	}
 
-	public function searchArray(Type $needleType): Type
+	public function reverseArray(TrinaryLogic $preserveKeys): Type
 	{
 		if ($this->isArray()->no()) {
 			return new ErrorType();
 		}
 
-		return TypeCombinator::union(new IntegerType(), new StringType(), new ConstantBooleanType(false));
+		return new ArrayType(new MixedType($this->isExplicitMixed), new MixedType($this->isExplicitMixed));
+	}
+
+	public function searchArray(Type $needleType, ?TrinaryLogic $strict = null): Type
+	{
+		if ($this->isArray()->no()) {
+			return new ErrorType();
+		}
+
+		return new UnionType([new IntegerType(), new StringType(), new ConstantBooleanType(false)]);
 	}
 
 	public function shiftArray(): Type
@@ -222,7 +286,88 @@ class MixedType implements CompoundType, SubtractableType
 			return new ErrorType();
 		}
 
-		return AccessoryArrayListType::intersectWith(new ArrayType(new IntegerType(), new MixedType($this->isExplicitMixed)));
+		return new IntersectionType([new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), new MixedType($this->isExplicitMixed)), new AccessoryArrayListType()]);
+	}
+
+	public function sliceArray(Type $offsetType, Type $lengthType, TrinaryLogic $preserveKeys): Type
+	{
+		if ($this->isArray()->no()) {
+			return new ErrorType();
+		}
+
+		return new ArrayType(new MixedType($this->isExplicitMixed), new MixedType($this->isExplicitMixed));
+	}
+
+	public function spliceArray(Type $offsetType, Type $lengthType, Type $replacementType): Type
+	{
+		if ($this->isArray()->no()) {
+			return new ErrorType();
+		}
+
+		return new ArrayType(new MixedType($this->isExplicitMixed), new MixedType($this->isExplicitMixed));
+	}
+
+	public function truncateListToSize(Type $sizeType): Type
+	{
+		if ($this->isArray()->no()) {
+			return new ErrorType();
+		}
+
+		return $this;
+	}
+
+	public function makeListMaybe(): Type
+	{
+		// `mixed` doesn't track list-ness; nothing to weaken.
+		return $this;
+	}
+
+	public function mapValueType(callable $cb): Type
+	{
+		if ($this->isArray()->no()) {
+			return new ErrorType();
+		}
+
+		return new ArrayType(
+			new MixedType($this->isExplicitMixed),
+			$cb(new MixedType($this->isExplicitMixed)),
+		);
+	}
+
+	public function mapKeyType(callable $cb): Type
+	{
+		if ($this->isArray()->no()) {
+			return new ErrorType();
+		}
+
+		return new ArrayType(
+			$cb(new MixedType($this->isExplicitMixed)),
+			new MixedType($this->isExplicitMixed),
+		);
+	}
+
+	public function makeAllArrayKeysOptional(): Type
+	{
+		// `mixed` is already arbitrary; nothing to weaken.
+		return $this;
+	}
+
+	public function changeKeyCaseArray(?int $case): Type
+	{
+		if ($this->isArray()->no()) {
+			return new ErrorType();
+		}
+
+		return new ArrayType(new MixedType($this->isExplicitMixed), new MixedType($this->isExplicitMixed));
+	}
+
+	public function filterArrayRemovingFalsey(): Type
+	{
+		if ($this->isArray()->no()) {
+			return new ErrorType();
+		}
+
+		return new ArrayType(new MixedType($this->isExplicitMixed), new MixedType($this->isExplicitMixed));
 	}
 
 	public function isCallable(): TrinaryLogic
@@ -236,9 +381,16 @@ class MixedType implements CompoundType, SubtractableType
 		return TrinaryLogic::createMaybe();
 	}
 
-	/**
-	 * @return ParametersAcceptor[]
-	 */
+	public function getEnumCases(): array
+	{
+		return [];
+	}
+
+	public function getEnumCaseObject(): ?EnumCaseObjectType
+	{
+		return null;
+	}
+
 	public function getCallableParametersAcceptors(ClassMemberAccessAnswerer $scope): array
 	{
 		return [new TrivialParametersAcceptor()];
@@ -246,7 +398,7 @@ class MixedType implements CompoundType, SubtractableType
 
 	public function equals(Type $type): bool
 	{
-		if (!$type instanceof self) {
+		if (get_class($type) !== static::class) {
 			return false;
 		}
 
@@ -265,29 +417,59 @@ class MixedType implements CompoundType, SubtractableType
 		return $this->subtractedType->equals($type->subtractedType);
 	}
 
-	public function isSubTypeOf(Type $otherType): TrinaryLogic
+	public function isSubTypeOf(Type $otherType): IsSuperTypeOfResult
 	{
 		if ($otherType instanceof self && !$otherType instanceof TemplateMixedType) {
-			return TrinaryLogic::createYes();
+			return IsSuperTypeOfResult::createYes();
 		}
 
 		if ($this->subtractedType !== null) {
 			$isSuperType = $this->subtractedType->isSuperTypeOf($otherType);
 			if ($isSuperType->yes()) {
-				return TrinaryLogic::createNo();
+				return IsSuperTypeOfResult::createNo();
 			}
 		}
 
-		return TrinaryLogic::createMaybe();
+		return IsSuperTypeOfResult::createMaybe();
 	}
 
-	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): TrinaryLogic
+	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): AcceptsResult
 	{
-		$isSuperType = $this->isSuperTypeOf($acceptingType);
+		$isSuperType = $this->isSuperTypeOf($acceptingType)->toAcceptsResult();
 		if ($isSuperType->no()) {
 			return $isSuperType;
 		}
-		return TrinaryLogic::createYes();
+		return AcceptsResult::createYes();
+	}
+
+	public function getTemplateType(string $ancestorClassName, string $templateTypeName): Type
+	{
+		return new self();
+	}
+
+	public function isObject(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(new ObjectWithoutClassType())->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function getClassStringType(): Type
+	{
+		return new ClassStringType();
+	}
+
+	public function isEnum(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(new ObjectWithoutClassType())->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+		return TrinaryLogic::createMaybe();
 	}
 
 	public function canAccessProperties(): TrinaryLogic
@@ -300,14 +482,56 @@ class MixedType implements CompoundType, SubtractableType
 		return TrinaryLogic::createYes();
 	}
 
-	public function getProperty(string $propertyName, ClassMemberAccessAnswerer $scope): PropertyReflection
+	public function getProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
 	{
 		return $this->getUnresolvedPropertyPrototype($propertyName, $scope)->getTransformedProperty();
 	}
 
 	public function getUnresolvedPropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
 	{
-		$property = new DummyPropertyReflection();
+		$property = new DummyPropertyReflection($propertyName);
+		return new CallbackUnresolvedPropertyPrototypeReflection(
+			$property,
+			$property->getDeclaringClass(),
+			false,
+			static fn (Type $type): Type => $type,
+		);
+	}
+
+	public function hasInstanceProperty(string $propertyName): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function getInstanceProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
+	{
+		return $this->getUnresolvedInstancePropertyPrototype($propertyName, $scope)->getTransformedProperty();
+	}
+
+	public function getUnresolvedInstancePropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
+	{
+		$property = new DummyPropertyReflection($propertyName);
+		return new CallbackUnresolvedPropertyPrototypeReflection(
+			$property,
+			$property->getDeclaringClass(),
+			false,
+			static fn (Type $type): Type => $type,
+		);
+	}
+
+	public function hasStaticProperty(string $propertyName): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function getStaticProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
+	{
+		return $this->getUnresolvedStaticPropertyPrototype($propertyName, $scope)->getTransformedProperty();
+	}
+
+	public function getUnresolvedStaticPropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
+	{
+		$property = new DummyPropertyReflection($propertyName);
 		return new CallbackUnresolvedPropertyPrototypeReflection(
 			$property,
 			$property->getDeclaringClass(),
@@ -352,9 +576,9 @@ class MixedType implements CompoundType, SubtractableType
 		return TrinaryLogic::createYes();
 	}
 
-	public function getConstant(string $constantName): ConstantReflection
+	public function getConstant(string $constantName): ClassConstantReflection
 	{
-		return new DummyConstantReflection($constantName);
+		return new DummyClassConstantReflection($constantName);
 	}
 
 	public function isCloneable(): TrinaryLogic
@@ -367,19 +591,9 @@ class MixedType implements CompoundType, SubtractableType
 		return $level->handle(
 			static fn (): string => 'mixed',
 			static fn (): string => 'mixed',
+			fn (): string => 'mixed' . $this->describeSubtractedType($this->subtractedType, $level),
 			function () use ($level): string {
-				$description = 'mixed';
-				if ($this->subtractedType !== null) {
-					$description .= sprintf('~%s', $this->subtractedType->describe($level));
-				}
-
-				return $description;
-			},
-			function () use ($level): string {
-				$description = 'mixed';
-				if ($this->subtractedType !== null) {
-					$description .= sprintf('~%s', $this->subtractedType->describe($level));
-				}
+				$description = 'mixed' . $this->describeSubtractedType($this->subtractedType, $level);
 
 				if ($this->isExplicitMixed) {
 					$description .= '=explicit';
@@ -394,8 +608,10 @@ class MixedType implements CompoundType, SubtractableType
 
 	public function toBoolean(): BooleanType
 	{
-		if ($this->subtractedType !== null && StaticTypeFactory::falsey()->equals($this->subtractedType)) {
-			return new ConstantBooleanType(true);
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(StaticTypeFactory::falsey())->yes()) {
+				return new ConstantBooleanType(true);
+			}
 		}
 
 		return new BooleanType();
@@ -403,14 +619,81 @@ class MixedType implements CompoundType, SubtractableType
 
 	public function toNumber(): Type
 	{
-		return new UnionType([
+		return TypeCombinator::union(
 			$this->toInteger(),
 			$this->toFloat(),
-		]);
+		);
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toGetClassResultType(): Type
+	{
+		$isObject = $this->isObject();
+		if ($isObject->no()) {
+			return new ConstantBooleanType(false);
+		}
+
+		$classString = $this->getClassStringType();
+		if ($isObject->yes()) {
+			return $classString;
+		}
+
+		return new UnionType([$classString, new ConstantBooleanType(false)]);
+	}
+
+	public function toClassConstantType(ReflectionProvider $reflectionProvider): Type
+	{
+		// `mixed::class` is undefined — the original `TypeTraverser` cb fell
+		// through to `ErrorType` for any leaf that wasn't a definite object.
+		return new ErrorType();
+	}
+
+	public function toObjectTypeForInstanceofCheck(): ClassNameToObjectTypeResult
+	{
+		return new ClassNameToObjectTypeResult(new MixedType(), false);
+	}
+
+	public function toObjectTypeForIsACheck(Type $objectOrClassType, bool $allowString, bool $allowSameClass): ClassNameToObjectTypeResult
+	{
+		if ($allowString) {
+			return new ClassNameToObjectTypeResult(
+				new UnionType([new ObjectWithoutClassType(), new ClassStringType()]),
+				false,
+			);
+		}
+
+		return new ClassNameToObjectTypeResult(new ObjectWithoutClassType(), false);
+	}
+
+	public function toAbsoluteNumber(): Type
+	{
+		return $this->toNumber()->toAbsoluteNumber();
 	}
 
 	public function toInteger(): Type
 	{
+		$castsToZero = new UnionType([
+			new NullType(),
+			new ConstantBooleanType(false),
+			new ConstantIntegerType(0),
+			new ConstantArrayType([], []),
+			new StringType(),
+			new FloatType(), // every 0.x float casts to int(0)
+		]);
+		if (
+			$this->subtractedType !== null
+			&& $this->subtractedType->isSuperTypeOf($castsToZero)->yes()
+		) {
+			return new UnionType([
+				IntegerRangeType::fromInterval(null, -1),
+				IntegerRangeType::fromInterval(1, null),
+			]);
+		}
+
 		return new IntegerType();
 	}
 
@@ -421,6 +704,32 @@ class MixedType implements CompoundType, SubtractableType
 
 	public function toString(): Type
 	{
+		if ($this->subtractedType !== null) {
+			$castsToEmptyString = new UnionType([
+				new NullType(),
+				new ConstantBooleanType(false),
+				new ConstantStringType(''),
+			]);
+			if ($this->subtractedType->isSuperTypeOf($castsToEmptyString)->yes()) {
+				$accessories = [
+					new StringType(),
+					new AccessoryNonEmptyStringType(),
+				];
+
+				$castsToZeroString = new UnionType([
+					new ConstantFloatType(0.0),
+					new ConstantStringType('0'),
+					new ConstantIntegerType(0),
+				]);
+				if ($this->subtractedType->isSuperTypeOf($castsToZeroString)->yes()) {
+					$accessories[] = new AccessoryNonFalsyStringType();
+				}
+				return new IntersectionType(
+					$accessories,
+				);
+			}
+		}
+
 		return new StringType();
 	}
 
@@ -433,7 +742,12 @@ class MixedType implements CompoundType, SubtractableType
 
 	public function toArrayKey(): Type
 	{
-		return new UnionType([new IntegerType(), new StringType()]);
+		return new BenevolentUnionType([new IntegerType(), new StringType()]);
+	}
+
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		return $this;
 	}
 
 	public function isIterable(): TrinaryLogic
@@ -507,8 +821,22 @@ class MixedType implements CompoundType, SubtractableType
 		return TrinaryLogic::createMaybe();
 	}
 
+	public function isOffsetAccessLegal(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(new ObjectWithoutClassType())->yes()) {
+				return TrinaryLogic::createYes();
+			}
+		}
+		return TrinaryLogic::createMaybe();
+	}
+
 	public function hasOffsetValueType(Type $offsetType): TrinaryLogic
 	{
+		if ($this->isOffsetAccessible()->no()) {
+			return TrinaryLogic::createNo();
+		}
+
 		return TrinaryLogic::createMaybe();
 	}
 
@@ -554,6 +882,11 @@ class MixedType implements CompoundType, SubtractableType
 		return $this;
 	}
 
+	public function traverseSimultaneously(Type $right, callable $cb): Type
+	{
+		return $this;
+	}
+
 	public function isArray(): TrinaryLogic
 	{
 		if ($this->subtractedType !== null) {
@@ -573,10 +906,10 @@ class MixedType implements CompoundType, SubtractableType
 	public function isOversizedArray(): TrinaryLogic
 	{
 		if ($this->subtractedType !== null) {
-			$oversizedArray = TypeCombinator::intersect(
+			$oversizedArray = new IntersectionType([
 				new ArrayType(new MixedType(), new MixedType()),
 				new OversizedArrayType(),
-			);
+			]);
 
 			if ($this->subtractedType->isSuperTypeOf($oversizedArray)->yes()) {
 				return TrinaryLogic::createNo();
@@ -589,12 +922,98 @@ class MixedType implements CompoundType, SubtractableType
 	public function isList(): TrinaryLogic
 	{
 		if ($this->subtractedType !== null) {
-			$list = TypeCombinator::intersect(
-				new ArrayType(new IntegerType(), new MixedType()),
+			$list = new IntersectionType([
+				new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), new MixedType()),
 				new AccessoryArrayListType(),
-			);
+			]);
 
 			if ($this->subtractedType->isSuperTypeOf($list)->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isNull(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(new NullType())->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isConstantValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantScalarValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getConstantScalarTypes(): array
+	{
+		return [];
+	}
+
+	public function getConstantScalarValues(): array
+	{
+		return [];
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(new ConstantBooleanType(true))->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(new ConstantBooleanType(false))->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isBoolean(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(new BooleanType())->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isFloat(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(new FloatType())->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isInteger(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(new IntegerType())->yes()) {
 				return TrinaryLogic::createNo();
 			}
 		}
@@ -615,12 +1034,28 @@ class MixedType implements CompoundType, SubtractableType
 	public function isNumericString(): TrinaryLogic
 	{
 		if ($this->subtractedType !== null) {
-			$numericString = TypeCombinator::intersect(
+			$numericString = new IntersectionType([
 				new StringType(),
 				new AccessoryNumericStringType(),
-			);
+			]);
 
 			if ($this->subtractedType->isSuperTypeOf($numericString)->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isDecimalIntegerString(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			$decimalIntegerString = new IntersectionType([
+				new StringType(),
+				new AccessoryDecimalIntegerStringType(),
+			]);
+
+			if ($this->subtractedType->isSuperTypeOf($decimalIntegerString)->yes()) {
 				return TrinaryLogic::createNo();
 			}
 		}
@@ -631,10 +1066,10 @@ class MixedType implements CompoundType, SubtractableType
 	public function isNonEmptyString(): TrinaryLogic
 	{
 		if ($this->subtractedType !== null) {
-			$nonEmptyString = TypeCombinator::intersect(
+			$nonEmptyString = new IntersectionType([
 				new StringType(),
 				new AccessoryNonEmptyStringType(),
-			);
+			]);
 
 			if ($this->subtractedType->isSuperTypeOf($nonEmptyString)->yes()) {
 				return TrinaryLogic::createNo();
@@ -647,10 +1082,10 @@ class MixedType implements CompoundType, SubtractableType
 	public function isNonFalsyString(): TrinaryLogic
 	{
 		if ($this->subtractedType !== null) {
-			$nonFalsyString = TypeCombinator::intersect(
+			$nonFalsyString = new IntersectionType([
 				new StringType(),
 				new AccessoryNonFalsyStringType(),
-			);
+			]);
 
 			if ($this->subtractedType->isSuperTypeOf($nonFalsyString)->yes()) {
 				return TrinaryLogic::createNo();
@@ -663,10 +1098,10 @@ class MixedType implements CompoundType, SubtractableType
 	public function isLiteralString(): TrinaryLogic
 	{
 		if ($this->subtractedType !== null) {
-			$literalString = TypeCombinator::intersect(
+			$literalString = new IntersectionType([
 				new StringType(),
 				new AccessoryLiteralStringType(),
-			);
+			]);
 
 			if ($this->subtractedType->isSuperTypeOf($literalString)->yes()) {
 				return TrinaryLogic::createNo();
@@ -676,24 +1111,134 @@ class MixedType implements CompoundType, SubtractableType
 		return TrinaryLogic::createMaybe();
 	}
 
-	public function tryRemove(Type $typeToRemove): ?Type
+	public function isLowercaseString(): TrinaryLogic
 	{
-		if ($this->isSuperTypeOf($typeToRemove)->yes()) {
-			return $this->subtract($typeToRemove);
+		if ($this->subtractedType !== null) {
+			$lowercaseString = new IntersectionType([
+				new StringType(),
+				new AccessoryLowercaseStringType(),
+			]);
+
+			if ($this->subtractedType->isSuperTypeOf($lowercaseString)->yes()) {
+				return TrinaryLogic::createNo();
+			}
 		}
 
-		return null;
+		return TrinaryLogic::createMaybe();
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function isUppercaseString(): TrinaryLogic
 	{
-		return new self(
-			$properties['isExplicitMixed'],
-			$properties['subtractedType'] ?? null,
-		);
+		if ($this->subtractedType !== null) {
+			$uppercaseString = new IntersectionType([
+				new StringType(),
+				new AccessoryUppercaseStringType(),
+			]);
+
+			if ($this->subtractedType->isSuperTypeOf($uppercaseString)->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isClassString(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(new StringType())->yes()) {
+				return TrinaryLogic::createNo();
+			}
+			if ($this->subtractedType->isSuperTypeOf(new ClassStringType())->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		if (!$this->isClassString()->no()) {
+			return new ObjectWithoutClassType();
+		}
+
+		return new ErrorType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		$objectOrClass = new UnionType([
+			new ObjectWithoutClassType(),
+			new ClassStringType(),
+		]);
+		if (!$this->isSuperTypeOf($objectOrClass)->no()) {
+			return new ObjectWithoutClassType();
+		}
+
+		return new ErrorType();
+	}
+
+	public function isVoid(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(new VoidType())->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		if ($this->subtractedType !== null) {
+			if ($this->subtractedType->isSuperTypeOf(new UnionType([new BooleanType(), new FloatType(), new IntegerType(), new StringType()]))->yes()) {
+				return TrinaryLogic::createNo();
+			}
+		}
+
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		return new BooleanType();
+	}
+
+	public function tryRemove(Type $typeToRemove): ?Type
+	{
+		// mixed is the top type, so removal is exactly the subtraction - also
+		// when an earlier subtraction already lowered isSuperTypeOf() from yes
+		// to maybe, which used to give up and remove nothing at all
+		if ($this->isSuperTypeOf($typeToRemove)->no()) {
+			return null;
+		}
+
+		return $this->subtract($typeToRemove);
+	}
+
+	public function exponentiate(Type $exponent): Type
+	{
+		return new BenevolentUnionType([
+			new FloatType(),
+			new IntegerType(),
+		]);
+	}
+
+	public function getFiniteTypes(): array
+	{
+		return [];
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode('mixed');
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return false;
 	}
 
 }

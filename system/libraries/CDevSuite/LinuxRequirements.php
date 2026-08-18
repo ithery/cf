@@ -34,10 +34,36 @@ class CDevSuite_LinuxRequirements {
 
     /**
      * Run all checks and output warnings.
+     *
+     * @return void
      */
     public function check() {
         $this->homePathIsInsideRoot();
         $this->seLinuxIsEnabled();
+        $this->sslDependenciesAreInstalled();
+    }
+
+    /**
+     * Verify that the tools "devsuite:secure" depends on (openssl to generate
+     * certificates, certutil to trust them in the Chrome/Chromium and Firefox
+     * NSS databases) are installed, and warn if not.
+     *
+     * @return void
+     */
+    public function sslDependenciesAreInstalled() {
+        $missing = c::collect([
+            'openssl' => 'openssl',
+            'certutil' => 'libnss3-tools (Debian/Ubuntu) or nss-tools (Fedora/RHEL)',
+        ])->filter(function ($package, $binary) {
+            return trim($this->cli->run('command -v ' . $binary)) === '';
+        });
+
+        if ($missing->count() > 0) {
+            CDevSuite::warning(
+                'The following packages are required for `devsuite:secure` to work and are missing: '
+                . $missing->implode(', ') . '. Please install them and re-run this command.'
+            );
+        }
     }
 
     /**

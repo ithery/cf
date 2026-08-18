@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * Description of CreateCommand.
+ */
+class CDevSuite_Command_Db_CreateCommand extends CDevSuite_CommandAbstract {
+    /**
+     * Get the signature arguments string for the command.
+     *
+     * @return string
+     */
+    public function getSignatureArguments() {
+        return '{name}';
+    }
+
+    /**
+     * Interactively prompt for connection details and create a new database configuration.
+     *
+     * @param CConsole_Command $cfCommand
+     *
+     * @return void
+     */
+    public function run(CConsole_Command $cfCommand) {
+        $name = $cfCommand->argument('name');
+        if (CDevSuite::db()->exists($name)) {
+            CDevSuite::error('Database configuration: ' . $name . ' already exists');
+            exit(CConsole::FAILURE_EXIT);
+        }
+
+        $data = [];
+
+        $type = $cfCommand->choice('Type:', ['mysql', 'mongodb'], 0, 1);
+        $host = $cfCommand->ask('Host:', 'localhost');
+        $defaultPort = '3306';
+        if ($type == 'mongodb') {
+            $defaultPort = '27017';
+        }
+        $port = $cfCommand->ask('Port:', $defaultPort);
+
+        $database = $cfCommand->ask('Database:', 'cresenity');
+        $user = $cfCommand->ask('User:', 'root');
+
+        $blankPassword = '';
+        if ($type == 'mysql') {
+            $blankPassword = '[blank]';
+        }
+        $password = $cfCommand->ask('Password:', $blankPassword);
+        if ($password == $blankPassword) {
+            $password = '';
+        }
+        $data = [
+            'type' => $type,
+            'host' => $host,
+            'database' => $database,
+            'port' => $port,
+            'user' => $user,
+            'password' => $password,
+        ];
+
+        if (CDevSuite::db()->create($name, $data)) {
+            CDevSuite::success('A [' . $name . '] ssh configuration has been created');
+        }
+    }
+}

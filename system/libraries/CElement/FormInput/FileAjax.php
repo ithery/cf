@@ -1,24 +1,48 @@
 <?php
 
-class CElement_FormInput_FileAjax extends CElement_FormInput {
+class CElement_FormInput_FileAjax extends CElement_FormInput_File {
     use CElement_Trait_UseViewTrait;
 
+    /**
+     * @var string
+     */
     protected $fileName;
 
-    protected $acceptFile;
-
+    /**
+     * @var int
+     */
     protected $maxUploadSize;   // in MB
 
+    /**
+     * @var array
+     */
     protected $allowedExtension;
 
+    /**
+     * @var null|callable|CFunction_SerializableClosure
+     */
     protected $validationCallback;
 
+    /**
+     * @var bool
+     */
     protected $disabledUpload;
 
+    /**
+     * @var null|string
+     */
     protected $tempStorage;
 
+    /**
+     * @var bool
+     */
     protected $withInfo;
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'file';
@@ -53,27 +77,48 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
             $view->with('value', $this->value);
             $view->with('ajaxName', $ajaxName);
             $view->with('ajaxUrl', $ajaxUrl);
+            $view->with('cresConfig', c::json([
+                'id' => $this->id,
+                'ajaxName' => $ajaxName,
+                'ajaxUrl' => $ajaxUrl,
+                'maxUploadSize' => $this->maxUploadSize,
+                'acceptFile' => $this->acceptFile,
+                'messages' => [
+                    'acceptFileNotAllowed' => c::__('element/file.errorMessageAcceptFileNotAllowed'),
+                    'maxUploadSize' => c::__('element/file.errorMessageMaxUploadSize'),
+                    'uploadFailed' => c::__('element/upload.errorMessageUploadFailed'),
+                ],
+            ]));
         });
     }
 
+    /**
+     * @param string $fileName
+     *
+     * @return $this
+     */
     public function setFileName($fileName) {
         $this->fileName = $fileName;
 
         return $this;
     }
 
-    public function setAcceptFile($accept) {
-        $this->acceptFile = $accept;
-
-        return $this;
-    }
-
+    /**
+     * @param int $size
+     *
+     * @return $this
+     */
     public function setMaxUploadSize($size) {
         $this->maxUploadSize = $size;
 
         return $this;
     }
 
+    /**
+     * @param bool $withInfo
+     *
+     * @return $this
+     */
     public function setWithInfo($withInfo = true) {
         $this->withInfo = $withInfo;
 
@@ -81,7 +126,7 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
     }
 
     /**
-     * @param int $ext
+     * @param string|array $ext
      *
      * @return $this
      */
@@ -95,18 +140,33 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param callable|Closure $callback
+     *
+     * @return $this
+     */
     public function setValidationCallback($callback) {
         $this->validationCallback = c::toSerializableClosure($callback);
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setDisabledUpload($bool) {
         $this->disabledUpload = $bool;
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $templateHtml = $this->getViewHtml();
         $html = $templateHtml;
@@ -114,6 +174,11 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
         return $html;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $templateJs = $this->getViewJs();
         $js = $templateJs;
@@ -121,6 +186,11 @@ class CElement_FormInput_FileAjax extends CElement_FormInput {
         return $js;
     }
 
+    /**
+     * @param string $tempStorage
+     *
+     * @return $this
+     */
     public function setTempStorage($tempStorage) {
         $this->tempStorage = $tempStorage;
 

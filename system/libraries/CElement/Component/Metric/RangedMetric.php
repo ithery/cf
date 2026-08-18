@@ -17,12 +17,22 @@ class CElement_Component_Metric_RangedMetric extends CElement_Component {
      */
     protected $selectedRangeKey;
 
+    /**
+     * @param array $ranges
+     *
+     * @return $this
+     */
     public function setRanges(array $ranges) {
         $this->ranges = $ranges;
 
         return $this;
     }
 
+    /**
+     * @param string $key
+     *
+     * @return $this
+     */
     public function setSelectedRange($key) {
         $this->selectedRangeKey = $key;
 

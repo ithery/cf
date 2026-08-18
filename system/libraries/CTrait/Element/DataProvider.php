@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 24, 2019, 1:19:25 AM
- */
 trait CTrait_Element_DataProvider {
     /**
      * @var CManager_DataProviderAbstract
@@ -66,10 +60,10 @@ trait CTrait_Element_DataProvider {
             }
 
             if (strlen($dbName) > 0) {
-                return CDatabase::instance($dbName);
+                return c::db($dbName);
             }
 
-            return CDatabase::instance($dbName, $dbConfig);
+            return c::db($dbName, $dbConfig);
         });
 
         return $this;

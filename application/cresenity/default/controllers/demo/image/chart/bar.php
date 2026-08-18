@@ -18,8 +18,8 @@ class Controller_Demo_Image_Chart_Bar extends \Cresenity\Demo\Controller {
         $uri = $imageChart->toUri();
         $app->addImg()->setSrc($uri)->addClass('mb-3');
 
-        $app->addH5()->add('With Google Engine');
-        $imageChart->setEngine('google');
+        $app->addH5()->add('With QuickChart Engine');
+        $imageChart->setEngine('quickchart');
         $barChart->setDirection(CChart::DIRECTION_VERTICAL);
         $uri = $imageChart->toUri();
         $app->addImg()->setSrc($uri)->addClass('mb-3');

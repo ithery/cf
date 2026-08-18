@@ -1,15 +1,19 @@
 <?php
 
 trait CTrait_Controller_Application_Log_System {
+    public function getPath() {
+        return DOCROOT . 'logs/' . CF::appCode();
+    }
+
     public function system() {
         $app = c::app();
-        $path = DOCROOT . 'logs/' . cf::appCode();
+        $path = $this->getPath();
         $years = array_reverse($this->getSubdirectory($path));
 
         $reportTimes = [];
 
         foreach ($years as $year) {
-            $months = array_reverse($this->getSubdirectory("${path}/${year}"));
+            $months = array_reverse($this->getSubdirectory("{$path}/{$year}"));
             foreach ($months as $month) {
                 $reportTimes[] = [
                     'year' => $year,
@@ -23,9 +27,10 @@ trait CTrait_Controller_Application_Log_System {
             $year = carr::get($time, 'year');
             $month = carr::get($time, 'month');
             $tab = $tabList->addTab()
-                ->setLabel("${year} - ${month}")
+                ->setLabel("{$year} - {$month}")
                 ->addClass('p-0')
-                ->setAjaxUrl($this->currentUrl() . "logSystem/${year}/${month}");
+                ->setNoPadding()
+                ->setAjaxUrl($this->currentUrl() . "tabDaily/{$year}/{$month}");
         }
 
         return $app;
@@ -47,83 +52,102 @@ trait CTrait_Controller_Application_Log_System {
         return array_values(array_diff(scandir($path), ['..', '.']));
     }
 
-    public function logSystem($year = null, $month = null) {
+    public function tabDaily($year, $month) {
         $app = c::app();
-        $path = DOCROOT . 'logs/' . cf::appCode();
-        if ($year) {
-            $path .= DS . $year;
 
-            if ($month) {
-                $path .= DS . $month;
-            }
-        }
-        $phpFiles = [];
+        $path = $this->getPath();
+
+        $path .= DS . $year;
+
+        $path .= DS . $month;
+        $logFiles = [];
 
         try {
             $directory = new RecursiveDirectoryIterator($path);
             $iterator = new RecursiveIteratorIterator($directory);
-            $phpFiles = new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+            $logFiles = new RegexIterator($iterator, '/^.+\.log$/i', RecursiveRegexIterator::GET_MATCH);
         } catch (Exception $ex) {
         }
+        $tabList = $app->addTabList();
+        $logFiles = c::collect($logFiles)->sort(function ($a, $b) {
+            return c::spaceshipOperator($b, $a);
+        })->toArray();
+        foreach ($logFiles as $file) {
+            $file = carr::get($file, 0);
 
-        $files = [];
-        $report = [];
-        foreach ($phpFiles as $file) {
-            $files[] = carr::get($file, '0');
-        }
-        $files = c::collect($files)->sort()->toArray();
-        foreach ($files as $file) {
-            $fileContent = file_get_contents($file);
-            $lines = explode("\n", $fileContent);
-
-            foreach ($lines as $line) {
-                preg_match('#^(.*?) --- (.*?):(.*?): (.*?)$#ims', $line, $matches);
-
-                if ($matches) {
-                    $time = carr::get($matches, 1);
-                    $domain = carr::get($matches, 2);
-                    $status = carr::get($matches, 3);
-                    $message = carr::get($matches, 4);
-                    $filename = str_replace('.php', '', basename($file));
-                    $report[] = [
-                        'time' => $time,
-                        'domain' => $domain,
-                        'status' => $status,
-                        'message' => $message,
-                        'filename' => $filename,
-                    ];
-                }
+            if ($file) {
+                $basename = basename($file);
+                $tab = $tabList->addTab()
+                    ->setLabel($basename)
+                    ->addClass('p-0')
+                    ->setNoPadding()
+                    ->setAjaxUrl($this->currentUrl() . "systemTable/{$year}/{$month}?file=" . urlencode($basename));
             }
         }
-
-        $report = array_reverse($report);
-        $table = $app->addTable()->setDataFromArray($report);
-        $table->addColumn('time')->setLabel('Time');
-        $table->addColumn('domain')->setLabel('Domain');
-        $table->addColumn('status')->setLabel('Status');
-        $table->addColumn('message')->setLabel('Message');
-        $table->addRowAction()->setLabel('View Raw')->addClass('btn-primary')->setLink($this->controllerUrl() . 'systemRaw/{filename}');
-        //$table->addHeaderAction()->setLabel('View Raw')->addClass('btn-primary')->setLink($this->controllerUrl() . 'systemRaw/' . $year . '/' . $month);
 
         return $app;
     }
 
-    public function systemRaw($file) {
+    public function systemTable($year, $month) {
+        $file = c::request()->file;
         $app = c::app();
-        $path = DOCROOT . 'logs/' . cf::appCode();
-        $year = substr($file, 0, 4);
-        $month = substr($file, 4, 2);
-        if ($year) {
-            $path .= DS . $year;
+        $path = $this->getPath();
 
-            if ($month) {
-                $path .= DS . $month;
-            }
-        }
-        $file = $path . DS . $file . '.php';
-        $content = file_get_contents($file);
-        $app->addPre()->add($content);
+        $path .= DS . $year;
+
+        $path .= DS . $month;
+        $path .= DS . $file;
+        $table = $app->addTable();
+        $table->addHeaderAction()->setLabel('Download')
+            ->addClass('btn-primary')
+            ->setLink($this->currentUrl() . "systemTableDownload/{$year}/{$month}/{$file}");
+        $table->addColumn('time')->setLabel('Time');
+        $table->addColumn('environment')->setLabel('Environment');
+        $table->addColumn('level')->setLabel('Level')->setCallback(function ($row, $value) {
+            return '<span class="badge badge-' . c::get($row, 'levelClass', 'secondary') . '">' . $value . '</span>';
+        });
+        $table->addColumn('message')->setLabel('Message')->setCallback(function ($row, $value) {
+            return c::div()->addShowMore()->add($value);
+        });
+        $table->setDataFromClosure(function (CManager_DataProviderParameter $parameter) use ($path) {
+            $errCode = 0;
+            $errMessage = '';
+
+            $perPage = $parameter->getPerPage();
+            $page = $parameter->getPage();
+            $keywords = $parameter->getSearchOrData();
+            $logFile = CLogger::reader()->createLogFile($path);
+            $logQuery = $logFile->logs();
+            $keyword = carr::first($keywords);
+            $logQuery->search($keyword);
+            $logQuery->setDirection(CLogger_Reader_Direction::BACKWARD);
+
+            return $logQuery->paginate($perPage, $page, function (CLogger_Reader_Log $log) {
+                return [
+                    'time' => (string) $log->time,
+                    'environment' => $log->environment,
+                    'level' => $log->level->getName(),
+                    'levelClass' => $log->level->getClass(),
+                    'short' => $log->text,
+                    'message' => $log->fullText,
+                ];
+            });
+        });
+        $table->setAjax(true);
 
         return $app;
+    }
+
+    public function systemTableDownload($year, $month, $file) {
+        $app = c::app();
+        $path = $this->getPath();
+
+        $path .= DS . $year;
+
+        $path .= DS . $month;
+        $path .= DS . $file;
+        $logFile = CLogger::reader()->createLogFile($path);
+
+        return $logFile->download();
     }
 }

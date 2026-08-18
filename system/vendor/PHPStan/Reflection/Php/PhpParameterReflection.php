@@ -3,29 +3,41 @@
 namespace PHPStan\Reflection\Php;
 
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionParameter;
+use PHPStan\Reflection\AllowedConstantsResult;
+use PHPStan\Reflection\AttributeReflection;
+use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ExtendedParameterReflection;
 use PHPStan\Reflection\InitializerExprContext;
 use PHPStan\Reflection\InitializerExprTypeResolver;
-use PHPStan\Reflection\ParameterReflectionWithPhpDocs;
+use PHPStan\Reflection\ParameterAllowedConstants;
 use PHPStan\Reflection\PassedByReference;
+use PHPStan\TrinaryLogic;
 use PHPStan\Type\MixedType;
-use PHPStan\Type\NullType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\TypehintHelper;
 
-class PhpParameterReflection implements ParameterReflectionWithPhpDocs
+final class PhpParameterReflection implements ExtendedParameterReflection
 {
 
 	private ?Type $type = null;
 
 	private ?Type $nativeType = null;
 
+	/**
+	 * @param list<AttributeReflection> $attributes
+	 */
 	public function __construct(
 		private InitializerExprTypeResolver $initializerExprTypeResolver,
 		private ReflectionParameter $reflection,
 		private ?Type $phpDocType,
-		private ?string $declaringClassName,
+		private ?ClassReflection $declaringClass,
 		private ?Type $outType,
+		private TrinaryLogic $immediatelyInvokedCallable,
+		private ?Type $closureThisType,
+		private array $attributes,
+		private ?ParameterAllowedConstants $allowedConstants,
+		private TrinaryLogic $pureUnlessCallableIsImpureParameter,
 	)
 	{
 	}
@@ -52,7 +64,7 @@ class PhpParameterReflection implements ParameterReflectionWithPhpDocs
 					$this->reflection->getDefaultValueExpression(),
 					InitializerExprContext::fromReflectionParameter($this->reflection),
 				);
-				if ($defaultValueType instanceof NullType) {
+				if ($defaultValueType->isNull()->yes()) {
 					$phpDocType = TypeCombinator::addNull($phpDocType);
 				}
 			}
@@ -60,7 +72,7 @@ class PhpParameterReflection implements ParameterReflectionWithPhpDocs
 			$this->type = TypehintHelper::decideTypeFromReflection(
 				$this->reflection->getType(),
 				$phpDocType,
-				$this->declaringClassName,
+				$this->declaringClass,
 				$this->isVariadic(),
 			);
 		}
@@ -89,18 +101,18 @@ class PhpParameterReflection implements ParameterReflectionWithPhpDocs
 		return new MixedType();
 	}
 
+	public function hasNativeType(): bool
+	{
+		return $this->reflection->getType() !== null;
+	}
+
 	public function getNativeType(): Type
 	{
-		if ($this->nativeType === null) {
-			$this->nativeType = TypehintHelper::decideTypeFromReflection(
-				$this->reflection->getType(),
-				null,
-				$this->declaringClassName,
-				$this->isVariadic(),
-			);
-		}
-
-		return $this->nativeType;
+		return $this->nativeType ??= TypehintHelper::decideTypeFromReflection(
+			$this->reflection->getType(),
+			selfClass: $this->declaringClass,
+			isVariadic: $this->isVariadic(),
+		);
 	}
 
 	public function getDefaultValue(): ?Type
@@ -118,6 +130,40 @@ class PhpParameterReflection implements ParameterReflectionWithPhpDocs
 	public function getOutType(): ?Type
 	{
 		return $this->outType;
+	}
+
+	public function isImmediatelyInvokedCallable(): TrinaryLogic
+	{
+		return $this->immediatelyInvokedCallable;
+	}
+
+	public function getClosureThisType(): ?Type
+	{
+		return $this->closureThisType;
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->attributes;
+	}
+
+	public function getAllowedConstants(): ?ParameterAllowedConstants
+	{
+		return $this->allowedConstants;
+	}
+
+	public function checkAllowedConstants(array $constants): AllowedConstantsResult
+	{
+		if ($this->allowedConstants === null) {
+			return new AllowedConstantsResult([], [], false);
+		}
+
+		return $this->allowedConstants->check($constants);
+	}
+
+	public function isPureUnlessCallableIsImpureParameter(): TrinaryLogic
+	{
+		return $this->pureUnlessCallableIsImpureParameter;
 	}
 
 }

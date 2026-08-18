@@ -1,22 +1,75 @@
 # PHPCF - DevSuite
-### devsuite:install
 
-`phpcf devsuite:install`
+### Install & Uninstall
 
+```
+phpcf devsuite:install
+phpcf devsuite:uninstall
+```
 
-### devsuite:start
+### Service
 
-`phpcf devsuite:start`
+```
+phpcf devsuite:start
+phpcf devsuite:restart
+phpcf devsuite:stop
+```
 
-### devsuite:stop
+### Link
 
-`phpcf devsuite:stop`
+Links a project directory into DevSuite.
 
-### devsuite:link
+```
+phpcf devsuite:link
+phpcf devsuite:links
+phpcf devsuite:unlink
+```
 
-`phpcf devsuite:link`
+### SSL/TLS
 
+Secures a domain with a trusted TLS certificate.
 
-### devsuite:links
+```
+phpcf devsuite:secure
+phpcf devsuite:unsecure
+```
 
-`phpcf devsuite:links`
+### TLD
+
+Sets the top level domain used by DevSuite.
+
+```
+phpcf devsuite:tld
+```
+
+### Open & Share
+
+```
+phpcf devsuite:open
+phpcf devsuite:share
+```
+
+### SSH
+
+```
+phpcf devsuite:ssh
+phpcf devsuite:ssh:list
+phpcf devsuite:ssh:create
+```
+
+### Database
+
+```
+phpcf devsuite:db:install
+phpcf devsuite:db:start
+phpcf devsuite:db:uninstall
+```
+
+| Command | Description |
+|---------|-----------|
+| `phpcf devsuite:db:list` | List the databases |
+| `phpcf devsuite:db:create` | Create a new database |
+| `phpcf devsuite:db:delete` | Delete a database |
+| `phpcf devsuite:db:compare` | Compare databases |
+| `phpcf devsuite:db:clone` | Clone a database |
+| `phpcf devsuite:db:sync` | Synchronise databases |

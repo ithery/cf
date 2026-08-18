@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
@@ -8,6 +8,15 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 class CTesting_TestCase extends BaseTestCase {
     use CTesting_Concern_MakesHttpRequests;
     use CTesting_Concern_InteractsWithAuthentication;
+    use CTesting_Concern_InteractsWithDatabase;
+
+    /**
+     * The service container instance, used by traits (MakesHttpRequests) that
+     * override or fake individual middleware/service bindings during a test.
+     *
+     * @var CContainer_Container
+     */
+    protected $app;
 
     /**
      * The callbacks that should be run after the application is created.
@@ -43,6 +52,10 @@ class CTesting_TestCase extends BaseTestCase {
      * @return void
      */
     protected function setUp() {
+        if (!$this->app) {
+            $this->app = $this->createApplication();
+        }
+
         $this->setUpTraits();
 
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
@@ -53,13 +66,28 @@ class CTesting_TestCase extends BaseTestCase {
     }
 
     /**
-     * Creates the application.
+     * Resolve the service container instance used by this test.
      *
-     * Needs to be implemented by subclasses.
+     * CF bootstraps a single global container (unlike Laravel, there is no
+     * separate "boot an application" step needed here since Bootstrap.php
+     * already ran via the PHPUnit `bootstrap` config before tests execute).
      *
-     * @return \Symfony\Component\HttpKernel\HttpKernelInterface
+     * @return CContainer_Container
      */
     protected function createApplication() {
+        return CContainer::getInstance();
+    }
+
+    /**
+     * Register a callback to be run before the test's application/container
+     * state is torn down (e.g. rolling back a database transaction).
+     *
+     * @param callable $callback
+     *
+     * @return void
+     */
+    public function beforeApplicationDestroyed(callable $callback) {
+        $this->beforeApplicationDestroyedCallbacks[] = $callback;
     }
 
     /**
@@ -70,8 +98,8 @@ class CTesting_TestCase extends BaseTestCase {
     protected function setUpTraits() {
         $uses = array_flip(c::classUsesRecursive(static::class));
 
-        if (isset($uses[CTesting_Trait_RefreshDatabase::class])) {
-            /** @var CTesting_Trait_RefreshDatabase $this */
+        if (isset($uses[CTesting_Trait_RefreshDatabaseTrait::class])) {
+            /** @var CTesting_Trait_RefreshDatabaseTrait $this */
             $this->refreshDatabase();
         }
         foreach ($uses as $trait) {
@@ -106,6 +134,33 @@ class CTesting_TestCase extends BaseTestCase {
         if (property_exists($this, 'defaultHeaders')) {
             $this->defaultHeaders = [];
         }
+
+        // Middleware toggled off via withoutMiddleware() is a process-global static
+        // flag (CHTTP / CApi_Manager), so it must be reset or it leaks into the next test.
+        CHTTP::withMiddleware();
+        CApi_Manager::withMiddlewareForAllGroups();
+
+        // CAuth_Manager caches resolved guards (with whatever user actingAs()/be()
+        // set on them) in a process-wide singleton, so an authenticated user from
+        // one test otherwise leaks into every later test in the same run.
+        CAuth::manager()->forgetGuards();
+
+        // CApp_Auth (c::app()->user(), and anything built on it like OH::user())
+        // caches its own resolved guard per guard name on first access, on top of
+        // CAuth_Manager's cache above - forgetGuards() orphans that cached guard
+        // object without CApp_Auth knowing, so later actingAs() calls stop being
+        // visible through this path even though CAuth_Manager itself is fresh.
+        if (class_exists(CApp_Auth::class)) {
+            CApp_Auth::forgetInstances();
+        }
+
+        // The session store is resolved once from the container and reused for
+        // every simulated request (like everything else here), so a test that
+        // performs a real login (writing the auth id into session, not just
+        // actingAs()'s in-memory setUser()) leaves that session data readable
+        // by every later test's fresh guard, even after forgetGuards() above -
+        // a new guard instance still reads from the same still-populated store.
+        c::session()->flush();
 
         if (class_exists('Mockery')) {
             if ($container = Mockery::getContainer()) {

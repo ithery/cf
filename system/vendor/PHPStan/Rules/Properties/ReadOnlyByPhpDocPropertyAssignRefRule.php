@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Properties;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function sprintf;
@@ -11,7 +12,8 @@ use function sprintf;
 /**
  * @implements Rule<Node\Expr\AssignRef>
  */
-class ReadOnlyByPhpDocPropertyAssignRefRule implements Rule
+#[RegisteredRule(level: 3)]
+final class ReadOnlyByPhpDocPropertyAssignRefRule implements Rule
 {
 
 	public function __construct(private PropertyReflectionFinder $propertyReflectionFinder)
@@ -38,7 +40,7 @@ class ReadOnlyByPhpDocPropertyAssignRefRule implements Rule
 			if ($nativeReflection === null) {
 				continue;
 			}
-			if (!$scope->canAccessProperty($propertyReflection)) {
+			if (!$scope->canWriteProperty($propertyReflection)) {
 				continue;
 			}
 			if (!$nativeReflection->isReadOnlyByPhpDoc() || $nativeReflection->isReadOnly()) {
@@ -46,7 +48,9 @@ class ReadOnlyByPhpDocPropertyAssignRefRule implements Rule
 			}
 
 			$declaringClass = $nativeReflection->getDeclaringClass();
-			$errors[] = RuleErrorBuilder::message(sprintf('@readonly property %s::$%s is assigned by reference.', $declaringClass->getDisplayName(), $propertyReflection->getName()))->build();
+			$errors[] = RuleErrorBuilder::message(sprintf('@readonly property %s::$%s is assigned by reference.', $declaringClass->getDisplayName(), $propertyReflection->getName()))
+				->identifier('property.readOnlyByPhpDocAssignByRef')
+				->build();
 		}
 
 		return $errors;

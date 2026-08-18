@@ -2,13 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- *
- * @since Aug 11, 2019, 3:20:19 AM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 use Intervention\Image\ImageManager;
 // import the Intervention Image Manager Class
 use Intervention\Image\Facades\Image;
@@ -17,10 +10,28 @@ use Intervention\Image\Facades\Image;
  * @property-read CManager_File_Connector_FileManager_FM_StorageRepository $storage
  */
 class CManager_File_Connector_FileManager_FM_Path {
+    /**
+     * Set via dir(), read by normalizeWorkingDir(); falls back to the fm helper's
+     * own input('working_dir')/getRootFolder() when null.
+     *
+     * @var null|string
+     */
     private $working_dir;
 
+    /**
+     * Set via setName(); the current file/folder name this path instance
+     * represents, appended onto $working_dir by normalizeWorkingDir().
+     *
+     * @var null|string
+     */
     private $item_name;
 
+    /**
+     * Set via thumb(); when true, path()/normalizeWorkingDir() resolve to the
+     * item's thumbnail location instead of its real one.
+     *
+     * @var bool
+     */
     private $is_thumb = false;
 
     /**
@@ -28,50 +39,145 @@ class CManager_File_Connector_FileManager_FM_Path {
      */
     private $fm;
 
-    public function __construct(CManager_File_Connector_FileManager_FM $fm = null) {
+    /**
+     * @param null|CManager_File_Connector_FileManager_FM $fm
+     *
+     * @return void
+     */
+    public function __construct(?CManager_File_Connector_FileManager_FM $fm = null) {
         $this->fm = $fm;
     }
 
+    /**
+     * @param string $var_name
+     *
+     * @return null|CManager_File_Connector_FileManager_FM_StorageRepository
+     */
     public function __get($var_name) {
         if ($var_name == 'storage') {
             return $this->fm->getStorage($this->path('url'));
         }
     }
 
+    /**
+     * Proxies any undefined method call through to the underlying storage
+     * repository for the current path.
+     *
+     * @param string $function_name
+     * @param array  $arguments
+     *
+     * @return mixed
+     */
     public function __call($function_name, $arguments) {
         return $this->storage->$function_name(...$arguments);
     }
 
+    /**
+     * @param CManager_File_Connector_FileManager_FM_Path $newPath
+     *
+     * @return void
+     */
     public function move($newPath) {
         $this->storage->move($newPath);
     }
 
+    /**
+     * @return bool
+     */
     public function exists() {
         return $this->storage->exists();
     }
 
+    /**
+     * @param string $working_dir
+     *
+     * @return $this
+     */
     public function dir($working_dir) {
         $this->working_dir = $working_dir;
 
         return $this;
     }
 
+    /**
+     * @param bool $is_thumb
+     *
+     * @return $this
+     */
     public function thumb($is_thumb = true) {
         $this->is_thumb = $is_thumb;
 
         return $this;
     }
 
+    /**
+     * @param null|string $item_name
+     *
+     * @return $this
+     */
     public function setName($item_name) {
+        if ($item_name !== null && $item_name !== '') {
+            $this->assertNameIsSafe($item_name);
+        }
         $this->item_name = $item_name;
 
         return $this;
     }
 
+    /**
+     * A file/folder name must be a single path segment -- rejects '/', '\\'
+     * and '..'/'.' so a tampered `file`/`name`/`items[]`/etc. request input
+     * can't smuggle in a nested or parent-traversing path (e.g.
+     * "../../../etc/passwd") and escape the configured root_path.
+     *
+     * @param mixed $name
+     *
+     * @throws \Exception
+     */
+    private function assertNameIsSafe($name) {
+        if (!is_string($name)
+            || strpbrk($name, '/\\') !== false
+            || $name === '.'
+            || $name === '..'
+        ) {
+            $this->error('invalid-path');
+        }
+    }
+
+    /**
+     * Rejects any '..' path segment -- prevents a tampered `working_dir`/
+     * `path`/`goToFolder` request input from traversing above the file
+     * manager's configured root_path. Directory paths are otherwise allowed
+     * to contain multiple segments (unlike item names, see assertNameIsSafe()).
+     *
+     * @param mixed $path
+     *
+     * @throws \Exception
+     */
+    private function assertWorkingDirIsSafe($path) {
+        if (!is_string($path)) {
+            $this->error('invalid-path');
+        }
+        foreach (explode('/', str_replace('\\', '/', $path)) as $segment) {
+            if ($segment === '..') {
+                $this->error('invalid-path');
+            }
+        }
+    }
+
+    /**
+     * @return null|string
+     */
     public function getName() {
         return $this->item_name;
     }
 
+    /**
+     * @param string $type one of 'working_dir', 'url', 'storage' (default), or
+     *                     anything else for the absolute filesystem path
+     *
+     * @return string
+     */
     public function path($type = 'storage') {
         if ($type == 'working_dir') {
             // working directory: /{user_slug}
@@ -92,18 +198,34 @@ class CManager_File_Connector_FileManager_FM_Path {
         }
     }
 
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
     public function translateToFmPath($path) {
         return str_replace($this->fm->ds(), DS, $path);
     }
 
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
     public function translateToOsPath($path) {
         return str_replace(DS, $this->fm->ds(), $path);
     }
 
+    /**
+     * @return string
+     */
     public function url() {
         return $this->storage->url($this->path('url'));
     }
 
+    /**
+     * @return CManager_File_Connector_FileManager_FM_Item[]
+     */
     public function folders() {
         $all_folders = array_map(function ($directory_path) {
             return $this->pretty($directory_path);
@@ -116,6 +238,9 @@ class CManager_File_Connector_FileManager_FM_Path {
         return $this->sortByColumn($folders);
     }
 
+    /**
+     * @return CManager_File_Connector_FileManager_FM_Item[]
+     */
     public function files() {
         $files = array_map(function ($file_path) {
             return $this->pretty($file_path);
@@ -124,6 +249,15 @@ class CManager_File_Connector_FileManager_FM_Path {
         return $this->sortByColumn($files);
     }
 
+    /**
+     * Wraps a raw file/folder path (as returned by the storage adapter) into an
+     * Item, cloning this Path so the original working_dir/thumb state is
+     * unaffected.
+     *
+     * @param string $item_path
+     *
+     * @return CManager_File_Connector_FileManager_FM_Item
+     */
     public function pretty($item_path) {
         $cloned = clone $this;
 
@@ -132,6 +266,9 @@ class CManager_File_Connector_FileManager_FM_Path {
         return new CManager_File_Connector_FileManager_FM_Item($cloned, $this->fm);
     }
 
+    /**
+     * @return mixed
+     */
     public function delete() {
         if ($this->isDirectory()) {
             return $this->storage->deleteDirectory();
@@ -146,7 +283,7 @@ class CManager_File_Connector_FileManager_FM_Path {
      * @return bool
      */
     public function createFolder() {
-        if ($this->storage->exists($this)) {
+        if ($this->storage->exists()) {
             return false;
         }
         $this->storage->makeDirectory(0777, true, true);
@@ -154,6 +291,9 @@ class CManager_File_Connector_FileManager_FM_Path {
         $this->fm->dispatch(new CManager_File_Connector_FileManager_Event_FolderIsCreated($this->path()));
     }
 
+    /**
+     * @return bool
+     */
     public function isDirectory() {
         $working_dir = $this->path('working_dir');
 
@@ -169,6 +309,9 @@ class CManager_File_Connector_FileManager_FM_Path {
         return in_array($this->path('url'), $parent_directories);
     }
 
+    /**
+     * @return CManager_File_Connector_FileManager_FM_Path
+     */
     public function createNewPathObject() {
         return new static($this->fm);
     }
@@ -182,8 +325,12 @@ class CManager_File_Connector_FileManager_FM_Path {
         return count($this->storage->allFiles()) == 0;
     }
 
+    /**
+     * @return string
+     */
     public function normalizeWorkingDir() {
         $path = $this->working_dir ?: $this->fm->input('working_dir') ?: $this->fm->getRootFolder();
+        $this->assertWorkingDirIsSafe($path);
         if ($this->is_thumb) {
             // Prevent if working dir is "/" normalizeWorkingDir will add double "//" that breaks S3 functionality
             $path = rtrim($path, DS) . DS . $this->fm->getThumbFolderName();
@@ -197,26 +344,42 @@ class CManager_File_Connector_FileManager_FM_Path {
     }
 
     /**
-     * Sort files and directories.
+     * Sort files and directories. `sortType` input is '{field}_{asc|desc}'
+     * (e.g. 'time_desc'), matching the list view's sortable column headers and
+     * the grid view's sort dropdown -- see FileManager.js.
      *
-     * @param mixed $arr_items array of files or folders or both
+     * @param CManager_File_Connector_FileManager_FM_Item[] $arr_items array of files or folders or both
      *
-     * @return array of object
+     * @return CManager_File_Connector_FileManager_FM_Item[]
      */
     public function sortByColumn($arr_items) {
-        $sortBy = $this->fm->input('sortType');
-        if (in_array($sortBy, ['name', 'time'])) {
-            $keyToSort = $sortBy;
-        } else {
-            $keyToSort = 'name';
+        $sortBy = $this->fm->input('sortType') ?: 'name_asc';
+        $direction = cstr::endsWith($sortBy, '_desc') ? 'desc' : 'asc';
+        $field = preg_replace('/_(asc|desc)$/', '', $sortBy);
+        if (!in_array($field, ['name', 'time', 'size'])) {
+            $field = 'name';
         }
-        uasort($arr_items, function ($a, $b) use ($keyToSort) {
-            return strcmp($a->{$keyToSort}, $b->{$keyToSort});
+        // size() is a human-readable string ("12.34 MB") that sorts wrong as
+        // text -- sizeBytes() is the raw byte count used for a numeric sort.
+        $keyToSort = $field === 'size' ? 'size_bytes' : $field;
+
+        uasort($arr_items, function ($a, $b) use ($keyToSort, $direction) {
+            $aVal = $a->{$keyToSort};
+            $bVal = $b->{$keyToSort};
+            $cmp = is_numeric($aVal) && is_numeric($bVal) ? ($aVal <=> $bVal) : strcmp((string) $aVal, (string) $bVal);
+
+            return $direction === 'desc' ? -$cmp : $cmp;
         });
 
         return $arr_items;
     }
 
+    /**
+     * @param string $error_type
+     * @param array  $variables
+     *
+     * @throws \Exception
+     */
     public function error($error_type, $variables = []) {
         return $this->fm->error($error_type, $variables);
     }
@@ -245,6 +408,11 @@ class CManager_File_Connector_FileManager_FM_Path {
         return $newFileName;
     }
 
+    /**
+     * @param mixed $file
+     *
+     * @return string
+     */
     private function uploadValidator($file) {
         if (empty($file)) {
             return $this->error('file-empty');
@@ -256,7 +424,15 @@ class CManager_File_Connector_FileManager_FM_Path {
             throw new \Exception('File failed to upload. Error code: ' . $file->getError());
         }
         $newFileName = $this->getNewName($file);
-        if ($this->setName($newFileName)->exists() && !$this->fm->config('over_write_on_duplicate')) {
+        $onDuplicate = $this->fm->input('on_duplicate');
+        if ($this->setName($newFileName)->exists()
+            && !$this->fm->config('over_write_on_duplicate')
+            && !in_array($onDuplicate, ['replace', 'keep_both'], true)
+        ) {
+            // Google Drive-style conflict prompt: the client shows this error's
+            // translated message verbatim to recognize it's a name conflict (not
+            // some other failure), then re-submits with on_duplicate=replace/
+            // keep_both -- see promptDuplicate()/uploadFile() in FileManager.js.
             return $this->error('file-exist');
         }
         if ($this->fm->config('should_validate_mime', false)) {
@@ -276,6 +452,11 @@ class CManager_File_Connector_FileManager_FM_Path {
         return 'pass';
     }
 
+    /**
+     * @param mixed $file
+     *
+     * @return string
+     */
     private function getNewName($file) {
         $newFileName = $this->fm
             ->translateFromUtf8(trim(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)));
@@ -288,10 +469,42 @@ class CManager_File_Connector_FileManager_FM_Path {
         if ($extension) {
             $newFileName .= '.' . $extension;
         }
+        if ($this->fm->input('on_duplicate') === 'keep_both') {
+            $newFileName = $this->uniqueNameFor($newFileName);
+        }
 
         return $newFileName;
     }
 
+    /**
+     * Appends " (1)", " (2)", ... to $fileName until it no longer collides with
+     * an existing file in this directory -- Google Drive's "Keep both files".
+     *
+     * @param string $fileName
+     *
+     * @return string
+     */
+    private function uniqueNameFor($fileName) {
+        if (!$this->setName($fileName)->exists()) {
+            return $fileName;
+        }
+        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+        $base = $extension ? substr($fileName, 0, -(strlen($extension) + 1)) : $fileName;
+        $i = 1;
+        do {
+            $candidate = $base . ' (' . $i . ')' . ($extension ? '.' . $extension : '');
+            $i++;
+        } while ($this->setName($candidate)->exists());
+
+        return $candidate;
+    }
+
+    /**
+     * @param mixed  $file
+     * @param string $newFileName
+     *
+     * @return string
+     */
     private function saveFile($file, $newFileName) {
         $this->setName($newFileName)->storage->save($file);
         $this->makeThumbnail($newFileName);
@@ -299,6 +512,11 @@ class CManager_File_Connector_FileManager_FM_Path {
         return $newFileName;
     }
 
+    /**
+     * @param string $fileName
+     *
+     * @return void
+     */
     public function makeThumbnail($fileName) {
         $original_image = $this->pretty($fileName);
         if (!$original_image->shouldCreateThumb()) {

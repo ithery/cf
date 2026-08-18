@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Dec 17, 2017, 1:21:50 PM
- */
 class CDatabase_Query_Builder {
     use CDatabase_Trait_Builder,
         CDatabase_Trait_ExplainQueries,
@@ -16,6 +10,13 @@ class CDatabase_Query_Builder {
     use CTrait_Macroable {
         __call as macroCall;
     }
+
+    /**
+     * The database connection instance.
+     *
+     * @var \CDatabase_ConnectionInterface
+     */
+    public $connection;
 
     /**
      * The database query grammar instance.
@@ -119,6 +120,13 @@ class CDatabase_Query_Builder {
     public $orders;
 
     /**
+     * The maximum number of records to return per group.
+     *
+     * @var array
+     */
+    public $groupLimit;
+
+    /**
      * The maximum number of records to return.
      *
      * @var int
@@ -189,31 +197,29 @@ class CDatabase_Query_Builder {
     ];
 
     /**
+     * All of the available bitwise operators.
+     *
+     * @var string[]
+     */
+    public $bitwiseOperators = [
+        '&', '|', '^', '<<', '>>', '&~',
+    ];
+
+    /**
      * Whether use write pdo for select.
      *
      * @var bool
      */
     public $useWritePdo = false;
 
-    /**
-     * The current connection.
-     *
-     * @var CDatabase
-     */
-    protected $db;
+    public function __construct(?CDatabase_Connection $connection = null, ?CDatabase_Query_Grammar $grammar = null, ?CDatabase_Query_Processor $processor = null) {
+        $connection = $connection ?: CDatabase::manager()->connection();
 
-    public function __construct(CDatabase $db = null) {
-        if ($db == null) {
-            $db = CDatabase::instance();
-        }
-        $this->db = $db;
-        //get driver
+        $this->connection = $connection;
 
-        $driverName = $this->db->driverName();
-        $grammarClass = 'CDatabase_Query_Grammar_' . $driverName;
-        $processorClass = 'CDatabase_Query_Processor_' . $driverName;
-        $this->grammar = new $grammarClass();
-        $this->processor = new $processorClass();
+        $this->grammar = $connection->getQueryGrammar();
+
+        $this->processor = $connection->getPostProcessor();
     }
 
     /**
@@ -357,7 +363,8 @@ class CDatabase_Query_Builder {
         if ($query->getConnection()->getDatabaseName() !== $this->getConnection()->getDatabaseName()) {
             $databaseName = $query->getConnection()->getDatabaseName();
 
-            if (strpos($query->from, $databaseName) !== 0 && strpos($query->from, '.') === false) {
+            // if (strpos($query->from, $databaseName) !== 0 && strpos($query->from, '.') === false) {
+            if (!cstr::startsWith($query->from, $databaseName) && !cstr::contains($query->from, '.')) {
                 $query->from($databaseName . '.' . $query->from);
             }
         }
@@ -375,15 +382,15 @@ class CDatabase_Query_Builder {
     public function addSelect($column) {
         $columns = is_array($column) ? $column : func_get_args();
 
-        foreach ($columns as $as => $column) {
-            if (is_string($as) && $this->isQueryable($column)) {
+        foreach ($columns as $as => $col) {
+            if (is_string($as) && $this->isQueryable($col)) {
                 if (is_null($this->columns)) {
                     $this->select($this->from . '.*');
                 }
 
-                $this->selectSub($column, $as);
+                $this->selectSub($col, $as);
             } else {
-                $this->columns[] = $column;
+                $this->columns[] = $col;
             }
         }
 
@@ -772,7 +779,7 @@ class CDatabase_Query_Builder {
 
         $this->havings[] = compact('type', 'column', 'operator', 'value', 'boolean');
 
-        if (!$value instanceof CDatabase_Query_Expression) {
+        if (!$value instanceof CDatabase_Contract_Query_ExpressionInterface) {
             $this->addBinding($this->flattenValue($value), 'having');
         }
 
@@ -991,6 +998,22 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Add a "group limit" clause to the query.
+     *
+     * @param int    $value
+     * @param string $column
+     *
+     * @return $this
+     */
+    public function groupLimit($value, $column) {
+        if ($value >= 0) {
+            $this->groupLimit = compact('value', 'column');
+        }
+
+        return $this;
+    }
+
+    /**
      * Set the limit and offset for a given page.
      *
      * @param int $page
@@ -1191,7 +1214,7 @@ class CDatabase_Query_Builder {
      * @return string
      */
     public function toCompiledSql() {
-        return $this->db->compileBinds($this->toSql(), $this->getBindings());
+        return $this->connection->compileBinds($this->toSql(), $this->getBindings());
     }
 
     /**
@@ -1227,9 +1250,13 @@ class CDatabase_Query_Builder {
      * @return \CCollection
      */
     public function get($columns = ['*']) {
-        return c::collect($this->onceWithColumns(carr::wrap($columns), function () {
+        $items = c::collect($this->onceWithColumns(carr::wrap($columns), function () {
             return $this->processor->processSelect($this, $this->runSelect());
         }));
+
+        return isset($this->groupLimit)
+            ? $this->withoutGroupLimitKeys($items)
+            : $items;
     }
 
     /**
@@ -1238,7 +1265,37 @@ class CDatabase_Query_Builder {
      * @return array
      */
     protected function runSelect() {
-        return $this->db->query($this->toSql(), $this->getBindings());
+        return $this->connection->select(
+            $this->toSql(),
+            $this->getBindings(),
+            !$this->useWritePdo
+        );
+    }
+
+    /**
+     * Remove the group limit keys from the results in the collection.
+     *
+     * @param \CCollection $items
+     *
+     * @return \CCollection
+     */
+    protected function withoutGroupLimitKeys($items) {
+        $keysToRemove = ['cf_row'];
+
+        if (is_string($this->groupLimit['column'])) {
+            $column = c::last(explode('.', $this->groupLimit['column']));
+
+            $keysToRemove[] = '@cf_group := ' . $this->grammar->wrap($column);
+            $keysToRemove[] = '@cf_group := ' . $this->grammar->wrap('pivot_' . $column);
+        }
+
+        $items->each(function ($item) use ($keysToRemove) {
+            foreach ($keysToRemove as $key) {
+                unset($item->$key);
+            }
+        });
+
+        return $items;
     }
 
     /**
@@ -1249,7 +1306,7 @@ class CDatabase_Query_Builder {
      * @param string   $pageName
      * @param null|int $page
      *
-     * @return \CPagination_Paginator\CPagination_LengthAwarePaginator
+     * @return \CPagination_LengthAwarePaginator
      */
     public function paginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null) {
         $page = $page ?: CPagination_Paginator::resolveCurrentPage($pageName);
@@ -1410,10 +1467,11 @@ class CDatabase_Query_Builder {
         }
 
         return new CCollection_LazyCollection(function () {
-            $result = $this->db->query($this->toSql(), $this->getBindings());
-            foreach ($result as $row) {
-                yield $row;
-            }
+            yield from $this->connection->cursor(
+                $this->toSql(),
+                $this->getBindings(),
+                !$this->useWritePdo
+            );
         });
     }
 
@@ -1480,9 +1538,13 @@ class CDatabase_Query_Builder {
             return $column;
         }
 
-        $separator = strpos(strtolower($column), ' as ') !== false ? ' as ' : '\.';
+        $columnString = $column instanceof CDatabase_Contract_Query_ExpressionInterface
+            ? $this->grammar->getValue($column)
+            : $column;
 
-        return c::last(preg_split('~' . $separator . '~i', $column));
+        $separator = cstr::contains(strtolower($columnString), ' as ') ? ' as ' : '\.';
+
+        return c::last(preg_split('~' . $separator . '~i', $columnString));
     }
 
     /**
@@ -1555,12 +1617,11 @@ class CDatabase_Query_Builder {
     public function exists() {
         $this->applyBeforeQueryCallbacks();
 
-        $results = $this->db->query(
+        $results = $this->connection->select(
             $this->grammar->compileExists($this),
             $this->getBindings(),
             !$this->useWritePdo
         );
-
         // If the results has rows, we will get the row and see if the exists column is a
         // boolean true. If there is no results for this query we will return false as
         // there are no rows for this query at all and we can return that info here.
@@ -1611,6 +1672,7 @@ class CDatabase_Query_Builder {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count($columns = '*') {
         return (int) $this->aggregate(__FUNCTION__, carr::wrap($columns));
     }
@@ -1793,7 +1855,7 @@ class CDatabase_Query_Builder {
         // Finally, we will run this query against the database connection and return
         // the results. We will need to also flatten these bindings before running
         // the query so they are all in one huge, flattened array for execution.
-        return $this->db->query(
+        return $this->connection->insertWithQuery(
             $this->grammar->compileInsert($this, $values),
             $this->cleanBindings(carr::flatten($values, 1))
         );
@@ -1822,11 +1884,7 @@ class CDatabase_Query_Builder {
 
         $this->applyBeforeQueryCallbacks();
 
-        // return $this->connection->affectingStatement(
-        //     $this->grammar->compileInsertOrIgnore($this, $values),
-        //     $this->cleanBindings(carr::flatten($values, 1))
-        // );
-        return $this->db->query(
+        return $this->connection->affectingStatement(
             $this->grammar->compileInsertOrIgnore($this, $values),
             $this->cleanBindings(carr::flatten($values, 1))
         );
@@ -1863,14 +1921,10 @@ class CDatabase_Query_Builder {
 
         list($sql, $bindings) = $this->createSub($query);
 
-        return $this->db->query(
+        return $this->connection->affectingStatement(
             $this->grammar->compileInsertUsing($this, $columns, $sql),
             $this->cleanBindings($bindings)
         );
-        // return $this->connection->affectingStatement(
-        //     $this->grammar->compileInsertUsing($this, $columns, $sql),
-        //     $this->cleanBindings($bindings)
-        // );
     }
 
     /**
@@ -1878,19 +1932,31 @@ class CDatabase_Query_Builder {
      *
      * @param array $values
      *
-     * @return CDatabase_Result
+     * @return int
      */
     public function update(array $values) {
         $this->applyBeforeQueryCallbacks();
+        $values = c::collect($values)->map(function ($value) {
+            if (!$value instanceof CDatabase_Query_Builder) {
+                return ['value' => $value, 'bindings' => $value];
+            }
 
-        $sql = $this->grammar->compileUpdate($this, $values);
+            list($query, $bindings) = $this->parseSub($value);
 
-        return $this->db->query($sql, $this->cleanBindings(
-            $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
+            return ['value' => new CDatabase_Query_Expression("({$query})"), 'bindings' => function () use ($bindings) {
+                return $bindings;
+            }];
+        });
+
+        $sql = $this->grammar->compileUpdate($this, $values->map(function ($value) {
+            return $value['value'];
+        })->all());
+
+        return $this->connection->updateWithQuery($sql, $this->cleanBindings(
+            $this->grammar->prepareBindingsForUpdate($this->bindings, $values->map(function ($value) {
+                return $value['value'];
+            })->all())
         ));
-        //        return $this->db->update($sql, $this->cleanBindings(
-        //                                $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
-        //        ));
     }
 
     /**
@@ -1952,14 +2018,10 @@ class CDatabase_Query_Builder {
             })->all()
         ));
 
-        return $this->db->query(
+        return $this->connection->affectingStatement(
             $this->grammar->compileUpsert($this, $values, (array) $uniqueBy, $update),
             $bindings
         );
-        // return $this->connection->affectingStatement(
-        //     $this->grammar->compileUpsert($this, $values, (array) $uniqueBy, $update),
-        //     $bindings
-        // );
     }
 
     /**
@@ -2061,7 +2123,7 @@ class CDatabase_Query_Builder {
 
         $this->applyBeforeQueryCallbacks();
 
-        return $this->db->query(
+        return $this->connection->deleteWithQuery(
             $this->grammar->compileDelete($this),
             $this->cleanBindings(
                 $this->grammar->prepareBindingsForDelete($this->bindings)
@@ -2078,7 +2140,7 @@ class CDatabase_Query_Builder {
         $this->applyBeforeQueryCallbacks();
 
         foreach ($this->grammar->compileTruncate($this) as $sql => $bindings) {
-            $this->db->query($sql, $bindings);
+            $this->connection->statement($sql, $bindings);
         }
     }
 
@@ -2088,7 +2150,7 @@ class CDatabase_Query_Builder {
      * @return \CDatabase_Query_Builder
      */
     public function newQuery() {
-        return new static($this->db, $this->grammar, $this->processor);
+        return new static($this->connection, $this->grammar, $this->processor);
     }
 
     /**
@@ -2118,10 +2180,43 @@ class CDatabase_Query_Builder {
      *
      * @param mixed $value
      *
-     * @return \CDatabase_Query_Expression
+     * @return \CDatabase_Contract_Query_ExpressionInterface
      */
     public function raw($value) {
-        return CDatabase::raw($value);
+        return $this->connection->raw($value);
+    }
+
+    /**
+     * Get the query builder instances that are used in the union of the query.
+     *
+     * @return \CCollection
+     */
+    protected function getUnionBuilders() {
+        return isset($this->unions)
+            ? (new CCollection($this->unions))->pluck('query')
+            : new CCollection();
+    }
+
+    /**
+     * Get the "limit" value for the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getLimit() {
+        $value = $this->unions ? $this->unionLimit : $this->limit;
+
+        return !is_null($value) ? (int) $value : null;
+    }
+
+    /**
+     * Get the "offset" value for the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getOffset() {
+        $value = $this->unions ? $this->unionOffset : $this->offset;
+
+        return !is_null($value) ? (int) $value : null;
     }
 
     /**
@@ -2178,12 +2273,35 @@ class CDatabase_Query_Builder {
         }
 
         if (is_array($value)) {
-            $this->bindings[$type] = array_values(array_merge($this->bindings[$type], $value));
+            // $this->bindings[$type] = array_values(array_merge($this->bindings[$type], $value));
+            $this->bindings[$type] = array_values(array_map(
+                function ($value) {
+                    return $this->castBinding($value);
+                },
+                array_merge($this->bindings[$type], $value),
+            ));
         } else {
-            $this->bindings[$type][] = $value;
+            $this->bindings[$type][] = $this->castBinding($value);
         }
 
         return $this;
+    }
+
+    /**
+     * Cast the given binding value.
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public function castBinding($value) {
+        // prepare for php 8
+
+        // if ($value instanceof UnitEnum) {
+        //     return enum_value($value);
+        // }
+
+        return $value;
     }
 
     /**
@@ -2207,9 +2325,11 @@ class CDatabase_Query_Builder {
      * @return array
      */
     protected function cleanBindings(array $bindings) {
-        return array_values(array_filter($bindings, function ($binding) {
-            return !$binding instanceof CDatabase_Query_Expression;
-        }));
+        return c::collect($bindings)->reject(function ($binding) {
+            return $binding instanceof CDatabase_Contract_Query_ExpressionInterface;
+        })->map(function ($binding) {
+            return $this->castBinding($binding);
+        })->values()->all();
     }
 
     /**
@@ -2229,7 +2349,7 @@ class CDatabase_Query_Builder {
      * @return string
      */
     protected function defaultKeyName() {
-        if (strlen($this->from) > 0) {
+        if ($this->from) {
             return $this->from . '_' . 'id';
         }
 
@@ -2239,10 +2359,10 @@ class CDatabase_Query_Builder {
     /**
      * Get the database connection instance.
      *
-     * @return CDatabase
+     * @return CDatabase_Connection
      */
     public function getConnection() {
-        return $this->db;
+        return $this->connection;
     }
 
     /**
@@ -2289,6 +2409,15 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Clone the query.
+     *
+     * @return static
+     */
+    public function clone() {
+        return clone $this;
+    }
+
+    /**
      * Clone the query without the given properties.
      *
      * @param array $except
@@ -2296,7 +2425,7 @@ class CDatabase_Query_Builder {
      * @return static
      */
     public function cloneWithout(array $except) {
-        return c::tap(clone $this, function ($clone) use ($except) {
+        return c::tap($this->clone(), function ($clone) use ($except) {
             foreach ($except as $property) {
                 $clone->{$property} = null;
             }
@@ -2311,7 +2440,7 @@ class CDatabase_Query_Builder {
      * @return static
      */
     public function cloneWithoutBindings(array $except) {
-        return c::tap(clone $this, function ($clone) use ($except) {
+        return c::tap($this->clone(), function ($clone) use ($except) {
             foreach ($except as $type) {
                 $clone->bindings[$type] = [];
             }
@@ -2321,10 +2450,23 @@ class CDatabase_Query_Builder {
     /**
      * Dump the current SQL and bindings.
      *
+     * @param mixed ...$args
+     *
      * @return $this
      */
-    public function dump() {
-        cdbg::d($this->toSql(), $this->getBindings());
+    public function dump(...$args) {
+        c::dump($this->toSql(), $this->getBindings(), ...$args);
+
+        return $this;
+    }
+
+    /**
+     * Dump the raw current SQL with embedded bindings.
+     *
+     * @return $this
+     */
+    public function dumpRawSql() {
+        c::dump($this->toRawSql());
 
         return $this;
     }
@@ -2332,10 +2474,19 @@ class CDatabase_Query_Builder {
     /**
      * Die and dump the current SQL and bindings.
      *
-     * @return void
+     * @return never
      */
     public function dd() {
         cdbg::dd($this->toSql(), $this->getBindings());
+    }
+
+    /**
+     * Die and dump the current SQL with embedded bindings.
+     *
+     * @return never
+     */
+    public function ddRawSql() {
+        cdbg::dd($this->toRawSql());
     }
 
     /**

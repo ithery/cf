@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:31:26 AM
- */
 class CDatabase_Driver_Sqlsrv_Result extends CDatabase_Result {
     /**
      * @var \mysqli
@@ -161,6 +155,7 @@ class CDatabase_Driver_Sqlsrv_Result extends CDatabase_Result {
         return $field_names;
     }
 
+    #[\ReturnTypeWillChange]
     public function seek($offset) {
         $func = 'sqlsrv_' . $this->fetch_type;
 
@@ -174,6 +169,7 @@ class CDatabase_Driver_Sqlsrv_Result extends CDatabase_Result {
         return false;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         if ($this->total_rows <= $offset) {
             return false;

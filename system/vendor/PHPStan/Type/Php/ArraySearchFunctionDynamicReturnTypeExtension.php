@@ -4,6 +4,7 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\Constant\ConstantBooleanType;
@@ -11,9 +12,9 @@ use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\NullType;
 use PHPStan\Type\Type;
-use PHPStan\Type\TypeCombinator;
 use function count;
 
+#[AutowiredService]
 final class ArraySearchFunctionDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
@@ -28,31 +29,26 @@ final class ArraySearchFunctionDynamicReturnTypeExtension implements DynamicFunc
 
 	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		$argsCount = count($functionCall->getArgs());
+		$args = $functionCall->getArgs();
+		$argsCount = count($args);
 		if ($argsCount < 2) {
 			return null;
 		}
 
-		$haystackArgType = $scope->getType($functionCall->getArgs()[1]->value);
+		$haystackArgType = $scope->getType($args[1]->value);
 		if ($haystackArgType->isArray()->no()) {
 			return $this->phpVersion->arrayFunctionsReturnNullWithNonArray() ? new NullType() : new NeverType();
 		}
 
 		if ($argsCount < 3) {
-			return TypeCombinator::union($haystackArgType->getIterableKeyType(), new ConstantBooleanType(false));
+			$strictArgType = new ConstantBooleanType(false);
+		} else {
+			$strictArgType = $scope->getType($args[2]->value);
 		}
 
-		$strictArgType = $scope->getType($functionCall->getArgs()[2]->value);
-		if (!$strictArgType instanceof ConstantBooleanType || $strictArgType->getValue() === false) {
-			return TypeCombinator::union($haystackArgType->getIterableKeyType(), new ConstantBooleanType(false));
-		}
+		$needleArgType = $scope->getType($args[0]->value);
 
-		$needleArgType = $scope->getType($functionCall->getArgs()[0]->value);
-		if ($haystackArgType->getIterableValueType()->isSuperTypeOf($needleArgType)->no()) {
-			return new ConstantBooleanType(false);
-		}
-
-		return $haystackArgType->searchArray($needleArgType);
+		return $haystackArgType->searchArray($needleArgType, $strictArgType->isTrue());
 	}
 
 }

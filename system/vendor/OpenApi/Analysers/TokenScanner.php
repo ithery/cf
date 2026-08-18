@@ -31,13 +31,14 @@ class TokenScanner
         $units = [];
         $uses = [];
         $isInterface = false;
+        $isAbstractFunction = false;
         $namespace = '';
         $currentName = null;
         $unitLevel = 0;
         $lastToken = null;
         $stack = [];
 
-        $initUnit = function ($uses) {
+        $initUnit = function ($uses): array {
             return [
                 'uses' => $uses,
                 'interfaces' => [],
@@ -49,6 +50,15 @@ class TokenScanner
         };
 
         while (false !== ($token = $this->nextToken($tokens))) {
+            // named arguments
+            $nextToken = $this->nextToken($tokens);
+            if ($nextToken === ':' || $nextToken === false) {
+                continue;
+            }
+            do {
+                $prevToken = prev($tokens);
+            } while ($token !== $prevToken);
+
             if (!is_array($token)) {
                 switch ($token) {
                     case '{':
@@ -65,6 +75,12 @@ class TokenScanner
             }
 
             switch ($token[0]) {
+                case T_ABSTRACT:
+                    if (count($stack)) {
+                        $isAbstractFunction = true;
+                    }
+                    break;
+
                 case T_CURLY_OPEN:
                 case T_DOLLAR_OPEN_CURLY_BRACES:
                     $stack[] = $token[1];
@@ -134,7 +150,7 @@ class TokenScanner
                     if (!is_array($token) || T_IMPLEMENTS !== $token[0]) {
                         break;
                     }
-                // no break
+                    // no break
                 case T_IMPLEMENTS:
                     $fqns = $this->parseFQNStatement($tokens, $token);
                     if ($currentName) {
@@ -144,10 +160,14 @@ class TokenScanner
 
                 case T_FUNCTION:
                     $token = $this->nextToken($tokens);
+                    if ((!is_array($token) && '&' == $token)
+                        || (defined('T_AMPERSAND_NOT_FOLLOWED_BY_VAR_OR_VARARG') && T_AMPERSAND_NOT_FOLLOWED_BY_VAR_OR_VARARG == $token[0])) {
+                        $token = $this->nextToken($tokens);
+                    }
 
                     if (($unitLevel + 1) == count($stack) && $currentName) {
                         $units[$currentName]['methods'][] = $token[1];
-                        if (!$isInterface) {
+                        if (!$isInterface && !$isAbstractFunction) {
                             // more nesting
                             $units[$currentName]['properties'] = array_merge(
                                 $units[$currentName]['properties'],
@@ -157,6 +177,7 @@ class TokenScanner
                         } else {
                             // no function body
                             $this->skipTo($tokens, ';');
+                            $isAbstractFunction = false;
                         }
                     }
                     break;
@@ -181,7 +202,6 @@ class TokenScanner
                         $units[$currentName] = $initUnit($uses);
                     }
                     break;
-
             }
             $lastToken = $token;
         }
@@ -191,6 +211,8 @@ class TokenScanner
 
     /**
      * Get the next token that is not whitespace or comment.
+     *
+     * @return string|array|false
      */
     protected function nextToken(array &$tokens)
     {
@@ -209,6 +231,9 @@ class TokenScanner
         return $token;
     }
 
+    /**
+     * @return array<string>
+     */
     protected function resolveFQN(array $names, string $namespace, array $uses): array
     {
         $resolve = function ($name) use ($namespace, $uses) {
@@ -226,7 +251,7 @@ class TokenScanner
         return array_values(array_map($resolve, $names));
     }
 
-    protected function skipTo(array &$tokens, $char, bool $prev = false): void
+    protected function skipTo(array &$tokens, string $char, bool $prev = false): void
     {
         while (false !== ($token = next($tokens))) {
             if (is_string($token) && $token == $char) {
@@ -265,9 +290,9 @@ class TokenScanner
     /**
      * Parse a use statement.
      */
-    protected function parseFQNStatement(array &$tokens, &$token): array
+    protected function parseFQNStatement(array &$tokens, array &$token): array
     {
-        $normalizeAlias = function ($alias) {
+        $normalizeAlias = function ($alias): string {
             $alias = ltrim($alias, '\\');
             $elements = explode('\\', $alias);
 

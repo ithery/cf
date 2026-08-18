@@ -7,6 +7,7 @@
 namespace OpenApi\Analysers;
 
 use Doctrine\Common\Annotations\DocParser;
+use OpenApi\Annotations as OA;
 use OpenApi\Context;
 use OpenApi\Generator;
 
@@ -20,6 +21,9 @@ class DocBlockParser
      */
     protected $docParser;
 
+    /**
+     * @param array<string, class-string> $aliases
+     */
     public function __construct(array $aliases = [])
     {
         $docParser = new DocParser();
@@ -28,6 +32,9 @@ class DocBlockParser
         $this->docParser = $docParser;
     }
 
+    /**
+     * @param array<string, class-string> $aliases
+     */
     public function setAliases(array $aliases): void
     {
         $this->docParser->setImports($aliases);
@@ -39,7 +46,7 @@ class DocBlockParser
      * @param string  $comment a T_DOC_COMMENT
      * @param Context $context
      *
-     * @return array Annotations
+     * @return array<OA\AbstractAnnotation>
      */
     public function fromComment(string $comment, Context $context): array
     {
@@ -51,18 +58,21 @@ class DocBlockParser
                 $context->annotations = [];
             }
 
-            return $this->docParser->parse($comment);
+            return $this->docParser->parse($comment, $context->getDebugLocation());
         } catch (\Exception $e) {
             if (preg_match('/^(.+) at position ([0-9]+) in ' . preg_quote((string) $context, '/') . '\.$/', $e->getMessage(), $matches)) {
                 $errorMessage = $matches[1];
                 $errorPos = (int) $matches[2];
                 $atPos = strpos($comment, '@');
-                $context->line += substr_count($comment, "\n", 0, $atPos + $errorPos);
+                $context->line -= substr_count($comment, "\n", $atPos + $errorPos) + 1;
                 $lines = explode("\n", substr($comment, $atPos, $errorPos));
                 $context->character = strlen(array_pop($lines)) + 1; // position starts at 0 character starts at 1
                 $context->logger->error($errorMessage . ' in ' . $context, ['exception' => $e]);
             } else {
-                $context->logger->error($e->getMessage(), ['exception' => $e]);
+                $context->logger->error(
+                    $e->getMessage() . ($context->filename ? ('; file=' . $context->filename) : ''),
+                    ['exception' => $e]
+                );
             }
 
             return [];

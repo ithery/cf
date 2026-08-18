@@ -47,7 +47,7 @@ return [
     ],
     [
         'name' => 'elements.repeater',
-        'label' => c::__('Repeater') . ' [DEV]',
+        'label' => c::__('Repeater'),
         'uri' => 'demo/elements/repeater/index',
     ],
     [
@@ -69,5 +69,25 @@ return [
         'name' => 'elements.progressBar',
         'label' => c::__('Progress Bar'),
         'uri' => 'demo/elements/progressBar/index',
+    ],
+    [
+        'name' => 'elements.treeview',
+        'label' => c::__('Tree View'),
+        'uri' => 'demo/elements/treeview/index',
+    ],
+    [
+        'name' => 'elements.nestable',
+        'label' => c::__('Nestable'),
+        'uri' => 'demo/elements/nestable/index',
+    ],
+    [
+        'name' => 'elements.calendar',
+        'label' => c::__('Calendar'),
+        'uri' => 'demo/elements/calendar/index',
+    ],
+    [
+        'name' => 'elements.filemanager',
+        'label' => c::__('File Manager'),
+        'uri' => 'demo/elements/filemanager/index',
     ],
 ];

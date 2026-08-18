@@ -8,6 +8,7 @@ use PHPStan\Type\CompoundType;
 use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\ClassStringType;
 use PHPStan\Type\IntersectionType;
+use PHPStan\Type\IsSuperTypeOfResult;
 use PHPStan\Type\Generic\TemplateType;
 use PHPStan\Type\ObjectWithoutClassType;
 use PHPStan\Type\Generic\TemplateTypeMap;
@@ -34,24 +35,30 @@ class CQC_Phpstan_Service_Type_ModelProperty_GenericModelPropertyType extends CQ
         return $this->type;
     }
 
-    public function isSuperTypeOf(Type $type): TrinaryLogic {
+    /**
+     * PHPStan 2.x mengembalikan IsSuperTypeOfResult, bukan TrinaryLogic lagi -
+     * pembungkus yang membawa alasan penolakan. Tanda tangan yang tertinggal
+     * di sini bukan sekadar salah tipe: PHP menolak deklarasinya, sehingga
+     * setiap berkas yang memuat kelas ini mati sebelum dianalisis.
+     */
+    public function isSuperTypeOf(Type $type): IsSuperTypeOfResult {
         if ($type instanceof ConstantStringType) {
-            return $this->getGenericType()->hasProperty($type->getValue());
+            return new IsSuperTypeOfResult($this->getGenericType()->hasProperty($type->getValue()), []);
         }
 
         if ($type instanceof self) {
-            return TrinaryLogic::createYes();
+            return IsSuperTypeOfResult::createYes();
         }
 
         if ($type instanceof parent) {
-            return TrinaryLogic::createMaybe();
+            return IsSuperTypeOfResult::createMaybe();
         }
 
         if ($type instanceof CompoundType) {
             return $type->isSubTypeOf($this);
         }
 
-        return TrinaryLogic::createNo();
+        return IsSuperTypeOfResult::createNo();
     }
 
     public function traverse(callable $cb): Type {
@@ -100,8 +107,6 @@ class CQC_Phpstan_Service_Type_ModelProperty_GenericModelPropertyType extends CQ
 
     /**
      * @param mixed[] $properties
-     *
-     * @return Type
      */
     public static function __set_state(array $properties): Type {
         return new self($properties['type']);

@@ -1,18 +1,23 @@
 <?php
 
-use Opis\Closure\SerializableClosure;
-
 class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
+    /**
+     * @var string
+     */
     protected $modelClass;
 
     /**
-     * @var SerializableClosure
+     * @var CFunction_SerializableClosure
      */
     protected $queryCallback;
 
+    /**
+     * @param string        $modelClass
+     * @param null|callable $queryCallback
+     */
     public function __construct($modelClass, $queryCallback = null) {
         $this->modelClass = $modelClass;
-        $this->queryCallback = $queryCallback != null ? new SerializableClosure($queryCallback) : null;
+        $this->queryCallback = $queryCallback != null ? new CFunction_SerializableClosure($queryCallback) : null;
     }
 
     /**
@@ -26,11 +31,13 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         if ($columns !== null) {
             foreach ($columns as $col) {
                 if ($col instanceof CDatabase_Query_Expression) {
-                    $statement = $col->getValue();
+                    $statement = $col->getValue($query->getGrammar());
                     //$regex = '/([\w]++)`?+(?:\s++as\s++[^,\s]++)?+\s*+(?:FROM\s*+|$)/i';
                     // $regex = '/([\w]++)`?+\s*+(?:FROM\s*+|$)/i';
                     $regex = '/([\w]++)`?+\s*+$/i';
-
+                    if ($statement instanceof CDatabase_Query_Expression) {
+                        $statement = $statement->getValue($query->getGrammar());
+                    }
                     if (preg_match($regex, $statement, $match)) {
                         $fields[] = $match[1]; // field stored in $match[1]
                     }
@@ -51,7 +58,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         $query = $modelClass::query();
         /** @var CModel_Query $query */
         if ($this->queryCallback) {
-            if ($this->queryCallback instanceof SerializableClosure) {
+            if ($this->queryCallback instanceof CFunction_SerializableClosure) {
                 $this->queryCallback->__invoke($query);
             } else {
                 call_user_func_array($this->queryCallback, [$query]);
@@ -59,7 +66,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         }
 
         if ($callback) {
-            if ($callback instanceof SerializableClosure) {
+            if ($callback instanceof CFunction_SerializableClosure) {
                 $callback->__invoke($query);
             } else {
                 call_user_func_array($callback, [$query]);
@@ -83,9 +90,9 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
 
                             $field = array_pop($fields);
                             $relation = implode('.', $fields);
-
                             $q->orWhereHas($relation, function ($q2) use ($value, $field) {
-                                $q2->where($field, 'like', '%' . $value . '%');
+                                $table = $q2->getModel()->getTable();
+                                $q2->where($table . '.' . $field, 'like', '%' . $value . '%');
                             });
                         } else {
                             //check this is aggregate field where or not
@@ -93,7 +100,48 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                                 //TODO apply search on aggregateFields
                             } else {
                                 if (!$this->isRelationField($q, $fieldName)) {
-                                    $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                                    $connectionType = $q->getConnection()->getDriverName();
+                                    if ($connectionType == 'pgsql') {
+                                        $q->orWhere($fieldName, 'ilike', '%' . $value . '%');
+                                    } else {
+                                        $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        if (count($this->searchFullTextOr) > 0) {
+            $dataSearch = $this->searchFullTextOr;
+            $query->where(function (CModel_Query $q) use ($dataSearch, $aggregateFields) {
+                foreach ($dataSearch as $fieldName => $value) {
+                    if ($this->isCallable($value)) {
+                        $q->orWhere(function ($q) use ($value) {
+                            $this->callCallable($value, [$q]);
+                        });
+                    } else {
+                        if (strpos($fieldName, '.') !== false) {
+                            $fields = explode('.', $fieldName);
+
+                            $field = array_pop($fields);
+                            $relation = implode('.', $fields);
+                            $q->orWhereHas($relation, function ($q2) use ($value, $field) {
+                                $table = $q2->getModel()->getTable();
+
+                                // $q2->where($table . '.' . $field, 'like', '%' . $value . '%');
+                                $q2->whereFullText($table . '.' . $field, $value);
+                            });
+                        } else {
+                            //check this is aggregate field where or not
+                            if (in_array($fieldName, $aggregateFields)) {
+                                //TODO apply search on aggregateFields
+                            } else {
+                                if (!$this->isRelationField($q, $fieldName)) {
+                                    // $q->orWhere($fieldName, 'like', '%' . $value . '%');
+                                    $q->orWhereFullText($fieldName, $value);
                                 }
                             }
                         }
@@ -125,7 +173,12 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
                                 //TODO apply search on aggregateFields
                             } else {
                                 if (!$this->isRelationField($q, $fieldName)) {
-                                    $q->where($fieldName, 'like', '%' . $value . '%');
+                                    $connectionType = $q->getConnection()->getDriverName();
+                                    if ($connectionType == 'pgsql') {
+                                        $q->where($fieldName, 'ilike', '%' . $value . '%');
+                                    } else {
+                                        $q->where($fieldName, 'like', '%' . $value . '%');
+                                    }
                                 }
                             }
                         }
@@ -149,19 +202,26 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             $query->getQuery()->orders = null;
             $sortIndex = 0;
             foreach ($this->sort as $fieldName => $sortDirection) {
-                if (strpos($fieldName, '.') !== false) {
-                    $fields = explode('.', $fieldName);
-
-                    $field = array_pop($fields);
-                    $relationPath = implode('.', $fields);
-
-                    $alias = $this->withSelectRelationColumn($query, $relationPath, $field, $sortIndex);
-                    $query->orderBy($alias, $sortDirection);
+                if ($this->isCallable($sortDirection)) {
+                    $this->callCallable($sortDirection, [$query]);
                 } else {
-                    if (!$this->isRelationField($query, $fieldName)) {
-                        $query->orderBy($fieldName, $sortDirection);
+                    if (strpos($fieldName, '.') !== false) {
+                        $fields = explode('.', $fieldName);
+
+                        $field = array_pop($fields);
+                        $relationPath = implode('.', $fields);
+
+                        $alias = $this->withSelectRelationColumn($query, $relationPath, $field, $sortIndex);
+                        if ($alias) {
+                            $query->orderBy($alias, $sortDirection);
+                        }
+                    } else {
+                        if (!$this->isRelationField($query, $fieldName)) {
+                            $query->orderBy($fieldName, $sortDirection);
+                        }
                     }
                 }
+
                 $sortIndex++;
             }
         }
@@ -169,11 +229,22 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $query;
     }
 
+    /**
+     * @param CModel_Query $query
+     * @param string       $relationPath
+     * @param string       $column
+     * @param int          $index
+     *
+     * @return null|string
+     */
     protected function withSelectRelationColumn($query, $relationPath, $column, $index) {
         $alias = 'mdp_sort_' . $index;
 
         $relations = explode('.', $relationPath);
         $firstRelation = array_shift($relations);
+        if (!method_exists($query->getModel(), $firstRelation)) {
+            return null;
+        }
         $relation = $query->getModel()->$firstRelation();
 
         $selectQuery = $this->createSelectJoinQuery($query, $relation, $relations, $column);
@@ -202,14 +273,21 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $key;
     }
 
-    protected function createSelectJoinQuery($query, $relation, array $joinRelations, $column) {
+    /**
+     * @param CModel_Query    $query
+     * @param CModel_Relation $relation
+     * @param string[]        $joinRelations
+     * @param string          $column
+     *
+     * @return CDatabase_Query_Builder
+     */
+    protected function createSelectJoinQuery(CModel_Query $query, CModel_Relation $relation, array $joinRelations, $column) {
         $tableAlias = 'mdp_join_main';
-
         $relatedModel = $relation->getRelated();
         $relatedTable = $relatedModel->getTable();
-        $tableAndAlias = $relatedTable . ' AS ' . $tableAlias;
-        $newQuery = c::db()->createQueryBuilder()
-            ->from($tableAndAlias);
+        $relatedConnection = $relatedModel->getConnection();
+        $newQuery = $relatedConnection->newQuery()
+            ->from($relatedTable, $tableAlias);
 
         $currentModel = $relatedModel;
         $joinIndex = 0;
@@ -231,6 +309,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
             $currentModel = $joinModel;
             $joinIndex++;
             $columnAlias = $joinAlias;
+            $beforeAlias = $joinAlias;
         }
 
         if ($relation instanceof CModel_Relation_BelongsTo) {
@@ -255,7 +334,7 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         }
         $newQuery->select($columnAlias . '.' . $column);
 
-        if ($relation instanceof CModel_Relation_BelongsToOne) {
+        if ($relation instanceof CModel_Relation_BelongsToMany) {
             $joinAlias = 'mdp_bto_join_' . $column;
 
             $joinTable = $relation->getTable();
@@ -274,6 +353,12 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $newQuery;
     }
 
+    /**
+     * @param CModel_Query $query
+     * @param string       $fieldName
+     *
+     * @return bool
+     */
     protected function isRelationField($query, $fieldName) {
         if (method_exists($query->getModel(), $fieldName)) {
             try {
@@ -292,6 +377,15 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return false;
     }
 
+    /**
+     * @param null|int   $perPage
+     * @param array      $columns
+     * @param string     $pageName
+     * @param null|int   $page
+     * @param null|mixed $callback
+     *
+     * @return CPagination_LengthAwarePaginator
+     */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null) {
         //do nothing
         $query = $this->getModelQuery($callback);
@@ -305,6 +399,11 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $query->paginate($perPage, $columns, $pageName, $page);
     }
 
+    /**
+     * @param null|mixed $callback
+     *
+     * @return null|CModel
+     */
     public function first($callback = null) {
         //do nothing
         $query = $this->getModelQuery($callback);
@@ -323,12 +422,20 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return in_array(CModel_SoftDelete_SoftDeleteTrait::class, c::classUsesRecursive($model));
     }
 
+    /**
+     * @param callable $callback
+     *
+     * @return $this
+     */
     public function queryCallback($callback) {
         $this->queryCallback = $callback;
 
         return $this;
     }
 
+    /**
+     * @return CInterface_Enumerable
+     */
     public function toEnumerable() {
         $query = $this->getModelQuery();
 

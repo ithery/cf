@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 
 class CDaemon_Supervisor_Repository_RedisProcessRepository implements CDaemon_Supervisor_Contract_ProcessRepositoryInterface {
     /**

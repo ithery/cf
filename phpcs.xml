@@ -63,6 +63,7 @@
         <exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
         <exclude name="PEAR.WhiteSpace.ScopeIndent.IncorrectExact"/>
         <exclude name="Generic.Commenting.DocComment.LongNotCapital"/>
+        <exclude name="Generic.Commenting.DocComment.ShortNotCapital"/>
         <exclude name="Generic.Commenting.DocComment.TagsNotGrouped"/>
         <exclude name="Squiz.Commenting.DocCommentAlignment.SpaceAfterStar"/>
         <exclude name="Squiz.Classes.ValidClassName.NotCamelCaps"/>
@@ -71,6 +72,9 @@
         <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseParenthesis"/>
         <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterKeyword"/>
         <exclude name="PEAR.ControlStructures.MultiLineCondition.SpaceBeforeOpenBrace"/>
+        <exclude name="PEAR.ControlStructures.MultiLineCondition.SpacingAfterOpenBrace"/>
+        <exclude name="PEAR.ControlStructures.MultiLineCondition.Alignment"/>
+        <exclude name="PEAR.ControlStructures.MultiLineCondition.StartWithBoolean"/>
         <exclude name="Generic.Commenting.DocComment.ContentAfterOpen"/>
         <exclude name="Generic.Commenting.DocComment.ContentBeforeClose"/>
 
@@ -97,5 +101,17 @@
 
     <rule ref="Internal.NoCodeFound">
         <severity>0</severity>
+    </rule>
+
+    <!--
+        Berkas test boleh memuat kelas boneka pendampingnya.
+
+        Controller atau model tiruan yang hanya dipakai satu berkas test lebih
+        jelas bila duduk di bawah test yang memakainya. Memisahkannya ke berkas
+        sendiri justru menjauhkan keduanya, dan kelas itu tidak pernah di-autoload
+        di luar test.
+    -->
+    <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
+        <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
 </ruleset>

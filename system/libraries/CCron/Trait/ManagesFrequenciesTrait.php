@@ -67,6 +67,86 @@ trait CCron_Trait_ManagesFrequenciesTrait {
     }
 
     /**
+     * Schedule the event to run every second.
+     *
+     * @return $this
+     */
+    public function everySecond() {
+        return $this->repeatEvery(1);
+    }
+
+    /**
+     * Schedule the event to run every two seconds.
+     *
+     * @return $this
+     */
+    public function everyTwoSeconds() {
+        return $this->repeatEvery(2);
+    }
+
+    /**
+     * Schedule the event to run every five seconds.
+     *
+     * @return $this
+     */
+    public function everyFiveSeconds() {
+        return $this->repeatEvery(5);
+    }
+
+    /**
+     * Schedule the event to run every ten seconds.
+     *
+     * @return $this
+     */
+    public function everyTenSeconds() {
+        return $this->repeatEvery(10);
+    }
+
+    /**
+     * Schedule the event to run every fifteen seconds.
+     *
+     * @return $this
+     */
+    public function everyFifteenSeconds() {
+        return $this->repeatEvery(15);
+    }
+
+    /**
+     * Schedule the event to run every twenty seconds.
+     *
+     * @return $this
+     */
+    public function everyTwentySeconds() {
+        return $this->repeatEvery(20);
+    }
+
+    /**
+     * Schedule the event to run every thirty seconds.
+     *
+     * @return $this
+     */
+    public function everyThirtySeconds() {
+        return $this->repeatEvery(30);
+    }
+
+    /**
+     * Schedule the event to run multiple times per minute.
+     *
+     * @param int<0, 59> $seconds
+     *
+     * @return $this
+     */
+    protected function repeatEvery($seconds) {
+        if (60 % $seconds !== 0) {
+            throw new InvalidArgumentException("The seconds [$seconds] are not evenly divisible by 60.");
+        }
+
+        $this->repeatSeconds = $seconds;
+
+        return $this->everyMinute();
+    }
+
+    /**
      * Schedule the event to run every minute.
      *
      * @return $this
@@ -135,7 +215,7 @@ trait CCron_Trait_ManagesFrequenciesTrait {
      * @return $this
      */
     public function everyThirtyMinutes() {
-        return $this->spliceIntoPosition(1, '0,30');
+        return $this->spliceIntoPosition(1, '*/30');
     }
 
     /**
@@ -150,54 +230,67 @@ trait CCron_Trait_ManagesFrequenciesTrait {
     /**
      * Schedule the event to run hourly at a given offset in the hour.
      *
-     * @param array|int $offset
+     * @param  array|string|int<0, 59>|int<0, 59>[]  $offset
      *
      * @return $this
      */
     public function hourlyAt($offset) {
-        $offset = is_array($offset) ? implode(',', $offset) : $offset;
+        return $this->hourBasedSchedule($offset, '*');
+    }
 
-        return $this->spliceIntoPosition(1, $offset);
+    /**
+     * Schedule the event to run every odd hour.
+     *
+     * @param array|string|int $offset
+     *
+     * @return $this
+     */
+    public function everyOddHour($offset = 0) {
+        return $this->hourBasedSchedule($offset, '1-23/2');
     }
 
     /**
      * Schedule the event to run every two hours.
      *
+     * @param array|string|int $offset
+     *
      * @return $this
      */
-    public function everyTwoHours() {
-        return $this->spliceIntoPosition(1, 0)
-            ->spliceIntoPosition(2, '*/2');
+    public function everyTwoHours($offset = 0) {
+        return $this->hourBasedSchedule($offset, '*/2');
     }
 
     /**
      * Schedule the event to run every three hours.
      *
+     * @param array|string|int $offset
+     *
      * @return $this
      */
-    public function everyThreeHours() {
-        return $this->spliceIntoPosition(1, 0)
-            ->spliceIntoPosition(2, '*/3');
+    public function everyThreeHours($offset = 0) {
+        return $this->hourBasedSchedule($offset, '*/3');
     }
 
     /**
      * Schedule the event to run every four hours.
      *
+     * @param array|string|int $offset
+     *
      * @return $this
      */
-    public function everyFourHours() {
-        return $this->spliceIntoPosition(1, 0)
-            ->spliceIntoPosition(2, '*/4');
+    public function everyFourHours($offset = 0) {
+        return $this->hourBasedSchedule($offset, '*/4');
     }
 
     /**
      * Schedule the event to run every six hours.
      *
+     * @param array|string|int $offset
+     *
      * @return $this
      */
-    public function everySixHours() {
-        return $this->spliceIntoPosition(1, 0)
-            ->spliceIntoPosition(2, '*/6');
+    public function everySixHours($offset = 0) {
+        return $this->hourBasedSchedule($offset, '*/6');
     }
 
     /**
@@ -206,8 +299,7 @@ trait CCron_Trait_ManagesFrequenciesTrait {
      * @return $this
      */
     public function daily() {
-        return $this->spliceIntoPosition(1, 0)
-            ->spliceIntoPosition(2, 0);
+        return $this->hourBasedSchedule(0, 0);
     }
 
     /**
@@ -231,8 +323,10 @@ trait CCron_Trait_ManagesFrequenciesTrait {
     public function dailyAt($time) {
         $segments = explode(':', $time);
 
-        return $this->spliceIntoPosition(2, (int) $segments[0])
-            ->spliceIntoPosition(1, count($segments) === 2 ? (int) $segments[1] : '0');
+        return $this->hourBasedSchedule(
+            count($segments) >= 2 ? (int) $segments[1] : '0',
+            (int) $segments[0]
+        );
     }
 
     /**
@@ -259,7 +353,23 @@ trait CCron_Trait_ManagesFrequenciesTrait {
     public function twiceDailyAt($first = 1, $second = 13, $offset = 0) {
         $hours = $first . ',' . $second;
 
-        return $this->spliceIntoPosition(1, $offset)
+        return $this->hourBasedSchedule($offset, $hours);
+    }
+
+    /**
+     * Schedule the event to run at the given minutes and hours.
+     *
+     * @param array|string|int<0, 59> $minutes
+     * @param array|string|int<0, 23> $hours
+     *
+     * @return $this
+     */
+    protected function hourBasedSchedule($minutes, $hours) {
+        $minutes = is_array($minutes) ? implode(',', $minutes) : $minutes;
+
+        $hours = is_array($hours) ? implode(',', $hours) : $hours;
+
+        return $this->spliceIntoPosition(1, $minutes)
             ->spliceIntoPosition(2, $hours);
     }
 
@@ -433,6 +543,21 @@ trait CCron_Trait_ManagesFrequenciesTrait {
         return $this->spliceIntoPosition(1, 0)
             ->spliceIntoPosition(2, 0)
             ->spliceIntoPosition(3, 1)
+            ->spliceIntoPosition(4, '1-12/3');
+    }
+
+    /**
+     * Schedule the event to run quarterly on a given day and time.
+     *
+     * @param int    $dayOfQuarter
+     * @param string $time
+     *
+     * @return $this
+     */
+    public function quarterlyOn($dayOfQuarter = 1, $time = '0:0') {
+        $this->dailyAt($time);
+
+        return $this->spliceIntoPosition(3, $dayOfQuarter)
             ->spliceIntoPosition(4, '1-12/3');
     }
 

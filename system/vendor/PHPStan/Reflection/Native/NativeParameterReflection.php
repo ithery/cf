@@ -5,8 +5,9 @@ namespace PHPStan\Reflection\Native;
 use PHPStan\Reflection\ParameterReflection;
 use PHPStan\Reflection\PassedByReference;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
 
-class NativeParameterReflection implements ParameterReflection
+final class NativeParameterReflection implements ParameterReflection
 {
 
 	public function __construct(
@@ -50,18 +51,32 @@ class NativeParameterReflection implements ParameterReflection
 		return $this->defaultValue;
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): self
+	/** Used when merging signatures where only some of them declare this parameter. */
+	public function toOptional(): self
+	{
+		if ($this->optional) {
+			return $this;
+		}
+
+		return new self(
+			$this->name,
+			true,
+			$this->type,
+			$this->passedByReference,
+			$this->variadic,
+			$this->defaultValue,
+		);
+	}
+
+	public function union(self $other): self
 	{
 		return new self(
-			$properties['name'],
-			$properties['optional'],
-			$properties['type'],
-			$properties['passedByReference'],
-			$properties['variadic'],
-			$properties['defaultValue'],
+			$this->name,
+			$this->optional && $other->optional,
+			TypeCombinator::union($this->type, $other->type),
+			$this->passedByReference->combine($other->passedByReference),
+			$this->variadic && $other->variadic,
+			$this->optional && $other->optional ? $this->defaultValue : null,
 		);
 	}
 

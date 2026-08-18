@@ -2,13 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 8, 2018, 3:01:36 AM
- */
 abstract class CAjax_Engine_SelectSearch_Processor implements CAjax_Engine_SelectSearch_ProcessorInterface {
+    use CElement_FormInput_SelectSearch_Trait_SelectSearchUtilsTrait;
+
     /**
      * @var CAjax_Engine
      */
@@ -70,6 +66,13 @@ abstract class CAjax_Engine_SelectSearch_Processor implements CAjax_Engine_Selec
         return carr::wrap(carr::get($this->data, 'searchField', carr::get($this->data, 'search_field')));
     }
 
+    /**
+     * @return array
+     */
+    public function searchFullTextField() {
+        return carr::wrap(carr::get($this->data, 'searchFullTextField'));
+    }
+
     public function pageSize() {
         return $this->parameter->pageSize();
     }
@@ -84,6 +87,15 @@ abstract class CAjax_Engine_SelectSearch_Processor implements CAjax_Engine_Selec
 
     public function callback() {
         return $this->parameter->callback();
+    }
+
+    /**
+     * Returns the ID of the current search.
+     *
+     * @return int
+     */
+    public function searchIds() {
+        return carr::wrap($this->parameter->id());
     }
 
     public function input() {

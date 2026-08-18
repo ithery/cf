@@ -32,10 +32,14 @@ class CDaemon_Supervisor_MasterSupervisorCommand_AddSupervisor {
      * @return \Symfony\Component\Process\Process
      */
     protected function createProcess(CDaemon_Supervisor_MasterSupervisor $master, CDaemon_Supervisor_SupervisorOptions $options) {
-        $command = $options->toSupervisorCommand();
+        $runner = CDaemon::createSupervisorRunner($master, $options);
 
-        return Process::fromShellCommandline($command, $options->directory ?? DOCROOT)
-            ->setTimeout(null)
-            ->disableOutput();
+        return $runner->run();
+        // $command = $options->toSupervisorCommand();
+        // CDaemon::log('Command :' . $command);
+
+        // return Process::fromShellCommandline($command, $options->directory ?? DOCROOT)
+        //     ->setTimeout(null)
+        //     ->disableOutput();
     }
 }

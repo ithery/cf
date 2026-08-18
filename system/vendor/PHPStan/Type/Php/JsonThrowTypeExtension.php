@@ -5,19 +5,22 @@ namespace PHPStan\Type\Php;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\BitwiseFlagHelper;
 use PHPStan\Type\DynamicFunctionThrowTypeExtension;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
+use function array_key_exists;
 use function in_array;
 
-class JsonThrowTypeExtension implements DynamicFunctionThrowTypeExtension
+#[AutowiredService]
+final class JsonThrowTypeExtension implements DynamicFunctionThrowTypeExtension
 {
 
-	/** @var array<string, int> */
-	private array $argumentPositions = [
+	private const ARGUMENTS_POSITIONS = [
 		'json_encode' => 1,
 		'json_decode' => 3,
 	];
@@ -33,14 +36,14 @@ class JsonThrowTypeExtension implements DynamicFunctionThrowTypeExtension
 		FunctionReflection $functionReflection,
 	): bool
 	{
-		return $this->reflectionProvider->hasConstant(new Name\FullyQualified('JSON_THROW_ON_ERROR'), null) && in_array(
+		return in_array(
 			$functionReflection->getName(),
 			[
 				'json_encode',
 				'json_decode',
 			],
 			true,
-		);
+		) && $this->reflectionProvider->hasConstant(new Name\FullyQualified('JSON_THROW_ON_ERROR'), null);
 	}
 
 	public function getThrowTypeFromFunctionCall(
@@ -49,13 +52,17 @@ class JsonThrowTypeExtension implements DynamicFunctionThrowTypeExtension
 		Scope $scope,
 	): ?Type
 	{
-		$argumentPosition = $this->argumentPositions[$functionReflection->getName()];
-		if (!isset($functionCall->getArgs()[$argumentPosition])) {
+		if (!array_key_exists($functionReflection->getName(), self::ARGUMENTS_POSITIONS)) {
+			throw new ShouldNotHappenException();
+		}
+		$argumentPosition = self::ARGUMENTS_POSITIONS[$functionReflection->getName()];
+		$args = $functionCall->getArgs();
+		if (!isset($args[$argumentPosition])) {
 			return null;
 		}
 
-		$optionsExpr = $functionCall->getArgs()[$argumentPosition]->value;
-		if ($this->bitwiseFlagAnalyser->bitwiseOrContainsConstant($optionsExpr, $scope, 'JSON_THROW_ON_ERROR')->yes()) {
+		$optionsExpr = $args[$argumentPosition]->value;
+		if (!$this->bitwiseFlagAnalyser->bitwiseOrContainsConstant($optionsExpr, $scope, 'JSON_THROW_ON_ERROR')->no()) {
 			return new ObjectType('JsonException');
 		}
 

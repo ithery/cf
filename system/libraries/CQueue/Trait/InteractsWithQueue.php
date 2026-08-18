@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 3:10:18 AM
- */
 trait CQueue_Trait_InteractsWithQueue {
     /**
      * The underlying queue job instance.

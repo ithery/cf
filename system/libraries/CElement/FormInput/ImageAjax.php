@@ -6,10 +6,19 @@
  * @author Hery
  */
 class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
+    /**
+     * @var int
+     */
     protected $maxUploadSize;   // in MB
 
+    /**
+     * @var array
+     */
     protected $allowedExtension;
 
+    /**
+     * @var null|callable|CFunction_SerializableClosure
+     */
     protected $validationCallback;
 
     /**
@@ -17,12 +26,31 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
      */
     protected $cropper;
 
+    /**
+     * @var null|string
+     */
     protected $tempStorage;
 
+    /**
+     * @var bool
+     */
     protected $onExists;
 
+    /**
+     * @var bool
+     */
     protected $withInfo;
 
+    /**
+     * @var null|CManager_FileProvider_ImageFileProvider
+     */
+    protected $fileProvider;
+
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'image';
@@ -47,6 +75,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
                 ->setData('allowedExtension', $this->allowedExtension)
                 ->setData('withInfo', $this->withInfo)
                 ->setData('validationCallback', $this->validationCallback)
+                ->setData('fileProvider', $this->fileProvider)
                 ->makeUrl();
 
             $view->with('id', $this->id);
@@ -68,6 +97,30 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
     }
 
     /**
+     * @param string|null $id
+     *
+     * @return static
+     */
+    public static function factory($id = null) {
+        /** @phpstan-ignore-next-line */
+        return new static($id);
+    }
+
+    /**
+     * @param mixed $val
+     *
+     * @return $this
+     */
+    public function setValue($val) {
+        parent::setValue($val);
+        if ($val && $this->imgSrc == null) {
+            $this->imgSrc = CTemporary::getUrl('imgupload', $val);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param int $size
      *
      * @return $this
@@ -79,7 +132,7 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
     }
 
     /**
-     * @param int|array $ext
+     * @param string|array $ext
      *
      * @return $this
      */
@@ -93,18 +146,33 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
         return $this;
     }
 
+    /**
+     * @param bool $withInfo
+     *
+     * @return $this
+     */
     public function setWithInfo($withInfo = true) {
         $this->withInfo = $withInfo;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setOnExists($bool) {
         $this->onExists = $bool;
 
         return $this;
     }
 
+    /**
+     * @param callable|Closure $callback
+     *
+     * @return $this
+     */
     public function setValidationCallback($callback) {
         $this->validationCallback = c::toSerializableClosure($callback);
 
@@ -151,6 +219,22 @@ class CElement_FormInput_ImageAjax extends CElement_FormInput_Image {
         return $this->cropper;
     }
 
+    /**
+     * @return CManager_FileProvider_ImageFileProvider
+     */
+    public function withFileProvider() {
+        if ($this->fileProvider == null) {
+            $this->fileProvider = c::manager()->createImageFileProvider();
+        }
+
+        return $this->fileProvider;
+    }
+
+    /**
+     * @param string $tempStorage
+     *
+     * @return $this
+     */
     public function setTempStorage($tempStorage) {
         $this->tempStorage = $tempStorage;
 

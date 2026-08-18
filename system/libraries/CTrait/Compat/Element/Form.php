@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 17, 2018, 1:55:05 AM
+ * @see CElement_Component_Form
  */
 
  //@codingStandardsIgnoreStart
@@ -21,6 +18,7 @@ trait CTrait_Compat_Element_Form {
      * @return CElement_Component_Form
      */
     public function set_method($method) {
+        /** @var CElement_Component_Form $this */
         return $this->setMethod($method);
     }
 
@@ -34,6 +32,7 @@ trait CTrait_Compat_Element_Form {
      * @return CElement_Component_Form
      */
     public function set_action($action) {
+        /** @var CElement_Component_Form $this */
         return $this->setAction($action);
     }
 
@@ -47,6 +46,7 @@ trait CTrait_Compat_Element_Form {
      * @return CElement_Component_Form
      */
     public function set_target($target) {
+        /** @var CElement_Component_Form $this */
         return $this->setTarget($target);
     }
 
@@ -58,6 +58,7 @@ trait CTrait_Compat_Element_Form {
      * @return CElement_Component_Form
      */
     public function set_ajax_submit($bool) {
+        /** @var CElement_Component_Form $this */
         return $this->setAjaxSubmit($bool);
     }
 
@@ -69,6 +70,7 @@ trait CTrait_Compat_Element_Form {
      * @return CElement_Component_Form
      */
     public function set_ajax_submit_target($target) {
+        /** @var CElement_Component_Form $this */
         return $this->SetAjaxSubmitTarget($target);
     }
 
@@ -80,6 +82,7 @@ trait CTrait_Compat_Element_Form {
      * @return CElement_Component_Form
      */
     public function set_ajax_redirect($bool) {
+        /** @var CElement_Component_Form $this */
         return $this->setAjaxRedirect($bool);
     }
 
@@ -91,6 +94,7 @@ trait CTrait_Compat_Element_Form {
      * @return CElement_Component_Form
      */
     public function set_enctype($enctype = 'multipart/form-data') {
+        /** @var CElement_Component_Form $this */
         return $this->setEncType($enctype);
     }
 
@@ -102,6 +106,7 @@ trait CTrait_Compat_Element_Form {
      * @return CElement_Component_Form
      */
     public function set_validation($bool) {
+        /** @var CElement_Component_Form $this */
         return $this->setValidation($bool);
     }
 
@@ -113,6 +118,7 @@ trait CTrait_Compat_Element_Form {
      * @return CElement_Component_Form
      */
     public function set_autocomplete($bool) {
+        /** @var CElement_Component_Form $this */
         return $this->setAutoComplete($bool);
     }
 
@@ -124,6 +130,7 @@ trait CTrait_Compat_Element_Form {
      * @return $this
      */
     public function set_name($name) {
+        /** @var CElement_Component_Form $this */
         return $this->setName($name);
     }
 
@@ -135,58 +142,102 @@ trait CTrait_Compat_Element_Form {
      * @return $this
      */
     public function set_layout($layout) {
+        /** @var CElement_Component_Form $this */
         return $this->setLayout($layout);
     }
 
     /**
      * @deprecated since version 1.2
      *
-     * @param type $datatype
+     * @param mixed $datatype
      *
      * @return $this
      */
     public function set_ajax_datatype($datatype) {
+        /** @var CElement_Component_Form $this */
         return $this->setAjaxDataType($datatype);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function set_disable_js($bool) {
+        /** @var CElement_Component_Form $this */
         $this->disable_js = $bool;
 
         return $this;
     }
 
+    /**
+     * @param string $target
+     *
+     * @return $this
+     */
     public function set_ajax_submit_target_class($target) {
+        /** @var CElement_Component_Form $this */
         $this->ajax_submit_target_class = $target;
 
         return $this;
     }
 
+    /**
+     * @param string $jsfunc
+     *
+     * @return $this
+     */
     public function set_ajax_success_script_callback($jsfunc) {
+        /** @var CElement_Component_Form $this */
         $this->ajax_success_script_callback = $jsfunc;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setAjaxRedirect($bool) {
+        /** @var CElement_Component_Form $this */
         $this->ajax_redirect = $bool;
 
         return $this;
     }
 
+    /**
+     * @param string $url
+     *
+     * @return $this
+     */
     public function set_ajax_redirect_url($url) {
+        /** @var CElement_Component_Form $this */
         $this->ajax_redirect_url = $url;
 
         return $this;
     }
 
+    /**
+     * @param string $action_before_submit
+     *
+     * @return $this
+     */
     public function set_action_before_submit($action_before_submit) {
+        /** @var CElement_Component_Form $this */
         $this->action_before_submit = $action_before_submit;
 
         return $this;
     }
 
+    /**
+     * @param bool $bol
+     *
+     * @return $this
+     */
     public function set_auto_set_focus($bol) {
-        $this->auto_set_focus = $bol;
+        /** @var CElement_Component_Form $this */
+        $this->autoFocus = $bol;
 
         return $this;
     }
@@ -197,6 +248,7 @@ trait CTrait_Compat_Element_Form {
      * @return CHandler
      */
     public function add_ajax_submit_handler($handler_name) {
+        /** @var CElement_Component_Form $this */
         $handler = CHandler::factory($this->id, 'submit', $handler_name);
         $this->ajax_submit_handlers[] = $handler;
 

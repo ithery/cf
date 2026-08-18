@@ -4,15 +4,22 @@ namespace PHPStan\Analyser;
 
 use Exception;
 use JsonSerializable;
+use Nette\Utils\Strings;
+use Override;
 use PhpParser\Node;
 use PHPStan\ShouldNotHappenException;
 use ReturnTypeWillChange;
 use Throwable;
 use function is_bool;
+use function sprintf;
 
-/** @api */
-class Error implements JsonSerializable
+/**
+ * @api
+ */
+final class Error implements JsonSerializable
 {
+
+	public const PATTERN_IDENTIFIER = '[a-zA-Z0-9](?:[a-zA-Z0-9\\.]*[a-zA-Z0-9])?';
 
 	/**
 	 * Error constructor.
@@ -32,8 +39,12 @@ class Error implements JsonSerializable
 		private ?string $nodeType = null,
 		private ?string $identifier = null,
 		private array $metadata = [],
+		private ?FixedErrorDiff $fixedErrorDiff = null,
 	)
 	{
+		if ($this->identifier !== null && !self::validateIdentifier($this->identifier)) {
+			throw new ShouldNotHappenException(sprintf('Invalid identifier: %s', $this->identifier));
+		}
 	}
 
 	public function getMessage(): string
@@ -73,6 +84,7 @@ class Error implements JsonSerializable
 			$this->nodeType,
 			$this->identifier,
 			$this->metadata,
+			$this->fixedErrorDiff,
 		);
 	}
 
@@ -90,6 +102,29 @@ class Error implements JsonSerializable
 			$this->nodeType,
 			$this->identifier,
 			$this->metadata,
+			$this->fixedErrorDiff,
+		);
+	}
+
+	public function removeTraitContext(): self
+	{
+		if ($this->traitFilePath === null) {
+			throw new ShouldNotHappenException();
+		}
+
+		return new self(
+			$this->message,
+			$this->traitFilePath,
+			$this->line,
+			$this->canBeIgnored,
+			$this->filePath,
+			$this->traitFilePath,
+			$this->tip,
+			$this->nodeLine,
+			$this->nodeType,
+			$this->identifier,
+			$this->metadata,
+			$this->fixedErrorDiff,
 		);
 	}
 
@@ -134,6 +169,9 @@ class Error implements JsonSerializable
 			null,
 			$this->nodeLine,
 			$this->nodeType,
+			$this->identifier,
+			$this->metadata,
+			$this->fixedErrorDiff,
 		);
 	}
 
@@ -153,6 +191,56 @@ class Error implements JsonSerializable
 			$this->tip,
 			$this->nodeLine,
 			$this->nodeType,
+			$this->identifier,
+			$this->metadata,
+			$this->fixedErrorDiff,
+		);
+	}
+
+	public function withIdentifier(string $identifier): self
+	{
+		if ($this->identifier !== null) {
+			throw new ShouldNotHappenException(sprintf('Error already has an identifier: %s', $this->identifier));
+		}
+
+		return new self(
+			$this->message,
+			$this->file,
+			$this->line,
+			$this->canBeIgnored,
+			$this->filePath,
+			$this->traitFilePath,
+			$this->tip,
+			$this->nodeLine,
+			$this->nodeType,
+			$identifier,
+			$this->metadata,
+			$this->fixedErrorDiff,
+		);
+	}
+
+	/**
+	 * @param mixed[] $metadata
+	 */
+	public function withMetadata(array $metadata): self
+	{
+		if ($this->metadata !== []) {
+			throw new ShouldNotHappenException('Error already has metadata');
+		}
+
+		return new self(
+			$this->message,
+			$this->file,
+			$this->line,
+			$this->canBeIgnored,
+			$this->filePath,
+			$this->traitFilePath,
+			$this->tip,
+			$this->nodeLine,
+			$this->nodeType,
+			$this->identifier,
+			$metadata,
+			$this->fixedErrorDiff,
 		);
 	}
 
@@ -169,6 +257,11 @@ class Error implements JsonSerializable
 		return $this->nodeType;
 	}
 
+	/**
+	 * Error identifier set via `RuleErrorBuilder::identifier()`.
+	 *
+	 * List of all current error identifiers in PHPStan: https://phpstan.org/error-identifiers
+	 */
 	public function getIdentifier(): ?string
 	{
 		return $this->identifier;
@@ -183,11 +276,27 @@ class Error implements JsonSerializable
 	}
 
 	/**
+	 * @internal Experimental
+	 */
+	public function getFixedErrorDiff(): ?FixedErrorDiff
+	{
+		return $this->fixedErrorDiff;
+	}
+
+	/**
 	 * @return mixed
 	 */
 	#[ReturnTypeWillChange]
+	#[Override]
 	public function jsonSerialize()
 	{
+		$fixedErrorDiffHash = null;
+		$fixedErrorDiffDiff = null;
+		if ($this->fixedErrorDiff !== null) {
+			$fixedErrorDiffHash = $this->fixedErrorDiff->originalHash;
+			$fixedErrorDiffDiff = $this->fixedErrorDiff->diff;
+		}
+
 		return [
 			'message' => $this->message,
 			'file' => $this->file,
@@ -200,6 +309,8 @@ class Error implements JsonSerializable
 			'nodeType' => $this->nodeType,
 			'identifier' => $this->identifier,
 			'metadata' => $this->metadata,
+			'fixedErrorDiffHash' => $fixedErrorDiffHash,
+			'fixedErrorDiffDiff' => $fixedErrorDiffDiff,
 		];
 	}
 
@@ -208,6 +319,11 @@ class Error implements JsonSerializable
 	 */
 	public static function decode(array $json): self
 	{
+		$fixedErrorDiff = null;
+		if ($json['fixedErrorDiffHash'] !== null && $json['fixedErrorDiffDiff'] !== null) {
+			$fixedErrorDiff = new FixedErrorDiff($json['fixedErrorDiffHash'], $json['fixedErrorDiffDiff']);
+		}
+
 		return new self(
 			$json['message'],
 			$json['file'],
@@ -220,6 +336,7 @@ class Error implements JsonSerializable
 			$json['nodeType'] ?? null,
 			$json['identifier'] ?? null,
 			$json['metadata'] ?? [],
+			$fixedErrorDiff,
 		);
 	}
 
@@ -240,7 +357,13 @@ class Error implements JsonSerializable
 			$properties['nodeType'] ?? null,
 			$properties['identifier'] ?? null,
 			$properties['metadata'] ?? [],
+			$properties['fixedErrorDiff'] ?? null,
 		);
+	}
+
+	public static function validateIdentifier(string $identifier): bool
+	{
+		return Strings::match($identifier, '~^' . self::PATTERN_IDENTIFIER . '$~') !== null;
 	}
 
 }

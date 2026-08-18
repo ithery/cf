@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteDbInstall
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteDbInstallCommand extends CConsole_Command_DevSuiteCommand {
     /**
@@ -11,6 +9,10 @@ class CConsole_Command_DevSuite_DevSuiteDbInstallCommand extends CConsole_Comman
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_DbInstallCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Db_InstallCommand::class;
+
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:db:install';
 }

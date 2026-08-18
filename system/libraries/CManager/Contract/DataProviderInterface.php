@@ -1,10 +1,25 @@
 <?php
 
 interface CManager_Contract_DataProviderInterface {
+    /**
+     * @param array $searchData
+     *
+     * @return void
+     */
     public function searchOr(array $searchData);
 
+    /**
+     * @param array $searchData
+     *
+     * @return void
+     */
     public function searchAnd(array $searchData);
 
+    /**
+     * @param array $sortData
+     *
+     * @return void
+     */
     public function sort(array $sortData);
 
     /**
@@ -27,5 +42,11 @@ interface CManager_Contract_DataProviderInterface {
      */
     public function toEnumerable();
 
+    /**
+     * @param string $method
+     * @param string $column
+     *
+     * @return mixed
+     */
     public function aggregate($method, $column);
 }

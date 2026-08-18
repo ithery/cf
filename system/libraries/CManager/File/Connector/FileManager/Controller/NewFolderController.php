@@ -2,23 +2,16 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 4:23:21 AM
- */
-use CManager_File_Connector_FileManager_FM as FM;
-
 class CManager_File_Connector_FileManager_Controller_NewFolderController extends CManager_File_Connector_FileManager_AbstractController {
     /**
-     * Get list of folders as json to populate treeview.
+     * Creates a new folder in the current working directory.
      *
-     * @return mixed
+     * @return \CHTTP_JsonResponse
      */
     public function execute() {
         $fm = $this->fm();
         $folder_name = $fm->input('name');
+
         try {
             if (empty($folder_name)) {
                 $fm->error('folder-name');
@@ -30,9 +23,9 @@ class CManager_File_Connector_FileManager_Controller_NewFolderController extends
                 $fm->path()->setName($folder_name)->createFolder();
             }
         } catch (\Exception $e) {
-            echo $e->getMessage();
-            return;
+            return $this->errorResponse($e->getMessage());
         }
-        return c::response(parent::$successResponse);
+
+        return $this->successResponse();
     }
 }

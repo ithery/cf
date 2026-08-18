@@ -2,19 +2,30 @@
 
 namespace PHPStan\DependencyInjection\Nette;
 
+use PHPStan\DependencyInjection\AutowiredExtensionsExtension;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\DependencyInjection\Container;
+use PHPStan\DependencyInjection\ExtensionsCollection;
+use PHPStan\DependencyInjection\MissingServiceException;
 use PHPStan\DependencyInjection\ParameterNotFoundException;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
+use function sprintf;
 
 /**
  * @internal
  */
-class NetteContainer implements Container
+#[AutowiredService(as: NetteContainer::class)]
+final class NetteContainer implements Container
 {
 
-	public function __construct(private \Nette\DI\Container $container)
+	/** @var mixed[] */
+	private ?array $parameters = null;
+
+	public function __construct(
+		private readonly \Nette\DI\Container $container,
+	)
 	{
 	}
 
@@ -28,18 +39,25 @@ class NetteContainer implements Container
 	 */
 	public function getService(string $serviceName)
 	{
-		return $this->container->getService($serviceName);
+		try {
+			return $this->container->getService($serviceName);
+		} catch (\Nette\DI\MissingServiceException $e) {
+			throw new MissingServiceException($e->getMessage(), previous: $e);
+		}
 	}
 
 	/**
-	 * @phpstan-template T of object
-	 * @phpstan-param class-string<T> $className
-	 * @phpstan-return T
-	 * @return mixed
+	 * @template T of object
+	 * @param class-string<T> $className
+	 * @return T
 	 */
 	public function getByType(string $className)
 	{
-		return $this->container->getByType($className);
+		try {
+			return $this->container->getByType($className);
+		} catch (\Nette\DI\MissingServiceException $e) {
+			throw new MissingServiceException($e->getMessage(), previous: $e);
+		}
 	}
 
 	/**
@@ -49,6 +67,22 @@ class NetteContainer implements Container
 	public function findServiceNamesByType(string $className): array
 	{
 		return $this->container->findByType($className);
+	}
+
+	/**
+	 * @template T of object
+	 * @param class-string<T> $extensionInterfaceName
+	 * @return ExtensionsCollection<T>
+	 */
+	public function getExtensionsCollection(string $extensionInterfaceName): ExtensionsCollection
+	{
+		$serviceName = AutowiredExtensionsExtension::getCollectionServiceName($extensionInterfaceName);
+		if (!$this->container->hasService($serviceName)) {
+			throw new MissingServiceException(sprintf('%s is not an extension interface marked with the #[ExtensionInterface] attribute.', $extensionInterfaceName));
+		}
+
+		/** @var ExtensionsCollection<T> */
+		return $this->getService($serviceName);
 	}
 
 	/**
@@ -64,12 +98,14 @@ class NetteContainer implements Container
 	 */
 	public function getParameters(): array
 	{
-		return $this->container->parameters;
+		return $this->parameters ??= $this->container->getParameters();
 	}
 
 	public function hasParameter(string $parameterName): bool
 	{
-		return array_key_exists($parameterName, $this->container->parameters);
+		$parameters = $this->parameters ??= $this->container->getParameters();
+
+		return array_key_exists($parameterName, $parameters);
 	}
 
 	/**
@@ -77,11 +113,13 @@ class NetteContainer implements Container
 	 */
 	public function getParameter(string $parameterName)
 	{
-		if (!$this->hasParameter($parameterName)) {
+		$parameters = $this->parameters ??= $this->container->getParameters();
+
+		if (!array_key_exists($parameterName, $parameters)) {
 			throw new ParameterNotFoundException($parameterName);
 		}
 
-		return $this->container->parameters[$parameterName];
+		return $parameters[$parameterName];
 	}
 
 	/**

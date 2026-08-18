@@ -2,78 +2,72 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 5:40:10 PM
- */
 class CServer_Device_Cpu extends CServer_Device {
     /**
-     * Model of the cpu
+     * Model of the cpu.
      *
      * @var string
      */
     private $model = '';
 
     /**
-     * Speed of the cpu in hertz
+     * Speed of the cpu in hertz.
      *
      * @var int
      */
     private $cpuSpeed = 0;
 
     /**
-     * Max speed of the cpu in hertz
+     * Max speed of the cpu in hertz.
      *
      * @var int
      */
     private $cpuSpeedMax = 0;
 
     /**
-     * Min speed of the cpu in hertz
+     * Min speed of the cpu in hertz.
      *
      * @var int
      */
     private $cpuSpeedMin = 0;
 
     /**
-     * Cache size in bytes, if available
+     * Cache size in bytes, if available.
      *
      * @var int
      */
     private $cache = null;
 
     /**
-     * Virtualization, if available
+     * Virtualization, if available.
      *
      * @var string
      */
     private $virt = null;
 
     /**
-     * Busspeed in hertz, if available
+     * Busspeed in hertz, if available.
      *
      * @var int
      */
     private $busSpeed = null;
 
     /**
-     * Temperature of the cpu, if available
+     * Temperature of the cpu, if available.
      *
      * @var int
      */
     private $temp = null;
 
     /**
-     * Bogomips of the cpu, if available
+     * Bogomips of the cpu, if available.
      *
      * @var int
      */
     private $bogomips = null;
 
     /**
-     * Current load in percent of the cpu, if available
+     * Current load in percent of the cpu, if available.
      *
      * @var int
      */

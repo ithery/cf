@@ -34,6 +34,7 @@ class CDatabase_ConnectionFactory {
      * @return CDatabase_Connection
      */
     public function make(array $config, $name = null) {
+        $config = CDatabase_Config::flattenFormat($config);
         $config = $this->parseConfig($config, $name);
 
         if (isset($config['read'])) {
@@ -63,7 +64,7 @@ class CDatabase_ConnectionFactory {
      * @return CDatabase_Connection
      */
     protected function createSingleConnection(array $config) {
-        $driver = $this->createDriverResolver($config);
+        $driver = $this->createPdoResolver($config);
 
         return $this->createConnection(
             $config['driver'],
@@ -84,7 +85,7 @@ class CDatabase_ConnectionFactory {
     protected function createReadWriteConnection(array $config) {
         $connection = $this->createSingleConnection($this->getWriteConfig($config));
 
-        return $connection->setReadPdo($this->createReadDriver($config));
+        return $connection->setReadPdo($this->createReadPdo($config));
     }
 
     /**
@@ -94,8 +95,8 @@ class CDatabase_ConnectionFactory {
      *
      * @return \Closure
      */
-    protected function createReadDriver(array $config) {
-        return $this->createDriverResolver($this->getReadConfig($config));
+    protected function createReadPdo(array $config) {
+        return $this->createPdoResolver($this->getReadConfig($config));
     }
 
     /**
@@ -159,10 +160,12 @@ class CDatabase_ConnectionFactory {
      *
      * @return \Closure
      */
-    protected function createDriverResolver(array $config) {
-        return array_key_exists('host', $config)
-            ? $this->createDriverResolverWithHosts($config)
-            : $this->createDriverResolverWithoutHosts($config);
+    protected function createPdoResolver(array $config) {
+        $host = carr::get($config, 'host');
+
+        return $host
+            ? $this->createPdoResolverWithHosts($config)
+            : $this->createPdoResolverWithoutHosts($config);
     }
 
     /**
@@ -174,8 +177,9 @@ class CDatabase_ConnectionFactory {
      *
      * @return \Closure
      */
-    protected function createDriverResolverWithHosts(array $config) {
+    protected function createPdoResolverWithHosts(array $config) {
         return function () use ($config) {
+            $e = null;
             foreach (carr::shuffle($hosts = $this->parseHosts($config)) as $key => $host) {
                 $config['host'] = $host;
 
@@ -200,7 +204,7 @@ class CDatabase_ConnectionFactory {
      * @return array
      */
     protected function parseHosts(array $config) {
-        $hosts = carr::wrap($config['host']);
+        $hosts = carr::wrap(carr::get($config, 'host'));
         if (empty($hosts)) {
             throw new InvalidArgumentException('Database hosts array is empty.');
         }
@@ -215,7 +219,7 @@ class CDatabase_ConnectionFactory {
      *
      * @return \Closure
      */
-    protected function createDriverResolverWithoutHosts(array $config) {
+    protected function createPdoResolverWithoutHosts(array $config) {
         return function () use ($config) {
             return $this->createConnector($config)->connect($config);
         };
@@ -235,17 +239,20 @@ class CDatabase_ConnectionFactory {
             throw new InvalidArgumentException('A driver must be specified.');
         }
 
-        if (c::container()->bound($key = "db.connector.{$config['driver']}")) {
+        $driver = carr::get($config, 'driver');
+        $driver = carr::get($this->getDriverMap(), $driver, $driver);
+        if (c::container()->bound($key = "db.connector.{$driver}")) {
             return c::container()->make($key);
         }
-
-        switch ($config['driver']) {
-            case 'mysqli':
-                return new CDatabase_Connector_MySqliConnector();
-            case 'mongodb':
-                return new CDatabase_Connector_MongoDBConnector();
-            case 'pdo.mysql':
-                return new CDatabase_Connector_PDOConnector_MySqlConnector();
+        switch ($driver) {
+            case 'mysql':
+                return new CDatabase_Connector_Pdo_MySqlConnector();
+            case 'sqlite':
+                return new CDatabase_Connector_Pdo_SqliteConnector();
+            case 'sqlsrv':
+                return new CDatabase_Connector_Pdo_SqlServerConnector();
+            case 'pgsql':
+                return new CDatabase_Connector_Pdo_PostgresConnector();
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$config['driver']}].");
@@ -269,15 +276,27 @@ class CDatabase_ConnectionFactory {
             return $resolver($connection, $database, $prefix, $config);
         }
 
+        $driver = carr::get($this->getDriverMap(), $driver, $driver);
         switch ($driver) {
-            case 'mysqli':
-                return new CDatabase_Connection_MySqliConnection($connection, $database, $prefix, $config);
-            case 'mongodb':
-                return new CDatabase_Connection_MongoDBConnection($connection, $database, $prefix, $config);
-            case 'pdo.mysql':
-                return new CDatabase_Connection_PDOConnection_MysqlConnection($connection, $database, $prefix, $config);
+            case 'mysql':
+                return new CDatabase_Connection_Pdo_MySqlConnection($connection, $database, $prefix, $config);
+            case 'sqlite':
+                return new CDatabase_Connection_Pdo_SqliteConnection($connection, $database, $prefix, $config);
+            case 'pgsql':
+                return new CDatabase_Connection_Pdo_PostgresConnection($connection, $database, $prefix, $config);
+            case 'sqlsrv':
+                return new CDatabase_Connection_Pdo_SqlServerConnection($connection, $database, $prefix, $config);
         }
 
         throw new InvalidArgumentException("Unsupported driver [{$driver}].");
+    }
+
+    private function getDriverMap() {
+        return [
+            'mysqli' => 'mysql',
+            'pdo.mysql' => 'mysql',
+            'postgre' => 'pgsql',
+            'postgres' => 'pgsql',
+        ];
     }
 }

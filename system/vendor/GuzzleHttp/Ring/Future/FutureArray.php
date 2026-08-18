@@ -13,6 +13,7 @@ class FutureArray implements FutureArrayInterface
         return isset($this->_value[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->_value[$offset];

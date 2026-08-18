@@ -2,22 +2,25 @@
 
 namespace PHPStan\Node;
 
+use Override;
 use PhpParser\Node;
-use PHPStan\Reflection\FunctionReflection;
+use PHPStan\Reflection\Php\PhpFunctionFromParserNodeReflection;
 
-/** @api */
-class InFunctionNode extends Node\Stmt implements VirtualNode
+/**
+ * @api
+ */
+final class InFunctionNode extends Node\Stmt implements VirtualNode
 {
 
 	public function __construct(
-		private FunctionReflection $functionReflection,
+		private PhpFunctionFromParserNodeReflection $functionReflection,
 		private Node\Stmt\Function_ $originalNode,
 	)
 	{
 		parent::__construct($originalNode->getAttributes());
 	}
 
-	public function getFunctionReflection(): FunctionReflection
+	public function getFunctionReflection(): PhpFunctionFromParserNodeReflection
 	{
 		return $this->functionReflection;
 	}
@@ -27,6 +30,7 @@ class InFunctionNode extends Node\Stmt implements VirtualNode
 		return $this->originalNode;
 	}
 
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Stmt_InFunctionNode';
@@ -35,6 +39,7 @@ class InFunctionNode extends Node\Stmt implements VirtualNode
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];

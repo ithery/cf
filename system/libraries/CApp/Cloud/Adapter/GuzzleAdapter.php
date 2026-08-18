@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2019, 7:07:06 AM
- */
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\ClientInterface;
@@ -27,7 +21,7 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
     /**
      * @param null|ClientInterface $client
      */
-    public function __construct(ClientInterface $client = null) {
+    public function __construct(?ClientInterface $client = null) {
         $this->client = $client ?: new Client();
     }
 

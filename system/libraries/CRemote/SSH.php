@@ -9,6 +9,14 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class CRemote_SSH {
+    /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @var CRemote_SSH_Config
+     */
     protected $config;
 
     /**
@@ -17,16 +25,15 @@ class CRemote_SSH {
     protected $connection;
 
     /**
-     * Get a remote connection instance.
-     *
-     * @param string|array|mixed $name
-     *
-     * @return CRemote_SSH_ConnectionInterface
+     * @param array|CRemote_SSH_Config $config
      */
-    public function __construct(array $config) {
+    public function __construct($config) {
+        if (!$config instanceof CRemote_SSH_Config) {
+            $config = new CRemote_SSH_Config($config);
+        }
         $this->config = $config;
 
-        $this->name = carr::get($config, 'name', carr::get($config, 'host'));
+        $this->name = $config->getHost();
         $this->connection = $this->makeConnection($this->name, $config);
     }
 
@@ -40,29 +47,13 @@ class CRemote_SSH {
     }
 
     /**
-     * Make a new connection instance.
-     *
-     * @param string $name
-     * @param array  $config
+     * @param string             $name
+     * @param CRemote_SSH_Config $config
      *
      * @return CRemote_SSH_Connection
      */
-    protected function makeConnection($name, array $config) {
-        $timeout = isset($config['timeout']) ? $config['timeout'] : 10;
-        $host = carr::get($config, 'ip_address');
-        if (strlen($host) == 0) {
-            $host = carr::get($config, 'host');
-        }
-
-        $this->setOutput($connection = new CRemote_SSH_Connection(
-            $name,
-            $host,
-            carr::get($config, 'port', 22),
-            $config['username'],
-            $this->getAuth($config),
-            null,
-            $timeout
-        ));
+    protected function makeConnection($name, CRemote_SSH_Config $config) {
+        $this->setOutput($connection = new CRemote_SSH_Connection($name, $config));
 
         return $connection;
     }
@@ -80,28 +71,6 @@ class CRemote_SSH {
         $connection->setOutput($output);
     }
 
-    /**
-     * Format the appropriate authentication array payload.
-     *
-     * @param array $config
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @return array
-     */
-    protected function getAuth(array $config) {
-        if (isset($config['agent']) && $config['agent'] === true) {
-            return ['agent' => true];
-        } elseif (isset($config['key']) && trim($config['key']) != '') {
-            return ['key' => $config['key'], 'keyphrase' => $config['keyphrase']];
-        } elseif (isset($config['keytext']) && trim($config['keytext']) != '') {
-            return ['keytext' => $config['keytext']];
-        } elseif (isset($config['password'])) {
-            return ['password' => $config['password']];
-        }
-
-        throw new \InvalidArgumentException('Password / key is required.');
-    }
 
     public function output() {
         $output = $this->connection->getOutput();
@@ -123,11 +92,11 @@ class CRemote_SSH {
      * Run a set of commands to the connection.
      *
      * @param string|array $commands
-     * @param \Closure     $callback
+     * @param Closure      $callback
      *
      * @return $this
      */
-    public function run($commands, Closure $callback = null) {
+    public function run($commands, ?Closure $callback = null) {
         $this->connection->run($commands, $callback);
 
         return $this;
@@ -185,7 +154,7 @@ class CRemote_SSH {
     }
 
     /**
-     * @return \phpseclib3\Net\SFTP
+     * @return phpseclib3\Net\SFTP
      */
     public function getClient() {
         return $this->connection->getGateway()->getConnection();
@@ -216,6 +185,17 @@ class CRemote_SSH {
     }
 
     /**
+     * Check whether a given file exists on the server.
+     *
+     * @param string $remote
+     *
+     * @return bool
+     */
+    public function exists($remote) {
+        return $this->connection->exists($remote);
+    }
+
+    /**
      * Download the contents of a remote file.
      *
      * @param string $remote
@@ -236,5 +216,19 @@ class CRemote_SSH {
      */
     public function getString($remote) {
         return $this->connection->getString($remote);
+    }
+
+    /**
+     * @return CRemote_SSH_Config
+     */
+    public function getConfig() {
+        return $this->config;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHost() {
+        return $this->config->getConnectionHost();
     }
 }

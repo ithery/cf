@@ -5,16 +5,23 @@ namespace PHPStan\Type\Php;
 use DateInterval;
 use PhpParser\Node\Expr\StaticCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicStaticMethodThrowTypeExtension;
 use PHPStan\Type\NeverType;
+use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeUtils;
 use function count;
 
-class DateIntervalConstructorThrowTypeExtension implements DynamicStaticMethodThrowTypeExtension
+#[AutowiredService]
+final class DateIntervalConstructorThrowTypeExtension implements DynamicStaticMethodThrowTypeExtension
 {
+
+	public function __construct(private PhpVersion $phpVersion)
+	{
+	}
 
 	public function isStaticMethodSupported(MethodReflection $methodReflection): bool
 	{
@@ -28,23 +35,32 @@ class DateIntervalConstructorThrowTypeExtension implements DynamicStaticMethodTh
 		}
 
 		$valueType = $scope->getType($methodCall->getArgs()[0]->value);
-		$constantStrings = TypeUtils::getConstantStrings($valueType);
+		$constantStrings = $valueType->getConstantStrings();
 
 		foreach ($constantStrings as $constantString) {
 			try {
 				new DateInterval($constantString->getValue());
 			} catch (\Exception $e) { // phpcs:ignore
-				return $methodReflection->getThrowType();
+				return $this->exceptionType();
 			}
 
 			$valueType = TypeCombinator::remove($valueType, $constantString);
 		}
 
 		if (!$valueType instanceof NeverType) {
-			return $methodReflection->getThrowType();
+			return $this->exceptionType();
 		}
 
 		return null;
+	}
+
+	private function exceptionType(): Type
+	{
+		if ($this->phpVersion->hasDateTimeExceptions()) {
+			return new ObjectType('DateMalformedIntervalStringException');
+		}
+
+		return new ObjectType('Exception');
 	}
 
 }

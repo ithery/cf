@@ -21,7 +21,7 @@ return [
     'errors_disabled' => 'You can go to the <a href="%s">home page</a> or <a href="%s">try again</a>.',
     // Drivers
     'driver_implements' => 'The %s driver for the %s library must implement the %s interface',
-    'driver_not_found' => 'The %s driver for the %s library could not be found',
+    'driver_not_found' => 'The :driver driver for the :library library could not be found',
     // Resource names
     'config' => 'config file',
     'controller' => 'controller',

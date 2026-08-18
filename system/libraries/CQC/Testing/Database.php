@@ -46,6 +46,7 @@ class CQC_Testing_Database {
         $time1 = filemtime(__FILE__);
         $class = new ReflectionClass(CQC_Testing_Database_Migration::class);
         $time2 = filemtime($class->getFileName());
+
         return max($time1, $time2);
     }
 
@@ -66,8 +67,8 @@ class CQC_Testing_Database {
                 'type' => 'sqlite',
                 'database' => $this->path,
             ];
-
-            $this->connection = CDatabase::instance(static::class, $config);
+            CDatabase::manager()->addConnection($config, static::class);
+            $this->connection = c::db(static::class);
         }
 
         return $this->connection;

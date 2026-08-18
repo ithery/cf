@@ -169,6 +169,7 @@ final class CVendor_Firebase_JWT_Value_Duration {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->toString();
     }

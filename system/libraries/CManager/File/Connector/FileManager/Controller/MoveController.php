@@ -2,43 +2,35 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 10:01:26 PM
- */
-use CManager_File_Connector_FileManager_FM as FM;
-
 class CManager_File_Connector_FileManager_Controller_MoveController extends CManager_File_Connector_FileManager_AbstractController {
     /**
-     * Get list of folders as json to populate treeview.
+     * Lists the allowed root folder(s) and their direct children, used by the
+     * client to render the folder-picker dialog (see showMovePicker() in
+     * FileManager.js) before the actual move (see DoMoveController).
      *
-     * @return mixed
+     * @return \CHTTP_JsonResponse
      */
     public function execute() {
         $fm = $this->fm();
-        $app = CApp::instance();
-        $items = $fm->input('items');
         $folder_types = array_filter(['root'], function ($type) use ($fm) {
             return $fm->allowFolderType($type);
         });
 
-        $rootFolders = array_map(function ($type) use ($folder_types, $fm) {
+        $rootFolders = array_values(array_map(function ($type) use ($fm) {
             $path = $fm->path()->dir($fm->getRootFolder($type));
 
-            return (object) [
+            return [
                 'name' => $type,
-                'url' => $path->path('working_dir'),
-                'children' => $path->folders(),
-                'has_next' => !($type == end($folder_types)),
+                'path' => $path->path('working_dir'),
+                'children' => array_values(array_map(function ($child) {
+                    return [
+                        'name' => $child->name(),
+                        'path' => $child->url(),
+                    ];
+                }, $path->folders())),
             ];
-        }, $folder_types);
+        }, $folder_types));
 
-        $app->addView('cresenity.element.component.file-manager.move', [
-            'fm' => $fm,
-            'rootFolders' => $rootFolders,
-            'items' => $items
-        ]);
+        return $this->successResponse(['folders' => $rootFolders]);
     }
 }

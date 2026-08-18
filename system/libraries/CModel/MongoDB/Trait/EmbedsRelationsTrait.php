@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Oct 21, 2019, 9:22:00 PM
- */
 trait CModel_MongoDB_Trait_EmbedsRelationsTrait {
     /**
      * Define an embedded one-to-many relationship.
@@ -34,7 +28,8 @@ trait CModel_MongoDB_Trait_EmbedsRelationsTrait {
             $foreignKey = cstr::snake(c::classBasename($this));
         }
         $query = $this->newQuery();
-        $instance = new $related;
+        $instance = new $related();
+
         return new CModel_MongoDB_Relation_EmbedsMany($query, $this, $instance, $localKey, $foreignKey, $relation);
     }
 
@@ -63,7 +58,8 @@ trait CModel_MongoDB_Trait_EmbedsRelationsTrait {
             $foreignKey = cstr::snake(c::classBasename($this));
         }
         $query = $this->newQuery();
-        $instance = new $related;
+        $instance = new $related();
+
         return new CModel_MongoDB_Relation_EmbedsOne($query, $this, $instance, $localKey, $foreignKey, $relation);
     }
 }

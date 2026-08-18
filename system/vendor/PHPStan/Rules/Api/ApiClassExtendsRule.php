@@ -6,6 +6,7 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\Class_;
 use PHPStan\Analyser\MutatingScope;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -15,7 +16,8 @@ use function sprintf;
 /**
  * @implements Rule<Class_>
  */
-class ApiClassExtendsRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ApiClassExtendsRule implements Rule
 {
 
 	public function __construct(
@@ -53,7 +55,7 @@ class ApiClassExtendsRule implements Rule
 		$ruleError = RuleErrorBuilder::message(sprintf(
 			'Extending %s is not covered by backward compatibility promise. The class might change in a minor PHPStan version.',
 			$extendedClassReflection->getDisplayName(),
-		))->tip(sprintf(
+		))->identifier('phpstanApi.class')->tip(sprintf(
 			"If you think it should be covered by backward compatibility promise, open a discussion:\n   %s\n\n   See also:\n   https://phpstan.org/developing-extensions/backward-compatibility-promise",
 			'https://github.com/phpstan/phpstan/discussions',
 		))->build();

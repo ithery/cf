@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2018, 2:38:26 PM
- */
 trait CTrait_Element_Property_AutoComplete {
     /**
      * @var string
@@ -24,6 +18,7 @@ trait CTrait_Element_Property_AutoComplete {
             $bool = in_array($bool, ['on', 'yes', 'ok', 'y']) ? true : false;
         }
         $this->autoComplete = $bool;
+
         return $this;
     }
 
@@ -39,6 +34,7 @@ trait CTrait_Element_Property_AutoComplete {
      */
     public function setAutoCompleteOn() {
         $this->autoComplete = true;
+
         return $this;
     }
 
@@ -47,6 +43,7 @@ trait CTrait_Element_Property_AutoComplete {
      */
     public function setAutoCompleteOff() {
         $this->autoComplete = false;
+
         return $this;
     }
 }

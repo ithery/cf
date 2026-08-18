@@ -436,7 +436,7 @@ class CServer_Browsershot {
         return $this;
     }
 
-    public function setScreenshotType(string $type, int $quality = null) {
+    public function setScreenshotType(string $type, ?int $quality = null) {
         $this->screenshotType = $type;
 
         if (!is_null($quality)) {
@@ -658,9 +658,9 @@ class CServer_Browsershot {
     public function addChromiumArguments(array $arguments) {
         foreach ($arguments as $argument => $value) {
             if (is_numeric($argument)) {
-                $this->chromiumArguments[] = "--${value}";
+                $this->chromiumArguments[] = "--{$value}";
             } else {
-                $this->chromiumArguments[] = "--${argument}=${value}";
+                $this->chromiumArguments[] = "--{$argument}={$value}";
             }
         }
 

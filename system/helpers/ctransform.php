@@ -3,6 +3,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated 1.6, use c::transform
+ */
 class ctransform {
     /**
      * @param mixed $rp

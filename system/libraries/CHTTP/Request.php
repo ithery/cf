@@ -2,21 +2,22 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- *
- * @since Jun 2, 2019, 10:24:00 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
- */
+use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 
-class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, ArrayAccess {
+class CHTTP_Request extends SymfonyRequest implements Arrayable, ArrayAccess {
     use CHTTP_Trait_InteractsWithInput,
         CHTTP_Trait_InteractsWithContentTypes,
         CHTTP_Trait_InteractsWithFlashData;
 
+    /**
+     * The CBrowser instance.
+     *
+     * @var null|CBrowser
+     */
     protected $browser;
 
     /**
@@ -84,7 +85,13 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return string
      */
     public function root() {
-        return rtrim($this->getSchemeAndHttpHost() . $this->getBaseUrl(), '/');
+        $schemeAndHttpHost = $this->getSchemeAndHttpHost();
+        if (cstr::endsWith($schemeAndHttpHost, ':')) {
+            //remove last char
+            $schemeAndHttpHost = substr($schemeAndHttpHost, 0, -1);
+        }
+
+        return rtrim($schemeAndHttpHost . $this->getBaseUrl(), '/');
     }
 
     public function getHost() {
@@ -120,8 +127,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
 
     /**
      * Get the full URL for the request with the added query string parameters.
-     *
-     * @param array $query
      *
      * @return string
      */
@@ -249,8 +254,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return bool
      */
     public function prefetch() {
-        return strcasecmp($this->server->get('HTTP_X_MOZ'), 'prefetch') === 0
-                || strcasecmp($this->headers->get('Purpose'), 'prefetch') === 0;
+        return strcasecmp((string) $this->server->get('HTTP_X_MOZ'), 'prefetch') === 0
+                || strcasecmp((string) $this->headers->get('Purpose'), 'prefetch') === 0;
     }
 
     /**
@@ -292,8 +297,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Merge new input into the current request's input array.
      *
-     * @param array $input
-     *
      * @return $this
      */
     public function merge(array $input) {
@@ -304,8 +307,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
 
     /**
      * Replace the input for the current request.
-     *
-     * @param array $input
      *
      * @return $this
      */
@@ -366,7 +367,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Create a new request instance from the given request.
      *
-     * @param \CHTTP_Request      $from
      * @param null|\CHTTP_Request $to
      *
      * @return static
@@ -405,8 +405,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Create an request from a Symfony instance.
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     *
      * @return static
      *
      * @phpstan-return static(CHTTP_Request)
@@ -434,7 +432,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * @inheritdoc
      */
-    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null) {
+    public function duplicate(?array $query = null, ?array $request = null, ?array $attributes = null, ?array $cookies = null, ?array $files = null, ?array $server = null) {
         return parent::duplicate($query, $request, $attributes, $cookies, $this->filterFiles($files), $server);
     }
 
@@ -461,6 +459,20 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         }
 
         return $files;
+    }
+
+    /**
+     * Gets the Session.
+     *
+     * @return null|SessionInterface The session
+     */
+    public function getSession() {
+        $session = $this->session();
+        if ($session) {
+            return new CSession_SymfonySessionDecorator($session);
+        }
+
+        throw new SessionNotFoundException();
     }
 
     /**
@@ -554,8 +566,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Set the user resolver callback.
      *
-     * @param \Closure $callback
-     *
      * @return $this
      */
     public function setUserResolver(Closure $callback) {
@@ -576,8 +586,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
 
     /**
      * Set the route resolver callback.
-     *
-     * @param \Closure $callback
      *
      * @return $this
      */
@@ -620,6 +628,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->__get($offset);
     }
@@ -686,10 +695,25 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         return $this->browser;
     }
 
+    /**
+     * Validate the request with given rules.
+     *
+     * @param mixed ...$params
+     *
+     * @return \CValidation_Validator
+     */
     public function validate(array $rules, ...$params) {
         return c::validator()->validate($this->all(), $rules, ...$params);
     }
 
+    /**
+     * Validate the request with given rules and error bag.
+     *
+     * @param mixed ...$params
+     * @param mixed $errorBag
+     *
+     * @return \CValidation_Validator
+     */
     public function validateWithBag($errorBag, array $rules, ...$params) {
         try {
             return $this->validate($rules, ...$params);

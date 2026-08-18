@@ -1,12 +1,5 @@
 <?php
 
-use CModel_Scout_Builder;
-use Illuminate\Support\Arr;
-use Illuminate\Support\LazyCollection;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Laravel\Scout\Attributes\CModel_Scout_Attributes_SearchUsingPrefix;
-use Laravel\Scout\Attributes\CModel_Scout_Attributes_SearchUsingFullText;
-
 class CModel_Scout_Engine_DatabaseEngine extends CModel_Scout_EngineAbstract implements CModel_Scout_Contract_PaginateModel {
     /**
      * Create a new engine instance.
@@ -262,13 +255,15 @@ class CModel_Scout_Engine_DatabaseEngine extends CModel_Scout_EngineAbstract imp
         if (PHP_MAJOR_VERSION < 8) {
             return [];
         }
+        $reflectionMethod = new ReflectionMethod($builder->model, 'toSearchableArray');
+        if (PHP_MAJOR_VERSION >= 8 && method_exists($reflectionMethod, 'getAttributes')) {
+            foreach ($reflectionMethod->getAttributes() as $attribute) {
+                if ($attribute->getName() !== $attributeClass) {
+                    continue;
+                }
 
-        foreach ((new ReflectionMethod($builder->model, 'toSearchableArray'))->getAttributes() as $attribute) {
-            if ($attribute->getName() !== $attributeClass) {
-                continue;
+                $columns = array_merge($columns, carr::wrap($attribute->getArguments()[0]));
             }
-
-            $columns = array_merge($columns, carr::wrap($attribute->getArguments()[0]));
         }
 
         return $columns;

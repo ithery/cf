@@ -4,17 +4,19 @@ namespace PHPStan\Rules\Classes;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\InClassNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\Type\ObjectType;
 use function array_values;
 use function sprintf;
+use function strtolower;
 
 /**
  * @implements Rule<InClassNode>
  */
-class AllowedSubTypesRule implements Rule
+#[RegisteredRule(level: 0)]
+final class AllowedSubTypesRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -45,20 +47,21 @@ class AllowedSubTypesRule implements Rule
 			}
 
 			foreach ($allowedSubTypes as $allowedSubType) {
-				if (!$allowedSubType instanceof ObjectType) {
+				if (!$allowedSubType->isObject()->yes()) {
 					continue;
 				}
 
-				if ($className === $allowedSubType->getClassName()) {
+				if ($allowedSubType->getObjectClassNames() === [$className]) {
 					continue 2;
 				}
 			}
 
+			$identifierType = strtolower($classReflection->getClassTypeDescription());
 			$messages[] = RuleErrorBuilder::message(sprintf(
 				'Type %s is not allowed to be a subtype of %s.',
 				$className,
 				$parentReflection->getName(),
-			))->build();
+			))->identifier(sprintf('%s.disallowedSubtype', $identifierType))->build();
 		}
 
 		return $messages;

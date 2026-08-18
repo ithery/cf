@@ -4,17 +4,19 @@ namespace PHPStan\Rules\Generics;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Internal\SprintfHelper;
 use PHPStan\Node\InClassMethodNode;
-use PHPStan\Reflection\MethodReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Rules\Rule;
 use function sprintf;
 
 /**
  * @implements Rule<InClassMethodNode>
  */
-class MethodSignatureVarianceRule implements Rule
+#[RegisteredRule(level: 2)]
+#[ValidatesStubFiles]
+final class MethodSignatureVarianceRule implements Rule
 {
 
 	public function __construct(private VarianceCheck $varianceCheck)
@@ -28,17 +30,17 @@ class MethodSignatureVarianceRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$method = $scope->getFunction();
-		if (!$method instanceof MethodReflection) {
-			return [];
-		}
+		$method = $node->getMethodReflection();
 
 		return $this->varianceCheck->checkParametersAcceptor(
-			ParametersAcceptorSelector::selectSingle($method->getVariants()),
+			$method,
 			sprintf('in parameter %%s of method %s::%s()', SprintfHelper::escapeFormatString($method->getDeclaringClass()->getDisplayName()), SprintfHelper::escapeFormatString($method->getName())),
+			sprintf('in param-out type of parameter %%s of method %s::%s()', SprintfHelper::escapeFormatString($method->getDeclaringClass()->getDisplayName()), SprintfHelper::escapeFormatString($method->getName())),
 			sprintf('in return type of method %s::%s()', $method->getDeclaringClass()->getDisplayName(), $method->getName()),
 			sprintf('in method %s::%s()', $method->getDeclaringClass()->getDisplayName(), $method->getName()),
-			$method->getName() === '__construct' || $method->isStatic(),
+			$method->isStatic(),
+			$method->isPrivate() || $method->getName() === '__construct',
+			'method',
 		);
 	}
 

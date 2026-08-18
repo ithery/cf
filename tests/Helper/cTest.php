@@ -2,10 +2,13 @@
 use Mockery as m;
 use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
 // @codingStandardsIgnoreStart
 class cTest extends TestCase {
     // @codingStandardsIgnoreEnd
+
+    use MockeryPHPUnitIntegration;
 
     /**
      * @return void
@@ -31,6 +34,26 @@ class cTest extends TestCase {
         $this->assertSame('foo', c::value(function ($arg) {
             return $arg;
         }, 'foo'));
+    }
+
+    /**
+     * Regression test: c::value() used to only unwrap-and-invoke
+     * \Opis\Closure\SerializableClosure, not CFunction_SerializableClosure
+     * (the framework's own, now-preferred wrapper) - a CFunction_SerializableClosure
+     * passed to c::value() silently came back unchanged (the wrapper object
+     * itself, never invoked) since it isn't a \Closure instance either.
+     */
+    public function testValueInvokesBothSerializableClosureWrapperTypes() {
+        $this->assertSame('foo', c::value(new CFunction_SerializableClosure(function () {
+            return 'foo';
+        })));
+        $this->assertSame('foo', c::value(new CFunction_SerializableClosure(function ($arg) {
+            return $arg;
+        }), 'foo'));
+
+        $this->assertSame('foo', c::value(new \Opis\Closure\SerializableClosure(function () {
+            return 'foo';
+        })));
     }
 
     public function testObjectGet() {
@@ -728,18 +751,22 @@ class SupportTestArrayAccess implements ArrayAccess {
         $this->attributes = $attributes;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return array_key_exists($offset, $this->attributes);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->attributes[$offset];
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->attributes[$offset] = $value;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         unset($this->attributes[$offset]);
     }

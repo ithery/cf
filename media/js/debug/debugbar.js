@@ -5,10 +5,9 @@ if (typeof (PhpDebugBar) == 'undefined') {
 }
 
 (function ($) {
-
-    if (typeof (localStorage) == 'undefined') {
+    if (typeof (window.localStorage) == 'undefined') {
         // provide mock localStorage object for dumb browsers
-        localStorage = {
+        window.localStorage = {
             setItem: function (key, value) {},
             getItem: function (key) {
                 return null;
@@ -38,7 +37,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
             d = d[parts[i]];
         }
         return d;
-    }
+    };
 
     /**
      * Counts the number of properties in an object
@@ -57,7 +56,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
             }
         }
         return count;
-    }
+    };
 
     /**
      * Returns a prefixed css class name
@@ -91,7 +90,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
             return PhpDebugBar.utils.csscls(cls, prefix);
         };
         return f;
-    }
+    };
 
     var csscls = PhpDebugBar.utils.makecsscls('phpdebugbar-');
 
@@ -125,7 +124,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Called after the constructor
-         * 
+         *
          * @param {Object} options
          */
         initialize: function (options) {
@@ -139,7 +138,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Sets the value of an attribute
-         * 
+         *
          * @param {String} attr Can also be an object to set multiple attributes at once
          * @param {Object} value
          */
@@ -161,7 +160,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Checks if an attribute exists and is not null
-         * 
+         *
          * @param {String} attr
          * @return {[type]} [description]
          */
@@ -171,7 +170,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Returns the value of an attribute
-         * 
+         *
          * @param {String} attr
          * @return {Object}
          */
@@ -183,7 +182,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
          * Registers a callback function that will be called whenever the value of the attribute changes
          *
          * If cb is a jQuery element, text() will be used to fill the element
-         * 
+         *
          * @param {String} attr
          * @param {Function} cb
          */
@@ -217,7 +216,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
      * Creates a subclass
      *
      * Code from Backbone.js
-     * 
+     *
      * @param {Array} props Prototype properties
      * @return {Function}
      */
@@ -233,7 +232,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
             this.constructor = child;
         };
         Surrogate.prototype = parent.prototype;
-        child.prototype = new Surrogate;
+        child.prototype = new Surrogate();
         $.extend(child.prototype, props);
 
         child.__super__ = parent.prototype;
@@ -245,7 +244,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
     /**
      * Tab
-     * 
+     *
      * A tab is composed of a tab label which is always visible and
      * a tab panel which is visible only when the tab is active.
      *
@@ -294,7 +293,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
                 if (this.has('widget')) {
                     this.get('widget').set('data', data);
                 }
-            })
+            });
         }
 
     });
@@ -358,7 +357,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Formats the title of a dataset
-         * 
+         *
          * @this {DatasetTitleFormater}
          * @param {String} id
          * @param {Object} data
@@ -374,11 +373,11 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
             var nb = getObjectSize(this.debugbar.datasets) + 1;
 
-            if (typeof (data['__meta']) === 'undefined') {
-                return "#" + nb + suffix;
+            if (typeof (data.__meta) === 'undefined') {
+                return '#' + nb + suffix;
             }
 
-            var uri = data['__meta']['uri'], filename;
+            var uri = data.__meta.uri, filename;
             if (uri.length && uri.charAt(uri.length - 1) === '/') {
                 // URI ends in a trailing /: get the portion before then to avoid returning an empty string
                 filename = uri.substr(0, uri.length - 1); // strip trailing '/'
@@ -394,7 +393,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
                 filename = filename.substr(0, maxLength) + '...';
             }
 
-            var label = "#" + nb + " " + filename + suffix + ' (' + data['__meta']['datetime'].split(' ')[1] + ')';
+            var label = '#' + nb + ' ' + filename + suffix + ' (' + data.__meta.datetime.split(' ')[1] + ')';
             return label;
         }
 
@@ -415,7 +414,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
      */
     var DebugBar = PhpDebugBar.DebugBar = Widget.extend({
 
-        className: "phpdebugbar " + csscls('minimized'),
+        className: 'phpdebugbar ' + csscls('minimized'),
 
         options: {
             bodyMarginBottom: true,
@@ -439,8 +438,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
          * @this {DebugBar}
          */
         registerResizeHandler: function () {
-            if (typeof this.resize.bind == 'undefined')
-                return;
+            if (typeof this.resize.bind == 'undefined') {return;}
 
             var f = this.resize.bind(this);
             this.respCSSSize = 0;
@@ -454,13 +452,13 @@ if (typeof (PhpDebugBar) == 'undefined') {
         resize: function () {
             var contentSize = this.respCSSSize;
             if (this.respCSSSize == 0) {
-                this.$header.find("> div > *:visible").each(function () {
+                this.$header.find('> div > *:visible').each(function () {
                     contentSize += $(this).outerWidth();
                 });
             }
 
             var currentSize = this.$header.width();
-            var cssClass = "phpdebugbar-mini-design";
+            var cssClass = 'phpdebugbar-mini-design';
             var bool = this.$header.hasClass(cssClass);
 
             if (currentSize <= contentSize && !bool) {
@@ -536,7 +534,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
             this.$openbtn = $('<a />').addClass(csscls('open-btn')).appendTo(this.$headerRight).hide();
             this.$openbtn.click(function () {
                 self.openHandler.show(function (id, dataset) {
-                    self.addDataSet(dataset, id, "(opened)");
+                    self.addDataSet(dataset, id, '(opened)');
                     self.showTab();
                 });
             });
@@ -661,7 +659,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Adds an indicator
-         * 
+         *
          * @this {DebugBar}
          * @param {String} name Internal name
          * @param {Indicator} indicator Indicator object
@@ -684,7 +682,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Returns a control
-         * 
+         *
          * @param {String} name
          * @return {Object}
          */
@@ -696,7 +694,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Checks if there's a control under the specified name
-         * 
+         *
          * @this {DebugBar}
          * @param {String} name
          * @return {Boolean}
@@ -707,7 +705,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Checks if a tab with the specified name exists
-         * 
+         *
          * @this {DebugBar}
          * @param {String} name
          * @return {Boolean}
@@ -718,7 +716,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Checks if an indicator with the specified name exists
-         * 
+         *
          * @this {DebugBar}
          * @param {String} name
          * @return {Boolean}
@@ -729,7 +727,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Removes all tabs and indicators from the debug bar and hides it
-         * 
+         *
          * @this {DebugBar}
          */
         reset: function () {
@@ -746,7 +744,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Open the debug bar and display the specified tab
-         * 
+         *
          * @this {DebugBar}
          * @param {String} name If not specified, display the first tab
          */
@@ -760,7 +758,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
             }
 
             if (!this.isTab(name)) {
-                throw new Error("Unknown tab '" + name + "'");
+                throw new Error('Unknown tab \'' + name + '\'');
             }
 
             this.$resizehdle.show();
@@ -797,7 +795,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Checks if the panel is minimized
-         * 
+         *
          * @return {Boolean}
          */
         isMinimized: function () {
@@ -874,7 +872,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
          *
          * Example:
          *     {"memory": ["memory.peak_usage_str", "0B"]}
-         * 
+         *
          * @this {DebugBar}
          * @param {Object} map
          */
@@ -898,7 +896,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
          *
          * For this method to be usefull, you need to specify
          * a dataMap using setDataMap()
-         * 
+         *
          * @this {DebugBar}
          * @param {Object} data
          * @return {String} Dataset's id
@@ -913,10 +911,10 @@ if (typeof (PhpDebugBar) == 'undefined') {
          *
          * If more than one dataset are added, the dataset selector
          * will be displayed.
-         * 
+         *
          * For this method to be usefull, you need to specify
          * a dataMap using setDataMap()
-         * 
+         *
          * @this {DebugBar}
          * @param {Object} data
          * @param {String} id The name of this set, optional
@@ -942,7 +940,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Loads a dataset using the open handler
-         * 
+         *
          * @param {String} id
          * @param {Bool} show Whether to show the new dataset, optional (default: true)
          */
@@ -959,7 +957,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Returns the data from a dataset
-         * 
+         *
          * @this {DebugBar}
          * @param {String} id
          * @return {Object}
@@ -970,7 +968,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Switch the currently displayed dataset
-         * 
+         *
          * @this {DebugBar}
          * @param {String} id
          */
@@ -981,7 +979,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Called when the current dataset is modified.
-         * 
+         *
          * @this {DebugBar}
          * @param {Object} data
          */
@@ -1000,7 +998,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Sets the handler to open past dataset
-         * 
+         *
          * @this {DebugBar}
          * @param {object} handler
          */
@@ -1015,7 +1013,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Returns the handler to open past dataset
-         * 
+         *
          * @this {DebugBar}
          * @return {object}
          */
@@ -1047,7 +1045,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Handles an XMLHttpRequest
-         * 
+         *
          * @this {AjaxHandler}
          * @param {XMLHttpRequest} xhr
          * @return {Bool}
@@ -1066,14 +1064,14 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Checks if the HEADER-id exists and loads the dataset using the open handler
-         * 
+         *
          * @param {XMLHttpRequest} xhr
          * @return {Bool}
          */
         loadFromId: function (xhr) {
             var id = this.extractIdFromHeaders(xhr);
             if (id && this.debugbar.openHandler) {
-                this.debugbar.loadDataSet(id, "(ajax)", undefined, this.autoShow);
+                this.debugbar.loadDataSet(id, '(ajax)', undefined, this.autoShow);
                 return true;
             }
             return false;
@@ -1081,7 +1079,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Extracts the id from the HEADER-id
-         * 
+         *
          * @param {XMLHttpRequest} xhr
          * @return {String}
          */
@@ -1091,7 +1089,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Checks if the HEADER exists and loads the dataset
-         * 
+         *
          * @param {XMLHttpRequest} xhr
          * @return {Bool}
          */
@@ -1113,14 +1111,14 @@ if (typeof (PhpDebugBar) == 'undefined') {
             if (data.error) {
                 throw new Error('Error loading debugbar data: ' + data.error);
             } else if (data.data) {
-                this.debugbar.addDataSet(data.data, data.id, "(ajax)", this.autoShow);
+                this.debugbar.addDataSet(data.data, data.id, '(ajax)', this.autoShow);
             }
             return true;
         },
 
         /**
          * Extract the data as a string from headers of an XMLHttpRequest
-         * 
+         *
          * @this {AjaxHandler}
          * @param {XMLHttpRequest} xhr
          * @return {string}
@@ -1167,7 +1165,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Parses the string data into an object
-         * 
+         *
          * @this {AjaxHandler}
          * @param {string} data
          * @return {string}
@@ -1178,7 +1176,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Attaches an event listener to jQuery.ajaxComplete()
-         * 
+         *
          * @this {AjaxHandler}
          * @param {jQuery} jq Optional
          */
@@ -1193,7 +1191,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
 
         /**
          * Attaches an event listener to XMLHttpRequest
-         * 
+         *
          * @this {AjaxHandler}
          */
         bindToXHR: function () {
@@ -1201,7 +1199,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
             var proxied = XMLHttpRequest.prototype.open;
             XMLHttpRequest.prototype.open = function (method, url, async, user, pass) {
                 var xhr = this;
-                this.addEventListener("readystatechange", function () {
+                this.addEventListener('readystatechange', function () {
                     var skipUrl = self.debugbar.openHandler ? self.debugbar.openHandler.get('url') : null;
                     if (xhr.readyState == 4 && url.indexOf(skipUrl) !== 0) {
                         self.handle(xhr);
@@ -1212,6 +1210,4 @@ if (typeof (PhpDebugBar) == 'undefined') {
         }
 
     });
-
-})(PhpDebugBar.$);
-    
+}(PhpDebugBar.$));

@@ -90,6 +90,7 @@ class CColor_Format_Hex extends CColor_FormatAbstract {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return '#' . implode('', $this->values());
     }

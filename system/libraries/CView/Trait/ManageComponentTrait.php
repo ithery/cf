@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 28, 2020
- */
 trait CView_Trait_ManageComponentTrait {
     /**
      * The components being rendered.
@@ -93,7 +87,6 @@ trait CView_Trait_ManageComponentTrait {
 
         try {
             $view = c::value($view, $data);
-
             if ($view instanceof CView_View) {
                 return $view->with($data)->render();
             } elseif ($view instanceof CInterface_Htmlable) {
@@ -181,7 +174,7 @@ trait CView_Trait_ManageComponentTrait {
      * @return void
      */
     public function endSlot() {
-        carr::last($this->componentStack);
+        c::last($this->componentStack);
 
         $currentSlot = array_pop(
             $this->slotStack[$this->currentComponent()]

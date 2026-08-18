@@ -67,6 +67,7 @@ class ArrayEveryEntryToken implements TokenInterface
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return sprintf('[%s, ..., %s]', $this->value, $this->value);

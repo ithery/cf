@@ -5,12 +5,13 @@ namespace TeamTNT\TNTSearch\Support;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use Traversable;
 
 class Collection implements Countable, IteratorAggregate
 {
-    protected $items = [];
+    protected array $items = [];
 
-    public function __construct($items = [])
+    public function __construct(array $items = [])
     {
         $this->items = $items;
     }
@@ -41,7 +42,7 @@ class Collection implements Countable, IteratorAggregate
      *
      * @return static
      */
-    public function filter(callable $callback = null)
+    public function filter(?callable $callback = null)
     {
         if ($callback) {
             $return = [];
@@ -120,7 +121,7 @@ class Collection implements Countable, IteratorAggregate
     /**
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->items);
     }
@@ -148,7 +149,7 @@ class Collection implements Countable, IteratorAggregate
     /**
      * @return ArrayIterator
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->items);
     }

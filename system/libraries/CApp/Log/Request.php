@@ -3,24 +3,27 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @since Mar 10, 2019, 6:13:15 AM
  */
 use CApp_Base as Base;
 
+use CApp_Navigation_Helper as NavHelper;
+
 class CApp_Log_Request {
+    /**
+     * @param array $data
+     *
+     * @return bool|void
+     */
     public static function populate($data = []) {
-        $app = CApp::instance();
-        $db = CDatabase::instance();
+        $db = c::db();
         $appId = Base::appId();
         $orgId = Base::orgId();
         $userId = Base::userId();
         $browser = new CBrowser();
 
         //no need to log ajax request
-        if (CApp::isAjax()) {
+        if (c::request()->ajax()) {
             return false;
         }
         //no need to log on administrator page
@@ -32,17 +35,17 @@ class CApp_Log_Request {
             }
         }
 
-        $nav = cnav::nav();
+        $nav = NavHelper::nav();
 
         $nav_name = '';
         $nav_label = '';
         $action_label = '';
         $action_name = '';
-        $controller = crouter::controller();
+        $controller = c::router()->current()->getController();
         if ($controller == 'cresenity') {
             return false;
         }
-        $method = crouter::method();
+        $method = c::router()->current()->getRouteData()->getMethod();
         if ($nav != null) {
             $nav_name = $nav['name'];
             $nav_label = $nav['label'];
@@ -56,9 +59,7 @@ class CApp_Log_Request {
                 }
             }
         }
-        $db = CDatabase::instance();
         $ip_address = Base::remoteAddress();
-        $session_id = CSession::instance()->id();
 
         $platform_version = crequest::platform_version();
         $description = CF::domain();

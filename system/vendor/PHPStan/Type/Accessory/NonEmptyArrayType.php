@@ -2,13 +2,22 @@
 
 namespace PHPStan\Type\Accessory;
 
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\TrinaryLogic;
+use PHPStan\Type\AcceptsResult;
+use PHPStan\Type\ArrayType;
+use PHPStan\Type\BooleanType;
 use PHPStan\Type\CompoundType;
+use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantFloatType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\ErrorType;
+use PHPStan\Type\InstanceofDeprecated;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntersectionType;
+use PHPStan\Type\IsSuperTypeOfResult;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\Traits\MaybeCallableTypeTrait;
 use PHPStan\Type\Traits\NonGeneralizableTypeTrait;
@@ -21,6 +30,7 @@ use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
 use PHPStan\Type\VerbosityLevel;
 
+#[InstanceofDeprecated(insteadUse: 'Type::isIterableAtLeastOnce()')]
 class NonEmptyArrayType implements CompoundType, AccessoryType
 {
 
@@ -42,6 +52,16 @@ class NonEmptyArrayType implements CompoundType, AccessoryType
 		return [];
 	}
 
+	public function getObjectClassNames(): array
+	{
+		return [];
+	}
+
+	public function getObjectClassReflections(): array
+	{
+		return [];
+	}
+
 	public function getArrays(): array
 	{
 		return [];
@@ -52,44 +72,56 @@ class NonEmptyArrayType implements CompoundType, AccessoryType
 		return [];
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function getConstantStrings(): array
 	{
+		return [];
+	}
+
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
+	{
+		$isArray = $type->isArray();
+		$isIterableAtLeastOnce = $type->isIterableAtLeastOnce();
+		$isNonEmptyArray = $isArray->and($isIterableAtLeastOnce);
+
+		if ($isNonEmptyArray->yes()) {
+			return AcceptsResult::createYes();
+		}
+
 		if ($type instanceof CompoundType) {
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
-		return $type->isArray()
-			->and($type->isIterableAtLeastOnce());
+		return new AcceptsResult($isNonEmptyArray, []);
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($this->equals($type)) {
-			return TrinaryLogic::createYes();
+			return IsSuperTypeOfResult::createYes();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
 		}
 
-		return $type->isArray()
-			->and($type->isIterableAtLeastOnce());
+		return new IsSuperTypeOfResult($type->isArray()->and($type->isIterableAtLeastOnce()), []);
 	}
 
-	public function isSubTypeOf(Type $otherType): TrinaryLogic
+	public function isSubTypeOf(Type $otherType): IsSuperTypeOfResult
 	{
 		if ($otherType instanceof UnionType || $otherType instanceof IntersectionType) {
 			return $otherType->isSuperTypeOf($this);
 		}
 
-		return $otherType->isArray()
-			->and($otherType->isIterableAtLeastOnce())
-			->and($otherType instanceof self ? TrinaryLogic::createYes() : TrinaryLogic::createMaybe());
+		return new IsSuperTypeOfResult(
+			$otherType->isArray()->and($otherType->isIterableAtLeastOnce())->and($otherType instanceof self ? TrinaryLogic::createYes() : TrinaryLogic::createMaybe()),
+			[],
+		);
 	}
 
-	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): TrinaryLogic
+	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): AcceptsResult
 	{
-		return $this->isSubTypeOf($acceptingType);
+		return $this->isSubTypeOf($acceptingType)->toAcceptsResult();
 	}
 
 	public function equals(Type $type): bool
@@ -103,6 +135,11 @@ class NonEmptyArrayType implements CompoundType, AccessoryType
 	}
 
 	public function isOffsetAccessible(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isOffsetAccessLegal(): TrinaryLogic
 	{
 		return TrinaryLogic::createYes();
 	}
@@ -122,7 +159,17 @@ class NonEmptyArrayType implements CompoundType, AccessoryType
 		return $this;
 	}
 
+	public function setExistingOffsetValueType(Type $offsetType, Type $valueType): Type
+	{
+		return $this;
+	}
+
 	public function unsetOffset(Type $offsetType): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getKeysArrayFiltered(Type $filterValueType, TrinaryLogic $strict): Type
 	{
 		return new ErrorType();
 	}
@@ -133,6 +180,11 @@ class NonEmptyArrayType implements CompoundType, AccessoryType
 	}
 
 	public function getValuesArray(): Type
+	{
+		return $this;
+	}
+
+	public function chunkArray(Type $lengthType, TrinaryLogic $preserveKeys): Type
 	{
 		return $this;
 	}
@@ -157,7 +209,12 @@ class NonEmptyArrayType implements CompoundType, AccessoryType
 		return new MixedType();
 	}
 
-	public function searchArray(Type $needleType): Type
+	public function reverseArray(TrinaryLogic $preserveKeys): Type
+	{
+		return $this;
+	}
+
+	public function searchArray(Type $needleType, ?TrinaryLogic $strict = null): Type
 	{
 		return new MixedType();
 	}
@@ -170,6 +227,70 @@ class NonEmptyArrayType implements CompoundType, AccessoryType
 	public function shuffleArray(): Type
 	{
 		return $this;
+	}
+
+	public function sliceArray(Type $offsetType, Type $lengthType, TrinaryLogic $preserveKeys): Type
+	{
+		if ((new ConstantIntegerType(0))->isSuperTypeOf($offsetType)->yes() && $lengthType->isNull()->yes()) {
+			return $this;
+		}
+
+		return new MixedType();
+	}
+
+	public function spliceArray(Type $offsetType, Type $lengthType, Type $replacementType): Type
+	{
+		if (
+			(new ConstantIntegerType(0))->isSuperTypeOf($lengthType)->yes()
+			|| $replacementType->toArray()->isIterableAtLeastOnce()->yes()
+		) {
+			return $this;
+		}
+
+		return new MixedType();
+	}
+
+	public function truncateListToSize(Type $sizeType): Type
+	{
+		// The accessory only asserts "this array is non-empty" — truncating
+		// to a positive size leaves that property in place.
+		return $this;
+	}
+
+	public function makeListMaybe(): Type
+	{
+		// Non-emptiness is independent of list-ness; weaken-list keeps it.
+		return $this;
+	}
+
+	public function mapValueType(callable $cb): Type
+	{
+		// Mapping doesn't change the entry count; non-emptiness is preserved.
+		return $this;
+	}
+
+	public function mapKeyType(callable $cb): Type
+	{
+		return $this;
+	}
+
+	public function makeAllArrayKeysOptional(): Type
+	{
+		// Without `ConstantArrayType` keys to mark optional, this is a no-op.
+		// Non-emptiness is unrelated to per-key optionality and is preserved.
+		return $this;
+	}
+
+	public function changeKeyCaseArray(?int $case): Type
+	{
+		// Case-folding keys doesn't change the entry count.
+		return $this;
+	}
+
+	public function filterArrayRemovingFalsey(): Type
+	{
+		// Filtering may leave the array empty — drop the assertion.
+		return new MixedType();
 	}
 
 	public function isIterable(): TrinaryLogic
@@ -237,12 +358,67 @@ class NonEmptyArrayType implements CompoundType, AccessoryType
 		return TrinaryLogic::createMaybe();
 	}
 
+	public function isNull(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isConstantScalarValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getConstantScalarTypes(): array
+	{
+		return [];
+	}
+
+	public function getConstantScalarValues(): array
+	{
+		return [];
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isBoolean(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFloat(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isInteger(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
 	public function isString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
 
 	public function isNumericString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isDecimalIntegerString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
@@ -262,7 +438,61 @@ class NonEmptyArrayType implements CompoundType, AccessoryType
 		return TrinaryLogic::createNo();
 	}
 
+	public function isLowercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isClassString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isUppercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function isVoid(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		if ($type->isArray()->yes() && $type->isIterableAtLeastOnce()->no()) {
+			return new ConstantBooleanType(false);
+		}
+
+		return new BooleanType();
+	}
+
 	public function toNumber(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toAbsoluteNumber(): Type
 	{
 		return new ErrorType();
 	}
@@ -284,7 +514,7 @@ class NonEmptyArrayType implements CompoundType, AccessoryType
 
 	public function toArray(): Type
 	{
-		return new MixedType();
+		return $this;
 	}
 
 	public function toArrayKey(): Type
@@ -292,14 +522,44 @@ class NonEmptyArrayType implements CompoundType, AccessoryType
 		return new ErrorType();
 	}
 
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		return $this;
+	}
+
 	public function traverse(callable $cb): Type
 	{
 		return $this;
 	}
 
-	public static function __set_state(array $properties): Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		return new self();
+		return $this;
+	}
+
+	public function exponentiate(Type $exponent): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getFiniteTypes(): array
+	{
+		return [];
+	}
+
+	public function getDefaultBaseType(): Type
+	{
+		return new ArrayType(new MixedType(), new MixedType());
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode('non-empty-array');
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return false;
 	}
 
 }

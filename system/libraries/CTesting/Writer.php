@@ -76,10 +76,10 @@ final class CTesting_Writer implements CTesting_WriterInterface {
      * Creates an instance of the writer.
      */
     public function __construct(
-        CTesting_SolutionRepositoryInterface $solutionsRepository = null,
-        OutputInterface $output = null,
-        CTesting_ArgumentFormatter $argumentFormatter = null,
-        CTesting_Highlighter $highlighter = null
+        ?CTesting_SolutionRepositoryInterface $solutionsRepository = null,
+        ?OutputInterface $output = null,
+        ?CTesting_ArgumentFormatter $argumentFormatter = null,
+        ?CTesting_Highlighter $highlighter = null
     ) {
         $this->solutionsRepository = $solutionsRepository ?: new CTesting_SolutionRepository_NullSolutionRepository();
         $this->output = $output ?: new ConsoleOutput();

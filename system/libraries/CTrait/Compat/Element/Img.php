@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 24, 2019, 12:39:06 PM
+ * @see CElement_Element_Img
  */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_Img {
@@ -15,9 +12,11 @@ trait CTrait_Compat_Element_Img {
      *
      * @param string $src
      *
-     * @return @deprecated 1.2
+     * @return $this
+     * @deprecated 1.2
      */
     public function set_src($src) {
+        /** @var CElement_Element_Img $this */
         return $this->setSrc($src);
     }
 }

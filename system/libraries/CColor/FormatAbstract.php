@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2019, 3:21:38 AM
- */
 abstract class CColor_FormatAbstract {
     /**
      * @param string $code
@@ -155,6 +149,8 @@ abstract class CColor_FormatAbstract {
     /**
      * @link https://en.wikipedia.org/wiki/Luma_(video) Magic numbers taken from link
      *
+     * @param mixed $constant
+     *
      * @return bool
      */
     public function isLight($constant = 0.5) {
@@ -165,6 +161,8 @@ abstract class CColor_FormatAbstract {
     }
 
     /**
+     * @param mixed $constant
+     *
      * @return bool
      */
     public function isDark($constant = 0.5) {

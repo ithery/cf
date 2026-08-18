@@ -310,7 +310,7 @@
                 var div_cc;
                 var cc_label;
                 var cc;
-                <?php foreach ($customControl as $cc): ?>
+                @foreach ($customControl as $cc)
                     <?php
                     $control = carr::get($cc, 'control');
                     $control_name = carr::get($cc, 'input_name');
@@ -322,7 +322,7 @@
                     div_cc.append(cc_label);
                     div_cc.append(cc);
                     div.append(div_cc);
-                <?php endforeach; ?>
+                @endforeach
                 @if($removeLink)
                     var remove = $("<a>").addClass("multi-image-ajax-remove").html("@lang('element/image.remove')");
                     div.append(remove);
@@ -337,14 +337,18 @@
                 var xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function () {
                     if (this.readyState == 4 && this.status == 200) {
-                        var dataFile = JSON.parse(this.responseText);
-                        div.removeClass("loading");
-                        div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[]\" value=" + dataFile.fileId + ">");
-                        if(file.type.match("image.*")){
-                            img.attr('src', data.url);
-                        }
-                        index++;
-                        fileChanged();
+                        var response = JSON.parse(this.responseText);
+
+                        cresenity.handleJsonResponse(response, function (dataFile) {
+                            div.removeClass("loading");
+                            div.append("<input type=\"hidden\" name=\"<?php echo $name; ?>[]\" value=" + dataFile.fileId + ">");
+                            if(file.type.match("image.*")){
+                                img.attr('src', data.url);
+                            }
+                            index++;
+                            fileChanged();
+                        });
+
                     } else if (this.readyState == 4 && this.status != 200) {
                         //div.remove();
                     }

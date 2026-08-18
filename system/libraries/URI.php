@@ -168,6 +168,7 @@ class URI extends CFRouter {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return URI::$current_uri;
     }

@@ -1,6 +1,14 @@
 <?php
 
+/**
+ * @property array $rows                     rows the array-driven table is seeded with, set by the consuming model
+ * @property array $schema                    column name => type map used when $rows is empty, set by the consuming model
+ * @property int   $arrayDriverInsertChunkSize number of rows inserted per batch during migrate(), set by the consuming model
+ */
 trait CModel_ArrayDriver_ArrayDriverTrait {
+    /**
+     * @var array
+     */
     protected static $arrayDriverConnection;
 
     public function getRows() {
@@ -79,6 +87,10 @@ trait CModel_ArrayDriver_ArrayDriverTrait {
         }
     }
 
+    /**
+     * @param string $database
+     * @return void
+     */
     protected static function setSqliteConnection($database) {
         $config = [
             'pdo' => true,
@@ -86,7 +98,8 @@ trait CModel_ArrayDriver_ArrayDriverTrait {
             'database' => $database,
         ];
 
-        static::$arrayDriverConnection = CDatabase::instance(static::class, $config);
+        static::$arrayDriverConnection = CDatabase::connectionFactory()->make($config);
+        CDatabase::manager()->addConnection($config, static::class);
     }
 
     public function migrate() {
@@ -106,6 +119,11 @@ trait CModel_ArrayDriver_ArrayDriverTrait {
         }
     }
 
+    /**
+     * @param string $tableName
+     * @param array $firstRow
+     * @return void
+     */
     public function createTable(string $tableName, $firstRow) {
         $this->createTableSafely($tableName, function ($table) use ($firstRow) {
             // Add the "id" column if it doesn't already exist in the rows.

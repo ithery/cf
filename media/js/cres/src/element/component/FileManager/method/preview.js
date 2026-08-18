@@ -1,5 +1,5 @@
-export const previewMethod = (items) => {
-    let carousel = $('#carouselTemplate').clone().attr('id', 'previewCarousel').removeClass('d-none');
+export function previewMethod(items) {
+    let carousel = this.find('.fm-carousel-template').clone().attr('id', 'previewCarousel').removeClass('d-none fm-carousel-template');
     let imageTemplate = carousel.find('.carousel-item').clone().removeClass('active');
     let indicatorTemplate = carousel.find('.carousel-indicators > li').clone().removeClass('active');
     carousel.children('.carousel-inner').html('');
@@ -8,10 +8,21 @@ export const previewMethod = (items) => {
     items.forEach(function (item, index) {
         let carouselItem = imageTemplate.clone()
             .addClass(index === 0 ? 'active' : '');
+        let isText = typeof item.mime_type === 'string' && item.mime_type.indexOf('text/') === 0;
         if (item.thumb_url) {
             carouselItem.find('.carousel-image').css('background-image', 'url(\'' + item.url + '?timestamp=' + item.time + '\')');
+        } else if (isText) {
+            let textBox = $('<pre>').addClass('carousel-text-preview').text('...');
+            carouselItem.find('.carousel-image').addClass('carousel-image-text').append(textBox);
+            $.get(item.url).done(function (content) {
+                textBox.text(content);
+            }).fail(function () {
+                textBox.text('');
+            });
         } else {
-            carouselItem.find('.carousel-image').css('width', '50vh').append($('<div>').addClass('mime-icon ico-' + item.icon));
+            carouselItem.find('.carousel-image').css('width', '50vh').append(
+                $('<div>').addClass('mime-icon ico-' + item.icon).append($('<div>').addClass('ico'))
+            );
         }
 
         carouselItem.find('.carousel-label').attr('target', '_blank').attr('href', item.url)
@@ -49,4 +60,4 @@ export const previewMethod = (items) => {
     // end carousel swipe control
 
     this.notify(carousel);
-};
+}

@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Oct 1, 2019, 4:45:10 PM
+ * @deprecated 1.8
  */
 class CExcel_Constant {
     const XLSX = 'Xlsx';

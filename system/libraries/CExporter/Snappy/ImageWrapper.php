@@ -16,6 +16,16 @@ class CExporter_Snappy_ImageWrapper {
     protected $options = [];
 
     /**
+     * @var string
+     */
+    protected $html;
+
+    /**
+     * @var string
+     */
+    protected $file;
+
+    /**
      * @param \Knp\Snappy\Image $snappy
      */
     public function __construct(SnappyImage $snappy) {

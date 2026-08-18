@@ -4,24 +4,23 @@ namespace PHPStan\Rules\TooWideTypehints;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\FunctionReturnStatementsNode;
-use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\ShouldNotHappenException;
-use PHPStan\Type\NullType;
-use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\UnionType;
-use PHPStan\Type\VerbosityLevel;
-use function count;
 use function sprintf;
 
 /**
  * @implements Rule<FunctionReturnStatementsNode>
  */
-class TooWideFunctionReturnTypehintRule implements Rule
+#[RegisteredRule(level: 4)]
+final class TooWideFunctionReturnTypehintRule implements Rule
 {
+
+	public function __construct(
+		private TooWideTypeCheck $check,
+	)
+	{
+	}
 
 	public function getNodeType(): string
 	{
@@ -30,65 +29,19 @@ class TooWideFunctionReturnTypehintRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$function = $scope->getFunction();
-		if (!$function instanceof FunctionReflection) {
-			throw new ShouldNotHappenException();
-		}
+		$function = $node->getFunctionReflection();
 
-		$functionReturnType = ParametersAcceptorSelector::selectSingle($function->getVariants())->getReturnType();
-		if (!$functionReturnType instanceof UnionType) {
-			return [];
-		}
-		$statementResult = $node->getStatementResult();
-		if ($statementResult->hasYield()) {
-			return [];
-		}
-
-		$returnStatements = $node->getReturnStatements();
-		if (count($returnStatements) === 0) {
-			return [];
-		}
-
-		$returnTypes = [];
-		foreach ($returnStatements as $returnStatement) {
-			$returnNode = $returnStatement->getReturnNode();
-			if ($returnNode->expr === null) {
-				continue;
-			}
-
-			$returnTypes[] = $returnStatement->getScope()->getType($returnNode->expr);
-		}
-
-		if (count($returnTypes) === 0) {
-			return [];
-		}
-
-		$returnType = TypeCombinator::union(...$returnTypes);
-
-		$messages = [];
-		foreach ($functionReturnType->getTypes() as $type) {
-			if (!$type->isSuperTypeOf($returnType)->no()) {
-				continue;
-			}
-
-			if ($type instanceof NullType && !$node->hasNativeReturnTypehint()) {
-				foreach ($node->getExecutionEnds() as $executionEnd) {
-					if ($executionEnd->getStatementResult()->isAlwaysTerminating()) {
-						continue;
-					}
-
-					continue 2;
-				}
-			}
-
-			$messages[] = RuleErrorBuilder::message(sprintf(
-				'Function %s() never returns %s so it can be removed from the return type.',
+		return $this->check->checkFunctionReturnType(
+			$node,
+			$function->getNativeReturnType(),
+			$function->getPhpDocReturnType(),
+			sprintf(
+				'Function %s()',
 				$function->getName(),
-				$type->describe(VerbosityLevel::getRecommendedLevelByType($type)),
-			))->build();
-		}
-
-		return $messages;
+			),
+			false,
+			$scope,
+		);
 	}
 
 }

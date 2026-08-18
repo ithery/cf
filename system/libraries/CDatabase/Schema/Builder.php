@@ -16,9 +16,16 @@ class CDatabase_Schema_Builder {
     public static $defaultMorphKeyType = 'int';
 
     /**
+     * Indicates whether Doctrine DBAL usage will be prevented if possible when dropping, renaming, and modifying columns.
+     *
+     * @var bool
+     */
+    public static $alwaysUsesNativeSchemaOperationsIfPossible = false;
+
+    /**
      * The database connection instance.
      *
-     * @var \CDatabase
+     * @var \CDatabase_Connection
      */
     protected $connection;
 
@@ -39,12 +46,13 @@ class CDatabase_Schema_Builder {
     /**
      * Create a new database Schema manager.
      *
-     * @param \CDatabase $connection
+     * @param \CDatabase_Connection $connection
      *
      * @return void
      */
-    public function __construct(CDatabase $connection) {
+    public function __construct(CDatabase_Connection $connection) {
         $this->connection = $connection;
+
         $this->grammar = $connection->getSchemaGrammar();
     }
 
@@ -86,6 +94,26 @@ class CDatabase_Schema_Builder {
     }
 
     /**
+     * Set the default morph key type for migrations to ULIDs.
+     *
+     * @return void
+     */
+    public static function morphUsingUlids() {
+        return static::defaultMorphKeyType('ulid');
+    }
+
+    /**
+     * Attempt to use native schema operations for dropping, renaming, and modifying columns, even if Doctrine DBAL is installed.
+     *
+     * @param bool $value
+     *
+     * @return void
+     */
+    public static function useNativeSchemaOperationsIfPossible(bool $value = true) {
+        static::$alwaysUsesNativeSchemaOperationsIfPossible = $value;
+    }
+
+    /**
      * Create a database in the schema.
      *
      * @param string $name
@@ -121,10 +149,74 @@ class CDatabase_Schema_Builder {
     public function hasTable($table) {
         $table = $this->connection->getTablePrefix() . $table;
 
-        return count($this->connection->selectFromWriteConnection(
-            $this->grammar->compileTableExists(),
-            [$table]
-        )) > 0;
+        foreach ($this->getTables() as $value) {
+            if (strtolower($table) === strtolower($value['name'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the given view exists.
+     *
+     * @param string $view
+     *
+     * @return bool
+     */
+    public function hasView($view) {
+        $view = $this->connection->getTablePrefix() . $view;
+
+        foreach ($this->getViews() as $value) {
+            if (strtolower($view) === strtolower($value['name'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the tables that belong to the database.
+     *
+     * @return array
+     */
+    public function getTables() {
+        $grammar = $this->grammar;
+
+        return $this->connection->getPostProcessor()->processTables(
+            $this->connection->selectFromWriteConnection($this->grammar->compileTables())
+        );
+    }
+
+    /**
+     * Get the names of the tables that belong to the database.
+     *
+     * @return array
+     */
+    public function getTableListing() {
+        return array_column($this->getTables(), 'name');
+    }
+
+    /**
+     * Get the views that belong to the database.
+     *
+     * @return array
+     */
+    public function getViews() {
+        return $this->connection->getPostProcessor()->processViews(
+            $this->connection->selectFromWriteConnection($this->grammar->compileViews())
+        );
+    }
+
+    /**
+     * Get the user-defined types that belong to the database.
+     *
+     * @return array
+     */
+    public function getTypes() {
+        throw new LogicException('This database driver does not support user-defined types.');
     }
 
     /**
@@ -184,13 +276,40 @@ class CDatabase_Schema_Builder {
      * @return array
      */
     public function getColumnListing($table) {
-        $results = $this->connection->selectFromWriteConnection($this->grammar->compileColumnListing(
-            $this->connection->getTablePrefix() . $table
-        ));
-
-        return $this->connection->getPostProcessor()->processColumnListing($results);
+        return array_column($this->getColumns($table), 'name');
     }
 
+    /**
+     * Get the columns for a given table.
+     *
+     * @param string $table
+     *
+     * @return array
+     */
+    public function getColumns($table) {
+        $table = $this->connection->getTablePrefix() . $table;
+
+        return $this->connection->getPostProcessor()->processColumns(
+            $this->connection->selectFromWriteConnection($this->grammar->compileColumns($table))
+        );
+    }
+    /**
+     * Get the indexes for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexes($table) {
+        [$schema, $table] = $this->parseSchemaAndTable($table);
+
+        $table = $this->connection->getTablePrefix().$table;
+
+        return $this->connection->getPostProcessor()->processIndexes(
+            $this->connection->selectFromWriteConnection(
+                $this->grammar->compileIndexes($schema, $table)
+            )
+        );
+    }
     /**
      * Modify a table on the schema.
      *
@@ -358,7 +477,7 @@ class CDatabase_Schema_Builder {
      *
      * @return \CDatabase_Schema_Blueprint
      */
-    protected function createBlueprint($table, Closure $callback = null) {
+    protected function createBlueprint($table, ?Closure $callback = null) {
         $prefix = $this->connection->getConfig('prefix_indexes')
                     ? $this->connection->getConfig('prefix')
                     : '';
@@ -382,7 +501,62 @@ class CDatabase_Schema_Builder {
     public function registerCustomDoctrineType($class, $name, $type) {
         $this->connection->registerDoctrineType($class, $name, $type);
     }
+    /**
+     * Get the names of the current schemas for the connection.
+     *
+     * @return string[]|null
+     */
+    public function getCurrentSchemaListing() {
+        return null;
+    }
 
+    /**
+     * Get the default schema name for the connection.
+     *
+     * @return string|null
+     */
+    public function getCurrentSchemaName() {
+        return $this->getCurrentSchemaListing()[0] ?? null;
+    }
+    /**
+     * Parse the given database object reference and extract the schema and table.
+     *
+     * @param  string  $reference
+     * @param  string|bool|null  $withDefaultSchema
+     * @return array{string|null, string}
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function parseSchemaAndTable($reference, $withDefaultSchema = null) {
+        $segments = explode('.', $reference);
+
+        if (count($segments) > 2) {
+            throw new InvalidArgumentException(
+                "Using three-part references is not supported, you may use `Schema::connection('{$segments[0]}')` instead."
+            );
+        }
+
+        $table = $segments[1] ?? $segments[0];
+
+        // $schema = match (true) {
+        //     isset($segments[1]) => $segments[0],
+        //     is_string($withDefaultSchema) => $withDefaultSchema,
+        //     $withDefaultSchema => $this->getCurrentSchemaName(),
+        //     default => null,
+        // };
+
+        if (isset($segments[1])) {
+            $schema = $segments[0];
+        } elseif (is_string($withDefaultSchema)) {
+            $schema = $withDefaultSchema;
+        } elseif ($withDefaultSchema) {
+            $schema = $this->getCurrentSchemaName();
+        } else {
+            $schema = null;
+        }
+
+        return [$schema, $table];
+    }
     /**
      * Get the database connection instance.
      *

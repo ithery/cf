@@ -1,11 +1,10 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- */
-interface CBase_MessageBagInterface extends CInterface_Arrayable {
+interface CBase_MessageBagInterface extends Arrayable {
     /**
      * Get the keys present in the message bag.
      *

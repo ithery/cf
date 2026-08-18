@@ -2,31 +2,42 @@
 
 namespace PHPStan\Node;
 
+use Override;
+use PhpParser\Node\Expr\Yield_;
+use PhpParser\Node\Expr\YieldFrom;
+use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\Function_;
 use PhpParser\NodeAbstract;
+use PHPStan\Analyser\ImpurePoint;
 use PHPStan\Analyser\StatementResult;
+use PHPStan\Reflection\Php\PhpFunctionFromParserNodeReflection;
+use function count;
 
-/** @api */
-class FunctionReturnStatementsNode extends NodeAbstract implements ReturnStatementsNode
+/**
+ * @api
+ */
+final class FunctionReturnStatementsNode extends NodeAbstract implements ReturnStatementsNode
 {
 
 	/**
-	 * @param ReturnStatement[] $returnStatements
-	 * @param ExecutionEndNode[] $executionEnds
+	 * @param list<ReturnStatement> $returnStatements
+	 * @param list<Yield_|YieldFrom> $yieldStatements
+	 * @param list<ExecutionEndNode> $executionEnds
+	 * @param ImpurePoint[] $impurePoints
 	 */
 	public function __construct(
 		private Function_ $function,
 		private array $returnStatements,
+		private array $yieldStatements,
 		private StatementResult $statementResult,
 		private array $executionEnds,
+		private array $impurePoints,
+		private PhpFunctionFromParserNodeReflection $functionReflection,
 	)
 	{
 		parent::__construct($function->getAttributes());
 	}
 
-	/**
-	 * @return ReturnStatement[]
-	 */
 	public function getReturnStatements(): array
 	{
 		return $this->returnStatements;
@@ -37,12 +48,14 @@ class FunctionReturnStatementsNode extends NodeAbstract implements ReturnStateme
 		return $this->statementResult;
 	}
 
-	/**
-	 * @return ExecutionEndNode[]
-	 */
 	public function getExecutionEnds(): array
 	{
 		return $this->executionEnds;
+	}
+
+	public function getImpurePoints(): array
+	{
+		return $this->impurePoints;
 	}
 
 	public function returnsByRef(): bool
@@ -55,6 +68,17 @@ class FunctionReturnStatementsNode extends NodeAbstract implements ReturnStateme
 		return $this->function->returnType !== null;
 	}
 
+	public function getYieldStatements(): array
+	{
+		return $this->yieldStatements;
+	}
+
+	public function isGenerator(): bool
+	{
+		return count($this->yieldStatements) > 0;
+	}
+
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Node_FunctionReturnStatementsNode';
@@ -63,9 +87,23 @@ class FunctionReturnStatementsNode extends NodeAbstract implements ReturnStateme
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];
+	}
+
+	public function getFunctionReflection(): PhpFunctionFromParserNodeReflection
+	{
+		return $this->functionReflection;
+	}
+
+	/**
+	 * @return Stmt[]
+	 */
+	public function getStatements(): array
+	{
+		return $this->function->getStmts();
 	}
 
 }

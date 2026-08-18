@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 29, 2019, 10:45:30 AM
- */
 class CAjax_Engine_SelectSearch_Parameter {
     protected $requestGet;
 
@@ -32,5 +26,9 @@ class CAjax_Engine_SelectSearch_Parameter {
 
     public function callback() {
         return carr::get($this->requestGet, 'callback');
+    }
+
+    public function id() {
+        return carr::get($this->requestGet, 'id');
     }
 }

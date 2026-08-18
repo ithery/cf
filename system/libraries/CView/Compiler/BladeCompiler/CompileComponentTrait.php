@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Dec 6, 2020
- */
 trait CView_Compiler_BladeCompiler_CompileComponentTrait {
     /**
      * The component name hash stack.
@@ -24,7 +18,7 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
      * @return string
      */
     protected function compileComponent($expression) {
-        list($component, $alias, $data) = strpos($expression, ',') !== false
+        list($component, $alias, $data) = cstr::contains($expression, ',')
                     ? array_map('trim', explode(',', trim($expression, '()'), 3)) + ['', '', '']
                     : [trim($expression, '()'), '', ''];
 
@@ -32,7 +26,7 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
 
         $hash = static::newComponentHash($component);
 
-        if (cstr::contains($component, ['::class', '\\'])) {
+        if (cstr::contains($component, ['::class', '\\']) || class_exists($component)) {
             return static::compileClassComponentOpening($component, $alias, $data, $hash);
         }
 
@@ -65,7 +59,7 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
     public static function compileClassComponentOpening($component, $alias, $data, $hash) {
         return implode("\n", [
             '<?php if (isset($component)) { $__componentOriginal' . $hash . ' = $component; } ?>',
-            '<?php $component = $__env->getContainer()->make(' . cstr::finish($component, '::class') . ', ' . ($data ?: '[]') . '); ?>',
+            '<?php $component = ' . $component . '::resolve(' . ($data ?: '[]') . ' + (isset($attributes) && $attributes instanceof \CView_ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>',
             '<?php $component->withName(' . $alias . '); ?>',
             '<?php if ($component->shouldRender()): ?>',
             '<?php $__env->startComponent($component->resolveView(), $component->data()); ?>',
@@ -146,9 +140,13 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
      * @return string
      */
     protected function compileProps($expression) {
-        return "<?php \$attributes = \$attributes->exceptProps{$expression}; ?>
+        return "<?php \$attributes ??= new \\CView_ComponentAttributeBag(); ?>
+<?php foreach(\$attributes->onlyProps{$expression} as \$__key => \$__value) {
+    \$\$__key = \$\$__key ?? \$__value;
+} ?>
+<?php \$attributes = \$attributes->exceptProps{$expression}; ?>
 <?php foreach (array_filter({$expression}, 'is_string', ARRAY_FILTER_USE_KEY) as \$__key => \$__value) {
-    \$\$__key = isset(\$\$__key) ? \$\$__key : \$__value;
+    \$\$__key = \$\$__key ?? \$__value;
 } ?>
 <?php \$__defined_vars = get_defined_vars(); ?>
 <?php foreach (\$attributes as \$__key => \$__value) {

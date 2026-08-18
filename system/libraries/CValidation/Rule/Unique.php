@@ -64,6 +64,7 @@ class CValidation_Rule_Unique {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return rtrim(sprintf(
             'unique:%s,%s,%s,%s,%s',

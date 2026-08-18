@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 5:51:41 AM
- */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CManager_File_Connector_FileManager_Controller_UploadController extends CManager_File_Connector_FileManager_AbstractController {
@@ -30,7 +24,11 @@ class CManager_File_Connector_FileManager_Controller_UploadController extends CM
             }
         }
         if (is_array($uploadedFiles)) {
-            $response = count($errorBag) > 0 ? $errorBag : parent::$successResponse;
+            if (count($errorBag) > 0) {
+                return $this->errorResponse(implode("\n", $errorBag));
+            }
+
+            return $this->successResponse();
         } else { // upload via ckeditor 'Upload' tab
             if (is_null($newFilename)) {
                 $response = $errorBag[0];

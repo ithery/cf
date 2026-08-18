@@ -2,6 +2,9 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Traits\FalseyBooleanTypeTrait;
 use PHPStan\Type\Traits\NonArrayTypeTrait;
@@ -15,6 +18,7 @@ use PHPStan\Type\Traits\NonRemoveableTypeTrait;
 use PHPStan\Type\Traits\UndecidedComparisonTypeTrait;
 
 /** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::isVoid()')]
 class VoidType implements Type
 {
 
@@ -34,34 +38,41 @@ class VoidType implements Type
 	{
 	}
 
-	/**
-	 * @return string[]
-	 */
 	public function getReferencedClasses(): array
 	{
 		return [];
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function getObjectClassNames(): array
+	{
+		return [];
+	}
+
+	public function getObjectClassReflections(): array
+	{
+		return [];
+	}
+
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
 		if ($type instanceof CompoundType) {
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
-		return TrinaryLogic::createFromBoolean($type instanceof self);
+		return new AcceptsResult($type->isVoid()->or($type->isNull()), []);
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof self) {
-			return TrinaryLogic::createYes();
+			return IsSuperTypeOfResult::createYes();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
 		}
 
-		return TrinaryLogic::createNo();
+		return IsSuperTypeOfResult::createNo();
 	}
 
 	public function equals(Type $type): bool
@@ -75,6 +86,16 @@ class VoidType implements Type
 	}
 
 	public function toNumber(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toAbsoluteNumber(): Type
 	{
 		return new ErrorType();
 	}
@@ -104,12 +125,77 @@ class VoidType implements Type
 		return new ErrorType();
 	}
 
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		return new NullType();
+	}
+
+	public function isOffsetAccessLegal(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isNull(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantScalarValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getConstantScalarTypes(): array
+	{
+		return [];
+	}
+
+	public function getConstantScalarValues(): array
+	{
+		return [];
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isBoolean(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFloat(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isInteger(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
 	public function isString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
 
 	public function isNumericString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isDecimalIntegerString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
@@ -129,17 +215,74 @@ class VoidType implements Type
 		return TrinaryLogic::createNo();
 	}
 
+	public function isLowercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isUppercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isClassString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function isVoid(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		return new BooleanType();
+	}
+
 	public function traverse(callable $cb): Type
 	{
 		return $this;
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		return new self();
+		return $this;
+	}
+
+	public function exponentiate(Type $exponent): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getFiniteTypes(): array
+	{
+		return [];
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode('void');
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return false;
 	}
 
 }

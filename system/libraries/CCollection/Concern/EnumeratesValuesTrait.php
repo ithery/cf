@@ -1,11 +1,14 @@
 <?php
 
+use Illuminate\Contracts\Support\Jsonable;
 use Symfony\Component\VarDumper\VarDumper;
+use Illuminate\Contracts\Support\Arrayable;
 
 /**
  * @property-read CBase_HigherOrderCollectionProxy $average
  * @property-read CBase_HigherOrderCollectionProxy $avg
  * @property-read CBase_HigherOrderCollectionProxy $contains
+ * @property-read CBase_HigherOrderCollectionProxy $doesntContain
  * @property-read CBase_HigherOrderCollectionProxy $each
  * @property-read CBase_HigherOrderCollectionProxy $every
  * @property-read CBase_HigherOrderCollectionProxy $filter
@@ -17,19 +20,24 @@ use Symfony\Component\VarDumper\VarDumper;
  * @property-read CBase_HigherOrderCollectionProxy $max
  * @property-read CBase_HigherOrderCollectionProxy $min
  * @property-read CBase_HigherOrderCollectionProxy $partition
+ * @property-read CBase_HigherOrderCollectionProxy $percentage
  * @property-read CBase_HigherOrderCollectionProxy $reject
+ * @property-read CBase_HigherOrderCollectionProxy $skipUntil
+ * @property-read CBase_HigherOrderCollectionProxy $skipWhile
  * @property-read CBase_HigherOrderCollectionProxy $some
  * @property-read CBase_HigherOrderCollectionProxy $sortBy
  * @property-read CBase_HigherOrderCollectionProxy $sortByDesc
- * @property-read CBase_HigherOrderCollectionProxy $skipUntil
- * @property-read CBase_HigherOrderCollectionProxy $skipWhile
  * @property-read CBase_HigherOrderCollectionProxy $sum
  * @property-read CBase_HigherOrderCollectionProxy $takeUntil
  * @property-read CBase_HigherOrderCollectionProxy $takeWhile
  * @property-read CBase_HigherOrderCollectionProxy $unique
+ * @property-read CBase_HigherOrderCollectionProxy $unless
  * @property-read CBase_HigherOrderCollectionProxy $until
+ * @property-read CBase_HigherOrderCollectionProxy $when
  */
 trait CCollection_Concern_EnumeratesValuesTrait {
+    use CTrait_Conditionable;
+
     /**
      * Indicates that the object's string representation should be escaped when __toString is invoked.
      *
@@ -40,12 +48,13 @@ trait CCollection_Concern_EnumeratesValuesTrait {
     /**
      * The methods that can be proxied.
      *
-     * @var string[]
+     * @var array<int, string>
      */
     protected static $proxies = [
         'average',
         'avg',
         'contains',
+        'doesntContain',
         'each',
         'every',
         'filter',
@@ -57,6 +66,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
         'max',
         'min',
         'partition',
+        'percentage',
         'reject',
         'skipUntil',
         'skipWhile',
@@ -67,7 +77,9 @@ trait CCollection_Concern_EnumeratesValuesTrait {
         'takeUntil',
         'takeWhile',
         'unique',
+        'unless',
         'until',
+        'when',
     ];
 
     /**
@@ -122,13 +134,13 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      *
      * @return static
      */
-    public static function times($number, callable $callback = null) {
+    public static function times($number, ?callable $callback = null) {
         if ($number < 1) {
             return new static();
         }
 
         return static::range(1, $number)
-            ->when($callback)
+            ->unless($callback == null)
             ->map($callback);
     }
 
@@ -443,30 +455,6 @@ trait CCollection_Concern_EnumeratesValuesTrait {
     }
 
     /**
-     * Apply the callback if the value is truthy.
-     *
-     * @param bool|mixed    $value
-     * @param null|callable $callback
-     * @param null|callable $default
-     *
-     * @return static|mixed
-     */
-    public function when($value, callable $callback = null, callable $default = null) {
-        if (!$callback) {
-            return new CBase_HigherOrderWhenProxy($this, $value);
-        }
-
-        if ($value) {
-            return $callback($this, $value);
-        }
-        if ($default) {
-            return $default($this, $value);
-        }
-
-        return $this;
-    }
-
-    /**
      * Apply the callback if the collection is empty.
      *
      * @param callable      $callback
@@ -474,7 +462,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      *
      * @return static|mixed
      */
-    public function whenEmpty(callable $callback, callable $default = null) {
+    public function whenEmpty(callable $callback, ?callable $default = null) {
         return $this->when($this->isEmpty(), $callback, $default);
     }
 
@@ -486,21 +474,8 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      *
      * @return static|mixed
      */
-    public function whenNotEmpty(callable $callback, callable $default = null) {
+    public function whenNotEmpty(callable $callback, ?callable $default = null) {
         return $this->when($this->isNotEmpty(), $callback, $default);
-    }
-
-    /**
-     * Apply the callback if the value is falsy.
-     *
-     * @param bool          $value
-     * @param callable      $callback
-     * @param null|callable $default
-     *
-     * @return static|mixed
-     */
-    public function unless($value, callable $callback, callable $default = null) {
-        return $this->when(!$value, $callback, $default);
     }
 
     /**
@@ -511,7 +486,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      *
      * @return static|mixed
      */
-    public function unlessEmpty(callable $callback, callable $default = null) {
+    public function unlessEmpty(callable $callback, ?callable $default = null) {
         return $this->whenNotEmpty($callback, $default);
     }
 
@@ -523,7 +498,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      *
      * @return static|mixed
      */
-    public function unlessNotEmpty(callable $callback, callable $default = null) {
+    public function unlessNotEmpty(callable $callback, ?callable $default = null) {
         return $this->whenEmpty($callback, $default);
     }
 
@@ -661,12 +636,22 @@ trait CCollection_Concern_EnumeratesValuesTrait {
     /**
      * Filter the items, removing any items that don't match the given type.
      *
-     * @param string $type
+     * @param class-string|class-string[] $type
      *
      * @return static
      */
     public function whereInstanceOf($type) {
         return $this->filter(function ($value) use ($type) {
+            if (is_array($type)) {
+                foreach ($type as $classType) {
+                    if ($value instanceof $classType) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
             return $value instanceof $type;
         });
     }
@@ -830,7 +815,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      */
     public function toArray() {
         return $this->map(function ($value) {
-            return $value instanceof CInterface_Arrayable ? $value->toArray() : $value;
+            return $value instanceof Arrayable ? $value->toArray() : $value;
         })->all();
     }
 
@@ -839,15 +824,16 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
             }
-            if ($value instanceof Cinterface_Jsonable) {
+            if ($value instanceof Jsonable) {
                 return json_decode($value->toJson(), true);
             }
-            if ($value instanceof Cinterface_Arrayable) {
+            if ($value instanceof Arrayable) {
                 return $value->toArray();
             }
 
@@ -882,6 +868,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->escapeWhenCastingToString
                     ? c::e($this->toJson())
@@ -943,10 +930,10 @@ trait CCollection_Concern_EnumeratesValuesTrait {
         if ($items instanceof CInterface_Enumerable) {
             return $items->all();
         }
-        if ($items instanceof CInterface_Arrayable) {
+        if ($items instanceof Arrayable) {
             return $items->toArray();
         }
-        if ($items instanceof CInterface_Jsonable) {
+        if ($items instanceof Jsonable) {
             return json_decode($items->toJson(), true);
         }
         if ($items instanceof JsonSerializable) {
@@ -969,13 +956,13 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      * @return \Closure
      */
     protected function operatorForWhere($key, $operator = null, $value = null) {
-        if (func_num_args() === 1 || $operator === null) {
+        if (func_num_args() === 1) {
             $value = true;
 
             $operator = '=';
         }
 
-        if (func_num_args() === 2 || $value === null) {
+        if (func_num_args() === 2) {
             $value = $operator;
 
             $operator = '=';

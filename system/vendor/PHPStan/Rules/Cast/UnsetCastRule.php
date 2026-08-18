@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Cast;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -11,7 +12,8 @@ use PHPStan\Rules\RuleErrorBuilder;
 /**
  * @implements Rule<Node\Expr\Cast\Unset_>
  */
-class UnsetCastRule implements Rule
+#[RegisteredRule(level: 0)]
+final class UnsetCastRule implements Rule
 {
 
 	public function __construct(private PhpVersion $phpVersion)
@@ -30,7 +32,10 @@ class UnsetCastRule implements Rule
 		}
 
 		return [
-			RuleErrorBuilder::message('The (unset) cast is no longer supported in PHP 8.0 and later.')->nonIgnorable()->build(),
+			RuleErrorBuilder::message('The (unset) cast is no longer supported in PHP 8.0 and later.')
+				->identifier('cast.unset')
+				->nonIgnorable()
+				->build(),
 		];
 	}
 

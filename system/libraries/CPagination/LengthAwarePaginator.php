@@ -1,6 +1,9 @@
 <?php
 
-class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator implements Cinterface_Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Cinterface_Jsonable, CPagination_LengthAwarePaginatorInterface {
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
+
+class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Jsonable, CPagination_LengthAwarePaginatorInterface {
     /**
      * The total number of items before slicing.
      *
@@ -21,7 +24,7 @@ class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator imp
      * @param mixed    $items
      * @param int      $total
      * @param int      $perPage
-     * @param int|null $currentPage
+     * @param null|int $currentPage
      * @param array    $options     (path, query, fragment, pageName)
      *
      * @return void
@@ -118,7 +121,7 @@ class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator imp
     /**
      * Get the URL for the next page.
      *
-     * @return string|null
+     * @return null|string
      */
     public function nextPageUrl() {
         if ($this->lastPage() > $this->currentPage()) {
@@ -160,6 +163,7 @@ class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator imp
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->toArray();
     }

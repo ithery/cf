@@ -2,39 +2,68 @@
 
 namespace PHPStan\Reflection;
 
+use Closure;
+use Nette\Utils\Strings;
 use PhpParser\Node\Arg;
+use PhpParser\Node\ComplexType;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\BinaryOp;
+use PhpParser\Node\Expr\Cast\Array_;
+use PhpParser\Node\Expr\Cast\Bool_;
+use PhpParser\Node\Expr\Cast\Double;
+use PhpParser\Node\Expr\Cast\Object_;
+use PhpParser\Node\Expr\ClassConstFetch;
+use PhpParser\Node\Expr\ConstFetch;
+use PhpParser\Node\Expr\FuncCall;
+use PhpParser\Node\Expr\New_;
+use PhpParser\Node\Expr\PropertyFetch;
+use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
-use PhpParser\Node\Scalar\DNumber;
-use PhpParser\Node\Scalar\LNumber;
+use PhpParser\Node\Param;
+use PhpParser\Node\Scalar\Float_;
+use PhpParser\Node\Scalar\Int_;
 use PhpParser\Node\Scalar\MagicConst;
 use PhpParser\Node\Scalar\MagicConst\Dir;
 use PhpParser\Node\Scalar\MagicConst\File;
 use PhpParser\Node\Scalar\MagicConst\Line;
 use PhpParser\Node\Scalar\String_;
 use PHPStan\Analyser\ConstantResolver;
-use PHPStan\DependencyInjection\Type\OperatorTypeSpecifyingExtensionRegistryProvider;
+use PHPStan\Analyser\OutOfClassScope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Node\Expr\TypeExpr;
 use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDoc\Tag\TemplateTag;
+use PHPStan\Reflection\Callables\CallableParametersAcceptor;
+use PHPStan\Reflection\Callables\SimpleImpurePoint;
+use PHPStan\Reflection\Callables\SimpleThrowPoint;
+use PHPStan\Reflection\Native\NativeParameterReflection;
 use PHPStan\Reflection\ReflectionProvider\ReflectionProviderProvider;
 use PHPStan\ShouldNotHappenException;
+use PHPStan\TrinaryLogic;
 use PHPStan\Type\Accessory\AccessoryArrayListType;
 use PHPStan\Type\Accessory\AccessoryLiteralStringType;
+use PHPStan\Type\Accessory\AccessoryLowercaseStringType;
 use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
 use PHPStan\Type\Accessory\AccessoryNonFalsyStringType;
+use PHPStan\Type\Accessory\AccessoryNumericStringType;
+use PHPStan\Type\Accessory\AccessoryUppercaseStringType;
+use PHPStan\Type\Accessory\HasOffsetValueType;
 use PHPStan\Type\Accessory\NonEmptyArrayType;
 use PHPStan\Type\ArrayType;
 use PHPStan\Type\BenevolentUnionType;
 use PHPStan\Type\BooleanType;
+use PHPStan\Type\CallableAssertionsHelper;
 use PHPStan\Type\ClassStringType;
+use PHPStan\Type\ClosureType;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantArrayTypeBuilder;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantFloatType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\Constant\ConstantStringType;
+use PHPStan\Type\Constant\OversizedArrayBuilder;
 use PHPStan\Type\ConstantScalarType;
 use PHPStan\Type\ConstantTypeHelper;
 use PHPStan\Type\Enum\EnumCaseObjectType;
@@ -43,44 +72,78 @@ use PHPStan\Type\FloatType;
 use PHPStan\Type\GeneralizePrecision;
 use PHPStan\Type\Generic\GenericClassStringType;
 use PHPStan\Type\Generic\TemplateType;
+use PHPStan\Type\Generic\TemplateTypeMap;
+use PHPStan\Type\Generic\TemplateTypeVarianceMap;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntegerType;
 use PHPStan\Type\IntersectionType;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\NeverType;
+use PHPStan\Type\NonexistentParentClassType;
 use PHPStan\Type\NullType;
+use PHPStan\Type\ObjectShapeType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\ObjectWithoutClassType;
+use PHPStan\Type\OperatorTypeSpecifyingExtensionRegistry;
+use PHPStan\Type\ParserNodeTypeToPHPStanType;
 use PHPStan\Type\StaticType;
-use PHPStan\Type\StaticTypeFactory;
 use PHPStan\Type\StringType;
 use PHPStan\Type\ThisType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeTraverser;
+use PHPStan\Type\TypehintHelper;
+use PHPStan\Type\TypeResult;
 use PHPStan\Type\TypeUtils;
 use PHPStan\Type\TypeWithClassName;
+use PHPStan\Type\UnaryOperatorTypeSpecifyingExtensionRegistry;
 use PHPStan\Type\UnionType;
+use stdClass;
+use Throwable;
+use function array_key_exists;
 use function array_keys;
+use function array_map;
+use function array_merge;
+use function array_values;
+use function assert;
+use function ceil;
 use function count;
 use function dirname;
+use function floor;
 use function in_array;
+use function intval;
+use function is_finite;
 use function is_float;
 use function is_int;
+use function is_numeric;
+use function is_string;
 use function max;
+use function min;
 use function sprintf;
+use function str_starts_with;
 use function strtolower;
+use const INF;
 
-class InitializerExprTypeResolver
+#[AutowiredService]
+final class InitializerExprTypeResolver
 {
 
 	public const CALCULATE_SCALARS_LIMIT = 128;
+
+	/** @var array<string, true> */
+	private array $currentlyResolvingClassConstant = [];
+
+	/** @var array<string, Type> */
+	private array $classConstantValueTypeCache = [];
 
 	public function __construct(
 		private ConstantResolver $constantResolver,
 		private ReflectionProviderProvider $reflectionProviderProvider,
 		private PhpVersion $phpVersion,
-		private OperatorTypeSpecifyingExtensionRegistryProvider $operatorTypeSpecifyingExtensionRegistryProvider,
+		private OperatorTypeSpecifyingExtensionRegistry $operatorTypeSpecifyingExtensionRegistry,
+		private UnaryOperatorTypeSpecifyingExtensionRegistry $unaryOperatorTypeSpecifyingExtensionRegistry,
+		private OversizedArrayBuilder $oversizedArrayBuilder,
+		#[AutowiredParameter]
+		private bool $usePathConstantsAsConstantString,
 	)
 	{
 	}
@@ -91,16 +154,16 @@ class InitializerExprTypeResolver
 		if ($expr instanceof TypeExpr) {
 			return $expr->getExprType();
 		}
-		if ($expr instanceof LNumber) {
+		if ($expr instanceof Int_) {
 			return new ConstantIntegerType($expr->value);
 		}
-		if ($expr instanceof DNumber) {
+		if ($expr instanceof Float_) {
 			return new ConstantFloatType($expr->value);
 		}
 		if ($expr instanceof String_) {
 			return new ConstantStringType($expr->value);
 		}
-		if ($expr instanceof Expr\ConstFetch) {
+		if ($expr instanceof ConstFetch) {
 			$constName = (string) $expr->name;
 			$loweredConstName = strtolower($constName);
 			if ($loweredConstName === 'true') {
@@ -120,14 +183,22 @@ class InitializerExprTypeResolver
 		}
 		if ($expr instanceof File) {
 			$file = $context->getFile();
-			return $file !== null ? (new ConstantStringType($file))->generalize(GeneralizePrecision::moreSpecific()) : new StringType();
+			if ($file === null) {
+				return new StringType();
+			}
+			$stringType = new ConstantStringType($file);
+			return $this->usePathConstantsAsConstantString ? $stringType : $stringType->generalize(GeneralizePrecision::moreSpecific());
 		}
 		if ($expr instanceof Dir) {
 			$file = $context->getFile();
-			return $file !== null ? (new ConstantStringType(dirname($file)))->generalize(GeneralizePrecision::moreSpecific()) : new StringType();
+			if ($file === null) {
+				return new StringType();
+			}
+			$stringType = new ConstantStringType(dirname($file));
+			return $this->usePathConstantsAsConstantString ? $stringType : $stringType->generalize(GeneralizePrecision::moreSpecific());
 		}
 		if ($expr instanceof Line) {
-			return new ConstantIntegerType($expr->getLine());
+			return new ConstantIntegerType($expr->getStartLine());
 		}
 		if ($expr instanceof Expr\New_) {
 			if ($expr->class instanceof Name) {
@@ -139,16 +210,73 @@ class InitializerExprTypeResolver
 		if ($expr instanceof Expr\Array_) {
 			return $this->getArrayType($expr, fn (Expr $expr): Type => $this->getType($expr, $context));
 		}
+		if ($expr instanceof Expr\Cast) {
+			return $this->getCastType($expr, fn (Expr $expr): Type => $this->getType($expr, $context));
+		}
+		if ($expr instanceof Expr\CallLike && $expr->isFirstClassCallable()) {
+			return $this->getFirstClassCallableType($expr, $context, false);
+		}
+		if ($expr instanceof Expr\Closure && $expr->static) {
+			$parameters = [];
+			$isVariadic = false;
+			$firstOptionalParameterIndex = null;
+			foreach ($expr->params as $i => $param) {
+				$isOptionalCandidate = $param->default !== null || $param->variadic;
+
+				if ($isOptionalCandidate) {
+					if ($firstOptionalParameterIndex === null) {
+						$firstOptionalParameterIndex = $i;
+					}
+				} else {
+					$firstOptionalParameterIndex = null;
+				}
+			}
+
+			foreach ($expr->params as $i => $param) {
+				if ($param->variadic) {
+					$isVariadic = true;
+				}
+				if (!$param->var instanceof Variable || !is_string($param->var->name)) {
+					throw new ShouldNotHappenException();
+				}
+				$parameters[] = new NativeParameterReflection(
+					$param->var->name,
+					$firstOptionalParameterIndex !== null && $i >= $firstOptionalParameterIndex,
+					$this->getFunctionType($param->type, $this->isParameterValueNullable($param), false, $context),
+					$param->byRef
+						? PassedByReference::createCreatesNewVariable()
+						: PassedByReference::createNo(),
+					$param->variadic,
+					$param->default !== null ? $this->getType($param->default, $context) : null,
+				);
+			}
+
+			$returnType = new MixedType(false);
+			if ($expr->returnType !== null) {
+				$returnType = $this->getFunctionType($expr->returnType, false, false, $context);
+			}
+
+			return new ClosureType(
+				$parameters,
+				$returnType,
+				$isVariadic,
+				TemplateTypeMap::createEmpty(),
+				TemplateTypeMap::createEmpty(),
+				TemplateTypeVarianceMap::createEmpty(),
+				acceptsNamedArguments: TrinaryLogic::createYes(),
+				isStatic: TrinaryLogic::createYes(),
+			);
+		}
 		if ($expr instanceof Expr\ArrayDimFetch && $expr->dim !== null) {
 			$var = $this->getType($expr->var, $context);
 			$dim = $this->getType($expr->dim, $context);
 			return $var->getOffsetValueType($dim);
 		}
-		if ($expr instanceof Expr\ClassConstFetch && $expr->name instanceof Identifier) {
+		if ($expr instanceof ClassConstFetch && $expr->name instanceof Identifier) {
 			return $this->getClassConstFetchType($expr->class, $expr->name->toString(), $context->getClassName(), fn (Expr $expr): Type => $this->getType($expr, $context));
 		}
 		if ($expr instanceof Expr\UnaryPlus) {
-			return $this->getType($expr->expr, $context)->toNumber();
+			return $this->getUnaryPlusType($expr->expr, fn (Expr $expr): Type => $this->getType($expr, $context));
 		}
 		if ($expr instanceof Expr\UnaryMinus) {
 			return $this->getUnaryMinusType($expr->expr, fn (Expr $expr): Type => $this->getType($expr, $context));
@@ -161,11 +289,12 @@ class InitializerExprTypeResolver
 		}
 
 		if ($expr instanceof Expr\Ternary) {
-			$condType = $this->getType($expr->cond, $context);
 			$elseType = $this->getType($expr->else, $context);
 			if ($expr->if === null) {
+				$condType = $this->getType($expr->cond, $context);
+
 				return TypeCombinator::union(
-					TypeCombinator::remove($condType, StaticTypeFactory::falsey()),
+					TypeCombinator::removeFalsey($condType),
 					$elseType,
 				);
 			}
@@ -173,7 +302,7 @@ class InitializerExprTypeResolver
 			$ifType = $this->getType($expr->if, $context);
 
 			return TypeCombinator::union(
-				TypeCombinator::remove($ifType, StaticTypeFactory::falsey()),
+				TypeCombinator::removeFalsey($ifType),
 				$elseType,
 			);
 		}
@@ -267,7 +396,7 @@ class InitializerExprTypeResolver
 			return $this->resolveIdenticalType(
 				$this->getType($expr->left, $context),
 				$this->getType($expr->right, $context),
-			);
+			)->type;
 		}
 
 		if ($expr instanceof BinaryOp\NotIdentical) {
@@ -278,7 +407,7 @@ class InitializerExprTypeResolver
 			return $this->resolveEqualType(
 				$this->getType($expr->left, $context),
 				$this->getType($expr->right, $context),
-			);
+			)->type;
 		}
 
 		if ($expr instanceof BinaryOp\NotEqual) {
@@ -286,19 +415,19 @@ class InitializerExprTypeResolver
 		}
 
 		if ($expr instanceof Expr\BinaryOp\Smaller) {
-			return $this->getType($expr->left, $context)->isSmallerThan($this->getType($expr->right, $context))->toBooleanType();
+			return $this->getType($expr->left, $context)->isSmallerThan($this->getType($expr->right, $context), $this->phpVersion)->toBooleanType();
 		}
 
 		if ($expr instanceof Expr\BinaryOp\SmallerOrEqual) {
-			return $this->getType($expr->left, $context)->isSmallerThanOrEqual($this->getType($expr->right, $context))->toBooleanType();
+			return $this->getType($expr->left, $context)->isSmallerThanOrEqual($this->getType($expr->right, $context), $this->phpVersion)->toBooleanType();
 		}
 
 		if ($expr instanceof Expr\BinaryOp\Greater) {
-			return $this->getType($expr->right, $context)->isSmallerThan($this->getType($expr->left, $context))->toBooleanType();
+			return $this->getType($expr->right, $context)->isSmallerThan($this->getType($expr->left, $context), $this->phpVersion)->toBooleanType();
 		}
 
 		if ($expr instanceof Expr\BinaryOp\GreaterOrEqual) {
-			return $this->getType($expr->right, $context)->isSmallerThanOrEqual($this->getType($expr->left, $context))->toBooleanType();
+			return $this->getType($expr->right, $context)->isSmallerThanOrEqual($this->getType($expr->left, $context), $this->phpVersion)->toBooleanType();
 		}
 
 		if ($expr instanceof Expr\BinaryOp\LogicalXor) {
@@ -318,6 +447,13 @@ class InitializerExprTypeResolver
 		}
 
 		if ($expr instanceof MagicConst\Class_) {
+			if ($context->getTraitName() !== null) {
+				return new IntersectionType([
+					new ClassStringType(),
+					new AccessoryLiteralStringType(),
+				]);
+			}
+
 			if ($context->getClassName() === null) {
 				return new ConstantStringType('');
 			}
@@ -326,6 +462,13 @@ class InitializerExprTypeResolver
 		}
 
 		if ($expr instanceof MagicConst\Namespace_) {
+			if ($context->getTraitName() !== null) {
+				return new IntersectionType([
+					new StringType(),
+					new AccessoryLiteralStringType(),
+				]);
+			}
+
 			return new ConstantStringType($context->getNamespace() ?? '');
 		}
 
@@ -345,6 +488,24 @@ class InitializerExprTypeResolver
 			return new ConstantStringType($context->getTraitName(), true);
 		}
 
+		if ($expr instanceof MagicConst\Property) {
+			$contextProperty = $context->getProperty();
+			if ($contextProperty === null) {
+				return new ConstantStringType('');
+			}
+
+			return new ConstantStringType($contextProperty);
+		}
+
+		if ($expr instanceof PropertyFetch && $expr->name instanceof Identifier) {
+			$fetchedOnType = $this->getType($expr->var, $context);
+			if (!$fetchedOnType->hasInstanceProperty($expr->name->name)->yes()) {
+				return new ErrorType();
+			}
+
+			return $fetchedOnType->getInstanceProperty($expr->name->name, new OutOfClassScope())->getReadableType();
+		}
+
 		return new MixedType();
 	}
 
@@ -353,8 +514,16 @@ class InitializerExprTypeResolver
 	 */
 	public function getConcatType(Expr $left, Expr $right, callable $getTypeCallback): Type
 	{
-		$leftStringType = $getTypeCallback($left)->toString();
-		$rightStringType = $getTypeCallback($right)->toString();
+		$leftType = $getTypeCallback($left);
+		$rightType = $getTypeCallback($right);
+
+		return $this->resolveConcatType($leftType, $rightType);
+	}
+
+	public function resolveConcatType(Type $left, Type $right): Type
+	{
+		$leftStringType = $left->toString();
+		$rightStringType = $right->toString();
 		if (TypeCombinator::union(
 			$leftStringType,
 			$rightStringType,
@@ -374,34 +543,33 @@ class InitializerExprTypeResolver
 			return $leftStringType->append($rightStringType);
 		}
 
+		$leftConstantStrings = $leftStringType->getConstantStrings();
+		$rightConstantStrings = $rightStringType->getConstantStrings();
+		$combinedConstantStringsCount = count($leftConstantStrings) * count($rightConstantStrings);
+
 		// we limit the number of union-types for performance reasons
-		if ($leftStringType instanceof UnionType && count($leftStringType->getTypes()) <= 16 && $rightStringType instanceof ConstantStringType) {
-			$constantStrings = TypeUtils::getConstantStrings($leftStringType);
-			if (count($constantStrings) > 0) {
-				$strings = [];
-				foreach ($constantStrings as $constantString) {
-					if ($constantString->getValue() === '') {
-						$strings[] = $rightStringType;
+		if ($combinedConstantStringsCount > 0 && $combinedConstantStringsCount <= self::CALCULATE_SCALARS_LIMIT) {
+			$strings = [];
+
+			foreach ($leftConstantStrings as $leftConstantString) {
+				if ($leftConstantString->getValue() === '') {
+					$strings = array_merge($strings, $rightConstantStrings);
+
+					continue;
+				}
+
+				foreach ($rightConstantStrings as $rightConstantString) {
+					if ($rightConstantString->getValue() === '') {
+						$strings[] = $leftConstantString;
 
 						continue;
 					}
-					$strings[] = $constantString->append($rightStringType);
+
+					$strings[] = $leftConstantString->append($rightConstantString);
 				}
-				return TypeCombinator::union(...$strings);
 			}
-		}
-		if ($rightStringType instanceof UnionType && count($rightStringType->getTypes()) <= 16 && $leftStringType instanceof ConstantStringType) {
-			$constantStrings = TypeUtils::getConstantStrings($rightStringType);
-			if (count($constantStrings) > 0) {
-				$strings = [];
-				foreach ($constantStrings as $constantString) {
-					if ($constantString->getValue() === '') {
-						$strings[] = $leftStringType;
 
-						continue;
-					}
-					$strings[] = $leftStringType->append($constantString);
-				}
+			if (count($strings) > 0) {
 				return TypeCombinator::union(...$strings);
 			}
 		}
@@ -419,6 +587,44 @@ class InitializerExprTypeResolver
 			$accessoryTypes[] = new AccessoryLiteralStringType();
 		}
 
+		if ($leftStringType->isLowercaseString()->and($rightStringType->isLowercaseString())->yes()) {
+			$accessoryTypes[] = new AccessoryLowercaseStringType();
+		}
+
+		if ($leftStringType->isUppercaseString()->and($rightStringType->isUppercaseString())->yes()) {
+			$accessoryTypes[] = new AccessoryUppercaseStringType();
+		}
+
+		$leftNumericStringNonEmpty = TypeCombinator::remove($leftStringType, new ConstantStringType(''));
+		if ($leftNumericStringNonEmpty->isNumericString()->yes()) {
+			$validationCallback = $left->isInteger()->yes()
+				? static fn (string $value): bool => !str_starts_with($value, '-')
+				: static fn (string $value): bool => Strings::match($value, '#^\d+$#') !== null;
+
+			$allRightConstantsZeroOrMore = false;
+			foreach ($rightConstantStrings as $rightConstantString) {
+				if ($rightConstantString->getValue() === '') {
+					continue;
+				}
+
+				if (
+					!is_numeric($rightConstantString->getValue())
+					|| !$validationCallback($rightConstantString->getValue())
+				) {
+					$allRightConstantsZeroOrMore = false;
+					break;
+				}
+
+				$allRightConstantsZeroOrMore = true;
+			}
+
+			$zeroOrMoreInteger = IntegerRangeType::fromInterval(0, null);
+			$nonNegativeRight = $allRightConstantsZeroOrMore || $zeroOrMoreInteger->isSuperTypeOf($right)->yes();
+			if ($nonNegativeRight) {
+				$accessoryTypes[] = new AccessoryNumericStringType();
+			}
+		}
+
 		if (count($accessoryTypes) > 0) {
 			$accessoryTypes[] = new StringType();
 			return new IntersectionType($accessoryTypes);
@@ -432,32 +638,38 @@ class InitializerExprTypeResolver
 	 */
 	public function getArrayType(Expr\Array_ $expr, callable $getTypeCallback): Type
 	{
-		$arrayBuilder = ConstantArrayTypeBuilder::createEmpty();
 		if (count($expr->items) > ConstantArrayTypeBuilder::ARRAY_COUNT_LIMIT) {
-			$arrayBuilder->degradeToGeneralArray();
+			return $this->oversizedArrayBuilder->build($expr, $getTypeCallback);
 		}
-		$isList = null;
-		foreach ($expr->items as $arrayItem) {
-			if ($arrayItem === null) {
-				continue;
-			}
 
+		$arrayBuilder = ConstantArrayTypeBuilder::createEmpty();
+		$isList = null;
+		$hasOffsetValueTypes = [];
+		foreach ($expr->items as $arrayItem) {
 			$valueType = $getTypeCallback($arrayItem->value);
 			if ($arrayItem->unpack) {
-				if ($valueType instanceof ConstantArrayType) {
+				$constantArrays = $valueType->getConstantArrays();
+				if (count($constantArrays) === 1) {
+					$constantArrayType = $constantArrays[0];
+
 					$hasStringKey = false;
-					foreach ($valueType->getKeyTypes() as $keyType) {
-						if ($keyType instanceof ConstantStringType) {
-							$hasStringKey = true;
-							break;
+					if ($this->phpVersion->supportsArrayUnpackingWithStringKeys()) {
+						foreach ($constantArrayType->getKeyTypes() as $keyType) {
+							if ($keyType->isString()->yes()) {
+								$hasStringKey = true;
+								break;
+							}
 						}
 					}
 
-					foreach ($valueType->getValueTypes() as $i => $innerValueType) {
-						if ($hasStringKey && $this->phpVersion->supportsArrayUnpackingWithStringKeys()) {
-							$arrayBuilder->setOffsetValueType($valueType->getKeyTypes()[$i], $innerValueType, $valueType->isOptionalKey($i));
+					foreach ($constantArrayType->getValueTypes() as $i => $innerValueType) {
+						if ($hasStringKey) {
+							$arrayBuilder->setOffsetValueType($constantArrayType->getKeyTypes()[$i], $innerValueType, $constantArrayType->isOptionalKey($i));
+							if (!$constantArrayType->isOptionalKey($i)) {
+								$hasOffsetValueTypes[$constantArrayType->getKeyTypes()[$i]->getValue()] = new HasOffsetValueType($constantArrayType->getKeyTypes()[$i], $innerValueType);
+							}
 						} else {
-							$arrayBuilder->setOffsetValueType(null, $innerValueType, $valueType->isOptionalKey($i));
+							$arrayBuilder->setOffsetValueType(null, $innerValueType, $constantArrayType->isOptionalKey($i));
 						}
 					}
 				} else {
@@ -466,6 +678,14 @@ class InitializerExprTypeResolver
 					if ($this->phpVersion->supportsArrayUnpackingWithStringKeys() && !$valueType->getIterableKeyType()->isString()->no()) {
 						$isList = false;
 						$offsetType = $valueType->getIterableKeyType();
+
+						foreach ($hasOffsetValueTypes as $key => $hasOffsetValueType) {
+							if (!$offsetType->isSuperTypeOf($hasOffsetValueType->getOffsetType())->yes()) {
+								continue;
+							}
+
+							unset($hasOffsetValueTypes[$key]);
+						}
 					} else {
 						$isList ??= $arrayBuilder->isList();
 						$offsetType = new IntegerType();
@@ -483,10 +703,299 @@ class InitializerExprTypeResolver
 
 		$arrayType = $arrayBuilder->getArray();
 		if ($isList === true) {
-			return AccessoryArrayListType::intersectWith($arrayType);
+			$arrayType = TypeCombinator::intersect($arrayType, new AccessoryArrayListType());
+		}
+
+		if (count($hasOffsetValueTypes) > 0 && !$arrayType->isConstantArray()->yes()) {
+			$arrayType = TypeCombinator::intersect($arrayType, ...array_values($hasOffsetValueTypes));
 		}
 
 		return $arrayType;
+	}
+
+	/**
+	 * @param callable(Expr): Type $getTypeCallback
+	 */
+	public function getCastType(Expr\Cast $expr, callable $getTypeCallback): Type
+	{
+		if ($expr instanceof \PhpParser\Node\Expr\Cast\Int_) {
+			return $getTypeCallback($expr->expr)->toInteger();
+		}
+		if ($expr instanceof Bool_) {
+			return $getTypeCallback($expr->expr)->toBoolean();
+		}
+		if ($expr instanceof Double) {
+			return $getTypeCallback($expr->expr)->toFloat();
+		}
+		if ($expr instanceof \PhpParser\Node\Expr\Cast\String_) {
+			return $getTypeCallback($expr->expr)->toString();
+		}
+		if ($expr instanceof Array_) {
+			return $getTypeCallback($expr->expr)->toArray();
+		}
+		if ($expr instanceof Object_) {
+			return $this->getCastObjectType($getTypeCallback($expr->expr));
+		}
+
+		return new MixedType();
+	}
+
+	public function getCastObjectType(Type $exprType): Type
+	{
+		$castToObject = static function (Type $type): Type {
+			$constantArrays = $type->getConstantArrays();
+			if (count($constantArrays) > 0) {
+				$objects = [];
+				foreach ($constantArrays as $constantArray) {
+					$properties = [];
+					$optionalProperties = [];
+					foreach ($constantArray->getKeyTypes() as $i => $keyType) {
+						$valueType = $constantArray->getValueTypes()[$i];
+						$optional = $constantArray->isOptionalKey($i);
+						if ($optional) {
+							$optionalProperties[] = $keyType->getValue();
+						}
+						$properties[$keyType->getValue()] = $valueType;
+					}
+
+					$objects[] = new IntersectionType([new ObjectShapeType($properties, $optionalProperties), new ObjectType(stdClass::class)]);
+				}
+
+				return TypeCombinator::union(...$objects);
+			}
+			if ($type->isObject()->yes()) {
+				return $type;
+			}
+
+			return new ObjectType('stdClass');
+		};
+
+		if ($exprType instanceof UnionType) {
+			return TypeCombinator::union(...array_map($castToObject, $exprType->getTypes()));
+		}
+
+		return $castToObject($exprType);
+	}
+
+	/**
+	 * @param Name|Identifier|ComplexType|null $type
+	 */
+	public function getFunctionType($type, bool $isNullable, bool $isVariadic, InitializerExprContext $context): Type
+	{
+		if ($isNullable) {
+			return TypeCombinator::addNull(
+				$this->getFunctionType($type, false, $isVariadic, $context),
+			);
+		}
+		if ($isVariadic) {
+			if ($this->phpVersion->supportsNamedArguments()) {
+				return new ArrayType(new UnionType([IntegerRangeType::createAllGreaterThanOrEqualTo(0), new StringType()]), $this->getFunctionType(
+					$type,
+					false,
+					false,
+					$context,
+				));
+			}
+
+			return new IntersectionType([new ArrayType(IntegerRangeType::createAllGreaterThanOrEqualTo(0), $this->getFunctionType(
+				$type,
+				false,
+				false,
+				$context,
+			)), new AccessoryArrayListType()]);
+		}
+
+		if ($type instanceof Name) {
+			$className = (string) $type;
+			$lowercasedClassName = strtolower($className);
+			if ($lowercasedClassName === 'parent') {
+				$classReflection = null;
+				if ($context->getClassName() !== null && $this->getReflectionProvider()->hasClass($context->getClassName())) {
+					$classReflection = $this->getReflectionProvider()->getClass($context->getClassName());
+				}
+				if ($classReflection !== null && $classReflection->getParentClass() !== null) {
+					return new ObjectType($classReflection->getParentClass()->getName());
+				}
+
+				return new NonexistentParentClassType();
+			}
+		}
+
+		$classReflection = null;
+		if ($context->getClassName() !== null && $this->getReflectionProvider()->hasClass($context->getClassName())) {
+			$classReflection = $this->getReflectionProvider()->getClass($context->getClassName());
+		}
+
+		return ParserNodeTypeToPHPStanType::resolve($type, $classReflection);
+	}
+
+	private function isParameterValueNullable(Param $parameter): bool
+	{
+		if ($parameter->default instanceof ConstFetch) {
+			return strtolower((string) $parameter->default->name) === 'null';
+		}
+
+		return false;
+	}
+
+	public function getFirstClassCallableType(Expr\CallLike $expr, InitializerExprContext $context, bool $nativeTypesPromoted): Type
+	{
+		if ($expr instanceof FuncCall) {
+			if ($expr->name instanceof Name) {
+				if ($this->getReflectionProvider()->hasFunction($expr->name, $context)) {
+					$function = $this->getReflectionProvider()->getFunction($expr->name, $context);
+					return $this->createFirstClassCallable(
+						$function,
+						$function->getVariants(),
+						$nativeTypesPromoted,
+					);
+				}
+
+				return new ObjectType(Closure::class);
+			}
+		}
+
+		if ($expr instanceof Expr\StaticCall) {
+			if (!$expr->class instanceof Name) {
+				return new ObjectType(Closure::class);
+			}
+
+			if (!$expr->name instanceof Identifier) {
+				return new ObjectType(Closure::class);
+			}
+
+			$classReflection = null;
+			if ($context->getClassName() !== null && $this->getReflectionProvider()->hasClass($context->getClassName())) {
+				$classReflection = $this->getReflectionProvider()->getClass($context->getClassName());
+			}
+
+			$classType = $this->resolveTypeByName($expr->class, $classReflection);
+			$methodName = $expr->name->toString();
+			if (!$classType->hasMethod($methodName)->yes()) {
+				return new ObjectType(Closure::class);
+			}
+
+			$method = $classType->getMethod($methodName, new OutOfClassScope());
+			$classType = $this->resolveTypeByNameWithLateStaticBinding($expr->class, $classType, $method);
+			if (!$classType->hasMethod($methodName)->yes()) {
+				return new ObjectType(Closure::class);
+			}
+			$method = $classType->getMethod($methodName, new OutOfClassScope());
+
+			return $this->createFirstClassCallable(
+				$method,
+				$method->getVariants(),
+				$nativeTypesPromoted,
+			);
+		}
+
+		if ($expr instanceof New_) {
+			return new ErrorType();
+		}
+
+		throw new ShouldNotHappenException();
+	}
+
+	/**
+	 * @param ParametersAcceptor[] $variants
+	 */
+	public function createFirstClassCallable(
+		FunctionReflection|ExtendedMethodReflection|null $function,
+		array $variants,
+		bool $nativeTypesPromoted,
+	): Type
+	{
+		$closureTypes = [];
+
+		foreach ($variants as $variant) {
+			$returnType = $variant->getReturnType();
+			if ($variant instanceof ExtendedParametersAcceptor) {
+				$returnType = $nativeTypesPromoted ? $variant->getNativeReturnType() : $returnType;
+			}
+
+			$templateTags = [];
+			foreach ($variant->getTemplateTypeMap()->getTypes() as $templateType) {
+				if (!$templateType instanceof TemplateType) {
+					continue;
+				}
+				$templateTags[$templateType->getName()] = new TemplateTag(
+					$templateType->getName(),
+					$templateType->getBound(),
+					$templateType->getDefault(),
+					$templateType->getVariance(),
+				);
+			}
+
+			$throwPoints = [];
+			$impurePoints = [];
+			$acceptsNamedArguments = TrinaryLogic::createYes();
+			$mustUseReturnValue = TrinaryLogic::createMaybe();
+			$isStaticClosure = TrinaryLogic::createMaybe();
+			if ($variant instanceof CallableParametersAcceptor) {
+				$throwPoints = $variant->getThrowPoints();
+				$impurePoints = $variant->getImpurePoints();
+				$acceptsNamedArguments = $variant->acceptsNamedArguments();
+				$mustUseReturnValue = $variant->mustUseReturnValue();
+				$isStaticClosure = $variant->isStaticClosure();
+			} elseif ($function !== null) {
+				$returnTypeForThrow = $variant->getReturnType();
+				$throwType = $function->getThrowType();
+				if ($throwType === null) {
+					if ($returnTypeForThrow instanceof NeverType && $returnTypeForThrow->isExplicit()) {
+						$throwType = new ObjectType(Throwable::class);
+					}
+				}
+
+				if ($throwType !== null) {
+					if (!$throwType->isVoid()->yes()) {
+						$throwPoints[] = SimpleThrowPoint::createExplicit($throwType, true);
+					}
+				} else {
+					if (!(new ObjectType(Throwable::class))->isSuperTypeOf($returnTypeForThrow)->yes()) {
+						$throwPoints[] = SimpleThrowPoint::createImplicit();
+					}
+				}
+
+				$impurePoint = SimpleImpurePoint::createFromVariant($function, $variant);
+				if ($impurePoint !== null) {
+					$impurePoints[] = $impurePoint;
+				}
+
+				$acceptsNamedArguments = $function->acceptsNamedArguments();
+				$mustUseReturnValue = $function->mustUseReturnValue();
+			}
+
+			$parameters = $variant->getParameters();
+			if ($function !== null) {
+				$assertions = $function->getAsserts();
+			} elseif ($variant instanceof CallableParametersAcceptor) {
+				$assertions = $variant->getAsserts();
+			} else {
+				$assertions = Assertions::createEmpty();
+			}
+
+			// a conditional return type referencing the function's own parameter,
+			// like @return ($value is int ? true : false) on is_int(),
+			// also becomes a type predicate of the resulting Closure
+			$assertions = CallableAssertionsHelper::withConditionalReturnPredicate($assertions, $variant);
+			$closureTypes[] = new ClosureType(
+				$parameters,
+				$returnType,
+				$variant->isVariadic(),
+				$variant->getTemplateTypeMap(),
+				$variant->getResolvedTemplateTypeMap(),
+				$variant instanceof ExtendedParametersAcceptor ? $variant->getCallSiteVarianceMap() : TemplateTypeVarianceMap::createEmpty(),
+				$templateTags,
+				$throwPoints,
+				$impurePoints,
+				acceptsNamedArguments: $acceptsNamedArguments,
+				mustUseReturnValue: $mustUseReturnValue,
+				assertions: $assertions,
+				isStatic: $isStaticClosure,
+			);
+		}
+
+		return TypeCombinator::union(...$closureTypes);
 	}
 
 	/**
@@ -497,46 +1006,38 @@ class InitializerExprTypeResolver
 		$leftType = $getTypeCallback($left);
 		$rightType = $getTypeCallback($right);
 
+		$specifiedTypes = $this->operatorTypeSpecifyingExtensionRegistry
+			->callOperatorTypeSpecifyingExtensions(new BinaryOp\BitwiseAnd($left, $right), $leftType, $rightType);
+		if ($specifiedTypes !== null) {
+			return $specifiedTypes;
+		}
+
 		if ($leftType instanceof NeverType || $rightType instanceof NeverType) {
-			return new NeverType();
+			return $this->getNeverType($leftType, $rightType);
 		}
 
-		$leftTypes = TypeUtils::getConstantScalars($leftType);
-		$rightTypes = TypeUtils::getConstantScalars($rightType);
-		$leftTypesCount = count($leftTypes);
-		$rightTypesCount = count($rightTypes);
-		if ($leftTypesCount > 0 && $rightTypesCount > 0) {
-			$resultTypes = [];
-			$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
-			foreach ($leftTypes as $leftTypeInner) {
-				foreach ($rightTypes as $rightTypeInner) {
-					if ($leftTypeInner instanceof ConstantStringType && $rightTypeInner instanceof ConstantStringType) {
-						$resultType = $this->getTypeFromValue($leftTypeInner->getValue() & $rightTypeInner->getValue());
-					} else {
-						$leftNumberType = $leftTypeInner->toNumber();
-						$rightNumberType = $rightTypeInner->toNumber();
-
-						if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
-							return new ErrorType();
-						}
-
-						if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
-							throw new ShouldNotHappenException();
-						}
-
-						$resultType = $this->getTypeFromValue($leftNumberType->getValue() & $rightNumberType->getValue());
-					}
-					if ($generalize) {
-						$resultType = $resultType->generalize(GeneralizePrecision::lessSpecific());
-					}
-					$resultTypes[] = $resultType;
-				}
-			}
-			return TypeCombinator::union(...$resultTypes);
+		$result = $this->getFiniteOrConstantScalarTypes($leftType, $rightType, static fn ($a, $b) => $a & $b);
+		if ($result instanceof Type) {
+			return $result;
+		} elseif ($result === self::IS_SCALAR_TYPE) {
+			$leftType = $this->optimizeScalarType($leftType);
+			$rightType = $this->optimizeScalarType($rightType);
 		}
 
-		if ($leftType->isString()->yes() && $rightType->isString()->yes()) {
+		if ($leftType instanceof MixedType && $rightType instanceof MixedType) {
+			return new BenevolentUnionType([new IntegerType(), new StringType()]);
+		}
+
+		$leftIsString = $leftType->isString();
+		$rightIsString = $rightType->isString();
+		if (
+			($leftIsString->yes() || $leftType instanceof MixedType)
+			&& ($rightIsString->yes() || $rightType instanceof MixedType)
+		) {
 			return new StringType();
+		}
+		if ($leftIsString->maybe() && $rightIsString->maybe()) {
+			return new ErrorType();
 		}
 
 		$leftNumberType = $leftType->toNumber();
@@ -564,49 +1065,41 @@ class InitializerExprTypeResolver
 		$leftType = $getTypeCallback($left);
 		$rightType = $getTypeCallback($right);
 
+		$specifiedTypes = $this->operatorTypeSpecifyingExtensionRegistry
+			->callOperatorTypeSpecifyingExtensions(new BinaryOp\BitwiseOr($left, $right), $leftType, $rightType);
+		if ($specifiedTypes !== null) {
+			return $specifiedTypes;
+		}
+
 		if ($leftType instanceof NeverType || $rightType instanceof NeverType) {
-			return new NeverType();
+			return $this->getNeverType($leftType, $rightType);
 		}
 
-		$leftTypes = TypeUtils::getConstantScalars($leftType);
-		$rightTypes = TypeUtils::getConstantScalars($rightType);
-		$leftTypesCount = count($leftTypes);
-		$rightTypesCount = count($rightTypes);
-		if ($leftTypesCount > 0 && $rightTypesCount > 0) {
-			$resultTypes = [];
-			$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
-			foreach ($leftTypes as $leftTypeInner) {
-				foreach ($rightTypes as $rightTypeInner) {
-					if ($leftTypeInner instanceof ConstantStringType && $rightTypeInner instanceof ConstantStringType) {
-						$resultType = $this->getTypeFromValue($leftTypeInner->getValue() | $rightTypeInner->getValue());
-					} else {
-						$leftNumberType = $leftTypeInner->toNumber();
-						$rightNumberType = $rightTypeInner->toNumber();
-
-						if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
-							return new ErrorType();
-						}
-
-						if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
-							throw new ShouldNotHappenException();
-						}
-
-						$resultType = $this->getTypeFromValue($leftNumberType->getValue() | $rightNumberType->getValue());
-					}
-					if ($generalize) {
-						$resultType = $resultType->generalize(GeneralizePrecision::lessSpecific());
-					}
-					$resultTypes[] = $resultType;
-				}
-			}
-			return TypeCombinator::union(...$resultTypes);
+		$result = $this->getFiniteOrConstantScalarTypes($leftType, $rightType, static fn ($a, $b) => $a | $b);
+		if ($result instanceof Type) {
+			return $result;
+		} elseif ($result === self::IS_SCALAR_TYPE) {
+			$leftType = $this->optimizeScalarType($leftType);
+			$rightType = $this->optimizeScalarType($rightType);
 		}
 
-		if ($leftType->isString()->yes() && $rightType->isString()->yes()) {
+		if ($leftType instanceof MixedType && $rightType instanceof MixedType) {
+			return new BenevolentUnionType([new IntegerType(), new StringType()]);
+		}
+
+		$leftIsString = $leftType->isString();
+		$rightIsString = $rightType->isString();
+		if (
+			($leftIsString->yes() || $leftType instanceof MixedType)
+			&& ($rightIsString->yes() || $rightType instanceof MixedType)
+		) {
 			return new StringType();
 		}
+		if ($leftIsString->maybe() && $rightIsString->maybe()) {
+			return new ErrorType();
+		}
 
-		if (TypeCombinator::union($leftType->toNumber(), $rightType->toNumber()) instanceof ErrorType) {
+		if ($leftType->toNumber() instanceof ErrorType || $rightType->toNumber() instanceof ErrorType) {
 			return new ErrorType();
 		}
 
@@ -621,53 +1114,105 @@ class InitializerExprTypeResolver
 		$leftType = $getTypeCallback($left);
 		$rightType = $getTypeCallback($right);
 
+		$specifiedTypes = $this->operatorTypeSpecifyingExtensionRegistry
+			->callOperatorTypeSpecifyingExtensions(new BinaryOp\BitwiseXor($left, $right), $leftType, $rightType);
+		if ($specifiedTypes !== null) {
+			return $specifiedTypes;
+		}
+
 		if ($leftType instanceof NeverType || $rightType instanceof NeverType) {
-			return new NeverType();
+			return $this->getNeverType($leftType, $rightType);
 		}
 
-		$leftTypes = TypeUtils::getConstantScalars($leftType);
-		$rightTypes = TypeUtils::getConstantScalars($rightType);
-		$leftTypesCount = count($leftTypes);
-		$rightTypesCount = count($rightTypes);
-		if ($leftTypesCount > 0 && $rightTypesCount > 0) {
-			$resultTypes = [];
-			$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
-			foreach ($leftTypes as $leftTypeInner) {
-				foreach ($rightTypes as $rightTypeInner) {
-					if ($leftTypeInner instanceof ConstantStringType && $rightTypeInner instanceof ConstantStringType) {
-						$resultType = $this->getTypeFromValue($leftTypeInner->getValue() ^ $rightTypeInner->getValue());
-					} else {
-						$leftNumberType = $leftTypeInner->toNumber();
-						$rightNumberType = $rightTypeInner->toNumber();
-
-						if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
-							return new ErrorType();
-						}
-
-						if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
-							throw new ShouldNotHappenException();
-						}
-
-						$resultType = $this->getTypeFromValue($leftNumberType->getValue() ^ $rightNumberType->getValue());
-					}
-					if ($generalize) {
-						$resultType = $resultType->generalize(GeneralizePrecision::lessSpecific());
-					}
-					$resultTypes[] = $resultType;
-				}
-			}
-			return TypeCombinator::union(...$resultTypes);
+		$result = $this->getFiniteOrConstantScalarTypes($leftType, $rightType, static fn ($a, $b) => $a ^ $b);
+		if ($result instanceof Type) {
+			return $result;
+		} elseif ($result === self::IS_SCALAR_TYPE) {
+			$leftType = $this->optimizeScalarType($leftType);
+			$rightType = $this->optimizeScalarType($rightType);
 		}
 
-		if ($leftType->isString()->yes() && $rightType->isString()->yes()) {
+		if ($leftType instanceof MixedType && $rightType instanceof MixedType) {
+			return new BenevolentUnionType([new IntegerType(), new StringType()]);
+		}
+
+		$leftIsString = $leftType->isString();
+		$rightIsString = $rightType->isString();
+		if (
+			($leftIsString->yes() || $leftType instanceof MixedType)
+			&& ($rightIsString->yes() || $rightType instanceof MixedType)
+		) {
 			return new StringType();
 		}
+		if ($leftIsString->maybe() && $rightIsString->maybe()) {
+			return new ErrorType();
+		}
 
-		if (TypeCombinator::union($leftType->toNumber(), $rightType->toNumber()) instanceof ErrorType) {
+		if ($leftType->toNumber() instanceof ErrorType || $rightType->toNumber() instanceof ErrorType) {
 			return new ErrorType();
 		}
 
 		return new IntegerType();
+	}
+
+	private const IS_SCALAR_TYPE = 1;
+	private const IS_UNKNOWN = 2;
+
+	/**
+	 * @param callable(bool|float|int|string|null, bool|float|int|string|null):string $operationCallable
+	 *
+	 * @return self::IS_UNKNOWN|self::IS_SCALAR_TYPE|Type
+	 */
+	private function getFiniteOrConstantScalarTypes(Type $leftType, Type $rightType, callable $operationCallable): int|Type
+	{
+		if ($leftType instanceof IntegerRangeType) {
+			$leftTypes = $leftType->getFiniteTypes();
+		} else {
+			$leftTypes = $leftType->getConstantScalarTypes();
+		}
+		if ($rightType instanceof IntegerRangeType) {
+			$rightTypes = $rightType->getFiniteTypes();
+		} else {
+			$rightTypes = $rightType->getConstantScalarTypes();
+		}
+
+		$leftTypesCount = count($leftTypes);
+		$rightTypesCount = count($rightTypes);
+
+		if ($leftTypesCount === 0 || $rightTypesCount === 0) {
+			return self::IS_UNKNOWN;
+		}
+
+		$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
+		if ($generalize) {
+			return self::IS_SCALAR_TYPE;
+		}
+
+		$resultTypes = [];
+		foreach ($leftTypes as $leftTypeInner) {
+			foreach ($rightTypes as $rightTypeInner) {
+				if ($leftTypeInner instanceof ConstantStringType && $rightTypeInner instanceof ConstantStringType) {
+					$resultValue = $operationCallable($leftTypeInner->getValue(), $rightTypeInner->getValue());
+					$resultType = $this->getTypeFromValue($resultValue);
+				} else {
+					$leftNumberType = $leftTypeInner->toNumber();
+					$rightNumberType = $rightTypeInner->toNumber();
+
+					if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
+						return new ErrorType();
+					}
+
+					if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
+						throw new ShouldNotHappenException();
+					}
+
+					$resultValue = $operationCallable($leftNumberType->getValue(), $rightNumberType->getValue());
+					$resultType = $this->getTypeFromValue($resultValue);
+				}
+				$resultTypes[] = $resultType;
+			}
+		}
+		return TypeCombinator::union(...$resultTypes);
 	}
 
 	/**
@@ -675,29 +1220,23 @@ class InitializerExprTypeResolver
 	 */
 	public function getSpaceshipType(Expr $left, Expr $right, callable $getTypeCallback): Type
 	{
-		$callbackLeftType = $getTypeCallback($left);
-		$callbackRightType = $getTypeCallback($right);
+		$leftTypes = $getTypeCallback($left);
+		$rightTypes = $getTypeCallback($right);
 
-		if ($callbackLeftType instanceof NeverType || $callbackRightType instanceof NeverType) {
-			return new NeverType();
+		if ($leftTypes instanceof NeverType || $rightTypes instanceof NeverType) {
+			return $this->getNeverType($leftTypes, $rightTypes);
 		}
 
-		$leftTypes = TypeUtils::getConstantScalars($callbackLeftType);
-		$rightTypes = TypeUtils::getConstantScalars($callbackRightType);
+		$leftValues = $leftTypes->getConstantScalarValues();
+		$rightValues = $rightTypes->getConstantScalarValues();
 
-		$leftTypesCount = count($leftTypes);
-		$rightTypesCount = count($rightTypes);
-		if ($leftTypesCount > 0 && $rightTypesCount > 0) {
+		$leftValuesCount = count($leftValues);
+		$rightValuesCount = count($rightValues);
+		if ($leftValuesCount > 0 && $rightValuesCount > 0 && $leftValuesCount * $rightValuesCount <= self::CALCULATE_SCALARS_LIMIT) {
 			$resultTypes = [];
-			$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
-			foreach ($leftTypes as $leftType) {
-				foreach ($rightTypes as $rightType) {
-					$leftValue = $leftType->getValue();
-					$rightValue = $rightType->getValue();
+			foreach ($leftValues as $leftValue) {
+				foreach ($rightValues as $rightValue) {
 					$resultType = $this->getTypeFromValue($leftValue <=> $rightValue);
-					if ($generalize) {
-						$resultType = $resultType->generalize(GeneralizePrecision::lessSpecific());
-					}
 					$resultTypes[] = $resultType;
 				}
 			}
@@ -715,47 +1254,59 @@ class InitializerExprTypeResolver
 		$leftType = $getTypeCallback($left);
 		$rightType = $getTypeCallback($right);
 
-		$leftTypes = TypeUtils::getConstantScalars($leftType);
-		$rightTypes = TypeUtils::getConstantScalars($rightType);
+		$result = $this->getDivTypeFromTypes($left, $right, $leftType, $rightType);
+
+		if ($leftType->isInteger()->yes() && $rightType->isInteger()->yes()) {
+			$modType = $getTypeCallback(new BinaryOp\Mod($left, $right));
+			if ($modType->isInteger()->yes() && (new ConstantIntegerType(0))->isSuperTypeOf($modType)->yes()) {
+				return TypeCombinator::remove($result, new FloatType());
+			}
+		}
+
+		return $result;
+	}
+
+	private function getDivTypeFromTypes(Expr $left, Expr $right, Type $leftType, Type $rightType): Type
+	{
+		$leftTypes = $leftType->getConstantScalarTypes();
+		$rightTypes = $rightType->getConstantScalarTypes();
 		$leftTypesCount = count($leftTypes);
 		$rightTypesCount = count($rightTypes);
 		if ($leftTypesCount > 0 && $rightTypesCount > 0) {
 			$resultTypes = [];
 			$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
-			foreach ($leftTypes as $leftTypeInner) {
-				foreach ($rightTypes as $rightTypeInner) {
-					$leftNumberType = $leftTypeInner->toNumber();
-					$rightNumberType = $rightTypeInner->toNumber();
+			if (!$generalize) {
+				foreach ($leftTypes as $leftTypeInner) {
+					foreach ($rightTypes as $rightTypeInner) {
+						$leftNumberType = $leftTypeInner->toNumber();
+						$rightNumberType = $rightTypeInner->toNumber();
 
-					if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
-						return new ErrorType();
-					}
+						if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
+							return new ErrorType();
+						}
 
-					if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
-						throw new ShouldNotHappenException();
-					}
+						if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
+							throw new ShouldNotHappenException();
+						}
 
-					if ($rightNumberType->getValue() === 0 || $rightNumberType->getValue() === 0.0) {
-						return new ErrorType();
-					}
+						if (in_array($rightNumberType->getValue(), [0, 0.0], true)) {
+							return new ErrorType();
+						}
 
-					$resultType = $this->getTypeFromValue($leftNumberType->getValue() / $rightNumberType->getValue()); // @phpstan-ignore-line
-					if ($generalize) {
-						$resultType = $resultType->generalize(GeneralizePrecision::lessSpecific());
+						$resultType = $this->getTypeFromValue($leftNumberType->getValue() / $rightNumberType->getValue()); // @phpstan-ignore binaryOp.invalid
+						$resultTypes[] = $resultType;
 					}
-					$resultTypes[] = $resultType;
 				}
+				return TypeCombinator::union(...$resultTypes);
 			}
-			return TypeCombinator::union(...$resultTypes);
+
+			$leftType = $this->optimizeScalarType($leftType);
+			$rightType = $this->optimizeScalarType($rightType);
 		}
 
-		$rightScalarTypes = TypeUtils::getConstantScalars($rightType->toNumber());
-		foreach ($rightScalarTypes as $scalarType) {
-
-			if (
-				$scalarType->getValue() === 0
-				|| $scalarType->getValue() === 0.0
-			) {
+		$rightScalarValues = $rightType->toNumber()->getConstantScalarValues();
+		foreach ($rightScalarValues as $scalarValue) {
+			if (in_array($scalarValue, [0, 0.0], true)) {
 				return new ErrorType();
 			}
 		}
@@ -772,42 +1323,54 @@ class InitializerExprTypeResolver
 		$rightType = $getTypeCallback($right);
 
 		if ($leftType instanceof NeverType || $rightType instanceof NeverType) {
-			return new NeverType();
+			return $this->getNeverType($leftType, $rightType);
 		}
 
-		$leftTypes = TypeUtils::getConstantScalars($leftType);
-		$rightTypes = TypeUtils::getConstantScalars($rightType);
+		$extensionSpecified = $this->operatorTypeSpecifyingExtensionRegistry
+			->callOperatorTypeSpecifyingExtensions(new BinaryOp\Mod($left, $right), $leftType, $rightType);
+		if ($extensionSpecified !== null) {
+			return $extensionSpecified;
+		}
+
+		if ($leftType->toNumber() instanceof ErrorType || $rightType->toNumber() instanceof ErrorType) {
+			return new ErrorType();
+		}
+
+		$leftTypes = $leftType->getConstantScalarTypes();
+		$rightTypes = $rightType->getConstantScalarTypes();
 		$leftTypesCount = count($leftTypes);
 		$rightTypesCount = count($rightTypes);
 		if ($leftTypesCount > 0 && $rightTypesCount > 0) {
 			$resultTypes = [];
 			$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
-			foreach ($leftTypes as $leftTypeInner) {
-				foreach ($rightTypes as $rightTypeInner) {
-					$leftNumberType = $leftTypeInner->toNumber();
-					$rightNumberType = $rightTypeInner->toNumber();
+			if (!$generalize) {
+				foreach ($leftTypes as $leftTypeInner) {
+					foreach ($rightTypes as $rightTypeInner) {
+						$leftNumberType = $leftTypeInner->toNumber();
+						$rightNumberType = $rightTypeInner->toNumber();
 
-					if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
-						return new ErrorType();
-					}
+						if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
+							return new ErrorType();
+						}
 
-					if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
-						throw new ShouldNotHappenException();
-					}
+						if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
+							throw new ShouldNotHappenException();
+						}
 
-					$rightIntegerValue = (int) $rightNumberType->getValue();
-					if ($rightIntegerValue === 0) {
-						return new ErrorType();
-					}
+						$rightIntegerValue = (int) $rightNumberType->getValue();
+						if ($rightIntegerValue === 0) {
+							return new ErrorType();
+						}
 
-					$resultType = $this->getTypeFromValue((int) $leftNumberType->getValue() % $rightIntegerValue);
-					if ($generalize) {
-						$resultType = $resultType->generalize(GeneralizePrecision::lessSpecific());
+						$resultType = $this->getTypeFromValue((int) $leftNumberType->getValue() % $rightIntegerValue);
+						$resultTypes[] = $resultType;
 					}
-					$resultTypes[] = $resultType;
 				}
+				return TypeCombinator::union(...$resultTypes);
 			}
-			return TypeCombinator::union(...$resultTypes);
+
+			$leftType = $this->optimizeScalarType($leftType);
+			$rightType = $this->optimizeScalarType($rightType);
 		}
 
 		$integerType = $rightType->toInteger();
@@ -815,20 +1378,16 @@ class InitializerExprTypeResolver
 			return new ConstantIntegerType(0);
 		}
 
-		$rightScalarTypes = TypeUtils::getConstantScalars($rightType->toNumber());
-		foreach ($rightScalarTypes as $scalarType) {
+		$rightScalarValues = $rightType->toNumber()->getConstantScalarValues();
+		foreach ($rightScalarValues as $scalarValue) {
 
-			if (
-				$scalarType->getValue() === 0
-				|| $scalarType->getValue() === 0.0
-			) {
+			if (in_array($scalarValue, [0, 0.0], true)) {
 				return new ErrorType();
 			}
 		}
 
-		$integer = new IntegerType();
 		$positiveInt = IntegerRangeType::fromInterval(0, null);
-		if ($integer->isSuperTypeOf($rightType)->yes()) {
+		if ($rightType->isInteger()->yes()) {
 			$rangeMin = null;
 			$rangeMax = null;
 
@@ -873,38 +1432,40 @@ class InitializerExprTypeResolver
 		$rightType = $getTypeCallback($right);
 
 		if ($leftType instanceof NeverType || $rightType instanceof NeverType) {
-			return new NeverType();
+			return $this->getNeverType($leftType, $rightType);
 		}
 
-		$leftTypes = TypeUtils::getConstantScalars($leftType);
-		$rightTypes = TypeUtils::getConstantScalars($rightType);
+		$leftTypes = $leftType->getConstantScalarTypes();
+		$rightTypes = $rightType->getConstantScalarTypes();
 		$leftTypesCount = count($leftTypes);
 		$rightTypesCount = count($rightTypes);
 		if ($leftTypesCount > 0 && $rightTypesCount > 0) {
 			$resultTypes = [];
 			$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
-			foreach ($leftTypes as $leftTypeInner) {
-				foreach ($rightTypes as $rightTypeInner) {
-					$leftNumberType = $leftTypeInner->toNumber();
-					$rightNumberType = $rightTypeInner->toNumber();
+			if (!$generalize) {
+				foreach ($leftTypes as $leftTypeInner) {
+					foreach ($rightTypes as $rightTypeInner) {
+						$leftNumberType = $leftTypeInner->toNumber();
+						$rightNumberType = $rightTypeInner->toNumber();
 
-					if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
-						return new ErrorType();
-					}
+						if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
+							return new ErrorType();
+						}
 
-					if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
-						throw new ShouldNotHappenException();
-					}
+						if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
+							throw new ShouldNotHappenException();
+						}
 
-					$resultType = $this->getTypeFromValue($leftNumberType->getValue() + $rightNumberType->getValue());
-					if ($generalize) {
-						$resultType = $resultType->generalize(GeneralizePrecision::lessSpecific());
+						$resultType = $this->getTypeFromValue($leftNumberType->getValue() + $rightNumberType->getValue());
+						$resultTypes[] = $resultType;
 					}
-					$resultTypes[] = $resultType;
 				}
+
+				return TypeCombinator::union(...$resultTypes);
 			}
 
-			return TypeCombinator::union(...$resultTypes);
+			$leftType = $this->optimizeScalarType($leftType);
+			$rightType = $this->optimizeScalarType($rightType);
 		}
 
 		$leftConstantArrays = $leftType->getConstantArrays();
@@ -938,6 +1499,42 @@ class InitializerExprTypeResolver
 			return TypeCombinator::union(...$resultTypes);
 		}
 
+		// `array{...} + array<TKey, TValue>` keeps the known keyed prefix and
+		// folds the right-hand side into an open `...<TKey, TValue>` tail. This
+		// only applies when the left arrays' sealedness is known (bleeding edge);
+		// otherwise the legacy behavior below is kept for backward compatibility.
+		if ($leftCount > 0 && $rightCount === 0
+			&& $leftCount < ConstantArrayTypeBuilder::ARRAY_COUNT_LIMIT
+			&& $rightType->isArray()->yes()) {
+			$allSealednessKnown = true;
+			foreach ($leftConstantArrays as $leftConstantArray) {
+				if ($leftConstantArray->isUnsealed()->maybe()) {
+					$allSealednessKnown = false;
+					break;
+				}
+			}
+
+			if ($allSealednessKnown) {
+				$rightKeyType = $rightType->getIterableKeyType();
+				$rightValueType = $rightType->getIterableValueType();
+				$resultTypes = [];
+				foreach ($leftConstantArrays as $leftConstantArray) {
+					$newArrayBuilder = ConstantArrayTypeBuilder::createFromConstantArray($leftConstantArray);
+					$existingUnsealed = $leftConstantArray->getUnsealedTypes();
+					if ($leftConstantArray->isUnsealed()->yes() && $existingUnsealed !== null) {
+						$newArrayBuilder->makeUnsealed(
+							TypeCombinator::union($existingUnsealed[0], $rightKeyType),
+							TypeCombinator::union($existingUnsealed[1], $rightValueType),
+						);
+					} else {
+						$newArrayBuilder->makeUnsealed($rightKeyType, $rightValueType);
+					}
+					$resultTypes[] = $newArrayBuilder->getArray();
+				}
+				return TypeCombinator::union(...$resultTypes);
+			}
+		}
+
 		$leftIsArray = $leftType->isArray();
 		$rightIsArray = $rightType->isArray();
 		if ($leftIsArray->yes() && $rightIsArray->yes()) {
@@ -955,22 +1552,62 @@ class InitializerExprTypeResolver
 				$keyType = TypeCombinator::union(...$keyTypes);
 			}
 
+			$leftIterableValueType = $leftType->getIterableValueType();
 			$arrayType = new ArrayType(
 				$keyType,
-				TypeCombinator::union($leftType->getIterableValueType(), $rightType->getIterableValueType()),
+				TypeCombinator::union($leftIterableValueType, $rightType->getIterableValueType()),
 			);
 
+			$accessories = [];
+			if ($leftCount > 0) {
+				// Use the first constant array as a reference to list potential offsets.
+				// We only need to check the first array because we're looking for offsets that exist in ALL arrays.
+				$constantArray = $leftConstantArrays[0];
+				foreach ($constantArray->getKeyTypes() as $offsetType) {
+					if (!$leftType->hasOffsetValueType($offsetType)->yes()) {
+						continue;
+					}
+
+					$valueType = $leftType->getOffsetValueType($offsetType);
+					$accessories[] = new HasOffsetValueType($offsetType, $valueType);
+				}
+			}
+
+			if ($rightCount > 0) {
+				// Use the first constant array as a reference to list potential offsets.
+				// We only need to check the first array because we're looking for offsets that exist in ALL arrays.
+				$constantArray = $rightConstantArrays[0];
+				foreach ($constantArray->getKeyTypes() as $offsetType) {
+					if (!$rightType->hasOffsetValueType($offsetType)->yes()) {
+						continue;
+					}
+
+					$valueType = TypeCombinator::union($leftIterableValueType, $rightType->getOffsetValueType($offsetType));
+					$accessories[] = new HasOffsetValueType($offsetType, $valueType);
+				}
+			}
+
 			if ($leftType->isIterableAtLeastOnce()->yes() || $rightType->isIterableAtLeastOnce()->yes()) {
-				$arrayType = TypeCombinator::intersect($arrayType, new NonEmptyArrayType());
+				$accessories[] = new NonEmptyArrayType();
 			}
 			if ($leftType->isList()->yes() && $rightType->isList()->yes()) {
-				$arrayType = AccessoryArrayListType::intersectWith($arrayType);
+				$accessories[] = new AccessoryArrayListType();
+			}
+
+			if (count($accessories) > 0) {
+				$arrayType = TypeCombinator::intersect($arrayType, ...$accessories);
 			}
 
 			return $arrayType;
 		}
 
 		if ($leftType instanceof MixedType && $rightType instanceof MixedType) {
+			if ($leftIsArray->no() && $rightIsArray->no()) {
+				return new BenevolentUnionType([
+					new FloatType(),
+					new IntegerType(),
+				]);
+			}
 			return new BenevolentUnionType([
 				new FloatType(),
 				new IntegerType(),
@@ -1006,8 +1643,16 @@ class InitializerExprTypeResolver
 				new BooleanType(),
 			]);
 
-			if ($plusable->isSuperTypeOf($leftType)->yes() && $plusable->isSuperTypeOf($rightType)->yes()) {
+			$plusableSuperTypeOfLeft = $plusable->isSuperTypeOf($leftType)->yes();
+			$plusableSuperTypeOfRight = $plusable->isSuperTypeOf($rightType)->yes();
+			if ($plusableSuperTypeOfLeft && $plusableSuperTypeOfRight) {
 				return TypeCombinator::union($leftType, $rightType);
+			}
+			if ($plusableSuperTypeOfLeft && $rightType instanceof MixedType) {
+				return $leftType;
+			}
+			if ($plusableSuperTypeOfRight && $leftType instanceof MixedType) {
+				return $rightType;
 			}
 		}
 
@@ -1022,35 +1667,37 @@ class InitializerExprTypeResolver
 		$leftType = $getTypeCallback($left);
 		$rightType = $getTypeCallback($right);
 
-		$leftTypes = TypeUtils::getConstantScalars($leftType);
-		$rightTypes = TypeUtils::getConstantScalars($rightType);
+		$leftTypes = $leftType->getConstantScalarTypes();
+		$rightTypes = $rightType->getConstantScalarTypes();
 		$leftTypesCount = count($leftTypes);
 		$rightTypesCount = count($rightTypes);
 		if ($leftTypesCount > 0 && $rightTypesCount > 0) {
 			$resultTypes = [];
 			$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
-			foreach ($leftTypes as $leftTypeInner) {
-				foreach ($rightTypes as $rightTypeInner) {
-					$leftNumberType = $leftTypeInner->toNumber();
-					$rightNumberType = $rightTypeInner->toNumber();
+			if (!$generalize) {
+				foreach ($leftTypes as $leftTypeInner) {
+					foreach ($rightTypes as $rightTypeInner) {
+						$leftNumberType = $leftTypeInner->toNumber();
+						$rightNumberType = $rightTypeInner->toNumber();
 
-					if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
-						return new ErrorType();
-					}
+						if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
+							return new ErrorType();
+						}
 
-					if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
-						throw new ShouldNotHappenException();
-					}
+						if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
+							throw new ShouldNotHappenException();
+						}
 
-					$resultType = $this->getTypeFromValue($leftNumberType->getValue() - $rightNumberType->getValue());
-					if ($generalize) {
-						$resultType = $resultType->generalize(GeneralizePrecision::lessSpecific());
+						$resultType = $this->getTypeFromValue($leftNumberType->getValue() - $rightNumberType->getValue());
+						$resultTypes[] = $resultType;
 					}
-					$resultTypes[] = $resultType;
 				}
+
+				return TypeCombinator::union(...$resultTypes);
 			}
 
-			return TypeCombinator::union(...$resultTypes);
+			$leftType = $this->optimizeScalarType($leftType);
+			$rightType = $this->optimizeScalarType($rightType);
 		}
 
 		return $this->resolveCommonMath(new BinaryOp\Minus($left, $right), $leftType, $rightType);
@@ -1064,48 +1711,49 @@ class InitializerExprTypeResolver
 		$leftType = $getTypeCallback($left);
 		$rightType = $getTypeCallback($right);
 
-		$leftTypes = TypeUtils::getConstantScalars($leftType);
-		$rightTypes = TypeUtils::getConstantScalars($rightType);
+		$leftTypes = $leftType->getConstantScalarTypes();
+		$rightTypes = $rightType->getConstantScalarTypes();
 		$leftTypesCount = count($leftTypes);
 		$rightTypesCount = count($rightTypes);
 		if ($leftTypesCount > 0 && $rightTypesCount > 0) {
 			$resultTypes = [];
 			$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
-			foreach ($leftTypes as $leftTypeInner) {
-				foreach ($rightTypes as $rightTypeInner) {
-					$leftNumberType = $leftTypeInner->toNumber();
-					$rightNumberType = $rightTypeInner->toNumber();
+			if (!$generalize) {
+				foreach ($leftTypes as $leftTypeInner) {
+					foreach ($rightTypes as $rightTypeInner) {
+						$leftNumberType = $leftTypeInner->toNumber();
+						$rightNumberType = $rightTypeInner->toNumber();
 
-					if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
-						return new ErrorType();
-					}
+						if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
+							return new ErrorType();
+						}
 
-					if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
-						throw new ShouldNotHappenException();
-					}
+						if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
+							throw new ShouldNotHappenException();
+						}
 
-					$resultType = $this->getTypeFromValue($leftNumberType->getValue() * $rightNumberType->getValue());
-					if ($generalize) {
-						$resultType = $resultType->generalize(GeneralizePrecision::lessSpecific());
+						$resultType = $this->getTypeFromValue($leftNumberType->getValue() * $rightNumberType->getValue());
+						$resultTypes[] = $resultType;
 					}
-					$resultTypes[] = $resultType;
 				}
+
+				return TypeCombinator::union(...$resultTypes);
 			}
 
-			return TypeCombinator::union(...$resultTypes);
+			$leftType = $this->optimizeScalarType($leftType);
+			$rightType = $this->optimizeScalarType($rightType);
 		}
 
-		$floatType = new FloatType();
 		$leftNumberType = $leftType->toNumber();
 		if ($leftNumberType instanceof ConstantIntegerType && $leftNumberType->getValue() === 0) {
-			if ($floatType->isSuperTypeOf($rightType)->yes()) {
+			if ($rightType->isFloat()->yes()) {
 				return new ConstantFloatType(0.0);
 			}
 			return new ConstantIntegerType(0);
 		}
 		$rightNumberType = $rightType->toNumber();
 		if ($rightNumberType instanceof ConstantIntegerType && $rightNumberType->getValue() === 0) {
-			if ($floatType->isSuperTypeOf($leftType)->yes()) {
+			if ($leftType->isFloat()->yes()) {
 				return new ConstantFloatType(0.0);
 			}
 			return new ConstantIntegerType(0);
@@ -1122,57 +1770,18 @@ class InitializerExprTypeResolver
 		$leftType = $getTypeCallback($left);
 		$rightType = $getTypeCallback($right);
 
-		if ($leftType instanceof MixedType || $rightType instanceof MixedType) {
-			return new BenevolentUnionType([
-				new FloatType(),
-				new IntegerType(),
-			]);
+		$extensionSpecified = $this->operatorTypeSpecifyingExtensionRegistry
+			->callOperatorTypeSpecifyingExtensions(new BinaryOp\Pow($left, $right), $leftType, $rightType);
+		if ($extensionSpecified !== null) {
+			return $extensionSpecified;
 		}
 
-		$object = new ObjectWithoutClassType();
-		if (
-			!$leftType instanceof NeverType &&
-			!$rightType instanceof NeverType &&
-			(
-				!$object->isSuperTypeOf($leftType)->no()
-				|| !$object->isSuperTypeOf($rightType)->no()
-			)
-		) {
-			return TypeCombinator::union($leftType, $rightType);
+		$exponentiatedTyped = $leftType->exponentiate($rightType);
+		if (!$exponentiatedTyped instanceof ErrorType) {
+			return $exponentiatedTyped;
 		}
 
-		$leftTypes = TypeUtils::getConstantScalars($leftType);
-		$rightTypes = TypeUtils::getConstantScalars($rightType);
-		$leftTypesCount = count($leftTypes);
-		$rightTypesCount = count($rightTypes);
-		if ($leftTypesCount > 0 && $rightTypesCount > 0) {
-			$resultTypes = [];
-			$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
-			foreach ($leftTypes as $leftTypeInner) {
-				foreach ($rightTypes as $rightTypeInner) {
-					$leftNumberType = $leftTypeInner->toNumber();
-					$rightNumberType = $rightTypeInner->toNumber();
-
-					if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
-						return new ErrorType();
-					}
-
-					if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
-						throw new ShouldNotHappenException();
-					}
-
-					$resultType = $this->getTypeFromValue($leftNumberType->getValue() ** $rightNumberType->getValue());
-					if ($generalize) {
-						$resultType = $resultType->generalize(GeneralizePrecision::lessSpecific());
-					}
-					$resultTypes[] = $resultType;
-				}
-			}
-
-			return TypeCombinator::union(...$resultTypes);
-		}
-
-		return $this->resolveCommonMath(new BinaryOp\Pow($left, $right), $leftType, $rightType);
+		return new ErrorType();
 	}
 
 	/**
@@ -1183,43 +1792,51 @@ class InitializerExprTypeResolver
 		$leftType = $getTypeCallback($left);
 		$rightType = $getTypeCallback($right);
 
-		if ($leftType instanceof NeverType || $rightType instanceof NeverType) {
-			return new NeverType();
+		$specifiedTypes = $this->operatorTypeSpecifyingExtensionRegistry
+			->callOperatorTypeSpecifyingExtensions(new BinaryOp\ShiftLeft($left, $right), $leftType, $rightType);
+		if ($specifiedTypes !== null) {
+			return $specifiedTypes;
 		}
 
-		$leftTypes = TypeUtils::getConstantScalars($leftType);
-		$rightTypes = TypeUtils::getConstantScalars($rightType);
+		if ($leftType instanceof NeverType || $rightType instanceof NeverType) {
+			return $this->getNeverType($leftType, $rightType);
+		}
+
+		$leftTypes = $leftType->getConstantScalarTypes();
+		$rightTypes = $rightType->getConstantScalarTypes();
 		$leftTypesCount = count($leftTypes);
 		$rightTypesCount = count($rightTypes);
 		if ($leftTypesCount > 0 && $rightTypesCount > 0) {
 			$resultTypes = [];
 			$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
-			foreach ($leftTypes as $leftTypeInner) {
-				foreach ($rightTypes as $rightTypeInner) {
-					$leftNumberType = $leftTypeInner->toNumber();
-					$rightNumberType = $rightTypeInner->toNumber();
+			if (!$generalize) {
+				foreach ($leftTypes as $leftTypeInner) {
+					foreach ($rightTypes as $rightTypeInner) {
+						$leftNumberType = $leftTypeInner->toNumber();
+						$rightNumberType = $rightTypeInner->toNumber();
 
-					if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
-						return new ErrorType();
-					}
+						if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
+							return new ErrorType();
+						}
 
-					if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
-						throw new ShouldNotHappenException();
-					}
+						if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
+							throw new ShouldNotHappenException();
+						}
 
-					if ($rightNumberType->getValue() < 0) {
-						return new ErrorType();
-					}
+						if ($rightNumberType->getValue() < 0) {
+							return new ErrorType();
+						}
 
-					$resultType = $this->getTypeFromValue($leftNumberType->getValue() << $rightNumberType->getValue());
-					if ($generalize) {
-						$resultType = $resultType->generalize(GeneralizePrecision::lessSpecific());
+						$resultType = $this->getTypeFromValue(intval($leftNumberType->getValue()) << intval($rightNumberType->getValue()));
+						$resultTypes[] = $resultType;
 					}
-					$resultTypes[] = $resultType;
 				}
+
+				return TypeCombinator::union(...$resultTypes);
 			}
 
-			return TypeCombinator::union(...$resultTypes);
+			$leftType = $this->optimizeScalarType($leftType);
+			$rightType = $this->optimizeScalarType($rightType);
 		}
 
 		$leftNumberType = $leftType->toNumber();
@@ -1229,7 +1846,7 @@ class InitializerExprTypeResolver
 			return new ErrorType();
 		}
 
-		return new IntegerType();
+		return $this->resolveCommonMath(new Expr\BinaryOp\ShiftLeft($left, $right), $leftType, $rightType);
 	}
 
 	/**
@@ -1240,43 +1857,51 @@ class InitializerExprTypeResolver
 		$leftType = $getTypeCallback($left);
 		$rightType = $getTypeCallback($right);
 
-		if ($leftType instanceof NeverType || $rightType instanceof NeverType) {
-			return new NeverType();
+		$specifiedTypes = $this->operatorTypeSpecifyingExtensionRegistry
+			->callOperatorTypeSpecifyingExtensions(new BinaryOp\ShiftRight($left, $right), $leftType, $rightType);
+		if ($specifiedTypes !== null) {
+			return $specifiedTypes;
 		}
 
-		$leftTypes = TypeUtils::getConstantScalars($leftType);
-		$rightTypes = TypeUtils::getConstantScalars($rightType);
+		if ($leftType instanceof NeverType || $rightType instanceof NeverType) {
+			return $this->getNeverType($leftType, $rightType);
+		}
+
+		$leftTypes = $leftType->getConstantScalarTypes();
+		$rightTypes = $rightType->getConstantScalarTypes();
 		$leftTypesCount = count($leftTypes);
 		$rightTypesCount = count($rightTypes);
 		if ($leftTypesCount > 0 && $rightTypesCount > 0) {
 			$resultTypes = [];
 			$generalize = $leftTypesCount * $rightTypesCount > self::CALCULATE_SCALARS_LIMIT;
-			foreach ($leftTypes as $leftTypeInner) {
-				foreach ($rightTypes as $rightTypeInner) {
-					$leftNumberType = $leftTypeInner->toNumber();
-					$rightNumberType = $rightTypeInner->toNumber();
+			if (!$generalize) {
+				foreach ($leftTypes as $leftTypeInner) {
+					foreach ($rightTypes as $rightTypeInner) {
+						$leftNumberType = $leftTypeInner->toNumber();
+						$rightNumberType = $rightTypeInner->toNumber();
 
-					if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
-						return new ErrorType();
-					}
+						if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
+							return new ErrorType();
+						}
 
-					if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
-						throw new ShouldNotHappenException();
-					}
+						if (!$leftNumberType instanceof ConstantScalarType || !$rightNumberType instanceof ConstantScalarType) {
+							throw new ShouldNotHappenException();
+						}
 
-					if ($rightNumberType->getValue() < 0) {
-						return new ErrorType();
-					}
+						if ($rightNumberType->getValue() < 0) {
+							return new ErrorType();
+						}
 
-					$resultType = $this->getTypeFromValue($leftNumberType->getValue() >> $rightNumberType->getValue());
-					if ($generalize) {
-						$resultType = $resultType->generalize(GeneralizePrecision::lessSpecific());
+						$resultType = $this->getTypeFromValue(intval($leftNumberType->getValue()) >> intval($rightNumberType->getValue()));
+						$resultTypes[] = $resultType;
 					}
-					$resultTypes[] = $resultType;
 				}
+
+				return TypeCombinator::union(...$resultTypes);
 			}
 
-			return TypeCombinator::union(...$resultTypes);
+			$leftType = $this->optimizeScalarType($leftType);
+			$rightType = $this->optimizeScalarType($rightType);
 		}
 
 		$leftNumberType = $leftType->toNumber();
@@ -1286,64 +1911,96 @@ class InitializerExprTypeResolver
 			return new ErrorType();
 		}
 
-		return new IntegerType();
+		return $this->resolveCommonMath(new Expr\BinaryOp\ShiftRight($left, $right), $leftType, $rightType);
 	}
 
-	public function resolveIdenticalType(Type $leftType, Type $rightType): BooleanType
+	private function optimizeScalarType(Type $type): Type
 	{
-		if ($leftType instanceof ConstantScalarType && $rightType instanceof ConstantScalarType) {
-			return new ConstantBooleanType($leftType->getValue() === $rightType->getValue());
+		$types = [];
+		if ($type->isInteger()->yes()) {
+			$types[] = new IntegerType();
+		}
+		if ($type->isString()->yes()) {
+			$types[] = new StringType();
+		}
+		if ($type->isFloat()->yes()) {
+			$types[] = new FloatType();
+		}
+		if ($type->isNull()->yes()) {
+			$types[] = new NullType();
 		}
 
-		$isSuperset = $leftType->isSuperTypeOf($rightType);
-		if ($isSuperset->no()) {
-			return new ConstantBooleanType(false);
+		if (count($types) === 0) {
+			return new ErrorType();
+		}
+
+		if (count($types) === 1) {
+			return $types[0];
+		}
+
+		return new UnionType($types);
+	}
+
+	/**
+	 * @return TypeResult<BooleanType>
+	 */
+	public function resolveIdenticalType(Type $leftType, Type $rightType): TypeResult
+	{
+		if ($leftType instanceof NeverType || $rightType instanceof NeverType) {
+			return new TypeResult(new ConstantBooleanType(false), []);
+		}
+
+		if ($leftType instanceof ConstantScalarType && $rightType instanceof ConstantScalarType) {
+			return new TypeResult(new ConstantBooleanType($leftType->getValue() === $rightType->getValue()), []);
+		}
+
+		$leftTypeFiniteTypes = $leftType->getFiniteTypes();
+		$rightTypeFiniteType = $rightType->getFiniteTypes();
+		if (count($leftTypeFiniteTypes) === 1 && count($rightTypeFiniteType) === 1) {
+			return new TypeResult(new ConstantBooleanType($leftTypeFiniteTypes[0]->equals($rightTypeFiniteType[0])), []);
+		}
+
+		$leftIsSuperTypeOfRight = $leftType->isSuperTypeOf($rightType);
+		$rightIsSuperTypeOfLeft = $rightType->isSuperTypeOf($leftType);
+		if ($leftIsSuperTypeOfRight->no() && $rightIsSuperTypeOfLeft->no()) {
+			return new TypeResult(new ConstantBooleanType(false), array_merge($leftIsSuperTypeOfRight->getReasons(), $rightIsSuperTypeOfLeft->getReasons()));
 		}
 
 		if ($leftType instanceof ConstantArrayType && $rightType instanceof ConstantArrayType) {
-			return $this->resolveConstantArrayTypeComparison($leftType, $rightType, fn ($leftValueType, $rightValueType): BooleanType => $this->resolveIdenticalType($leftValueType, $rightValueType));
+			return $this->resolveConstantArrayTypeComparison($leftType, $rightType, fn ($leftValueType, $rightValueType): TypeResult => $this->resolveIdenticalType($leftValueType, $rightValueType));
 		}
 
-		return new BooleanType();
+		return new TypeResult(new BooleanType(), []);
 	}
 
-	public function resolveEqualType(Type $leftType, Type $rightType): BooleanType
+	/**
+	 * @return TypeResult<BooleanType>
+	 */
+	public function resolveEqualType(Type $leftType, Type $rightType): TypeResult
 	{
-		$integerType = new IntegerType();
-		$floatType = new FloatType();
+		if ($leftType instanceof NeverType || $rightType instanceof NeverType) {
+			return new TypeResult(new ConstantBooleanType(false), []);
+		}
+
 		if (
-			($leftType->isString()->yes() && $rightType->isString()->yes())
-			|| ($integerType->isSuperTypeOf($leftType)->yes() && $integerType->isSuperTypeOf($rightType)->yes())
-			|| ($floatType->isSuperTypeOf($leftType)->yes() && $floatType->isSuperTypeOf($rightType)->yes())
+			($leftType->isEnum()->yes() && $rightType->isTrue()->no())
+			|| ($rightType->isEnum()->yes() && $leftType->isTrue()->no())
 		) {
 			return $this->resolveIdenticalType($leftType, $rightType);
 		}
 
-		if ($leftType->isConstantArray()->yes() && $leftType->isIterableAtLeastOnce()->no() && $rightType instanceof ConstantScalarType) {
-			// @phpstan-ignore-next-line
-			return new ConstantBooleanType($rightType->getValue() == []); // phpcs:ignore
-		}
-		if ($rightType->isConstantArray()->yes() && $rightType->isIterableAtLeastOnce()->no() && $leftType instanceof ConstantScalarType) {
-			// @phpstan-ignore-next-line
-			return new ConstantBooleanType($leftType->getValue() == []); // phpcs:ignore
-		}
-
-		if ($leftType instanceof ConstantScalarType && $rightType instanceof ConstantScalarType) {
-			// @phpstan-ignore-next-line
-			return new ConstantBooleanType($leftType->getValue() == $rightType->getValue()); // phpcs:ignore
-		}
-
 		if ($leftType instanceof ConstantArrayType && $rightType instanceof ConstantArrayType) {
-			return $this->resolveConstantArrayTypeComparison($leftType, $rightType, fn ($leftValueType, $rightValueType): BooleanType => $this->resolveEqualType($leftValueType, $rightValueType));
+			return $this->resolveConstantArrayTypeComparison($leftType, $rightType, fn ($leftValueType, $rightValueType): TypeResult => $this->resolveEqualType($leftValueType, $rightValueType));
 		}
 
-		return new BooleanType();
+		return new TypeResult($leftType->looseCompare($rightType, $this->phpVersion), []);
 	}
 
 	/**
-	 * @param callable(Type, Type): BooleanType $valueComparisonCallback
+	 * @param callable(Type, Type): TypeResult<BooleanType> $valueComparisonCallback
+	 * @return TypeResult<BooleanType>
 	 */
-	private function resolveConstantArrayTypeComparison(ConstantArrayType $leftType, ConstantArrayType $rightType, callable $valueComparisonCallback): BooleanType
+	private function resolveConstantArrayTypeComparison(ConstantArrayType $leftType, ConstantArrayType $rightType, callable $valueComparisonCallback): TypeResult
 	{
 		$leftKeyTypes = $leftType->getKeyTypes();
 		$rightKeyTypes = $rightType->getKeyTypes();
@@ -1360,7 +2017,7 @@ class InitializerExprTypeResolver
 
 			if (count($rightKeyTypes) === 0) {
 				if (!$leftOptional) {
-					return new ConstantBooleanType(false);
+					return new TypeResult(new ConstantBooleanType(false), []);
 				}
 				continue;
 			}
@@ -1373,13 +2030,13 @@ class InitializerExprTypeResolver
 					$found = true;
 					break;
 				} elseif (!$rightType->isOptionalKey($j)) {
-					return new ConstantBooleanType(false);
+					return new TypeResult(new ConstantBooleanType(false), []);
 				}
 			}
 
 			if (!$found) {
 				if (!$leftOptional) {
-					return new ConstantBooleanType(false);
+					return new TypeResult(new ConstantBooleanType(false), []);
 				}
 				continue;
 			}
@@ -1396,110 +2053,102 @@ class InitializerExprTypeResolver
 				}
 			}
 
-			$leftIdenticalToRight = $valueComparisonCallback($leftValueTypes[$i], $rightValueTypes[$j]);
-			if ($leftIdenticalToRight instanceof ConstantBooleanType && !$leftIdenticalToRight->getValue()) {
-				return new ConstantBooleanType(false);
+			$leftIdenticalToRightResult = $valueComparisonCallback($leftValueTypes[$i], $rightValueTypes[$j]);
+			$leftIdenticalToRight = $leftIdenticalToRightResult->type;
+			if ($leftIdenticalToRight->isFalse()->yes()) {
+				return $leftIdenticalToRightResult;
 			}
 			$resultType = TypeCombinator::union($resultType, $leftIdenticalToRight);
 		}
 
 		foreach (array_keys($rightKeyTypes) as $j) {
 			if (!$rightType->isOptionalKey($j)) {
-				return new ConstantBooleanType(false);
+				return new TypeResult(new ConstantBooleanType(false), []);
 			}
 			$resultType = new BooleanType();
 		}
 
-		return $resultType->toBoolean();
+		return new TypeResult($resultType->toBoolean(), []);
 	}
 
 	/**
-	 * @param BinaryOp\Plus|BinaryOp\Minus|BinaryOp\Mul|BinaryOp\Pow|BinaryOp\Div $expr
+	 * @param BinaryOp\Plus|BinaryOp\Minus|BinaryOp\Mul|BinaryOp\Div|BinaryOp\ShiftLeft|BinaryOp\ShiftRight $expr
 	 */
 	private function resolveCommonMath(Expr\BinaryOp $expr, Type $leftType, Type $rightType): Type
 	{
-		if (($leftType instanceof IntegerRangeType || $leftType instanceof ConstantIntegerType || $leftType instanceof UnionType) &&
-			($rightType instanceof IntegerRangeType || $rightType instanceof ConstantIntegerType || $rightType instanceof UnionType) &&
-			!$expr instanceof BinaryOp\Pow) {
+		$specifiedTypes = $this->operatorTypeSpecifyingExtensionRegistry
+			->callOperatorTypeSpecifyingExtensions($expr, $leftType, $rightType);
+		if ($specifiedTypes !== null) {
+			return $specifiedTypes;
+		}
 
-			if ($leftType instanceof ConstantIntegerType) {
+		$types = TypeCombinator::union($leftType, $rightType);
+		$leftNumberType = $leftType->toNumber();
+		$rightNumberType = $rightType->toNumber();
+
+		if (
+			!$types instanceof MixedType
+			&& (
+				$rightNumberType instanceof IntegerRangeType
+				|| $rightNumberType instanceof ConstantIntegerType
+				|| $rightNumberType instanceof UnionType
+			)
+		) {
+			if ($leftNumberType instanceof IntegerRangeType || $leftNumberType instanceof ConstantIntegerType) {
 				return $this->integerRangeMath(
-					$leftType,
+					$leftNumberType,
 					$expr,
-					$rightType,
+					$rightNumberType,
 				);
-			} elseif ($leftType instanceof UnionType) {
-
+			} elseif ($leftNumberType instanceof UnionType) {
 				$unionParts = [];
 
-				foreach ($leftType->getTypes() as $type) {
-					if ($type instanceof IntegerRangeType || $type instanceof ConstantIntegerType) {
-						$unionParts[] = $this->integerRangeMath($type, $expr, $rightType);
+				foreach ($leftNumberType->getTypes() as $type) {
+					$numberType = $type->toNumber();
+					if ($numberType instanceof IntegerRangeType || $numberType instanceof ConstantIntegerType) {
+						$unionParts[] = $this->integerRangeMath($numberType, $expr, $rightNumberType);
 					} else {
-						$unionParts[] = $type;
+						$unionParts[] = $numberType;
 					}
 				}
 
 				$union = TypeCombinator::union(...$unionParts);
-				if ($leftType instanceof BenevolentUnionType) {
+				if ($leftNumberType instanceof BenevolentUnionType) {
 					return TypeUtils::toBenevolentUnion($union)->toNumber();
 				}
 
 				return $union->toNumber();
 			}
-
-			return $this->integerRangeMath($leftType, $expr, $rightType);
 		}
 
-		$operatorSigil = $expr->getOperatorSigil();
-		$operatorTypeSpecifyingExtensions = $this->operatorTypeSpecifyingExtensionRegistryProvider->getRegistry()->getOperatorTypeSpecifyingExtensions($operatorSigil, $leftType, $rightType);
-
-		/** @var Type[] $extensionTypes */
-		$extensionTypes = [];
-
-		foreach ($operatorTypeSpecifyingExtensions as $extension) {
-			$extensionTypes[] = $extension->specifyType($operatorSigil, $leftType, $rightType);
-		}
-
-		if (count($extensionTypes) > 0) {
-			return TypeCombinator::union(...$extensionTypes);
-		}
-
-		$types = TypeCombinator::union($leftType, $rightType);
 		if (
-			$leftType instanceof ArrayType
-			|| $rightType instanceof ArrayType
-			|| $types instanceof ArrayType
+			$leftType->isArray()->yes()
+			|| $rightType->isArray()->yes()
+			|| $types->isArray()->yes()
 		) {
 			return new ErrorType();
 		}
 
-		$leftNumberType = $leftType->toNumber();
-		$rightNumberType = $rightType->toNumber();
 		if ($leftNumberType instanceof ErrorType || $rightNumberType instanceof ErrorType) {
 			return new ErrorType();
 		}
 		if ($leftNumberType instanceof NeverType || $rightNumberType instanceof NeverType) {
-			return new NeverType();
+			return $this->getNeverType($leftNumberType, $rightNumberType);
 		}
 
 		if (
-			(new FloatType())->isSuperTypeOf($leftNumberType)->yes()
-			|| (new FloatType())->isSuperTypeOf($rightNumberType)->yes()
+			$leftNumberType->isFloat()->yes()
+			|| $rightNumberType->isFloat()->yes()
 		) {
+			if ($expr instanceof Expr\BinaryOp\ShiftLeft || $expr instanceof Expr\BinaryOp\ShiftRight) {
+				return new IntegerType();
+			}
 			return new FloatType();
-		}
-
-		if ($expr instanceof Expr\BinaryOp\Pow) {
-			return new BenevolentUnionType([
-				new FloatType(),
-				new IntegerType(),
-			]);
 		}
 
 		$resultType = TypeCombinator::union($leftNumberType, $rightNumberType);
 		if ($expr instanceof Expr\BinaryOp\Div) {
-			if ($types instanceof MixedType || $resultType instanceof IntegerType) {
+			if ($types instanceof MixedType || $resultType->isInteger()->yes()) {
 				return new BenevolentUnionType([new IntegerType(), new FloatType()]);
 			}
 
@@ -1518,8 +2167,7 @@ class InitializerExprTypeResolver
 
 	/**
 	 * @param ConstantIntegerType|IntegerRangeType $range
-	 * @param BinaryOp\Div|BinaryOp\Minus|BinaryOp\Mul|BinaryOp\Plus $node
-	 * @param IntegerRangeType|ConstantIntegerType|UnionType $operand
+	 * @param BinaryOp\Div|BinaryOp\Minus|BinaryOp\Mul|BinaryOp\Plus|BinaryOp\ShiftLeft|BinaryOp\ShiftRight $node
 	 */
 	private function integerRangeMath(Type $range, BinaryOp $node, Type $operand): Type
 	{
@@ -1536,8 +2184,9 @@ class InitializerExprTypeResolver
 			$unionParts = [];
 
 			foreach ($operand->getTypes() as $type) {
-				if ($type instanceof IntegerRangeType || $type instanceof ConstantIntegerType) {
-					$unionParts[] = $this->integerRangeMath($range, $node, $type);
+				$numberType = $type->toNumber();
+				if ($numberType instanceof IntegerRangeType || $numberType instanceof ConstantIntegerType) {
+					$unionParts[] = $this->integerRangeMath($range, $node, $numberType);
 				} else {
 					$unionParts[] = $type->toNumber();
 				}
@@ -1549,6 +2198,17 @@ class InitializerExprTypeResolver
 			}
 
 			return $union->toNumber();
+		}
+
+		$operand = $operand->toNumber();
+		if ($operand instanceof IntegerRangeType) {
+			$operandMin = $operand->getMin();
+			$operandMax = $operand->getMax();
+		} elseif ($operand instanceof ConstantIntegerType) {
+			$operandMin = $operand->getValue();
+			$operandMax = $operand->getValue();
+		} else {
+			return $operand;
 		}
 
 		if ($node instanceof BinaryOp\Plus) {
@@ -1616,78 +2276,132 @@ class InitializerExprTypeResolver
 				}
 			}
 		} elseif ($node instanceof Expr\BinaryOp\Mul) {
+			$min1 = $rangeMin === 0 || $operandMin === 0 ? 0 : ($rangeMin ?? -INF) * ($operandMin ?? -INF);
+			$min2 = $rangeMin === 0 || $operandMax === 0 ? 0 : ($rangeMin ?? -INF) * ($operandMax ?? INF);
+			$max1 = $rangeMax === 0 || $operandMin === 0 ? 0 : ($rangeMax ?? INF) * ($operandMin ?? -INF);
+			$max2 = $rangeMax === 0 || $operandMax === 0 ? 0 : ($rangeMax ?? INF) * ($operandMax ?? INF);
+
+			$min = min($min1, $min2, $max1, $max2);
+			$max = max($min1, $min2, $max1, $max2);
+
+			if (!is_finite($min)) {
+				$min = null;
+			}
+			if (!is_finite($max)) {
+				$max = null;
+			}
+		} elseif ($node instanceof Expr\BinaryOp\Div) {
 			if ($operand instanceof ConstantIntegerType) {
-				/** @var int|float|null $min */
-				$min = $rangeMin !== null ? $rangeMin * $operand->getValue() : null;
-
-				/** @var int|float|null $max */
-				$max = $rangeMax !== null ? $rangeMax * $operand->getValue() : null;
+				$min = $rangeMin !== null && $operand->getValue() !== 0 ? $rangeMin / $operand->getValue() : null;
+				$max = $rangeMax !== null && $operand->getValue() !== 0 ? $rangeMax / $operand->getValue() : null;
 			} else {
-				/** @var int|float|null $min */
-				$min = $rangeMin !== null && $operand->getMin() !== null ? $rangeMin * $operand->getMin() : null;
+				// Avoid division by zero when looking for the min and the max by using the closest int
+				$operandMin = $operandMin !== 0 ? $operandMin : 1;
+				$operandMax = $operandMax !== 0 ? $operandMax : -1;
 
-				/** @var int|float|null $max */
-				$max = $rangeMax !== null && $operand->getMax() !== null ? $rangeMax * $operand->getMax() : null;
+				if (
+					($operandMin < 0 || $operandMin === null)
+					&& ($operandMax > 0 || $operandMax === null)
+				) {
+					$negativeOperand = IntegerRangeType::fromInterval($operandMin, 0);
+					assert($negativeOperand instanceof IntegerRangeType);
+					$positiveOperand = IntegerRangeType::fromInterval(0, $operandMax);
+					assert($positiveOperand instanceof IntegerRangeType);
+
+					$result = TypeCombinator::union(
+						$this->integerRangeMath($range, $node, $negativeOperand),
+						$this->integerRangeMath($range, $node, $positiveOperand),
+					)->toNumber();
+
+					if ($result->equals(new UnionType([new IntegerType(), new FloatType()]))) {
+						return new BenevolentUnionType([new IntegerType(), new FloatType()]);
+					}
+
+					return $result;
+				}
+				if (
+					($rangeMin < 0 || $rangeMin === null)
+					&& ($rangeMax > 0 || $rangeMax === null)
+				) {
+					$negativeRange = IntegerRangeType::fromInterval($rangeMin, 0);
+					assert($negativeRange instanceof IntegerRangeType);
+					$positiveRange = IntegerRangeType::fromInterval(0, $rangeMax);
+					assert($positiveRange instanceof IntegerRangeType);
+
+					$result = TypeCombinator::union(
+						$this->integerRangeMath($negativeRange, $node, $operand),
+						$this->integerRangeMath($positiveRange, $node, $operand),
+					)->toNumber();
+
+					if ($result->equals(new UnionType([new IntegerType(), new FloatType()]))) {
+						return new BenevolentUnionType([new IntegerType(), new FloatType()]);
+					}
+
+					return $result;
+				}
+
+				$rangeMinSign = ($rangeMin ?? -INF) <=> 0;
+				$rangeMaxSign = ($rangeMax ?? INF) <=> 0;
+
+				$min1 = $operandMin !== null ? ($rangeMin ?? -INF) / $operandMin : $rangeMinSign * -0.1;
+				$min2 = $operandMax !== null ? ($rangeMin ?? -INF) / $operandMax : $rangeMinSign * 0.1;
+				$max1 = $operandMin !== null ? ($rangeMax ?? INF) / $operandMin : $rangeMaxSign * -0.1;
+				$max2 = $operandMax !== null ? ($rangeMax ?? INF) / $operandMax : $rangeMaxSign * 0.1;
+
+				$min = min($min1, $min2, $max1, $max2);
+				$max = max($min1, $min2, $max1, $max2);
+
+				if ($min === -INF) {
+					$min = null;
+				}
+				if ($max === INF) {
+					$max = null;
+				}
 			}
 
 			if ($min !== null && $max !== null && $min > $max) {
 				[$min, $max] = [$max, $min];
 			}
 
-			// invert maximas on multiplication with negative constants
+			if (is_float($min)) {
+				$min = (int) ceil($min);
+			}
+			if (is_float($max)) {
+				$max = (int) floor($max);
+			}
+
+			// invert maximas on division with negative constants
 			if ((($range instanceof ConstantIntegerType && $range->getValue() < 0)
 					|| ($operand instanceof ConstantIntegerType && $operand->getValue() < 0))
 				&& ($min === null || $max === null)) {
 				[$min, $max] = [$max, $min];
 			}
 
+			if ($min === null && $max === null) {
+				return new BenevolentUnionType([new IntegerType(), new FloatType()]);
+			}
+
+			return TypeCombinator::union(IntegerRangeType::fromInterval($min, $max), new FloatType());
+		} elseif ($node instanceof Expr\BinaryOp\ShiftLeft) {
+			if (!$operand instanceof ConstantIntegerType) {
+				return new IntegerType();
+			}
+			if ($operand->getValue() < 0) {
+				return new ErrorType();
+			}
+			$min = $rangeMin !== null ? intval($rangeMin) << $operand->getValue() : null;
+			$max = $rangeMax !== null ? intval($rangeMax) << $operand->getValue() : null;
+		} elseif ($node instanceof Expr\BinaryOp\ShiftRight) {
+			if (!$operand instanceof ConstantIntegerType) {
+				return new IntegerType();
+			}
+			if ($operand->getValue() < 0) {
+				return new ErrorType();
+			}
+			$min = $rangeMin !== null ? intval($rangeMin) >> $operand->getValue() : null;
+			$max = $rangeMax !== null ? intval($rangeMax) >> $operand->getValue() : null;
 		} else {
-			if ($operand instanceof ConstantIntegerType) {
-				$min = $rangeMin !== null && $operand->getValue() !== 0 ? $rangeMin / $operand->getValue() : null;
-				$max = $rangeMax !== null && $operand->getValue() !== 0 ? $rangeMax / $operand->getValue() : null;
-			} else {
-				$min = $rangeMin !== null && $operand->getMin() !== null && $operand->getMin() !== 0 ? $rangeMin / $operand->getMin() : null;
-				$max = $rangeMax !== null && $operand->getMax() !== null && $operand->getMax() !== 0 ? $rangeMax / $operand->getMax() : null;
-			}
-
-			if ($range instanceof IntegerRangeType && $operand instanceof IntegerRangeType) {
-				if ($rangeMax === null && $operand->getMax() === null) {
-					$min = 0;
-				} elseif ($rangeMin === null && $operand->getMin() === null) {
-					$min = null;
-					$max = null;
-				}
-			}
-
-			if ($operand instanceof IntegerRangeType
-				&& ($operand->getMin() === null || $operand->getMax() === null)
-				|| ($rangeMin === null || $rangeMax === null)
-				|| is_float($min) || is_float($max)
-			) {
-				if (is_float($min)) {
-					$min = (int) $min;
-				}
-				if (is_float($max)) {
-					$max = (int) $max;
-				}
-
-				if ($min !== null && $max !== null && $min > $max) {
-					[$min, $max] = [$max, $min];
-				}
-
-				// invert maximas on division with negative constants
-				if ((($range instanceof ConstantIntegerType && $range->getValue() < 0)
-						|| ($operand instanceof ConstantIntegerType && $operand->getValue() < 0))
-					&& ($min === null || $max === null)) {
-					[$min, $max] = [$max, $min];
-				}
-
-				if ($min === null && $max === null) {
-					return new BenevolentUnionType([new IntegerType(), new FloatType()]);
-				}
-
-				return TypeCombinator::union(IntegerRangeType::fromInterval($min, $max), new FloatType());
-			}
+			throw new ShouldNotHappenException();
 		}
 
 		if (is_float($min)) {
@@ -1727,7 +2441,7 @@ class InitializerExprTypeResolver
 			}
 			if (in_array(strtolower($constantClass), $namesToResolve, true)) {
 				$resolvedName = $this->resolveName($class, $classReflection);
-				if ($resolvedName === 'parent' && strtolower($constantName) === 'class') {
+				if (strtolower($resolvedName) === 'parent' && strtolower($constantName) === 'class') {
 					return new ClassStringType();
 				}
 				$constantClassType = $this->resolveTypeByName($class, $classReflection);
@@ -1744,60 +2458,27 @@ class InitializerExprTypeResolver
 		}
 
 		if (strtolower($constantName) === 'class') {
-			return TypeTraverser::map(
-				$constantClassType,
-				static function (Type $type, callable $traverse): Type {
-					if ($type instanceof UnionType || $type instanceof IntersectionType) {
-						return $traverse($type);
-					}
-
-					if ($type instanceof NullType) {
-						return $type;
-					}
-
-					if ($type instanceof EnumCaseObjectType) {
-						return TypeCombinator::intersect(
-							new GenericClassStringType(new ObjectType($type->getClassName())),
-							new AccessoryLiteralStringType(),
-						);
-					}
-
-					if ($type instanceof TemplateType && !$type instanceof TypeWithClassName) {
-						return TypeCombinator::intersect(
-							new GenericClassStringType($type),
-							new AccessoryLiteralStringType(),
-						);
-					} elseif ($type instanceof TypeWithClassName) {
-						$reflection = $type->getClassReflection();
-						if ($reflection !== null && $reflection->isFinalByKeyword()) {
-							return new ConstantStringType($reflection->getName(), true);
-						}
-
-						return TypeCombinator::intersect(
-							new GenericClassStringType($type),
-							new AccessoryLiteralStringType(),
-						);
-					} elseif ((new ObjectWithoutClassType())->isSuperTypeOf($type)->yes()) {
-						return TypeCombinator::intersect(
-							new ClassStringType(),
-							new AccessoryLiteralStringType(),
-						);
-					}
-
-					return new ErrorType();
-				},
-			);
+			return $constantClassType->toClassConstantType($this->getReflectionProvider());
 		}
 
-		$referencedClasses = TypeUtils::getDirectClassNames($constantClassType);
+		if ($constantClassType->isClassString()->yes()) {
+			if ($constantClassType->isConstantScalarValue()->yes()) {
+				$isObject = false;
+			}
+			$constantClassType = $constantClassType->getClassStringObjectType();
+		}
+
 		$types = [];
-		foreach ($referencedClasses as $referencedClass) {
+		foreach ($constantClassType->getObjectClassNames() as $referencedClass) {
 			if (!$this->getReflectionProvider()->hasClass($referencedClass)) {
 				continue;
 			}
 
 			$constantClassReflection = $this->getReflectionProvider()->getClass($referencedClass);
 			if (!$constantClassReflection->hasConstant($constantName)) {
+				if ($constantClassReflection->getName() === 'Attribute' && $constantName === 'TARGET_CONSTANT') {
+					return new ConstantIntegerType(1 << 16);
+				}
 				continue;
 			}
 
@@ -1806,32 +2487,70 @@ class InitializerExprTypeResolver
 				continue;
 			}
 
+			$resolvingName = sprintf('%s::%s', $constantClassReflection->getName(), $constantName);
+			if (array_key_exists($resolvingName, $this->currentlyResolvingClassConstant)) {
+				$types[] = new MixedType();
+				continue;
+			}
+
+			if (!$isObject && array_key_exists($resolvingName, $this->classConstantValueTypeCache)) {
+				$types[] = $this->classConstantValueTypeCache[$resolvingName];
+				continue;
+			}
+
+			$this->currentlyResolvingClassConstant[$resolvingName] = true;
+
+			if (!$isObject) {
+				$reflectionConstant = $constantClassReflection->getNativeReflection()->getReflectionConstant($constantName);
+				if ($reflectionConstant === false) {
+					unset($this->currentlyResolvingClassConstant[$resolvingName]);
+					continue;
+				}
+				$reflectionConstantDeclaringClass = $reflectionConstant->getDeclaringClass();
+				$constantType = $this->getType($reflectionConstant->getValueExpression(), InitializerExprContext::fromClass($reflectionConstantDeclaringClass->getName(), $reflectionConstantDeclaringClass->getFileName() ?: null));
+				$nativeType = null;
+				if ($reflectionConstant->getType() !== null) {
+					$nativeType = TypehintHelper::decideTypeFromReflection($reflectionConstant->getType(), selfClass: $constantClassReflection);
+				}
+				$resolvedType = $this->constantResolver->resolveClassConstantType(
+					$constantClassReflection->getName(),
+					$constantName,
+					$constantType,
+					$nativeType,
+					$constantClassReflection->getConstantPhpDocType($constantName),
+				);
+				$this->classConstantValueTypeCache[$resolvingName] = $resolvedType;
+				$types[] = $resolvedType;
+				unset($this->currentlyResolvingClassConstant[$resolvingName]);
+				continue;
+			}
+
 			$constantReflection = $constantClassReflection->getConstant($constantName);
 			if (
-				$constantReflection instanceof ClassConstantReflection
-				&& $isObject
-				&& !$constantClassReflection->isFinal()
+				!$constantClassReflection->isFinal()
+				&& !$constantReflection->isFinal()
 				&& !$constantReflection->hasPhpDocType()
+				&& !$constantReflection->hasNativeType()
 			) {
+				unset($this->currentlyResolvingClassConstant[$resolvingName]);
 				return new MixedType();
 			}
 
-			if (
-				$isObject
-				&& (
-					!$constantReflection instanceof ClassConstantReflection
-					|| !$constantClassReflection->isFinal()
-				)
-			) {
+			if (!$constantClassReflection->isFinal()) {
 				$constantType = $constantReflection->getValueType();
 			} else {
 				$constantType = $this->getType($constantReflection->getValueExpr(), InitializerExprContext::fromClassReflection($constantReflection->getDeclaringClass()));
 			}
 
-			$constantType = $this->constantResolver->resolveConstantType(
-				sprintf('%s::%s', $constantClassReflection->getName(), $constantName),
+			$nativeType = $constantReflection->getNativeType();
+			$constantType = $this->constantResolver->resolveClassConstantType(
+				$constantClassReflection->getName(),
+				$constantName,
 				$constantType,
+				$nativeType,
+				$constantClassReflection->getConstantPhpDocType($constantName),
 			);
+			unset($this->currentlyResolvingClassConstant[$resolvingName]);
 			$types[] = $constantType;
 		}
 
@@ -1862,31 +2581,63 @@ class InitializerExprTypeResolver
 	/**
 	 * @param callable(Expr): Type $getTypeCallback
 	 */
+	public function getUnaryPlusType(Expr $expr, callable $getTypeCallback): Type
+	{
+		$type = $getTypeCallback($expr);
+
+		$specifiedTypes = $this->unaryOperatorTypeSpecifyingExtensionRegistry
+			->callUnaryOperatorTypeSpecifyingExtensions('+', $type);
+		if ($specifiedTypes !== null) {
+			return $specifiedTypes;
+		}
+
+		return $type->toNumber();
+	}
+
+	/**
+	 * @param callable(Expr): Type $getTypeCallback
+	 */
 	public function getUnaryMinusType(Expr $expr, callable $getTypeCallback): Type
 	{
-		$type = $getTypeCallback($expr)->toNumber();
-		$scalarValues = TypeUtils::getConstantScalars($type);
+		$type = $getTypeCallback($expr);
+
+		$specifiedTypes = $this->unaryOperatorTypeSpecifyingExtensionRegistry
+			->callUnaryOperatorTypeSpecifyingExtensions('-', $type);
+		if ($specifiedTypes !== null) {
+			return $specifiedTypes;
+		}
+
+		$type = $this->getUnaryMinusTypeFromType($expr, $type);
+		if ($type instanceof IntegerRangeType) {
+			return $getTypeCallback(new Expr\BinaryOp\Mul($expr, new Int_(-1)));
+		}
+
+		return $type;
+	}
+
+	public function getUnaryMinusTypeFromType(Expr $expr, Type $type): Type
+	{
+		$type = $type->toNumber();
+		$scalarValues = $type->getConstantScalarValues();
 
 		if (count($scalarValues) > 0) {
 			$newTypes = [];
 			foreach ($scalarValues as $scalarValue) {
-				if ($scalarValue instanceof ConstantIntegerType) {
+				if (is_int($scalarValue)) {
 					/** @var int|float $newValue */
-					$newValue = -$scalarValue->getValue();
+					$newValue = -$scalarValue;
 					if (!is_int($newValue)) {
-						return $type;
+						// Negating the smallest integer overflows into a float.
+						$newTypes[] = new ConstantFloatType($newValue);
+						continue;
 					}
 					$newTypes[] = new ConstantIntegerType($newValue);
-				} elseif ($scalarValue instanceof ConstantFloatType) {
-					$newTypes[] = new ConstantFloatType(-$scalarValue->getValue());
+				} elseif (is_float($scalarValue)) {
+					$newTypes[] = new ConstantFloatType(-$scalarValue);
 				}
 			}
 
 			return TypeCombinator::union(...$newTypes);
-		}
-
-		if ($type instanceof IntegerRangeType) {
-			return $getTypeCallback(new Expr\BinaryOp\Mul($expr, new LNumber(-1)));
 		}
 
 		return $type;
@@ -1898,42 +2649,33 @@ class InitializerExprTypeResolver
 	public function getBitwiseNotType(Expr $expr, callable $getTypeCallback): Type
 	{
 		$exprType = $getTypeCallback($expr);
-		return TypeTraverser::map($exprType, static function (Type $type, callable $traverse): Type {
-			if ($type instanceof UnionType || $type instanceof IntersectionType) {
-				return $traverse($type);
-			}
-			if ($type instanceof ConstantStringType) {
-				return new ConstantStringType(~$type->getValue());
-			}
-			if ($type->isString()->yes()) {
-				$accessories = [
-					new StringType(),
-				];
-				if ($type->isNonEmptyString()->yes()) {
-					$accessories[] = new AccessoryNonEmptyStringType();
-				}
-				// it is not useful to apply numeric and literal strings here.
-				// numeric string isn't certainly kept numeric: 3v4l.org/JERDB
 
-				return TypeCombinator::intersect(...$accessories);
-			}
-			if ($type instanceof IntegerType || $type instanceof FloatType) {
-				return new IntegerType(); //no const types here, result depends on PHP_INT_SIZE
-			}
-			return new ErrorType();
-		});
+		$specifiedTypes = $this->unaryOperatorTypeSpecifyingExtensionRegistry
+			->callUnaryOperatorTypeSpecifyingExtensions('~', $exprType);
+		if ($specifiedTypes !== null) {
+			return $specifiedTypes;
+		}
+
+		return $this->getBitwiseNotTypeFromType($exprType);
+	}
+
+	public function getBitwiseNotTypeFromType(Type $exprType): Type
+	{
+		return $exprType->toBitwiseNotType();
 	}
 
 	private function resolveName(Name $name, ?ClassReflection $classReflection): string
 	{
 		$originalClass = (string) $name;
 		if ($classReflection !== null) {
-			if (in_array(strtolower($originalClass), [
+			$lowerClass = strtolower($originalClass);
+
+			if (in_array($lowerClass, [
 				'self',
 				'static',
 			], true)) {
 				return $classReflection->getName();
-			} elseif ($originalClass === 'parent') {
+			} elseif ($lowerClass === 'parent') {
 				if ($classReflection->getParentClass() !== null) {
 					return $classReflection->getParentClass()->getName();
 				}
@@ -1961,6 +2703,20 @@ class InitializerExprTypeResolver
 		return new ObjectType($originalClass);
 	}
 
+	private function resolveTypeByNameWithLateStaticBinding(Name $class, Type $classType, MethodReflection $methodReflectionCandidate): Type
+	{
+		if (
+			$classType instanceof StaticType
+			&& !in_array($class->toLowerString(), ['self', 'static', 'parent'], true)
+		) {
+			if ($methodReflectionCandidate->isStatic()) {
+				$classType = $classType->getStaticObjectType();
+			}
+		}
+
+		return $classType;
+	}
+
 	/**
 	 * @param mixed $value
 	 */
@@ -1972,6 +2728,18 @@ class InitializerExprTypeResolver
 	private function getReflectionProvider(): ReflectionProvider
 	{
 		return $this->reflectionProviderProvider->getReflectionProvider();
+	}
+
+	private function getNeverType(Type $leftType, Type $rightType): Type
+	{
+		// make sure we don't lose the explicit flag in the process
+		if ($leftType instanceof NeverType && $leftType->isExplicit()) {
+			return $leftType;
+		}
+		if ($rightType instanceof NeverType && $rightType->isExplicit()) {
+			return $rightType;
+		}
+		return new NeverType();
 	}
 
 }

@@ -44,6 +44,7 @@ final class IsAnything extends Constraint
     /**
      * Counts the number of constraint elements.
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return 0;

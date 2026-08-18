@@ -2,7 +2,7 @@
 
 interface CExporter_Concern_FromCollection {
     /**
-     * @return Collection
+     * @return CCollection
      */
     public function collection();
 }

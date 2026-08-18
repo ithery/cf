@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 abstract class CComponent {
     use CTrait_Macroable {
         __call as macroCall;
@@ -140,6 +134,7 @@ abstract class CComponent {
         // activate it here, and deactivate it at the end
         // of this method.
         $engine = CView::engineResolver()->resolve('blade');
+        /** @var CComponent_ComponentCompilerEngine $engine */
         $engine->startComponentRendering($this);
 
         $this->setErrorBag(

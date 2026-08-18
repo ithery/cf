@@ -8,6 +8,14 @@ class CApp_Auth_Role {
      */
     protected static $roles = [];
 
+    /**
+     * Get the role model instance for the given id, using an in-memory cache.
+     *
+     * @param null|int|string $id      the role id (or a special value such as 'PUBLIC')
+     * @param bool            $refresh whether to bypass and refresh the cache
+     *
+     * @return null|CModel
+     */
     public static function getModel($id, $refresh = false) {
         if ($id === null) {
             return null;

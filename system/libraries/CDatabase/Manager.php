@@ -1,6 +1,12 @@
 <?php
 
+use Doctrine\DBAL\Types\Type;
+
 class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterface {
+    use CTrait_Macroable {
+        __call as macroCall;
+    }
+
     protected $defaultConnection;
 
     /**
@@ -10,6 +16,35 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      */
     protected $connections = [];
 
+    /**
+     * The callback to be executed to reconnect to a database.
+     *
+     * @var callable
+     */
+    protected $reconnector;
+
+    /**
+     * The custom Doctrine column types.
+     *
+     * @var array<string, array>
+     */
+    protected $doctrineTypes = [];
+
+    /**
+     * The custom connection resolvers.
+     *
+     * @var array<string, callable>
+     */
+    protected $extensions = [];
+
+    /**
+     * @var array
+     */
+    protected $config;
+
+    /**
+     * @var CDatabase_Manager
+     */
     private static $instance;
 
     public static function instance() {
@@ -26,10 +61,16 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      * @return void
      */
     public function __construct() {
-        $this->defaultConnection = 'default';
         $this->reconnector = function ($connection) {
             $this->reconnect($connection->getNameWithReadWriteType());
         };
+        $this->config = CF::config('database');
+
+        $defaultConnection = carr::get($this->config, 'default');
+        if (is_array($defaultConnection)) {
+            $defaultConnection = 'default';
+        }
+        $this->defaultConnection = $defaultConnection;
     }
 
     /**
@@ -47,14 +88,27 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
         // If we haven't created this connection, we'll create it based on the config
         // provided in the application. Once we've created the connections we will
         // set the "fetch mode" for PDO which determines the query return types.
+
         if (!isset($this->connections[$name])) {
             $this->connections[$name] = $this->configure(
                 $this->makeConnection($database),
                 $type
             );
+            CEvent::dispatcher()->dispatch(new CDatabase_Event_ConnectionCreated($this->connections[$name]));
         }
 
         return $this->connections[$name];
+    }
+
+    /**
+     * Alias for connection.
+     *
+     * @param string $name
+     *
+     * @return CDatabase_Connection
+     */
+    public function getConnection($name = null) {
+        return $this->connection($name);
     }
 
     /**
@@ -95,6 +149,10 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
             return call_user_func($this->extensions[$driver], $config, $name);
         }
 
+        if ($driver == 'mongodb') {
+            return $this->createMongoDBConnection($config);
+        }
+
         return CDatabase_ConnectionFactory::instance()->make($config, $name);
     }
 
@@ -109,7 +167,22 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      */
     protected function configuration($name) {
         $name = $name ?: $this->getDefaultConnection();
-        $config = CDatabase_Config::resolve($name);
+        $connections = carr::get($this->config, 'connections');
+        if ($name == 'default') {
+            $defaultValue = carr::get($this->config, 'default');
+            if (is_string($defaultValue)) {
+                $name = $defaultValue;
+            }
+        }
+        $config = carr::get($connections, $name, carr::get($this->config, $name));
+
+        if (is_null($config)) {
+            throw new InvalidArgumentException("Database connection [{$name}] not configured.");
+        }
+
+        $config = (new CDatabase_ConfigurationUrlParser())
+            ->parseConfiguration($config);
+        $config = CDatabase_Config::flattenFormat($config);
 
         return $config;
     }
@@ -124,10 +197,11 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      */
     protected function configure(CDatabase_Connection $connection, $type) {
         $connection = $this->setPdoForType($connection, $type)->setReadWriteType($type);
-
         // Here we'll set a reconnector callback. This reconnector can be any callable
         // so we will set a Closure to reconnect from this manager with the name of
         // the connection, which will allow us to reconnect from the connections.
+        $connection->setEventDispatcher(CEvent::dispatcher());
+        $connection->setTransactionManager(CDatabase::transactionManager());
         $connection->setReconnector($this->reconnector);
 
         $this->registerConfiguredDoctrineTypes($connection);
@@ -145,12 +219,55 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      */
     protected function setPdoForType(CDatabase_Connection $connection, $type = null) {
         if ($type === 'read') {
-            $connection->setDriver($connection->getReadDriver());
+            $connection->setPdo($connection->getReadPdo());
         } elseif ($type === 'write') {
-            $connection->setReadDriver($connection->getDriver());
+            $connection->setReadPdo($connection->getPdo());
         }
 
         return $connection;
+    }
+
+    /**
+     * Register custom Doctrine types with the connection.
+     *
+     * @param \CDatabase_Connection $connection
+     *
+     * @return void
+     */
+    protected function registerConfiguredDoctrineTypes(CDatabase_Connection $connection) {
+        foreach (CF::config('database.dbal.types', []) as $name => $class) {
+            $this->registerDoctrineType($class, $name, $name);
+        }
+
+        foreach ($this->doctrineTypes as $name => [$type, $class]) {
+            $connection->registerDoctrineType($class, $name, $type);
+        }
+    }
+
+    /**
+     * Register a custom Doctrine type.
+     *
+     * @param string $class
+     * @param string $name
+     * @param string $type
+     *
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \RuntimeException
+     *
+     * @return void
+     */
+    public function registerDoctrineType(string $class, string $name, string $type): void {
+        if (!class_exists('Doctrine\DBAL\Connection')) {
+            throw new RuntimeException(
+                'Registering a custom Doctrine type requires Doctrine DBAL (doctrine/dbal).'
+            );
+        }
+
+        if (!Type::hasType($name)) {
+            Type::addType($name, $class);
+        }
+
+        $this->doctrineTypes[$name] = [$type, $class];
     }
 
     /**
@@ -310,6 +427,53 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
     }
 
     /**
+     * Register a connection with the manager.
+     *
+     * @param array  $config
+     * @param string $name
+     *
+     * @return void
+     */
+    public function addConnection(array $config, $name = 'default') {
+        $connections = carr::get($this->config, 'connections');
+
+        $connections[$name] = $config;
+
+        carr::set($this->config, 'connections', $connections);
+    }
+
+    /**
+     * Register a connection with the manager.
+     *
+     * @param array  $config
+     * @param string $name
+     *
+     * @return void
+     */
+    public function addRedisConnection(array $config, $name = 'default') {
+        $redisConnections = carr::get($this->config, 'redis');
+
+        //blacklist name for client and options
+        $invalidNames = ['client', ' options'];
+        if (in_array($name, $invalidNames)) {
+            throw new Exception(sprintf('invalid name for name %s when add redis connection', $name));
+        }
+        $redisConnections[$name] = $config;
+
+        carr::set($this->config, 'redis', $redisConnections);
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public function getConfig($key, $default = null) {
+        return carr::get($this->config, $key, $default);
+    }
+
+    /**
      * Dynamically pass methods to the default connection.
      *
      * @param string $method
@@ -318,6 +482,14 @@ class CDatabase_Manager implements CDatabase_Contract_ConnectionResolverInterfac
      * @return mixed
      */
     public function __call($method, $parameters) {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         return $this->connection()->$method(...$parameters);
+    }
+
+    public function createMongoDBConnection($config) {
+        return new CDatabase_Connection_MongoDBConnection($config);
     }
 }

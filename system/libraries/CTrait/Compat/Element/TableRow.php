@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 12, 2022, 1:55:05 AM
+ * @see CElement_Component_TableRow
  */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_TableRow {
@@ -18,6 +15,7 @@ trait CTrait_Compat_Element_TableRow {
      * @deprecated since 1.2, use addColumn
      */
     public function add_column($content) {
+        /** @var CElement_Component_TableRow $this */
         return $this->addColumn($content);
     }
 }

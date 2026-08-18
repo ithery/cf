@@ -34,4 +34,13 @@ final class CCrypt {
 
         return $key;
     }
+
+    /**
+     * @param null|string $driver
+     *
+     * @return CCrypt_HashManager
+     */
+    public static function hasher($driver = null) {
+        return CCrypt_HashManager::instance($driver);
+    }
 }

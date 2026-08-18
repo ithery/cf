@@ -5,6 +5,7 @@ namespace PHPStan\Rules\Methods;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
 use PHPStan\BetterReflection\Reflector\Exception\IdentifierNotFound;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\InClassNode;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Rules\Rule;
@@ -16,7 +17,8 @@ use function strtolower;
 /**
  * @implements Rule<InClassNode>
  */
-class MissingMagicSerializationMethodsRule implements Rule
+#[RegisteredRule(level: 0)]
+final class MissingMagicSerializationMethodsRule implements Rule
 {
 
 	public function __construct(private PhpVersion $phpversion)
@@ -66,13 +68,19 @@ class MissingMagicSerializationMethodsRule implements Rule
 			$messages[] = RuleErrorBuilder::message(sprintf(
 				'Non-abstract class %s implements the Serializable interface, but does not implement __serialize().',
 				$classReflection->getDisplayName(),
-			))->tip('See https://wiki.php.net/rfc/phase_out_serializable')->build();
+			))
+				->tip('See https://wiki.php.net/rfc/phase_out_serializable')
+				->identifier('class.serializable')
+				->build();
 		}
 		if ($missingMagicUnserialize) {
 			$messages[] = RuleErrorBuilder::message(sprintf(
 				'Non-abstract class %s implements the Serializable interface, but does not implement __unserialize().',
 				$classReflection->getDisplayName(),
-			))->tip('See https://wiki.php.net/rfc/phase_out_serializable')->build();
+			))
+				->tip('See https://wiki.php.net/rfc/phase_out_serializable')
+				->identifier('class.serializable')
+				->build();
 		}
 
 		return $messages;

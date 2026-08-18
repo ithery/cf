@@ -23,6 +23,7 @@ final class CVendor_Firebase_Value_Email implements \JsonSerializable {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->value;
     }
@@ -30,6 +31,7 @@ final class CVendor_Firebase_Value_Email implements \JsonSerializable {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->value;
     }

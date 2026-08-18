@@ -130,6 +130,7 @@ final class Directory extends AbstractNode implements IteratorAggregate
      */
     private $numTestedFunctions = -1;
 
+    #[\ReturnTypeWillChange]
     public function count()
     {
         if ($this->numFiles === -1) {
@@ -143,6 +144,7 @@ final class Directory extends AbstractNode implements IteratorAggregate
         return $this->numFiles;
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new RecursiveIteratorIterator(

@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2018, 2:00:52 PM
+ * @see CElement_FormInput_Text
  */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_FormInput_Text {
@@ -19,37 +16,32 @@ trait CTrait_Compat_Element_FormInput_Text {
      * @return $this
      */
     public function set_placeholder($placeholder, $lang = true) {
+        /** @var CElement_FormInput_Text $this */
         return $this->setPlaceholder($placeholder, $lang);
     }
 
+    /**
+     * @deprecated, please use the $inputStyle property directly
+     *
+     * @return null|mixed
+     */
     public function get_input_style() {
-        return $this->input_style;
+        /** @var CElement_FormInput_Text $this */
+        return $this->inputStyle;
     }
 
-    public function get_button_position() {
-        return $this->button_position;
-    }
-
-    public function get_action() {
-        return $this->action;
-    }
-
+    /**
+     * @deprecated, please set the $inputStyle property directly
+     *
+     * @param mixed $input_style
+     *
+     * @return $this
+     */
     public function set_input_style($input_style) {
-        $this->input_style = $input_style;
+        /** @var CElement_FormInput_Text $this */
+        $this->inputStyle = $input_style;
 
         return $this;
-    }
-
-    public function set_button_position($button_position) {
-        $this->button_position = $button_position;
-
-        return $this;
-    }
-
-    public function add_action($id = '') {
-        $this->action = CElement_Factory::createComponent('Action', $id);
-
-        return $this->action;
     }
 }
 //@codingStandardsIgnoreEnd

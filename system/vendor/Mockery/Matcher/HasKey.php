@@ -38,6 +38,7 @@ class HasKey extends MatcherAbstract
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return "<HasKey[$this->_expected]>";

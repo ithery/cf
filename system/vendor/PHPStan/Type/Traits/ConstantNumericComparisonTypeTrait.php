@@ -2,7 +2,9 @@
 
 namespace PHPStan\Type\Traits;
 
+use PHPStan\Php\PhpVersion;
 use PHPStan\Type\Constant\ConstantBooleanType;
+use PHPStan\Type\Constant\ConstantFloatType;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\NullType;
@@ -12,7 +14,7 @@ use PHPStan\Type\TypeCombinator;
 trait ConstantNumericComparisonTypeTrait
 {
 
-	public function getSmallerType(): Type
+	public function getSmallerType(PhpVersion $phpVersion): Type
 	{
 		$subtractedTypes = [
 			new ConstantBooleanType(true),
@@ -22,15 +24,17 @@ trait ConstantNumericComparisonTypeTrait
 		if (!(bool) $this->value) {
 			$subtractedTypes[] = new NullType();
 			$subtractedTypes[] = new ConstantBooleanType(false);
+			$subtractedTypes[] = new ConstantFloatType(0.0); // subtract range when we support float-ranges
 		}
 
 		return TypeCombinator::remove(new MixedType(), TypeCombinator::union(...$subtractedTypes));
 	}
 
-	public function getSmallerOrEqualType(): Type
+	public function getSmallerOrEqualType(PhpVersion $phpVersion): Type
 	{
 		$subtractedTypes = [
 			IntegerRangeType::createAllGreaterThan($this->value),
+			// subtract range when we support float-ranges
 		];
 
 		if (!(bool) $this->value) {
@@ -40,11 +44,12 @@ trait ConstantNumericComparisonTypeTrait
 		return TypeCombinator::remove(new MixedType(), TypeCombinator::union(...$subtractedTypes));
 	}
 
-	public function getGreaterType(): Type
+	public function getGreaterType(PhpVersion $phpVersion): Type
 	{
 		$subtractedTypes = [
 			new NullType(),
 			new ConstantBooleanType(false),
+			new ConstantFloatType(0.0), // subtract range when we support float-ranges
 			IntegerRangeType::createAllSmallerThanOrEqualTo($this->value),
 		];
 
@@ -55,7 +60,7 @@ trait ConstantNumericComparisonTypeTrait
 		return TypeCombinator::remove(new MixedType(), TypeCombinator::union(...$subtractedTypes));
 	}
 
-	public function getGreaterOrEqualType(): Type
+	public function getGreaterOrEqualType(PhpVersion $phpVersion): Type
 	{
 		$subtractedTypes = [
 			IntegerRangeType::createAllSmallerThan($this->value),
@@ -64,6 +69,7 @@ trait ConstantNumericComparisonTypeTrait
 		if ((bool) $this->value) {
 			$subtractedTypes[] = new NullType();
 			$subtractedTypes[] = new ConstantBooleanType(false);
+			$subtractedTypes[] = new ConstantFloatType(0.0); // subtract range when we support float-ranges
 		}
 
 		return TypeCombinator::remove(new MixedType(), TypeCombinator::union(...$subtractedTypes));

@@ -1,10 +1,13 @@
 <?php
 
 /**
- * Description of JsonResponse
+ * Description of JsonResponse.
  *
  * @author Hery
  */
+
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
 
 class CHTTP_JsonResponse extends BaseJsonResponse {
@@ -32,7 +35,7 @@ class CHTTP_JsonResponse extends BaseJsonResponse {
     /**
      * Sets the JSONP callback.
      *
-     * @param string|null $callback
+     * @param null|string $callback
      *
      * @return $this
      */
@@ -53,16 +56,16 @@ class CHTTP_JsonResponse extends BaseJsonResponse {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setData($data = []) {
         $this->original = $data;
 
-        if ($data instanceof CInterface_Jsonable) {
+        if ($data instanceof Jsonable) {
             $this->data = $data->toJson($this->encodingOptions);
         } elseif ($data instanceof JsonSerializable) {
             $this->data = json_encode($data->jsonSerialize(), $this->encodingOptions);
-        } elseif ($data instanceof CInterface_Arrayable) {
+        } elseif ($data instanceof Arrayable) {
             $this->data = json_encode($data->toArray(), $this->encodingOptions);
         } else {
             $this->data = json_encode($data, $this->encodingOptions);
@@ -96,7 +99,7 @@ class CHTTP_JsonResponse extends BaseJsonResponse {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setEncodingOptions($options) {
         $this->encodingOptions = (int) $options;

@@ -4,6 +4,11 @@
  * Class ConfigLoader.
  */
 class CElement_FormInput_EditorJs_ConfigLoader {
+    /**
+     * Loaded tool validation/sanitization settings, keyed by tool name.
+     *
+     * @var array
+     */
     public $tools = [];
 
     /**
@@ -28,6 +33,8 @@ class CElement_FormInput_EditorJs_ConfigLoader {
      * @param array $config
      *
      * @throws CElement_FormInput_EditorJs_EditorJsException
+     *
+     * @return void
      */
     private function loadTools($config) {
         if (!isset($config['tools'])) {
@@ -36,7 +43,7 @@ class CElement_FormInput_EditorJs_ConfigLoader {
 
         foreach ($config['tools'] as $toolName => $toolData) {
             if (isset($this->tools[$toolName])) {
-                throw new CElement_FormInput_EditorJs_EditorJsException("Duplicate tool ${toolName} in configuration");
+                throw new CElement_FormInput_EditorJs_EditorJsException("Duplicate tool {$toolName} in configuration");
             }
 
             $this->tools[$toolName] = $this->loadTool($toolData);

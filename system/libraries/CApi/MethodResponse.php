@@ -6,6 +6,9 @@ class CApi_MethodResponse {
      */
     protected $method;
 
+    /**
+     * @var CApi_HTTP_Request
+     */
     protected $request;
 
     public function __construct(CApi_HTTP_Request $request, CApi_MethodAbstract $method) {
@@ -13,6 +16,10 @@ class CApi_MethodResponse {
         $this->request = $request;
     }
 
+    /**
+     * @param string $format
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function toResponse($format = 'json') {
         $response = new CApi_HTTP_Response($this->method->result());
         $response->morph($format);

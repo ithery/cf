@@ -20,38 +20,89 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     const ON_ERROR = 0;    // error() or fatalError() is called
 
+    /**
+     * @var int
+     */
     const ON_SIGNAL = 1;    // the daemon has received a signal
 
+    /**
+     * @var int
+     */
     const ON_INIT = 2;    // the library has completed initialization, your setup() method is about to be called. Note: Not Available to Worker code.
 
+    /**
+     * @var int
+     */
     const ON_PREEXECUTE = 3;    // inside the event loop, right before your execute() method
 
+    /**
+     * @var int
+     */
     const ON_POSTEXECUTE = 4;    // and right after
 
+    /**
+     * @var int
+     */
     const ON_FORK = 5;    // in a background process right after it has been forked from the daemon
 
+    /**
+     * @var int
+     */
     const ON_PIDCHANGE = 6;    // whenever the pid changes -- in a background process for example
 
+    /**
+     * @var int
+     */
     const ON_IDLE = 7;    // called when there is idle time at the end of a loopInterval, or at the idleProbability when loopInterval isn't used
 
+    /**
+     * @var int
+     */
     const ON_REAP = 8;    // notification from the OS that a child process of this application has exited
 
+    /**
+     * @var int
+     */
     const ON_SHUTDOWN = 10;   // called at the top of the destructor
 
+    /**
+     * @var string
+     */
     protected $serviceName;
 
+    /**
+     * @var array
+     */
     protected $config;
 
+    /**
+     * @var int
+     */
     protected $startTime;
 
+    /**
+     * @var bool
+     */
     protected $shutdown = false;
 
+    /**
+     * @var bool
+     */
     protected $parent = true;
 
+    /**
+     * @var null|int
+     */
     protected $parentPid = null;
 
+    /**
+     * @var bool
+     */
     protected $isRecoverWorkers = false;
 
+    /**
+     * @var bool
+     */
     protected $isDebugWorkers = false;
 
     /**
@@ -59,13 +110,46 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     protected $pidFile = null;
 
+    /**
+     * Whether this process is the one registered in the pid file.
+     *
+     * Only the owner may remove it on shutdown. Without this, a start that
+     * failed after claiming the file deleted the registration of the daemon
+     * that was already running.
+     *
+     * @var bool
+     */
+    protected $pidFileOwned = false;
+
+    /**
+     * @var bool
+     */
     protected $stdout = false;
 
+    /**
+     * @var bool
+     */
     protected $debug = true;
 
+    /**
+     * @var int
+     */
     protected $terminateLimit = 20;
 
-    protected $sizeToRotate = '500KB';
+    /**
+     * @var int
+     */
+    protected $logSizeToRotate = 500 * 1024;
+
+    /**
+     * @var int
+     */
+    protected $logKeepToRotate = 10;
+
+    /**
+     * @var null|CDaemon_Runner
+     */
+    protected $runner = null;
 
     /**
      * The frequency of the event loop. In seconds.
@@ -112,6 +196,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      */
     protected $autoRestartInterval = 43200;
 
+    /**
+     * @var bool If true, the daemon will continue running even if a fatal error occurs. If false, the daemon will attempt to restart itself after a fatal error.
+     */
     protected $isDaemonContinueOnFatalError = false;
 
     /**
@@ -155,7 +242,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @see CDaemon_ServiceAbstract::log()
      * @see CDaemon_ServiceAbstract::restart();
      *
-     * @var stream
+     * @var bool|resource
      */
     private static $logHandle = false;
 
@@ -179,11 +266,17 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         return $this->isDaemonContinueOnFatalError;
     }
 
+    /**
+     * @param mixed $serviceName
+     * @param mixed $config
+     */
     public function __construct($serviceName, $config) {
         $this->serviceName = $serviceName;
         $this->config = $config;
         $this->stdout = carr::get($config, 'stdout', false);
         $this->pidFile = $this->getConfig('pidFile');
+        $this->logSizeToRotate = CF::config('daemon.logs.rotation.size', 500 * 1024);
+        $this->logKeepToRotate = CF::config('daemon.logs.rotation.keep', 10);
         CDaemon_ErrorHandler::init();
         //$this->getopt();
     }
@@ -192,8 +285,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * Ensure that essential runtime conditions are met.
      * To easily add rules to this, overload this method, build yourself an array of error messages,
      * and then call parent::checkEnvironment($my_errors).
-     *
-     * @param array $errors
      *
      * @throws Exception
      *
@@ -217,18 +308,18 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         }
         foreach ($this->plugins as $plugin) {
             foreach ($plugin->checkEnvironment() as $error) {
-                $errors[] = "[${plugin}] ${error}";
+                $errors[] = "[{$plugin}] {$error}";
             }
         }
         foreach ($this->workers as $worker) {
             foreach ($worker->checkEnvironment() as $error) {
-                $errors[] = "[${worker}] ${error}";
+                $errors[] = "[{$worker}] {$error}";
             }
         }
         if (count($errors)) {
             $errors = implode("\n  ", $errors);
 
-            throw new Exception("Checking Dependencies... Failed:\n  ${errors}");
+            throw new Exception("Checking Dependencies... Failed:\n  {$errors}");
         }
     }
 
@@ -265,6 +356,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $plugin->setup();
         }
         $this->dispatch([self::ON_INIT]);
+        $this->dispatchEvent(new CDaemon_Event_Service_OnInit($this));
         foreach ($this->workers as $worker) {
             $worker->setup();
         }
@@ -273,7 +365,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->on(self::ON_IDLE, [$this, 'statsTrim'], (empty($this->loopInterval)) ? null : ($this->loopInterval * 50)); // Throttle to about once every 50 iterations
         $this->setup();
         $this->log('Application Startup Complete. Starting Event Loop.');
-        $this->log('Event Loop Duration: ' . number_format($this->getLoopInterval(), 2)) . ' seconds';
+        $this->log('Event Loop Duration: ' . number_format($this->getLoopInterval(), 2) . ' seconds');
     }
 
     /**
@@ -285,6 +377,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         try {
             $this->shutdown = true;
             $this->dispatch([self::ON_SHUTDOWN]);
+            $this->dispatchEvent(new CDaemon_Event_Service_OnShutdown($this));
             foreach (array_merge($this->workers, $this->plugins) as $object) {
                 $object->teardown();
                 unset($object);
@@ -293,7 +386,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $this->fatalError(sprintf('Exception Thrown in Shutdown: %s [file] %s [line] %s%s%s', $e->getMessage(), $e->getFile(), $e->getLine(), PHP_EOL, $e->getTraceAsString()));
         }
         $this->callbacks = [];
-        if ($this->parent && $this->pidFile && file_exists($this->pidFile) && file_get_contents($this->pidFile) == $this->pid) {
+        if ($this->parent && $this->pidFileOwned && $this->pidFile && file_exists($this->pidFile) && file_get_contents($this->pidFile) == $this->pid) {
             $this->log('Unlink PID:' . $this->pidFile);
             unlink($this->pidFile);
         }
@@ -318,12 +411,26 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $this->pid(getmypid()); // We have a new pid now
             $pidFile = $this->pidFile;
 
+            // The pid file must not be taken from a daemon of the same class that
+            // is still running. It used to be claimed here before anything checked
+            // whether this process could run at all, so an instance that went on to
+            // fail -- a socket daemon whose port was already bound, say -- first
+            // overwrote the incumbent's registration and then deleted it on the way
+            // out. Its supervisor then read an empty pid file, concluded the daemon
+            // was down, and started another doomed instance, over and over.
+            if ($this->isPidFileHeldByLiveInstance()) {
+                $this->log('Already running with PID ' . $this->getPidFromPidFile() . ', not starting a second instance');
+
+                return;
+            }
+
             $handle = @fopen($pidFile, 'w');
             if (!$handle) {
                 $this->fatalError('Unable to write PID to ' . $this->pidFile);
             }
             fwrite($handle, $this->pid);
             fclose($handle);
+            $this->pidFileOwned = true;
             $this->setupPlugins();
             $this->setupWorkers();
             $this->checkEnvironment();
@@ -351,12 +458,14 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             }
             if ($this->shouldRun()) {
                 $this->dispatch([self::ON_PREEXECUTE]);
+                $this->dispatchEvent(new CDaemon_Event_Service_OnPreExecute($this));
                 $this->loopProcess();
                 if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
                     pcntl_signal_dispatch();
                 }
 
                 $this->dispatch([self::ON_POSTEXECUTE]);
+                $this->dispatchEvent(new CDaemon_Event_Service_OnPostExecute($this));
             }
             $this->timer();
         }
@@ -382,13 +491,10 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * Register a callback for the given $event. Use the event class constants for built-in events. Add and dispatch
      * your own events however you want.
      *
-     * @param $event mixed scalar  When creating custom events, keep ints < 100 reserved for the daemon
-     * @param $callback closure|callback
-     * @param $throttle Optional time in seconds to throttle calls to the given $callback. For example, if
-     *                  $throttle = 10, the provided $callback will not be called more than once every 10 seconds, even if the
-     *                  given $event is dispatched more frequently than that.
-     * @param $criteria closure|callback Optional. If provided, any event payload will be passed to this callable and
-     *                  the event dispatched only if it returns truthy.
+     * @param mixed $event    When creating custom events, keep ints < 100 reserved for the daemon
+     * @param closure|callable $callback
+     * @param int|null $throttle Optional time in seconds to throttle calls to the given $callback. For example, if $throttle = 10, the provided $callback will not be called more than once every 10 seconds, even if the given $event is dispatched more frequently than that.
+     * @param callable|null $criteria Optional. If provided, any event payload will be passed to this callable and the event dispatched only if it returns truthy.
      *
      * @throws Exception
      *
@@ -473,7 +579,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * Run any task asynchronously by passing it to this method. Will fork into a child process, execute the supplied
      * code, and exit.
      *
-     * The $callable provided can be a standard PHP Callback, a Closure, or any object that implements Core_ITask
+     * The $callable provided can be a standard PHP Callback, a Closure, or any object that implements CDaemon_TaskAbstract
      *
      * Note: If the task uses MySQL or certain other outside resources, the connection will have to be
      * re-established in the child process. There are three options:
@@ -487,15 +593,15 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * 3. Run setup code specific to the current background task:
      *    If you need to run specific setup code for a task or worker you have to use an object. You can't use the shortened
-     *    form of passing a callback or closure. For tasks that means an object that implements Core_ITask. For workers,
-     *    it's Core_IWorker. The setup() and teardown() methods defined in the interfaces are natural places to handle
+     *    form of passing a callback or closure. For tasks that means an object that implements CDaemon_TaskAbstract. For workers,
+     *    it's CDaemon_WorkerInterface. The setup() and teardown() methods defined in the interfaces are natural places to handle
      *    database connections, etc.
      *
      * @param callable|CDaemon_TaskAbstract $task a valid PHP callback or closure
      *
      * @link https://github.com/shaneharter/PHP-Daemon/wiki/Tasks
      *
-     * @return Core_Lib_Process|bool Return a newly created Process object or false on failure
+     * @return CDaemon_Process|bool Return a newly created Process object or false on failure
      */
     public function task($task) {
         if ($this->shutdown) {
@@ -518,7 +624,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             $group = 'tasks';
             $callable = $task;
         }
-        $proc = $this->getPlugin('ProcessManager')->fork($group);
+        /** @var CDaemon_Plugin_ProcessManager $processManager */
+        $processManager = $this->getPlugin('ProcessManager');
+        $proc = $processManager->fork($group);
         if ($proc === false) {
             // Parent Process - Fork Failed
             $e = new Exception();
@@ -531,7 +639,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             // Child Process
             $this->startTime = time();
             $this->parent = false;
-            $this->parentPid == $this->pid;
+            $this->parentPid = $this->pid;
             $this->pid(getmypid());
             // Remove unused worker objects. They can be memory hogs.
             foreach ($this->workers as $workerKey => $worker) {
@@ -548,10 +656,18 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             }
             exit;
         }
-        // Parent Process - Return the newly created Core_Lib_Process object
+
+        // Parent Process - Return the newly created CDaemon_Process object
         return $proc;
     }
 
+    /**
+     * Get a configuration value from the config array passed to the constructor.
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
     public function getConfig($key) {
         return carr::get($this->config, $key);
     }
@@ -560,56 +676,29 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * Log the $message to the filename returned by CDaemon_ServiceAbstract::logFile() and/or optionally print to stdout.
      * Multi-Line messages will be handled nicely.
      *
-     * Note: Your logFile() method will be called every 5 minutes (at even increments, eg 00:05, 00:10, 00:15, etc) to
-     * allow you to rotate the filename based on time (one log file per month, day, hour, whatever) if you wish.
-     *
-     * Note: You may find value in overloading this method in your app in favor of a more fully-featured logging tool
-     * like log4php or Zend_Log. There are fantastic logging libraries available, and this simplistic home-grown option
-     * was chosen specifically to avoid forcing another dependency on you.
-     *
      * @param string $message
      * @param string $label   Truncated at 12 chars
      * @param mixed  $indent
      */
     public function log($message, $label = '', $indent = 0) {
-        static $logFile = '';
-        static $logFileCheckAt = 0;
-        static $logFileError = false;
-        $header = "\nDate                  PID   Label         Message\n";
+        $header = "\nDate                  PID   Label         Message" . PHP_EOL;
         $date = date('Y-m-d H:i:s');
         $pid = str_pad($this->pid, 5, ' ', STR_PAD_LEFT);
         $label = str_pad(substr($label, 0, 12), 13, ' ', STR_PAD_RIGHT);
-        $prefix = "[${date}] ${pid} ${label}" . str_repeat("\t", $indent);
-        if (time() >= $logFileCheckAt && $this->logFile() != $logFile) {
-            $logFile = $this->logFile();
-            $logFileCheckAt = mktime(date('H'), (date('i') - (date('i') % 5)) + 5, null);
-            @fclose(self::$logHandle);
-            self::$logHandle = $logFileError = false;
-        }
-        if (self::$logHandle === false) {
-            if (strlen($logFile) > 0 && file_exists($logFile)) {
-                $rotator = CLogger_Rotator::createRotate($logFile);
+        $prefix = "[{$date}] {$pid} {$label}" . str_repeat("\t", $indent);
+        $logFile = $this->logFile();
 
-                $rotator->size($this->sizeToRotate)->run();
-            }
-            if (strlen($logFile) > 0 && self::$logHandle = @fopen($logFile, 'a+')) {
-                if ($this->parent) {
-                    fwrite(self::$logHandle, $header);
-                    if ($this->stdout) {
-                        echo $header;
-                    }
-                }
-            } elseif (!$logFileError) {
-                $logFileError = true;
-                trigger_error(__CLASS__ . 'Error: Could not write to logfile ' . $logFile, E_USER_WARNING);
+        $this->runner()->autoRotateLog($this->logSizeToRotate, $this->logKeepToRotate);
+        if (!CFile::exists($logFile)) {
+            CFile::put($logFile, $header);
+            if ($this->stdout) {
+                echo $header;
             }
         }
-        $message = $prefix . ' ' . str_replace("\n", "\n${prefix} ", trim($message)) . "\n";
-        if (self::$logHandle) {
-            fwrite(self::$logHandle, $message);
-        }
+        $line = $prefix . ' ' . str_replace(PHP_EOL, PHP_EOL . $prefix, trim($message)) . PHP_EOL;
+        CFile::append($logFile, $line);
         if ($this->stdout) {
-            echo $message;
+            echo $line;
         }
     }
 
@@ -617,6 +706,12 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         return carr::get($this->config, 'logFile');
     }
 
+    /**
+     * Log the provided $message if debug mode is enabled.
+     *
+     * @param string $label
+     * @param mixed  $message
+     */
     public function debug($message, $label = '') {
         if ($this->debug) {
             return;
@@ -630,12 +725,24 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * The library has no concept of a runtime error. If your application doesn't attach any ON_ERROR listeners, there
      * is literally no difference between using this and just passing the message to CDaemon_ServiceAbstract::log().
      *
-     * @param $message
      * @param string $label
+     * @param mixed  $message
      */
     public function error($message, $label = '') {
         $this->log($message, $label);
         $this->dispatch([self::ON_ERROR], [$message]);
+        $this->dispatchEvent(new CDaemon_Event_Service_OnError($this, $message, $label));
+    }
+
+    /**
+     * Dispatch an event to the CEvent system.
+     *
+     * @param mixed $event
+     *
+     * @return mixed
+     */
+    public function dispatchEvent($event) {
+        return CEvent::dispatch($event);
     }
 
     /**
@@ -704,6 +811,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
                 break;
         }
         $this->dispatch([self::ON_SIGNAL], [$signal]);
+        $this->dispatchEvent(new CDaemon_Event_Service_OnSignal($this, $signal));
     }
 
     /**
@@ -837,6 +945,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         // If we have idle time, do any housekeeping tasks
         if ($isIdle()) {
             $this->dispatch([CDaemon_ServiceAbstract::ON_IDLE], [$isIdle]);
+            $this->dispatchEvent(new CDaemon_Event_Service_OnIdle($this));
         }
         $stats = [];
         $stats['duration'] = microtime(true) - $startTime;
@@ -879,6 +988,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->restart();
     }
 
+    /**
+     * Stop the process with the given PID.
+     *
+     * @param int $pid
+     *
+     * @return string
+     */
     private function stopPid($pid) {
         $command = 'kill -2 ' . $pid;
         $result = '';
@@ -925,6 +1041,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             return;
         }
         $this->log('Restart Happening Now...');
+        $this->dispatchEvent(new CDaemon_Event_Service_OnRestart($this));
         $this->shutdown = true;
         // We want to shutdown workers, release any lock files, and swap out the pid file (as applicable)
         // Basically put this into a walking-dead state by destructing everything while keeping this process alive
@@ -941,17 +1058,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             fclose(STDIN);
         }
 
-        $class = get_class($this);
-        $runner = CDaemon::createRunner($class);
-        // Close the static log handle to prevent it being inherrited by the new process.
-        if (is_resource(self::$logHandle)) {
-            if ($rotateLog) {
-                $this->log('Rotating Log...');
-            }
-            fclose(self::$logHandle);
-            if ($rotateLog) {
-                $runner->rotateLog();
-            }
+        $this->closeInheritedConnections();
+
+        $runner = $this->runner();
+
+        if ($rotateLog) {
+            $this->log('Rotating Log...');
+            $runner->rotateLog();
         }
         $runner->run();
 
@@ -960,7 +1073,32 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     }
 
     /**
-     * Load any plugin that implements the Core_IPlugin.
+     * Close pooled Redis and database connections before the daemon re-executes itself.
+     *
+     * @return void
+     */
+    protected function closeInheritedConnections() {
+        try {
+            $redis = CRedis::instance();
+            foreach (array_keys($redis->connections()) as $name) {
+                $redis->purge($name);
+            }
+        } catch (Throwable $ex) {
+            //bersih-bersih tidak boleh menggagalkan restart
+        }
+
+        try {
+            $manager = CDatabase::manager();
+            foreach (array_keys($manager->getConnections()) as $name) {
+                $manager->disconnect($name);
+            }
+        } catch (Throwable $ex) {
+            //bersih-bersih tidak boleh menggagalkan restart
+        }
+    }
+
+    /**
+     * Load any plugin that implements the CDaemon_PluginInterface.
      *
      * @param string                      $alias
      * @param null|CDaemon_PluginAbstract $instance
@@ -971,17 +1109,17 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * two examples are identical:
      *
      * @example $this->plugin('ini');
-     * @example $this->plugin('ini', new Core_Plugin_Ini() );
+     * @example $this->plugin('ini', new CDaemon_Plugin_Ini() );
      *
-     * In both of the preceding examples, a Core_Plugin_Ini object is available throughout your application object
+     * In both of the preceding examples, a CDaemon_Plugin_Ini object is available throughout your application object
      * as $this->ini.
      *
      * More complex (or just less magical) code can be used when appropriate. Want to load multiple instances of a plugin?
      * Want to use more meaningful names in your application instead of just duplicating part of the class name?
      * You can do all that too. This is simple dependency injection. Inject whatever object you want at runtime as long
-     * as it implements Core_IPlugin.
-     * @example $this->plugin('credentials', new Core_Plugins_Ini());
-     *          $this->plugin('settings', new Core_Plugins_Ini());
+     * as it implements CDaemon_PluginInterface.
+     * @example $this->plugin('credentials', new CDaemon_Plugin_Ini());
+     *          $this->plugin('settings', new CDaemon_Plugin_Ini());
      *          $this->credentials->filename = '~/prod/credentials.ini';
      *          $this->settings->filename = BASE_PATH . '/MyDaemon/settings.ini';
      *          echo $this->credentials['mysql']['user']; // Echo the 'user' key in the 'mysql' section
@@ -992,7 +1130,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * CDaemon_ServiceAbstract or in your application superclass.
      *
      * Note: The Lock objects in Core/Lock are also Plugins and can be loaded in nearly the same way.
-     * Take Core_Lock_File for instance.  The only difference is that you cannot magically load it using the alias
+     * Take CDaemon_Lock_File for instance.  The only difference is that you cannot magically load it using the alias
      * 'file' alone. The Plugin loader would not know to look for the file in the Lock directory. In these instances
      * the prefix is necessary.
      * @example $this->plugin('Lock_File'); // Instantiated at $this->Lock_File
@@ -1001,7 +1139,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @return CDaemon_PluginAbstract Returns an instance of the plugin
      */
-    protected function addPlugin($alias, CDaemon_PluginAbstract $instance = null) {
+    protected function addPlugin($alias, ?CDaemon_PluginAbstract $instance = null) {
         $this->checkPluginAlias($alias);
         if ($instance === null) {
             // This if wouldn't be necessary if /Lock lived inside /Plugin.
@@ -1028,11 +1166,11 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     }
 
     /**
-     * @param type $alias
+     * @param string $alias
      *
      * @throws Exception
      *
-     * @return CDaemon_Plugin
+     * @return CDaemon_PluginAbstract
      */
     public function getPlugin($alias) {
         if (!isset($this->plugins[$alias])) {
@@ -1045,7 +1183,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     /**
      * Simple function to validate that alises for Plugins won't interfere with each other or with existing daemon properties.
      *
-     * @param $alias
+     * @param mixed $alias
      *
      * @throws Exception
      */
@@ -1063,11 +1201,11 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @param string                           $alias  The name of the worker -- Will be instantiated at $this->{$alias}
      * @param callable|CDaemon_WorkerInterface $worker An object of type CDaemon_WorkerInterface OR a callable (function, callback, closure)
-     * @param CDaemon_Worker_ViaInterface      $via    A Core_IWorkerVia object that defines the medium for IPC (In theory could be any message queue, redis, memcache, etc)
+     * @param CDaemon_Worker_ViaInterface      $via    A CDaemon_Worker_ViaInterface object that defines the medium for IPC
      *
-     * @return CDaemon_Worker_Mediator Returns a Core_Worker class that can be used to interact with the Worker
+     * @return CDaemon_Worker_MediatorAbstract
      */
-    protected function addWorker($alias, $worker, CDaemon_Worker_ViaInterface $via = null) {
+    protected function addWorker($alias, $worker, ?CDaemon_Worker_ViaInterface $via = null) {
         if (!$this->parent) {
             // While in theory there is nothing preventing you from creating workers in child processes, supporting it
             // would require changing a lot of error handling and process management code and I don't really see the value in it.
@@ -1082,7 +1220,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
                 $mediator = new CDaemon_Worker_MediatorObject($alias, $this, $via);
                 // Ensure that there are no reserved method names in the worker object -- Determine if there will
                 // be a collision between worker methods and public methods on the Mediator class
-                // Exclude any methods required by the Core_IWorker interface from the check.
+                // Exclude any methods required by the CDaemon_WorkerInterface interface from the check.
                 $intersection = array_intersect(get_class_methods($worker), get_class_methods($mediator));
                 $intersection = array_diff($intersection, get_class_methods(CDaemon_WorkerInterface::class));
                 if (!empty($intersection)) {
@@ -1105,11 +1243,11 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     }
 
     /**
-     * @param type $alias
+     * @param string $alias
      *
      * @throws Exception
      *
-     * @return type
+     * @return CDaemon_Worker_MediatorAbstract
      */
     protected function getWorker($alias) {
         if (!isset($this->workers[$alias])) {
@@ -1122,7 +1260,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     /**
      * Simple function to validate that alises for Plugins or Workers won't interfere with each other or with existing daemon properties.
      *
-     * @param $alias
+     * @param mixed $alias
      *
      * @throws Exception
      */
@@ -1212,7 +1350,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
             throw new Exception(__METHOD__ . ' Failed. Could not set loop interval. Number Expected. Given: ' . $setValue);
         }
         $this->loopInterval = $setValue;
-        $this->log('Adjusting Event Loop Duration: ' . number_format($this->getLoopInterval(), 2)) . ' seconds';
+        $this->log('Adjusting Event Loop Duration: ' . number_format($this->getLoopInterval(), 2) . ' seconds');
 
         $this->log('Current Process Priority: ' . pcntl_getpriority() . '');
     }
@@ -1231,11 +1369,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         if (!is_integer($setValue)) {
             throw new Exception(__METHOD__ . ' Failed. Could not set pid. Integer Expected. Given: ' . $setValue);
         }
+        $oldPid = $this->pid;
         $this->pid = $setValue;
         if ($this->parent) {
             $this->parentPid = $setValue;
         }
         $this->dispatch([self::ON_PIDCHANGE], [$setValue]);
+        $this->dispatchEvent(new CDaemon_Event_Service_OnPidChange($this, $oldPid, $setValue));
     }
 
     public function isParent() {
@@ -1270,6 +1410,26 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         return false;
     }
 
+    /**
+     * Determine if the pid file names a daemon of this class that is still alive.
+     *
+     * A pid on its own is not enough: pids are reused, so the process is matched
+     * on its service class as well before this process stands down for it.
+     *
+     * @return bool
+     */
+    protected function isPidFileHeldByLiveInstance() {
+        if (!$this->pidFile || !file_exists($this->pidFile)) {
+            return false;
+        }
+        $pid = trim((string) file_get_contents($this->pidFile));
+        if (strlen($pid) == 0 || (int) $pid == getmypid()) {
+            return false;
+        }
+
+        return CDaemon_Utils::daemonIsRunningWithPid($pid, get_called_class());
+    }
+
     public function getServiceName() {
         return $this->serviceName;
     }
@@ -1288,5 +1448,13 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     public function isShutdown() {
         return $this->shutdown;
+    }
+
+    public function runner() {
+        if ($this->runner == null) {
+            $this->runner = CDaemon::createRunner(get_class($this));
+        }
+
+        return $this->runner;
     }
 }

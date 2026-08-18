@@ -4,6 +4,8 @@ namespace PHPStan\Rules\Generics;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Internal\SprintfHelper;
 use PHPStan\Rules\Rule;
 use PHPStan\ShouldNotHappenException;
@@ -14,7 +16,9 @@ use function sprintf;
 /**
  * @implements Rule<Node\Stmt\Trait_>
  */
-class TraitTemplateTypeRule implements Rule
+#[RegisteredRule(level: 2)]
+#[ValidatesStubFiles]
+final class TraitTemplateTypeRule implements Rule
 {
 
 	public function __construct(
@@ -52,6 +56,7 @@ class TraitTemplateTypeRule implements Rule
 		$escapedTraitName = SprintfHelper::escapeFormatString($traitName);
 
 		return $this->templateTypeCheck->check(
+			$scope,
 			$node,
 			TemplateTypeScope::createWithClass($traitName),
 			$resolvedPhpDoc->getTemplateTags(),
@@ -59,6 +64,9 @@ class TraitTemplateTypeRule implements Rule
 			sprintf('PHPDoc tag @template for trait %s cannot have existing type alias %%s as its name.', $escapedTraitName),
 			sprintf('PHPDoc tag @template %%s for trait %s has invalid bound type %%s.', $escapedTraitName),
 			sprintf('PHPDoc tag @template %%s for trait %s with bound type %%s is not supported.', $escapedTraitName),
+			sprintf('PHPDoc tag @template %%s for trait %s has invalid default type %%s.', $escapedTraitName),
+			sprintf('Default type %%s in PHPDoc tag @template %%s for trait %s is not subtype of bound type %%s.', $escapedTraitName),
+			sprintf('PHPDoc tag @template %%s for trait %s does not have a default type but follows an optional @template %%s.', $escapedTraitName),
 		);
 	}
 

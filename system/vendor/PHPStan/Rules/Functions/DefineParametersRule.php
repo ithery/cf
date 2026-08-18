@@ -5,6 +5,7 @@ namespace PHPStan\Rules\Functions;
 use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -14,7 +15,8 @@ use function strtolower;
 /**
  * @implements Rule<Node\Expr\FuncCall>
  */
-class DefineParametersRule implements Rule
+#[RegisteredRule(level: 0)]
+final class DefineParametersRule implements Rule
 {
 
 	public function __construct(private PhpVersion $phpVersion)
@@ -47,7 +49,10 @@ class DefineParametersRule implements Rule
 		return [
 			RuleErrorBuilder::message(
 				'Argument #3 ($case_insensitive) is ignored since declaration of case-insensitive constants is no longer supported.',
-			)->line($node->getLine())->build(),
+			)
+				->line($node->getStartLine())
+				->identifier('argument.unused')
+				->build(),
 		];
 	}
 

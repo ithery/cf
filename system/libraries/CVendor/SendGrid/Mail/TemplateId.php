@@ -61,6 +61,7 @@ class CVendor_SendGrid_Mail_TemplateId implements \JsonSerializable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->getTemplateId();
     }

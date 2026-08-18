@@ -35,12 +35,14 @@ class CModel_Spatial_Geometry_MultiLineString extends CModel_Spatial_Geometry_Ge
         return new static($lineStrings, $srid);
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return implode(',', array_map(function (CModel_Spatial_Geometry_LineString $lineString) {
             return sprintf('(%s)', (string) $lineString);
         }, $this->getLineStrings()));
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->validateItemType($value);
 
@@ -73,6 +75,7 @@ class CModel_Spatial_Geometry_MultiLineString extends CModel_Spatial_Geometry_Ge
      *
      * @return \GeoJson\Geometry\MultiLineString
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         $lineStrings = [];
 

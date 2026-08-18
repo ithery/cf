@@ -3,26 +3,54 @@
 namespace PHPStan\Type;
 
 use PHPStan\Reflection\ReflectionProviderStaticAccessor;
-use PHPStan\TrinaryLogic;
 
 class StringAlwaysAcceptingObjectWithToStringType extends StringType
 {
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
-		if ($type instanceof TypeWithClassName) {
-			$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
-			if (!$reflectionProvider->hasClass($type->getClassName())) {
-				return TrinaryLogic::createNo();
-			}
-
-			$typeClass = $reflectionProvider->getClass($type->getClassName());
-			return TrinaryLogic::createFromBoolean(
-				$typeClass->hasNativeMethod('__toString'),
-			);
+		if ($type instanceof CompoundType) {
+			return $type->isSubTypeOf($this);
 		}
 
-		return parent::accepts($type, $strictTypes);
+		$thatClassNames = $type->getObjectClassNames();
+		if ($thatClassNames === []) {
+			return parent::isSuperTypeOf($type);
+		}
+
+		$result = IsSuperTypeOfResult::createNo();
+		$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
+		foreach ($thatClassNames as $thatClassName) {
+			if (!$reflectionProvider->hasClass($thatClassName)) {
+				return IsSuperTypeOfResult::createNo();
+			}
+
+			$typeClass = $reflectionProvider->getClass($thatClassName);
+			$result = $result->or(IsSuperTypeOfResult::createFromBoolean($typeClass->hasNativeMethod('__toString')));
+		}
+
+		return $result;
+	}
+
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
+	{
+		$thatClassNames = $type->getObjectClassNames();
+		if ($thatClassNames === []) {
+			return parent::accepts($type, $strictTypes);
+		}
+
+		$result = AcceptsResult::createNo();
+		$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
+		foreach ($thatClassNames as $thatClassName) {
+			if (!$reflectionProvider->hasClass($thatClassName)) {
+				return AcceptsResult::createNo();
+			}
+
+			$typeClass = $reflectionProvider->getClass($thatClassName);
+			$result = $result->or(AcceptsResult::createFromBoolean($typeClass->hasNativeMethod('__toString')));
+		}
+
+		return $result;
 	}
 
 }

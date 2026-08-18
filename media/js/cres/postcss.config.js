@@ -6,12 +6,12 @@ module.exports = {
     plugins: {
         tailwindcss: {},
         autoprefixer: {},
-        'postcss-url':{ url: 'inline' },
+        'postcss-url': { url: 'inline' },
         'postcss-inline-base64': {
-            baseDir: 'src/',
+            baseDir: 'src/'
         },
         'postcss-import': {
-            path: __dirname,
+            path: __dirname
         }
     }
 };

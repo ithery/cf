@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 interface CQueue_QueueableCollectionInterface {
     /**
      * Get the type of the entities being queued.

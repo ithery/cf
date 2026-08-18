@@ -121,13 +121,9 @@ class CQC_Phpstan_Service_BuilderHelper {
      * that should be checked by caller before calling this method.
      *
      * @param ClassReflection $eloquentBuilder can be `CModel_Query` or a custom builder extending it
-     * @param string          $methodName
-     * @param ClassReflection $model
      *
      * @throws MissingMethodFromReflectionException
      * @throws ShouldNotHappenException
-     *
-     * @return null|MethodReflection
      */
     public function searchOnModelQuery(ClassReflection $eloquentBuilder, string $methodName, ClassReflection $model): ?MethodReflection {
         // Check for local query scopes
@@ -155,7 +151,7 @@ class CQC_Phpstan_Service_BuilderHelper {
 
         if ($model->hasNativeMethod('scope' . ucfirst($methodName))) {
             $methodReflection = $model->getNativeMethod('scope' . ucfirst($methodName));
-            $parametersAcceptor = ParametersAcceptorSelector::selectSingle($methodReflection->getVariants());
+            $parametersAcceptor = $methodReflection->getOnlyVariant();
 
             $parameters = $parametersAcceptor->getParameters();
             // We shift the parameters,
@@ -188,17 +184,13 @@ class CQC_Phpstan_Service_BuilderHelper {
     }
 
     /**
-     * @param string $modelClassName
-     *
      * @throws MissingMethodFromReflectionException
      * @throws ShouldNotHappenException
-     *
-     * @return string
      */
     public function determineBuilderName(string $modelClassName): string {
         $method = $this->reflectionProvider->getClass($modelClassName)->getNativeMethod('newModelQuery');
 
-        $returnType = ParametersAcceptorSelector::selectSingle($method->getVariants())->getReturnType();
+        $returnType = $method->getOnlyVariant()->getReturnType();
 
         if (in_array(CModel_Query::class, $returnType->getReferencedClasses(), true)) {
             return CModel_Query::class;
@@ -214,7 +206,7 @@ class CQC_Phpstan_Service_BuilderHelper {
     public function determineCollectionClassName(string $modelClassName): string {
         try {
             $newCollectionMethod = $this->reflectionProvider->getClass($modelClassName)->getNativeMethod('newCollection');
-            $returnType = ParametersAcceptorSelector::selectSingle($newCollectionMethod->getVariants())->getReturnType();
+            $returnType = $newCollectionMethod->getOnlyVariant()->getReturnType();
             if ($returnType instanceof ObjectType) {
                 return $returnType->getClassName();
             }

@@ -14,12 +14,16 @@ final class TemplateKeyOfType extends KeyOfType implements TemplateType
 	use TemplateTypeTrait;
 	use UndecidedComparisonCompoundTypeTrait;
 
+	/**
+	 * @param non-empty-string $name
+	 */
 	public function __construct(
 		TemplateTypeScope $scope,
 		TemplateTypeStrategy $templateTypeStrategy,
 		TemplateTypeVariance $templateTypeVariance,
 		string $name,
 		KeyOfType $bound,
+		?Type $default,
 	)
 	{
 		parent::__construct($bound->getType());
@@ -28,6 +32,7 @@ final class TemplateKeyOfType extends KeyOfType implements TemplateType
 		$this->variance = $templateTypeVariance;
 		$this->name = $name;
 		$this->bound = $bound;
+		$this->default = $default;
 	}
 
 	protected function getResult(): Type
@@ -40,12 +45,8 @@ final class TemplateKeyOfType extends KeyOfType implements TemplateType
 			$result,
 			$this->getVariance(),
 			$this->getStrategy(),
+			$this->getDefault(),
 		);
-	}
-
-	protected function shouldGeneralizeInferredType(): bool
-	{
-		return false;
 	}
 
 }

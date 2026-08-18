@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2018, 1:41:33 AM
- */
 trait CManager_Asset_Trait_CssTrait {
     public function fullpathCssFile($file) {
         return CManager_Asset_Helper::fullpathCssFile($file, $this->mediaPaths);
@@ -35,8 +29,13 @@ trait CManager_Asset_Trait_CssTrait {
         }
     }
 
-    public function registerCssFile($file, $pos = 'head') {
-        $originalFile = $file;
+    /**
+     * @param string $file
+     * @param string $pos
+     *
+     * @return CManager_Asset_Container
+     */
+    public function registerCssFile($file, $pos = CManager_Asset::POS_HEAD) {
         $fileOptions = $file;
         if (!is_array($fileOptions)) {
             $fileOptions = [

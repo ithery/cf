@@ -4,11 +4,13 @@ namespace PHPStan\Analyser;
 
 use PhpParser\Node\Stmt;
 
-/** @api */
-class StatementExitPoint
+/**
+ * @api
+ */
+final class StatementExitPoint
 {
 
-	public function __construct(private Stmt $statement, private MutatingScope $scope)
+	public function __construct(private Stmt $statement, private Scope $scope)
 	{
 	}
 
@@ -17,7 +19,7 @@ class StatementExitPoint
 		return $this->statement;
 	}
 
-	public function getScope(): MutatingScope
+	public function getScope(): Scope
 	{
 		return $this->scope;
 	}

@@ -20,22 +20,57 @@ abstract class CException_ContextAbstract {
         return $git;
     }
 
+    /**
+     * Get the latest git commit hash in the repository.
+     *
+     * @param string $baseDir The base directory of the git repository.
+     *
+     * @return string|null The latest git commit hash, or null if not found.
+     */
     protected function getGitHash($baseDir) {
         return $this->command("git log --pretty=format:'%H' -n 1", $baseDir);
     }
 
+    /**
+     * Get the latest git commit message in the repository.
+     *
+     * @param string $baseDir The base directory of the git repository.
+     *
+     * @return string|null The latest git commit message, or null if not found.
+     */
     protected function getGitMessage($baseDir) {
         return $this->command("git log --pretty=format:'%s' -n 1", $baseDir);
     }
 
+    /**
+     * Get the latest git tag in the repository.
+     *
+     * @param string $baseDir The base directory of the git repository.
+     *
+     * @return string|null The latest git tag, or null if no tags are found.
+     */
     protected function getGitTag($baseDir) {
         return $this->command('git describe --tags --abbrev=0', $baseDir);
     }
 
+    /**
+     * Get the remote URL of the git repository.
+     *
+     * @param string $baseDir The base directory of the git repository.
+     *
+     * @return string|null The remote URL, or null if not found.
+     */
     protected function getGitRemote($baseDir) {
         return $this->command('git config --get remote.origin.url', $baseDir);
     }
 
+    /**
+     * Check if the git repository is clean (no uncommitted changes).
+     *
+     * @param string $baseDir The base directory of the git repository.
+     *
+     * @return bool True if the repository is clean, false otherwise.
+     */
     protected function getGitIsClean($baseDir) {
         return empty($this->command('git status -s', $baseDir));
     }
@@ -59,6 +94,14 @@ abstract class CException_ContextAbstract {
         return $directory;
     }
 
+    /**
+     * Execute a shell command in the given base directory and return the output.
+     *
+     * @param string $command The shell command to execute.
+     * @param string $baseDir The base directory to execute the command in.
+     *
+     * @return string The output of the command.
+     */
     protected function command($command, $baseDir) {
         $process = Process::fromShellCommandline($command, $baseDir);
 
@@ -104,7 +147,7 @@ abstract class CException_ContextAbstract {
         //serialize all variables
         return c::collect($variables)->map(function ($item) {
             if ($item instanceof Closure) {
-                $item = new \Opis\Closure\SerializableClosure($item);
+                $item = new CFunction_SerializableClosure($item);
             }
 
             return serialize($item);

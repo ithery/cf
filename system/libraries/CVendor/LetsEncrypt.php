@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 15, 2019, 11:29:51 PM
- */
 use LEClient\LEClient;
 
 class CVendor_LetsEncrypt {
@@ -32,6 +26,7 @@ class CVendor_LetsEncrypt {
         if (self::$instance == null) {
             self::$instance = new CVendor_LetsEncrypt($config);
         }
+
         return self::$instance;
     }
 
@@ -120,6 +115,7 @@ class CVendor_LetsEncrypt {
                 return false;
             }
         }
+
         return $data;
     }
 

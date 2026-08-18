@@ -11,6 +11,11 @@ return [
         'uri' => 'demo/controls/password/index',
     ],
     [
+        'name' => 'controls.autonumeric',
+        'label' => c::__('Auto Numeric'),
+        'uri' => 'demo/controls/autonumeric/index',
+    ],
+    [
         'name' => 'controls.select',
         'label' => c::__('Select'),
         'uri' => 'demo/controls/select/index',
@@ -19,6 +24,21 @@ return [
         'name' => 'controls.select.search',
         'label' => c::__('Select Search'),
         'uri' => 'demo/controls/select/search/index',
+    ],
+    [
+        'name' => 'controls.select.selectTwo',
+        'label' => c::__('Select Two'),
+        'uri' => 'demo/controls/select/selectTwo/index',
+    ],
+    [
+        'name' => 'controls.checkbox',
+        'label' => c::__('Checkbox'),
+        'uri' => 'demo/controls/checkbox/index',
+    ],
+    [
+        'name' => 'controls.radio',
+        'label' => c::__('Radio'),
+        'uri' => 'demo/controls/radio/index',
     ],
     [
         'name' => 'controls.date',
@@ -46,8 +66,18 @@ return [
         'uri' => 'demo/controls/editorjs/index',
     ],
     [
+        'name' => 'controls.summernote',
+        'label' => c::__('Summernote'),
+        'uri' => 'demo/controls/summernote/index',
+    ],
+    [
         'name' => 'controls.querybuilder',
         'label' => c::__('Query Builder'),
         'uri' => 'demo/controls/querybuilder/index',
+    ],
+    [
+        'name' => 'controls.color',
+        'label' => c::__('Color Picker'),
+        'uri' => 'demo/controls/color/index',
     ],
 ];

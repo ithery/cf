@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 1:57:48 AM
- */
 trait CJavascript_JQuery_Trait_AjaxTrait {
     protected $ajaxTransition;
 
@@ -51,6 +45,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
         $retour .= $this->_getOnAjaxDone($responseElement, $jqueryDone, $ajaxTransition, $jsCallback, $hasLoader, ($historize ? $originalSelector : null)) . "});\n";
         $retour = $this->_addJsCondition($jsCondition, $retour);
         $this->addScript($retour);
+
         return $retour;
     }
 
@@ -71,6 +66,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
             }
             $s .= "'{$k}':{$v}";
         }
+
         return $s;
     }
 
@@ -78,6 +74,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
         if (isset($jsCondition)) {
             return 'if(' . $jsCondition . "){\n" . $jsSource . "\n}";
         }
+
         return $jsSource;
     }
 
@@ -99,6 +96,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
                 $retour .= "url=url+'" . $slash . "'+($(this).attr('" . $attr . "')||'');\n";
             }
         }
+
         return $retour;
     }
 
@@ -109,6 +107,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
     protected function autoActiveLinks($previousURL = 'window.location.href') {
         $result = "\nfunction getHref(url) { return \$('a').filter(function(){return \$(this).prop('href') == url; });}";
         $result .= "\nvar myurl={$previousURL};if(window._previousURL) getHref(window._previousURL).removeClass('active');getHref(myurl).addClass('active');window._previousURL=myurl;";
+
         return $result;
     }
 
@@ -137,6 +136,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
             $retour .= "\n$(self).removeClass('loading');";
         }
         $retour .= "\t" . $jsCallback . "\n";
+
         return $retour;
     }
 
@@ -144,6 +144,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
         if (CJavascript_Helper_String::isNotNull($responseElement)) {
             $responseElement = CJavascript_Helper_Javascript::prepJQuerySelector($responseElement);
         }
+
         return $responseElement;
     }
 
@@ -154,6 +155,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
         if (strncmp($url, 'http://', 7) != 0 && strncmp($url, 'https://', 8) != 0) {
             $url = $this->getUrl($url);
         }
+
         return $url;
     }
 
@@ -164,6 +166,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
         if (\preg_match("@^\{.*?\}$@", $params)) {
             return '$.param(' . $params . ')';
         }
+
         return $params;
     }
 
@@ -174,6 +177,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
                 $allParameters[] = self::correctParams($params);
             }
         }
+
         return \implode("+'&'+", $allParameters);
     }
 
@@ -193,6 +197,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
                 return AjaxTransition::{$params}($responseElement, $jqueryDone);
             };
         }
+
         return $result;
     }
 
@@ -209,7 +214,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
     }
 
     /**
-     * Performs an ajax GET request
+     * Performs an ajax GET request.
      *
      * @param string $url             The url of the request
      * @param string $responseElement selector of the HTML element displaying the answer
@@ -220,7 +225,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
     }
 
     /**
-     * Performs an ajax GET request
+     * Performs an ajax GET request.
      *
      * @param string $url             The url of the request
      * @param string $responseElement selector of the HTML element displaying the answer
@@ -265,7 +270,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
     }
 
     /**
-     * Performs an ajax request
+     * Performs an ajax request.
      *
      * @param string $method          The http method (get, post, delete, put, head)
      * @param string $url             The url of the request
@@ -274,6 +279,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function ajax($method, $url, $responseElement = '', $parameters = []) {
         $parameters['immediatly'] = true;
+
         return $this->protectedAjax($method, $url, $responseElement, $parameters);
     }
 
@@ -282,7 +288,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
     }
 
     /**
-     * Performs a deferred ajax request
+     * Performs a deferred ajax request.
      *
      * @param string $method          The http method (get, post, delete, put, head)
      * @param string $url             The url of the request
@@ -291,11 +297,12 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function ajaxDeferred($method, $url, $responseElement = '', $parameters = []) {
         $parameters['immediatly'] = false;
+
         return $this->protectedAjax($method, $url, $responseElement, $parameters);
     }
 
     /**
-     * Performs an ajax request and receives the JSON data types by assigning DOM elements with the same name
+     * Performs an ajax request and receives the JSON data types by assigning DOM elements with the same name.
      *
      * @param string $url        the request url
      * @param string $method     Method used
@@ -310,11 +317,12 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
                 . "if($('#'+key," . $context . ").length){ if($('#'+key," . $context . ").is('[value]')) { $('#'+key," . $context . ").val(data[key]);} else { $('#'+key," . $context . ").html(data[key]); }}};\n";
         $retour .= "\t$(document).trigger('jsonReady',[data]);\n";
         $parameters['jsCallback'] = $retour;
+
         return $this->protectedAjax($method, $url, null, $parameters);
     }
 
     /**
-     * Performs an ajax request and receives the JSON data types by assigning DOM elements with the same name
+     * Performs an ajax request and receives the JSON data types by assigning DOM elements with the same name.
      *
      * @param string $url        the request url
      * @param string $method     Method used
@@ -325,7 +333,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
     }
 
     /**
-     * Makes an ajax request and receives the JSON data types by assigning DOM elements with the same name when $event fired on $element
+     * Makes an ajax request and receives the JSON data types by assigning DOM elements with the same name when $event fired on $element.
      *
      * @param string $element
      * @param string $event
@@ -335,11 +343,12 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function jsonOn($event, $element, $url, $method = 'get', $parameters = []) {
         $this->setDefaultParameters($parameters, ['preventDefault' => true, 'stopPropagation' => true, 'immediatly' => true]);
+
         return $this->addEvent($element, $this->jsonDeferred($url, $method, $parameters), $event, $parameters['preventDefault'], $parameters['stopPropagation'], $parameters['immediatly']);
     }
 
     /**
-     * Prepares an ajax request delayed and receives the JSON data types by assigning DOM elements with the same name
+     * Prepares an ajax request delayed and receives the JSON data types by assigning DOM elements with the same name.
      *
      * @param string $url        the request url
      * @param string $method     Method used
@@ -347,11 +356,12 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function jsonDeferred($url, $method = 'get', $parameters = []) {
         $parameters['immediatly'] = false;
+
         return $this->protectedJson($url, $method, $parameters);
     }
 
     /**
-     * Performs an ajax request and receives the JSON array data types by assigning DOM elements with the same name
+     * Performs an ajax request and receives the JSON array data types by assigning DOM elements with the same name.
      *
      * @param string $maskSelector
      * @param string $url          the request url
@@ -379,11 +389,12 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
         $retour .= "\t$(document).trigger('jsonReady',[data]);\n";
         $retour .= "\t" . $jsCallback;
         $parameters['jsCallback'] = $retour;
+
         return $this->protectedAjax($method, $url, null, $parameters);
     }
 
     /**
-     * Performs an ajax request and receives the JSON array data types by assigning DOM elements with the same name
+     * Performs an ajax request and receives the JSON array data types by assigning DOM elements with the same name.
      *
      * @param string $maskSelector
      * @param string $url          the request url
@@ -395,7 +406,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
     }
 
     /**
-     * Peforms an ajax request delayed and receives a JSON array data types by copying and assigning them to the DOM elements with the same name
+     * Peforms an ajax request delayed and receives a JSON array data types by copying and assigning them to the DOM elements with the same name.
      *
      * @param string $maskSelector
      * @param string $url          the request url
@@ -404,11 +415,12 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function jsonArrayDeferred($maskSelector, $url, $method = 'get', $parameters = []) {
         $parameters['immediatly'] = false;
+
         return $this->jsonArray($maskSelector, $url, $method, $parameters);
     }
 
     /**
-     * Performs an ajax request and receives the JSON array data types by assigning DOM elements with the same name when $event fired on $element
+     * Performs an ajax request and receives the JSON array data types by assigning DOM elements with the same name when $event fired on $element.
      *
      * @param string $element
      * @param string $event
@@ -419,12 +431,13 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function jsonArrayOn($event, $element, $maskSelector, $url, $method = 'get', $parameters = []) {
         $this->setDefaultParameters($parameters, ['preventDefault' => true, 'stopPropagation' => true, 'immediatly' => true]);
+
         return $this->addEvent($element, $this->jsonArrayDeferred($maskSelector, $url, $method, $parameters), $event, $parameters['preventDefault'], $parameters['stopPropagation'], $parameters['immediatly']);
     }
 
     /**
      * Prepares a Get ajax request
-     * for using on an event
+     * for using on an event.
      *
      * @param string $url             The url of the request
      * @param string $responseElement selector of the HTML element displaying the answer
@@ -432,12 +445,13 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function getDeferred($url, $responseElement = '', $parameters = []) {
         $parameters['immediatly'] = false;
+
         return $this->protectedGet($url, $responseElement, $parameters);
     }
 
     /**
      * Performs a get to $url on the event $event on $element
-     * and display it in $responseElement
+     * and display it in $responseElement.
      *
      * @param string $event           the event
      * @param string $element         the element on which event is observed
@@ -447,12 +461,13 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function getOn($event, $element, $url, $responseElement = '', $parameters = []) {
         $this->setDefaultParameters($parameters, ['preventDefault' => true, 'stopPropagation' => true, 'immediatly' => true]);
+
         return $this->addEvent($element, $this->getDeferred($url, $responseElement, $parameters), $event, $parameters['preventDefault'], $parameters['stopPropagation'], $parameters['immediatly']);
     }
 
     /**
      * Performs an ajax request to $url on the event $event on $element
-     * and display it in $responseElement
+     * and display it in $responseElement.
      *
      * @param string $event           the event observed
      * @param string $element         the element on which event is observed
@@ -462,12 +477,13 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function ajaxOn($event, $element, $url, $responseElement = '', $parameters = []) {
         $this->setDefaultParameters($parameters, ['preventDefault' => true, 'stopPropagation' => true, 'immediatly' => true, 'method' => 'get']);
+
         return $this->addEvent($element, $this->ajaxDeferred($parameters['method'], $url, $responseElement, $parameters), $event, $parameters['preventDefault'], $parameters['stopPropagation'], $parameters['immediatly']);
     }
 
     /**
      * Performs a get to $url on the click event on $element
-     * and display it in $responseElement
+     * and display it in $responseElement.
      *
      * @param string $element         the element on which event is observed
      * @param string $url             The url of the request
@@ -480,7 +496,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
 
     /**
      * Performs a get to $url on the click event on $element
-     * and display it in $responseElement
+     * and display it in $responseElement.
      *
      * @param string $element         the element on which click is observed
      * @param string $url             The url of the request
@@ -492,7 +508,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
     }
 
     /**
-     * Uses an hyperlink to make an ajax get request
+     * Uses an hyperlink to make an ajax get request.
      *
      * @param string $element         an hyperlink selector
      * @param string $responseElement the target of the ajax request (data-target attribute of the element is used if responseElement is omited)
@@ -508,11 +524,12 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
         if (!isset($parameters['historize'])) {
             $parameters['historize'] = true;
         }
+
         return $this->getOnClick($element, '', $responseElement, $parameters);
     }
 
     /**
-     * Uses an hyperlink to make an ajax get request
+     * Uses an hyperlink to make an ajax get request.
      *
      * @param string $element         an hyperlink selector
      * @param string $responseElement the target of the ajax request (data-target attribute of the element is used if responseElement is omited)
@@ -528,16 +545,18 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
         if (!isset($parameters['historize'])) {
             $parameters['historize'] = true;
         }
+
         return $this->postOnClick($element, '', '{}', $responseElement, $parameters);
     }
 
     private function protectedPost($url, $params = '{}', $responseElement = '', $parameters = []) {
         $parameters['params'] = $params;
+
         return $this->protectedAjax('POST', $url, $responseElement, $parameters);
     }
 
     /**
-     * Makes an ajax post
+     * Makes an ajax post.
      *
      * @param string $url             the request url
      * @param string $responseElement selector of the HTML element displaying the answer
@@ -550,7 +569,7 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
 
     /**
      * Prepares a delayed ajax POST
-     * to use on an event
+     * to use on an event.
      *
      * @param string $url             the request url
      * @param string $params          JSON parameters
@@ -559,12 +578,13 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function postDeferred($url, $params = '{}', $responseElement = '', $parameters = []) {
         $parameters['immediatly'] = false;
+
         return $this->protectedPost($url, $params, $responseElement, $parameters);
     }
 
     /**
      * Performs a post to $url on the event $event fired on $element and pass the parameters $params
-     * Display the result in $responseElement
+     * Display the result in $responseElement.
      *
      * @param string $event
      * @param string $element
@@ -575,12 +595,13 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function postOn($event, $element, $url, $params = '{}', $responseElement = '', $parameters = []) {
         $this->setDefaultParameters($parameters, ['preventDefault' => true, 'stopPropagation' => true, 'immediatly' => true]);
+
         return $this->addEvent($element, $this->postDeferred($url, $params, $responseElement, $parameters), $event, $parameters['preventDefault'], $parameters['stopPropagation'], $parameters['immediatly']);
     }
 
     /**
      * Performs a post to $url on the click event fired on $element and pass the parameters $params
-     * Display the result in $responseElement
+     * Display the result in $responseElement.
      *
      * @param string $element
      * @param string $url             The url of the request
@@ -631,11 +652,12 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
         if ($immediatly) {
             $this->jquery_code_for_compile[] = $retour;
         }
+
         return $retour;
     }
 
     /**
-     * Performs a post form with ajax
+     * Performs a post form with ajax.
      *
      * @param string $url             The url of the request
      * @param string $form            The form HTML id
@@ -644,12 +666,13 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function postForm($url, $form, $responseElement, $parameters = []) {
         $parameters['immediatly'] = true;
+
         return $this->protectedPostForm($url, $form, $responseElement, $parameters);
     }
 
     /**
      * Performs a delayed post form with ajax
-     * For use on an event
+     * For use on an event.
      *
      * @param string $url             The url of the request
      * @param string $form            The form HTML id
@@ -658,12 +681,13 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function postFormDeferred($url, $form, $responseElement, $parameters = []) {
         $parameters['immediatly'] = false;
+
         return $this->protectedPostForm($url, $form, $responseElement, $parameters);
     }
 
     /**
      * Performs a post form with ajax in response to an event $event on $element
-     * display the result in $responseElement
+     * display the result in $responseElement.
      *
      * @param string $event
      * @param string $element
@@ -674,12 +698,13 @@ trait CJavascript_JQuery_Trait_AjaxTrait {
      */
     public function postFormOn($event, $element, $url, $form, $responseElement = '', $parameters = []) {
         $this->setDefaultParameters($parameters, ['preventDefault' => true, 'stopPropagation' => true, 'immediatly' => true]);
+
         return $this->addEvent($element, $this->postFormDeferred($url, $form, $responseElement, $parameters), $event, $parameters['preventDefault'], $parameters['stopPropagation'], $parameters['immediatly']);
     }
 
     /**
      * Performs a post form with ajax in response to the click event on $element
-     * display the result in $responseElement
+     * display the result in $responseElement.
      *
      * @param string $element
      * @param string $url

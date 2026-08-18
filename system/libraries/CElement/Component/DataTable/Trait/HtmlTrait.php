@@ -1,9 +1,17 @@
 <?php
 
 trait CElement_Component_DataTable_Trait_HtmlTrait {
+    /**
+     * @return void
+     */
     protected function htmlGetTableClass() {
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
@@ -49,7 +57,8 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $html->appendln('<div class="' . $mainClassTitle . '">')->incIndent();
                 if (strlen($this->icon) > 0) {
                     $html->appendln('<span class="icon">')->incIndent();
-                    $html->appendln('<i class="icon-' . $this->icon . '"></i>');
+                    $html->append($this->getIconHtml());
+                    // $html->appendln('<i class="icon-' . $this->icon . '"></i>');
                     $html->decIndent()->appendln('</span');
                 }
                 $html->appendln('<h5>' . $this->title . '</h5>');
@@ -111,6 +120,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     protected function rawTBody($indent = 0) {
         /** @var CElement_Component_DataTable $this */
         $html = new CStringBuilder();
@@ -240,6 +254,22 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     $html->decIndent()->appendln('</tr>')->br();
                 }
             }
+            if ($no === 0) {
+                $emptyColspan = count($this->columns);
+                if ($this->haveRowAction()) {
+                    $emptyColspan++;
+                }
+                if ($this->numbering) {
+                    $emptyColspan++;
+                }
+                if ($this->checkbox) {
+                    $emptyColspan++;
+                }
+                $emptyMessage = carr::get($this->labels, 'noData', carr::get($this->labels, 'emptyTable'));
+                $html->appendln('<tr class="odd">')->incIndent()->br();
+                $html->appendln('<td colspan="' . $emptyColspan . '" class="text-center dataTables_empty">' . $emptyMessage . '</td>')->br();
+                $html->decIndent()->appendln('</tr>')->br();
+            }
         }
 
         $this->js_cell .= $js;
@@ -249,6 +279,13 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $html->text();
     }
 
+    /**
+     * @param CStringBuilder                       $html
+     * @param CElement_Component_DataTable_DataRow $row
+     * @param int|string                           $key
+     *
+     * @return string
+     */
     protected function drawActionAndGetJs(CStringBuilder $html, CElement_Component_DataTable_DataRow $row, $key) {
         $js = '';
         if ($this->haveRowAction()) {
@@ -280,7 +317,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     $action->setVisibility($visibility);
                 }
                 if ($action instanceof CElement_Component_ActionRow) {
-                    $action->applyRowCallback($row->toArray());
+                    $action->applyRowCallback($row->getRow());
                 }
                 $actionNeedRender = $actionNeedRender || $action->isVisible();
             }
@@ -295,6 +332,12 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $js;
     }
 
+    /**
+     * @param int  $indent
+     * @param bool $wrapped
+     *
+     * @return string
+     */
     protected function rawHtml($indent = 0, $wrapped = false) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -378,7 +421,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $fval = $footerField->getValue();
                 if ($fval instanceof CRenderable) {
                     $html->incIndent()->appendln('<td class="' . $class . '">')->br();
-                    list($html, $js) = $this->getHtmlJsCell($fval);
+                    list($cellHtml, $cellJs) = $this->getHtmlJsCell($fval);
                     $html->appendln($fval->html($indent))->br();
                     $html->decIndent()->appendln('</td>')->br();
                 } elseif (is_array($fval)) {
@@ -429,6 +472,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $html->text();
     }
 
+    /**
+     * @return string
+     */
     public function htmlTHead() {
         $thClass = '';
         /** @var CElement_Component_DataTable $this */
@@ -482,6 +528,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $html->text();
     }
 
+    /**
+     * @return string
+     */
     public function htmlActionTh() {
         $thClass = '';
         if ($this->headerNoLineBreak) {
@@ -499,6 +548,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $html;
     }
 
+    /**
+     * @param mixed $cell
+     *
+     * @return array
+     */
     protected function getHtmlJsCell($cell) {
         $html = '';
         $js = '';

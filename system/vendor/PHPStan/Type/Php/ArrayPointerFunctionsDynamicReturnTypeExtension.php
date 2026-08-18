@@ -4,6 +4,7 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
@@ -12,7 +13,8 @@ use PHPStan\Type\TypeCombinator;
 use function count;
 use function in_array;
 
-class ArrayPointerFunctionsDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class ArrayPointerFunctionsDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	/** @var string[] */
@@ -43,8 +45,8 @@ class ArrayPointerFunctionsDynamicReturnTypeExtension implements DynamicFunction
 		}
 
 		$itemType = $functionReflection->getName() === 'reset'
-			? $argType->getFirstIterableValueType()
-			: $argType->getLastIterableValueType();
+			? $argType->getIterableValueType()
+			: $argType->getIterableValueType();
 		if ($iterableAtLeastOnce->yes()) {
 			return $itemType;
 		}

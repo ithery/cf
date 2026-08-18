@@ -2,22 +2,27 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 2, 2019, 12:24:32 AM
- */
 trait CApp_Model_Trait_Resource_IsSorted {
+    /**
+     * @return void
+     */
     public function setHighestOrderNumber() {
         $orderColumnName = $this->determineOrderColumnName();
         $this->$orderColumnName = $this->getHighestOrderNumber() + 1;
     }
 
+    /**
+     * @return int
+     */
     public function getHighestOrderNumber() {
         return (int) static::max($this->determineOrderColumnName());
     }
 
+    /**
+     * @param CModel_Query $query
+     *
+     * @return CModel_Query
+     */
     public function scopeOrdered(CModel_Query $query) {
         return $query->orderBy($this->determineOrderColumnName());
     }
@@ -40,10 +45,16 @@ trait CApp_Model_Trait_Resource_IsSorted {
         }
     }
 
+    /**
+     * @return string
+     */
     protected function determineOrderColumnName() {
         return isset($this->sortable['order_column_name']) ? $this->sortable['order_column_name'] : 'order_column';
     }
 
+    /**
+     * @return bool
+     */
     public function shouldSortWhenCreating() {
         return isset($this->sortable['sort_when_creating']) ? $this->sortable['sort_when_creating'] : true;
     }

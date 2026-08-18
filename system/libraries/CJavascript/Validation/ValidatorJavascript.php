@@ -1,15 +1,13 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see Proengsoft\JsValidation https://github.com/proengsoft/laravel-jsvalidation
- * @since Apr 14, 2019, 1:04:19 PM
  */
-class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable {
+class CJavascript_Validation_ValidatorJavascript implements Arrayable {
     /**
      * Registered validator instance.
      *
@@ -71,13 +69,13 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
     /**
      * Set default parameters.
      *
-     * @param $options
+     * @param array $options
      *
      * @return void
      */
     protected function setDefaults($options) {
         $this->selector = empty($options['selector']) ? 'form' : $options['selector'];
-        $this->template = empty($options['template']) ? 'CJavascript/Validation/Validate' : $options['template'];
+        $this->view = empty($options['view']) ? 'cresenity/javascript/validation/validate' : $options['view'];
         $this->remote = isset($options['remote']) ? $options['remote'] : true;
         $this->focusOnError = isset($options['focus_on_error']) ? $options['focus_on_error'] : true;
         $this->animateDuration = isset($options['animate_duration']) ? $options['animate_duration'] : 1000;
@@ -86,16 +84,16 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
     /**
      * Render the specified view with validator data.
      *
+     * @param null|string $view
      * @param null|string $selector
-     * @param null|mixed  $template
      *
      * @return string
      */
-    public function render($template = null, $selector = null) {
-        $this->template($template);
+    public function render($view = null, $selector = null) {
+        $this->view($view);
         $this->selector($selector);
 
-        $view = CView::factory('cresenity.javascript.validation.validate', [
+        $view = CView::factory($this->view, [
             'validator' => $this->getTemplateData()
         ]);
         //$template = new CTemplate($this->template, ['validator' => $this->getTemplateData()]);
@@ -123,6 +121,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         try {
             return $this->render();
@@ -134,7 +133,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
     /**
      * Gets value from view data.
      *
-     * @param $name
+     * @param string $name
      *
      * @throws \CJavascript_Validation_Exception_PropertyNotFoundException
      *
@@ -205,12 +204,12 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
     /**
      * Set the view to render Javascript Validations.
      *
-     * @param mixed $template
+     * @param null|string $view
      *
      * @return \CJavascript_Validation_ValidatorJavascript
      */
-    public function template($template) {
-        $this->view = is_null($template) ? $this->template : $template;
+    public function view($view) {
+        $this->view = is_null($view) ? $this->view : $view;
 
         return $this;
     }

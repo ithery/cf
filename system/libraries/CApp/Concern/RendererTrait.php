@@ -1,19 +1,24 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
-
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see CApp
- * @since Jul 27, 2019, 10:23:46 PM
  */
 trait CApp_Concern_RendererTrait {
+    /**
+     * @var bool
+     */
     protected $rendered = false;
 
+    /**
+     * @var null|array
+     */
     protected $viewData = null;
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderContent($options = []) {
         /** @var CApp $this */
         $viewData = $this->getViewData();
@@ -21,30 +26,47 @@ trait CApp_Concern_RendererTrait {
         return carr::get($viewData, 'content');
     }
 
+    /**
+     * @param null|array|Closure|CNavigation_Nav|string $nav
+     * @param mixed                                      $renderer
+     *
+     * @return string
+     */
     public function renderNavigation($nav = null, $renderer = null) {
         /** @var CApp $this */
-        // if ($expression != null) {
-        //     $expression = str_replace(['(', ')'], '', $expression);
-        //     $expression = str_replace(['"', '\''], '', $expression);
-        //     $expression = str_replace(',', ' ', $expression);
-        // }
-
         if ($nav == null) {
             $nav = $this->nav;
         }
+        if ($nav == null) {
+            //Lewat CNavigation_Data::get() agar navigation callback ikut
+            //diterapkan. Sebelumnya jalur ini membaca $this->nav langsung,
+            //sehingga CNavigation_Data::setNavigationCallback() tidak pernah
+            //berpengaruh pada @CAppNav — yaitu cara hampir semua aplikasi
+            //merender sidenav-nya. Hasilnya di-memoisasi per domain, jadi
+            //tidak menambah pembacaan berkas.
+            $nav = CNavigation_Data::get();
+        }
 
-        /** @var CApp $this */
-        $nav = $this->resolveNav($nav);
-
+        if (!$nav instanceof CNavigation_Nav) {
+            /** @var CApp $this */
+            $nav = $this->resolveNav($nav);
+        }
+        /** @var CNavigation_Nav $nav */
         if ($renderer != null) {
             $this->setNavRenderer($renderer);
         }
 
-        $renderer = $this->resolveNavRenderer();
+        $renderer = $this->getNavRenderer();
+        $renderer = CNavigation::manager()->resolveRenderer($renderer);
 
-        return $renderer->render($nav);
+        return $renderer->render($nav->getData());
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderStyles($options = []) {
         /** @var CApp $this */
         $viewData = $this->getViewData();
@@ -52,7 +74,9 @@ trait CApp_Concern_RendererTrait {
 
         $alpineJs = curl::base() . 'media/js/libs/alpine.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/libs/alpine.js'));
         $alpineScript = '<script src="' . $alpineJs . '" defer></script>';
-        $cresStyle = '<link href="' . $cresCss . '" rel="stylesheet" />' . PHP_EOL;
+        $cresStyle = '<link href="' . $cresCss . '" rel="stylesheet" />';
+        $cresStyleIsEnabled = !!CF::config('cresjs.style.enable');
+        $cresStyleInline = $cresStyleIsEnabled ? PHP_EOL . '<style id="cres-styles"></style>' : '';
 
         $allStyles = carr::get($viewData, 'head_client_script');
 
@@ -64,6 +88,9 @@ trait CApp_Concern_RendererTrait {
     [cres\:offline] {
         display: none;
     }
+    [cs-cloak] {
+        display: none!important;
+    }
     [cres\:dirty]:not(textarea):not(input):not(select) {
         display: none;
     }
@@ -74,11 +101,16 @@ trait CApp_Concern_RendererTrait {
     }
     @keyframes cresautofill { from {} }
 </style>
-${cresStyle}
-${allStyles}
+{$cresStyle}{$cresStyleInline}
+{$allStyles}
 HTML;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderScripts($options = []) {
         $viewData = $this->getViewData();
         $endClientScript = carr::get($viewData, 'end_client_script', '');
@@ -101,46 +133,70 @@ HTML;
         }
 
         return <<<HTML
-            ${endClientScript}
-            <script defer src="${cresJs}"></script>
-            ${notificationScript}
+            {$endClientScript}
+            <script defer src="{$cresJs}"></script>
+            {$notificationScript}
             <script>
-                ${js}
-                ${readyClientScript}
+                {$js}
+                {$readyClientScript}
                 if (window) {
                     window.onload = function () {
-                        ${loadClientScript}
+                        {$loadClientScript}
                     }
                 }
-                ${customJs}
+                {$customJs}
             </script>
-            ${pushesScript}
+            {$pushesScript}
 
 HTML;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderTitle($options = []) {
         $viewData = $this->getViewData();
 
         return carr::get($viewData, 'title');
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderPageTitle($options = []) {
         $viewData = $this->getViewData();
 
         return carr::get($viewData, 'pageTitle');
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderMessages($options = []) {
         return CApp_Message::flashAll();
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function renderSeo($options = []) {
         /** @var CApp $this */
         return $this->seo()->generate();
     }
 
+    /**
+     * @return array
+     */
     public function getViewData() {
+        /** @var CApp $this */
         if ($this->viewData == null) {
             $theme_path = '';
 
@@ -176,7 +232,6 @@ HTML;
             $jsScriptFile = '';
             $jsScriptFile = PHP_EOL . '<script>' . $asset->varJs() . '</script>';
             $jsScriptFile .= PHP_EOL . '<script>if(typeof define === "function") define=undefined;</script>';
-            //$jsScriptFile .= '<script src="/media/js/capp.js?v='.uniqid().'"></script>';
             $jsScriptFile .= PHP_EOL . $asset->render(CManager_Asset::POS_END, CManager_Asset::TYPE_JS_FILE);
 
             $js = $asset->wrapJs($js, true);
@@ -220,6 +275,9 @@ HTML;
         return $this->viewData;
     }
 
+    /**
+     * @return void
+     */
     public function allModuleData() {
         $allModule = CManager::asset()->module()->allModules();
         foreach ($allModule as $moduleName => $module) {
@@ -236,6 +294,9 @@ HTML;
         }
     }
 
+    /**
+     * @return bool
+     */
     public function rendered() {
         return $this->rendered;
     }
@@ -243,7 +304,7 @@ HTML;
     /**
      * Render the html of this.
      *
-     * @throws CException
+     * @throws Exception
      * @throws CApp_Exception
      *
      * @return string
@@ -260,18 +321,20 @@ HTML;
             CDebug::bar()->populateAssets();
         }
         $this->rendered = true;
-        $this->registerCoreModules();
 
         CFEvent::run('CApp.beforeRender');
+        $this->registerCoreModules();
 
         if (c::request()->ajax()) {
-            return $this->json();
+            return $this->toJson();
         }
 
-        CView::factory()->share(
-            'errors',
-            c::session()->get('errors') ?: new CBase_ViewErrorBag()
-        );
+        if (CSession::sessionConfigured()) {
+            CView::factory()->share(
+                'errors',
+                c::session()->get('errors') ?: new CBase_ViewErrorBag()
+            );
+        }
 
         $viewData = $this->getViewData();
         $v = $this->getView();

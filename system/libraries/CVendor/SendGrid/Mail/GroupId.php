@@ -48,6 +48,7 @@ class CVendor_SendGrid_Mail_GroupId implements \JsonSerializable {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->getGroupId();
     }

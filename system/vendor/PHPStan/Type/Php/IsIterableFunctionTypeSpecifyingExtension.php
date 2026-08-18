@@ -8,6 +8,7 @@ use PHPStan\Analyser\SpecifiedTypes;
 use PHPStan\Analyser\TypeSpecifier;
 use PHPStan\Analyser\TypeSpecifierAwareExtension;
 use PHPStan\Analyser\TypeSpecifierContext;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\FunctionTypeSpecifyingExtension;
@@ -15,7 +16,8 @@ use PHPStan\Type\IterableType;
 use PHPStan\Type\MixedType;
 use function strtolower;
 
-class IsIterableFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
+#[AutowiredService]
+final class IsIterableFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
 {
 
 	private TypeSpecifier $typeSpecifier;
@@ -36,7 +38,7 @@ class IsIterableFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyin
 			return new SpecifiedTypes();
 		}
 
-		return $this->typeSpecifier->create($node->getArgs()[0]->value, new IterableType(new MixedType(), new MixedType()), $context, false, $scope);
+		return $this->typeSpecifier->create($node->getArgs()[0]->value, new IterableType(new MixedType(), new MixedType()), $context, $scope);
 	}
 
 	public function setTypeSpecifier(TypeSpecifier $typeSpecifier): void

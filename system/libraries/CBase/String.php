@@ -2,15 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 use Symfony\Component\VarDumper\VarDumper;
 
-class CBase_String implements Stringable {
+class CBase_String implements Stringable, ArrayAccess {
     use CTrait_Macroable;
     use CTrait_Conditionable;
     use CTrait_Tappable;
@@ -97,6 +91,17 @@ class CBase_String implements Stringable {
      */
     public function basename($suffix = '') {
         return new static(basename($this->value, $suffix));
+    }
+
+    /**
+     * Get the character at the specified index.
+     *
+     * @param int $index
+     *
+     * @return string|false
+     */
+    public function charAt($index) {
+        return cstr::charAt($this->value, $index);
     }
 
     /**
@@ -408,6 +413,17 @@ class CBase_String implements Stringable {
         }
 
         return new static(isset($matches[1]) ? $matches[1] : $matches[0]);
+    }
+
+    /**
+     * Determine if a given string matches a given pattern.
+     *
+     * @param string|iterable<string> $pattern
+     *
+     * @return bool
+     */
+    public function isMatch($pattern) {
+        return cstr::isMatch($pattern, $this->value);
     }
 
     /**
@@ -1106,7 +1122,7 @@ class CBase_String implements Stringable {
      * @param null|string $format
      * @param null|string $tz
      *
-     * @throws \CarbonV3\Exceptions\InvalidFormatException
+     * @throws \Carbon\Exceptions\InvalidFormatException
      *
      * @return \CCarbon
      */
@@ -1116,6 +1132,65 @@ class CBase_String implements Stringable {
         }
 
         return CCarbon::createFromFormat($format, $this->value, $tz);
+    }
+
+    /**
+     * Convert the object to a string when JSON encoded.
+     *
+     * @return string
+     */
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize() {
+        return $this->__toString();
+    }
+
+    /**
+     * Determine if the given offset exists.
+     *
+     * @param mixed $offset
+     *
+     * @return bool
+     */
+    #[ReturnTypeWillChange]
+    public function offsetExists($offset) {
+        return isset($this->value[$offset]);
+    }
+
+    /**
+     * Get the value at the given offset.
+     *
+     * @param mixed $offset
+     *
+     * @return string
+     */
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset) {
+        return $this->value[$offset];
+    }
+
+    /**
+     * Set the value at the given offset.
+     *
+     * @param mixed $offset
+     * @param mixed $value
+     *
+     * @return void
+     */
+    #[ReturnTypeWillChange]
+    public function offsetSet($offset, $value) {
+        $this->value[$offset] = $value;
+    }
+
+    /**
+     * Unset the value at the given offset.
+     *
+     * @param mixed $offset
+     *
+     * @return void
+     */
+    #[ReturnTypeWillChange]
+    public function offsetUnset($offset) {
+        unset($this->value[$offset]);
     }
 
     /**
@@ -1130,19 +1205,11 @@ class CBase_String implements Stringable {
     }
 
     /**
-     * Convert the object to a string when JSON encoded.
-     *
-     * @return string
-     */
-    public function jsonSerialize() {
-        return $this->__toString();
-    }
-
-    /**
      * Get the raw string value.
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->value;
     }

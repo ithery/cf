@@ -2,9 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- */
 class CContainer_ContextualBindingBuilder implements CContainer_ContextualBindingBuilderInterface {
     /**
      * The underlying container instance.
@@ -49,6 +46,7 @@ class CContainer_ContextualBindingBuilder implements CContainer_ContextualBindin
      */
     public function needs($abstract) {
         $this->needs = $abstract;
+
         return $this;
     }
 

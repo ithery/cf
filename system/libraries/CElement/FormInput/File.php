@@ -3,10 +3,32 @@
 class CElement_FormInput_File extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_File;
 
+    /**
+     * @var bool
+     */
     protected $multiple;
 
+    /**
+     * Which upload widget to render: `file-upload` (bootstrap fileupload) or `jquery-fileupload`.
+     *
+     * @var string
+     */
     protected $applyjs;
 
+    /**
+     * Comma-separated file extensions/mime types/mime-group wildcards (eg.
+     * `.pdf,.docx`, `image/*`) -- rendered as the native `accept` attribute
+     * and enforced client-side via the `control:File` cres.js module.
+     *
+     * @var string
+     */
+    protected $acceptFile = '';
+
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -19,14 +41,24 @@ class CElement_FormInput_File extends CElement_FormInput {
         $this->applyjs = c::theme('fileupload', 'file-upload');
     }
 
+    /**
+     * @param string|null $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         /** @phpstan-ignore-next-line */
         return new static($id);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         if ($this->applyjs == 'jquery-fileupload') {
-            CClientModules::instance()->registerModule('jquery-fileupload');
+            c::manager()->registerModule('jquery-fileupload');
         }
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -62,11 +94,21 @@ class CElement_FormInput_File extends CElement_FormInput {
             $html->appendln('<div class="fileupload ' . $add_class . '" data-provides="fileupload">');
             $html->appendln('	<div class="input-group">');
             $html->appendln('		<div class="uneditable-input span3"><i class="icon-file fileupload-exists"></i> <span class="fileupload-preview">' . $this->value . '</span></div>');
-            $html->appendln('		<span class="btn btn-file"><span class="fileupload-new">' . clang::__('Select file') . '</span><span class="fileupload-exists">' . clang::__('Change') . '</span>');
+            $html->appendln('		<span class="btn btn-file"><span class="fileupload-new">' . c::__('Select file') . '</span><span class="fileupload-exists">' . c::__('Change') . '</span>');
         }
-        $html->appendln('			<input type="file" name="' . $name . '" id="' . $this->id . '" class="file' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $multiple . ' />')->incIndent()->br();
+        $accept = '';
+        if (strlen($this->acceptFile) > 0) {
+            $accept = ' accept="' . c::e($this->acceptFile) . '"';
+        }
+        $cresConfig = ' cres-element="control:File" cres-config="' . c::e(c::json([
+            'acceptFile' => $this->acceptFile,
+            'messages' => [
+                'acceptFileNotAllowed' => c::__('element/file.errorMessageAcceptFileNotAllowed'),
+            ],
+        ])) . '"';
+        $html->appendln('			<input type="file" name="' . $name . '" id="' . $this->id . '" class="file' . $classes . '"' . $custom_css . $disabled . $multiple . $accept . $cresConfig . ' />')->incIndent()->br();
         if ($this->applyjs == 'file-upload') {
-            $html->appendln('		</span><a href="#" class="btn remove fileupload-exists" data-dismiss="fileupload">' . clang::__('Remove') . '</a>');
+            $html->appendln('		</span><a href="#" class="btn remove fileupload-exists" data-dismiss="fileupload">' . c::__('Remove') . '</a>');
             $html->appendln('	</div>');
             $html->appendln('</div>');
         }
@@ -79,6 +121,11 @@ class CElement_FormInput_File extends CElement_FormInput {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);
@@ -158,14 +205,35 @@ class CElement_FormInput_File extends CElement_FormInput {
         return $js->text();
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setMultiple($bool) {
-        $this->multiple = true;
+        $this->multiple = $bool;
 
         return $this;
     }
 
+    /**
+     * @param string $applyjs
+     *
+     * @return $this
+     */
     public function setApplyJs($applyjs) {
         $this->applyjs = $applyjs;
+
+        return $this;
+    }
+
+    /**
+     * @param string $acceptFile
+     *
+     * @return $this
+     */
+    public function setAcceptFile($acceptFile) {
+        $this->acceptFile = $acceptFile;
 
         return $this;
     }

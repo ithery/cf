@@ -18,6 +18,9 @@ class CException extends Exception {
         E_DEPRECATED => 'Deprecated',
     ];
 
+    /**
+     * @var CException_ExceptionHandler
+     */
     protected static $exceptionHandler;
 
     /**
@@ -33,7 +36,7 @@ class CException extends Exception {
      *
      * @return void
      */
-    public function __construct($message = '', array $variables = null, $code = 0, Exception $previous = null) {
+    public function __construct($message = '', ?array $variables = null, $code = 0, ?Exception $previous = null) {
         if (is_array($variables)) {
             $message = strtr($message, $variables);
         } else {
@@ -68,6 +71,7 @@ class CException extends Exception {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return self::text($this);
     }
@@ -91,7 +95,9 @@ class CException extends Exception {
      */
     public static function exceptionHandler() {
         if (static::$exceptionHandler == null) {
-            static::$exceptionHandler = new CException_ExceptionHandler();
+            $exceptionHandlerClass = CF::config('app.classes.exception_handler', CException_ExceptionHandler::class);
+            /** @var class-string<CException_ExceptionHandler> $exceptionHandlerClass */
+            static::$exceptionHandler = new $exceptionHandlerClass();
         }
 
         return static::$exceptionHandler;

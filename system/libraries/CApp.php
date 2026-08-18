@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Renderable;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
@@ -24,6 +27,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Element_H4                   addH4($id=null)
  * @method CElement_Element_H5                   addH5($id=null)
  * @method CElement_Element_H6                   addH6($id=null)
+ * @method CElement_Element_H6                   addP($id=null)
  * @method CElement_Element_Span                 addSpan($id=null)
  * @method CElement_Element_Pre                  addPre($id=null)
  * @method CElement_List_ActionList              addActionList($id=null)
@@ -38,9 +42,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_Image              addImage($id=null)
  * @method CElement_Component_Chart              addChart($id=null)
  * @method CElement_Component_Metric_ValueMetric addValueMetric($id=null)
+ * @method CApp                                  addBr()
+ * @method CApp                                  addHr()
+ * @method CApp                                  add(mixed $renderable)
  * @method $this                                 addJs($js)
  */
-class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
+class CApp implements CInterface_Responsable, Renderable, Jsonable {
     use CTrait_Compat_App,
         CTrait_Macroable,
         CTrait_RequestInfoTrait,
@@ -56,62 +63,142 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
 
+    /**
+     * @var null|CApp[]
+     */
     public static $instance = null;
 
+    /**
+     * @var mixed
+     */
     protected $renderer;
 
+    /**
+     * @var array
+     */
     protected $data = [];
 
+    /**
+     * @var null|string
+     */
     protected $id = null;
 
     /**
-     * @var CApp_PWA
+     * @var array<string, CApp_PWA>
      */
-    protected $pwa;
+    protected $pwa = [];
 
     /**
      * @var CApp_Element
      */
     protected $element;
 
+    /**
+     * @var null|Closure
+     */
     protected $baseResolver = null;
 
-    private $content = '';
+    /**
+     * @var string
+     */
+    protected $content = '';
 
-    private $js = '';
+    /**
+     * @var string
+     */
+    protected $js = '';
 
+    /**
+     * @var string
+     */
     private $custom_js = '';
 
+    /**
+     * @var string
+     */
     private $custom_header = '';
 
+    /**
+     * @var string
+     */
     private $custom_footer = '';
 
+    /**
+     * @var array
+     */
     private $custom_data = [];
 
+    /**
+     * @var bool
+     */
     private $signup = false;
 
+    /**
+     * @var bool
+     */
     private $activation = false;
 
+    /**
+     * @var bool
+     */
     private $resend = false;
 
+    /**
+     * @var string
+     */
     private $additional_head = '';
 
+    /**
+     * @var array
+     */
     private $ajaxData = [];
 
+    /**
+     * @var bool
+     */
     private $renderMessage = true;
 
+    /**
+     * @var bool
+     */
     private $keepMessage = false;
 
+    /**
+     * @var bool
+     */
     private $useRequireJs = false;
 
+    /**
+     * @var null|bool
+     */
     private static $haveScrollToTop = null;
 
+    /**
+     * @var bool
+     */
+    private $coreModuleIsRegistered = false;
+
+    /**
+     * @var null|CApp_Visitor
+     */
+    private $visitor;
+
+    /**
+     * Whether the app output has already been rendered. Set by CApp_Concern_RendererTrait.
+     *
+     * @var bool
+     */
+    protected $rendered = false;
+
+    /**
+     * @param null|string $domain
+     */
     public function __construct($domain = null) {
         $this->element = new CApp_Element();
 
         //we load another configuration for this app
         //org configuration
-        if (strlen(CF::orgCode()) > 0) {
+        if (strlen((string) CF::orgCode()) > 0) {
             $orgBootFile = DOCROOT . 'application' . DS . $this->code() . DS . CF::orgCode() . DS . CF::orgCode() . EXT;
             if (file_exists($orgBootFile)) {
                 include $orgBootFile;
@@ -127,14 +214,14 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $this->id = 'capp';
         //check login
 
-        if (ccfg::get('update_last_request')) {
+        if (CF::config('app.update_last_request')) {
             $user = $this->user();
 
             if ($user != null) {
-                if (!is_array($user) && is_object($user)) {
+                if (!is_array($user) && is_object($user) && $user->user_id) {
                     //update last request
-                    $db = $this->db();
-                    $db->update('users', ['last_request' => date('Y-m-d H:i:s')], ['user_id' => $user->user_id]);
+                    $db = c::db();
+                    $db->table('users')->where('user_id', '=', $user->user_id)->update(['last_request' => date('Y-m-d H:i:s')]);
                 }
             }
         }
@@ -164,6 +251,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return new CBase_ForwarderStaticClass(c::value($this->baseResolver));
     }
 
+    /**
+     * @param string $method
+     * @param array  $parameters
+     *
+     * @return mixed
+     */
     public function __call($method, $parameters) {
         if (method_exists($this->element, $method)) {
             return call_user_func_array([$this->element, $method], $parameters);
@@ -173,15 +266,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         }
 
         throw new Exception('undefined method on CApp: ' . $method);
-    }
-
-    /**
-     * @param string $domain
-     *
-     * @return CApp_Api
-     */
-    public static function api($domain = null) {
-        return CApp_Api::instance($domain);
     }
 
     /**
@@ -220,7 +304,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      * @return CApp_Navigation
      */
     public static function nav($domain = null) {
-        return CApp_Navigation::instance($domain);
+        return CNavigation::manager();
     }
 
     /**
@@ -229,11 +313,14 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      * @return CApp_Navigation
      */
     public static function navigation($domain = null) {
-        return CApp_Navigation::instance($domain);
+        return CNavigation::manager();
     }
 
+    /**
+     * @return bool
+     */
     public static function isAjax() {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) and is_string($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
     /**
@@ -250,10 +337,20 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return new CApp_Data();
     }
 
+    /**
+     * @param string      $message
+     * @param array       $params
+     * @param null|string $lang
+     *
+     * @return null|string
+     */
     public static function getTranslation($message, $params = [], $lang = null) {
         return c::__($message, $params, $lang);
     }
 
+    /**
+     * @return CComponent_Manager
+     */
     public static function component() {
         return CComponent_Manager::instance();
     }
@@ -262,12 +359,20 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      * @param null|mixed $domain
      * @param null|mixed $dbName
      *
-     * @return CDatabase
+     * @deprecated 1.6 use c::db
+     *
+     * @return CDatabase_Connection
      */
     public static function db($domain = null, $dbName = null) {
-        return CDatabase::instance($dbName, null, $domain);
+        return CDatabase::manager()->connection($dbName);
     }
 
+    /**
+     * @param array|string $key
+     * @param mixed        $value
+     *
+     * @return CApp
+     */
     public function setAjaxData($key, $value = null) {
         if (is_array($key)) {
             $this->ajaxData = array_merge($this->ajaxData, $key);
@@ -278,10 +383,20 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return void
+     */
     public function setRenderMessage($bool) {
         $this->renderMessage = $bool;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return void
+     */
     public function setKeepMessage($bool) {
         $this->keepMessage = $bool;
     }
@@ -295,47 +410,73 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return CTranslation::translator();
     }
 
+    /**
+     * @param array $data
+     * @param array $rules
+     * @param array $messages
+     * @param array $customAttributes
+     *
+     * @return array
+     */
     public function validate(array $data, array $rules, array $messages = [], array $customAttributes = []) {
         $validation = CValidation::factory();
 
         return $validation->validate($data, $rules, $messages, $customAttributes);
     }
 
+    /**
+     * @return null|int|string
+     */
     public function appId() {
         return CF::appId();
     }
 
+    /**
+     * @return CManager
+     */
     public function manager() {
         return CManager::instance();
     }
 
+    /**
+     * @return string
+     */
     public function name() {
         return strlen(CF::appCode()) > 0 ? CF::appCode() : CF::appCode();
     }
 
+    /**
+     * @return string
+     */
     public function code() {
         return CF::appCode();
     }
 
+    /**
+     * @param string $type
+     * @param string $message
+     *
+     * @return void
+     */
     public function message($type, $message) {
         return CApp_Message::add($type, $message);
     }
 
+    /**
+     * @return mixed
+     */
     public function controller() {
         return CHTTP::kernel()->controller();
     }
 
+    /**
+     * @param string      $path
+     * @param null|string $domain
+     *
+     * @return mixed
+     */
     public static function config($path, $domain = null) {
         return CApp_Config::get($path, $domain);
-    }
-
-    /**
-     * @deprecated
-     *
-     * @return bool
-     */
-    public static function isAdmin() {
-        return static::isAdministrator();
     }
 
     /**
@@ -367,63 +508,110 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return self::$instance[$domain];
     }
 
+    /**
+     * Buang instance per-domain yang sudah dibuat.
+     *
+     * `instance()` di atas adalah singleton proses (bukan per-request) —
+     * di produksi itu aman karena tiap request PHP-FPM adalah proses baru,
+     * tapi test harness memproses banyak simulasi request dalam satu proses
+     * yang sama (lihat CTesting_Concern_MakesHttpRequests::call(), yang
+     * sudah reset CObserver dengan alasan yang sama). Tanpa reset ini,
+     * widget/breadcrumb/title dari satu simulasi request nempel ke request
+     * berikutnya kalau domain-nya sama. Nama beda dari method instance
+     * `reset()` di bawah (yang cuma bersihin satu instance) — ini buang
+     * semua instance per-domain sekaligus.
+     *
+     * @return void
+     */
+    public static function resetInstances() {
+        self::$instance = null;
+    }
+
+    /**
+     * @param bool $bool
+     *
+     * @return CApp
+     */
     public function signup($bool = true) {
         $this->signup = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return CApp
+     */
     public function resend($bool = true) {
         $this->resend = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return CApp
+     */
     public function activation($bool = true) {
         $this->activation = $bool;
 
         return $this;
     }
 
+    /**
+     * @param string $js
+     *
+     * @return CApp
+     */
     public function addCustomJs($js) {
         $this->custom_js .= $js;
 
         return $this;
     }
 
-    public function registerCoreModules() {
-        $manager = CManager::instance();
-        $theme = CManager::theme()->getCurrentTheme();
-        $themeFile = CF::getFile('themes', $theme);
-        if (file_exists($themeFile)) {
-            $themeData = include $themeFile;
-            $moduleArray = carr::get($themeData, 'client_modules');
-            $cssArray = carr::get($themeData, 'css');
-            $jsArray = carr::get($themeData, 'js');
-            $cs = CClientScript::instance();
-            if ($moduleArray != null) {
-                foreach ($moduleArray as $module) {
-                    $manager->registerThemeModule($module);
-                }
-            }
-            if (ccfg::get('have_clock')) {
-                $manager->registerModule('servertime');
-            }
-            if ($cssArray != null) {
-                foreach ($cssArray as $css) {
-                    $manager->asset()->theme()->registerCssFile($css);
-                }
-            }
-            if ($jsArray != null) {
-                foreach ($jsArray as $js) {
-                    $manager->asset()->theme()->registerJsFiles($js);
-                }
-            }
-        }
+    /**
+     * @param bool $force
+     *
+     * @return void
+     */
+    public function registerCoreModules($force = false) {
+        if ($force || !$this->coreModuleIsRegistered) {
+            $manager = CManager::instance();
+            $theme = CManager::theme()->getCurrentTheme();
+            $themeFile = CF::getFile('themes', $theme);
+            if (file_exists($themeFile)) {
+                $themeData = include $themeFile;
+                $moduleArray = carr::get($themeData, 'client_modules');
+                $cssArray = carr::get($themeData, 'css');
+                $jsArray = carr::get($themeData, 'js');
 
-        $manager->registerModule('block-ui');
+                if ($moduleArray != null) {
+                    foreach ($moduleArray as $module) {
+                        $manager->registerThemeModule($module);
+                    }
+                }
+
+                if ($cssArray != null) {
+                    foreach ($cssArray as $css) {
+                        $manager->asset()->theme()->registerCssFile($css);
+                    }
+                }
+                if ($jsArray != null) {
+                    foreach ($jsArray as $js) {
+                        $manager->asset()->theme()->registerJsFiles($js);
+                    }
+                }
+            }
+
+            $manager->registerModule('block-ui');
+        }
     }
 
+    /**
+     * @return CApp
+     */
     public function reset() {
         $this->rendered = false;
         $this->element->clear();
@@ -443,6 +631,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $this->setCustomData($key, $value);
     }
 
+    /**
+     * @param array|string $key
+     * @param mixed        $value
+     *
+     * @return CApp
+     */
     public function setCustomData($key, $value = null) {
         if (is_array($key)) {
             $this->custom_data = $key;
@@ -457,6 +651,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $this;
     }
 
+    /**
+     * @param null|string $key
+     * @param mixed       $default
+     *
+     * @return mixed
+     */
     public function getCustomData($key = null, $default = null) {
         if ($key === null) {
             return $this->custom_data;
@@ -465,6 +665,13 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return carr::get($this->custom_data, $key, $default);
     }
 
+    /**
+     * @param null|int|string $roleId
+     * @param null|int|string $orgId
+     * @param null|string     $type
+     *
+     * @return array
+     */
     public function getRoleChildList($roleId = null, $orgId = null, $type = null) {
         if (strlen($roleId) == 0) {
             $roleId = c::optional($this->role())->role_id;
@@ -481,7 +688,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             foreach ($childs as $child) {
                 $depth = carr::get($child, 'depth');
                 $childList[$child['role_id']] = cutils::indent($depth, '&nbsp;&nbsp;') . $child['name'];
-                $traverse($child->getChildren);
+                $traverse($child->getChildren()->orderBy('lft', 'asc')->get());
             }
         };
 
@@ -490,12 +697,20 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $childList;
     }
 
+    /**
+     * @param string $buffer
+     *
+     * @return string
+     */
     protected function minifyJavascript($buffer) {
         $minifier = new CManager_Asset_Compiler_Minify_MinifyJs();
 
         return $minifier->execute($buffer);
     }
 
+    /**
+     * @return array
+     */
     public function toArray() {
         $data = [];
         $data['title'] = $this->title;
@@ -511,11 +726,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $asset = CManager::asset();
         $html = $this->element->html();
         $js = $this->element->js();
+
         if (CF::config('app.javascript.minify')) {
             $js = $this->minifyJavascript($js);
         }
 
-        $js = $asset->renderJsRequire($js, 'cresenity.cf.requireJs');
+        //$js = $asset->renderJsRequire($js, 'cresenity.cf.requireJs');
 
         $cappScript = $this->yieldPushContent('capp-script');
         //strip cappScript from <script>
@@ -527,13 +743,17 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         // }
 
         //$js .= $cappScript;
+        $assetData = [];
+        $assetData['js'] = $asset->getAllJsFileUrl();
+        $assetData['css'] = $asset->getAllCssFileUrl();
+        $data['assets'] = $assetData;
         $data['html'] = $message . $html . $cappScript;
         $data['js'] = base64_encode($js);
         if (CF::config('app.debug')) {
             $data['jsRaw'] = $js;
         }
 
-        $data['css_require'] = $asset->getAllCssFileUrl();
+        //$data['css_require'] = $asset->getAllCssFileUrl();
         $data['message'] = $messageOrig;
         $data['ajaxData'] = $this->ajaxData;
         $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');
@@ -565,6 +785,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $this->toJson($options);
     }
 
+    /**
+     * @param Exception   $exception
+     * @param null|string $email
+     *
+     * @return void
+     */
     public static function sendExceptionEmail(Exception $exception, $email = null) {
         $ignoredExceptions = [
             CDaemon_Exception_AlreadyRunningException::class,
@@ -594,24 +820,42 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     public function toResponse($request) {
         if (c::request()->ajax()) {
-            return c::response()->json($this);
+            /** @var CApp $this */
+            if (CDebug::bar()->isEnabled()) {
+                CDebug::bar()->populateAssets();
+            }
+            CFEvent::run('CApp.beforeRender');
+            $this->registerCoreModules();
+
+            return c::response()->json($this->toArray());
         }
 
         return CHTTP::createResponse($this->render());
     }
 
-    public static function isAdministrator() {
-        return carr::first(explode('/', trim(curl::current(), '/'))) == 'administrator';
-    }
-
+    /**
+     * @deprecated 1.8, use c::manager()->theme()->setTheme() instead
+     *
+     * @param string $theme
+     *
+     * @return void
+     */
     public static function setTheme($theme) {
         return CManager::theme()->setTheme($theme);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return void
+     */
     public static function setHaveScrollToTop($bool = true) {
         static::$haveScrollToTop = $bool;
     }
 
+    /**
+     * @return bool
+     */
     public static function haveScrollToTop() {
         if (static::$haveScrollToTop === null) {
             static::$haveScrollToTop = CF::config('cresjs', 'scroll_to_top', false);
@@ -620,6 +864,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return static::$haveScrollToTop;
     }
 
+    /**
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return CApp
+     */
     public function setData($key, $value) {
         $this->data[$key] = $value;
 
@@ -635,6 +885,11 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return CApp_Formatter::instance();
     }
 
+    /**
+     * @param string $group
+     *
+     * @return void
+     */
     public function enablePWA($group) {
         $this->pwa($group)->enable();
     }
@@ -660,5 +915,16 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     public function notification() {
         return CApp_Notification::instance();
+    }
+
+    /**
+     * @return CApp_Visitor
+     */
+    public function visitor() {
+        if ($this->visitor == null) {
+            $this->visitor = new CApp_Visitor(CF::config('visitor'));
+        }
+
+        return $this->visitor;
     }
 }

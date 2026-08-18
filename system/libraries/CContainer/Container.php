@@ -133,7 +133,12 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      * @return CContainer_ContextualBindingBuilderInterface
      */
     public function when($concrete) {
-        return new CContainer_ContextualBindingBuilder($this, $this->getAlias($concrete));
+        $aliases = [];
+        foreach (carr::wrap($concrete) as $c) {
+            $aliases[] = $this->getAlias($c);
+        }
+
+        return new CContainer_ContextualBindingBuilder($this, $aliases);
     }
 
     /**
@@ -745,7 +750,15 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
         if ($concrete instanceof Closure) {
             return $concrete($this, $this->getLastParameterOverride());
         }
-        $reflector = new ReflectionClass($concrete);
+        // A missing class has to surface as a binding failure like every other
+        // resolution problem. Letting ReflectionException through means a caller
+        // guarding against CContainer_Exception_BindingResolutionException misses
+        // it entirely.
+        try {
+            $reflector = new ReflectionClass($concrete);
+        } catch (ReflectionException $e) {
+            throw new CContainer_Exception_BindingResolutionException("Target class [{$concrete}] does not exist.", 0, $e);
+        }
         // If the type is not instantiable, the developer is attempting to resolve
         // an abstract type such as an Interface of Abstract Class and there is
         // no binding registered for the abstractions so we need to bail out.
@@ -795,7 +808,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
             // If the class is null, it means the dependency is a string or some other
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
-            $results[] = is_null($dependency->getClass()) ? $this->resolvePrimitive($dependency) : $this->resolveClass($dependency);
+            $results[] = is_null(CBase_Reflector::getParameterClassName($dependency)) ? $this->resolvePrimitive($dependency) : $this->resolveClass($dependency);
         }
 
         return $results;
@@ -865,7 +878,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      */
     protected function resolveClass(ReflectionParameter $parameter) {
         try {
-            return $this->make($parameter->getClass()->name);
+            return $this->make(CBase_Reflector::getParameterClassName($parameter));
         } catch (CContainer_Exception_BindingResolutionException $e) {
             // If we can not resolve the class instance, we will check to see if the value
             // is optional, and if it is we will return the optional parameter value as
@@ -921,7 +934,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @return void
      */
-    public function resolving($abstract, Closure $callback = null) {
+    public function resolving($abstract, ?Closure $callback = null) {
         if (is_string($abstract)) {
             $abstract = $this->getAlias($abstract);
         }
@@ -940,7 +953,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @return void
      */
-    public function afterResolving($abstract, Closure $callback = null) {
+    public function afterResolving($abstract, ?Closure $callback = null) {
         if (is_string($abstract)) {
             $abstract = $this->getAlias($abstract);
         }
@@ -1138,7 +1151,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @return CContainer_ContainerInterface|static
      */
-    public static function setInstance(CContainer_ContainerInterface $container = null) {
+    public static function setInstance(?CContainer_ContainerInterface $container = null) {
         return static::$instance = $container;
     }
 
@@ -1161,6 +1174,7 @@ class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->make($key);
     }

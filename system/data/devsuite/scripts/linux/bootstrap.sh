@@ -6,14 +6,9 @@ SOURCE="${BASH_SOURCE[0]}"
 SUDOCMDS="uninstall install start restart stop unsecure secure use"
 HOMEPATH=$HOME
 
-ROOTPATH=$DOCROOT
+ISSUDO=$SUDO
 
-ISSUDO = $SUDO
-
-
-
-
-if [ ! -z "$ISSUDO" ]
+if [ -n "$ISSUDO" ]; then
     exit
 fi
 
@@ -83,10 +78,10 @@ then
     check_dependencies
 
     HOST="${PWD##*/}"
-    DOMAIN=$(cat "$HOME/.devsuite/config.json" | jq -r ".domain")
-    PORT=$(cat "$HOME/.devsuite/config.json" | jq -r ".port")
+    DOMAIN=$(cat "$HOME/.config/devsuite/config.json" | jq -r ".domain")
+    PORT=$(cat "$HOME/.config/devsuite/config.json" | jq -r ".port")
 
-    for linkname in ~/.devsuite/Sites/*; do
+    for linkname in ~/.config/devsuite/Sites/*; do
         if [[ "$(readlink ${linkname})" = "$PWD" ]]
         then
             HOST="${linkname##*/}"
@@ -95,7 +90,7 @@ then
 
     # Decide the correct PORT to use according if the site has a secure
     # config or not.
-    if grep --no-messages --quiet 443 ~/.devsuite/Nginx/$HOST*
+    if grep --no-messages --quiet 443 ~/.config/devsuite/Nginx/$HOST*
     then
         PORT=88
     else
@@ -107,9 +102,11 @@ then
     sudo -u $USER "$DIR/bin/ngrok" http "$HOST.$DOMAIN:$PORT" -host-header=rewrite ${*:2}
     exit
 
-# Finally, for every other command we will just proxy into the PHP tool
-# and let it handle the request. These are commands which can be run
-# without sudo and don't require taking over terminals like Ngrok.
+# Finally, for every other command we will just proxy into the "phpcf"
+# framework console tool and let it handle the request (it registers all
+# of the "devsuite:*" commands - see system/libraries/CConsole/Command/DevSuite).
+# These are commands which can be run without sudo and don't require
+# taking over terminals like Ngrok.
 else
-    php "$DIR/cli/valet.php" "$@"
+    phpcf "devsuite:$1" "${@:2}"
 fi

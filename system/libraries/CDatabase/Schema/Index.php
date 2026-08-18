@@ -2,16 +2,10 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 11:54:17 AM
- */
 class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabase_Schema_Constraint {
     /**
      * Asset identifier instances of the column names the index is associated with.
-     * array($columnName => Identifier)
+     * array($columnName => Identifier).
      *
      * @var CDatabase_Schema_Identifier[]
      */
@@ -29,14 +23,14 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
 
     /**
      * Platform specific flags for indexes.
-     * array($flagName => true)
+     * array($flagName => true).
      *
      * @var array
      */
     protected $flags = [];
 
     /**
-     * Platform specific options
+     * Platform specific options.
      *
      * @todo $_flags should eventually be refactored into options
      *
@@ -71,9 +65,9 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
     /**
      * @param string $column
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     protected function addColumn($column) {
         if (is_string($column)) {
@@ -84,14 +78,14 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getColumns() {
         return array_keys($this->columns);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getQuotedColumns(CDatabase_Platform $platform) {
         $columns = [];
@@ -296,7 +290,7 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
     }
 
     /**
-     * Return whether the two indexes have the same partial index
+     * Return whether the two indexes have the same partial index.
      *
      * @param CDatabase_Schema_Index $other
      *

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 class CComponent_BladeDirective {
     public static function component($expression) {
         $lastArg = c::str(carr::last(explode(',', $expression)))->trim();

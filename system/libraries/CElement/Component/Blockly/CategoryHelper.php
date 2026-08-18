@@ -21,6 +21,9 @@ class CElement_Component_Blockly_CategoryHelper {
 
     const CATEGORY_VARIABLES_DYNAMIC = 'variablesDynamic';
 
+    /**
+     * @var array
+     */
     public static $categoryHue = [
         'math' => '230',
         'loops' => '120',
@@ -33,6 +36,12 @@ class CElement_Component_Blockly_CategoryHelper {
         'variablesDynamic' => '310',
     ];
 
+    /**
+     * @param string $category
+     * @param array  $blocksArray list of BlockHelper::* block name constants
+     *
+     * @return string
+     */
     public static function renderCategory($category, $blocksArray) {
         $blockXml = carr::reduce($blocksArray, function ($output, $block) {
             try {
@@ -41,7 +50,7 @@ class CElement_Component_Blockly_CategoryHelper {
                 return $output;
             }
         }, '');
-        $categoryName = ucwords(str_replace('_', '_', cstr::snake($category)));
+        $categoryName = ucwords(str_replace('_', ' ', cstr::snake($category)));
         $categoryHue = carr::get(static::$categoryHue, strtolower($category), '230');
         $categoryOpen = '<category name="' . $categoryName . '" colour="' . $categoryHue . '">';
         $categoryClose = '</category>';

@@ -1,9 +1,11 @@
 <?php
 
-use \CApp_Navigation_Helper as Helper;
+use CApp_Navigation_Helper as Helper;
 
 //@codingStandardsIgnoreStart
-
+/**
+ * @deprecated 1.8 use CApp_Navigation_Helper
+ */
 class cnav {
     public static function nav($nav = null, $controller = null, $method = null, $path = null) {
         return Helper::nav($nav, $controller, $method, $path);
@@ -23,10 +25,6 @@ class cnav {
 
     public static function as_user_rights_array($app_id, $role_id, $navs = null, $app_role_id = '', $domain = '', $level = 0) {
         return Helper::asUserRightsArray($app_id, $role_id, $navs, $app_role_id, $domain, $level);
-    }
-
-    public static function is_public($nav) {
-        return Helper::isPublic($nav);
     }
 
     public static function child_count($nav) {

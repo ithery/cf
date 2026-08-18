@@ -2,31 +2,45 @@
 
 namespace PHPStan\Rules\PhpDoc;
 
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Type\ErrorType;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeTraverser;
+use function array_unique;
+use function array_values;
 
-class UnresolvableTypeHelper
+#[AutowiredService]
+final class UnresolvableTypeHelper
 {
 
-	public function containsUnresolvableType(Type $type): bool
+	public function getUnresolvableType(Type $type): ?UnresolvableTypeResult
 	{
 		$containsUnresolvable = false;
-		TypeTraverser::map($type, static function (Type $type, callable $traverse) use (&$containsUnresolvable): Type {
+		$reasons = [];
+		TypeTraverser::map($type, static function (Type $type, callable $traverse) use (&$containsUnresolvable, &$reasons): Type {
+			$reason = null;
 			if ($type instanceof ErrorType) {
 				$containsUnresolvable = true;
-				return $type;
+				$reason = $type->getReason();
 			}
 			if ($type instanceof NeverType && !$type->isExplicit()) {
 				$containsUnresolvable = true;
-				return $type;
+				$reason = $type->getReason();
 			}
 
-			return $traverse($type);
+			if ($reason !== null) {
+				$reasons[] = $reason;
+			}
+
+			return $containsUnresolvable ? $type : $traverse($type);
 		});
 
-		return $containsUnresolvable;
+		if (!$containsUnresolvable) {
+			return null;
+		}
+
+		return new UnresolvableTypeResult(array_values(array_unique($reasons)));
 	}
 
 }

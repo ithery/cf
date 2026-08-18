@@ -12,6 +12,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Illuminate\Contracts\Support\Htmlable;
 
 //@codingStandardsIgnoreStart
 class c {
@@ -28,6 +29,17 @@ class c {
         return rtrim($str, DS) . DS;
     }
 
+    /**
+     * Unsigned right shift.
+     *
+     * Emulates (in PHP) the unsigned right shift operator ">>>" as it's
+     * known in Java or C#.
+     *
+     * @param int $a the left operand
+     * @param int $b the right operand
+     *
+     * @return int the result of the shift operation
+     */
     public static function urShift($a, $b) {
         if ($b == 0) {
             return $a;
@@ -36,10 +48,26 @@ class c {
         return ($a >> $b) & ~(1 << (8 * PHP_INT_SIZE - 1) >> ($b - 1));
     }
 
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
     public static function manimgurl($path) {
         return curl::base() . 'public/manual/' . $path;
     }
 
+    /**
+     * Ensures a value is an iteratee shim.
+     *
+     * Checks if the value is a callable, then if it has a `toString()` method,
+     * and finally if it is an array with exactly one property. Otherwise
+     * defers to `c::property`.
+     *
+     * @param mixed $value the value to inspect
+     *
+     * @return callable returns the resolved value
+     */
     public static function baseIteratee($value) {
         if (\is_callable($value)) {
             return $value;
@@ -54,6 +82,14 @@ class c {
         return static::property($value);
     }
 
+    /**
+     * Creates a function that checks if the value at `property` of a given object equals `source`.
+     *
+     * @param array|string $property the path of the property to get
+     * @param mixed        $source   the value to compare
+     *
+     * @return callable returns the new matcher function
+     */
     public static function baseMatchesProperty($property, $source) {
         return function ($value, $index, $collection) use ($property, $source) {
             $propertyVal = static::property($property);
@@ -62,6 +98,13 @@ class c {
         };
     }
 
+    /**
+     * Checks if `value` is a match to `source` (recursively).
+     *
+     * @param mixed $source the value to compare
+     *
+     * @return callable returns the function that checks if `value` is a match to `source`
+     */
     public static function baseMatches($source) {
         return function ($value, $index, $collection) use ($source) {
             if ($value === $source || static::isEqual($value, $source)) {
@@ -82,6 +125,14 @@ class c {
         };
     }
 
+    /**
+     * Performs a deep comparison between two values to determine if they are equivalent.
+     *
+     * @param mixed $value the value to compare
+     * @param mixed $other the other value to compare
+     *
+     * @return bool
+     */
     public static function isEqual($value, $other) {
         $factory = CComparator::createFactory();
         $comparator = $factory->getComparatorFor($value, $other);
@@ -135,7 +186,7 @@ class c {
                 }
 
                 if (\is_string($path) && $path[0] !== '[' && $path[strlen($path) - 1] !== ']') {
-                    $path = "[${path}]";
+                    $path = '[' . $path . ']';
                 }
             }
 
@@ -204,8 +255,8 @@ class c {
     public static function traitUsesRecursive($trait) {
         $traits = class_uses($trait);
 
-        foreach ($traits as $trait) {
-            $traits += self::traitUsesRecursive($trait);
+        foreach ($traits as $usedTrait) {
+            $traits += self::traitUsesRecursive($usedTrait);
         }
 
         return $traits;
@@ -225,8 +276,8 @@ class c {
 
         $results = [];
 
-        foreach (array_reverse(class_parents($class)) + [$class => $class] as $class) {
-            $results += self::traitUsesRecursive($class);
+        foreach (array_reverse(class_parents($class)) + [$class => $class] as $classOrParent) {
+            $results += self::traitUsesRecursive($classOrParent);
         }
 
         return array_unique($results);
@@ -273,37 +324,35 @@ class c {
      *
      * @return mixed
      */
-    public static function with($value, callable $callback = null) {
+    public static function with($value, ?callable $callback = null) {
         return is_null($callback) ? $value : $callback($value);
     }
 
     /**
      * Report an exception.
      *
-     * @param \Throwable $exception
+     * @param \Throwable|string $exception
      *
      * @return void
      */
     public static function report($exception) {
-        if ($exception instanceof Throwable
-            && !$exception instanceof Exception
-        ) {
-            $exception = new FatalThrowableError($exception);
+        if (is_string($exception)) {
+            $exception = new Exception($exception);
         }
 
-        $exceptionHandler = CException::exceptionHandler();
-        $exceptionHandler->report($exception);
+        CException::exceptionHandler()->report($exception);
     }
 
     /**
      * Return the default value of the given value.
      *
      * @param mixed $value
+     * @param mixed ...$args arguments to invoke $value with, if it's a Closure
      *
      * @return mixed
      */
     public static function value($value, ...$args) {
-        if ($value instanceof SerializableClosure) {
+        if ($value instanceof SerializableClosure || $value instanceof CFunction_SerializableClosure) {
             return $value->__invoke(...$args);
         }
 
@@ -313,11 +362,10 @@ class c {
     //@codingStandardsIgnoreStart
 
     /**
-     * Dispatch an event and call the listeners.
+     * Dispatch an event and call the listeners, or get the event dispatcher
+     * if called with no arguments.
      *
-     * @param string|object $event
-     * @param mixed         $payload
-     * @param bool          $halt
+     * @param mixed ...$args forwarded to CEvent::dispatch($event, $payload = [], $halt = false)
      *
      * @return null|array|CEvent_Dispatcher
      */
@@ -335,14 +383,14 @@ class c {
      * @param null|string $message
      * @param array       $context
      *
-     * @return null|\CLogger
+     * @return null|\CLogger_Manager
      */
     public static function logger($message = null, array $context = []) {
         if (is_null($message)) {
-            return CLogger::instance();
+            return CLogger::logger();
         }
 
-        return CLogger::instance()->add(CLogger::DEBUG, $message, $context);
+        return CLogger::logger()->debug($message, $context);
     }
 
     //@codingStandardsIgnoreEnd
@@ -352,7 +400,7 @@ class c {
      *
      * @param null|\DateTimeZone|string $tz
      *
-     * @return CCarbon|\Carbon\Carbon|\CarbonV3\Carbon
+     * @return CCarbon|\Carbon\Carbon
      */
     public static function now($tz = null) {
         return CCarbon::now($tz);
@@ -369,6 +417,11 @@ class c {
         return CCarbon::today($tz);
     }
 
+    /**
+     * @param bool $getAsNumber
+     *
+     * @return array|int|float
+     */
     public static function hrtime($getAsNumber = false) {
         if (function_exists('hrtime')) {
             return hrtime($getAsNumber);
@@ -394,6 +447,12 @@ class c {
         return c::e($str);
     }
 
+    /**
+     * @param string $path
+     * @param int    $count number of times to go up a directory level
+     *
+     * @return string
+     */
     public static function dirname($path, $count = 1) {
         if ($count > 1) {
             return dirname(static::dirname($path, --$count));
@@ -410,7 +469,7 @@ class c {
      *
      * @return mixed
      */
-    public static function optional($value = null, callable $callback = null) {
+    public static function optional($value = null, ?callable $callback = null) {
         if (is_null($callback)) {
             return new COptional($value);
         }
@@ -422,7 +481,7 @@ class c {
     /**
      * Encode HTML special characters in a string.
      *
-     * @param CBase_DeferringDisplayableValue|CInterface_Htmlable|string $value
+     * @param CBase_DeferringDisplayableValueInterface|Htmlable|string $value
      * @param bool                                                       $doubleEncode
      *
      * @return string
@@ -432,11 +491,11 @@ class c {
             $value = $value->resolveDisplayableValue();
         }
 
-        if ($value instanceof CInterface_Htmlable) {
+        if ($value instanceof Htmlable) {
             return $value->toHtml();
         }
 
-        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', $doubleEncode);
+        return htmlspecialchars($value ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', $doubleEncode);
     }
 
     /**
@@ -517,6 +576,9 @@ class c {
         if ($key === null) {
             return CTranslation::translator();
         }
+        if ($replace === null) {
+            $replace = [];
+        }
 
         return CTranslation::translator()->trans($key, $replace, $locale);
     }
@@ -547,16 +609,18 @@ class c {
      * @param null|mixed        $default
      *
      * @return CSession_Store|mixed
+     *
+     * @phpstan-return ($key is null ? CSession_Store : mixed)
      */
     public static function session($key = null, $default = null) {
         if ($key === null) {
-            return CSession::instance()->store();
+            return CSession::store();
         }
         if (is_array($key)) {
-            return CSession::instance()->store()->put($key);
+            return CSession::store()->put($key);
         }
 
-        return CSession::instance()->store()->get($key, $default);
+        return CSession::store()->get($key, $default);
     }
 
     /**
@@ -606,9 +670,9 @@ class c {
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param null|string                $view
-     * @param CInterface_Arrayable|array $data
-     * @param array                      $mergeData
+     * @param null|string                                   $view
+     * @param \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param array                                         $mergeData
      *
      * @return CView_View|CView_Factory
      */
@@ -653,6 +717,18 @@ class c {
         return static::abort(404);
     }
 
+    /**
+     * Throw an HttpException with the given data.
+     *
+     * @param CHTTP_Response|\CInterface_Responsable|int $code
+     * @param string                                     $message
+     * @param array                                      $headers
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @return void
+     */
     public static function abort($code, $message = '', array $headers = []) {
         if ($code instanceof CHTTP_Response) {
             throw new CHTTP_Exception_ResponseException($code);
@@ -752,9 +828,14 @@ class c {
         if (is_numeric($value) || is_bool($value)) {
             return false;
         }
-
+        if ($value instanceof CModel) {
+            return false;
+        }
         if ($value instanceof Countable) {
             return count($value) === 0;
+        }
+        if ($value instanceof Stringable) {
+            return trim((string) $value) === '';
         }
 
         return empty($value);
@@ -768,7 +849,7 @@ class c {
      * @return bool
      */
     public static function filled($value) {
-        return !static::blank($value);
+        return !self::blank($value);
     }
 
     /**
@@ -812,6 +893,32 @@ class c {
      */
     public static function router() {
         return CRouting_Router::instance();
+    }
+
+    /**
+     * Create an Fluent object from the given value.
+     *
+     * @param object|array $value
+     *
+     * @return \CBase_Fluent
+     */
+    public static function fluent($value) {
+        return new CBase_Fluent($value);
+    }
+
+    /**
+     * Return a new literal or anonymous object using named arguments.
+     *
+     * @param mixed ...$arguments
+     *
+     * @return \stdClass
+     */
+    public static function literal(...$arguments) {
+        if (count($arguments) === 1 && array_is_list($arguments)) {
+            return $arguments[0];
+        }
+
+        return (object) $arguments;
     }
 
     /**
@@ -870,8 +977,8 @@ class c {
      * @return void
      */
     public static function dump($var) {
-        foreach (func_get_args() as $var) {
-            VarDumper::dump($var);
+        foreach (func_get_args() as $arg) {
+            VarDumper::dump($arg);
         }
     }
 
@@ -889,6 +996,13 @@ class c {
      */
     public static function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null) {
         $attempts = 0;
+        $backoff = [];
+
+        if (is_array($times)) {
+            $backoff = $times;
+
+            $times = count($times) + 1;
+        }
 
         beginning:
         $attempts++;
@@ -900,9 +1014,9 @@ class c {
             if ($times < 1 || ($when && !$when($e))) {
                 throw $e;
             }
-
+            $sleepMilliseconds = $backoff[$attempts - 1] ?? $sleepMilliseconds;
             if ($sleepMilliseconds) {
-                usleep(c::value($sleepMilliseconds, $attempts) * 1000);
+                CBase_Sleep::usleep(c::value($sleepMilliseconds, $attempts, $e) * 1000);
             }
 
             goto beginning;
@@ -981,6 +1095,8 @@ class c {
      * @param array       $parameters
      *
      * @return CContainer_Container|mixed
+     *
+     * @phpstan-return ($abstract is null ? CContainer_Container : mixed)
      */
     public static function container($abstract = null, array $parameters = []) {
         if (is_null($abstract)) {
@@ -988,6 +1104,22 @@ class c {
         }
 
         return CContainer::getInstance()->make($abstract, $parameters);
+    }
+
+    /**
+     * @param null|string $key
+     * @param mixed       $default
+     *
+     * @return CConfig_Repository|mixed
+     *
+     * @phpstan-return ($key is null ? CConfig_Repository : mixed)
+     */
+    public static function config($key = null, $default = null) {
+        if ($key == null) {
+            return CConfig::repository();
+        }
+
+        return CConfig::repository()->get($key, $default);
     }
 
     /**
@@ -1020,16 +1152,19 @@ class c {
     }
 
     /**
-     * Get the CDatabase instance.
+     * Get the database connection instance.
      *
      * @param null|string $name
      *
-     * @return \CDatabase
+     * @return \CDatabase_Connection
      */
     public static function db($name = null) {
-        return CDatabase::instance($name);
+        return CDatabase::manager()->connection($name);
     }
 
+    /**
+     * @return string
+     */
     public static function userAgent() {
         return !empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '';
     }
@@ -1060,7 +1195,7 @@ class c {
             if ($segment === '*') {
                 if ($target instanceof CCollection) {
                     $target = $target->all();
-                } elseif (!is_array($target)) {
+                } elseif (!is_iterable($target)) {
                     return c::value($default);
                 }
 
@@ -1071,6 +1206,17 @@ class c {
                 }
 
                 return in_array('*', $key) ? carr::collapse($result) : $result;
+            }
+            if ($segment === '{first}') {
+                $segment = array_key_first(is_array($target) ? $target : c::collect($target)->all());
+            } elseif ($segment === '{last}') {
+                $segment = array_key_last(is_array($target) ? $target : c::collect($target)->all());
+            } elseif ($segment === '\*') {
+                $segment = '*';
+            } elseif ($segment === '\{first}') {
+                $segment = '{first}';
+            } elseif ($segment === '\{last}') {
+                $segment = '{last}';
             }
 
             if (carr::accessible($target) && carr::exists($target, $segment)) {
@@ -1146,6 +1292,40 @@ class c {
     }
 
     /**
+     * Remove an item from an array or object using "dot" notation.
+     *
+     * @param mixed        $target
+     * @param array|string $key
+     *
+     * @return void
+     */
+    public static function forget(&$target, $key) {
+        $segments = is_array($key) ? $key : explode('.', $key);
+
+        if (($segment = array_shift($segments)) === '*' && carr::accessible($target)) {
+            if ($segments) {
+                foreach ($target as &$inner) {
+                    self::forget($inner, $segments);
+                }
+            }
+        } elseif (carr::accessible($target)) {
+            if ($segments && carr::exists($target, $segment)) {
+                self::forget($target[$segment], $segments);
+            } else {
+                carr::forget($target, $segment);
+            }
+        } elseif (is_object($target)) {
+            if ($segments && isset($target->{$segment})) {
+                self::forget($target->{$segment}, $segments);
+            } elseif (isset($target->{$segment})) {
+                unset($target->{$segment});
+            }
+        }
+
+        return $target;
+    }
+
+    /**
      * Fill in data where it's missing.
      *
      * @param mixed        $target
@@ -1199,16 +1379,39 @@ class c {
         return $a > $b ? 1 : -1;
     }
 
+    /**
+     * Dispatch a job (or Closure) to its appropriate queue handler.
+     *
+     * @param object|Closure $job
+     *
+     * @return CQueue_PendingClosureDispatch|CQueue_PendingDispatch
+     */
     public static function dispatch($job) {
         return $job instanceof Closure
             ? new CQueue_PendingClosureDispatch(CQueue_CallQueuedClosure::create($job))
             : new CQueue_PendingDispatch($job);
     }
 
+    /**
+     * Dispatch a command to its appropriate handler in the current process.
+     *
+     * @param object      $job
+     * @param null|mixed  $handler
+     *
+     * @return mixed
+     */
     public static function dispatchSync($job, $handler = null) {
         return CQueue::dispatcher()->dispatchSync($job, $handler);
     }
 
+    /**
+     * Dispatch a command to its appropriate handler in the current process without a queue.
+     *
+     * @param object     $job
+     * @param null|mixed $handler
+     *
+     * @return mixed
+     */
     public static function dispatchNow($job, $handler = null) {
         return CQueue::dispatcher()->dispatchNow($job, $handler);
     }
@@ -1289,6 +1492,8 @@ class c {
      * @param null|mixed  $default
      *
      * @return CManager_Theme|mixed
+     *
+     * @phpstan-return ($key is null ? CManager_Theme : mixed)
      */
     public static function theme($key = null, $default = null) {
         if ($key !== null) {
@@ -1298,18 +1503,37 @@ class c {
         return static::manager()->theme();
     }
 
+    /**
+     * @return string
+     */
     public static function locale() {
         return str_replace('_', '-', CF::getLocale());
     }
 
+    /**
+     * @param mixed $obj
+     *
+     * @return bool
+     */
     public static function isIterable($obj) {
         return is_array($obj) || (is_object($obj) && ($obj instanceof \Traversable));
     }
 
+    /**
+     * @param string $type
+     * @param string $message
+     *
+     * @return void
+     */
     public static function msg($type, $message) {
-        return CApp_Message::add($type, $message);
+        CApp_Message::add($type, $message);
     }
 
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
     public static function docRoot($path = null) {
         $docRoot = rtrim(DOCROOT, DS);
         if ($path != null) {
@@ -1350,10 +1574,20 @@ class c {
         return c::untrailingslashit($appRoot) . DS;
     }
 
+    /**
+     * @param null|string $name
+     *
+     * @return CStorage_Adapter
+     */
     public static function disk($name = null) {
         return CStorage::instance()->disk($name);
     }
 
+    /**
+     * @param callable $callable
+     *
+     * @return Closure
+     */
     public static function closureFromCallable($callable) {
         if (method_exists(Closure::class, 'fromCallable')) {
             return Closure::fromCallable($callable);
@@ -1364,10 +1598,18 @@ class c {
         };
     }
 
+    /**
+     * @param null|mixed $event
+     *
+     * @return CBroadcast_PendingBroadcast
+     */
     public static function broadcast($event = null) {
         return CBroadcast::manager()->event($event);
     }
 
+    /**
+     * @return string
+     */
     public static function environment() {
         if (CF::isProduction()) {
             return 'production';
@@ -1402,27 +1644,18 @@ class c {
     }
 
     /**
-     * Get Public Path.
+     * Get the prompt facade, used for interactive console prompts.
      *
-     * @param string $path
-     *
-     * @return string
+     * @return \CConsole_Prompt_Facade
      */
-    public static function publicPath($path = null) {
-        $publicPath = DOCROOT . 'public';
-        if ($path != null && strlen($path) > 0) {
-            $publicPath .= ltrim($path, '/');
-        }
-
-        return $publicPath;
+    public static function prompt() {
+        return new CConsole_Prompt_Facade();
     }
 
     /**
      * Get / set the specified cache value.
      *
      * If an array is passed, we'll assume you want to put to the cache.
-     *
-     * @param  dynamic  key|key,default|data,expiration|null
      *
      * @throws \Exception
      *
@@ -1490,6 +1723,21 @@ class c {
         return $cookie->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
     }
 
+    /**
+     * Create a cookie and queue it to be sent with the next response.
+     *
+     * @param string      $name
+     * @param null|string $value
+     * @param int         $minutes
+     * @param null|string $path
+     * @param null|string $domain
+     * @param null|bool   $secure
+     * @param bool        $httpOnly
+     * @param bool        $raw
+     * @param null|string $sameSite
+     *
+     * @return void
+     */
     public static function setCookie($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null) {
         $cookie = CHTTP::cookie()->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
 
@@ -1561,6 +1809,15 @@ class c {
         return $difference;
     }
 
+    /**
+     * JSON-encode $data, defaulting to HTML-safe encoding flags (safe to embed in an attribute/script tag).
+     *
+     * @param mixed    $data
+     * @param null|int $options
+     * @param int      $depth
+     *
+     * @return string
+     */
     public static function json($data, $options = null, $depth = 512) {
         if ($options == null) {
             $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
@@ -1569,10 +1826,24 @@ class c {
         return json_encode($data, $options, $depth);
     }
 
+    /**
+     * JSON-encode $data and escape it for safe use inside an HTML attribute value.
+     *
+     * @param mixed    $data
+     * @param null|int $options
+     * @param int      $depth
+     *
+     * @return string
+     */
     public static function jsonAttr($data, $options = null, $depth = 512) {
         return htmlspecialchars(c::json($data, $options, $depth), ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
     public static function escAttr($string) {
         return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
     }
@@ -1596,18 +1867,22 @@ class c {
     /**
      * @param callable|Closure $callback
      *
-     * @return callable|SerializableClosure
+     * @return callable|CFunction_SerializableClosure
      */
     public static function toSerializableClosure($callback) {
-        return $callback instanceof Closure ? new SerializableClosure($callback) : $callback;
+        return $callback instanceof Closure ? new CFunction_SerializableClosure($callback) : $callback;
     }
 
     /**
-     * @param callable|Closure|SerializableClosure $callback
+     * @param callable|Closure|SerializableClosure|CFunction_SerializableClosure $callback
      *
      * @return callable|Closure
      */
     public static function toCallable($callback) {
+        if ($callback instanceof CFunction_SerializableClosure) {
+            return $callback->getClosure();
+        }
+
         if ($callback instanceof SerializableClosure) {
             return $callback->getClosure();
         }
@@ -1616,11 +1891,15 @@ class c {
     }
 
     /**
-     * @param callable|Closure|SerializableClosure $callback
+     * @param callable|Closure|SerializableClosure|CFunction_SerializableClosure $callback
      *
      * @return bool
      */
     public static function isCallable($callback) {
+        if ($callback instanceof CFunction_SerializableClosure) {
+            return true;
+        }
+
         if ($callback instanceof SerializableClosure) {
             return true;
         }
@@ -1628,8 +1907,19 @@ class c {
         return is_callable($callback);
     }
 
+    /**
+     * Checks if given string is a HTML.
+     *
+     * @param string $string
+     *
+     * @return bool
+     */
     public static function isHtml($string) {
-        return preg_match('/<[^<]+>/', $string, $m) != 0;
+        if ($string === null) {
+            return false;
+        }
+
+        return preg_match('/<[^<]+>/', (string) $string, $m) != 0;
     }
 
     /**
@@ -1643,12 +1933,27 @@ class c {
         return new CBase_HtmlString('<input type="hidden" name="_method" value="' . $method . '">');
     }
 
+    /**
+     * Generate a fake value for a given property.
+     *
+     * @param null|string $property
+     *
+     * @return mixed
+     */
     public static function faker($property = null) {
         $faker = FackerFactory::create();
 
         return $property ? $faker->{$property} : $faker;
     }
 
+    /**
+     * Measure the average execution time (in seconds) of $callback over $times runs.
+     *
+     * @param callable $callback
+     * @param int      $times
+     *
+     * @return float
+     */
     public static function stopwatch($callback, $times = 1) {
         $totalTime = 0;
 
@@ -1663,6 +1968,12 @@ class c {
         return $totalTime / $times;
     }
 
+    /**
+     * @param mixed $a
+     * @param mixed $b
+     *
+     * @return void
+     */
     public static function swap(&$a, &$b) {
         $temp = $a;
         $a = $b;
@@ -1679,6 +1990,17 @@ class c {
         return new CCarbon($time, $tz);
     }
 
+    /**
+     * Invoke $callback with $args. Accepts a plain callable, a 'Class::method' or 'Class@method'
+     * string, or a (Opis/CFunction) SerializableClosure.
+     *
+     * @param callable|string|\Opis\Closure\SerializableClosure|CFunction_SerializableClosure $callback
+     * @param array                                                                           $args
+     *
+     * @throws Exception
+     *
+     * @return mixed
+     */
     public static function call($callback, array $args = []) {
         if (is_string($callback)) {
             $className = null;
@@ -1708,6 +2030,10 @@ class c {
             return $callback->__invoke(...$args);
         }
 
+        if ($callback instanceof CFunction_SerializableClosure) {
+            return $callback->__invoke(...$args);
+        }
+
         throw new Exception('callback is not callable');
     }
 
@@ -1727,7 +2053,7 @@ class c {
     }
 
     /**
-     * @param null|sting $locale
+     * @param null|string $locale
      *
      * @return array
      */
@@ -1787,8 +2113,287 @@ class c {
         return CAuth_Access_Gate::instance();
     }
 
+    /**
+     * Resolve the user timezone for the given request.
+     *
+     * @param CHTTP_Request $request
+     *
+     * @return string
+     */
     public static function resolveUserTimezone(CHTTP_Request $request) {
         return $request->timezone;
+    }
+
+    /**
+     * Make a closure to be queueable.
+     *
+     * @param \Closure $closure
+     *
+     * @return CEvent_QueuedClosure
+     */
+    public static function queueable(Closure $closure) {
+        return new CEvent_QueuedClosure($closure);
+    }
+
+    /**
+     * Backward compatibility like array_is_list on php 8.1.
+     *
+     * @param array $array
+     *
+     * @return bool
+     */
+    public static function arrayIsList(array $array): bool {
+        if ([] === $array || $array === array_values($array)) {
+            return true;
+        }
+
+        $nextKey = -1;
+
+        foreach ($array as $k => $v) {
+            if ($k !== ++$nextKey) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @template T
+     *
+     * @param (callable(): T) $callback
+     *
+     * @return T
+     */
+    public static function once(callable $callback) {
+        $trace = debug_backtrace(
+            DEBUG_BACKTRACE_PROVIDE_OBJECT,
+            2
+        );
+
+        $backtrace = new CBase_Once_Backtrace($trace);
+
+        if ($backtrace->getFunctionName() === 'eval') {
+            return call_user_func($callback);
+        }
+
+        $object = $backtrace->getObject();
+
+        $hash = $backtrace->getHash();
+
+        $cache = CBase_Once_Cache::instance();
+
+        if (is_string($object)) {
+            $object = $cache;
+        }
+
+        if (!$cache->isEnabled()) {
+            return call_user_func($callback, $backtrace->getArguments());
+        }
+
+        if (!$cache->has($object, $hash)) {
+            $result = call_user_func($callback, $backtrace->getArguments());
+
+            $cache->set($object, $hash, $result);
+        }
+
+        return $cache->get($object, $hash);
+    }
+
+    /**
+     * Conditionally join CSS class names together (à la the "clsx"/"classnames" JS packages).
+     * Accepts strings, arrays, or a map of class-name => bool.
+     *
+     * @return string
+     */
+    public static function clsx() {
+        $args = func_get_args();
+
+        return CBase_CClsx::clsx(...$args);
+    }
+
+    /**
+     * Generate CSS style string from an associative array.
+     *
+     * @param array $styles Styles array
+     *
+     * @return string
+     */
+    public static function stylex($styles) {
+        if (!is_array($styles) || empty($styles)) {
+            return '';
+        }
+
+        if (array_values($styles) === $styles) { // Check if it's an indexed array
+            return implode(';', $styles) . ';';
+        }
+
+        $styleNames = '';
+        foreach ($styles as $key => $value) {
+            $cssPropertyName = cstr::kebabCase($key);
+            if (is_string($value)) {
+                $styleNames .= "{$cssPropertyName}:{$value};";
+
+                continue;
+            }
+
+            if (is_bool($value)) {
+                $styleNames .= $cssPropertyName;
+
+                continue;
+            }
+
+            if (!is_array($value) || empty($value)) {
+                continue;
+            }
+
+            foreach ($value as $condValue => $condition) {
+                if ((is_callable($condition) && $condition()) || $condition) {
+                    $styleNames .= "{$cssPropertyName}:{$condValue};";
+
+                    break;
+                }
+            }
+        }
+
+        return $styleNames;
+    }
+
+    /**
+     * Returns the time elapsed in seconds since the application began.
+     *
+     * @return float
+     */
+    public static function elapsed() {
+        return microtime(true) - CF_START;
+    }
+
+    /**
+     * Join the given paths together.
+     *
+     * @param null|string $basePath
+     * @param string      ...$paths
+     *
+     * @return string
+     */
+    public static function joinPaths($basePath, ...$paths) {
+        foreach ($paths as $index => $path) {
+            if (empty($path) && $path !== '0') {
+                unset($paths[$index]);
+            } else {
+                $paths[$index] = DIRECTORY_SEPARATOR . ltrim($path, DIRECTORY_SEPARATOR);
+            }
+        }
+
+        return $basePath . implode('', $paths);
+    }
+
+    /**
+     * @return CApp_Visitor
+     */
+    public static function visitor() {
+        return c::app()->visitor();
+    }
+
+    /**
+     * Generates a random MD5 hash.
+     *
+     * This function is using the date and time along with a random number
+     * between 0 and 9999 to generate a unique MD5 hash. The hash is then
+     * returned as a string.
+     *
+     * @return string
+     */
+    public static function randmd5() {
+        $rand = rand(0, 9999);
+        $base = date('YmdHis') . $rand;
+
+        return md5($rand);
+    }
+
+    /**
+     * Defer execution of the given callback.
+     *
+     * @param null|callable $callback
+     * @param null|string   $name
+     * @param bool          $always
+     *
+     * @return \CBase_Defer_DeferredCallback
+     */
+    public static function defer($callback = null, $name = null, $always = false) {
+        if ($callback === null) {
+            return CContainer::getInstance()->make(CBase_Defer_DeferredCallback::class);
+        }
+
+        return c::tap(
+            new CBase_Defer_DeferredCallback($callback, $name, $always),
+            function ($deferred) {
+                return CContainer::getInstance()->make(CBase_Defer_DeferredCallbackCollection::class)[] = $deferred;
+            }
+        );
+    }
+
+    /**
+     * Return the path where the whole resource library is stored.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public static function storagePath($path = '') {
+        $storagePath = rtrim(DOCROOT, '/') . '/temp/storage/' . CF::appCode();
+        if ($path) {
+            $storagePath = $storagePath . '/' . ltrim($path, '/');
+        }
+    }
+
+    /**
+     * Return the base path for the given path.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public static function basePath($path = '') {
+        $basePath = CF::appDir();
+        if ($path) {
+            $basePath = $basePath . '/' . ltrim($path, '/');
+        }
+
+        return $basePath;
+    }
+
+    /**
+     * Resolve the scalar value of a (possibly backed/unit) enum, passing anything else through as-is.
+     *
+     * @param mixed $value
+     * @param mixed $default used when $value is null
+     *
+     * @return mixed
+     */
+    public static function enumValue($value, $default = null) {
+        if (interface_exists('BackedEnum') && $value instanceof \BackedEnum) {
+            return $value->value;
+        }
+
+        if (interface_exists('UnitEnum') && $value instanceof \UnitEnum) {
+            return $value->name;
+        }
+
+        if ($value !== null) {
+            return $value;
+        }
+
+        return c::value($default);
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return mixed
+     */
+    public static function arrayLast(array $array) {
+        return $array ? current(array_slice($array, -1)) : null;
     }
 }
 

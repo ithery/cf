@@ -23,16 +23,16 @@ use EmptyIterator;
 /**
  * @extends Option<mixed>
  */
-final class None extends Option
-{
-    /** @var None|null */
+final class None extends Option {
+    /**
+     * @var null|None
+     */
     private static $instance;
 
     /**
      * @return None
      */
-    public static function create()
-    {
+    public static function create() {
         if (null === self::$instance) {
             self::$instance = new self();
         }
@@ -40,97 +40,79 @@ final class None extends Option
         return self::$instance;
     }
 
-    public function get()
-    {
+    public function get() {
         throw new \RuntimeException('None has no value.');
     }
 
-    public function getOrCall($callable)
-    {
+    public function getOrCall($callable) {
         return $callable();
     }
 
-    public function getOrElse($default)
-    {
+    public function getOrElse($default) {
         return $default;
     }
 
-    public function getOrThrow(\Exception $ex)
-    {
+    public function getOrThrow(\Exception $ex) {
         throw $ex;
     }
 
-    public function isEmpty()
-    {
+    public function isEmpty() {
         return true;
     }
 
-    public function isDefined()
-    {
+    public function isDefined() {
         return false;
     }
 
-    public function orElse(Option $else)
-    {
+    public function orElse(Option $else) {
         return $else;
     }
 
-    public function ifDefined($callable)
-    {
+    public function ifDefined($callable) {
         // Just do nothing in that case.
     }
 
-    public function forAll($callable)
-    {
+    public function forAll($callable) {
         return $this;
     }
 
-    public function map($callable)
-    {
+    public function map($callable) {
         return $this;
     }
 
-    public function flatMap($callable)
-    {
+    public function flatMap($callable) {
         return $this;
     }
 
-    public function filter($callable)
-    {
+    public function filter($callable) {
         return $this;
     }
 
-    public function filterNot($callable)
-    {
+    public function filterNot($callable) {
         return $this;
     }
 
-    public function select($value)
-    {
+    public function select($value) {
         return $this;
     }
 
-    public function reject($value)
-    {
+    public function reject($value) {
         return $this;
     }
 
-    public function getIterator()
-    {
+    #[\ReturnTypeWillChange]
+    public function getIterator() {
         return new EmptyIterator();
     }
 
-    public function foldLeft($initialValue, $callable)
-    {
+    public function foldLeft($initialValue, $callable) {
         return $initialValue;
     }
 
-    public function foldRight($initialValue, $callable)
-    {
+    public function foldRight($initialValue, $callable) {
         return $initialValue;
     }
 
-    private function __construct()
-    {
+    private function __construct() {
     }
 }

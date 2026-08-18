@@ -1,0 +1,14 @@
+<?php
+
+class {{ class }} extends AbstractBrowserTestCase {
+    /**
+     * A basic browser test example.
+     *
+     * @return void
+     */
+    public function testExample() {
+        $this->browse(function (CTesting_Browser $browser) {
+            $browser->visit('/');
+        });
+    }
+}

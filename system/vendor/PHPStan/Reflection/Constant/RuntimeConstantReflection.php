@@ -2,17 +2,25 @@
 
 namespace PHPStan\Reflection\Constant;
 
-use PHPStan\Reflection\GlobalConstantReflection;
+use PHPStan\Reflection\AttributeReflection;
+use PHPStan\Reflection\ConstantReflection;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Type;
 
-class RuntimeConstantReflection implements GlobalConstantReflection
+final class RuntimeConstantReflection implements ConstantReflection
 {
 
+	/**
+	 * @param list<AttributeReflection> $attributes
+	 */
 	public function __construct(
 		private string $name,
 		private Type $valueType,
 		private ?string $fileName,
+		private TrinaryLogic $isDeprecated,
+		private ?string $deprecatedDescription,
+		private array $attributes,
+		private bool $internal,
 	)
 	{
 	}
@@ -20,6 +28,16 @@ class RuntimeConstantReflection implements GlobalConstantReflection
 	public function getName(): string
 	{
 		return $this->name;
+	}
+
+	public function describe(): string
+	{
+		return $this->name;
+	}
+
+	public function isBuiltin(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean($this->internal);
 	}
 
 	public function getValueType(): Type
@@ -34,17 +52,22 @@ class RuntimeConstantReflection implements GlobalConstantReflection
 
 	public function isDeprecated(): TrinaryLogic
 	{
-		return TrinaryLogic::createNo();
+		return $this->isDeprecated;
 	}
 
 	public function getDeprecatedDescription(): ?string
 	{
-		return null;
+		return $this->deprecatedDescription;
 	}
 
 	public function isInternal(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->attributes;
 	}
 
 }

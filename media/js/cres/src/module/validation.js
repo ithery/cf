@@ -3,6 +3,9 @@ import strlen from 'locutus/php/strings/strlen';
 import is_numeric from 'locutus/php/var/is_numeric';
 import array_diff from 'locutus/php/array/array_diff';
 import DateFormatter from '../formatter/DateFormatter';
+/**
+ * @see https://github.com/proengsoft/laravel-jsvalidation
+ */
 let appValidation = {
 
     implicitRules: ['Required', 'Confirmed'],
@@ -60,7 +63,7 @@ let appValidation = {
 
     setupValidations: function () {
         /**
-         * Create JQueryValidation check to validate Laravel rules.
+         * Create JQueryValidation check to validate CF rules.
          */
 
 
@@ -124,7 +127,7 @@ let appValidation = {
         }, '');
 
         /**
-         * Create JQueryValidation check to validate Remote Laravel rules.
+         * Create JQueryValidation check to validate Remote CF rules.
          */
         $.validator.addMethod('appValidationRemote', function (value, element, params) {
             let implicit = false,

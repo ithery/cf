@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+namespace CuyZ\Valinor\Type\Types;
+
+use CuyZ\Valinor\Compiler\Native\ComplianceNode;
+use CuyZ\Valinor\Compiler\Node;
+use CuyZ\Valinor\Type\Type;
+use CuyZ\Valinor\Utility\IsSingleton;
+
+/** @internal */
+final class MixedType implements Type
+{
+    use IsSingleton;
+
+    /**
+     * @param mixed $value
+     * @return boolean
+     */
+    public function accepts($value): bool
+    {
+        return true;
+    }
+
+    public function compiledAccept(ComplianceNode $node): ComplianceNode
+    {
+        return Node::value(true);
+    }
+
+    public function matches(Type $other): bool
+    {
+        return $other instanceof self;
+    }
+
+    public function nativeType(): Type
+    {
+        return $this;
+    }
+
+    public function toString(): string
+    {
+        return 'mixed';
+    }
+}

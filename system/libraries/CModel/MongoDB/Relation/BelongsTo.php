@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Oct 21, 2019, 9:22:47 PM
- */
 class CModel_MongoDB_Relation_BelongsTo extends CModel_Relation_BelongsTo {
     /**
      * Get the key for comparing against the parent key in "has" query.

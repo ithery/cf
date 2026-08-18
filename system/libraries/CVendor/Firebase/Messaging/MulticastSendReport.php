@@ -179,6 +179,7 @@ final class CVendor_Firebase_Messaging_MulticastSendReport implements Countable 
             });
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return \count($this->items);
     }

@@ -53,6 +53,7 @@ final class Headers implements \ArrayAccess, \Countable {
      * @param string $offset
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->getCaseInsensitive($offset);

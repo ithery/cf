@@ -1,9 +1,6 @@
 <?php
+require_once DOCROOT . 'system/vendor/Termwind/Functions.php';
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 class CConsole {
     const SUCCESS_EXIT = 0;
 
@@ -28,7 +25,7 @@ class CConsole {
 
     public static function prefix() {
         $appConfig = CConfig::instance('app');
-        $appConfig->refresh();
+        // $appConfig->refresh();
 
         return $appConfig->get('prefix');
     }
@@ -84,5 +81,11 @@ class CConsole {
         }
 
         return static::$kernel;
+    }
+
+    public static function stdout($output, $force = false) {
+        if ($force || CF::isCli()) {
+            fwrite(STDOUT, $output);
+        }
     }
 }

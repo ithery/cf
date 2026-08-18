@@ -5,8 +5,10 @@ namespace PHPStan\Node;
 use PhpParser\Node\Expr;
 use PHPStan\Analyser\Scope;
 
-/** @api */
-class MatchExpressionArmCondition
+/**
+ * @api
+ */
+final class MatchExpressionArmCondition
 {
 
 	public function __construct(private Expr $condition, private Scope $scope, private int $line)

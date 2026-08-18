@@ -2,95 +2,41 @@
 
 namespace PHPStan\Type;
 
-use PHPStan\Reflection\ReflectionProviderStaticAccessor;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\Name\FullyQualified;
+use PHPStan\BetterReflection\Reflection\Adapter\ReflectionIntersectionType;
+use PHPStan\BetterReflection\Reflection\Adapter\ReflectionNamedType;
+use PHPStan\BetterReflection\Reflection\Adapter\ReflectionUnionType;
+use PHPStan\Reflection\ClassReflection;
 use PHPStan\ShouldNotHappenException;
-use PHPStan\Type\Constant\ConstantBooleanType;
+use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Generic\TemplateTypeHelper;
-use ReflectionIntersectionType;
-use ReflectionNamedType;
 use ReflectionType;
-use ReflectionUnionType;
 use function array_map;
 use function count;
 use function get_class;
 use function sprintf;
-use function str_ends_with;
-use function strtolower;
 
-class TypehintHelper
+final class TypehintHelper
 {
-
-	private static function getTypeObjectFromTypehint(string $typeString, ?string $selfClass): Type
-	{
-		switch (strtolower($typeString)) {
-			case 'int':
-				return new IntegerType();
-			case 'bool':
-				return new BooleanType();
-			case 'false':
-				return new ConstantBooleanType(false);
-			case 'true':
-				return new ConstantBooleanType(true);
-			case 'string':
-				return new StringType();
-			case 'float':
-				return new FloatType();
-			case 'array':
-				return new ArrayType(new MixedType(), new MixedType());
-			case 'iterable':
-				return new IterableType(new MixedType(), new MixedType());
-			case 'callable':
-				return new CallableType();
-			case 'void':
-				return new VoidType();
-			case 'object':
-				return new ObjectWithoutClassType();
-			case 'mixed':
-				return new MixedType(true);
-			case 'self':
-				return $selfClass !== null ? new ObjectType($selfClass) : new ErrorType();
-			case 'parent':
-				$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
-				if ($selfClass !== null && $reflectionProvider->hasClass($selfClass)) {
-					$classReflection = $reflectionProvider->getClass($selfClass);
-					if ($classReflection->getParentClass() !== null) {
-						return new ObjectType($classReflection->getParentClass()->getName());
-					}
-				}
-				return new NonexistentParentClassType();
-			case 'static':
-				$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
-				if ($selfClass !== null && $reflectionProvider->hasClass($selfClass)) {
-					return new StaticType($reflectionProvider->getClass($selfClass));
-				}
-
-				return new ErrorType();
-			case 'null':
-				return new NullType();
-			case 'never':
-				return new NeverType(true);
-			default:
-				return new ObjectType($typeString);
-		}
-	}
 
 	/** @api */
 	public static function decideTypeFromReflection(
 		?ReflectionType $reflectionType,
 		?Type $phpDocType = null,
-		?string $selfClass = null,
+		ClassReflection|null $selfClass = null,
 		bool $isVariadic = false,
 	): Type
 	{
 		if ($reflectionType === null) {
-			if ($isVariadic && $phpDocType instanceof ArrayType) {
+			if ($isVariadic && ($phpDocType instanceof ArrayType || $phpDocType instanceof ConstantArrayType)) {
 				$phpDocType = $phpDocType->getItemType();
 			}
 			return $phpDocType ?? new MixedType();
 		}
 
 		if ($reflectionType instanceof ReflectionUnionType) {
-			$type = TypeCombinator::union(...array_map(static fn (ReflectionType $type): Type => self::decideTypeFromReflection($type, null, $selfClass, false), $reflectionType->getTypes()));
+			$type = TypeCombinator::union(...array_map(static fn (ReflectionType $type): Type => self::decideTypeFromReflection($type, selfClass: $selfClass), $reflectionType->getTypes()));
 
 			return self::decideType($type, $phpDocType);
 		}
@@ -98,8 +44,8 @@ class TypehintHelper
 		if ($reflectionType instanceof ReflectionIntersectionType) {
 			$types = [];
 			foreach ($reflectionType->getTypes() as $innerReflectionType) {
-				$innerType = self::decideTypeFromReflection($innerReflectionType, null, $selfClass, false);
-				if (!$innerType instanceof ObjectType) {
+				$innerType = self::decideTypeFromReflection($innerReflectionType, selfClass: $selfClass);
+				if (!$innerType->isObject()->yes()) {
 					return new NeverType();
 				}
 
@@ -113,31 +59,15 @@ class TypehintHelper
 			throw new ShouldNotHappenException(sprintf('Unexpected type: %s', get_class($reflectionType)));
 		}
 
-		$reflectionTypeString = $reflectionType->getName();
-		if (str_ends_with(strtolower($reflectionTypeString), '\\object')) {
-			$reflectionTypeString = 'object';
-		}
-		if (str_ends_with(strtolower($reflectionTypeString), '\\mixed')) {
-			$reflectionTypeString = 'mixed';
-		}
-		if (str_ends_with(strtolower($reflectionTypeString), '\\true')) {
-			$reflectionTypeString = 'true';
-		}
-		if (str_ends_with(strtolower($reflectionTypeString), '\\false')) {
-			$reflectionTypeString = 'false';
-		}
-		if (str_ends_with(strtolower($reflectionTypeString), '\\null')) {
-			$reflectionTypeString = 'null';
-		}
-		if (str_ends_with(strtolower($reflectionTypeString), '\\never')) {
-			$reflectionTypeString = 'never';
+		if ($reflectionType->isIdentifier()) {
+			$typeNode = new Identifier($reflectionType->getName());
+		} else {
+			$typeNode = new FullyQualified($reflectionType->getName());
 		}
 
-		$type = self::getTypeObjectFromTypehint($reflectionTypeString, $selfClass);
+		$type = ParserNodeTypeToPHPStanType::resolve($typeNode, $selfClass);
 		if ($reflectionType->allowsNull()) {
 			$type = TypeCombinator::addNull($type);
-		} elseif ($phpDocType !== null) {
-			$phpDocType = TypeCombinator::removeNull($phpDocType);
 		}
 
 		return self::decideType($type, $phpDocType);
@@ -145,9 +75,16 @@ class TypehintHelper
 
 	public static function decideType(
 		Type $type,
-		?Type $phpDocType = null,
+		?Type $phpDocType,
 	): Type
 	{
+		if ($phpDocType !== null && $type->isNull()->no()) {
+			$phpDocType = TypeCombinator::removeNull($phpDocType);
+		}
+		if ($type instanceof BenevolentUnionType) {
+			return $type;
+		}
+
 		if ($phpDocType !== null && !$phpDocType instanceof ErrorType) {
 			if ($phpDocType instanceof NeverType && $phpDocType->isExplicit()) {
 				return $phpDocType;
@@ -155,7 +92,7 @@ class TypehintHelper
 			if (
 				$type instanceof MixedType
 				&& !$type->isExplicitMixed()
-				&& $phpDocType instanceof VoidType
+				&& $phpDocType->isVoid()->yes()
 			) {
 				return $phpDocType;
 			}
@@ -164,9 +101,9 @@ class TypehintHelper
 				if ($phpDocType instanceof UnionType) {
 					$innerTypes = [];
 					foreach ($phpDocType->getTypes() as $innerType) {
-						if ($innerType instanceof ArrayType) {
+						if ($innerType instanceof ArrayType && $innerType->getKeyType()->describe(VerbosityLevel::typeOnly()) === 'mixed') {
 							$innerTypes[] = new IterableType(
-								$innerType->getKeyType(),
+								$innerType->getIterableKeyType(),
 								$innerType->getItemType(),
 							);
 						} else {
@@ -174,7 +111,7 @@ class TypehintHelper
 						}
 					}
 					$phpDocType = new UnionType($innerTypes);
-				} elseif ($phpDocType instanceof ArrayType) {
+				} elseif ($phpDocType instanceof ArrayType && $phpDocType->getKeyType()->describe(VerbosityLevel::typeOnly()) === 'mixed') {
 					$phpDocType = new IterableType(
 						$phpDocType->getKeyType(),
 						$phpDocType->getItemType(),
@@ -183,8 +120,11 @@ class TypehintHelper
 			}
 
 			if (
-				(!$phpDocType instanceof NeverType || ($type instanceof MixedType && !$type->isExplicitMixed()))
-				&& $type->isSuperTypeOf(TemplateTypeHelper::resolveToBounds($phpDocType))->yes()
+				($type->isCallable()->yes() && $phpDocType->isCallable()->yes())
+				|| (
+					(!$phpDocType instanceof NeverType || ($type instanceof MixedType && !$type->isExplicitMixed()))
+					&& $type->isSuperTypeOf(TemplateTypeHelper::resolveToBounds($phpDocType))->yes()
+				)
 			) {
 				$resultType = $phpDocType;
 			} else {

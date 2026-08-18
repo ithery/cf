@@ -2,22 +2,18 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 1:56:59 AM
- */
 trait CJavascript_JQuery_Trait_InternalTrait {
     protected function defer($script) {
         $result = 'window.defer=function (method) {if (window.jQuery) method(); else setTimeout(function() { defer(method) }, 50);};';
         $result .= 'window.defer(function(){' . $script . '})';
+
         return $result;
     }
 
     protected function ready($script) {
         $result = '$(document).ready(function() {' . "\n";
         $result .= $script . '})';
+
         return $result;
     }
 
@@ -48,11 +44,12 @@ trait CJavascript_JQuery_Trait_InternalTrait {
             $input
         );
         $input = str_replace('}$', '};$', $input);
+
         return $input;
     }
 
     /**
-     * Outputs an opening <script>
+     * Outputs an opening <script>.
      *
      * @param string $src
      *
@@ -61,11 +58,12 @@ trait CJavascript_JQuery_Trait_InternalTrait {
     protected function openScript($src = '') {
         $str = '<script type="text/javascript" ';
         $str .= ($src == '') ? '>' : ' src="' . $src . '">';
+
         return $str;
     }
 
     /**
-     * Outputs an closing </script>
+     * Outputs an closing </script>.
      *
      * @param string $extra
      *

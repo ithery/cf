@@ -1,28 +1,33 @@
 <?php
 
-use Opis\Closure\SerializableClosure;
-
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 12:00:39 AM
- */
 class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectSearch;
     use CElement_FormInput_SelectSearch_Trait_Select2v23Trait;
+    use CElement_FormInput_SelectSearch_Trait_SelectSearchUtilsTrait;
     use CTrait_Element_Property_ApplyJs;
     use CTrait_Element_Property_DependsOn;
     use CTrait_Element_Property_Placeholder;
 
+    /**
+     * @var string
+     */
     protected $query;
 
+    /**
+     * @var null|string|CFunction_SerializableClosure
+     */
     protected $formatSelection;
 
+    /**
+     * @var null|string|CFunction_SerializableClosure
+     */
     protected $formatResult;
 
+    /**
+     * @var string
+     */
     protected $keyField;
 
     /**
@@ -30,32 +35,89 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
      */
     protected $searchField = [];
 
+    /**
+     * @var array
+     */
+    protected $searchFullTextField = [];
+
+    /**
+     * @var bool
+     */
     protected $multiple;
 
+    /**
+     * @var bool
+     */
     protected $autoSelect;
 
+    /**
+     * @var int
+     */
     protected $minInputLength;
 
+    /**
+     * @var array
+     */
     protected $dropdownClasses;
 
+    /**
+     * @var int
+     */
     protected $delay;
 
+    /**
+     * @var null|callable
+     */
     protected $valueCallback;
 
+    /**
+     * @var null|CManager_Contract_DataProviderInterface
+     */
     protected $dataProvider;
 
+    /**
+     * @var array
+     */
     protected $requires;
 
+    /**
+     * @var bool
+     */
     protected $allowClear;
 
+    /**
+     * @var null|CFunction_SerializableClosure
+     */
     protected $queryResolver;
 
+    /**
+     * @var string
+     */
     protected $language;
 
+    /**
+     * @var array
+     */
     protected $prependData;
 
+    /**
+     * @var int
+     */
     protected $perPage;
 
+    /**
+     * @var bool
+     */
+    protected $onModal;
+
+    /**
+     * @var string
+     */
+    protected $themeType = 'selectsearch';
+
+    /**
+     * @param null|string $id
+     */
     public function __construct($id = null) {
         parent::__construct($id);
         $this->dropdownClasses = [];
@@ -77,6 +139,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->value = null;
         $this->allowClear = false;
         $this->prependData = [];
+        $this->onModal = false;
         $language = CF::getLocale();
         if (strlen($language) > 2) {
             $language = strtolower(substr($language, 0, 2));
@@ -84,15 +147,28 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->language = $language;
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         /** @phpstan-ignore-next-line */
         return new static($id);
     }
 
+    /**
+     * @param Closure $resolver
+     *
+     * @return void
+     */
     public function setQueryResolver(Closure $resolver) {
-        $this->queryResolver = new SerializableClosure($resolver);
+        $this->queryResolver = CFunction::serializeClosure($resolver);
     }
 
+    /**
+     * @return string
+     */
     public function query() {
         if ($this->queryResolver != null) {
             return $this->queryResolver->__invoke($this->query);
@@ -205,12 +281,41 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param string|array $searchField
+     *
+     * @return $this
+     */
+    public function setSearchFullTextField($searchField) {
+        $searchField = carr::wrap($searchField);
+        $this->searchFullTextField = $searchField;
+
+        if ($this->formatSelection == null) {
+            $this->formatSelection = '{' . carr::first($searchField) . '}';
+        }
+        if ($this->formatResult == null) {
+            $this->formatResult = '{' . carr::first($searchField) . '}';
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return $this
+     */
     public function setPrependData(array $data) {
         $this->prependData = $data;
 
         return $this;
     }
 
+    /**
+     * @param array $row
+     *
+     * @return $this
+     */
     public function prependRow(array $row) {
         $this->prependData[] = $row;
 
@@ -228,6 +333,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param string|Closure $fmt
+     *
+     * @return $this
+     */
     public function setFormat($fmt) {
         $this->setFormatResult($fmt);
         $this->setFormatSelection($fmt);
@@ -242,7 +352,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
      */
     public function setFormatResult($fmt) {
         if ($fmt instanceof Closure) {
-            $fmt = new \Opis\Closure\SerializableClosure($fmt);
+            $fmt = CFunction::serializeClosure($fmt);
         }
         $this->formatResult = $fmt;
 
@@ -256,13 +366,18 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
      */
     public function setFormatSelection($fmt) {
         if ($fmt instanceof Closure) {
-            $fmt = new \Opis\Closure\SerializableClosure($fmt);
+            $fmt = CFunction::serializeClosure($fmt);
         }
         $this->formatSelection = $fmt;
 
         return $this;
     }
 
+    /**
+     * @param string|array $c
+     *
+     * @return $this
+     */
     public function addDropdownClass($c) {
         if (is_array($c)) {
             $this->dropdownClasses = array_merge($c, $this->dropdownClasses);
@@ -285,12 +400,53 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param Closure $closure
+     *
+     * @return $this
+     */
+    public function setDataFromClosure($closure) {
+        $this->dataProvider = CManager::createClosureDataProvider($closure);
+
+        return $this;
+    }
+
+    /**
+     * @param CCollection $collection
+     *
+     * @return $this
+     */
+    public function setDataFromCollection($collection) {
+        $this->dataProvider = CManager::createCollectionDataProvider($collection);
+
+        return $this;
+    }
+
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setAllowClear($bool = true) {
         $this->allowClear = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
+    public function setOnModal($bool = true) {
+        $this->onModal = $bool;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
     public function createAjaxUrl() {
         $ajaxMethod = CAjax::createMethod();
         $ajaxMethod->setType(CAjax::TYPE_SELECT_SEARCH);
@@ -298,11 +454,13 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $ajaxMethod->setData('dataProvider', serialize($this->dataProvider));
         $ajaxMethod->setData('keyField', $this->keyField);
         $ajaxMethod->setData('searchField', $this->searchField);
+        $ajaxMethod->setData('searchFullTextField', $this->searchFullTextField);
         $ajaxMethod->setData('valueCallback', $this->valueCallback);
         $ajaxMethod->setData('formatSelection', serialize($this->formatSelection));
         $ajaxMethod->setData('formatResult', serialize($this->formatResult));
         $ajaxMethod->setData('dependsOn', serialize($this->dependsOn));
         $ajaxMethod->setData('prependData', serialize($this->prependData));
+
         if (c::app()->isAuthEnabled()) {
             $ajaxMethod->enableAuth();
         }
@@ -312,6 +470,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $ajaxUrl;
     }
 
+    /**
+     * @param string $template
+     *
+     * @return string
+     */
     private function generateSelect2Template($template) {
         //escape the character
         $template = str_replace("'", "\'", $template);
@@ -328,6 +491,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $template;
     }
 
+    /**
+     * @return null|array|CCollection
+     */
     protected function getSelectedRow() {
         if ($this->autoSelect || $this->value != null) {
             $value = null;
@@ -337,7 +503,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             if ($this->value !== null) {
                 $value = $this->value;
             }
+            if ($value instanceof CCollection) {
+                $value = $value->toArray();
+            }
             $values = carr::wrap($value);
+
             $result = c::collect($values)->map(function ($value) {
                 $db = c::db();
                 if (count($this->prependData) > 0) {
@@ -350,9 +520,14 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     $query = clone $this->dataProvider;
 
                     if ($value !== null) {
-                        $query->queryCallback(function ($q) use ($value) {
-                            $q->where($this->keyField, '=', $value);
-                        });
+                        // new, get query from setDataFromModel
+                        $query = $query->getModelQuery();
+                        $query->where($this->keyField, '=', $value);
+
+                        // old
+                        // $query->queryCallback(function ($q) use ($value) {
+                        //     $q->where($this->keyField, '=', $value);
+                        // });
                     }
                     $model = $query->first();
 
@@ -365,6 +540,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 }
 
                 $result = $db->query($q)->resultArray(false);
+
                 if (count($result) > 0) {
                     return carr::first($result);
                 }
@@ -382,13 +558,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return null;
     }
 
-    public function modelToSelect2Array(CModel $model) {
-        $itemArray = $model->toArray();
-        $itemArray['id'] = $model->getKey();
-
-        return $itemArray;
-    }
-
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         //call parent to trigger build
 
@@ -443,7 +617,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     }
                     if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
                         foreach ($row as $k => $v) {
-                            $row[$k] = $this->valueCallback($row, $k, $v);
+                            $row[$k] = ($this->valueCallback)($row, $k, $v);
                         }
                     }
 
@@ -453,7 +627,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         $strSelection = '{' . carr::first($this->searchField) . '}';
                     }
 
-                    if ($strSelection instanceof \Opis\Closure\SerializableClosure) {
+                    if ($strSelection instanceof CFunction_SerializableClosure) {
                         $strSelection = $strSelection->__invoke($model ?: $row);
                     }
                     if ($strSelection instanceof CRenderable) {
@@ -485,21 +659,62 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $html->text();
     }
 
+    /**
+     * @return array
+     */
+    protected function buildSelectedData() {
+        $selectedData = [];
+
+        $selectedRows = $this->getSelectedRow();
+
+        if ($selectedRows) {
+            foreach ($selectedRows as $index => $selectedRow) {
+                if ($selectedRow != null) {
+                    $row = $selectedRow;
+                    $model = null;
+
+                    if ($row instanceof CModel) {
+                        $model = $row;
+                        $row = $this->modelToSelect2Array($model);
+                    }
+
+                    if (is_object($row)) {
+                        $row = (array) $row;
+                    }
+                    if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
+                        foreach ($row as $k => $v) {
+                            $row[$k] = ($this->valueCallback)($row, $k, $v);
+                        }
+                    }
+                    $row = $this->addCAppFormatToData($this->formatResult, $row, $model ?: $row, 'result');
+                    $row = $this->addCAppFormatToData($this->formatSelection, $row, $model ?: $row, 'selection');
+                    $selectedData[] = $row;
+                }
+            }
+        }
+
+        return $selectedData;
+    }
+
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         if ($this->applyJs == 'select2v2.3') {
             return $this->jsSelect2v23($indent);
         }
 
         $ajaxUrl = $this->createAjaxUrl();
-
         $strSelection = $this->formatSelection;
         $strResult = $this->formatResult;
 
-        if ($strSelection instanceof \Opis\Closure\SerializableClosure) {
+        if ($strSelection instanceof CFunction_SerializableClosure) {
             $strSelection = '';
         }
 
-        if ($strResult instanceof \Opis\Closure\SerializableClosure) {
+        if ($strResult instanceof CFunction_SerializableClosure) {
             $strResult = '';
         }
 
@@ -536,49 +751,13 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if ($this->value !== null) {
             $value = $this->value;
         }
-
-        $selectedRows = $this->getSelectedRow();
-
-        $selectedData = [];
-        if ($selectedRows) {
-            foreach ($selectedRows as $index => $selectedRow) {
-                if ($selectedRow != null) {
-                    $row = $selectedRow;
-                    $model = null;
-                    if ($row instanceof CModel) {
-                        $model = $row;
-                        $row = $this->modelToSelect2Array($model);
-                    }
-                    if (is_object($row)) {
-                        $row = (array) $row;
-                    }
-                    if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
-                        foreach ($row as $k => $v) {
-                            $row[$k] = $this->valueCallback($row, $k, $v);
-                        }
-                    }
-                    $formatSelection = $this->formatSelection;
-                    if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
-                        $formatSelection = $formatSelection->__invoke($model ?: $row);
-                        if ($formatSelection instanceof CRenderable) {
-                            $row['cappFormatSelection'] = $formatSelection->html();
-                            $row['cappFormatSelectionIsHtml'] = true;
-                        } else {
-                            $row['cappFormatSelection'] = $formatSelection;
-                            $row['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
-                        }
-                    }
-                    $selectedData[] = $row;
-                }
-            }
-        }
+        $selectedData = $this->buildSelectedData();
 
         if ($selectedData && is_array($selectedData) && count($selectedData) > 0) {
             if (!$this->multiple) {
                 $selectedData = carr::first($selectedData);
             }
             $rjson = json_encode($selectedData);
-
             $strJsInit = '
                 initSelection : function (element, callback) {
                     var data = ' . $rjson . ';
@@ -605,13 +784,19 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         }
         $additionalRequestDataJs = '';
         foreach ($this->dependsOn as $index => $dependOn) {
-            $dependsOnSelector = $dependOn->getSelector();
+            $dependsOnSelector = $dependOn->getSelector()->getQuerySelector();
             $variableUniqueKey = 'dependsOn_' . $index;
-
+            $valueScript = $dependOn->getSelector()->getScriptForValue();
             $additionalRequestDataJs .= "
-                result['" . $variableUniqueKey . "']= $('" . $dependsOnSelector . "').val();
-            ";
+                result['" . $variableUniqueKey . "']= " . $valueScript . ';
+            ';
         }
+
+        $strJsOnModal = '';
+        if ($this->onModal) {
+            $strJsOnModal = 'dropdownParent: $("#' . $this->id . '").closest(".modal"),';
+        }
+
         $str = "
 
             $('#" . $this->id . "').select2({
@@ -620,6 +805,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 placeholder: '" . $placeholder . "',
                 allowClear: " . ($this->allowClear ? 'true' : 'false') . ",
                 minimumInputLength: '" . $this->minInputLength . "',
+                " . $strJsOnModal . "
                 ajax: {
                     url: '" . $ajaxUrl . "',
                     dataType: 'jsonp',
@@ -669,8 +855,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     return $('<div>" . $strResult . "</div>');
                 },
                 templateSelection: function(item) {
-
-                    if(item.selected && item.element) {
+                    if(item.element) {
                         let dataMultiple = $(item.element).attr('data-multiple');
                         if(dataMultiple == '0') {
                             let dataContent = $(item.element).attr('data-content');
@@ -682,6 +867,14 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                                 return dataContent;
                             }
                         } else {
+                            let dataContent = $(item.element).attr('data-content');
+
+                            if(dataContent) {
+                                if(/<\/?[a-z][\s\S]*>/i.test(dataContent)) {
+                                    return $(dataContent);
+                                }
+                                return dataContent;
+                            }
                             if(item.text){
                                 return item.text;
                             }
@@ -747,7 +940,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $js->append($str)->br();
 
         foreach ($this->dependsOn as $index => $dependOn) {
-            $dependsOnSelector = $dependOn->getSelector();
+            $dependsOnSelector = $dependOn->getSelector()->getQuerySelector();
             $targetSelector = '#' . $this->id();
             $throttle = $dependOn->getThrottle();
             $dependsOnFunctionName = 'dependsOnFunction' . uniqid();
@@ -770,5 +963,52 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         }
 
         return $js->text();
+    }
+
+    /**
+     * @return array
+     */
+    public function buildJavascriptOptions() {
+        $options = [];
+        $ajaxUrl = $this->createAjaxUrl();
+        $strSelection = $this->formatSelection;
+        $strResult = $this->formatResult;
+        $options['ajaxUrl'] = $ajaxUrl;
+        $options['language'] = $this->language;
+        $options['placeholder'] = $this->placeholder;
+        $options['multiple'] = $this->multiple;
+        $options['autoSelect'] = $this->autoSelect;
+        $options['minInputLength'] = $this->minInputLength;
+        $options['delay'] = $this->delay;
+        $options['requires'] = $this->requires;
+        $options['valueCallback'] = $this->valueCallback;
+        $options['applyJs'] = $this->applyJs;
+        $options['perPage'] = (int) $this->perPage;
+        $options['value'] = $this->value;
+        $options['allowClear'] = $this->allowClear;
+        $options['onModal'] = $this->onModal;
+        $options['strSelection'] = $strSelection;
+        $options['strResult'] = $strResult;
+        $options['prependData'] = $this->prependData;
+        $options['readonly'] = $this->readonly;
+        $options['value'] = $this->value;
+
+        $dependsOn = [];
+        foreach ($this->dependsOn as $index => $dependOn) {
+            $dependsOnSelector = $dependOn->getSelector()->getQuerySelector();
+            $targetSelector = '#' . $this->id();
+            $throttle = $dependOn->getThrottle();
+            $dependOn = [];
+            $dependOn['targetSelector'] = $targetSelector;
+            $dependOn['dependsOnSelector'] = $dependsOnSelector;
+            $dependOn['throttle'] = $throttle;
+
+            $dependsOn[] = $dependOn;
+        }
+
+        $options['dependsOn'] = $dependsOn;
+        $options['selectedData'] = $this->buildSelectedData();
+
+        return $options;
     }
 }

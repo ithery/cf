@@ -1,19 +1,32 @@
 <?php
 
 /**
- * Description of PhpFpm
- *
- * @author Hery
+ * Description of PhpFpm.
  */
 class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
+    /**
+     * @var CDevSuite_PackageManager
+     */
     public $pm;
 
+    /**
+     * @var CDevSuite_ServiceManager
+     */
     public $sm;
 
+    /**
+     * @var CDevSuite_CommandLine
+     */
     public $cli;
 
+    /**
+     * @var CDevSuite_Filesystem
+     */
     public $files;
 
+    /**
+     * @var string
+     */
     public $version;
 
     /**
@@ -106,6 +119,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
 
         if ($exception) {
             CDevSuite::info('Changing version failed');
+
             throw $exception;
         }
 
@@ -152,7 +166,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
     }
 
     /**
-     * Install Drop-In systemd override for php-fpm service
+     * Install Drop-In systemd override for php-fpm service.
      *
      * @return void
      */
@@ -194,7 +208,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
     /**
      * Get installed PHP version.
      *
-     * @param string $real force getting version from /usr/bin/php
+     * @param bool $real force getting version from /usr/bin/php
      *
      * @return string
      */
@@ -209,7 +223,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
     }
 
     /**
-     * Determine php service name
+     * Determine php service name.
      *
      * @return string
      */
@@ -218,7 +232,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
         $status = $this->sm->status($service);
 
         if (strpos($status, 'not-found') || strpos($status, 'not be found')) {
-            return new DomainException('Unable to determine PHP service name.');
+            throw new DomainException('Unable to determine PHP service name.');
         }
 
         return $service;

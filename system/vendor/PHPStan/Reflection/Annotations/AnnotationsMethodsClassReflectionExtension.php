@@ -2,14 +2,23 @@
 
 namespace PHPStan\Reflection\Annotations;
 
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\PhpDoc\Tag\TemplateTag;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\MethodsClassReflectionExtension;
+use PHPStan\Type\Generic\TemplateTypeFactory;
 use PHPStan\Type\Generic\TemplateTypeHelper;
+use PHPStan\Type\Generic\TemplateTypeMap;
+use PHPStan\Type\Generic\TemplateTypeScope;
+use PHPStan\Type\Generic\TemplateTypeVariance;
+use PHPStan\Type\Type;
+use function array_map;
 use function count;
 
-class AnnotationsMethodsClassReflectionExtension implements MethodsClassReflectionExtension
+// autoTag: false - wired explicitly in ClassReflectionExtensionRegistry, must not be tagged
+#[AutowiredService(autoTag: false)]
+final class AnnotationsMethodsClassReflectionExtension implements MethodsClassReflectionExtension
 {
 
 	/** @var ExtendedMethodReflection[][] */
@@ -25,13 +34,10 @@ class AnnotationsMethodsClassReflectionExtension implements MethodsClassReflecti
 			$this->methods[$classReflection->getCacheKey()][$methodName] = $method;
 		}
 
-		return isset($this->methods[$classReflection->getCacheKey()][$methodName]);
+		return true;
 	}
 
-	/**
-	 * @return ExtendedMethodReflection
-	 */
-	public function getMethod(ClassReflection $classReflection, string $methodName): MethodReflection
+	public function getMethod(ClassReflection $classReflection, string $methodName): ExtendedMethodReflection
 	{
 		return $this->methods[$classReflection->getCacheKey()][$methodName];
 	}
@@ -56,6 +62,13 @@ class AnnotationsMethodsClassReflectionExtension implements MethodsClassReflecti
 				);
 			}
 
+			$templateTypeScope = TemplateTypeScope::createWithClass($classReflection->getName());
+
+			$templateTypeMap = new TemplateTypeMap(array_map(
+				static fn (TemplateTag $tag): Type => TemplateTypeFactory::fromTemplateTag($templateTypeScope, $tag),
+				$methodTags[$methodName]->getTemplateTags(),
+			));
+
 			$isStatic = $methodTags[$methodName]->isStatic();
 			$nativeCallMethodName = $isStatic ? '__callStatic' : '__call';
 
@@ -65,6 +78,8 @@ class AnnotationsMethodsClassReflectionExtension implements MethodsClassReflecti
 				TemplateTypeHelper::resolveTemplateTypes(
 					$methodTags[$methodName]->getReturnType(),
 					$classReflection->getActiveTemplateTypeMap(),
+					$classReflection->getCallSiteVarianceMap(),
+					TemplateTypeVariance::createCovariant(),
 				),
 				$parameters,
 				$isStatic,
@@ -72,6 +87,7 @@ class AnnotationsMethodsClassReflectionExtension implements MethodsClassReflecti
 				$classReflection->hasNativeMethod($nativeCallMethodName)
 					? $classReflection->getNativeMethod($nativeCallMethodName)->getThrowType()
 					: null,
+				$templateTypeMap,
 			);
 		}
 
@@ -84,21 +100,12 @@ class AnnotationsMethodsClassReflectionExtension implements MethodsClassReflecti
 			return $methodWithDeclaringClass;
 		}
 
-		foreach ($classReflection->getParents() as $parentClass) {
+		$parentClass = $classReflection->getParentClass();
+		if ($parentClass !== null) {
 			$methodWithDeclaringClass = $this->findClassReflectionWithMethod($parentClass, $parentClass, $methodName);
-			if ($methodWithDeclaringClass === null) {
-				foreach ($parentClass->getTraits() as $traitClass) {
-					$parentTraitMethodWithDeclaringClass = $this->findClassReflectionWithMethod($traitClass, $parentClass, $methodName);
-					if ($parentTraitMethodWithDeclaringClass === null) {
-						continue;
-					}
-
-					return $parentTraitMethodWithDeclaringClass;
-				}
-				continue;
+			if ($methodWithDeclaringClass !== null) {
+				return $methodWithDeclaringClass;
 			}
-
-			return $methodWithDeclaringClass;
 		}
 
 		foreach ($classReflection->getInterfaces() as $interfaceClass) {

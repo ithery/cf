@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 1, 2019, 11:58:21 PM
- */
 interface CModel_HasResourceInterface {
     /**
      * Set the polymorphic relation.
@@ -100,7 +94,7 @@ interface CModel_HasResourceInterface {
      *
      * @param CModel_Resource_ResourceInterface $resource
      */
-    public function registerResourceConversions(CModel_Resource_ResourceInterface $resource = null);
+    public function registerResourceConversions(?CModel_Resource_ResourceInterface $resource = null);
 
     /**
      * Register the resource collections.

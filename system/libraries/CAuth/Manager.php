@@ -1,6 +1,6 @@
 <?php
 
-final class CAuth_Manager {
+final class CAuth_Manager implements CAuth_Contract_AuthFactoryInterface {
     use CAuth_Concern_CreateUserProvider;
 
     /**
@@ -68,8 +68,23 @@ final class CAuth_Manager {
         if (!isset($this->guards[$name])) {
             $this->guards[$name] = $this->resolve($name);
         }
-
         return $this->guards[$name];
+    }
+
+    /**
+     * Drop all cached guard instances, so the next guard() call resolves a
+     * fresh one instead of reusing whatever user setUser()/attempt() left
+     * cached on it.
+     *
+     * This manager is a process-wide singleton, which is harmless in
+     * production (fresh PHP process per request) but means an authenticated
+     * user set via actingAs() in one test otherwise leaks into every later
+     * test in the same run - see CTesting_TestCase::tearDown().
+     *
+     * @return void
+     */
+    public function forgetGuards() {
+        $this->guards = [];
     }
 
     /**
@@ -83,7 +98,6 @@ final class CAuth_Manager {
      */
     protected function resolve($name) {
         $config = $this->getConfig($name);
-
         if (is_null($config)) {
             throw new InvalidArgumentException("Auth guard [{$name}] is not defined.");
         }
@@ -140,10 +154,10 @@ final class CAuth_Manager {
      * @return \CAuth_Guard_SessionGuard
      */
     public function createSessionDriver($name, $config) {
-        $provider = $this->createUserProvider(carr::get($config, 'provider', null));
-
-        $guard = new CAuth_Guard_SessionGuard($name, $provider, CSession::instance()->store());
-
+        // $providerSessionName = carr::get($config, 'providerSessionName', 'user_provider');
+        $provider = carr::get($config, 'provider', null);
+        $provider = $this->createUserProvider($provider);
+        $guard = new CAuth_Guard_SessionGuard($name, $provider, c::session());
         // When using the remember me functionality of the authentication services we
         // will need to be set the encryption instance of the guard, which allows
         // secure, encrypted cookie values to get generated for those cookies.

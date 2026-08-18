@@ -3,34 +3,63 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 24, 2019, 3:48:03 AM
+ * @deprecated 1.8
  */
 trait CElement_Component_DataTable_Trait_ExportTrait {
     use CElement_Component_DataTable_Trait_Legacy_ExportTrait;
 
+    /**
+     * @var bool
+     */
     public $export_xml;
 
+    /**
+     * @var bool
+     */
     public $export_excel;
 
+    /**
+     * @var bool
+     */
     public $export_excelxml;
 
+    /**
+     * @var bool
+     */
     public $export_excelcsv;
 
+    /**
+     * @var bool
+     */
     public $export_pdf;
 
+    /**
+     * @var array
+     */
     public $report_header = [];
 
+    /**
+     * @var string
+     */
     public $export_filename = '';
 
+    /**
+     * @var string
+     */
     public $export_sheetname = '';
 
+    /**
+     * @return bool
+     */
     public function isExported() {
         return $this->export_excel || $this->export_excelxml || $this->export_excelcsv || $this->export_pdf;
     }
 
+    /**
+     * @param string $orientation 'P', 'L', 'PORTRAIT', or 'LANDSCAPE'
+     *
+     * @return $this
+     */
     public function setPdfOrientation($orientation) {
         if (strtoupper($orientation) == 'PORTRAIT') {
             $orientation = 'P';
@@ -47,6 +76,11 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         return $this;
     }
 
+    /**
+     * @param string $filename
+     *
+     * @return void
+     */
     public function exportPdf($filename) {
         $this->export_pdf = true;
         $html = $this->html();
@@ -59,6 +93,11 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         die();
     }
 
+    /**
+     * @param string $filename
+     *
+     * @return void
+     */
     public function exportExcelcsv($filename) {
         $this->export_excelcsv = true;
         $csv_field_terminated = ',';
@@ -184,6 +223,12 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         exit;
     }
 
+    /**
+     * @param string      $filename
+     * @param null|string $sheet_name
+     *
+     * @return void
+     */
     public function exportExcelxml($filename, $sheet_name = null) {
         $this->export_excelxml = true;
 
@@ -410,18 +455,18 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 $additionColumn++;
             }
 
-            foreach ($this->footer_field as $f) {
+            foreach ($this->footerFields as $f) {
                 echo '<tr>';
 
-                $colspan = $f['labelcolspan'];
+                $colspan = $f->getLabelColSpan();
                 if ($colspan == 0) {
                     $colspan = $totalColumn + $additionColumn - 1;
                 }
                 echo '<td class="tfoot" colspan="' . ($colspan) . '">';
-                echo $f['label'];
+                echo $f->getLabel();
                 echo '</td>';
                 $class = '';
-                switch ($f['align']) {
+                switch ($f->getAlign()) {
                     case 'left':
                         $class .= ' align-left';
 
@@ -436,7 +481,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                         break;
                 }
 
-                $fval = $f['value'];
+                $fval = $f->getValue();
 
                 if (is_array($fval)) {
                     $skip_column = 0;
@@ -487,12 +532,20 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         exit;
     }
 
+    /**
+     * @param string $line
+     *
+     * @return $this
+     */
     public function addReportHeader($line) {
         $this->report_header[] = $line;
 
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getReportHeaders() {
         return $this->report_header;
     }
@@ -638,15 +691,15 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
             if ($totalColumn < 2) {
                 $totalColumn = 2;
             }
-            foreach ($this->footer_field as $f) {
-                $colspan = $f['labelcolspan'];
+            foreach ($this->footerFields as $f) {
+                $colspan = $f->getLabelColSpan();
                 if ($colspan == 0) {
                     $colspan = $totalColumn + $additionColumn - 1;
                 }
 
-                $excel->writeByIndex($colStart, $j, $f['label'] . $colspan);
+                $excel->writeByIndex($colStart, $j, $f->getLabel() . $colspan);
                 $excel->setAlignByIndex($colStart, $j, 'left');
-                $fval = $f['value'];
+                $fval = $f->getValue();
 
                 if (is_array($fval)) {
                     $skip_column = 0;
@@ -686,7 +739,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                     }
                 } else {
                     $excel->writeByIndex($totalColumn, $j, $fval);
-                    $excel->setAlignByIndex($totalColumn, $j, $f['align']);
+                    $excel->setAlignByIndex($totalColumn, $j, $f->getAlign());
                 }
                 if ($colspan > 1) {
                     $excel->mergeCell($colStart, $j, $colspan - 1, $j);
@@ -707,24 +760,42 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         cdownload::force($fn, null, $sfn);
     }
 
+    /**
+     * @param string $filename
+     *
+     * @return $this
+     */
     public function setExportFilename($filename) {
         $this->export_filename = $filename;
 
         return $this;
     }
 
+    /**
+     * @param string $sheetname
+     *
+     * @return $this
+     */
     public function setExportSheetname($sheetname) {
         $this->export_sheetname = $sheetname;
 
         return $this;
     }
 
+    /**
+     * @param int $size
+     *
+     * @return $this
+     */
     public function setPdfFontSize($size) {
         $this->pdf_font_size = $size;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getPdfTableAttr() {
         if ($this->export_pdf) {
             return ' border="1" width="100%"';
@@ -733,6 +804,9 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         return '';
     }
 
+    /**
+     * @return string
+     */
     public function getPdfTHeadTdAttr() {
         if ($this->export_pdf) {
             return ' bgcolor="#9f9f9f" color="#000" style="color:#000" ';
@@ -741,6 +815,9 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         return '';
     }
 
+    /**
+     * @return string
+     */
     public function getPdfTBodyTdAttr() {
         if ($this->export_pdf) {
             return ' valign="middle"';

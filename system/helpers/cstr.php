@@ -43,18 +43,48 @@ class cstr {
      */
     protected static $studlyCache = [];
 
+    /**
+     * Get the length of the given string.
+     *
+     * @param string $str
+     *
+     * @return int
+     */
     public static function len($str) {
         return static::length($str);
     }
 
+    /**
+     * Get the length of the given string.
+     *
+     * @param string $str
+     *
+     * @return int
+     */
     public static function toupper($str) {
         return strtoupper($str);
     }
 
+    /**
+     * Convert a string to lowercase.
+     *
+     * @param string $str
+     *
+     * @return string
+     */
     public static function tolower($str) {
         return strtolower($str);
     }
 
+    /**
+     * Find the position of the first occurrence of a substring in a string.
+     *
+     * @param string $string
+     * @param string $needle
+     * @param int    $offset
+     *
+     * @return int
+     */
     public static function pos($string, $needle, $offset = 0) {
         return strpos($string, $needle, $offset);
     }
@@ -190,7 +220,6 @@ class cstr {
      * Replace a given value in the string sequentially with an array.
      *
      * @param string $search
-     * @param array  $replace
      * @param string $subject
      *
      * @return string
@@ -244,6 +273,29 @@ class cstr {
     }
 
     /**
+     * Replace the first occurrence of the given value if it appears at the start of the string.
+     *
+     * @param string $search
+     * @param string $replace
+     * @param string $subject
+     *
+     * @return string
+     */
+    public static function replaceStart($search, $replace, $subject) {
+        $search = (string) $search;
+
+        if ($search === '') {
+            return $subject;
+        }
+
+        if (static::startsWith($subject, $search)) {
+            return static::replaceFirst($search, $replace, $subject);
+        }
+
+        return $subject;
+    }
+
+    /**
      * Replace the last occurrence of a given value in the string.
      *
      * @param string $search
@@ -253,6 +305,10 @@ class cstr {
      * @return string
      */
     public static function replaceLast($search, $replace, $subject) {
+        if ($search === '') {
+            return $subject;
+        }
+
         $position = strrpos($subject, $search);
 
         if ($position !== false) {
@@ -260,6 +316,47 @@ class cstr {
         }
 
         return $subject;
+    }
+
+    /**
+     * Replace the last occurrence of a given value if it appears at the end of the string.
+     *
+     * @param string $search
+     * @param string $replace
+     * @param string $subject
+     *
+     * @return string
+     */
+    public static function replaceEnd($search, $replace, $subject) {
+        $search = (string) $search;
+
+        if ($search === '') {
+            return $subject;
+        }
+
+        if (static::endsWith($subject, $search)) {
+            return static::replaceLast($search, $replace, $subject);
+        }
+
+        return $subject;
+    }
+
+    /**
+     * Replace the patterns matching the given regular expression.
+     *
+     * @param string          $pattern
+     * @param \Closure|string $replace
+     * @param array|string    $subject
+     * @param int             $limit
+     *
+     * @return null|string|string[]
+     */
+    public static function replaceMatches($pattern, $replace, $subject, $limit = -1) {
+        if ($replace instanceof Closure) {
+            return preg_replace_callback($pattern, $replace, $subject, $limit);
+        }
+
+        return preg_replace($pattern, $replace, $subject, $limit);
     }
 
     /**
@@ -299,6 +396,10 @@ class cstr {
      * @return bool
      */
     public static function contains($haystack, $needles) {
+        //dipanggil dari mana-mana, termasuk dengan nilai null; PHP 8.1 mengeluh
+        //kalau null sampai ke mb_strpos, jadi dijinakkan di satu tempat ini
+        $haystack = (string) $haystack;
+
         foreach ((array) $needles as $needle) {
             if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
                 return true;
@@ -409,15 +510,64 @@ class cstr {
      * @return string
      */
     public static function headline($value) {
-        $parts = explode('_', static::replace(' ', '_', $value));
+        $parts = explode(' ', $value);
 
-        if (count($parts) > 1) {
-            $parts = array_map([static::class, 'title'], $parts);
+        $parts = count($parts) > 1
+            ? array_map([static::class, 'title'], $parts)
+            : array_map([static::class, 'title'], static::ucsplit(implode('_', $parts)));
+
+        $collapsed = static::replace(['-', '_', ' '], '_', implode('_', $parts));
+
+        return implode(' ', array_filter(explode('_', $collapsed)));
+    }
+
+    /**
+     * Convert the given string to APA-style title case.
+     *
+     * See: https://apastyle.apa.org/style-grammar-guidelines/capitalization/title-case
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function apa($value) {
+        if (trim($value) === '') {
+            return $value;
         }
 
-        $studly = static::studly(implode($parts));
+        $minorWords = [
+            'and', 'as', 'but', 'for', 'if', 'nor', 'or', 'so', 'yet', 'a', 'an',
+            'the', 'at', 'by', 'for', 'in', 'of', 'off', 'on', 'per', 'to', 'up', 'via',
+        ];
 
-        $words = preg_split('/(?=[A-Z])/', $studly, -1, PREG_SPLIT_NO_EMPTY);
+        $endPunctuation = ['.', '!', '?', ':', '—', ','];
+
+        $words = preg_split('/\s+/', $value, -1, PREG_SPLIT_NO_EMPTY);
+
+        $words[0] = ucfirst(mb_strtolower($words[0]));
+
+        for ($i = 0; $i < count($words); $i++) {
+            $lowercaseWord = mb_strtolower($words[$i]);
+
+            if (str_contains($lowercaseWord, '-')) {
+                $hyphenatedWords = explode('-', $lowercaseWord);
+
+                $hyphenatedWords = array_map(function ($part) use ($minorWords) {
+                    return (in_array($part, $minorWords) && mb_strlen($part) <= 3) ? $part : ucfirst($part);
+                }, $hyphenatedWords);
+
+                $words[$i] = implode('-', $hyphenatedWords);
+            } else {
+                if (in_array($lowercaseWord, $minorWords)
+                    && mb_strlen($lowercaseWord) <= 3
+                    && !($i === 0 || in_array(mb_substr($words[$i - 1], -1), $endPunctuation))
+                ) {
+                    $words[$i] = $lowercaseWord;
+                } else {
+                    $words[$i] = ucfirst($lowercaseWord);
+                }
+            }
+        }
 
         return implode(' ', $words);
     }
@@ -436,8 +586,8 @@ class cstr {
     /**
      * Determine if a given string starts with a given substring.
      *
-     * @param string       $haystack
-     * @param string|array $needles
+     * @param string       $haystack string to search
+     * @param string|array $needles  substring
      *
      * @return bool
      */
@@ -454,8 +604,8 @@ class cstr {
     /**
      * Determine if a given string ends with a given substring.
      *
-     * @param string       $haystack
-     * @param string|array $needles
+     * @param string       $haystack string to search
+     * @param string|array $needles  substring
      *
      * @return bool
      */
@@ -484,7 +634,7 @@ class cstr {
         $radius = carr::get($options, 'radius', 100);
         $omission = carr::get($options, 'omission', '...');
 
-        preg_match('/^(.*?)(' . preg_quote((string) $phrase) . ')(.*)$/iu', (string) $text, $matches);
+        preg_match('/^(.*?)(' . preg_quote((string) $phrase, '/') . ')(.*)$/iu', (string) $text, $matches);
 
         if (empty($matches)) {
             return null;
@@ -547,6 +697,24 @@ class cstr {
         }
 
         return static::$camelCache[$value] = lcfirst(static::studly($value));
+    }
+
+    /**
+     * Get the character at the specified index.
+     *
+     * @param string $subject
+     * @param int    $index
+     *
+     * @return string|false
+     */
+    public static function charAt($subject, $index) {
+        $length = mb_strlen($subject);
+
+        if ($index < 0 ? $index < -$length : $index > $length - 1) {
+            return false;
+        }
+
+        return mb_substr($subject, $index, 1);
     }
 
     /**
@@ -695,23 +863,23 @@ class cstr {
             return false;
         }
 
-        foreach ($patterns as $pattern) {
-            $pattern = (string) $pattern;
+        foreach ($patterns as $singlePattern) {
+            $singlePattern = (string) $singlePattern;
             // If the given value is an exact match we can of course return true right
             // from the beginning. Otherwise, we will translate asterisks and do an
             // actual pattern match against the two strings to see if they match.
-            if ($pattern == $value) {
+            if ($singlePattern == $value) {
                 return true;
             }
 
-            $pattern = preg_quote($pattern, '#');
+            $singlePattern = preg_quote($singlePattern, '#');
 
             // Asterisks are translated into zero-or-more regular expression wildcards
             // to make it convenient to check if the strings starts with the given
             // pattern such as "library/*", making any string check convenient.
-            $pattern = str_replace('\*', '.*', $pattern);
+            $singlePattern = str_replace('\*', '.*', $singlePattern);
 
-            if (preg_match('#^' . $pattern . '\z#u', $value) === 1) {
+            if (preg_match('#^' . $singlePattern . '\z#u', $value) === 1) {
                 return true;
             }
         }
@@ -771,7 +939,6 @@ class cstr {
     /**
      * Swap multiple keywords in a string with other keywords.
      *
-     * @param array  $map
      * @param string $subject
      *
      * @return string
@@ -1052,10 +1219,24 @@ class cstr {
         return isset($languageSpecific[$language]) ? $languageSpecific[$language] : null;
     }
 
+    /**
+     * Determine if a given string contains uppercase character(s).
+     *
+     * @param string $string
+     *
+     * @return bool
+     */
     public static function haveUpper($string) {
-        return preg_match('~^\p{Lu}~u', $string);
+        return (bool) preg_match('~^\p{Lu}~u', $string);
     }
 
+    /**
+     * Convert a value to kebab case.
+     *
+     * @param string $string
+     *
+     * @return string
+     */
     public static function kebabCase($string) {
         return static::kebab($string);
     }
@@ -1083,7 +1264,6 @@ class cstr {
      * Converts GitHub flavored Markdown into HTML.
      *
      * @param string $string
-     * @param array  $options
      *
      * @return string
      */
@@ -1097,7 +1277,6 @@ class cstr {
      * Converts inline Markdown into HTML.
      *
      * @param string $string
-     * @param array  $options
      *
      * @return string
      */
@@ -1297,18 +1476,15 @@ class cstr {
     /**
      * Set the callable that will be used to generate UUIDs.
      *
-     * @param null|callable $factory
-     *
      * @return void
      */
-    public static function createUuidsUsing(callable $factory = null) {
+    public static function createUuidsUsing(?callable $factory = null) {
         static::$uuidFactory = $factory;
     }
 
     /**
      * Set the sequence that will be used to generate UUIDs.
      *
-     * @param array         $sequence
      * @param null|callable $whenMissing
      *
      * @return void
@@ -1344,11 +1520,9 @@ class cstr {
     /**
      * Always return the same UUID when generating new UUIDs.
      *
-     * @param null|\Closure $callback
-     *
      * @return \Ramsey\Uuid\UuidInterface
      */
-    public static function freezeUuids(Closure $callback = null) {
+    public static function freezeUuids(?Closure $callback = null) {
         $uuid = cstr::uuid();
 
         cstr::createUuidsUsing(function () use ($uuid) {
@@ -1432,6 +1606,32 @@ class cstr {
         }
 
         return isset($matches[1]) ? $matches[1] : $matches[0];
+    }
+
+    /**
+     * Determine if a given string matches a given pattern.
+     *
+     * @param string|iterable<string> $pattern
+     * @param string                  $value
+     *
+     * @return bool
+     */
+    public static function isMatch($pattern, $value) {
+        $value = (string) $value;
+
+        if (!is_iterable($pattern)) {
+            $pattern = [$pattern];
+        }
+
+        foreach ($pattern as $singlePattern) {
+            $singlePattern = (string) $singlePattern;
+
+            if (preg_match($singlePattern, $value) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1573,10 +1773,24 @@ class cstr {
         return new CBase_HtmlString($string);
     }
 
+    /**
+     * Encode a string to base64 URL safe.
+     *
+     * @param string $input
+     *
+     * @return string
+     */
     public function base64UrlEncode($input) {
         return strtr(base64_encode($input), '+/=', '._-');
     }
 
+    /**
+     * Decode a base64 URL safe string.
+     *
+     * @param string $input
+     *
+     * @return string
+     */
     public function base64UrlDecode($input) {
         return base64_decode(strtr($input, '._-', '+/='));
     }

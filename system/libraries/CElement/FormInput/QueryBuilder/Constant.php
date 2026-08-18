@@ -23,7 +23,7 @@ final class CElement_FormInput_QueryBuilder_Constant {
 
     const FILTER_INPUT_RADIO = 'radio';
 
-    const FILTER_INPUT_CHECKBOX = 'number';
+    const FILTER_INPUT_CHECKBOX = 'checkbox';
 
     const FILTER_INPUT_SELECT = 'select';
 
@@ -61,9 +61,104 @@ final class CElement_FormInput_QueryBuilder_Constant {
 
     const FILTER_OPERATOR_IS_EMPTY = 'is_empty';
 
-    const FILTER_OPERATOR_NOT_IS_EMPTY = 'is_not_empty';
+    const FILTER_OPERATOR_IS_NOT_EMPTY = 'is_not_empty';
 
     const FILTER_OPERATOR_IS_NULL = 'is_null';
 
     const FILTER_OPERATOR_IS_NOT_NULL = 'is_not_null';
+
+    /**
+     * Get the metadata (accepted value shape and applicable filter types) for every supported operator.
+     *
+     * @return array<string, array{accept_values: bool, apply_to: string[], multiple?: bool}>
+     */
+    public static function getOperatorData() {
+        return [
+            self::FILTER_OPERATOR_EQUAL => [
+                'accept_values' => true,
+                'apply_to' => ['string', 'number', 'datetime'],
+                'multiple' => false,
+            ],
+            self::FILTER_OPERATOR_NOT_EQUAL => [
+                'accept_values' => true,
+                'apply_to' => ['string', 'number', 'datetime'],
+                'multiple' => false,
+            ],
+            self::FILTER_OPERATOR_IN => [
+                'accept_values' => true,
+                'apply_to' => ['string', 'number', 'datetime'],
+                'multiple' => true,
+            ],
+            self::FILTER_OPERATOR_NOT_IN => [
+                'accept_values' => true,
+                'apply_to' => ['string', 'number', 'datetime'],
+                'multiple' => true,
+            ],
+            self::FILTER_OPERATOR_LESS => [
+                'accept_values' => true,
+                'apply_to' => ['number', 'datetime'],
+                'multiple' => false,
+            ],
+            self::FILTER_OPERATOR_LESS_OR_EQUAL => [
+                'accept_values' => true,
+                'apply_to' => ['number', 'datetime']
+            ],
+            self::FILTER_OPERATOR_GREATER => [
+                'accept_values' => true,
+                'apply_to' => ['number', 'datetime']
+            ],
+            self::FILTER_OPERATOR_GREATER_OR_EQUAL => [
+                'accept_values' => true,
+                'apply_to' => ['number', 'datetime']
+            ],
+            self::FILTER_OPERATOR_BETWEEN => [
+                'accept_values' => true,
+                'apply_to' => ['number', 'datetime']
+            ],
+            self::FILTER_OPERATOR_NOT_BETWEEN => [
+                'accept_values' => true,
+                'apply_to' => ['number', 'datetime']
+            ],
+            self::FILTER_OPERATOR_BEGINS_WITH => [
+                'accept_values' => true,
+                'apply_to' => ['string']
+            ],
+            self::FILTER_OPERATOR_NOT_BEGINS_WITH => [
+                'accept_values' => true,
+                'apply_to' => ['string']
+            ],
+            self::FILTER_OPERATOR_CONTAINS => [
+                'accept_values' => true,
+                'apply_to' => ['string']
+            ],
+            self::FILTER_OPERATOR_NOT_CONTAINS => [
+                'accept_values' => true,
+                'apply_to' => ['string']
+            ],
+            self::FILTER_OPERATOR_ENDS_WITH => [
+                'accept_values' => true,
+                'apply_to' => ['string']
+            ],
+            self::FILTER_OPERATOR_NOT_ENDS_WITH => [
+                'accept_values' => true,
+                'apply_to' => ['string']
+            ],
+            self::FILTER_OPERATOR_IS_EMPTY => [
+                'accept_values' => false,
+                'apply_to' => ['string']
+            ],
+            self::FILTER_OPERATOR_IS_NOT_EMPTY => [
+                'accept_values' => false,
+                'apply_to' => ['string']
+            ],
+            self::FILTER_OPERATOR_IS_NULL => [
+                'accept_values' => false,
+                'apply_to' => ['string', 'number', 'datetime']
+            ],
+            self::FILTER_OPERATOR_IS_NOT_NULL => [
+                'accept_values' => false,
+                'apply_to' => ['string', 'number', 'datetime']
+            ]
+        ];
+    }
 }

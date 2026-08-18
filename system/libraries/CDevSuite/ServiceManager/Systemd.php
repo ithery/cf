@@ -1,10 +1,18 @@
 <?php
 
+/**
+ * Description of Systemd.
+ */
 class CDevSuite_ServiceManager_Systemd extends CDevSuite_ServiceManager {
+    /**
+     * @var CDevSuite_CommandLine
+     */
     public $cli;
 
     /**
-     * Create a new Brew instance.
+     * Create a new Systemd instance.
+     *
+     * @return void
      */
     public function __construct() {
         $this->cli = CDevSuite::commandLine();
@@ -96,7 +104,7 @@ class CDevSuite_ServiceManager_Systemd extends CDevSuite_ServiceManager {
      *
      * @param mixed $service Service name
      *
-     * @return void
+     * @return bool
      */
     public function disabled($service) {
         $service = $this->getRealService($service);
@@ -189,7 +197,7 @@ class CDevSuite_ServiceManager_Systemd extends CDevSuite_ServiceManager {
     }
 
     /**
-     * Determine real service name
+     * Determine real service name.
      *
      * @param mixed $service Service name
      *
@@ -209,7 +217,7 @@ class CDevSuite_ServiceManager_Systemd extends CDevSuite_ServiceManager {
     /**
      * Install DevSuite DNS services.
      *
-     * @param Filesystem $files Filesystem object
+     * @param CDevSuite_Filesystem $files Filesystem object
      *
      * @return void
      */

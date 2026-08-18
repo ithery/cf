@@ -149,4 +149,15 @@ class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherI
 
         return parent::driver($driver);
     }
+
+    /**
+     * Determine if a given string is already hashed.
+     *
+     * @param string $value
+     *
+     * @return bool
+     */
+    public function isHashed($value) {
+        return password_get_info($value)['algo'] !== null;
+    }
 }

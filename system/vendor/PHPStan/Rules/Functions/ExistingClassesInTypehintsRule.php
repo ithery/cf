@@ -4,9 +4,10 @@ namespace PHPStan\Rules\Functions;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Internal\SprintfHelper;
 use PHPStan\Node\InFunctionNode;
-use PHPStan\Reflection\Php\PhpFunctionFromParserNodeReflection;
 use PHPStan\Rules\FunctionDefinitionCheck;
 use PHPStan\Rules\Rule;
 use function sprintf;
@@ -14,7 +15,9 @@ use function sprintf;
 /**
  * @implements Rule<InFunctionNode>
  */
-class ExistingClassesInTypehintsRule implements Rule
+#[RegisteredRule(level: 0)]
+#[ValidatesStubFiles]
+final class ExistingClassesInTypehintsRule implements Rule
 {
 
 	public function __construct(private FunctionDefinitionCheck $check)
@@ -28,15 +31,12 @@ class ExistingClassesInTypehintsRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if (!$scope->getFunction() instanceof PhpFunctionFromParserNodeReflection) {
-			return [];
-		}
-
-		$functionName = SprintfHelper::escapeFormatString($scope->getFunction()->getName());
+		$functionName = SprintfHelper::escapeFormatString($node->getFunctionReflection()->getName());
 
 		return $this->check->checkFunction(
+			$scope,
 			$node->getOriginalNode(),
-			$scope->getFunction(),
+			$node->getFunctionReflection(),
 			sprintf(
 				'Parameter $%%s of function %s() has invalid type %%s.',
 				$functionName,
@@ -53,6 +53,10 @@ class ExistingClassesInTypehintsRule implements Rule
 			),
 			sprintf(
 				'Function %s() has unresolvable native return type.',
+				$functionName,
+			),
+			sprintf(
+				'Attribute NoDiscard cannot be used on %%s function %s().',
 				$functionName,
 			),
 		);

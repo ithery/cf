@@ -69,6 +69,7 @@ class PHPUnitConstraint extends MatcherAbstract
     /**
      *
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return '<Constraint>';

@@ -3,6 +3,9 @@
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
+/**
+ * Description of ConsoleTrait.
+ */
 trait CDevSuite_Trait_ConsoleTrait {
     /**
      * Output the given text to the console.
@@ -59,6 +62,8 @@ trait CDevSuite_Trait_ConsoleTrait {
      * Formats a success result bar.
      *
      * @param string|array $message
+     *
+     * @return void
      */
     public static function success($message) {
         static::getOutputStyle()->success($message);
@@ -91,18 +96,20 @@ trait CDevSuite_Trait_ConsoleTrait {
     }
 
     /**
-     * Confirm the given text to the console.
+     * Ask the user to confirm the given text on the console.
      *
      * @param string $output
      * @param bool   $default
      *
-     * @return void
+     * @return bool
      */
     public static function confirm($output, $default = true) {
-        static::getOutputStyle()->confirm($output, $default);
+        return static::getOutputStyle()->confirm($output, $default);
     }
 
     /**
+     * Get the output style instance, creating it if necessary.
+     *
      * @return \CConsole_OutputStyle
      */
     protected static function getOutputStyle() {
@@ -116,6 +123,8 @@ trait CDevSuite_Trait_ConsoleTrait {
      * Starts the progress output.
      *
      * @param int $max Maximum steps (0 if unknown)
+     *
+     * @return void
      */
     public static function progressStart($max = 0) {
         static::getOutputStyle()->progressStart($max);
@@ -125,6 +134,8 @@ trait CDevSuite_Trait_ConsoleTrait {
      * Advances the progress output X steps.
      *
      * @param int $step Number of steps to advance
+     *
+     * @return void
      */
     public static function progressAdvance($step = 1) {
         static::getOutputStyle()->progressAdvance($step);
@@ -132,6 +143,8 @@ trait CDevSuite_Trait_ConsoleTrait {
 
     /**
      * Finishes the progress output.
+     *
+     * @return void
      */
     public static function progressFinish() {
         static::getOutputStyle()->progressFinish();

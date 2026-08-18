@@ -4,17 +4,18 @@ namespace PHPStan\Rules\Properties;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\ClassPropertiesNode;
 use PHPStan\Reflection\ConstructorsHelper;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\ShouldNotHappenException;
 use function sprintf;
 
 /**
  * @implements Rule<ClassPropertiesNode>
  */
-class MissingReadOnlyByPhpDocPropertyAssignRule implements Rule
+#[RegisteredRule(level: 0)]
+final class MissingReadOnlyByPhpDocPropertyAssignRule implements Rule
 {
 
 	public function __construct(
@@ -30,10 +31,7 @@ class MissingReadOnlyByPhpDocPropertyAssignRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if (!$scope->isInClass()) {
-			throw new ShouldNotHappenException();
-		}
-		$classReflection = $scope->getClassReflection();
+		$classReflection = $node->getClassReflection();
 		[$properties, $prematureAccess, $additionalAssigns] = $node->getUninitializedProperties($scope, $this->constructorsHelper->getConstructors($classReflection));
 
 		$errors = [];
@@ -45,10 +43,13 @@ class MissingReadOnlyByPhpDocPropertyAssignRule implements Rule
 				'Class %s has an uninitialized @readonly property $%s. Assign it in the constructor.',
 				$classReflection->getDisplayName(),
 				$propertyName,
-			))->line($propertyNode->getLine())->build();
+			))
+				->line($propertyNode->getStartLine())
+				->identifier('property.uninitializedReadonlyByPhpDoc')
+				->build();
 		}
 
-		foreach ($prematureAccess as [$propertyName, $line, $propertyNode]) {
+		foreach ($prematureAccess as [$propertyName, $line, $propertyNode, $file, $fileDescription]) {
 			if (!$propertyNode->isReadOnlyByPhpDoc() || $propertyNode->isReadOnly()) {
 				continue;
 			}
@@ -56,7 +57,11 @@ class MissingReadOnlyByPhpDocPropertyAssignRule implements Rule
 				'Access to an uninitialized @readonly property %s::$%s.',
 				$classReflection->getDisplayName(),
 				$propertyName,
-			))->line($line)->build();
+			))
+				->identifier('property.uninitializedReadonlyByPhpDoc')
+				->line($line)
+				->file($file, $fileDescription)
+				->build();
 		}
 
 		foreach ($additionalAssigns as [$propertyName, $line, $propertyNode]) {
@@ -67,7 +72,7 @@ class MissingReadOnlyByPhpDocPropertyAssignRule implements Rule
 				'@readonly property %s::$%s is already assigned.',
 				$classReflection->getDisplayName(),
 				$propertyName,
-			))->line($line)->build();
+			))->identifier('assign.readOnlyPropertyByPhpDoc')->line($line)->build();
 		}
 
 		return $errors;

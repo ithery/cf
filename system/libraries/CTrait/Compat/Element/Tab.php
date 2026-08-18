@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 17, 2018, 1:55:05 AM
+ * @see CElement_List_TabList_Tab
  */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_Tab {
@@ -14,103 +11,85 @@ trait CTrait_Compat_Element_Tab {
      * @param string $label
      * @param bool   $lang
      *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated since 1.2, use setLabel
      */
     public function set_label($label, $lang = true) {
+        /** @var CElement_List_TabList_Tab $this */
         return $this->setLabel($label, $lang);
     }
 
     /**
-     * Undocumented function.
-     *
      * @param string $url
      *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated since 1.1, use setAjaxUrl
      */
     public function set_ajax_url($url) {
+        /** @var CElement_List_TabList_Tab $this */
         return $this->setAjaxUrl($url);
     }
 
     /**
-     * Undocumented function.
-     *
      * @param string $target
      *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated since 1.1, use setTarget
      */
     public function set_target($target) {
+        /** @var CElement_List_TabList_Tab $this */
         return $this->setTarget($target);
     }
 
     /**
-     * Undocumented function.
+     * @param bool $bool
      *
-     * @param string $bool
-     *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated 1.1
      */
     public function set_ajax($bool) {
+        /** @var CElement_List_TabList_Tab $this */
         return $this->setAjax($bool);
     }
 
     /**
-     * Undocumented function.
+     * @param bool $bool
      *
-     * @param string $bool
-     *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated 1.1 use setNoPadding
      */
     public function set_nopadding($bool) {
+        /** @var CElement_List_TabList_Tab $this */
         return $this->setNoPadding($bool);
     }
 
     /**
-     * Undocumented function.
+     * @param bool $bool
      *
-     * @param string $bool
-     *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated 1.1
      */
     public function set_active($bool) {
+        /** @var CElement_List_TabList_Tab $this */
         return $this->setActive($bool);
     }
 
     /**
-     * Undocumented function.
-     *
      * @param string $icon
      *
-     * @return CElement_Component_Tab
+     * @return CElement_List_TabList_Tab
      *
      * @deprecated 1.1
      */
     public function set_icon($icon) {
+        /** @var CElement_List_TabList_Tab $this */
         return $this->setIcon($icon);
-    }
-
-    /**
-     * Undocumented function.
-     *
-     * @param int $indent
-     *
-     * @return CElement_Component_Tab
-     *
-     * @deprecated 1.1
-     */
-    public function header_html($indent = 0) {
-        return $this->headerHtml($indent);
     }
 }
 //@codingStandardsIgnoreEnd

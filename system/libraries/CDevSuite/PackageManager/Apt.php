@@ -1,6 +1,21 @@
 <?php
 
 class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
+    const SUPPORTED_PHP_VERSIONS = [
+        'php',
+        'php83',
+        'php81',
+        'php80',
+        'php74',
+        'php73',
+        'php72',
+        'php71',
+        'php70',
+    ];
+
+    /**
+     * @var CDevSuite_CommandLine
+     */
     public $cli;
 
     /**
@@ -13,7 +28,7 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
     }
 
     /**
-     * Get array of installed packages
+     * Get array of installed packages.
      *
      * @param string $package
      *
@@ -78,7 +93,9 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
     /**
      * Restart dnsmasq in Ubuntu.
      *
-     * @param mixed $sm
+     * @param CDevSuite_ServiceManager $sm
+     *
+     * @return void
      */
     public function nmRestart($sm) {
         $sm->restart(['network-manager']);
@@ -99,5 +116,14 @@ class CDevSuite_PackageManager_Apt extends CDevSuite_PackageManager {
         } catch (DomainException $e) {
             return false;
         }
+    }
+
+    /**
+     * Get the list of PHP versions supported by this package manager.
+     *
+     * @return CCollection
+     */
+    public function supportedPhpVersions() {
+        return c::collect(static::SUPPORTED_PHP_VERSIONS);
     }
 }

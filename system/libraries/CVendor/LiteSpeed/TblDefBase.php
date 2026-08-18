@@ -22,7 +22,7 @@ class CVendor_LiteSpeed_TblDefBase {
         if (!isset($this->tblDef[$tblId])) {
             $funcname = 'add_' . $tblId;
             if (!method_exists($this, $funcname)) {
-                die("invalid tid ${tblId}\n");
+                die("invalid tid {$tblId}\n");
             }
             $this->$funcname($tblId);
         }
@@ -225,7 +225,7 @@ class CVendor_LiteSpeed_TblDefBase {
                     $aip = substr($ip, $pos + 1);
                     $ipo[$aip] = $aip;
                     if ($aip != '127.0.0.1') {
-                        $ipv6["[::FFFF:${aip}]"] = "[::FFFF:${aip}]";
+                        $ipv6["[::FFFF:{$aip}]"] = "[::FFFF:{$aip}]";
                     }
                 }
             }
@@ -1126,7 +1126,7 @@ class CVendor_LiteSpeed_TblDefBase {
         ];
         $options = [];
         foreach ($status as $key => $value) {
-            $options[$key] = "${key}  ${value}";
+            $options[$key] = "{$key}  {$value}";
         }
 
         return $options;

@@ -2,8 +2,6 @@
 
 /**
  * Description of Nginx
- *
- * @author Hery
  */
 class CDevSuite_Windows_Nginx extends CDevSuite_Nginx {
     /**

@@ -10,20 +10,24 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class CExporter_Exportable_DataTable extends CExporter_Exportable implements CExporter_Concern_ShouldAutoSize, CExporter_Concern_FromDataTable, CExporter_Concern_WithHeadings, CExporter_Concern_WithMapping, CExporter_Concern_WithColumnFormatting {
     use CExporter_Exportable_Trait_UseColorTrait;
+
     /**
      * @var CElement_Component_DataTable
      */
     protected $table;
 
+    /**
+     * @var array
+     */
     protected $columnFormats;
 
     /**
-     * @var string|CColor_FormatAbstract
+     * @var null|string|CColor_FormatAbstract
      */
     protected $headingColor = null;
 
     /**
-     * @var string|CColor_FormatAbstract
+     * @var null|string|CColor_FormatAbstract
      */
     protected $headingBackgroundColor = null;
 
@@ -38,21 +42,34 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
     protected $borderStyle = Border::BORDER_NONE;
 
     /**
-     * @var string|CColor_FormatAbstract
+     * @var null|string|CColor_FormatAbstract
      */
     protected $borderColor = null;
 
+    /**
+     * @param CElement_Component_DataTable $table
+     */
     public function __construct(CElement_Component_DataTable $table) {
         $this->table = $table;
         $this->columnFormats = [];
     }
 
+    /**
+     * @param string|CColor_FormatAbstract $color
+     *
+     * @return $this
+     */
     public function setHeadingColor($color) {
         $this->headingColor = $color;
 
         return $this;
     }
 
+    /**
+     * @param string|CColor_FormatAbstract $color
+     *
+     * @return $this
+     */
     public function setHeadingBackgroundColor($color) {
         $this->headingBackgroundColor = $color;
 
@@ -62,13 +79,20 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
     /**
      * @return CElement_Component_DataTable
      */
+    /**
+     * @return CElement_Component_DataTable
+     */
     public function dataTable() {
         $this->table->setAjax(false);
-        //d
 
         return $this->table;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
     public function map($data) {
         $columns = $this->table->getColumns();
         $newRow = [];
@@ -76,8 +100,9 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         $detectedDataType = null;
         $transformMaps = [
             'format_currency' => CExporter::DATA_TYPE_CURRENCY,
-            'formatCurrency' => 'currency',
-            'thousand_separator' => 'float',
+            'formatCurrency' => CExporter::DATA_TYPE_CURRENCY,
+            'thousand_separator' => CExporter::DATA_TYPE_NUMBER,
+            'formatNumber' => CExporter::DATA_TYPE_NUMBER,
             'formatDatetime' => 'datetime',
             'formatDate' => 'date',
 
@@ -149,13 +174,19 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
             $columnIndex = Coordinate::stringFromColumnIndex($columnIntIndex + 1);
             $this->columnFormats[$columnIndex] = static::dataTypeToColumnFormat($dataType);
 
-            $newRow[$column->getFieldname()] = static::convertToDataType($value, $dataType);
+            $newRow[] = static::convertToDataType($value, $dataType);
             $columnIntIndex++;
         }
 
         return $newRow;
     }
 
+    /**
+     * @param mixed       $value
+     * @param null|string $detectedDataType
+     *
+     * @return null|string
+     */
     public static function detectDataTypeFromValue($value, $detectedDataType = null) {
         if ($detectedDataType != null) {
             if (in_array($detectedDataType, ['number', 'integer', 'float', 'double', 'currency']) && !is_numeric($value)) {
@@ -186,8 +217,17 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         return null;
     }
 
+    /**
+     * @param mixed       $value
+     * @param null|string $dataType
+     *
+     * @return mixed
+     */
     public static function convertToDataType($value, $dataType) {
         if ($dataType == 'currency') {
+            return (double) $value;
+        }
+        if ($dataType == CExporter::DATA_TYPE_NUMBER || $dataType == CExporter::DATA_TYPE_INTEGER) {
             return (double) $value;
         }
         if ($dataType == 'datetime') {
@@ -205,6 +245,11 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         return $value;
     }
 
+    /**
+     * @param null|string $dataType
+     *
+     * @return null|string
+     */
     public static function dataTypeToColumnFormat($dataType) {
         if ($dataType == CExporter::DATA_TYPE_DATE) {
             return NumberFormat::FORMAT_DATE_YYYYMMDD;
@@ -219,6 +264,15 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         if ($dataType == CExporter::DATA_TYPE_INTEGER || $dataType == CExporter::DATA_TYPE_NUMBER) {
             return NumberFormat::FORMAT_NUMBER;
         }
+        if ($dataType == CExporter::DATA_TYPE_PERCENTAGE) {
+            return NumberFormat::FORMAT_PERCENTAGE;
+        }
+        if ($dataType == CExporter::DATA_TYPE_PERCENTAGE_0) {
+            return NumberFormat::FORMAT_PERCENTAGE_0;
+        }
+        if ($dataType == CExporter::DATA_TYPE_PERCENTAGE_00) {
+            return NumberFormat::FORMAT_PERCENTAGE_00;
+        }
         if ($dataType == CExporter::DATA_TYPE_STRING) {
             return DataType::TYPE_STRING;
         }
@@ -226,10 +280,16 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         return null;
     }
 
+    /**
+     * @return array
+     */
     public function columnFormats() {
         return $this->columnFormats;
     }
 
+    /**
+     * @return array
+     */
     public function headings() {
         $columns = $this->table->getColumns();
         $heading = [];
@@ -240,6 +300,11 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         return $heading;
     }
 
+    /**
+     * @param CExporter_Event_AfterSheet $event
+     *
+     * @return void
+     */
     public function handleAfterSheet(CExporter_Event_AfterSheet $event) {
         $worksheet = $event->sheet->getDelegate();
         $columnString = $worksheet->getHighestColumn();
@@ -248,12 +313,6 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         // last column as letter value (e.g., D)
         $lastColumnStr = Coordinate::stringFromColumnIndex($lastColumn);
 
-        // set up a style array for cell formatting
-        $styleTextCenter = [
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER
-            ]
-        ];
         if ($this->headingBackgroundColor) {
             $worksheet->getStyle('A1:' . $lastColumnStr . '1')->applyFromArray(
                 [
@@ -287,7 +346,6 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
                 $worksheet->setCellValue(sprintf('A%d', $i), $reportHeaders[$i - 1]);
             }
         }
-        //$worksheet->getStyle(sprintf('A%d:A%d', $i, $headersCount))->applyFromArray($styleTextCenter);
 
         $lastRow = $worksheet->getHighestRow();
 
@@ -305,7 +363,7 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
             if ($dataType) {
                 $worksheet->setCellValueExplicit(Coordinate::stringFromColumnIndex($lastColumn) . $currentRow, $value, $dataType);
             } else {
-                $worksheet->setCellValue(Coordinate::stringFromColumnIndex($lastColumn) . $currentRow, $value, $dataType);
+                $worksheet->setCellValue(Coordinate::stringFromColumnIndex($lastColumn) . $currentRow, $value);
             }
         }
 

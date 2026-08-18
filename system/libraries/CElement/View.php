@@ -3,16 +3,25 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 28, 2020
+ * Renders a CView_View (with an optional data payload) as an element.
  */
 class CElement_View extends CElement {
     use CElement_Trait_UseViewTrait;
 
+    /**
+     * Keyed cache of CElement_PseudoElement instances, lazily created by viewElement().
+     *
+     * @var CElement_PseudoElement[]
+     */
     protected $viewElement;
 
+    /**
+     * @param string                 $id
+     * @param null|CView_View|string $view
+     * @param array                  $data
+     *
+     * @return void
+     */
     public function __construct($id, $view = null, $data = []) {
         parent::__construct($id);
         if ($view != null) {
@@ -25,10 +34,20 @@ class CElement_View extends CElement {
         });
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         return $this->getViewHtml($indent);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         return $this->getViewJs($indent);
     }

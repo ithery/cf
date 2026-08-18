@@ -4,6 +4,7 @@ use MongoDB\Client;
 
 class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     use CTrait_Compat_Database_Driver_MongoDB;
+
     /**
      * Database connection link.
      */
@@ -34,7 +35,6 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         $this->db = $db;
         $this->dbConfig = $config;
         $this->connect();
-        CF::log(CLogger::DEBUG, 'MongoDB Database Driver Initialized');
     }
 
     public function close() {
@@ -55,7 +55,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      *
      * @return bool
      */
-    protected function hasDsnString(array $config = null) {
+    protected function hasDsnString(?array $config = null) {
         if ($config == null) {
             $config = $this->dbConfig;
         }
@@ -72,7 +72,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      *
      * @return string
      */
-    protected function getDsnString(array $config = null) {
+    protected function getDsnString(?array $config = null) {
         if ($config == null) {
             $config = $this->dbConfig;
         }
@@ -89,7 +89,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      *
      * @return string
      */
-    protected function getHostDsn(array $config = null) {
+    protected function getHostDsn(?array $config = null) {
         if ($config == null) {
             $config = $this->dbConfig;
         }
@@ -129,7 +129,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      *
      * @return string
      */
-    protected function getDsn(array $config = null) {
+    protected function getDsn(?array $config = null) {
         if ($config == null) {
             $config = $this->dbConfig;
         }

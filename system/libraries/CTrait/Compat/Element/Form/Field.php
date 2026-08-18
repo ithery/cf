@@ -3,10 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 17, 2018, 2:29:43 AM
  * @see CElement_Component_Form_Field
  */
 //@codingStandardsIgnoreStart
@@ -20,58 +16,156 @@ trait CTrait_Compat_Element_Form_Field {
      * @return $this
      */
     public function set_label($text, $lang = true) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->setLabel($text, $lang);
     }
 
+    /**
+     * @param null|string $style_form_group
+     *
+     * @deprecated since 1.2 use setStyleFormGroup
+     *
+     * @return $this
+     */
     public function set_style_form_group($style_form_group) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->setStyleFormGroup($style_form_group);
     }
 
+    /**
+     * @param string $id
+     *
+     * @deprecated since 1.2 use setGroupId
+     *
+     * @return $this
+     */
     public function set_group_id($id) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->setGroupId($id);
     }
 
+    /**
+     * @param string $class
+     *
+     * @deprecated since 1.2 use addGroupClass
+     *
+     * @return $this
+     */
     public function add_group_class($class) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->addGroupClass($class);
     }
 
+    /**
+     * @param string $key
+     * @param string $val
+     *
+     * @deprecated since 1.2 use groupCustomCss
+     *
+     * @return $this
+     */
     public function group_custom_css($key, $val) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->groupCustomCss($key, $val);
     }
 
+    /**
+     * @param int|string $size
+     *
+     * @deprecated since 1.2 use setLabelSize
+     *
+     * @return $this
+     */
     public function set_label_size($size) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->setLabelSize($size);
     }
 
+    /**
+     * @param string $info_text
+     *
+     * @deprecated since 1.2 use setInfoText
+     *
+     * @return $this
+     */
     public function set_info_text($info_text) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->setInfoText($info_text);
     }
 
+    /**
+     * @deprecated since 1.2 use showLabel
+     *
+     * @return $this
+     */
     public function show_label() {
+        /** @var CElement_Component_Form_Field $this */
         return $this->showLabel();
     }
 
+    /**
+     * @deprecated since 1.2 use hideLabel
+     *
+     * @return $this
+     */
     public function hide_label() {
+        /** @var CElement_Component_Form_Field $this */
         return $this->hideLabel();
     }
 
+    /**
+     * @deprecated since 1.2 use styleFormInline
+     *
+     * @return $this
+     */
     public function style_form_inline() {
+        /** @var CElement_Component_Form_Field $this */
         return $this->styleFormInline();
     }
 
+    /**
+     * @param string $label_class
+     *
+     * @deprecated since 1.2 use addLabelClass
+     *
+     * @return $this
+     */
     public function add_label_class($label_class) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->addLabelClass($label_class);
     }
 
+    /**
+     * @param string $control_class
+     *
+     * @deprecated since 1.2 use addControlClass
+     *
+     * @return $this
+     */
     public function add_control_class($control_class) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->addControlClass($control_class);
     }
 
+    /**
+     * @deprecated since 1.2 use getInlineWithoutDefault
+     *
+     * @return string
+     */
     public function get_inline_without_default() {
+        /** @var CElement_Component_Form_Field $this */
         return $this->getInlineWithoutDefault();
     }
 
+    /**
+     * @param string $inline_without_default
+     *
+     * @deprecated since 1.2 use setInlineWithoutDefault
+     *
+     * @return $this
+     */
     public function set_inline_without_default($inline_without_default) {
+        /** @var CElement_Component_Form_Field $this */
         return $this->setInlineWithoutDefault($inline_without_default);
     }
 }

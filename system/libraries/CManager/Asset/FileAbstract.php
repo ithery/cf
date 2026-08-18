@@ -79,6 +79,7 @@ abstract class CManager_Asset_FileAbstract {
             }
         }
         $assetFile = $this->fullpath($dirFile);
+
         if (strpos($dirFile, 'http') !== false) {
             $assetFile = $dirFile;
         } else {
@@ -98,6 +99,15 @@ abstract class CManager_Asset_FileAbstract {
 
     abstract protected function render();
 
+    public function getMediaPaths() {
+        $dirs = CF::getDirs('media');
+
+        $dirs = array_merge($this->mediaPaths, $dirs);
+
+        return $dirs;
+    }
+
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->getPath();
     }

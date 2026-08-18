@@ -3,7 +3,7 @@
 trait CTrait_Controller_Application_Log_Activity {
     public function activity() {
         if (!isset($this->logActivityModel)) {
-            $this->logActivityModel = CApp_Model_LogActivity::class;
+            $this->logActivityModel = CF::config('app.model.log_activity', CApp_Model_LogActivity::class);
         }
         $app = c::app();
 

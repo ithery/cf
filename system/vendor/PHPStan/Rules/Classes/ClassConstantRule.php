@@ -3,14 +3,21 @@
 namespace PHPStan\Rules\Classes;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr\BinaryOp\Identical;
 use PhpParser\Node\Expr\ClassConstFetch;
+use PhpParser\Node\Name;
+use PhpParser\Node\Scalar\String_;
 use PHPStan\Analyser\NullsafeOperatorHelper;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Internal\SprintfHelper;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Rules\ClassCaseSensitivityCheck;
+use PHPStan\Rules\ClassNameCheck;
 use PHPStan\Rules\ClassNameNodePair;
+use PHPStan\Rules\ClassNameUsageLocation;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
@@ -28,14 +35,17 @@ use function strtolower;
 /**
  * @implements Rule<Node\Expr\ClassConstFetch>
  */
-class ClassConstantRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ClassConstantRule implements Rule
 {
 
 	public function __construct(
 		private ReflectionProvider $reflectionProvider,
 		private RuleLevelHelper $ruleLevelHelper,
-		private ClassCaseSensitivityCheck $classCaseSensitivityCheck,
+		private ClassNameCheck $classCheck,
 		private PhpVersion $phpVersion,
+		#[AutowiredParameter(ref: '%featureToggles.checkNonStringableDynamicAccess%')]
+		private bool $checkNonStringableDynamicAccess,
 	)
 	{
 	}
@@ -47,11 +57,54 @@ class ClassConstantRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if (!$node->name instanceof Node\Identifier) {
-			return [];
-		}
-		$constantName = $node->name->name;
+		$errors = [];
+		if ($node->name instanceof Node\Identifier) {
+			$constantNameScopes = [$node->name->name => $scope];
+		} else {
+			$nameType = $scope->getType($node->name);
+			$constantNameScopes = [];
+			foreach ($nameType->getConstantStrings() as $constantString) {
+				$name = $constantString->getValue();
+				$constantNameScopes[$name] = $scope->filterByTruthyValue(new Identical($node->name, new String_($name)));
+			}
 
+			if ($this->checkNonStringableDynamicAccess) {
+				$nameTypeResult = $this->ruleLevelHelper->findTypeToCheck(
+					$scope,
+					$node->name,
+					'',
+					static fn (Type $type) => $type->isString()->yes(),
+				);
+
+				$nameType = $nameTypeResult->getType();
+				if (!$nameType instanceof ErrorType && !$nameType->isString()->yes()) {
+					$className = $node->class instanceof Name
+						? $scope->resolveName($node->class)
+						: $scope->getType($node->class)->describe(VerbosityLevel::typeOnly());
+
+					$errors[] = RuleErrorBuilder::message(sprintf('Class constant name for %s must be a string, but %s was given.', $className, $nameType->describe(VerbosityLevel::precise())))
+						->identifier('classConstant.nameNotString')
+						->build();
+				}
+			}
+		}
+
+		foreach ($constantNameScopes as $constantName => $constantScope) {
+			$errors = array_merge($errors, $this->processSingleClassConstFetch(
+				$constantScope,
+				$node,
+				(string) $constantName, // @phpstan-ignore cast.useless
+			));
+		}
+
+		return $errors;
+	}
+
+	/**
+	 * @return list<IdentifierRuleError>
+	 */
+	private function processSingleClassConstFetch(Scope $scope, ClassConstFetch $node, string $constantName): array
+	{
 		$class = $node->class;
 		$messages = [];
 		if ($class instanceof Node\Name) {
@@ -60,7 +113,9 @@ class ClassConstantRule implements Rule
 			if (in_array($lowercasedClassName, ['self', 'static'], true)) {
 				if (!$scope->isInClass()) {
 					return [
-						RuleErrorBuilder::message(sprintf('Using %s outside of class scope.', $className))->build(),
+						RuleErrorBuilder::message(sprintf('Using %s outside of class scope.', $className))
+							->identifier(sprintf('outOfClass.%s', $lowercasedClassName))
+							->build(),
 					];
 				}
 
@@ -68,7 +123,9 @@ class ClassConstantRule implements Rule
 			} elseif ($lowercasedClassName === 'parent') {
 				if (!$scope->isInClass()) {
 					return [
-						RuleErrorBuilder::message(sprintf('Using %s outside of class scope.', $className))->build(),
+						RuleErrorBuilder::message(sprintf('Using %s outside of class scope.', $className))
+							->identifier(sprintf('outOfClass.%s', $lowercasedClassName))
+							->build(),
 					];
 				}
 				$currentClassReflection = $scope->getClassReflection();
@@ -78,7 +135,7 @@ class ClassConstantRule implements Rule
 							'Access to parent::%s but %s does not extend any class.',
 							$constantName,
 							$currentClassReflection->getDisplayName(),
-						))->build(),
+						))->identifier('class.noParent')->build(),
 					];
 				}
 				$classType = $scope->resolveTypeByName($class);
@@ -90,20 +147,51 @@ class ClassConstantRule implements Rule
 
 					if (strtolower($constantName) === 'class') {
 						return [
-							RuleErrorBuilder::message(sprintf('Class %s not found.', $className))->discoveringSymbolsTip()->build(),
+							RuleErrorBuilder::message(sprintf('Class %s not found.', $className))
+								->identifier('class.notFound')
+								->discoveringSymbolsTip()
+								->build(),
 						];
 					}
 
 					return [
 						RuleErrorBuilder::message(
 							sprintf('Access to constant %s on an unknown class %s.', $constantName, $className),
-						)->discoveringSymbolsTip()->build(),
+						)
+							->identifier('class.notFound')
+							->discoveringSymbolsTip()
+							->build(),
 					];
-				} else {
-					$messages = $this->classCaseSensitivityCheck->checkClassNames([new ClassNameNodePair($className, $class)]);
 				}
 
 				$classType = $scope->resolveTypeByName($class);
+				if (strtolower($constantName) !== 'class') {
+					foreach ($classType->getObjectClassReflections() as $classTypeReflection) {
+						if (!$classTypeReflection->isTrait()) {
+							continue;
+						}
+
+						return [
+							RuleErrorBuilder::message(sprintf(
+								'Cannot access constant %s on trait %s.',
+								$constantName,
+								$classTypeReflection->getDisplayName(),
+							))->identifier('classConstant.onTrait')->build(),
+						];
+					}
+				}
+
+				$locationData = [];
+				$locationClassReflection = $this->reflectionProvider->getClass($className);
+				if ($locationClassReflection->hasConstant($constantName)) {
+					$locationData['classConstant'] = $locationClassReflection->getConstant($constantName);
+				}
+
+				$messages = $this->classCheck->checkClassNames(
+					$scope,
+					[new ClassNameNodePair($className, $class)],
+					ClassNameUsageLocation::from(ClassNameUsageLocation::CLASS_CONSTANT_ACCESS, $locationData),
+				);
 			}
 
 			if (strtolower($constantName) === 'class') {
@@ -125,6 +213,7 @@ class ClassConstantRule implements Rule
 				if (!$this->phpVersion->supportsClassConstantOnExpression()) {
 					return [
 						RuleErrorBuilder::message('Accessing ::class constant on an expression is supported only on PHP 8.0 and later.')
+							->identifier('classConstant.notSupported')
 							->nonIgnorable()
 							->build(),
 					];
@@ -133,6 +222,7 @@ class ClassConstantRule implements Rule
 				if (!$class instanceof Node\Scalar\String_ && $classType->isString()->yes()) {
 					return [
 						RuleErrorBuilder::message('Accessing ::class constant on a dynamic string is not supported in PHP.')
+							->identifier('classConstant.dynamicString')
 							->nonIgnorable()
 							->build(),
 					];
@@ -156,7 +246,7 @@ class ClassConstantRule implements Rule
 					'Cannot access constant %s on %s.',
 					$constantName,
 					$typeForDescribe->describe(VerbosityLevel::typeOnly()),
-				))->build(),
+				))->identifier('classConstant.nonObject')->build(),
 			]);
 		}
 
@@ -170,7 +260,7 @@ class ClassConstantRule implements Rule
 					'Access to undefined constant %s::%s.',
 					$typeForDescribe->describe(VerbosityLevel::typeOnly()),
 					$constantName,
-				))->build(),
+				))->identifier('classConstant.notFound')->build(),
 			]);
 		}
 
@@ -182,6 +272,9 @@ class ClassConstantRule implements Rule
 					$constantReflection->isPrivate() ? 'private' : 'protected',
 					$constantName,
 					$constantReflection->getDeclaringClass()->getDisplayName(),
+				))->identifier(sprintf(
+					'classConstant.%s',
+					$constantReflection->isPrivate() ? 'private' : 'protected',
 				))->build(),
 			]);
 		}

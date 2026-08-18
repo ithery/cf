@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 15, 2019, 8:06:59 PM
- */
 abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Contract_UserInterface {
     /**
      * The unique identifier for the user.
@@ -140,6 +134,7 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Co
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return array_key_exists($offset, $this->user);
     }
@@ -151,6 +146,7 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Co
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->user[$offset];
     }
@@ -163,6 +159,7 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Co
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->user[$offset] = $value;
     }
@@ -174,6 +171,7 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Co
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         unset($this->user[$offset]);
     }

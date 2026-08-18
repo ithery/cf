@@ -1,70 +1,163 @@
 # Application - Authentication
+
+CApp provides a built-in authentication system with guards, providers, and session management. The API is similar to Laravel's authentication.
+
 ### Configuration
 
-Konfigurasi auth terletak pada file `auth.php`
+Authentication is configured in `config/auth.php`. The two key concepts are:
 
-Pada konfigurasi auth, ada 2 element penting yang perlu diperhatikan adalah guard dan provider.
+- **Guards** — define how users are authenticated for each request (e.g. session-based, token-based)
+- **Providers** — define how users are retrieved from the database
 
-### Database
+```php
+<?php
+// system/config/auth.php (defaults)
+return [
+    'defaults' => [
+        'guard' => 'web',
+        'passwords' => 'users',
+    ],
+    'guards' => [
+        'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+    ],
+];
+```
 
-Secara default CApp sudah menyertakan model `CApp_Model_User` yang akan digunakan pada model user untuk proses authentikasi.
+### Requiring Login
 
-Ketika membuat table users baru, yang perlu diperhatikan adalah harus ada kolom `password` minimal 60 karakter, dan kolom `remember_token` dengan minimal 100 karakter.
+Use `setLoginRequired()` to protect pages that require authentication:
 
-Kolom `remember_token` akan digunakan untuk menyimpan token yang diperoleh saat user memilih "remember me" option saat user login pada aplikasi
+```php
+<?php
+// In bootstrap.php (applies to all pages)
+c::app()->setLoginRequired(true);
 
+// In a specific controller
+public function index() {
+    $app = c::app();
+    $app->setLoginRequired(true);
+    // ...
+}
+```
+
+When login is required and the user is not authenticated, CApp automatically renders the login view.
+
+### Database Setup
+
+The framework includes a default `CApp_Model_User` model for authentication. When creating a users table, ensure it has:
+
+- A `password` column — minimum 60 characters (for bcrypt hashes)
+- A `remember_token` column — minimum 100 characters (for "remember me" functionality)
+
+### Checking Authentication
+
+```php
+// Check if user is logged in
+if (c::auth()->check()) {
+    // authenticated
+}
+
+// Check if user is a guest
+if (c::auth()->guest()) {
+    // not authenticated
+}
+
+// Get the authenticated user
+$user = c::auth()->user();
+
+// Get the authenticated user's ID
+$id = c::auth()->id();
+```
+
+The `c::app()->user()` shorthand also returns the current user:
+
+```php
+$user = c::app()->user();
+```
 
 ### Login
 
-Contoh Kode:
+Authenticate a user with credentials using `attempt()`:
 
 ```php
+<?php
 public function login() {
-    $post = c::request()->post();
-    if (!empty($post)) {
-        $email = isset($post['email']) ? $post['email'] : '';
-        $password = isset($post['password']) ? $post['password'] : '';
-        $rememberMe = isset($post['remember-me']) ? true : false;
+    $request = c::request();
 
-        $errCode = 0;
-        $errMessage = '';
-        $json = [];
+    if ($request->isMethod('post')) {
+        $email = $request->input('email', '');
+        $password = $request->input('password', '');
+        $rememberMe = $request->boolean('remember-me');
 
-        if ($errCode == 0) {
-            if (strlen($email) == 0) {
-                $errCode++;
-                $errMessage = 'Email required';
+        try {
+            $success = c::app()->auth()->attempt(
+                ['username' => $email, 'password' => $password],
+                $rememberMe
+            );
+
+            if ($success) {
+                return c::redirect('app/home');
             }
-        }
-        if ($errCode == 0) {
-            if (strlen($password) == 0) {
-                $errCode++;
-                $errMessage = 'Password required';
-            }
-        }
 
-        if ($errCode == 0) {
-            try {
-                $successLogin = c::app()->auth()->attempt(['username' => $email, 'password' => $password], $rememberMe);
-                if ($successLogin) {
-                    cmsg::clear('error');
-                } else {
-                    $errCode++;
-                    $errMessage = 'Username/Password Invalid';
-                }
-            } catch (Exception $ex) {
-                $errCode++;
-                $errMessage = $ex->getMessage();
-            }
+            return MyApp::jsonResponse(1, 'Invalid credentials');
+        } catch (Exception $e) {
+            return MyApp::jsonResponse(1, $e->getMessage());
         }
-
-        return c::base()->toJsonResponse($errCode, $errMessage, $json);
     }
 
+    // Already logged in
     if (c::auth()->check()) {
-        return c::redirect('admin/home');
+        return c::redirect('app/home');
     }
 
+    // Show login page
     return c::app();
 }
+```
+
+### Logout
+
+```php
+<?php
+public function logout() {
+    c::auth()->logout();
+
+    return c::redirect('home');
+}
+```
+
+### Guards
+
+Use a specific guard when your application has multiple authentication contexts (e.g. web users and API tokens):
+
+```php
+// Use the default guard
+$user = c::auth()->user();
+
+// Use a specific guard
+$user = c::auth('api')->user();
+
+// Via CApp
+$user = c::app()->auth('admin')->user();
+```
+
+### Auth Features
+
+Configure which authentication features are available in `config/app.php`:
+
+```php
+<?php
+return [
+    'auth' => [
+        'features' => [
+            'login' => true,
+            'registration' => true,
+            'resetPasswords' => true,
+            'emailVerification' => false,
+        ],
+    ],
+];
 ```

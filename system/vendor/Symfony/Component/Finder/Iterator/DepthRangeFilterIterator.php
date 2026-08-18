@@ -17,7 +17,6 @@ namespace Symfony\Component\Finder\Iterator;
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class DepthRangeFilterIterator extends \FilterIterator {
-
     private $minDepth = 0;
 
     /**
@@ -37,8 +36,8 @@ class DepthRangeFilterIterator extends \FilterIterator {
      *
      * @return bool true if the value should be kept, false otherwise
      */
+    #[\ReturnTypeWillChange]
     public function accept() {
         return $this->getInnerIterator()->getDepth() >= $this->minDepth;
     }
-
 }

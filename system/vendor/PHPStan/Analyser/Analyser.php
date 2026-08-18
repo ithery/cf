@@ -5,21 +5,29 @@ namespace PHPStan\Analyser;
 use Closure;
 use PHPStan\Collectors\CollectedData;
 use PHPStan\Collectors\Registry as CollectorRegistry;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Rules\Registry as RuleRegistry;
 use Throwable;
 use function array_fill_keys;
 use function array_merge;
 use function count;
-use function sprintf;
+use function memory_get_peak_usage;
 
-class Analyser
+/**
+ * @phpstan-import-type CollectorData from CollectedData
+ */
+#[AutowiredService]
+final class Analyser
 {
 
 	public function __construct(
 		private FileAnalyser $fileAnalyser,
 		private RuleRegistry $ruleRegistry,
 		private CollectorRegistry $collectorRegistry,
+		#[AutowiredParameter(ref: '@' . NodeScopeResolver::class)]
 		private NodeScopeResolver $nodeScopeResolver,
+		#[AutowiredParameter]
 		private int $internalErrorsCountLimit,
 	)
 	{
@@ -28,7 +36,7 @@ class Analyser
 	/**
 	 * @param string[] $files
 	 * @param Closure(string $file): void|null $preFileCallback
-	 * @param Closure(int ): void|null $postFileCallback
+	 * @param Closure(int, list<string>=): void|null $postFileCallback
 	 * @param string[]|null $allAnalysedFiles
 	 */
 	public function analyse(
@@ -48,14 +56,27 @@ class Analyser
 
 		/** @var list<Error> $errors */
 		$errors = [];
+		/** @var list<Error> $filteredPhpErrors */
+		$filteredPhpErrors = [];
+		/** @var list<Error> $allPhpErrors */
+		$allPhpErrors = [];
 
-		/** @var list<CollectedData> $collectedData */
+		/** @var list<Error> $locallyIgnoredErrors */
+		$locallyIgnoredErrors = [];
+
+		$linesToIgnore = [];
+		$unmatchedLineIgnores = [];
+
+		/** @var CollectorData $collectedData */
 		$collectedData = [];
 
 		$internalErrorsCount = 0;
 		$reachedInternalErrorsCountLimit = false;
 		$dependencies = [];
+		$usedTraitDependencies = [];
+		$packageDependencies = [];
 		$exportedNodes = [];
+		$allProcessedFiles = [];
 		foreach ($files as $file) {
 			if ($preFileCallback !== null) {
 				$preFileCallback($file);
@@ -70,8 +91,18 @@ class Analyser
 					null,
 				);
 				$errors = array_merge($errors, $fileAnalyserResult->getErrors());
+				$filteredPhpErrors = array_merge($filteredPhpErrors, $fileAnalyserResult->getFilteredPhpErrors());
+				$allPhpErrors = array_merge($allPhpErrors, $fileAnalyserResult->getAllPhpErrors());
+				$processedFiles = $fileAnalyserResult->getProcessedFiles();
+				$allProcessedFiles = array_merge($allProcessedFiles, $processedFiles);
+
+				$locallyIgnoredErrors = array_merge($locallyIgnoredErrors, $fileAnalyserResult->getLocallyIgnoredErrors());
+				$linesToIgnore[$file] = $fileAnalyserResult->getLinesToIgnore();
+				$unmatchedLineIgnores[$file] = $fileAnalyserResult->getUnmatchedLineIgnores();
 				$collectedData = array_merge($collectedData, $fileAnalyserResult->getCollectedData());
 				$dependencies[$file] = $fileAnalyserResult->getDependencies();
+				$usedTraitDependencies[$file] = $fileAnalyserResult->getUsedTraitDependencies();
+				$packageDependencies[$file] = $fileAnalyserResult->getPackageDependencies();
 
 				$fileExportedNodes = $fileAnalyserResult->getExportedNodes();
 				if (count($fileExportedNodes) > 0) {
@@ -82,14 +113,13 @@ class Analyser
 					throw $t;
 				}
 				$internalErrorsCount++;
-				$internalErrorMessage = sprintf('Internal error: %s', $t->getMessage());
-				$internalErrorMessage .= sprintf(
-					'%sRun PHPStan with --debug option and post the stack trace to:%s%s',
-					"\n",
-					"\n",
-					'https://github.com/phpstan/phpstan/issues/new?template=Bug_report.md',
-				);
-				$errors[] = new Error($internalErrorMessage, $file, null, $t);
+				$errors[] = (new Error($t->getMessage(), $file, canBeIgnored: $t))
+					->withIdentifier('phpstan.internal')
+					->withMetadata([
+						InternalError::STACK_TRACE_METADATA_KEY => InternalError::prepareTrace($t),
+						InternalError::STACK_TRACE_AS_STRING_METADATA_KEY => $t->getTraceAsString(),
+					]);
+				$processedFiles = [$file];
 				if ($internalErrorsCount >= $this->internalErrorsCountLimit) {
 					$reachedInternalErrorsCountLimit = true;
 					break;
@@ -100,16 +130,25 @@ class Analyser
 				continue;
 			}
 
-			$postFileCallback(1);
+			$postFileCallback(1, $processedFiles);
 		}
 
 		return new AnalyserResult(
-			$errors,
-			[],
-			$collectedData,
-			$internalErrorsCount === 0 ? $dependencies : null,
-			$exportedNodes,
-			$reachedInternalErrorsCountLimit,
+			unorderedErrors: $errors,
+			filteredPhpErrors: $filteredPhpErrors,
+			allPhpErrors: $allPhpErrors,
+			locallyIgnoredErrors: $locallyIgnoredErrors,
+			linesToIgnore: $linesToIgnore,
+			unmatchedLineIgnores: $unmatchedLineIgnores,
+			internalErrors: [],
+			collectedData: $collectedData,
+			dependencies: $internalErrorsCount === 0 ? $dependencies : null,
+			usedTraitDependencies: $internalErrorsCount === 0 ? $usedTraitDependencies : null,
+			packageDependencies: $internalErrorsCount === 0 ? $packageDependencies : null,
+			exportedNodes: $exportedNodes,
+			reachedInternalErrorsCountLimit: $reachedInternalErrorsCountLimit,
+			peakMemoryUsageBytes: memory_get_peak_usage(true),
+			processedFiles: $allProcessedFiles,
 		);
 	}
 

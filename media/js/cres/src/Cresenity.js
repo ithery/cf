@@ -26,9 +26,6 @@ import initProgressive from './module/progressive';
 import cresToast from './module/toast';
 import CresAlpine from './module/CresAlpine';
 import SSE from './cresenity/SSE';
-import AlpineCleave from './alpine/cleave';
-import AlpineAutoNumeric from './alpine/autonumeric';
-import AlpineTippy from './alpine/tippy';
 import { attachWaves } from './ui/waves';
 import formatter from './formatter';
 import { initCssDomVar } from './module/css-dom-var';
@@ -42,6 +39,16 @@ import { initMenu } from './module/menu';
 import { formatCurrency, unformatCurrency } from './formatter/currency';
 import { cresQuery } from './module/CresQuery';
 import { isJson } from './util/helper';
+import * as dateFns from 'date-fns';
+import * as dateFnsTz from 'date-fns-tz';
+import CresenityHistory from './history';
+import clsx from './module/clsx';
+import stylex from './module/stylex';
+import collect from 'collect.js';
+import emitter from './cresenity/emitter';
+import bootstrapHelper from './module/BootstrapHelper';
+import cresStyle from './module/CresStyle';
+import DownloadProgress from './module/DownloadProgress';
 
 export default class Cresenity {
     constructor() {
@@ -57,7 +64,8 @@ export default class Cresenity {
             'cresenity:loaded',
             'cresenity:js:loaded',
             'cresenity:ui:start',
-            'cresenity:notification:message'
+            'cresenity:notification:message',
+            'cresenity:history:statechange'
         ];
         this.modalElements = [];
         this.cresenityEventList = [
@@ -95,6 +103,13 @@ export default class Cresenity {
         this.$ = cresQuery;
         this.version = '1.4.1';
         this.checkAuthenticationInterval = null;
+        this.dateFns = dateFns;
+        this.dateFnsTz = dateFnsTz;
+        this.clsx = clsx;
+        this.stylex = stylex;
+        this.collect = collect;
+        this.emitter = emitter;
+        this.download = new DownloadProgress(this);
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -155,21 +170,23 @@ export default class Cresenity {
     on(eventName, cb) {
         window.addEventListener('cresenity:' + eventName, cb);
     }
-
+    async handleResponseAsync(data) {
+        if(data.assets) {
+            if(data.assets.css) {
+                for (let i = 0; i < data.assets.css.length; i++) {
+                    await this.cf.requireCssAsync(data.assets.css[i]);
+                }
+            }
+            if(data.assets.js) {
+                for (let i = 0; i < data.assets.js.length; i++) {
+                    await this.cf.requireJsAsync(data.assets.js[i]);
+                }
+            }
+        }
+        return data;
+    }
     handleResponse(data, callback) {
-        if (data.cssRequire && data.cssRequire.length > 0) {
-            for (let i = 0; i < data.cssRequire.length; i++) {
-                this.cf.require(data.cssRequire[i], 'css');
-            }
-        }
-
-        if (data.css_require && data.css_require.length > 0) {
-            for (let i = 0; i < data.css_require.length; i++) {
-                this.cf.require(data.css_require[i], 'css');
-            }
-        }
-
-        callback();
+        this.handleResponseAsync(data).then(callback);
     }
     htmlModal(html) {
         showHtmlModal(html);
@@ -313,7 +330,6 @@ export default class Cresenity {
                                     $(element).html(data.html);
                                     break;
                             }
-
                             if (data.js && data.js.length > 0) {
                                 let script = this.base64.decode(data.js);
                                 eval(script);
@@ -341,7 +357,7 @@ export default class Cresenity {
                 complete: () => {
                     this.dispatch('reload:complete');
                     $(element).data('xhr', false);
-                    if (typeof settings.onBlock === 'function') {
+                    if (typeof settings.onUnblock === 'function') {
                         settings.onUnblock($(element));
                     } else {
                         this.unblockElement($(element));
@@ -372,7 +388,6 @@ export default class Cresenity {
         this.reload(options);
     }
     isDebug() {
-        console.log(this.cf.getConfig().environment);
         if(this.cf.getConfig().environment == 'production') {
             return false;
         }
@@ -419,7 +434,7 @@ export default class Cresenity {
             settings.headerText = settings.title;
         }
 
-        let modalContainer = jQuery('<div>').addClass('modal');
+        let modalContainer = jQuery('<div>').addClass('modal cres-modal').attr('role', 'dialog');
 
         if (settings.modalClass) {
             modalContainer.addClass(settings.modalClass);
@@ -432,7 +447,7 @@ export default class Cresenity {
         if (settings.isFull) {
             modalContainer.addClass('sidebar full');
         }
-        let modalDialog = jQuery('<div>').addClass('modal-dialog modal-xl');
+        let modalDialog = jQuery('<div>').addClass('modal-dialog modal-xl').attr('role', 'document');
         let modalContent = jQuery('<div>').addClass('modal-content');
 
         let modalHeader = jQuery('<div>').addClass('modal-header');
@@ -449,6 +464,9 @@ export default class Cresenity {
             modalTitle.html(settings.headerText);
             modalHeader.append(modalTitle).append(modalButtonClose);
             modalContent.append(modalHeader);
+            if(typeof modalTitle == 'string') {
+                modalContainer.attr('aria-labelledby', modalTitle);
+            }
         }
         modalDialog.append(modalContent);
         if (settings.haveFooter) {
@@ -516,10 +534,16 @@ export default class Cresenity {
             reloadOptions.selector = modalBody;
             this.reload(reloadOptions);
         }
-
-        modalContainer.modal({
-            backdrop: settings.backdrop
-        });
+        if(bootstrapHelper.isBootstrap5()) {
+            let modal = new window.bootstrap.Modal(modalContainer[0], {
+                backdrop: settings.backdrop
+            });
+            modal.show();
+        } else {
+            modalContainer.modal({
+                backdrop: settings.backdrop
+            });
+        }
 
         return modalContainer;
     }
@@ -529,6 +553,14 @@ export default class Cresenity {
             let lastModal = this.modalElements[this.modalElements.length - 1];
 
             lastModal.modal('hide');
+        }
+    }
+    closeAllDialog() {
+        if (this.modalElements.length > 0) {
+            for(let i = this.modalElements.length-1; i>=0; i--) {
+                const modal = this.modalElements[i];
+                modal.modal('hide');
+            }
         }
     }
     closeDialog() {
@@ -541,11 +573,15 @@ export default class Cresenity {
             method: 'post'
         }, options);
         let dataAddition = settings.dataAddition;
+        let requestData = settings.data;
+        if (typeof requestData === 'undefined') {
+            requestData = {};
+        }
+        if(dataAddition) {
+            requestData = extend(requestData, dataAddition);
+        }
         let url = settings.url;
         url = this.url.replaceParam(url);
-        if (typeof dataAddition === 'undefined') {
-            dataAddition = {};
-        }
         if (settings.block) {
             this.blockPage();
         }
@@ -554,7 +590,7 @@ export default class Cresenity {
         let ajaxOptions = {
             url: url,
             dataType: 'json',
-            data: dataAddition,
+            data: requestData,
             type: settings.method,
 
             success: (response) => {
@@ -578,8 +614,13 @@ export default class Cresenity {
                 }
             },
             error: (xhr, errorAjaxOptions, thrownError) => {
+                if(xhr.readyState == 4) {
+                    if(xhr.status==404) {
+                        this.showError('Not Found');
+                    }
+                }
                 if (thrownError !== 'abort') {
-                    this.showError(thrownError);
+                    this.showError('Something went wrong' + (thrownError ? ' (' + thrownError + ')' : ''));
                 }
             },
 
@@ -928,7 +969,15 @@ export default class Cresenity {
     unblockElement(selector) {
         $(selector).unblock();
     }
-
+    arrayValue(elms) {
+        elms = $(elms);
+        if (elms.length === 0) {
+            return [];
+        }
+        return elms.map((index, elm) => {
+            return this.value(elm);
+        }).get();
+    }
     value(elm) {
         elm = $(elm);
         if (elm.length === 0) {
@@ -951,6 +1000,12 @@ export default class Cresenity {
             return elm.attr('value');
         }
         return elm.html();
+    }
+    isUsingBootstrap() {
+        return bootstrapHelper.isBootstrap();
+    }
+    initDependency() {
+        bootstrapHelper.check();
     }
     initConfirm() {
         elementRendered('a.confirm, button.confirm, input[type=submit].confirm', (el)=>{
@@ -1025,14 +1080,21 @@ export default class Cresenity {
     initCssDomVar() {
         initCssDomVar();
     }
+    initHistory() {
+        this.history = CresenityHistory;
+        if (!this.history.options || !this.history.options.delayInit) {
+            this.history.init();
+            this.history.Adapter.bind(window, 'statechange', function () { // Note: We are using statechange instead of popstate
+                dispatchWindowEvent('cresenity:history:statechange');
+            });
+        }
+    }
     initAlpineAndUi() {
-        Alpine.plugin(AlpineCleave);
-        Alpine.plugin(AlpineAutoNumeric);
-        Alpine.plugin(AlpineTippy);
         window.Alpine = Alpine;
-        this.ui.start();
-        window.Alpine.start();
         this.alpine = new CresAlpine(window.Alpine);
+        this.ui.start();
+        this.cresStyle = cresStyle;
+        window.Alpine.start();
     }
 
     initLiveReload() {
@@ -1064,6 +1126,7 @@ export default class Cresenity {
                     this.scrollToTop.init();
                 }
             }
+            this.initDependency();
             this.initElement();
             this.initConfirm();
             this.initReload();
@@ -1072,6 +1135,7 @@ export default class Cresenity {
             this.initWaves();
             this.initAlpineAndUi();
             this.initCssDomVar();
+            this.initHistory();
 
             this.initLiveReload();
             initProgressive();
@@ -1093,165 +1157,7 @@ export default class Cresenity {
         this.cf.init();
     }
     downloadProgress(options) {
-        let settings = extend({
-            // These are the defaults.
-            method: 'get',
-            dataAddition: {},
-            url: '/',
-            onComplete: false,
-            onSuccess: false,
-            onBlock: false,
-            onUnblock: false
-        }, options);
-
-
-        let method = settings.method;
-
-        let xhr = jQuery(window).data('cappXhrProgress');
-        if (xhr) {
-            xhr.abort();
-        }
-
-        let dataAddition = settings.dataAddition;
-        let url = settings.url;
-        url = this.url.replaceParam(url);
-        if (typeof dataAddition === 'undefined') {
-            dataAddition = {};
-        }
-
-
-        if (typeof settings.onBlock === 'function') {
-            settings.onBlock();
-        } else {
-            this.blockPage();
-        }
-
-        $.ajax({
-            type: method,
-            url: url,
-            dataType: 'json',
-            data: dataAddition,
-            success: (response) => {
-                this.handleJsonResponse(response, (data) => {
-                    let progressUrl = data.progressUrl;
-                    let progressContainer = $('<div>').addClass('cres-download-progress');
-
-                    const interval = setInterval(() => {
-                        $.ajax({
-                            type: method,
-                            url: progressUrl,
-                            dataType: 'json',
-                            success: (responseProgress) => {
-                                this.handleJsonResponse(responseProgress, (dataProgress) => {
-                                    let progressContainerStatus = progressContainer.find('.cres-download-progress-status');
-                                    if (dataProgress.state === 'DONE') {
-                                        progressContainerStatus.empty();
-                                        let innerStatus = $('<div>');
-
-                                        let innerStatusLabel = $('<label>', {
-                                            class: 'mb-3 d-block'
-                                        }).append('Your file is ready');
-                                        let linkDownload = $('<a>', {
-                                            target: '_blank',
-                                            href: dataProgress.fileUrl,
-                                            class: 'btn btn-primary'
-                                        }).append('Download');
-                                        let linkClose = $('<a>', {
-                                            href: 'javascript:;',
-                                            class: 'btn btn-primary ml-3'
-                                        }).append('Close');
-
-                                        innerStatus.append(innerStatusLabel);
-                                        innerStatus.append(linkDownload);
-                                        innerStatus.append(linkClose);
-
-                                        progressContainerStatus.append(innerStatus);
-                                        linkClose.click(() => {
-                                            this.closeLastModal();
-                                        });
-                                        clearInterval(interval);
-                                    } else {
-                                        if(dataProgress.state === 'PENDING') {
-                                            let progressValue = parseFloat(dataProgress.progressValue);
-                                            if(progressValue>0) {
-                                                let progressStatusBar = progressContainer.find('.cres-download-progress-status-bar');
-                                                if(progressStatusBar.length==0) {
-                                                    //create the status bar
-                                                    let progressAnimation = progressContainer.find('.cres-download-progress-animation');
-                                                    progressAnimation.empty();
-                                                    let progressStatusBar = $('<div class="cres-download-progress-status-bar my-4">');
-                                                    let progress = $('<div class="progress">');
-                                                    let progressBar = $('<div class="progress-bar progress-bar-striped progress-bar-animated">');
-                                                    progressAnimation.append(
-                                                        progressStatusBar.append(progress.append(progressBar))
-                                                    );
-                                                }
-
-                                                let progressMax = parseFloat(dataProgress.progressMax);
-                                                if(isNaN(progressMax) || progressMax==0) {
-                                                    progressMax = 100;
-                                                }
-
-                                                let progressBar = progressStatusBar.find('.progress-bar');
-                                                let progressPercent = Math.round(progressMax>0 ? progressValue * 100 / progressMax : 0);
-
-                                                progressBar.css('width', progressPercent + '%');
-                                                progressBar.html(progressPercent + '%');
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                    }, 3000);
-
-                    let innerStatus = $('<div>');
-                    let innerStatusLabel = $('<label>', {
-                        class: 'mb-4'
-                    }).append('Please Wait...');
-                    let innerStatusAnimation = $('<div class="cres-download-progress-animation">').append('<div class="sk-fading-circle sk-primary"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div>');
-                    let innerStatusAction = $('<div>', {
-                        class: 'text-center my-3'
-                    });
-                    let innerStatusCancelButton = $('<button>', {
-                        class: 'btn btn-primary'
-                    }).append('Cancel');
-                    innerStatusAction.append(innerStatusCancelButton);
-                    innerStatus.append(innerStatusLabel);
-                    innerStatus.append(innerStatusAnimation);
-                    innerStatus.append(innerStatusAction);
-                    progressContainer.append($('<div class="text-center">').addClass('cres-download-progress-status')
-                        .append(innerStatus));
-
-                    innerStatusCancelButton.click(() => {
-                        clearInterval(interval);
-                        this.closeLastModal();
-                    });
-
-
-                    this.modal({
-                        message: progressContainer,
-                        modalClass: 'cres-modal-download-progress'
-                    });
-                });
-            },
-            error: (xhrError, ajaxOptions, thrownError) => {
-                if (thrownError !== 'abort') {
-                    this.message('error', 'Error, please call administrator... (' + thrownError + ')');
-                }
-            },
-            complete: () => {
-                if (typeof settings.onBlock === 'function') {
-                    settings.onUnblock();
-                } else {
-                    this.unblockPage();
-                }
-
-                if (typeof settings.onComplete === 'function') {
-                    settings.onComplete();
-                }
-            }
-        });
+        this.download.start(options);
     }
     reactive(data, cb) {
         const reactiveData =Alpine.reactive(data);
@@ -1270,7 +1176,7 @@ export default class Cresenity {
         return this.alpine.getAlpineDataInstance(node);
     }
     handleJsonResponse(response, onSuccess, onError) {
-        let errMessage = 'Unexpected error happen, please relogin ro refresh this page';
+        let errMessage = 'Unexpected error happened, please re-login or refresh this page';
         if (typeof onError == 'string') {
             errMessage = onError;
         }

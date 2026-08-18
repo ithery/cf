@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     /**
      * The hasher implementation.
@@ -132,7 +134,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
                 continue;
             }
 
-            if (is_array($value) || $value instanceof CInterface_Arrayable) {
+            if (is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
             } elseif ($value instanceof Closure) {
                 $value($query);

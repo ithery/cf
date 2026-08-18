@@ -46,7 +46,7 @@ class CAuth_Password_DatabaseTokenRepository implements CAuth_Contract_TokenRepo
     /**
      * Create a new token repository instance.
      *
-     * @param \CDatabase              $connection
+     * @param \CDatabase_Connection   $connection
      * @param \CCrypt_HasherInterface $hasher
      * @param string                  $table
      * @param string                  $hashKey
@@ -56,7 +56,7 @@ class CAuth_Password_DatabaseTokenRepository implements CAuth_Contract_TokenRepo
      * @return void
      */
     public function __construct(
-        CDatabase $connection,
+        CDatabase_Connection $connection,
         CCrypt_HasherInterface $hasher,
         $table,
         $hashKey,
@@ -213,7 +213,7 @@ class CAuth_Password_DatabaseTokenRepository implements CAuth_Contract_TokenRepo
     /**
      * Get the database connection instance.
      *
-     * @return \CDatabase
+     * @return \CDatabase_Connection
      */
     public function getConnection() {
         return $this->connection;

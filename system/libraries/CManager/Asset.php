@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2018, 1:13:38 AM
- */
 class CManager_Asset {
     /**
      * POS CONST.
@@ -132,7 +126,7 @@ class CManager_Asset {
     }
 
     public function varJs() {
-        $varJs = 'window.capp = ' . json_encode(CApp::variables()) . ';';
+        $varJs = 'window.capp = ' . json_encode(c::app()->variables()) . ';';
 
         return $varJs;
     }
@@ -143,19 +137,18 @@ class CManager_Asset {
         if ($documentReady) {
             $js = 'jQuery(document).ready(function(){' . $js . '});';
         }
-        $js .= "
-            if (typeof cappStartedEventInitilized === 'undefined') {
-                cappStartedEventInitilized=false;
-             }
-            if(!cappStartedEventInitilized) {
-                var evt = document.createEvent('Events');
-                evt.initEvent('capp-started', false, true, window, 0);
-                cappStartedEventInitilized=true;
-                document.dispatchEvent(evt);
-            }
+        // $js .= "
+        //     if (typeof cappStartedEventInitilized === 'undefined') {
+        //         cappStartedEventInitilized=false;
+        //      }
+        //     if(!cappStartedEventInitilized) {
+        //         var evt = document.createEvent('Events');
+        //         evt.initEvent('capp-started', false, true, window, 0);
+        //         cappStartedEventInitilized=true;
+        //         document.dispatchEvent(evt);
+        //     }
 
-
-        ";
+        // ";
 
         $js .= CJavascript::compile();
         $bar = CDebug::bar();
@@ -193,7 +186,7 @@ class CManager_Asset {
                 $i++;
             }
         }
-        $jsBefore = CApp::isAjax() ? '' : $this->varJs();
+        $jsBefore = c::request()->ajax() ? '' : $this->varJs();
 
         return $jsBefore . $this->wrapJs($jsOpen . $js . $jsClose);
     }

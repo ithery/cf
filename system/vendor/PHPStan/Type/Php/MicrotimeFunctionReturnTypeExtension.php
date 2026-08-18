@@ -4,18 +4,21 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
+use PHPStan\Type\Accessory\AccessoryNonFalsyStringType;
 use PHPStan\Type\BenevolentUnionType;
-use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\FloatType;
+use PHPStan\Type\IntersectionType;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
 use function count;
 
-class MicrotimeFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class MicrotimeFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -25,26 +28,28 @@ class MicrotimeFunctionReturnTypeExtension implements DynamicFunctionReturnTypeE
 
 	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
 	{
+		$stringType = new IntersectionType([new StringType(), new AccessoryNonFalsyStringType()]);
+
 		if (count($functionCall->getArgs()) < 1) {
-			return new StringType();
+			return $stringType;
 		}
 
 		$argType = $scope->getType($functionCall->getArgs()[0]->value);
-		$isTrueType = (new ConstantBooleanType(true))->isSuperTypeOf($argType);
-		$isFalseType = (new ConstantBooleanType(false))->isSuperTypeOf($argType);
+		$isTrueType = $argType->isTrue();
+		$isFalseType = $argType->isFalse();
 		$compareTypes = $isTrueType->compareTo($isFalseType);
 		if ($compareTypes === $isTrueType) {
 			return new FloatType();
 		}
 		if ($compareTypes === $isFalseType) {
-			return new StringType();
+			return $stringType;
 		}
 
 		if ($argType instanceof MixedType) {
-			return new BenevolentUnionType([new StringType(), new FloatType()]);
+			return new BenevolentUnionType([$stringType, new FloatType()]);
 		}
 
-		return new UnionType([new StringType(), new FloatType()]);
+		return new UnionType([$stringType, new FloatType()]);
 	}
 
 }

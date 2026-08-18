@@ -2,13 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- *
- * @since Aug 11, 2019, 3:25:46 AM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 use League\Flysystem\Cached\CachedAdapter;
 
 class CManager_File_Connector_FileManager_FM_StorageRepository {
@@ -17,6 +10,11 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
      */
     private $disk;
 
+    /**
+     * Storage-relative path (e.g. 'files/{user_slug}') this repository operates on.
+     *
+     * @var string
+     */
     private $path;
 
     /**
@@ -24,21 +22,42 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
      */
     private $helper;
 
+    /**
+     * @param string                                  $storage_path
+     * @param CManager_File_Connector_FileManager_FM  $helper
+     *
+     * @return void
+     */
     public function __construct($storage_path, CManager_File_Connector_FileManager_FM $helper) {
         $this->helper = $helper;
         $this->disk = CStorage::instance()->disk($this->helper->config('disk'));
         $this->path = $storage_path;
     }
 
+    /**
+     * Proxies any undefined method call through to the underlying disk, passing
+     * this repository's own $path as the disk method's first argument.
+     *
+     * @param string $functionName
+     * @param array  $arguments
+     *
+     * @return mixed
+     */
     public function __call($functionName, $arguments) {
         // TODO: remove __call, define all function which storage must support
         return $this->disk->$functionName($this->path, ...$arguments);
     }
 
+    /**
+     * @return bool
+     */
     public function exists() {
         return $this->disk->exists($this->path);
     }
 
+    /**
+     * @return string
+     */
     public function rootPath() {
         $prefixer = $this->disk->getPrefixer();
 
@@ -53,6 +72,11 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
         return $pathPrefix;
     }
 
+    /**
+     * @param CManager_File_Connector_FileManager_FM_Path $newFmPath
+     *
+     * @return mixed
+     */
     public function move($newFmPath) {
         if ($this->isDirectory()) {
             return $this->moveRecursive($this->path, $newFmPath->path('storage'));
@@ -61,6 +85,11 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
         return $this->disk->move($this->path, $newFmPath->path('storage'));
     }
 
+    /**
+     * @param null|string $path defaults to this repository's own $path
+     *
+     * @return bool
+     */
     public function isDirectory($path = null) {
         if ($path == null) {
             $path = $this->path;
@@ -76,6 +105,12 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
         return in_array($path, $this->disk->directories($parentPath));
     }
 
+    /**
+     * @param string $from
+     * @param string $to
+     *
+     * @return mixed
+     */
     protected function moveRecursive($from, $to) {
         if ($this->isDirectory($from)) {
             return $this->moveDirectory($from, $to);
@@ -107,6 +142,11 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
         }
     }
 
+    /**
+     * @param mixed $file
+     *
+     * @return void
+     */
     public function save($file) {
         $nameint = strripos($this->path, '/');
         $nameclean = substr($this->path, $nameint + 1);
@@ -114,20 +154,43 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
         $this->disk->putFileAs($pathclean, $file, $nameclean, 'public');
     }
 
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
     public function url($path) {
         return $this->disk->url($path);
     }
 
+    /**
+     * Creates this repository's own $path as a directory on the disk (visibility
+     * forced to public). Takes variadic arguments passed straight through to the
+     * disk's own makeDirectory() (e.g. mode, recursive, force).
+     *
+     * @return void
+     */
     public function makeDirectory() {
         $this->disk->makeDirectory($this->path, ...func_get_args());
         $this->disk->setVisibility($this->path, 'public');
     }
 
+    /**
+     * @param null|string $path
+     *
+     * @return void
+     */
     protected function createDirectory($path = null) {
-        $this->disk->makeDirectory($path, 755, true, true);
+        // CStorage_Adapter::makeDirectory() only takes $path -- Flysystem's own
+        // createDirectory() already handles recursion, and visibility is set
+        // explicitly below rather than via a mode argument.
+        $this->disk->makeDirectory($path);
         $this->disk->setVisibility($path, 'public');
     }
 
+    /**
+     * @return string
+     */
     public function extension() {
         return pathinfo($this->path, PATHINFO_EXTENSION);
     }

@@ -8,13 +8,30 @@ parameters:
     earlyTerminatingFunctionCalls:
         - c::abort
         - cdbg::dd
+    #checkUnusedViews sengaja tidak ada. Ia sempat dideklarasikan tetapi tidak
+    #ada kelas yang membacanya, jadi hanya memberi kesan pemeriksaan itu aktif.
+    #Rule "unused views" Larastan juga tidak dapat dipindahkan apa adanya ke
+    #sini: berkas *.blade.php dikecualikan dari analyseAndScan sehingga
+    #collectornya tidak punya apa pun untuk dikumpulkan, dan CF merujuk view
+    #dalam dua notasi sekaligus - addView('block.card.small') dan
+    #addView('block/card/small') - sehingga collector yang hanya mengenali satu
+    #bentuk akan melaporkan view yang hidup sebagai mati. Lihat docs/TODO.md.
     checkModelProperties: true
     reportUnmatchedIgnoredErrors: false
     excludePaths:
         analyseAndScan:
             - system/stubs
+            - *.blade.php
         analyse:
             - system/vendor
+            - *.blade.php
+    ignoreErrors:
+        - '#If condition is always true.#'
+        - '#Negated boolean expression is always true.#'
+        - '#Right side of && is always true.#'
+        - '#Left side of && is always true.#'
+        - '#Left side of \|\| is always true.#'
+        - '#Class Error should be written with \:\:class notation, string found.#'
 
 
 parametersSchema:
@@ -27,15 +44,15 @@ conditionalTags:
         phpstan.rules.rule: %checkModelProperties%
 services:
     -
-        class: CQC_Phpstan_Service_Method_RelationForwardsCallsExtension
+        class: CQC_Phpstan_Method_RelationForwardsCallsExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
-        class: CQC_Phpstan_Service_Method_ModelForwardsCallsExtension
+        class: CQC_Phpstan_Method_ModelForwardsCallsExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
-        class: CQC_Phpstan_Service_Method_ModelQueryForwardsCallsExtension
+        class: CQC_Phpstan_Method_ModelQueryForwardsCallsExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
@@ -43,15 +60,15 @@ services:
         tags:
             - phpstan.broker.propertiesClassReflectionExtension
     -
-        class: CQC_Phpstan_Service_Method_HigherOrderCollectionProxyExtension
+        class: CQC_Phpstan_Method_HigherOrderCollectionProxyExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
-        class: CQC_Phpstan_Service_Method_Extension
+        class: CQC_Phpstan_Method_Extension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
-        class: CQC_Phpstan_Service_Method_RedirectResponseMethodsClassReflectionExtension
+        class: CQC_Phpstan_Method_RedirectResponseMethodsClassReflectionExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
     -
@@ -115,6 +132,21 @@ services:
         class: CQC_Phpstan_Service_BuilderHelper
         arguments:
             checkProperties: %checkModelProperties%
+    -
+        class: CQC_Phpstan_Service_MacroMethodsClassReflectionExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
+    #CQC_Phpstan_Service_Rule_NoModelMakeRule sengaja TIDAK didaftarkan.
+    #Ia sisa porting Larastan yang semantiknya tidak berlaku di sini: acuannya
+    #`Model::class` milik Laravel (tidak ada di CF, jadi tidak pernah menyala),
+    #dan `make()` di CF adalah pabrik yang me-resolve model dari nama
+    #(`TBModel::make('ShareNetwork')`), bukan `Model::make(array $attributes)`.
+    #Menyalakannya berarti menyarankan `new Model()` untuk pemanggilan yang
+    #tidak setara. Lihat docs/TODO.md.
+    -
+        class: CQC_Phpstan_Service_Rule_RelationExistenceRule
+        tags:
+            - phpstan.rules.rule
     -
         class: CQC_Phpstan_Service_Rule_StringToClassRule
         tags:

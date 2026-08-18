@@ -4,11 +4,23 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @see https://github.com/nehakadam/DateTimePicker
  */
 class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateTime {
+    /**
+     * CSS selector of the element the picker popup is appended to, set via
+     * {@see setParentElementSelector()}; null uses the plugin's default.
+     *
+     * @var null|string
+     */
+    protected $parentElementSelector;
+
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         c::manager()->registerModule('datetimepicker');
@@ -27,6 +39,9 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
         }
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         $this->setReadonly();
         parent::build();
@@ -36,10 +51,30 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
         $this->after()->addDiv($this->id . '-dtbox');
     }
 
+    /**
+     * @param CRenderable|string $selector
+     *
+     * @return void
+     */
+    public function setParentElementSelector($selector) {
+        if ($selector instanceof CRenderable) {
+            $selector = '#' . $selector->id();
+        }
+        $this->parentElementSelector = $selector;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
     protected function getTranslation($key) {
         return c::__('element/date.datepicker.' . $key);
     }
 
+    /**
+     * @return string
+     */
     private function getShortDayNames() {
         return "[
             '" . $this->getTranslation('daysShort.Sun') . "',
@@ -52,6 +87,9 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
         ]";
     }
 
+    /**
+     * @return string
+     */
     private function getFullDayNames() {
         return "[
             '" . $this->getTranslation('days.Sunday') . "',
@@ -64,6 +102,9 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
         ]";
     }
 
+    /**
+     * @return string
+     */
     private function getShortMonthNames() {
         return "[
             '" . $this->getTranslation('monthsShort.Jan') . "',
@@ -81,6 +122,9 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
         ]";
     }
 
+    /**
+     * @return string
+     */
     private function getFullMonthNames() {
         return "[
             '" . $this->getTranslation('months.January') . "',
@@ -98,6 +142,11 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
         ]";
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $dateTimeFormat = $this->dateTimeFormat;
         $options = '{';
@@ -107,6 +156,9 @@ class CElement_FormInput_DateTime_ModalDateTime extends CElement_FormInput_DateT
         $options .= 'shortMonthNames:' . $this->getShortMonthNames() . ',';
         $options .= 'fullMonthNames:' . $this->getFullMonthNames() . ',';
         $options .= "clearButtonContent:'" . $this->getTranslation('clear') . "',";
+        if ($this->parentElementSelector) {
+            $options .= "parentElement: '" . $this->parentElementSelector . "',";
+        }
 
         $options .= 'isPopup:true,';
         $options .= '}';

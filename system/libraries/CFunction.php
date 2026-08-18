@@ -3,14 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 use Opis\Closure\SerializableClosure as OpisSerializableClosure;
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @version Release:1.1
- *
- * @since Feb 17, 2018, 12:58:00 AM
- */
 class CFunction {
     /**
      * @var string|callable
@@ -28,7 +20,7 @@ class CFunction {
 
     private function __construct($func) {
         if ($func instanceof Closure) {
-            $func = new OpisSerializableClosure($func);
+            $func = new CFunction_SerializableClosure($func);
         }
         $this->func = $func;
     }
@@ -94,6 +86,9 @@ class CFunction {
             if ($this->func instanceof OpisSerializableClosure) {
                 return $this->func->__invoke(...$args);
             }
+            if ($this->func instanceof CFunction_SerializableClosure) {
+                return $this->func->__invoke(...$args);
+            }
         }
         if ($error == 0) {
             if (is_array($this->func)) {
@@ -157,5 +152,43 @@ class CFunction {
         }
 
         return 'ERROR ON CFUNCTION';
+    }
+
+    public static function serializeClosure(Closure $func) {
+        return new CFunction_SerializableClosure($func);
+    }
+
+    public static function isSerializeClosure($func) {
+        return $func instanceof CFunction_SerializableClosure;
+    }
+
+    public static function getClosureCode(Closure $c) {
+        $str = 'function (';
+        $r = new ReflectionFunction($c);
+        $params = [];
+        foreach ($r->getParameters() as $p) {
+            $s = '';
+            if ($p->isArray()) {
+                $s .= 'array ';
+            } elseif ($p->getClass()) {
+                $s .= $p->getClass()->name . ' ';
+            }
+            if ($p->isPassedByReference()) {
+                $s .= '&';
+            }
+            $s .= '$' . $p->name;
+            if ($p->isOptional()) {
+                $s .= ' = ' . var_export($p->getDefaultValue(), true);
+            }
+            $params[] = $s;
+        }
+        $str .= implode(', ', $params);
+        $str .= '){' . PHP_EOL;
+        $lines = file($r->getFileName());
+        for ($l = $r->getStartLine(); $l < $r->getEndLine(); $l++) {
+            $str .= $lines[$l];
+        }
+
+        return $str;
     }
 }

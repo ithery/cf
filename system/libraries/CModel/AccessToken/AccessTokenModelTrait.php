@@ -4,7 +4,7 @@ trait CModel_AccessToken_AccessTokenModelTrait {
     /**
      * Get the tokenable model that the access token belongs to.
      *
-     * @return \CModel_Relationship_MorphTo
+     * @return \CModel_Relation_MorphTo
      */
     public function tokenable() {
         return $this->morphTo('tokenable');
@@ -19,13 +19,13 @@ trait CModel_AccessToken_AccessTokenModelTrait {
      */
     public static function findToken($token) {
         if (strpos($token, '|') === false) {
-            return static::where('token', c::hash('sha256', $token))->first();
+            return static::where('token', hash('sha256', $token))->first();
         }
 
         list($id, $token) = explode('|', $token, 2);
 
         if ($instance = static::find($id)) {
-            return hash_equals($instance->token, c::hash('sha256', $token)) ? $instance : null;
+            return hash_equals($instance->token, hash('sha256', $token)) ? $instance : null;
         }
     }
 

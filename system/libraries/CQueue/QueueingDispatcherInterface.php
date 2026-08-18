@@ -2,13 +2,25 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 2:40:21 AM
- */
 interface CQueue_QueueingDispatcherInterface extends CQueue_DispatcherInterface {
+    /**
+     * Attempt to find the batch with the given ID.
+     *
+     * @param string $batchId
+     *
+     * @return null|\CQueue_Batch
+     */
+    public function findBatch(string $batchId);
+
+    /**
+     * Create a new batch of queueable jobs.
+     *
+     * @param \CCollection|array $jobs
+     *
+     * @return \CQueue_PendingBatch
+     */
+    public function batch($jobs);
+
     /**
      * Dispatch a command to its appropriate handler behind a queue.
      *

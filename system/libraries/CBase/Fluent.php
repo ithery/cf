@@ -1,6 +1,9 @@
 <?php
 
-class CBase_Fluent implements CInterface_Arrayable, ArrayAccess, CInterface_Jsonable, JsonSerializable {
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
+
+class CBase_Fluent implements Arrayable, ArrayAccess, Jsonable, JsonSerializable {
     /**
      * All of the attributes set on the fluent instance.
      *
@@ -60,6 +63,7 @@ class CBase_Fluent implements CInterface_Arrayable, ArrayAccess, CInterface_Json
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->toArray();
     }
@@ -94,6 +98,7 @@ class CBase_Fluent implements CInterface_Arrayable, ArrayAccess, CInterface_Json
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->get($offset);
     }

@@ -38,6 +38,7 @@ return [
             'driver' => 'session',
             'provider' => 'users',
             'sessionName' => 'user',
+            'providerSessionName' => 'user_provider',
             'uri' => [
                 'login' => null,
                 'logout' => null,

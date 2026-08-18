@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 2, 2019, 2:14:21 AM
- */
 trait CQueue_Trait_SerializesModels {
     use CQueue_Trait_SerializesAndRestoresModelIdentifiers;
 

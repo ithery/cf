@@ -2,14 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2018, 10:58:20 PM
- */
-use Opis\Closure\SerializableClosure;
-
 abstract class CAjax_Engine implements CAjax_EngineInterface {
     /**
      * @var CAjax_Method
@@ -26,9 +18,6 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
      */
     protected $args;
 
-    /**
-     * @param string $methodCall
-     */
     public function __construct(CAjax_Method $ajaxMethod) {
         $this->ajaxMethod = $ajaxMethod;
         $this->input = array_merge($_GET, $_POST);
@@ -87,6 +76,15 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
         return $this->ajaxMethod->getArgs();
     }
 
+    /**
+     * Convert response to JSON.
+     *
+     * @param int    $errCode
+     * @param string $errMessage
+     * @param array  $data
+     *
+     * @return \CHTTP_JsonResponse
+     */
     public function toJsonResponse($errCode, $errMessage, $data = []) {
         return c::response()->json([
             'errCode' => $errCode,
@@ -95,11 +93,15 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
         ]);
     }
 
+    /**
+     * Invoke a callback function with the given arguments.
+     *
+     * @param callable $callback
+     * @param array    $args
+     *
+     * @return mixed
+     */
     public function invokeCallback($callback, array $args = []) {
-        if ($callback instanceof SerializableClosure) {
-            return $callback->__invoke(...$args);
-        }
-
-        return call_user_func_array($callback, $args);
+        return c::call($callback, $args);
     }
 }

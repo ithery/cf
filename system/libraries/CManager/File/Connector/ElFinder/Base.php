@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 28, 2019, 3:04:58 AM
- */
 use CManager_File_Connector_ElFinder_Session as elFinderSession;
 
 class CManager_File_Connector_ElFinder_Base {
@@ -1847,7 +1841,7 @@ class CManager_File_Connector_ElFinder_Base {
                     $_url = $url;
                     $url = trim($matches[1]);
                     if (!preg_match('/^https?:\//', $url)) { // no scheme
-                        if ($url{0} != '/') { // Relative path
+                        if ($url[0] != '/') { // Relative path
                             // to Absolute path
                             $url = substr($url_path, 0, strrpos($url_path, '/')) . '/' . $url;
                         }

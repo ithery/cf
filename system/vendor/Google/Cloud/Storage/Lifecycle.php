@@ -358,6 +358,7 @@ class Lifecycle implements \ArrayAccess, \IteratorAggregate
      * @param string $offset
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return isset($this->lifecycle['rule'][$offset])

@@ -27,6 +27,9 @@ class Controller_Demo_Module_Transform extends \Cresenity\Demo\Controller {
         $widgetFormatByte = $app->addWidget()->setTitle('Transform Format Byte')->addClass('mb-3');
         $widgetFormatByte->add($globalValue . ' => ' . c::manager()->transform()->call('formatByte', $globalValue));
 
+        $widgetFormatByte = $app->addWidget()->setTitle('Delegate Transformer toCarbon|->format:m/d/y')->addClass('mb-3');
+        $widgetFormatByte->add('2019-01-03' . ' => ' . c::manager()->transform()->call('toCarbon|->format:m/d/y', '2019-01-03'));
+
         return $app;
     }
 }

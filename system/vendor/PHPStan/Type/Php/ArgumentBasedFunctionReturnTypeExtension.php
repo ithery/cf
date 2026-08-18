@@ -4,22 +4,23 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
+use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\Accessory\NonEmptyArrayType;
 use PHPStan\Type\ArrayType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\GeneralizePrecision;
+use PHPStan\Type\IntersectionType;
 use PHPStan\Type\Type;
-use PHPStan\Type\TypeCombinator;
+use function array_key_exists;
 
-class ArgumentBasedFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class ArgumentBasedFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
-	/** @var int[] */
-	private array $functionNames = [
+	private const FUNCTION_NAMES = [
 		'array_unique' => 0,
-		'array_change_key_case' => 0,
 		'array_diff_assoc' => 0,
 		'array_diff_key' => 0,
 		'array_diff_uassoc' => 0,
@@ -39,18 +40,22 @@ class ArgumentBasedFunctionReturnTypeExtension implements DynamicFunctionReturnT
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
 	{
-		return isset($this->functionNames[$functionReflection->getName()]);
+		return array_key_exists($functionReflection->getName(), self::FUNCTION_NAMES);
 	}
 
-	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
+	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		$argumentPosition = $this->functionNames[$functionReflection->getName()];
+		if (!array_key_exists($functionReflection->getName(), self::FUNCTION_NAMES)) {
+			throw new ShouldNotHappenException();
+		}
+		$argumentPosition = self::FUNCTION_NAMES[$functionReflection->getName()];
 
-		if (!isset($functionCall->getArgs()[$argumentPosition])) {
-			return ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+		$args = $functionCall->getArgs();
+		if (!isset($args[$argumentPosition])) {
+			return null;
 		}
 
-		$argument = $functionCall->getArgs()[$argumentPosition];
+		$argument = $args[$argumentPosition];
 		$argumentType = $scope->getType($argument->value);
 		$argumentKeyType = $argumentType->getIterableKeyType();
 		$argumentValueType = $argumentType->getIterableValueType();
@@ -64,7 +69,7 @@ class ArgumentBasedFunctionReturnTypeExtension implements DynamicFunctionReturnT
 			$argumentValueType,
 		);
 		if ($functionReflection->getName() === 'array_unique' && $argumentType->isIterableAtLeastOnce()->yes()) {
-			$array = TypeCombinator::intersect($array, new NonEmptyArrayType());
+			$array = new IntersectionType([$array, new NonEmptyArrayType()]);
 		}
 
 		return $array;

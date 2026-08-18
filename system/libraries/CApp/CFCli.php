@@ -1,16 +1,14 @@
 <?php
 
-/**
- * Description of CFCli.
- *
- * @author Hery
- */
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 class CApp_CFCli {
     use CTrait_HasOptions;
 
+    /**
+     * @param array $options
+     */
     public function __construct($options = []) {
         $this->options = $options;
     }

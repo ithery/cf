@@ -3,6 +3,7 @@
 namespace League\Flysystem\Local;
 
 use Generator;
+use Throwable;
 use SplFileInfo;
 use const LOCK_EX;
 use function chmod;
@@ -24,6 +25,7 @@ use function file_put_contents;
 use RecursiveDirectoryIterator;
 use League\Flysystem\PathPrefixer;
 use League\Flysystem\FileAttributes;
+use League\Flysystem\ChecksumProvider;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
@@ -35,13 +37,14 @@ use League\Flysystem\UnableToSetVisibility;
 use League\Flysystem\SymbolicLinkEncountered;
 use League\Flysystem\UnableToCreateDirectory;
 use League\Flysystem\UnableToDeleteDirectory;
+use League\Flysystem\UnableToProvideChecksum;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\MimeTypeDetection\MimeTypeDetector;
 use League\MimeTypeDetection\FinfoMimeTypeDetector;
 use League\Flysystem\UnixVisibility\VisibilityConverter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 
-class LocalFilesystemAdapter implements FilesystemAdapter {
+class LocalFilesystemAdapter implements FilesystemAdapter, ChecksumProvider {
     /**
      * @var int
      */
@@ -78,6 +81,16 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
     private $mimeTypeDetector;
 
     /**
+     * @var string
+     */
+    private $rootLocation;
+
+    /**
+     * @var bool
+     */
+    private $rootLocationIsSetup = false;
+
+    /**
      * @param string                   $location
      * @param null|VisibilityConverter $visibility
      * @param [type] $writeFlags
@@ -89,14 +102,30 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         VisibilityConverter $visibility = null,
         $writeFlags = LOCK_EX,
         $linkHandling = self::DISALLOW_LINKS,
-        MimeTypeDetector $mimeTypeDetector = null
+        MimeTypeDetector $mimeTypeDetector = null,
+        bool $lazyRootCreation = false
     ) {
         $this->prefixer = new PathPrefixer($location, DIRECTORY_SEPARATOR);
         $this->writeFlags = $writeFlags;
         $this->linkHandling = $linkHandling;
         $this->visibility = $visibility ?: new PortableVisibilityConverter();
-        $this->ensureDirectoryExists($location, $this->visibility->defaultForDirectories());
-        $this->mimeTypeDetector = $mimeTypeDetector ?: new FinfoMimeTypeDetector();
+        $this->rootLocation = $location;
+
+        $this->mimeTypeDetector = $mimeTypeDetector ?: new FallbackMimeTypeDetector(new FinfoMimeTypeDetector());
+        if (!$lazyRootCreation) {
+            $this->ensureRootDirectoryExists();
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function ensureRootDirectoryExists(): void {
+        if ($this->rootLocationIsSetup) {
+            return;
+        }
+
+        $this->ensureDirectoryExists($this->rootLocation, $this->visibility->defaultForDirectories());
     }
 
     /**
@@ -130,6 +159,7 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
      */
     private function writeToFile($path, $contents, Config $config) {
         $prefixedLocation = $this->prefixer->prefixPath($path);
+        $this->ensureRootDirectoryExists();
         $this->ensureDirectoryExists(
             dirname($prefixedLocation),
             $this->resolveDirectoryVisibility($config->get(Config::OPTION_DIRECTORY_VISIBILITY))
@@ -147,6 +177,11 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         }
     }
 
+    /**
+     * @param string $path
+     *
+     * @return void
+     */
     public function delete($path) {
         $location = $this->prefixer->prefixPath($path);
 
@@ -228,32 +263,41 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         $iterator = $deep ? $this->listDirectoryRecursively($location) : $this->listDirectory($location);
 
         foreach ($iterator as $fileInfo) {
-            if ($fileInfo->isLink()) {
-                if ($this->linkHandling & self::SKIP_LINKS) {
-                    continue;
+            $pathName = $fileInfo->getPathname();
+
+            try {
+                if ($fileInfo->isLink()) {
+                    if ($this->linkHandling & self::SKIP_LINKS) {
+                        continue;
+                    }
+
+                    throw SymbolicLinkEncountered::atLocation($fileInfo->getPathname());
                 }
 
-                throw SymbolicLinkEncountered::atLocation($fileInfo->getPathname());
+                $path = $this->prefixer->stripPrefix($fileInfo->getPathname());
+                $lastModified = $fileInfo->getMTime();
+                $isDirectory = $fileInfo->isDir();
+                $permissions = octdec(substr(sprintf('%o', $fileInfo->getPerms()), -4));
+                $visibility = $isDirectory ? $this->visibility->inverseForDirectory($permissions) : $this->visibility->inverseForFile($permissions);
+
+                yield $isDirectory ? new DirectoryAttributes(str_replace('\\', '/', $path), $visibility, $lastModified) : new FileAttributes(
+                    str_replace('\\', '/', $path),
+                    $fileInfo->getSize(),
+                    $visibility,
+                    $lastModified
+                );
+            } catch (Throwable $exception) {
+                if (file_exists($pathName)) {
+                    throw $exception;
+                }
             }
-
-            $path = $this->prefixer->stripPrefix($fileInfo->getPathname());
-            $lastModified = $fileInfo->getMTime();
-            $isDirectory = $fileInfo->isDir();
-            $permissions = octdec(substr(sprintf('%o', $fileInfo->getPerms()), -4));
-            $visibility = $isDirectory ? $this->visibility->inverseForDirectory($permissions) : $this->visibility->inverseForFile($permissions);
-
-            yield $isDirectory ? new DirectoryAttributes(str_replace('\\', '/', $path), $visibility, $lastModified) : new FileAttributes(
-                str_replace('\\', '/', $path),
-                $fileInfo->getSize(),
-                $visibility,
-                $lastModified
-            );
         }
     }
 
     public function move($source, $destination, Config $config) {
         $sourcePath = $this->prefixer->prefixPath($source);
         $destinationPath = $this->prefixer->prefixPath($destination);
+        $this->ensureRootDirectoryExists();
         $this->ensureDirectoryExists(
             dirname($destinationPath),
             $this->resolveDirectoryVisibility($config->get(Config::OPTION_DIRECTORY_VISIBILITY))
@@ -267,6 +311,7 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
     public function copy($source, $destination, Config $config) {
         $sourcePath = $this->prefixer->prefixPath($source);
         $destinationPath = $this->prefixer->prefixPath($destination);
+        $this->ensureRootDirectoryExists();
         $this->ensureDirectoryExists(
             dirname($destinationPath),
             $this->resolveDirectoryVisibility($config->get(Config::OPTION_DIRECTORY_VISIBILITY))
@@ -361,6 +406,7 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
      * @return void
      */
     public function createDirectory($path, Config $config) {
+        $this->ensureRootDirectoryExists();
         $location = $this->prefixer->prefixPath($path);
         $visibility = $config->get(Config::OPTION_VISIBILITY, $config->get(Config::OPTION_DIRECTORY_VISIBILITY));
         $permissions = $this->resolveDirectoryVisibility($visibility);
@@ -438,6 +484,9 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         if (\function_exists('error_clear_last')) {
             error_clear_last();
         }
+        if (!is_file($location)) {
+            throw UnableToRetrieveMetadata::mimeType($location, 'No such file exists.');
+        }
         $mimeType = $this->mimeTypeDetector->detectMimeTypeFromFile($location);
 
         if ($mimeType === null) {
@@ -482,6 +531,25 @@ class LocalFilesystemAdapter implements FilesystemAdapter {
         }
 
         throw UnableToRetrieveMetadata::fileSize($path, isset(error_get_last()['message']) ? error_get_last()['message'] : '');
+    }
+
+    /**
+     * @param string $path
+     * @param Config $config
+     *
+     * @return string
+     */
+    public function checksum($path, $config) {
+        $algo = $config->get('checksum_algo', 'md5');
+        $location = $this->prefixer->prefixPath($path);
+        error_clear_last();
+        $checksum = @hash_file($algo, $location);
+
+        if ($checksum === false) {
+            throw new UnableToProvideChecksum(error_get_last()['message'] ?? '', $path);
+        }
+
+        return $checksum;
     }
 
     /**

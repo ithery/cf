@@ -359,7 +359,7 @@ class CVendor_LiteSpeed_Data {
                     foreach ($maps as $map) {
                         $vn = $map->get(Node::FLD_VAL);
                         $domain = $map->getChildVal('domain');
-                        $l->addChild(new Node('map', "${vn} ${domain}"));
+                        $l->addChild(new Node('map', "{$vn} {$domain}"));
                     }
                     $l->removeChild('vhmap');
                 }
@@ -387,7 +387,7 @@ class CVendor_LiteSpeed_Data {
                     $suffix = $shcv->get(Node::FLD_VAL);
                     $type = $shcv->getChildVal('type');
                     $handler = $shcv->getChildVal('handler');
-                    $sh->addChild(new Node('add', "${type}:${handler} ${suffix}"));
+                    $sh->addChild(new Node('add', "{$type}:{$handler} {$suffix}"));
                 }
                 $sh->removeChild('addsuffix');
             }
@@ -804,7 +804,7 @@ class CVendor_LiteSpeed_Data {
         }
 
         if (defined('RECOVER_SCRIPT')) {
-            file_put_contents(RECOVER_SCRIPT, "mv ${migrated} {$this->xmlpath}\n", FILE_APPEND);
+            file_put_contents(RECOVER_SCRIPT, "mv {$migrated} {$this->xmlpath}\n", FILE_APPEND);
         }
         error_log("  converted {$this->xmlpath} to {$this->path}\n\n");
 
@@ -886,7 +886,7 @@ class CVendor_LiteSpeed_Data {
             rename($this->xmlpath, $migrated);
         }
         if (defined('RECOVER_SCRIPT')) {
-            file_put_contents(RECOVER_SCRIPT, "mv ${migrated} {$this->xmlpath}\n", FILE_APPEND);
+            file_put_contents(RECOVER_SCRIPT, "mv {$migrated} {$this->xmlpath}\n", FILE_APPEND);
         }
 
         error_log("  converted {$this->xmlpath} to {$this->path}\n\n");
@@ -935,7 +935,7 @@ class CVendor_LiteSpeed_Data {
         if (!file_exists($filepath)) {
             // new file, check path exists
             if (!PathTool::createFile("{$filepath}.new", $err)) {
-                error_log("failed to create file ${filepath} : ${err} \n");
+                error_log("failed to create file {$filepath} : {$err} \n");
 
                 return false;
             }

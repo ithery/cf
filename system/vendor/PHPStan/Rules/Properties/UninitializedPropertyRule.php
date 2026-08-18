@@ -8,13 +8,12 @@ use PHPStan\Node\ClassPropertiesNode;
 use PHPStan\Reflection\ConstructorsHelper;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\ShouldNotHappenException;
 use function sprintf;
 
 /**
  * @implements Rule<ClassPropertiesNode>
  */
-class UninitializedPropertyRule implements Rule
+final class UninitializedPropertyRule implements Rule
 {
 
 	public function __construct(
@@ -30,10 +29,7 @@ class UninitializedPropertyRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if (!$scope->isInClass()) {
-			throw new ShouldNotHappenException();
-		}
-		$classReflection = $scope->getClassReflection();
+		$classReflection = $node->getClassReflection();
 		[$properties, $prematureAccess] = $node->getUninitializedProperties($scope, $this->constructorsHelper->getConstructors($classReflection));
 
 		$errors = [];
@@ -45,10 +41,13 @@ class UninitializedPropertyRule implements Rule
 				'Class %s has an uninitialized property $%s. Give it default value or assign it in the constructor.',
 				$classReflection->getDisplayName(),
 				$propertyName,
-			))->line($propertyNode->getLine())->build();
+			))
+				->line($propertyNode->getStartLine())
+				->identifier('property.uninitialized')
+				->build();
 		}
 
-		foreach ($prematureAccess as [$propertyName, $line, $propertyNode]) {
+		foreach ($prematureAccess as [$propertyName, $line, $propertyNode, $file, $fileDescription]) {
 			if ($propertyNode->isReadOnly() || $propertyNode->isReadOnlyByPhpDoc()) {
 				continue;
 			}
@@ -56,7 +55,11 @@ class UninitializedPropertyRule implements Rule
 				'Access to an uninitialized property %s::$%s.',
 				$classReflection->getDisplayName(),
 				$propertyName,
-			))->line($line)->build();
+			))
+				->line($line)
+				->file($file, $fileDescription)
+				->identifier('property.uninitialized')
+				->build();
 		}
 
 		return $errors;

@@ -32,7 +32,7 @@ class curl {
         // Load the site domain
         $site_domain = (string) CF::config('core.site_domain', '');
         $domain = carr::get($_SERVER, 'HTTP_HOST');
-        if (strlen($domain) == 0) {
+        if (!$domain) {
             $domain = CF::domain();
         }
         if ($protocol == false) {
@@ -223,7 +223,7 @@ class curl {
         // We are about to exit, so run the send_headers event
         CFEvent::run('system.send_headers');
         //force save the session
-        if ($session = CSession::instance()->store()) {
+        if ($session = c::session()) {
             $session->save();
         }
         exit('<h1>' . $method . ' - ' . $codes[$method] . '</h1>' . $output);

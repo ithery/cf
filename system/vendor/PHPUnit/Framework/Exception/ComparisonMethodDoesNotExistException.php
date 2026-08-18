@@ -30,6 +30,7 @@ final class ComparisonMethodDoesNotExistException extends Exception
         );
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return $this->getMessage() . PHP_EOL;

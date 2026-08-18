@@ -73,6 +73,7 @@ class LogicalAndToken implements TokenInterface
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return sprintf('bool(%s)', implode(' AND ', $this->tokens));

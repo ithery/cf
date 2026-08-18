@@ -2,19 +2,10 @@
 
 namespace PHPStan\Type\Php;
 
-use PHPStan\Type\ClassStringType;
-use PHPStan\Type\Constant\ConstantStringType;
-use PHPStan\Type\Generic\GenericClassStringType;
-use PHPStan\Type\IntersectionType;
-use PHPStan\Type\NeverType;
-use PHPStan\Type\ObjectType;
-use PHPStan\Type\ObjectWithoutClassType;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Type\Type;
-use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeTraverser;
-use PHPStan\Type\TypeWithClassName;
-use PHPStan\Type\UnionType;
 
+#[AutowiredService]
 final class IsAFunctionTypeSpecifyingHelper
 {
 
@@ -23,62 +14,22 @@ final class IsAFunctionTypeSpecifyingHelper
 		Type $classType,
 		bool $allowString,
 		bool $allowSameClass,
-	): Type
+	): ?Type
 	{
-		$objectOrClassTypeClassName = $this->determineClassNameFromObjectOrClassType($objectOrClassType, $allowString);
+		$result = $classType->toObjectTypeForIsACheck($objectOrClassType, $allowString, $allowSameClass);
 
-		return TypeTraverser::map(
-			$classType,
-			static function (Type $type, callable $traverse) use ($objectOrClassTypeClassName, $allowString, $allowSameClass): Type {
-				if ($type instanceof UnionType || $type instanceof IntersectionType) {
-					return $traverse($type);
-				}
-				if ($type instanceof ConstantStringType) {
-					if (!$allowSameClass && $type->getValue() === $objectOrClassTypeClassName) {
-						return new NeverType();
-					}
-					if ($allowString) {
-						return TypeCombinator::union(
-							new ObjectType($type->getValue()),
-							new GenericClassStringType(new ObjectType($type->getValue())),
-						);
-					}
+		// `getConstantStrings() === []` propagates uncertainty from
+		// the input as a whole — preserved from the original
+		// `$isUncertain` initial state to keep the false-positive
+		// suppression below identical.
+		$isUncertain = $result->uncertainty || $classType->getConstantStrings() === [];
 
-					return new ObjectType($type->getValue());
-				}
-				if ($type instanceof GenericClassStringType) {
-					if ($allowString) {
-						return TypeCombinator::union(
-							$type->getGenericType(),
-							$type,
-						);
-					}
-
-					return $type->getGenericType();
-				}
-				if ($allowString) {
-					return TypeCombinator::union(
-						new ObjectWithoutClassType(),
-						new ClassStringType(),
-					);
-				}
-
-				return new ObjectWithoutClassType();
-			},
-		);
-	}
-
-	private function determineClassNameFromObjectOrClassType(Type $type, bool $allowString): ?string
-	{
-		if ($type instanceof TypeWithClassName) {
-			return $type->getClassName();
+		// prevent false-positives
+		if ($isUncertain && $result->type->isSuperTypeOf($objectOrClassType)->yes()) {
+			return null;
 		}
 
-		if ($allowString && $type instanceof ConstantStringType) {
-			return $type->getValue();
-		}
-
-		return null;
+		return $result->type;
 	}
 
 }

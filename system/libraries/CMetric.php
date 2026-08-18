@@ -1,6 +1,12 @@
 <?php
 
 class CMetric {
+    /**
+     * @param string      $name
+     * @param null|string $value
+     *
+     * @return CMetric_Metric
+     */
     public static function createMetric($name, $value = null) {
         $metric = static::manager()->driver()->create($name, $value);
 

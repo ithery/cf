@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 3:29:43 AM
- */
 use Aws\S3\S3Client;
 use League\Flysystem\Visibility;
 use League\Flysystem\Ftp\FtpAdapter;
@@ -90,6 +84,19 @@ class CStorage {
      */
     public function temp($name = null) {
         $name = $name ?: $this->getTempDriver();
+
+        return $this->disks[$name] = $this->get($name);
+    }
+
+    /**
+     * Get a filesystem instance.
+     *
+     * @param null|string $name
+     *
+     * @return CStorage_FilesystemInterface
+     */
+    public function publicTemp($name = null) {
+        $name = $name ?: $this->getPublicTempDriver();
 
         return $this->disks[$name] = $this->get($name);
     }
@@ -382,6 +389,15 @@ class CStorage {
     }
 
     /**
+     * Get the default driver name.
+     *
+     * @return string
+     */
+    public function getPublicTempDriver() {
+        return CF::config('storage.public-temp', $this->getTempDriver());
+    }
+
+    /**
      * Get the default cloud driver name.
      *
      * @return string
@@ -432,6 +448,13 @@ class CStorage {
         $this->customCreators[$driver] = $callback;
 
         return $this;
+    }
+
+    /**
+     * @return CStorage_Tus|CBase_ForwarderStaticClass
+     */
+    public static function tus() {
+        return new CBase_ForwarderStaticClass(CStorage_Tus::class);
     }
 
     /**

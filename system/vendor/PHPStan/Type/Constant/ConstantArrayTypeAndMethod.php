@@ -6,8 +6,10 @@ use PHPStan\ShouldNotHappenException;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Type;
 
-/** @api */
-class ConstantArrayTypeAndMethod
+/**
+ * @api
+ */
+final class ConstantArrayTypeAndMethod
 {
 
 	private function __construct(

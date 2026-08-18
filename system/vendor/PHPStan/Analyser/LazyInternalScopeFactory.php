@@ -2,106 +2,178 @@
 
 namespace PHPStan\Analyser;
 
+use PhpParser\Node;
+use PHPStan\Analyser\Fiber\FiberScope;
 use PHPStan\DependencyInjection\Container;
-use PHPStan\DependencyInjection\Type\DynamicReturnTypeExtensionRegistryProvider;
+use PHPStan\DependencyInjection\ExtensionsCollection;
+use PHPStan\DependencyInjection\GenerateFactory;
 use PHPStan\Node\Printer\ExprPrinter;
+use PHPStan\Parser\Parser;
 use PHPStan\Php\PhpVersion;
-use PHPStan\Reflection\FunctionReflection;
+use PHPStan\Reflection\AttributeReflectionFactory;
 use PHPStan\Reflection\InitializerExprTypeResolver;
-use PHPStan\Reflection\MethodReflection;
-use PHPStan\Reflection\ParametersAcceptor;
+use PHPStan\Reflection\Php\PhpFunctionFromParserNodeReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Properties\PropertyReflectionFinder;
-use PHPStan\ShouldNotHappenException;
-use function is_a;
+use PHPStan\Type\ClosureType;
+use PHPStan\Type\ExpressionTypeResolverExtension;
+use WeakReference;
 
-class LazyInternalScopeFactory implements InternalScopeFactory
+#[GenerateFactory(interface: InternalScopeFactoryFactory::class, resultType: LazyInternalScopeFactory::class)]
+final class LazyInternalScopeFactory implements InternalScopeFactory
 {
 
-	private bool $treatPhpDocTypesAsCertain;
+	/** @var int|array{min: int, max: int}|null */
+	private int|array|null $phpVersion;
 
-	private bool $explicitMixedInUnknownGenericNew;
+	private Parser $currentSimpleVersionParser;
 
-	private bool $explicitMixedForGlobalVariables;
+	private ?ReflectionProvider $reflectionProvider = null;
+
+	private ?InitializerExprTypeResolver $initializerExprTypeResolver = null;
+
+	/** @var ExtensionsCollection<ExpressionTypeResolverExtension>|null */
+	private ?ExtensionsCollection $expressionTypeResolverExtensions = null;
+
+	private ?ExprPrinter $exprPrinter = null;
+
+	private ?TypeSpecifier $typeSpecifier = null;
+
+	private ?PropertyReflectionFinder $propertyReflectionFinder = null;
+
+	private ?ConstantResolver $constantResolver = null;
+
+	private ?PhpVersion $phpVersionType = null;
+
+	private ?AttributeReflectionFactory $attributeReflectionFactory = null;
+
+	private ?self $twin = null;
+
+	/** @var WeakReference<self>|null */
+	private ?WeakReference $origin = null;
 
 	/**
-	 * @param class-string $scopeClass
+	 * @param callable(Node $node, Scope $scope): void|null $nodeCallback
 	 */
 	public function __construct(
-		private string $scopeClass,
 		private Container $container,
+		private $nodeCallback,
+		private bool $fiber = false,
 	)
 	{
-		$this->treatPhpDocTypesAsCertain = $container->getParameter('treatPhpDocTypesAsCertain');
-		$this->explicitMixedInUnknownGenericNew = $this->container->getParameter('featureToggles')['explicitMixedInUnknownGenericNew'];
-		$this->explicitMixedForGlobalVariables = $this->container->getParameter('featureToggles')['explicitMixedForGlobalVariables'];
+		$this->phpVersion = $this->container->getParameter('phpVersion');
+		$this->currentSimpleVersionParser = $this->container->getService('currentPhpVersionSimpleParser');
 	}
 
-	/**
-	 * @param ExpressionTypeHolder[] $expressionTypes
-	 * @param array<string, ConditionalExpressionHolder[]> $conditionalExpressions
-	 * @param array<string, true> $currentlyAssignedExpressions
-	 * @param array<string, true> $currentlyAllowedUndefinedExpressions
-	 * @param ExpressionTypeHolder[] $nativeExpressionTypes
-	 * @param array<(FunctionReflection|MethodReflection)> $inFunctionCallsStack
-	 *
-	 */
 	public function create(
 		ScopeContext $context,
 		bool $declareStrictTypes = false,
-		FunctionReflection|MethodReflection|null $function = null,
+		PhpFunctionFromParserNodeReflection|null $function = null,
 		?string $namespace = null,
 		array $expressionTypes = [],
+		array $nativeExpressionTypes = [],
 		array $conditionalExpressions = [],
-		?string $inClosureBindScopeClass = null,
-		?ParametersAcceptor $anonymousFunctionReflection = null,
+		array $inClosureBindScopeClasses = [],
+		?ClosureType $anonymousFunctionReflection = null,
 		bool $inFirstLevelStatement = true,
 		array $currentlyAssignedExpressions = [],
 		array $currentlyAllowedUndefinedExpressions = [],
-		array $nativeExpressionTypes = [],
 		array $inFunctionCallsStack = [],
 		bool $afterExtractCall = false,
-		?Scope $parentScope = null,
+		?MutatingScope $parentScope = null,
 		bool $nativeTypesPromoted = false,
 	): MutatingScope
 	{
-		$scopeClass = $this->scopeClass;
-		if (!is_a($scopeClass, MutatingScope::class, true)) {
-			throw new ShouldNotHappenException();
+		$className = MutatingScope::class;
+		if ($this->fiber) {
+			$className = FiberScope::class;
 		}
 
-		return new $scopeClass(
+		$this->reflectionProvider ??= $this->container->getByType(ReflectionProvider::class);
+		$this->initializerExprTypeResolver ??= $this->container->getByType(InitializerExprTypeResolver::class);
+		$this->expressionTypeResolverExtensions ??= $this->container->getExtensionsCollection(ExpressionTypeResolverExtension::class);
+		$this->exprPrinter ??= $this->container->getByType(ExprPrinter::class);
+		$this->typeSpecifier ??= $this->container->getByType(TypeSpecifier::class);
+		$this->propertyReflectionFinder ??= $this->container->getByType(PropertyReflectionFinder::class);
+
+		$this->constantResolver ??= $this->container->getByType(ConstantResolver::class);
+
+		$this->phpVersionType ??= $this->container->getByType(PhpVersion::class);
+		$this->attributeReflectionFactory ??= $this->container->getByType(AttributeReflectionFactory::class);
+
+		return new $className(
+			$this->container,
 			$this,
-			$this->container->getByType(ReflectionProvider::class),
-			$this->container->getByType(InitializerExprTypeResolver::class),
-			$this->container->getByType(DynamicReturnTypeExtensionRegistryProvider::class)->getRegistry(),
-			$this->container->getByType(ExprPrinter::class),
-			$this->container->getByType(TypeSpecifier::class),
-			$this->container->getByType(PropertyReflectionFinder::class),
-			$this->container->getService('currentPhpVersionSimpleParser'),
-			$this->container->getByType(NodeScopeResolver::class),
-			$this->container->getByType(ConstantResolver::class),
+			$this->reflectionProvider,
+			$this->initializerExprTypeResolver,
+			$this->expressionTypeResolverExtensions,
+			$this->exprPrinter,
+			$this->typeSpecifier,
+			$this->propertyReflectionFinder,
+			$this->currentSimpleVersionParser,
+			$this->constantResolver,
 			$context,
-			$this->container->getByType(PhpVersion::class),
+			$this->phpVersionType,
+			$this->attributeReflectionFactory,
+			$this->phpVersion,
+			$this->nodeCallback,
 			$declareStrictTypes,
 			$function,
 			$namespace,
 			$expressionTypes,
+			$nativeExpressionTypes,
 			$conditionalExpressions,
-			$inClosureBindScopeClass,
+			$inClosureBindScopeClasses,
 			$anonymousFunctionReflection,
 			$inFirstLevelStatement,
 			$currentlyAssignedExpressions,
 			$currentlyAllowedUndefinedExpressions,
-			$nativeExpressionTypes,
 			$inFunctionCallsStack,
-			$this->treatPhpDocTypesAsCertain,
 			$afterExtractCall,
 			$parentScope,
 			$nativeTypesPromoted,
-			$this->explicitMixedInUnknownGenericNew,
-			$this->explicitMixedForGlobalVariables,
 		);
+	}
+
+	public function toFiberFactory(): InternalScopeFactory
+	{
+		return $this->fiber ? $this : $this->twin();
+	}
+
+	public function toMutatingFactory(): InternalScopeFactory
+	{
+		return $this->fiber ? $this->twin() : $this;
+	}
+
+	/**
+	 * The factory for the other scope flavour, created once. Scopes switch
+	 * flavour constantly, and a fresh factory would start with empty memos —
+	 * resolving every service above out of the container again on its first
+	 * create().
+	 *
+	 * The pair is held one way strongly and the other way weakly: a factory
+	 * belongs to a single analysed file (ScopeFactory::create() makes one per
+	 * file, closing over that file's node callback), and a strong cycle here
+	 * would keep every file's callback alive for the whole run — PHPStan runs
+	 * with the cycle collector disabled, so nothing would ever free it.
+	 */
+	private function twin(): self
+	{
+		if ($this->twin !== null) {
+			return $this->twin;
+		}
+
+		if ($this->origin !== null) {
+			$origin = $this->origin->get();
+			if ($origin !== null) {
+				return $origin;
+			}
+		}
+
+		$this->twin = new self($this->container, $this->nodeCallback, !$this->fiber);
+		$this->twin->origin = WeakReference::create($this);
+
+		return $this->twin;
 	}
 
 }

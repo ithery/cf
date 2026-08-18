@@ -2,17 +2,18 @@
 
 /**
  * Description of SSH.
- *
- * @author Hery
  */
 
 use Symfony\Component\Process\Process;
 
 class CDevSuite_Ssh {
+    /**
+     * @var CDevSuite_Filesystem
+     */
     public $files;
 
     /**
-     * Create a new Nginx instance.
+     * Create a new Ssh instance.
      *
      * @return void
      */
@@ -29,12 +30,25 @@ class CDevSuite_Ssh {
         return CDevSuite::homePath() . '/ssh.json';
     }
 
+    /**
+     * Create the SSH configuration file if it does not already exist.
+     *
+     * @return void
+     */
     public function ensureFileExists() {
         if (!$this->files->exists($this->path())) {
             $this->write([]);
         }
     }
 
+    /**
+     * Store a new SSH connection configuration under the given name, after verifying it can connect.
+     *
+     * @param string $name
+     * @param array  $configuration
+     *
+     * @return bool
+     */
     public function create($name, $configuration) {
         if (!$this->isCanConnect($configuration)) {
             CDevSuite::info('Error when connecting to:' . $name . ', please check your configuration');
@@ -75,6 +89,11 @@ class CDevSuite_Ssh {
         return json_decode($this->files->get($this->path()), true);
     }
 
+    /**
+     * Get the stored SSH connections formatted as table rows.
+     *
+     * @return \CCollection
+     */
     public function getTableData() {
         $data = $this->read();
 
@@ -89,17 +108,38 @@ class CDevSuite_Ssh {
         });
     }
 
+    /**
+     * Determine if an SSH configuration exists for the given key.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
     public function exists($key) {
         return is_array(carr::get($this->read(), $key));
     }
 
+    /**
+     * Exit the process with an error if no SSH configuration exists for the given key.
+     *
+     * @param string $key
+     *
+     * @return void
+     */
     public function existsOrExit($key) {
         if (!$this->exists($key)) {
-            CDevSuite::error('Databaes configuration: ' . $key . ' not exists');
+            CDevSuite::error('Database configuration: ' . $key . ' not exists');
             exit(CConsole::FAILURE_EXIT);
         }
     }
 
+    /**
+     * Determine whether an SSH connection can be established for the given config key or raw config array.
+     *
+     * @param string|array $key
+     *
+     * @return bool
+     */
     public function isCanConnect($key) {
         if (!CServer::isWindows()) {
             try {
@@ -116,12 +156,26 @@ class CDevSuite_Ssh {
         return true;
     }
 
+    /**
+     * Get a CRemote_SSH instance for the given config key or raw config array.
+     *
+     * @param string|array $key
+     *
+     * @return CRemote_SSH
+     */
     public function getRemoteSsh($key) {
         $config = $this->toRemoteSshConfig($key);
 
         return CRemote::ssh($config);
     }
 
+    /**
+     * Build a CRemote SSH config array from a stored config key or a raw config array.
+     *
+     * @param string|array $keyFile
+     *
+     * @return array
+     */
     public function toRemoteSshConfig($keyFile) {
         $configArray = $keyFile;
         if (!is_array($configArray)) {
@@ -152,6 +206,11 @@ class CDevSuite_Ssh {
         return $config;
     }
 
+    /**
+     * Get the name of the SSH client executable for the current OS.
+     *
+     * @return string
+     */
     public function executableName() {
         if (CServer::isWindows()) {
             $bit = PHP_INT_SIZE * 8;
@@ -162,6 +221,13 @@ class CDevSuite_Ssh {
         return 'ssh';
     }
 
+    /**
+     * Open an interactive SSH session for the stored connection with the given name.
+     *
+     * @param string $name
+     *
+     * @return void
+     */
     public function open($name) {
         $configArray = carr::get($this->read(), $name);
 

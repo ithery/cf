@@ -1,8 +1,5 @@
 <?php
 
-use Dingo\Api\Http\Request;
-use Illuminate\Contracts\Container\Container;
-
 class CApi_Event_RequestWasMatched {
     /**
      * Request instance.

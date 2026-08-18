@@ -3,7 +3,6 @@
 namespace SVG\Nodes\Texts;
 
 use SVG\Nodes\SVGNodeContainer;
-use SVG\Nodes\Structures\SVGFont;
 use SVG\Rasterization\SVGRasterizer;
 
 /**
@@ -21,7 +20,7 @@ class SVGTSpan extends SVGNodeContainer
     /**
      * @inheritdoc
      */
-    public function rasterize(SVGRasterizer $rasterizer)
+    public function rasterize(SVGRasterizer $rasterizer): void
     {
         // Nothing to rasterize.
     }

@@ -11,6 +11,11 @@ abstract class CElement_Component_DataTable_Exporter_AbstractEngine implements C
      */
     protected $filename;
 
+    /**
+     * @param CElement_Component_DataTable $dataTable
+     *
+     * @return void
+     */
     public function __construct($dataTable) {
         $this->dataTable = $dataTable;
     }

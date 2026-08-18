@@ -1,7 +1,7 @@
 <?php
 defined('SYSPATH') or die('No direct access allowed.');
 
-$config = [
+return [
     '323' => ['text/h323'],
     '7z' => ['application/x-7z-compressed'],
     'abw' => ['application/x-abiword'],

@@ -4,17 +4,28 @@ namespace PHPStan\Rules\Operators;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Node\Expr\TypeExpr;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use PHPStan\Rules\RuleLevelHelper;
 use PHPStan\Type\ErrorType;
+use PHPStan\Type\Type;
 use PHPStan\Type\VerbosityLevel;
 use function sprintf;
 
 /**
  * @implements Rule<Node\Expr>
  */
-class InvalidUnaryOperationRule implements Rule
+#[RegisteredRule(level: 2)]
+final class InvalidUnaryOperationRule implements Rule
 {
+
+	public function __construct(
+		private RuleLevelHelper $ruleLevelHelper,
+	)
+	{
+	}
 
 	public function getNodeType(): string
 	{
@@ -31,25 +42,48 @@ class InvalidUnaryOperationRule implements Rule
 			return [];
 		}
 
-		if ($scope->getType($node) instanceof ErrorType) {
-
-			if ($node instanceof Node\Expr\UnaryPlus) {
-				$operator = '+';
-			} elseif ($node instanceof Node\Expr\UnaryMinus) {
-				$operator = '-';
-			} else {
-				$operator = '~';
-			}
-			return [
-				RuleErrorBuilder::message(sprintf(
-					'Unary operation "%s" on %s results in an error.',
-					$operator,
-					$scope->getType($node->expr)->describe(VerbosityLevel::value()),
-				))->line($node->expr->getLine())->build(),
-			];
+		if ($node instanceof Node\Expr\BitwiseNot) {
+			$callback = static fn (Type $type): bool => $type->isString()->yes() || $type->isInteger()->yes() || $type->isFloat()->yes();
+		} else {
+			$callback = static fn (Type $type): bool => !$type->toNumber() instanceof ErrorType;
 		}
 
-		return [];
+		$exprType = $this->ruleLevelHelper->findTypeToCheck(
+			$scope,
+			$node->expr,
+			'',
+			$callback,
+		)->getType();
+		if ($exprType instanceof ErrorType) {
+			return [];
+		}
+
+		$newNode = clone $node;
+		$newNode->setAttribute('phpstan_cache_printer', null);
+		$newNode->expr = new TypeExpr($exprType);
+		// getScopeType(): the node was synthesized right here, so NodeScopeResolver
+		// never visits it and there is no before-scope to wait for
+		if (!$scope->getScopeType($newNode) instanceof ErrorType) {
+			return [];
+		}
+
+		if ($node instanceof Node\Expr\UnaryPlus) {
+			$operator = '+';
+		} elseif ($node instanceof Node\Expr\UnaryMinus) {
+			$operator = '-';
+		} else {
+			$operator = '~';
+		}
+		return [
+			RuleErrorBuilder::message(sprintf(
+				'Unary operation "%s" on %s results in an error.',
+				$operator,
+				$scope->getType($node->expr)->describe(VerbosityLevel::value()),
+			))
+				->line($node->expr->getStartLine())
+				->identifier('unaryOp.invalid')
+				->build(),
+		];
 	}
 
 }

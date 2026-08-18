@@ -31,11 +31,11 @@ class CQueue_CallQueuedClosure implements CQueue_ShouldQueueInterface {
     /**
      * Create a new job instance.
      *
-     * @param \CQueue_SerializableClosure $closure
+     * @param \CFunction_SerializableClosure $closure
      *
      * @return void
      */
-    public function __construct(CQueue_SerializableClosure $closure) {
+    public function __construct(CFunction_SerializableClosure $closure) {
         $this->closure = $closure;
     }
 
@@ -47,7 +47,7 @@ class CQueue_CallQueuedClosure implements CQueue_ShouldQueueInterface {
      * @return self
      */
     public static function create($job) {
-        return new self(new CQueue_SerializableClosure($job));
+        return new self(new CFunction_SerializableClosure($job));
     }
 
     /**
@@ -58,7 +58,8 @@ class CQueue_CallQueuedClosure implements CQueue_ShouldQueueInterface {
      * @return void
      */
     public function handle(CContainer_Container $container) {
-        $container->call($this->closure->getClosure(), ['job' => $this]);
+        // $container->call($this->closure->getClosure(), ['job' => $this]);
+        $container->call($this->closure->getClosure(), [$this]);
     }
 
     /**

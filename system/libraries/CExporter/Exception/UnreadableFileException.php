@@ -6,7 +6,7 @@ class CExporter_Exception_UnreadableFileException extends Exception implements C
      * @param int            $code
      * @param null|Throwable $previous
      */
-    public function __construct($message = 'File could not be read', $code = 0, Throwable $previous = null) {
+    public function __construct($message = 'File could not be read', $code = 0, ?Throwable $previous = null) {
         parent::__construct($message, $code, $previous);
     }
 }

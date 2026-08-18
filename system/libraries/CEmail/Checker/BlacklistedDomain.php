@@ -1,5 +1,10 @@
 <?php
 class CEmail_Checker_BlacklistedDomain implements \IteratorAggregate, \Countable {
+    /**
+     * @var array
+     */
+    protected $domains;
+
     public function __construct() {
         $this->domains = CEmail_Helper::parseLines(file_get_contents(
             DOCROOT . 'system' . DS . 'data' . 'email' . DS . 'blacklist.txt'

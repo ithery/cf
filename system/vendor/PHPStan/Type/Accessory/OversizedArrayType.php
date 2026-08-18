@@ -2,31 +2,38 @@
 
 namespace PHPStan\Type\Accessory;
 
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\TrinaryLogic;
+use PHPStan\Type\AcceptsResult;
+use PHPStan\Type\ArrayType;
+use PHPStan\Type\BooleanType;
 use PHPStan\Type\CompoundType;
 use PHPStan\Type\Constant\ConstantFloatType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\ErrorType;
+use PHPStan\Type\InstanceofDeprecated;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntersectionType;
+use PHPStan\Type\IsSuperTypeOfResult;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\Traits\MaybeCallableTypeTrait;
 use PHPStan\Type\Traits\NonGeneralizableTypeTrait;
 use PHPStan\Type\Traits\NonGenericTypeTrait;
 use PHPStan\Type\Traits\NonObjectTypeTrait;
 use PHPStan\Type\Traits\NonRemoveableTypeTrait;
-use PHPStan\Type\Traits\TruthyBooleanTypeTrait;
 use PHPStan\Type\Traits\UndecidedComparisonCompoundTypeTrait;
 use PHPStan\Type\Type;
 use PHPStan\Type\UnionType;
 use PHPStan\Type\VerbosityLevel;
 
+#[InstanceofDeprecated(insteadUse: 'Type::isOversizedArray()')]
 class OversizedArrayType implements CompoundType, AccessoryType
 {
 
 	use MaybeCallableTypeTrait;
 	use NonObjectTypeTrait;
-	use TruthyBooleanTypeTrait;
 	use NonGenericTypeTrait;
 	use UndecidedComparisonCompoundTypeTrait;
 	use NonRemoveableTypeTrait;
@@ -41,6 +48,16 @@ class OversizedArrayType implements CompoundType, AccessoryType
 		return [];
 	}
 
+	public function getObjectClassNames(): array
+	{
+		return [];
+	}
+
+	public function getObjectClassReflections(): array
+	{
+		return [];
+	}
+
 	public function getArrays(): array
 	{
 		return [];
@@ -51,44 +68,48 @@ class OversizedArrayType implements CompoundType, AccessoryType
 		return [];
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function getConstantStrings(): array
+	{
+		return [];
+	}
+
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
 		if ($type instanceof CompoundType) {
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
-		return $type->isArray()
-			->and($type->isIterableAtLeastOnce());
+		return new AcceptsResult($type->isArray()->and($type->isIterableAtLeastOnce()), []);
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($this->equals($type)) {
-			return TrinaryLogic::createYes();
+			return IsSuperTypeOfResult::createYes();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
 		}
 
-		return $type->isArray()
-			->and($type->isOversizedArray());
+		return new IsSuperTypeOfResult($type->isArray()->and($type->isOversizedArray()), []);
 	}
 
-	public function isSubTypeOf(Type $otherType): TrinaryLogic
+	public function isSubTypeOf(Type $otherType): IsSuperTypeOfResult
 	{
 		if ($otherType instanceof UnionType || $otherType instanceof IntersectionType) {
 			return $otherType->isSuperTypeOf($this);
 		}
 
-		return $otherType->isArray()
-			->and($otherType->isOversizedArray())
-			->and($otherType instanceof self ? TrinaryLogic::createYes() : TrinaryLogic::createMaybe());
+		return new IsSuperTypeOfResult(
+			$otherType->isArray()->and($otherType->isOversizedArray())->and($otherType instanceof self ? TrinaryLogic::createYes() : TrinaryLogic::createMaybe()),
+			[],
+		);
 	}
 
-	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): TrinaryLogic
+	public function isAcceptedBy(Type $acceptingType, bool $strictTypes): AcceptsResult
 	{
-		return $this->isSubTypeOf($acceptingType);
+		return $this->isSubTypeOf($acceptingType)->toAcceptsResult();
 	}
 
 	public function equals(Type $type): bool
@@ -102,6 +123,11 @@ class OversizedArrayType implements CompoundType, AccessoryType
 	}
 
 	public function isOffsetAccessible(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isOffsetAccessLegal(): TrinaryLogic
 	{
 		return TrinaryLogic::createYes();
 	}
@@ -121,9 +147,19 @@ class OversizedArrayType implements CompoundType, AccessoryType
 		return $this;
 	}
 
+	public function setExistingOffsetValueType(Type $offsetType, Type $valueType): Type
+	{
+		return $this;
+	}
+
 	public function unsetOffset(Type $offsetType): Type
 	{
 		return new ErrorType();
+	}
+
+	public function getKeysArrayFiltered(Type $filterValueType, TrinaryLogic $strict): Type
+	{
+		return $this->getKeysArray();
 	}
 
 	public function getKeysArray(): Type
@@ -132,6 +168,11 @@ class OversizedArrayType implements CompoundType, AccessoryType
 	}
 
 	public function getValuesArray(): Type
+	{
+		return $this;
+	}
+
+	public function chunkArray(Type $lengthType, TrinaryLogic $preserveKeys): Type
 	{
 		return $this;
 	}
@@ -156,7 +197,12 @@ class OversizedArrayType implements CompoundType, AccessoryType
 		return $this;
 	}
 
-	public function searchArray(Type $needleType): Type
+	public function reverseArray(TrinaryLogic $preserveKeys): Type
+	{
+		return $this;
+	}
+
+	public function searchArray(Type $needleType, ?TrinaryLogic $strict = null): Type
 	{
 		return new MixedType();
 	}
@@ -171,6 +217,51 @@ class OversizedArrayType implements CompoundType, AccessoryType
 		return $this;
 	}
 
+	public function sliceArray(Type $offsetType, Type $lengthType, TrinaryLogic $preserveKeys): Type
+	{
+		return $this;
+	}
+
+	public function spliceArray(Type $offsetType, Type $lengthType, Type $replacementType): Type
+	{
+		return $this;
+	}
+
+	public function truncateListToSize(Type $sizeType): Type
+	{
+		return $this;
+	}
+
+	public function makeListMaybe(): Type
+	{
+		return $this;
+	}
+
+	public function mapValueType(callable $cb): Type
+	{
+		return $this;
+	}
+
+	public function mapKeyType(callable $cb): Type
+	{
+		return $this;
+	}
+
+	public function makeAllArrayKeysOptional(): Type
+	{
+		return $this;
+	}
+
+	public function changeKeyCaseArray(?int $case): Type
+	{
+		return $this;
+	}
+
+	public function filterArrayRemovingFalsey(): Type
+	{
+		return $this;
+	}
+
 	public function isIterable(): TrinaryLogic
 	{
 		return TrinaryLogic::createYes();
@@ -178,7 +269,7 @@ class OversizedArrayType implements CompoundType, AccessoryType
 
 	public function isIterableAtLeastOnce(): TrinaryLogic
 	{
-		return TrinaryLogic::createYes();
+		return TrinaryLogic::createMaybe();
 	}
 
 	public function getArraySize(): Type
@@ -236,12 +327,67 @@ class OversizedArrayType implements CompoundType, AccessoryType
 		return TrinaryLogic::createMaybe();
 	}
 
+	public function isNull(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isConstantScalarValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getConstantScalarTypes(): array
+	{
+		return [];
+	}
+
+	public function getConstantScalarValues(): array
+	{
+		return [];
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isBoolean(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFloat(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isInteger(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
 	public function isString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
 
 	public function isNumericString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isDecimalIntegerString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
@@ -261,9 +407,64 @@ class OversizedArrayType implements CompoundType, AccessoryType
 		return TrinaryLogic::createNo();
 	}
 
+	public function isLowercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isClassString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isUppercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function isVoid(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		return new BooleanType();
+	}
+
 	public function toNumber(): Type
 	{
 		return new ErrorType();
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toAbsoluteNumber(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toBoolean(): BooleanType
+	{
+		return new BooleanType();
 	}
 
 	public function toInteger(): Type
@@ -291,14 +492,44 @@ class OversizedArrayType implements CompoundType, AccessoryType
 		return new ErrorType();
 	}
 
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		return $this;
+	}
+
 	public function traverse(callable $cb): Type
 	{
 		return $this;
 	}
 
-	public static function __set_state(array $properties): Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		return new self();
+		return $this;
+	}
+
+	public function exponentiate(Type $exponent): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getFiniteTypes(): array
+	{
+		return [];
+	}
+
+	public function getDefaultBaseType(): Type
+	{
+		return new ArrayType(new MixedType(), new MixedType());
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode(''); // no PHPDoc representation
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return false;
 	}
 
 }

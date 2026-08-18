@@ -4,9 +4,8 @@ namespace PHPStan\Rules\Functions;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\InFunctionNode;
-use PHPStan\Reflection\ParametersAcceptorSelector;
-use PHPStan\Reflection\Php\PhpFunctionFromParserNodeReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\ShouldNotHappenException;
@@ -18,7 +17,8 @@ use function sprintf;
 /**
  * @implements Rule<InFunctionNode>
  */
-class IncompatibleDefaultParameterTypeRule implements Rule
+#[RegisteredRule(level: 2)]
+final class IncompatibleDefaultParameterTypeRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -28,12 +28,7 @@ class IncompatibleDefaultParameterTypeRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$function = $scope->getFunction();
-		if (!$function instanceof PhpFunctionFromParserNodeReflection) {
-			return [];
-		}
-		$parameters = ParametersAcceptorSelector::selectSingle($function->getVariants());
-
+		$function = $node->getFunctionReflection();
 		$errors = [];
 		foreach ($node->getOriginalNode()->getParams() as $paramI => $param) {
 			if ($param->default === null) {
@@ -47,10 +42,11 @@ class IncompatibleDefaultParameterTypeRule implements Rule
 			}
 
 			$defaultValueType = $scope->getType($param->default);
-			$parameterType = $parameters->getParameters()[$paramI]->getType();
+			$parameterType = $function->getParameters()[$paramI]->getType();
 			$parameterType = TemplateTypeHelper::resolveToBounds($parameterType);
 
-			if ($parameterType->accepts($defaultValueType, true)->yes()) {
+			$accepts = $parameterType->accepts($defaultValueType, true);
+			if ($accepts->yes()) {
 				continue;
 			}
 
@@ -63,7 +59,11 @@ class IncompatibleDefaultParameterTypeRule implements Rule
 				$defaultValueType->describe($verbosityLevel),
 				$function->getName(),
 				$parameterType->describe($verbosityLevel),
-			))->line($param->getLine())->build();
+			))
+				->line($param->getStartLine())
+				->identifier('parameter.defaultValue')
+				->acceptsReasonsTip($accepts->reasons)
+				->build();
 		}
 
 		return $errors;

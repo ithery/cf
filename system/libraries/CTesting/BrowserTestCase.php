@@ -4,7 +4,7 @@ use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 
 abstract class CTesting_BrowserTestCase extends CTesting_TestCase {
-    use CTesting_Concern_ProvidesBrowser;
+    use CTesting_Browser_Concern_ProvidesBrowser;
     use CTesting_Chrome_SupportChromeTrait;
 
     /**

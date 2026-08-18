@@ -1,10 +1,19 @@
 <?php
 
 class CElement_Component_ProgressBar extends CElement_Component {
+    /**
+     * @var int
+     */
     protected $minValue;
 
+    /**
+     * @var int
+     */
     protected $maxValue;
 
+    /**
+     * @var int
+     */
     protected $value;
 
     /**
@@ -17,6 +26,11 @@ class CElement_Component_ProgressBar extends CElement_Component {
      */
     protected $process;
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id = null) {
         parent::__construct($id);
         $this->minValue = 0;
@@ -27,12 +41,22 @@ class CElement_Component_ProgressBar extends CElement_Component {
         $this->process = null;
     }
 
+    /**
+     * @param int $value
+     *
+     * @return $this
+     */
     public function setValue($value) {
         $this->value = $value;
 
         return $this;
     }
 
+    /**
+     * @param callable|CElement_Component_ProgressBar_Process $process
+     *
+     * @return $this
+     */
     public function withProcess($process) {
         if (!$process instanceof CElement_Component_ProgressBar_Process) {
             $process = new CElement_Component_ProgressBar_Process($process);
@@ -42,6 +66,9 @@ class CElement_Component_ProgressBar extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         $this->addClass('cres:element:component:ProgressBar');
         $this->addClass('progress');
@@ -62,7 +89,7 @@ class CElement_Component_ProgressBar extends CElement_Component {
             'updateMethod' => 'cres_update_progressbar_' . $this->id,
             'id' => $this->id,
         ];
-        $this->setAttr('cres-config', htmlspecialchars(json_encode($config), ENT_QUOTES, 'UTF-8'));
+        $this->setAttr('cres-config', c::json($config));
         if ($this->process != null) {
             $this->add($this->process->createIframeProcess($config));
         }

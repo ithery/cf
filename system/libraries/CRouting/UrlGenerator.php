@@ -133,6 +133,7 @@ class CRouting_UrlGenerator {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->to($this->request->getPathInfo());
     }
@@ -245,9 +246,12 @@ class CRouting_UrlGenerator {
         $path = $dirname . DS . $filename;
         $root = $this->formatRoot($this->formatScheme($secure));
         $path = CF::findFile('media', $path, false, $extension);
+        // Normalize slashes (Windows/Linux compatibility)
+        $path = str_replace(['\\', '//'], '/', $path);
+        $docroot = str_replace('\\', '/', DOCROOT);
         $count = 1;
-        if (cstr::startsWith($path, DOCROOT)) {
-            $path = str_replace(DOCROOT, '', $path, $count);
+        if (cstr::startsWith($path, $docroot)) {
+            $path = str_replace($docroot, '', $path, $count);
         }
 
         return $this->removeIndex($root) . '/' . trim($path, '/');
@@ -262,6 +266,20 @@ class CRouting_UrlGenerator {
      */
     public function secureMedia($path) {
         return $this->media($path, true);
+    }
+
+    /**
+     * Generate the URL to an asset from a custom root domain such as CDN, etc.
+     * Alias of assetFrom.
+     *
+     * @param string    $root
+     * @param string    $path
+     * @param null|bool $secure
+     *
+     * @return string
+     */
+    public function mediaFrom($root, $path, $secure = null) {
+        return $this->assetFrom($root, $path, $secure);
     }
 
     /**
@@ -640,6 +658,19 @@ class CRouting_UrlGenerator {
         $this->cachedScheme = null;
 
         $this->forceScheme = $scheme ? $scheme . '://' : null;
+    }
+
+    /**
+     * Force the use of the HTTPS scheme for all generated URLs.
+     *
+     * @param bool $force
+     *
+     * @return void
+     */
+    public function forceHttps($force = true) {
+        if ($force) {
+            $this->forceScheme('https');
+        }
     }
 
     /**

@@ -226,7 +226,7 @@ trait CTrait_Compat_Observable {
     /**
      * @param string $tabs_id
      *
-     * @return CTabList
+     * @return CElement_List_TabList
      *
      * @deprecated since 1.2
      */
@@ -234,32 +234,12 @@ trait CTrait_Compat_Observable {
         return $this->addTabList($tabs_id);
     }
 
-    /**
-     * @param string $id
-     * @param mixed  $tabs_id
-     *
-     * @deprecated since 1.2
-     *
-     * @return $this
-     */
-    public function add_tab_static_list($tabs_id = '') {
-        return $this->addTabStaticList($tabs_id);
-    }
-
     public function add_elm($tag, $id = '') {
         return $this->addElm($tag, $id);
     }
 
-    public function add_row_fluid($id = '') {
-        return $this->addRowFluid($id);
-    }
-
     public function add_img($id = '') {
         return $this->addImg($id);
-    }
-
-    public function add_basic_span($id = '') {
-        return $this->addBasicSpan($id);
     }
 
     /**
@@ -330,10 +310,6 @@ trait CTrait_Compat_Observable {
         return $this->addAction($id);
     }
 
-    public function add_pie_chart($id = '') {
-        return $this->addPieChart($id);
-    }
-
     /**
      * @deprecated since version 1.2, please use function addDashboard
      *
@@ -391,20 +367,6 @@ trait CTrait_Compat_Observable {
     }
 
     /**
-     * @param string $id
-     *
-     * @return CPieChartElement
-     *
-     * @deprecated
-     */
-    public function addPieChart($id = '') {
-        $pie_chart = CPieChartElement::factory($id);
-        $this->add($pie_chart);
-
-        return $pie_chart;
-    }
-
-    /**
      * Add Row.
      *
      * @param string $id
@@ -418,71 +380,6 @@ trait CTrait_Compat_Observable {
         $this->add($row);
 
         return $row;
-    }
-
-    /**
-     * Add Calendar.
-     *
-     * @param string $id
-     * @param mixed  $calendar_id
-     *
-     * @return CCalendar
-     *
-     * @deprecated 1.2
-     */
-    public function addCalendar($calendar_id = '') {
-        $calendar = CCalendar::factory($calendar_id);
-        $this->add($calendar);
-
-        return $calendar;
-    }
-
-    /**
-     * Add TabStaticList.
-     *
-     * @param string $tabs_id
-     *
-     * @return CTabStaticList
-     *
-     * @deprecated 1.2
-     */
-    public function addTabStaticList($tabs_id = '') {
-        $tabs = CTabStaticList::factory($tabs_id);
-        $this->add($tabs);
-
-        return $tabs;
-    }
-
-    /**
-     * Add TabStaticList.
-     *
-     * @param string $id
-     *
-     * @return CBasicSpan
-     *
-     * @deprecated 1.2
-     */
-    public function addBasicSpan($id = '') {
-        $span = CBasicSpan::factory($id);
-        $this->add($span);
-
-        return $span;
-    }
-
-    /**
-     * Add TabStaticList.
-     *
-     * @param string $id
-     *
-     * @return CRowFluid
-     *
-     * @deprecated 1.2
-     */
-    public function addRowFluid($id = '') {
-        $rowf = CRowFluid::factory($id);
-        $this->add($rowf);
-
-        return $rowf;
     }
 }
 //@codingStandardsIgnoreEnd

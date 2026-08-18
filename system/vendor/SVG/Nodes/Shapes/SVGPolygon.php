@@ -16,7 +16,7 @@ class SVGPolygon extends SVGPolygonalShape
     /**
      * @param array[] $points Array of points (float 2-tuples).
      */
-    public function __construct($points = array())
+    public function __construct(array $points = [])
     {
         parent::__construct($points);
     }
@@ -24,7 +24,7 @@ class SVGPolygon extends SVGPolygonalShape
     /**
      * @inheritdoc
      */
-    public function rasterize(SVGRasterizer $rasterizer)
+    public function rasterize(SVGRasterizer $rasterizer): void
     {
         if ($this->getComputedStyle('display') === 'none') {
             return;
@@ -37,11 +37,11 @@ class SVGPolygon extends SVGPolygonalShape
 
         TransformParser::parseTransformString($this->getAttribute('transform'), $rasterizer->pushTransform());
 
-        $rasterizer->render('polygon', array(
+        $rasterizer->render('polygon', [
             'open'      => false,
             'points'    => $this->getPoints(),
             'fill-rule' => strtolower($this->getComputedStyle('fill-rule') ?: 'nonzero')
-        ), $this);
+        ], $this);
 
         $rasterizer->popTransform();
     }

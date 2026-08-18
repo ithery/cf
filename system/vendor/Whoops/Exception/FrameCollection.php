@@ -107,6 +107,7 @@ class FrameCollection implements ArrayAccess, IteratorAggregate, Serializable, C
      * @see ArrayAccess::offsetGet
      * @param int $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->frames[$offset];

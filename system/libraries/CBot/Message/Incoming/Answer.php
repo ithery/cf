@@ -45,6 +45,7 @@ class CBot_Message_Incoming_Answer {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->text;
     }

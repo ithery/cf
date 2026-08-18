@@ -8,6 +8,7 @@ use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\AssignOp;
 use PhpParser\Node\Expr\AssignRef;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\NullsafeCheck;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -15,7 +16,8 @@ use PHPStan\Rules\RuleErrorBuilder;
 /**
  * @implements Rule<Expr>
  */
-class InvalidAssignVarRule implements Rule
+#[RegisteredRule(level: 0)]
+final class InvalidAssignVarRule implements Rule
 {
 
 	public function __construct(private NullsafeCheck $nullsafeCheck)
@@ -39,19 +41,28 @@ class InvalidAssignVarRule implements Rule
 
 		if ($this->nullsafeCheck->containsNullSafe($node->var)) {
 			return [
-				RuleErrorBuilder::message('Nullsafe operator cannot be on left side of assignment.')->nonIgnorable()->build(),
+				RuleErrorBuilder::message('Nullsafe operator cannot be on left side of assignment.')
+					->identifier('nullsafe.assign')
+					->nonIgnorable()
+					->build(),
 			];
 		}
 
 		if ($node instanceof AssignRef && $this->nullsafeCheck->containsNullSafe($node->expr)) {
 			return [
-				RuleErrorBuilder::message('Nullsafe operator cannot be on right side of assignment by reference.')->nonIgnorable()->build(),
+				RuleErrorBuilder::message('Nullsafe operator cannot be on right side of assignment by reference.')
+					->identifier('nullsafe.byRef')
+					->nonIgnorable()
+					->build(),
 			];
 		}
 
 		if ($this->containsNonAssignableExpression($node->var)) {
 			return [
-				RuleErrorBuilder::message('Expression on left side of assignment is not assignable.')->nonIgnorable()->build(),
+				RuleErrorBuilder::message('Expression on left side of assignment is not assignable.')
+					->identifier('assign.invalidExpr')
+					->nonIgnorable()
+					->build(),
 			];
 		}
 
@@ -76,7 +87,7 @@ class InvalidAssignVarRule implements Rule
 			return false;
 		}
 
-		if ($expr instanceof Expr\List_ || $expr instanceof Expr\Array_) {
+		if ($expr instanceof Expr\List_) {
 			foreach ($expr->items as $item) {
 				if ($item === null) {
 					continue;

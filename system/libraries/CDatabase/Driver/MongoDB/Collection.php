@@ -2,13 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- *
- * @since Oct 21, 2019, 11:06:42 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 use MongoDB\BSON\ObjectID;
 use MongoDB\Collection as MongoCollection;
 
@@ -55,7 +48,7 @@ class CDatabase_Driver_MongoDB_Collection {
         $start = microtime(true);
         $result = call_user_func_array([$this->collection, $method], $parameters);
 
-        if ($this->driver->db()->isLogQuery() || $this->driver->db()->isBenchmarkQuery()) {
+        if ($this->driver->db()->logging()) {
             // Once we have run the query we will calculate the time that it took to run and
             // then log the query, bindings, and execution time so we will report them on
             // the event that the developer needs them. We'll log time in milliseconds.
@@ -78,12 +71,13 @@ class CDatabase_Driver_MongoDB_Collection {
             }
 
             $queryString = $this->collection->getCollectionName() . '.' . $method . '(' . implode(',', $query) . ')';
-            if ($this->driver->db()->isBenchmarkQuery()) {
-                $this->driver->db()->benchmarkQuery($queryString, $time, is_array($result) ? count($result) : 0);
+            if ($this->driver->db()->logging()) {
+                $this->driver->db()->logQuery($queryString, [], $time);
             }
-            $this->driver->db()->setLastQuery($queryString);
-            $this->driver->db()->logQuery($queryString, [], $time);
+            // $this->driver->db()->setLastQuery($queryString);
+            // $this->driver->db()->logQuery($queryString, [], $time);
         }
+
         return $result;
     }
 }

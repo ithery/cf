@@ -1,6 +1,9 @@
 <?php
 
-class CPagination_CursorPaginator extends CPagination_CursorPaginatorAbstract implements Cinterface_Arrayable, ArrayAccess, Countable, IteratorAggregate, CInterface_Jsonable, JsonSerializable, CPagination_CursorPaginatorInterface {
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
+
+class CPagination_CursorPaginator extends CPagination_CursorPaginatorAbstract implements Arrayable, ArrayAccess, Countable, IteratorAggregate, Jsonable, JsonSerializable, CPagination_CursorPaginatorInterface {
     /**
      * Create a new paginator instance.
      *
@@ -121,6 +124,7 @@ class CPagination_CursorPaginator extends CPagination_CursorPaginatorAbstract im
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->toArray();
     }

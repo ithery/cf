@@ -4,21 +4,28 @@ namespace PHPStan\Command\ErrorFormatter;
 
 use PHPStan\Command\AnalysisResult;
 use PHPStan\Command\Output;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\File\RelativePathHelper;
 use function array_keys;
 use function array_values;
 use function count;
 use function is_string;
 use function preg_replace;
+use function sprintf;
 use const PHP_EOL;
 
 /**
  * @see https://www.jetbrains.com/help/teamcity/build-script-interaction-with-teamcity.html#Reporting+Inspections
  */
-class TeamcityErrorFormatter implements ErrorFormatter
+#[AutowiredService(name: 'errorFormatter.teamcity')]
+final class TeamcityErrorFormatter implements ErrorFormatter
 {
 
-	public function __construct(private RelativePathHelper $relativePathHelper)
+	public function __construct(
+		#[AutowiredParameter(ref: '@simpleRelativePathHelper')]
+		private RelativePathHelper $relativePathHelper,
+	)
 	{
 	}
 
@@ -41,9 +48,15 @@ class TeamcityErrorFormatter implements ErrorFormatter
 		]);
 
 		foreach ($fileSpecificErrors as $fileSpecificError) {
+			$message = $fileSpecificError->getMessage();
+
+			if ($fileSpecificError->getIdentifier() !== null && $fileSpecificError->canBeIgnored()) {
+				$message .= sprintf(' (🪪 %s)', $fileSpecificError->getIdentifier());
+			}
+
 			$result .= $this->createTeamcityLine('inspection', [
 				'typeId' => 'phpstan',
-				'message' => $fileSpecificError->getMessage(),
+				'message' => $message,
 				'file' => $this->relativePathHelper->getRelativePath($fileSpecificError->getFile()),
 				'line' => $fileSpecificError->getLine(),
 				// additional attributes

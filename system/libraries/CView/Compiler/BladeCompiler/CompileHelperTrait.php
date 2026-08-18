@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CompileHelperTrait
+ * Description of CompileHelperTrait.
  *
  * @author Hery
  */
@@ -46,5 +46,31 @@ trait CView_Compiler_BladeCompiler_CompileHelperTrait {
      */
     protected function compileMethod($method) {
         return "<?php echo c::methodField{$method}; ?>";
+    }
+
+    /**
+     * Compile the "vite" statements into valid PHP.
+     *
+     * @param null|string $arguments
+     *
+     * @return string
+     */
+    protected function compileVite($arguments) {
+        $arguments ??= '()';
+
+        $class = CBase_Vite::class;
+
+        return "<?php echo c::container('$class'){$arguments}; ?>";
+    }
+
+    /**
+     * Compile the "viteReactRefresh" statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileViteReactRefresh() {
+        $class = CBase_Vite::class;
+
+        return "<?php echo c::container('$class')->reactRefresh(); ?>";
     }
 }

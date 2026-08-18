@@ -33,9 +33,9 @@
     </div>
     <div>
         <span class="btn btn-primary btn-dialog-select">
-            <span class="dialog-select-new"><?php echo clang::__($buttonLabel); ?></span>
+            <span class="dialog-select-new"><?php echo c::__($buttonLabel); ?></span>
             <span class="dialog-select-change dialog-select-exists">
-                <?php echo clang::__('Change'); ?>
+                <?php echo c::__('Change'); ?>
             </span>
             <input type="hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>">
         </span>

@@ -1,0 +1,38 @@
+<?php
+
+abstract class CTesting_Browser_Page {
+    /**
+     * Get the URL for the page.
+     *
+     * @return string
+     */
+    abstract public function url();
+
+    /**
+     * Assert that the browser is on the page.
+     *
+     * @param \CTesting_Browser $browser
+     *
+     * @return void
+     */
+    public function assert(CTesting_Browser $browser) {
+    }
+
+    /**
+     * Get the element shortcuts for the page.
+     *
+     * @return array
+     */
+    public function elements() {
+        return [];
+    }
+
+    /**
+     * Get the global element shortcuts for the site.
+     *
+     * @return array
+     */
+    public static function siteElements() {
+        return [];
+    }
+}

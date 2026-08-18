@@ -314,11 +314,11 @@ class CServer_Domain_Whois {
 
         $whoIsServer = carr::get(static::$whoIsServers, $tld);
         if (!$whoIsServer) {
-            return "Error: No appropriate Whois server found for ${domain} domain!";
+            return "Error: No appropriate Whois server found for {$domain} domain!";
         }
         $result = $this->queryWhoisServer($whoIsServer, $domain);
         if (!$result) {
-            return "Error: No results retrieved from ${whoIsServer} server for ${domain} domain!";
+            return "Error: No results retrieved from {$whoIsServer} server for {$domain} domain!";
         } else {
             $results = [];
             $whoIsServers = [];
@@ -345,7 +345,7 @@ class CServer_Domain_Whois {
             }
         }
 
-        return "${domain} domain lookup results from ${whoIsServer} server:\n\n" . $result;
+        return "{$domain} domain lookup results from {$whoIsServer} server:\n\n" . $result;
     }
 
     public function lookupIP($ip, $returnType = 'text') {

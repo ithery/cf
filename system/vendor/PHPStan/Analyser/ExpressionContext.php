@@ -2,28 +2,28 @@
 
 namespace PHPStan\Analyser;
 
-use PHPStan\Type\Type;
+use PhpParser\Node\Expr;
 
-class ExpressionContext
+final class ExpressionContext
 {
 
 	private function __construct(
 		private bool $isDeep,
 		private ?string $inAssignRightSideVariableName,
-		private ?Type $inAssignRightSideType,
-		private ?Type $inAssignRightSideNativeType,
+		private ?Expr $inAssignRightSideExpr,
+		private bool $inThrow = false,
 	)
 	{
 	}
 
 	public static function createTopLevel(): self
 	{
-		return new self(false, null, null, null);
+		return new self(isDeep: false, inAssignRightSideVariableName: null, inAssignRightSideExpr: null);
 	}
 
 	public static function createDeep(): self
 	{
-		return new self(true, null, null, null);
+		return new self(isDeep: true, inAssignRightSideVariableName: null, inAssignRightSideExpr: null);
 	}
 
 	public function enterDeep(): self
@@ -32,7 +32,7 @@ class ExpressionContext
 			return $this;
 		}
 
-		return new self(true, $this->inAssignRightSideVariableName, $this->inAssignRightSideType, $this->inAssignRightSideNativeType);
+		return new self(true, $this->inAssignRightSideVariableName, $this->inAssignRightSideExpr, $this->inThrow);
 	}
 
 	public function isDeep(): bool
@@ -40,9 +40,19 @@ class ExpressionContext
 		return $this->isDeep;
 	}
 
-	public function enterRightSideAssign(string $variableName, Type $type, Type $nativeType): self
+	public function enterThrow(): self
 	{
-		return new self($this->isDeep, $variableName, $type, $nativeType);
+		return new self($this->isDeep, $this->inAssignRightSideVariableName, $this->inAssignRightSideExpr, true);
+	}
+
+	public function isInThrow(): bool
+	{
+		return $this->inThrow;
+	}
+
+	public function enterRightSideAssign(string $variableName, Expr $expr): self
+	{
+		return new self($this->isDeep, $variableName, $expr, $this->inThrow);
 	}
 
 	public function getInAssignRightSideVariableName(): ?string
@@ -50,14 +60,9 @@ class ExpressionContext
 		return $this->inAssignRightSideVariableName;
 	}
 
-	public function getInAssignRightSideType(): ?Type
+	public function getInAssignRightSideExpr(): ?Expr
 	{
-		return $this->inAssignRightSideType;
-	}
-
-	public function getInAssignRightSideNativeType(): ?Type
-	{
-		return $this->inAssignRightSideNativeType;
+		return $this->inAssignRightSideExpr;
 	}
 
 }

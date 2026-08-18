@@ -1,6 +1,6 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 
 class CTesting_Fake_Queue_BatchRepositoryFake implements CQueue_Contract_BatchRepositoryInterface {
     /**

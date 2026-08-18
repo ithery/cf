@@ -2,15 +2,14 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2018, 2:00:52 PM
- */
 class CElement_FormInput_Email extends CElement_FormInput {
     use CTrait_Element_Property_Placeholder;
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'email';
@@ -18,6 +17,9 @@ class CElement_FormInput_Email extends CElement_FormInput {
         $this->addClass('form-control');
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);

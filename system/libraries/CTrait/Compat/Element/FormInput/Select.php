@@ -17,6 +17,7 @@ trait CTrait_Compat_Element_FormInput_Select {
      * @param mixed $list
      */
     public function set_list($list) {
+        /** @var CElement_FormInput_Select $this */
         return $this->setList($list);
     }
 
@@ -26,6 +27,7 @@ trait CTrait_Compat_Element_FormInput_Select {
      * @param mixed $bool
      */
     public function set_multiple($bool) {
+        /** @var CElement_FormInput_Select $this */
         return $this->setMultiple($bool);
     }
 
@@ -35,6 +37,7 @@ trait CTrait_Compat_Element_FormInput_Select {
      * @param mixed $applyjs
      */
     public function set_applyjs($applyjs) {
+        /** @var CElement_FormInput_Select $this */
         return $this->setApplyJs($applyjs);
     }
 
@@ -44,6 +47,7 @@ trait CTrait_Compat_Element_FormInput_Select {
      * @param mixed $bool
      */
     public function set_hide_search($bool) {
+        /** @var CElement_FormInput_Select $this */
         return $this->setHideSearch($bool);
     }
 
@@ -51,7 +55,8 @@ trait CTrait_Compat_Element_FormInput_Select {
      * @deprecated since version 1.2
      */
     public function get_hide_search() {
-        return $this->hide_search;
+        /** @var CElement_FormInput_Select $this */
+        return $this->hideSearch;
     }
 
     /**
@@ -61,7 +66,8 @@ trait CTrait_Compat_Element_FormInput_Select {
      * @param mixed $list
      */
     public function add_group_list($group, $list) {
-        $this->group_list[$group] = $list;
+        /** @var CElement_FormInput_Select $this */
+        $this->groupList[$group] = $list;
 
         return $this;
     }
@@ -72,14 +78,15 @@ trait CTrait_Compat_Element_FormInput_Select {
      * @param mixed $c
      */
     public function add_dropdown_class($c) {
+        /** @var CElement_FormInput_Select $this */
         if (is_array($c)) {
-            $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
+            $this->dropdownClasses = array_merge($c, $this->dropdownClasses);
         } else {
             if ($this->bootstrap == '3.3') {
                 $c = str_replace('span', 'col-md-', $c);
                 $c = str_replace('row-fluid', 'row', $c);
             }
-            $this->dropdown_classes[] = $c;
+            $this->dropdownClasses[] = $c;
         }
 
         return $this;

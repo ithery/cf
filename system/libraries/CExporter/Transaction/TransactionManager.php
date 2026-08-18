@@ -34,7 +34,7 @@ class CExporter_Transaction_TransactionManager extends CBase_ManagerAbstract {
      */
     public function createDbDriver() {
         return new CExporter_Transaction_Handler_DbHandler(
-            CDatabase::instance()
+            c::db()
         );
     }
 

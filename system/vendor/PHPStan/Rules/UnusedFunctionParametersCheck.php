@@ -3,88 +3,115 @@
 namespace PHPStan\Rules;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr\Variable;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Type\Constant\ConstantStringType;
-use function array_fill_keys;
-use function array_keys;
+use PHPStan\ShouldNotHappenException;
 use function array_merge;
+use function in_array;
 use function is_array;
 use function is_string;
 use function sprintf;
 
-class UnusedFunctionParametersCheck
+#[AutowiredService]
+final class UnusedFunctionParametersCheck
 {
 
-	public function __construct(private ReflectionProvider $reflectionProvider)
+	public function __construct(
+		private ReflectionProvider $reflectionProvider,
+		#[AutowiredParameter(ref: '%featureToggles.reportPreciseLineForUnusedFunctionParameter%')]
+		private bool $reportExactLine,
+	)
 	{
 	}
 
 	/**
-	 * @param string[] $parameterNames
+	 * @param Variable[] $parameterVars
 	 * @param Node[] $statements
-	 * @param mixed[] $additionalMetadata
-	 * @return RuleError[]
+	 * @param 'constructor.unusedParameter'|'closure.unusedUse' $identifier
+	 * @return list<IdentifierRuleError>
 	 */
 	public function getUnusedParameters(
 		Scope $scope,
-		array $parameterNames,
+		array $parameterVars,
 		array $statements,
 		string $unusedParameterMessage,
 		string $identifier,
-		array $additionalMetadata,
 	): array
 	{
-		$unusedParameters = array_fill_keys($parameterNames, true);
-		foreach ($this->getUsedVariables($scope, $statements) as $variableName) {
-			if (!isset($unusedParameters[$variableName])) {
-				continue;
+		$unusedParameters = [];
+		foreach ($parameterVars as $variable) {
+			if (!is_string($variable->name)) {
+				throw new ShouldNotHappenException();
 			}
 
+			$unusedParameters[$variable->name] = $variable;
+		}
+		foreach ($this->getUsedVariables($scope, $statements) as $variableName) {
 			unset($unusedParameters[$variableName]);
 		}
+
 		$errors = [];
-		foreach (array_keys($unusedParameters) as $name) {
-			$errors[] = RuleErrorBuilder::message(
-				sprintf($unusedParameterMessage, $name),
-			)->identifier($identifier)->metadata($additionalMetadata + ['variableName' => $name])->build();
+		foreach ($unusedParameters as $name => $variable) {
+			$errorBuilder = RuleErrorBuilder::message(sprintf($unusedParameterMessage, $name))->identifier($identifier);
+			if ($this->reportExactLine) {
+				$errorBuilder->line($variable->getStartLine());
+			}
+			$errors[] = $errorBuilder->build();
 		}
 
 		return $errors;
 	}
 
 	/**
-	 * @param Node[]|Node|scalar $node
+	 * @param Node[]|Node|scalar|null $node
 	 * @return string[]
 	 */
 	private function getUsedVariables(Scope $scope, $node): array
 	{
 		$variableNames = [];
 		if ($node instanceof Node) {
-			if ($node instanceof Node\Expr\FuncCall && $node->name instanceof Node\Name) {
+			if ($node instanceof Node\Expr\FuncCall && $node->name instanceof Node\Name && !$node->isFirstClassCallable()) {
 				$functionName = $this->reflectionProvider->resolveFunctionName($node->name, $scope);
-				if ($functionName === 'func_get_args') {
+				if (in_array($functionName, ['func_get_args', 'get_defined_vars'], true)) {
 					return $scope->getDefinedVariables();
 				}
 			}
-			if ($node instanceof Node\Expr\Variable && is_string($node->name) && $node->name !== 'this') {
-				return [$node->name];
+			if ($node instanceof Node\Expr\Include_ || $node instanceof Node\Expr\Eval_) {
+				return $scope->getDefinedVariables();
 			}
-			if ($node instanceof Node\Expr\ClosureUse && is_string($node->var->name)) {
+			if ($node instanceof Variable) {
+				if (is_string($node->name)) {
+					if ($node->name !== 'this') {
+						return [$node->name];
+					}
+				} else {
+					$nameType = $scope->getType($node->name);
+					if ($nameType->getConstantStrings() === []) {
+						return $scope->getDefinedVariables();
+					}
+
+					foreach ($nameType->getConstantStrings() as $constantString) {
+						$variableNames[] = $constantString->getValue();
+					}
+				}
+			}
+			if ($node instanceof Node\ClosureUse && is_string($node->var->name)) {
 				return [$node->var->name];
 			}
 			if (
 				$node instanceof Node\Expr\FuncCall
+				&& !$node->isFirstClassCallable()
 				&& $node->name instanceof Node\Name
 				&& (string) $node->name === 'compact'
 			) {
 				foreach ($node->getArgs() as $arg) {
 					$argType = $scope->getType($arg->value);
-					if (!($argType instanceof ConstantStringType)) {
-						continue;
+					foreach ($argType->getConstantStrings() as $constantStringType) {
+						$variableNames[] = $constantStringType->getValue();
 					}
-
-					$variableNames[] = $argType->getValue();
 				}
 			}
 			foreach ($node->getSubNodeNames() as $subNodeName) {

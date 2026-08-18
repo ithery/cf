@@ -2,6 +2,7 @@
 
 namespace PHPStan\Reflection\BetterReflection\SourceLocator;
 
+use Override;
 use PHPStan\BetterReflection\Identifier\Identifier;
 use PHPStan\BetterReflection\Identifier\IdentifierType;
 use PHPStan\BetterReflection\Reflection\Reflection;
@@ -9,7 +10,7 @@ use PHPStan\BetterReflection\Reflector\Reflector;
 use PHPStan\BetterReflection\SourceLocator\SourceStubber\PhpStormStubsSourceStubber;
 use PHPStan\BetterReflection\SourceLocator\Type\SourceLocator;
 
-class PhpVersionBlacklistSourceLocator implements SourceLocator
+final class PhpVersionBlacklistSourceLocator implements SourceLocator
 {
 
 	public function __construct(
@@ -19,6 +20,7 @@ class PhpVersionBlacklistSourceLocator implements SourceLocator
 	{
 	}
 
+	#[Override]
 	public function locateIdentifier(Reflector $reflector, Identifier $identifier): ?Reflection
 	{
 		if ($identifier->isClass()) {
@@ -36,6 +38,7 @@ class PhpVersionBlacklistSourceLocator implements SourceLocator
 		return $this->sourceLocator->locateIdentifier($reflector, $identifier);
 	}
 
+	#[Override]
 	public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType): array
 	{
 		return $this->sourceLocator->locateIdentifiersByType($reflector, $identifierType);

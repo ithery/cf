@@ -13,15 +13,22 @@ use PhpParser\Node\Expr\StaticPropertyFetch;
 use PhpParser\Node\Identifier;
 use PHPStan\Analyser\Scope;
 use PHPStan\Node\Constant\ClassConstantFetch;
+use PHPStan\Node\Expr\SetExistingOffsetValueTypeExpr;
+use PHPStan\Node\Expr\SetOffsetValueTypeExpr;
+use PHPStan\Node\Property\PropertyAssign;
 use PHPStan\Node\Property\PropertyRead;
 use PHPStan\Node\Property\PropertyWrite;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\MethodReflection;
 use PHPStan\ShouldNotHappenException;
-use PHPStan\Type\ThisType;
+use PHPStan\Type\TypeUtils;
+use ReflectionProperty;
 use function count;
 use function in_array;
+use function is_string;
+use function strtolower;
 
-class ClassStatementsGatherer
+final class ClassStatementsGatherer
 {
 
 	private const PROPERTY_ENUMERATING_FUNCTIONS = [
@@ -49,6 +56,12 @@ class ClassStatementsGatherer
 
 	/** @var ClassConstantFetch[] */
 	private array $constantFetches = [];
+
+	/** @var array<string, MethodReturnStatementsNode> */
+	private array $returnStatementNodes = [];
+
+	/** @var list<PropertyAssign> */
+	private array $propertyAssigns = [];
 
 	/**
 	 * @param callable(Node $node, Scope $scope): void $nodeCallback
@@ -109,6 +122,22 @@ class ClassStatementsGatherer
 		return $this->constantFetches;
 	}
 
+	/**
+	 * @return array<string, MethodReturnStatementsNode>
+	 */
+	public function getReturnStatementsNodes(): array
+	{
+		return $this->returnStatementNodes;
+	}
+
+	/**
+	 * @return list<PropertyAssign>
+	 */
+	public function getPropertyAssigns(): array
+	{
+		return $this->propertyAssigns;
+	}
+
 	public function __invoke(Node $node, Scope $scope): void
 	{
 		$nodeCallback = $this->nodeCallback;
@@ -130,6 +159,8 @@ class ClassStatementsGatherer
 				$this->propertyUsages[] = new PropertyWrite(
 					new PropertyFetch(new Expr\Variable('this'), new Identifier($node->getName())),
 					$scope,
+					true,
+					$node,
 				);
 			}
 			return;
@@ -144,10 +175,17 @@ class ClassStatementsGatherer
 		}
 		if ($node instanceof MethodCall || $node instanceof StaticCall) {
 			$this->methodCalls[] = new \PHPStan\Node\Method\MethodCall($node, $scope);
+			if ($node instanceof StaticCall && $node->name instanceof Identifier && $node->name->toLowerString() === '__construct') {
+				$this->tryToApplyPropertyWritesFromAncestorConstructor($node, $scope);
+			}
 			return;
 		}
 		if ($node instanceof MethodCallableNode || $node instanceof StaticMethodCallableNode) {
 			$this->methodCalls[] = new \PHPStan\Node\Method\MethodCall($node->getOriginalNode(), $scope);
+			return;
+		}
+		if ($node instanceof MethodReturnStatementsNode) {
+			$this->returnStatementNodes[strtolower($node->getMethodName())] = $node;
 			return;
 		}
 		if (
@@ -167,7 +205,16 @@ class ClassStatementsGatherer
 			return;
 		}
 		if ($node instanceof PropertyAssignNode) {
-			$this->propertyUsages[] = new PropertyWrite($node->getPropertyFetch(), $scope);
+			$propertyFetch = $node->getPropertyFetch();
+			$assignedExpr = $node->getAssignedExpr();
+			if ($assignedExpr instanceof SetOffsetValueTypeExpr || $assignedExpr instanceof SetExistingOffsetValueTypeExpr) {
+				$propertyType = $scope->getType($propertyFetch);
+				if (!$propertyType->isObject()->no()) {
+					$this->propertyUsages[] = new PropertyRead($propertyFetch, $scope);
+				}
+			}
+			$this->propertyUsages[] = new PropertyWrite($propertyFetch, $scope, false, $node);
+			$this->propertyAssigns[] = new PropertyAssign($node, $scope);
 			return;
 		}
 		if (!$node instanceof Expr) {
@@ -184,10 +231,11 @@ class ClassStatementsGatherer
 			}
 
 			$this->propertyUsages[] = new PropertyRead($node->expr, $scope);
-			$this->propertyUsages[] = new PropertyWrite($node->expr, $scope);
+			$this->propertyUsages[] = new PropertyWrite($node->expr, $scope, false, $node);
 			return;
 		}
-		if ($node instanceof Node\Scalar\EncapsedStringPart) {
+		if ($node instanceof Expr\Variable) {
+			$this->tryToApplyPromotedParameterRead($node, $scope);
 			return;
 		}
 		if ($node instanceof FunctionCallableNode) {
@@ -219,7 +267,7 @@ class ClassStatementsGatherer
 		}
 
 		$firstArgValue = $args[0]->value;
-		if (!$scope->getType($firstArgValue) instanceof ThisType) {
+		if (TypeUtils::findThisType($scope->getType($firstArgValue)) === null) {
 			return;
 		}
 
@@ -228,9 +276,94 @@ class ClassStatementsGatherer
 			if ($property->isStatic()) {
 				continue;
 			}
+			if ($property->getName() === '') {
+				throw new ShouldNotHappenException();
+			}
 			$this->propertyUsages[] = new PropertyRead(
 				new PropertyFetch(new Expr\Variable('this'), new Identifier($property->getName())),
 				$scope,
+			);
+		}
+	}
+
+	private function tryToApplyPromotedParameterRead(Expr\Variable $node, Scope $scope): void
+	{
+		if (!is_string($node->name) || $node->name === '') {
+			return;
+		}
+		if ($scope->isInExpressionAssign($node)) {
+			return;
+		}
+		if ($scope->isInAnonymousFunction()) {
+			return;
+		}
+		$function = $scope->getFunction();
+		if (!$function instanceof MethodReflection) {
+			return;
+		}
+		if (strtolower($function->getName()) !== '__construct') {
+			return;
+		}
+		if ($function->getDeclaringClass()->getName() !== $this->classReflection->getName()) {
+			return;
+		}
+
+		$variableName = $node->name;
+		$constructorNode = null;
+		foreach ($this->methods as $method) {
+			$methodNode = $method->getNode();
+			if (strtolower($methodNode->name->toString()) !== '__construct') {
+				continue;
+			}
+			$constructorNode = $methodNode;
+			break;
+		}
+
+		if ($constructorNode === null) {
+			return;
+		}
+
+		foreach ($constructorNode->params as $param) {
+			if ($param->flags === 0 && $param->hooks === []) {
+				continue;
+			}
+			if (!$param->var instanceof Expr\Variable || !is_string($param->var->name)) {
+				continue;
+			}
+			if ($param->var->name !== $variableName) {
+				continue;
+			}
+			$this->propertyUsages[] = new PropertyRead(
+				new PropertyFetch(new Expr\Variable('this'), new Identifier($variableName), $node->getAttributes()),
+				$scope,
+			);
+			return;
+		}
+	}
+
+	private function tryToApplyPropertyWritesFromAncestorConstructor(StaticCall $ancestorConstructorCall, Scope $scope): void
+	{
+		if (!$ancestorConstructorCall->class instanceof Node\Name) {
+			return;
+		}
+
+		$calledOnType = $scope->resolveTypeByName($ancestorConstructorCall->class);
+		if ($calledOnType->getClassReflection() === null || TypeUtils::findThisType($calledOnType) === null) {
+			return;
+		}
+
+		$classReflection = $calledOnType->getClassReflection()->getNativeReflection();
+		foreach ($classReflection->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED) as $property) {
+			if (!$property->isPromoted() || $property->getDeclaringClass()->getName() !== $classReflection->getName()) {
+				continue;
+			}
+			if ($property->getName() === '') {
+				throw new ShouldNotHappenException();
+			}
+			$this->propertyUsages[] = new PropertyWrite(
+				new PropertyFetch(new Expr\Variable('this'), new Identifier($property->getName()), $ancestorConstructorCall->getAttributes()),
+				$scope,
+				false,
 			);
 		}
 	}

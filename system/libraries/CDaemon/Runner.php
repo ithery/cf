@@ -1,41 +1,24 @@
 <?php
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\PhpExecutableFinder;
 
-class CDaemon_Runner {
+class CDaemon_Runner extends CDaemon_RunnerAbstract {
     /**
      * @var string
      */
     protected $serviceClass;
 
     /**
-     * @var string
+     * @param string      $serviceClass
+     * @param null|string $domain
      */
-    protected $domain;
-
-    /**
-     * @var bool
-     */
-    protected $debug = false;
-
     public function __construct($serviceClass, $domain = null) {
         $this->serviceClass = $serviceClass;
         $this->domain = $domain ?: CF::domain();
     }
 
-    public function setDebug($bool = true) {
-        $this->debug = $bool;
-
-        return $this;
-    }
-
     /**
-     * Alias for run.
+     * @return bool
      */
-    public function start() {
-        return $this->run();
-    }
-
     public function run() {
         $isUnix = CDaemon_Helper::getPlatform() === CDaemon_Helper::UNIX;
         if ($isUnix && !extension_loaded('posix')) {
@@ -48,10 +31,15 @@ class CDaemon_Runner {
         if ($isUnix) {
             return $this->runUnix();
         } else {
-            return $this->runWindows();
+            $this->runWindows();
+
+            return true;
         }
     }
 
+    /**
+     * @return bool
+     */
     public function isRunning() {
         if ($pid = $this->getPid()) {
             $pid = trim($pid);
@@ -69,6 +57,9 @@ class CDaemon_Runner {
         return $this->serviceClass;
     }
 
+    /**
+     * @return false|string
+     */
     public function getPid() {
         $pidFile = CDaemon_Helper::getPidFile($this->serviceClass);
 
@@ -79,77 +70,18 @@ class CDaemon_Runner {
         return false;
     }
 
-    protected function getCommandToExecuteOnUnix($background = true) {
-        $command = $this->getExecutableCommand();
-        $binary = $this->getPhpBinary();
-        $output = $this->debug ? $this->debugOutput() : '/dev/null';
-        //$output = $this->debugOutput();
-
-        $commandToExecute = "NSS_STRICT_NOFORK=DISABLED ${binary} ${command}";
-        if ($background) {
-            $commandToExecute .= " 1> \"${output}\" 2>&1 &";
-        }
-
-        return $commandToExecute;
-    }
-
-    protected function getCommandToExecuteOnWindows($background = true) {
-        $command = $this->getExecutableCommand();
-        $binary = $this->getPhpBinary();
-        //$output = $this->debug ? $this->debugOutput() : '/dev/null';
-        //$output = $this->debugOutput();
-
-        $commandToExecute = "\"${binary}\" ${command}";
-        if ($background) {
-            $commandToExecute = 'start "blah" /B ' . $commandToExecute;
-        }
-
-        return $commandToExecute;
-    }
-
-    public function getCommandToExecute($background = true) {
-        $isUnix = CDaemon_Helper::getPlatform() === CDaemon_Helper::UNIX;
-        if ($isUnix) {
-            return $this->getCommandToExecuteOnUnix($background);
-        }
-
-        return $this->getCommandToExecuteOnWindows($background);
-    }
-
+    /**
+     * @return bool
+     */
     protected function runUnix() {
-        $commandToExecute = $this->getCommandToExecuteOnUnix();
-
+        $commandToExecute = $this->getCommandToExecuteOnUnix(true);
         $process = new Process($commandToExecute);
         $process->setWorkingDirectory(DOCROOT);
+        $process->setTimeout(null);
+        $process->disableOutput();
         $process->run();
-        $result = $process->getExitCode();
 
-        return $result == 0;
-    }
-
-    // @codeCoverageIgnoreStart
-
-    /**
-     * Run windows.
-     *
-     * @return void
-     */
-    protected function runWindows() {
-        // Run in background (non-blocking). From
-        // http://us3.php.net/manual/en/function.exec.php#43834
-        $binary = $this->getPhpBinary();
-        $command = $this->getExecutableCommand();
-
-        pclose(popen("start \"blah\" /B \"${binary}\" ${command}", 'r'));
-    }
-
-    /**
-     * @return false|string
-     */
-    protected function getPhpBinary() {
-        $executableFinder = new PhpExecutableFinder();
-
-        return $executableFinder->find();
+        return $process->getExitCode() == 0;
     }
 
     /**
@@ -165,6 +97,9 @@ class CDaemon_Runner {
         return $cmd;
     }
 
+    /**
+     * @return string
+     */
     protected function debugOutput() {
         $serviceClass = $this->serviceClass;
         $output = DOCROOT . 'temp' . DS . 'daemon' . DS . CF::appCode() . '/' . $serviceClass . '.log';
@@ -176,33 +111,25 @@ class CDaemon_Runner {
         return $output;
     }
 
-    protected function debugContent() {
-        $output = $this->debugOutput();
-        if (CFile::exists($output)) {
-            return file_get_contents($output);
-        }
-
-        return null;
-    }
-
     /**
      * @return void
      */
     public function logDump() {
         $pid = $this->getPid();
         if ($pid) {
-            exec("kill -10 ${pid}");
+            exec("kill -10 {$pid}");
         }
     }
 
     /**
-     * @param bool $exit
+     * @param bool $force
      *
      * @return string
      */
-    public function stop($exit = true) {
+    public function stop($force = false) {
         $pid = $this->getPid();
-        $command = 'kill -9 ' . $pid;
+        $option = $force ? '-9' : '-2';
+        $command = 'kill ' . $option . ' ' . $pid;
         if (defined('CFCLI')) {
             $process = new Process($command);
             $process->run();
@@ -214,32 +141,98 @@ class CDaemon_Runner {
         return $result;
     }
 
+    /**
+     * @return string
+     */
     public function getLogFile() {
         return CDaemon_Helper::getLogFile($this->serviceClass);
     }
 
-    public function getLog() {
+    /**
+     * @param null|int $size
+     * @param null|int $keep
+     *
+     * @return void
+     */
+    public function autoRotateLog($size = null, $keep = null) {
         $logFile = $this->getLogFile();
-        if (CFile::exists($logFile)) {
-            return CFile::get($logFile);
-        }
-
-        return null;
-    }
-
-    public function rotateLog() {
-        $logFile = $this->getLogFile();
-
-        if (strlen($logFile) > 0 && file_exists($logFile)) {
+        $size = $size ?: CF::config('daemon.logs.rotation.size', 500 * 1024);
+        $keep = $keep ?: CF::config('daemon.logs.rotation.keep', 10);
+        if (strlen($logFile) > 0 && CFile::isFile($logFile) && CFile::size($logFile) > $size) {
             $rotator = CLogger_Rotator::createRotate($logFile);
-
-            $rotator->forceRotate();
+            $rotator->size($size)->keep($keep)->run();
         }
     }
 
+    /**
+     * @return string
+     */
     public function status() {
-        $labelStatus = $this->isRunning() ? 'Running' : 'Stopped';
+        return $this->isRunning() ? 'Running' : 'Stopped';
+    }
 
-        return $labelStatus;
+    /**
+     * @return null|CCarbon
+     */
+    public function getStartTime() {
+        $pid = $this->getPid();
+        if (!$pid) {
+            return null;
+        }
+
+        $pid = trim($pid);
+
+        if (CDaemon_Helper::getPlatform() !== CDaemon_Helper::UNIX) {
+            return null;
+        }
+
+        if (!CDaemon_Utils::daemonIsRunningWithPid($pid, $this->serviceClass)) {
+            return null;
+        }
+
+        $command = "ps -o lstart= -p {$pid}";
+        $output = trim(shell_exec($command));
+
+        if (!$output) {
+            return null;
+        }
+
+        try {
+            return new CCarbon($output);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * File descriptor usage, process age, and CPU time for the running
+     * daemon - a process leaking file descriptors (or spinning without
+     * making progress) still reports a normal memory footprint and a
+     * reassuring "Running" status, so neither shows up without reading
+     * these directly. Returns null when the daemon isn't running or on
+     * a platform where these aren't available. See
+     * CDaemon_ProcessMetrics::forPid() for the actual reading, kept as a
+     * plain function of a pid so it's testable against a real /proc entry
+     * without needing an actual daemon service running.
+     *
+     * @return null|array{fdUsed: null|int, fdLimit: null|int, ageSeconds: null|int, cpuSeconds: null|float, cpuRatio: null|float}
+     */
+    public function getProcessMetrics() {
+        $pid = $this->getPid();
+        if (!$pid) {
+            return null;
+        }
+
+        $pid = trim($pid);
+
+        if (CDaemon_Helper::getPlatform() !== CDaemon_Helper::UNIX) {
+            return null;
+        }
+
+        if (!CDaemon_Utils::daemonIsRunningWithPid($pid, $this->serviceClass)) {
+            return null;
+        }
+
+        return CDaemon_ProcessMetrics::forPid($pid);
     }
 }

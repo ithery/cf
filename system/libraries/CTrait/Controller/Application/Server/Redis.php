@@ -1,11 +1,13 @@
 <?php
 
 trait CTrait_Controller_Application_Server_Redis {
+    public function getTitle() {
+        return 'Redis';
+    }
+
     public function index() {
         $config = CF::config('database.redis');
-        $connections = c::collect($config)->filter(function ($conn) {
-            return is_array($conn);
-        })->mapWithKeys(function ($value, $key) {
+        $connections = CRedis_Manager::instance()->getConnections()->mapWithKeys(function ($value, $key) {
             return [$key => [
                 'connection' => $key,
                 'data' => $value
@@ -13,6 +15,7 @@ trait CTrait_Controller_Application_Server_Redis {
         });
 
         $app = c::app();
+        $app->setTitle($this->getTitle());
         $table = $app->addTable();
         $table->setDataFromArray($connections);
         $table->addColumn('connection')->setLabel('Connection');
@@ -170,11 +173,19 @@ trait CTrait_Controller_Application_Server_Redis {
         $manager = CRedis_Manager::instance($connection);
 
         $pattern = c::request()->pattern;
-        $result = $manager->scan($pattern);
+        $count = c::request()->count ?: 100;
+        $result = $manager->scan($pattern, $count);
+        $tableData = c::collect($result)->map(function ($key) {
+            return [
+                'key' => carr::get($key, 0),
+                'type' => carr::get($key, 1)->getPayload(),
+                'ttl' => carr::get($key, 2),
+            ];
+        })->toArray();
         $app = c::app();
 
         $table = $app->addTable();
-        $table->setDataFromArray($result->toArray());
+        $table->setDataFromArray($tableData);
         $table->addColumn('key')->setLabel('Key');
         $table->addColumn('type')->setLabel('Type');
         $table->addColumn('ttl')->setLabel('TTL');
@@ -189,20 +200,25 @@ trait CTrait_Controller_Application_Server_Redis {
         if ($method == 'add' || $method == 'edit') {
             return $this->keysEdit($connection, $key);
         }
+        if ($method == 'delete') {
+            return $this->keysDelete($connection, $key);
+        }
     }
 
-    public function keysEdit($connection, $type = null, $key = null) {
+    public function keysEdit($connection, $key = null) {
         $isAdd = $key == null;
         $value = '';
+        $type = '';
         if ($key == null) {
             if (c::request()->has('key')) {
                 $key = c::request()->input('key');
             }
         }
-        if ($type == null) {
-            if (c::request()->has('type')) {
-                $key = c::request()->input('type');
-            }
+        $manager = CRedis_Manager::instance($connection);
+        if ($key) {
+            $fetchResult = $manager->fetch($key);
+            $value = carr::get($fetchResult, 'value');
+            $type = carr::get($fetchResult, 'type');
         }
         if (c::request()->has('value')) {
             //do post the value
@@ -233,11 +249,27 @@ trait CTrait_Controller_Application_Server_Redis {
             $form->addField()->setLabel('Type')->addLabelControl('type')->setValue($type);
         });
 
-        $form->addField()->setLabel('Value')->addTextControl('value')->setValue($value);
+        $supportedType = ['string', 'set'];
+        if ($type == 'string') {
+            $form->addField()->setLabel('Value')->addTextAreaControl('value')->setValue($value);
+        }
+        if ($type == 'set') {
+            $form->addField()->setLabel('Value')->addSelectControl('value')->setValue($value)->setMultiple(true)->setList(array_combine($value, $value))->setApplyJsSelect2();
+        }
 
-        $form->addActionList()->addAction()->setLabel('Submit')->setSubmit();
+        if (in_array($type, $supportedType)) {
+            $form->addActionList()->addAction()->setLabel('Submit')->setSubmit();
+        } else {
+            $form->addAlert()->setTypeDanger()->add(sprintf('Type %s not supported', $type));
+        }
 
         return $app;
+    }
+
+    public function keysDelete($connection, $key = null) {
+        CRedis_Manager::instance($connection)->del($key);
+
+        return c::redirect()->back();
     }
 
     protected function tabMetrics($section, $connection) {

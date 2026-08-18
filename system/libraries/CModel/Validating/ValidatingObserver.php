@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 3:28:16 PM
- */
 class CModel_Validating_ValidatingObserver {
     /**
      * Register the validation event for saving the model. Saving validation

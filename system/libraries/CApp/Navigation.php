@@ -2,24 +2,31 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2018, 2:40:04 AM
- */
-
 use CApp_Navigation_Helper as Helper;
 
+/**
+ * @deprecated 1.6, dont use this anymore
+ */
 class CApp_Navigation {
+    /**
+     * @var CApp_Navigation[]
+     */
     public static $instance = [];
 
+    /**
+     * @var callable[]
+     */
     protected static $accessCallback = [];
 
+    /**
+     * @var callable[]
+     */
     protected static $activeCallback = [];
 
     /**
      * @param string $domain optional
+     *
+     * @return null|callable
      */
     public static function getAccessCallback($domain = null) {
         if ($domain == null) {
@@ -31,6 +38,8 @@ class CApp_Navigation {
 
     /**
      * @param string $domain optional
+     *
+     * @return null|callable
      */
     public static function getActiveCallback($domain = null) {
         if ($domain == null) {
@@ -41,8 +50,10 @@ class CApp_Navigation {
     }
 
     /**
-     * @param callable $navigationCallback
-     * @param string   $domain             optional
+     * @param callable $accessCallback
+     * @param string   $domain         optional
+     *
+     * @return void
      */
     public static function setAccessCallback(callable $accessCallback, $domain = null) {
         if ($domain == null) {
@@ -53,8 +64,10 @@ class CApp_Navigation {
     }
 
     /**
-     * @param callable $navigationCallback
-     * @param string   $domain             optional
+     * @param callable $activeCallback
+     * @param string   $domain         optional
+     *
+     * @return void
      */
     public static function setActiveCallback(callable $activeCallback, $domain = null) {
         if ($domain == null) {
@@ -81,9 +94,17 @@ class CApp_Navigation {
         return self::$instance[$domain];
     }
 
+    /**
+     * @param null|string $domain
+     */
     public function __construct($domain = null) {
     }
 
+    /**
+     * @param null|string $domain
+     *
+     * @return array
+     */
     public static function navs($domain = null) {
         if ($domain == null) {
             $domain = CF::domain();
@@ -96,7 +117,7 @@ class CApp_Navigation {
     /**
      * @param array $options
      *
-     * @return html of the element
+     * @return string html of the element
      */
     public static function render($options = []) {
         $engine = carr::get($options, 'engine', 'Bootstrap');
@@ -111,11 +132,18 @@ class CApp_Navigation {
         return $app->renderNavigation();
     }
 
+    /**
+     * @param null|array  $navs
+     * @param int         $level
+     * @param int         $child
+     * @param null|string $domain
+     *
+     * @return array|bool
+     */
     public static function filterNavWithAccess($navs = null, $level = 0, &$child = 0, $domain = null) {
         if ($domain == null) {
             $domain = CF::domain();
         }
-        $is_admin = CApp::instance()->isAdministrator();
         if ($navs == null && $level == 0) {
             $navs = static::navs($domain);
         }
@@ -138,17 +166,18 @@ class CApp_Navigation {
             $icon = carr::get($clonedNav, 'icon');
 
             if (strlen($controller) > 0) {
-                if (!$is_admin && ccfg::get('have_user_access')) {
+                if (CF::config('app.have_user_access')) {
                     if (!Helper::haveAccess($d)) {
                         continue;
                     }
                 }
             }
 
-            $haveSubnav = isset($d['subnav']) && is_array($d['subnav']);
+            $resolvedSubnav = CNavigation_Data::resolveSubnav($d);
+            $haveSubnav = count($resolvedSubnav) > 0;
             $subnavArray = [];
             if ($haveSubnav) {
-                $subnavArray = static::filterNavWithAccess(carr::get($d, 'subnav', []), $level + 1, $child);
+                $subnavArray = static::filterNavWithAccess($resolvedSubnav, $level + 1, $child);
                 $clonedNav['subnav'] = $subnavArray;
             }
 
@@ -165,7 +194,7 @@ class CApp_Navigation {
                     continue;
                 }
                 if (isset($d['controller']) && $d['controller'] != '') {
-                    if (!$is_admin && ccfg::get('have_user_access')) {
+                    if (CF::config('app.have_user_access')) {
                         if (!Helper::haveAccess($d)) {
                             continue;
                         }

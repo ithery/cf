@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract {
     /**
      * The active database connection.
@@ -25,13 +27,13 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
     /**
      * Create a new database user provider.
      *
-     * @param CDatabase              $conn
+     * @param CDatabase_Connection   $conn
      * @param CCrypt_HasherInterface $hasher
      * @param string                 $table
      *
      * @return void
      */
-    public function __construct(CDatabase $conn, CCrypt_HasherInterface $hasher, $table) {
+    public function __construct(CDatabase_Connection $conn, CCrypt_HasherInterface $hasher, $table) {
         $this->conn = $conn;
         $this->table = $table;
         $this->hasher = $hasher;
@@ -119,7 +121,7 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
                 continue;
             }
 
-            if (is_array($value) || $value instanceof CInterface_Arrayable) {
+            if (is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
             } elseif ($value instanceof Closure) {
                 $value($query);

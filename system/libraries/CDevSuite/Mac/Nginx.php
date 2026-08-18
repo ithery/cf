@@ -1,10 +1,7 @@
 <?php
 
 /**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 15, 2020
+ * Description of Nginx.
  */
 class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
     const NGINX_CONF = '/usr/local/etc/nginx/nginx.conf';
@@ -105,12 +102,14 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
 
     /**
      * Check nginx.conf for errors.
+     *
+     * @return void
      */
     private function lint() {
         $this->cli->run(
             'sudo nginx -c ' . static::NGINX_CONF . ' -t',
             function ($exitCode, $outputMessage) {
-                throw new DomainException("Nginx cannot start; please check your nginx.conf [${exitCode}: ${outputMessage}].");
+                throw new DomainException("Nginx cannot start; please check your nginx.conf [{$exitCode}: {$outputMessage}].");
             }
         );
     }

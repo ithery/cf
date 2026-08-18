@@ -2,9 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- */
 class CBase_ForwarderStaticClass {
     protected $class;
 

@@ -4,11 +4,12 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Type\ArrayType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
+use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntegerType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
@@ -16,7 +17,8 @@ use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\UnionType;
 use function count;
 
-class ArrayRandFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class ArrayRandFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -24,15 +26,16 @@ class ArrayRandFunctionReturnTypeExtension implements DynamicFunctionReturnTypeE
 		return $functionReflection->getName() === 'array_rand';
 	}
 
-	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
+	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		$argsCount = count($functionCall->getArgs());
+		$args = $functionCall->getArgs();
+		$argsCount = count($args);
 		if ($argsCount < 1) {
-			return ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+			return null;
 		}
 
-		$firstArgType = $scope->getType($functionCall->getArgs()[0]->value);
-		$isInteger = (new IntegerType())->isSuperTypeOf($firstArgType->getIterableKeyType());
+		$firstArgType = $scope->getType($args[0]->value);
+		$isInteger = $firstArgType->getIterableKeyType()->isInteger();
 		$isString = $firstArgType->getIterableKeyType()->isString();
 
 		if ($isInteger->yes()) {
@@ -47,16 +50,16 @@ class ArrayRandFunctionReturnTypeExtension implements DynamicFunctionReturnTypeE
 			return $valueType;
 		}
 
-		$secondArgType = $scope->getType($functionCall->getArgs()[1]->value);
+		$secondArgType = $scope->getType($args[1]->value);
 
-		if ($secondArgType instanceof ConstantIntegerType) {
-			if ($secondArgType->getValue() === 1) {
-				return $valueType;
-			}
+		$one = new ConstantIntegerType(1);
+		if ($one->isSuperTypeOf($secondArgType)->yes()) {
+			return $valueType;
+		}
 
-			if ($secondArgType->getValue() >= 2) {
-				return new ArrayType(new IntegerType(), $valueType);
-			}
+		$bigger2 = IntegerRangeType::fromInterval(2, null);
+		if ($bigger2->isSuperTypeOf($secondArgType)->yes()) {
+			return new ArrayType(new IntegerType(), $valueType);
 		}
 
 		return TypeCombinator::union($valueType, new ArrayType(new IntegerType(), $valueType));

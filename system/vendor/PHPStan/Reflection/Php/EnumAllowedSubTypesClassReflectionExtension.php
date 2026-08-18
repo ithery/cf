@@ -2,12 +2,14 @@
 
 namespace PHPStan\Reflection\Php;
 
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\AllowedSubTypesClassReflectionExtension;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Type\Enum\EnumCaseObjectType;
 use function array_keys;
 
-class EnumAllowedSubTypesClassReflectionExtension implements AllowedSubTypesClassReflectionExtension
+#[AutowiredService]
+final class EnumAllowedSubTypesClassReflectionExtension implements AllowedSubTypesClassReflectionExtension
 {
 
 	public function supports(ClassReflection $classReflection): bool

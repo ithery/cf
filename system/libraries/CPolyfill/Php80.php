@@ -7,6 +7,12 @@ class CPolyfill_Php80 {
         if (\PHP_VERSION_ID >= 80000) {
             return;
         }
+        if (!defined('T_NAME_QUALIFIED')) {
+            define('T_NAME_QUALIFIED', -1); // nilai fiktif, agar tidak bentrok
+        }
+        if (!defined('T_NAME_FULLY_QUALIFIED')) {
+            define('T_NAME_FULLY_QUALIFIED', -2);
+        }
 
         if (!defined('FILTER_VALIDATE_BOOL') && defined('FILTER_VALIDATE_BOOLEAN')) {
             define('FILTER_VALIDATE_BOOL', \FILTER_VALIDATE_BOOLEAN);

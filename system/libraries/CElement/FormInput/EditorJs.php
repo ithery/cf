@@ -1,11 +1,16 @@
 <?php
 /**
+ * EditorJS form input element.
+ *
  * @see CManager_EditorJs
  */
 class CElement_FormInput_EditorJs extends CElement_FormInput {
     use CTrait_Element_Property_Placeholder;
     use CElement_FormInput_EditorJs_Trait_EditorJsToolTrait;
 
+    /**
+     * @var null|CManager_EditorJs
+     */
     protected $editor;
 
     /**
@@ -28,6 +33,11 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
      */
     protected $uploadImageByUrlEndpoint;
 
+    /**
+     * Constructor.
+     *
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'hidden';
@@ -53,34 +63,65 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
         $this->uploadImageByUrlEndpoint = c::url('cresenity/editorjs/upload/url');
     }
 
+    /**
+     * Set the endpoint URL for uploading images by file.
+     *
+     * @param string $url
+     *
+     * @return $this
+     */
     public function setUploadImageByFileEndpoint($url) {
         $this->uploadImageByFileEndpoint = $url;
 
         return $this;
     }
 
+    /**
+     * Set the endpoint URL for uploading images by URL.
+     *
+     * @param string $url
+     *
+     * @return $this
+     */
     public function setUploadImageByUrlEndpoint($url) {
         $this->uploadImageByUrlEndpoint = $url;
 
         return $this;
     }
 
+    /**
+     * Set the initial block type for the editor.
+     *
+     * @param string $block
+     *
+     * @return $this
+     */
     public function setInitialBlock($block) {
         $this->initialBlock = $block;
 
         return $this;
     }
 
+    /**
+     * Get the editor holder element ID.
+     *
+     * @return string
+     */
     public function holderId() {
         return $this->id . '-editor';
     }
 
+    /**
+     * Build the editor input element and register necessary scripts.
+     *
+     * @return void
+     */
     public function build() {
         $divHolder = $this->before()->addDiv($this->holderId())->addClass('editorjs-holder cres-editor-js');
         $divHolder->setAttr('data-input-id', $this->id);
         $this->addClass('cres:element:control:EditorJs');
         $this->setAttr('cres-element', 'control:EditorJs');
-        $this->setAttr('cres-config', c::jsonAttr($this->buildControlConfig()));
+        $this->setAttr('cres-config', c::json($this->buildControlConfig()));
 
         $this->setAttr('data-holder-id', $this->holderId());
         $this->setAttr('type', $this->type);
@@ -96,26 +137,47 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
                 $value = [];
             }
         }
-        $this->setAttr('value', c::jsonAttr($value));
+        $this->setAttr('value', c::json($value));
         $manager = c::manager();
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/list@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/quote@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/image@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/code@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/table@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/link@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/warning@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/marker@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/embed@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/raw@latest');
-        $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/table@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/list@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/quote@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/image@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/code@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/table@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/link@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/warning@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/marker@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/embed@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/raw@latest');
+        // $manager->registerJs('https://cdn.jsdelivr.net/npm/@editorjs/table@latest');
+
+        $manager->registerJs('plugins/editorjs/editorjs-2.28.0.js');
+        $manager->registerJs('plugins/editorjs/simple-image-1.5.1.js');
+        $manager->registerJs('plugins/editorjs/list-1.8.0.js');
+        $manager->registerJs('plugins/editorjs/quote-2.5.0.js');
+        $manager->registerJs('plugins/editorjs/image-2.8.1.js');
+        $manager->registerJs('plugins/editorjs/code-2.8.0.js');
+        $manager->registerJs('plugins/editorjs/table-2.2.2.js');
+        $manager->registerJs('plugins/editorjs/link-2.5.0.js');
+        $manager->registerJs('plugins/editorjs/warning-1.3.0.js');
+        $manager->registerJs('plugins/editorjs/marker-1.3.0.js');
+        $manager->registerJs('plugins/editorjs/inline-code-1.4.0.js');
+        $manager->registerJs('plugins/editorjs/checklist-1.5.0.js');
+        $manager->registerJs('plugins/editorjs/delimiter-1.3.0.js');
+        $manager->registerJs('plugins/editorjs/embed-2.7.6.js');
+        $manager->registerJs('plugins/editorjs/raw-2.4.0.js');
     }
 
+    /**
+     * Build the configuration array for EditorJS.
+     *
+     * @return array
+     */
     protected function buildControlConfig() {
         $editorSettings = [
             'placeholder' => (string) $this->placeholder,
@@ -136,5 +198,16 @@ class CElement_FormInput_EditorJs extends CElement_FormInput {
         ];
 
         return $config;
+    }
+
+    /**
+     * Get the tool by key.
+     *
+     * @param string $key
+     *
+     * @return null|CElement_FormInput_EditorJs_ToolAbstract
+     */
+    public function getTool($key) {
+        return carr::get($this->tools, $key);
     }
 }

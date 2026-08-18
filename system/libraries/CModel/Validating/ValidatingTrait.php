@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 3:25:25 PM
- */
 trait CModel_Validating_ValidatingTrait {
     use CModel_Validating_Injector_UniqueInjectorTrait;
 
@@ -78,9 +72,9 @@ trait CModel_Validating_ValidatingTrait {
      *
      * @param bool $value
      *
-     * @return void
-     *
      * @throws InvalidArgumentException
+     *
+     * @return void
      */
     public function setThrowValidationExceptions($value) {
         $this->throwValidationExceptions = (boolean) $value;
@@ -102,9 +96,9 @@ trait CModel_Validating_ValidatingTrait {
      *
      * @param bool $value
      *
-     * @return void
-     *
      * @throws InvalidArgumentException
+     *
+     * @return void
      */
     public function setInjectUniqueIdentifier($value) {
         $this->injectUniqueIdentifier = (boolean) $value;
@@ -131,10 +125,12 @@ trait CModel_Validating_ValidatingTrait {
             // them we'll return their raw value instead.
             if (in_array($key, $this->getDates()) || $this->isDateCastable($key)) {
                 $attributes[$key] = $value;
+
                 continue;
             }
             $attributes[$key] = $this->getModel()->getAttributeValue($key);
         }
+
         return $attributes;
     }
 
@@ -154,7 +150,7 @@ trait CModel_Validating_ValidatingTrait {
      * @return array
      */
     protected function modelValidationMessages() {
-        return (new static)->getValidationMessages();
+        return (new static())->getValidationMessages();
     }
 
     /**
@@ -173,7 +169,7 @@ trait CModel_Validating_ValidatingTrait {
      * @return array
      */
     protected function modelValidationAttributeNames() {
-        return (new static)->getValidationAttributeNames();
+        return (new static())->getValidationAttributeNames();
     }
 
     /**
@@ -183,7 +179,7 @@ trait CModel_Validating_ValidatingTrait {
      *
      * @return void
      */
-    public function setValidationAttributeNames(array $attributeNames = null) {
+    public function setValidationAttributeNames(?array $attributeNames = null) {
         $this->validationAttributeNames = $attributeNames;
     }
 
@@ -222,7 +218,7 @@ trait CModel_Validating_ValidatingTrait {
      *
      * @return void
      */
-    public function setRules(array $rules = null) {
+    public function setRules(?array $rules = null) {
         $this->rules = $rules;
     }
 
@@ -232,7 +228,7 @@ trait CModel_Validating_ValidatingTrait {
      * @return CBase_MessageBag
      */
     public function getErrors() {
-        return $this->validationErrors ?: new CBase_MessageBag;
+        return $this->validationErrors ?: new CBase_MessageBag();
     }
 
     /**
@@ -253,20 +249,22 @@ trait CModel_Validating_ValidatingTrait {
      */
     public function isValid() {
         $rules = $this->getRules();
+
         return $this->performValidation($rules);
     }
 
     /**
      * Returns if the model is valid, otherwise throws an exception.
      *
-     * @return bool
-     *
      * @throws \Watson\Validating\ValidationException
+     *
+     * @return bool
      */
     public function isValidOrFail() {
         if (!$this->isValid()) {
             $this->throwValidationException();
         }
+
         return true;
     }
 
@@ -291,6 +289,7 @@ trait CModel_Validating_ValidatingTrait {
         $this->setValidating(false);
         $result = $this->getModel()->save($options);
         $this->setValidating($currentValidatingSetting);
+
         return $result;
     }
 
@@ -300,14 +299,15 @@ trait CModel_Validating_ValidatingTrait {
      *
      * @param array $options
      *
-     * @return bool
-     *
      * @throws \Throwable
+     *
+     * @return bool
      */
     public function saveOrFail(array $options = []) {
         if ($this->isInvalid()) {
             return $this->throwValidationException();
         }
+
         return $this->getModel()->parentSaveOrFail($options);
     }
 
@@ -316,9 +316,9 @@ trait CModel_Validating_ValidatingTrait {
      *
      * @param array $options
      *
-     * @return bool
-     *
      * @throws \Throwable
+     *
+     * @return bool
      */
     public function parentSaveOrFail($options) {
         return parent::saveOrFail($options);
@@ -372,6 +372,7 @@ trait CModel_Validating_ValidatingTrait {
         if ($this->getValidationAttributeNames()) {
             $validator->setAttributeNames($this->getValidationAttributeNames());
         }
+
         return $validator;
     }
 
@@ -382,14 +383,15 @@ trait CModel_Validating_ValidatingTrait {
      *
      * @param array $rules
      *
-     * @return bool
-     *
      * @throws CModel_Validating_ValidationException
+     *
+     * @return bool
      */
     protected function performValidation($rules = []) {
         $validation = $this->makeValidator($rules);
         $result = $validation->passes();
         $this->setErrors($validation->messages());
+
         return $result;
     }
 
@@ -400,6 +402,7 @@ trait CModel_Validating_ValidatingTrait {
      */
     public function throwValidationException() {
         $validator = $this->makeValidator($this->getRules());
+
         throw new CModel_Validating_ValidationException($validator, $this);
     }
 
@@ -445,6 +448,7 @@ trait CModel_Validating_ValidatingTrait {
                 }
             }
         }
+
         return $rules;
     }
 
@@ -458,6 +462,7 @@ trait CModel_Validating_ValidatingTrait {
      */
     protected function getUniqueIdentifierInjectorMethod($validationRule) {
         $method = 'prepare' . cstr::studly($validationRule) . 'Rule';
+
         return method_exists($this, $method) ? $method : false;
     }
 

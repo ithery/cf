@@ -2,17 +2,16 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 1:45:25 PM
- */
-class CServer_Memory extends CServer_Base {
+class CServer_Memory {
     /**
-     * @var CServer_Memory
+     * @var CServer_Server
      */
-    protected static $instance = [];
+    protected $server;
+
+    /**
+     * @var CServer_Memory_Info
+     */
+    protected $info;
 
     /**
      * @var CServer_Memory_OS
@@ -20,141 +19,185 @@ class CServer_Memory extends CServer_Base {
     protected $os;
 
     /**
-     * @var CServer_Memory_Info
+     * @var bool
      */
-    protected $info;
+    protected $memoryBuilt = false;
 
-    public function __construct(array $sshConfig = null) {
-        $os = CServer::getOS();
+    /**
+     * @var bool
+     */
+    protected $swapBuilt = false;
+
+    /**
+     * @param CServer_Server $server
+     */
+    public function __construct(CServer_Server $server) {
+        $this->server = $server;
         $this->info = new CServer_Memory_Info();
-        $osClass = 'CServer_Memory_OS_' . $os;
-        $this->os = new $osClass($this, $this->info);
-        $this->sshConfig = $sshConfig;
-        $this->host = carr::get($sshConfig, 'host');
+        $osName = $server->getOS();
+        $osClass = 'CServer_Memory_OS_' . $osName;
+        $this->os = new $osClass($server, $this->info);
     }
 
     /**
-     * @param array $sshConfig
-     *
-     * @return CServer_Memory
+     * @return CServer_Server
      */
-    public static function instance(array $sshConfig = null) {
-        if (!is_array(self::$instance)) {
-            self::$instance = [];
-        }
-        $host = 'localhost';
-
-        if ($sshConfig != null) {
-            $host = carr::get($sshConfig, 'host');
-        }
-        if (!isset(self::$instance[$host])) {
-            self::$instance[$host] = new CServer_Memory($sshConfig);
-        }
-        return self::$instance[$host];
+    public function getServer() {
+        return $this->server;
     }
 
-    public function getMemApplication() {
-        if (!$this->info->getMemApplication()) {
+    /**
+     * @return void
+     */
+    protected function ensureMemoryBuilt() {
+        if (!$this->memoryBuilt) {
+            $this->memoryBuilt = true;
             $this->os->buildMemory();
         }
+    }
+
+    /**
+     * @return void
+     */
+    protected function ensureSwapBuilt() {
+        if (!$this->swapBuilt) {
+            $this->swapBuilt = true;
+            $this->os->buildSwap();
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getMemApplication() {
+        $this->ensureMemoryBuilt();
+
         return $this->info->getMemApplication();
     }
 
+    /**
+     * @return int
+     */
     public function getMemFree() {
-        if (!$this->info->getMemFree()) {
-            $this->os->buildMemory();
-        }
+        $this->ensureMemoryBuilt();
+
         return $this->info->getMemFree();
     }
 
+    /**
+     * @return int
+     */
     public function getMemBuffer() {
-        if (!$this->info->getMemBuffer()) {
-            $this->os->buildMemory();
-        }
+        $this->ensureMemoryBuilt();
+
         return $this->info->getMemBuffer();
     }
 
+    /**
+     * @return int
+     */
     public function getMemTotal() {
-        if (!$this->info->getMemTotal()) {
-            $this->os->buildMemory();
-        }
+        $this->ensureMemoryBuilt();
+
         return $this->info->getMemTotal();
     }
 
+    /**
+     * @return int
+     */
     public function getMemUsed() {
-        if (!$this->info->getMemUsed()) {
-            $this->os->buildMemory();
-        }
+        $this->ensureMemoryBuilt();
+
         return $this->info->getMemUsed();
     }
 
+    /**
+     * @return int
+     */
     public function getMemCache() {
-        if (!$this->info->getMemCache()) {
-            $this->os->buildMemory();
-        }
+        $this->ensureMemoryBuilt();
+
         return $this->info->getMemCache();
     }
 
+    /**
+     * @return float
+     */
     public function getMemPercentUsed() {
-        if (!$this->info->getMemPercentUsed()) {
-            $this->os->buildMemory();
-        }
+        $this->ensureMemoryBuilt();
+
         return $this->info->getMemPercentUsed();
     }
 
+    /**
+     * @return float
+     */
     public function getMemPercentBuffer() {
-        if (!$this->info->getMemPercentBuffer()) {
-            $this->os->buildMemory();
-        }
+        $this->ensureMemoryBuilt();
+
         return $this->info->getMemPercentBuffer();
     }
 
+    /**
+     * @return float
+     */
     public function getMemPercentApplication() {
-        if (!$this->info->getMemPercentApplication()) {
-            $this->os->buildMemory();
-        }
+        $this->ensureMemoryBuilt();
+
         return $this->info->getMemPercentApplication();
     }
 
+    /**
+     * @return float
+     */
     public function getMemPercentCache() {
-        if (!$this->info->getMemPercentCache()) {
-            $this->os->buildMemory();
-        }
+        $this->ensureMemoryBuilt();
+
         return $this->info->getMemPercentCache();
     }
 
+    /**
+     * @return array
+     */
     public function getSwapDevices() {
-        if (!$this->info->getSwapDevices()) {
-            $this->os->buildSwap();
-        }
+        $this->ensureSwapBuilt();
+
         return $this->info->getSwapDevices();
     }
 
+    /**
+     * @return int
+     */
     public function getSwapFree() {
-        if (!$this->info->getSwapFree()) {
-            $this->os->buildSwap();
-        }
+        $this->ensureSwapBuilt();
+
         return $this->info->getSwapFree();
     }
 
+    /**
+     * @return float
+     */
     public function getSwapPercentUsed() {
-        if (!$this->info->getSwapPercentUsed()) {
-            $this->os->buildSwap();
-        }
+        $this->ensureSwapBuilt();
+
         return $this->info->getSwapPercentUsed();
     }
 
+    /**
+     * @return int
+     */
     public function getSwapTotal() {
-        if (!$this->info->getSwapTotal()) {
-            $this->os->buildSwap();
-        }
+        $this->ensureSwapBuilt();
+
         return $this->info->getSwapTotal();
     }
 
+    /**
+     * @return int
+     */
     public function getSwapUsed() {
-        if (!$this->info->getSwapUsed()) {
-            $this->os->buildSwap();
-        }
+        $this->ensureSwapBuilt();
+
         return $this->info->getSwapUsed();
     }
 }

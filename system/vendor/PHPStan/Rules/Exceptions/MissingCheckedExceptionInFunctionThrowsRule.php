@@ -5,16 +5,14 @@ namespace PHPStan\Rules\Exceptions;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
 use PHPStan\Node\FunctionReturnStatementsNode;
-use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\ShouldNotHappenException;
 use function sprintf;
 
 /**
  * @implements Rule<FunctionReturnStatementsNode>
  */
-class MissingCheckedExceptionInFunctionThrowsRule implements Rule
+final class MissingCheckedExceptionInFunctionThrowsRule implements Rule
 {
 
 	public function __construct(private MissingCheckedExceptionInThrowsCheck $check)
@@ -29,10 +27,7 @@ class MissingCheckedExceptionInFunctionThrowsRule implements Rule
 	public function processNode(Node $node, Scope $scope): array
 	{
 		$statementResult = $node->getStatementResult();
-		$functionReflection = $scope->getFunction();
-		if (!$functionReflection instanceof FunctionReflection) {
-			throw new ShouldNotHappenException();
-		}
+		$functionReflection = $node->getFunctionReflection();
 
 		$errors = [];
 		foreach ($this->check->check($functionReflection->getThrowType(), $statementResult->getThrowPoints()) as [$className, $throwPointNode]) {
@@ -41,8 +36,8 @@ class MissingCheckedExceptionInFunctionThrowsRule implements Rule
 				$functionReflection->getName(),
 				$className,
 			))
-				->line($throwPointNode->getLine())
-				->identifier('exceptions.missingThrowsTag')
+				->line($throwPointNode->getStartLine())
+				->identifier('missingType.checkedException')
 				->build();
 		}
 

@@ -1,10 +1,4 @@
 <?php
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 23, 2019, 11:43:39 PM
- */
 trait CObservable_Trait_ControlTrait {
     /**
      * Create SelectSearch Control.
@@ -15,6 +9,20 @@ trait CObservable_Trait_ControlTrait {
      */
     public function addSelectSearchControl($id = null) {
         $control = new CElement_FormInput_SelectSearch($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create SelectTwo Control (cres.js auto-initialized).
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_SelectTwo
+     */
+    public function addSelectTwoControl($id = null) {
+        $control = new CElement_FormInput_SelectTwo($id);
         $this->wrapper->add($control);
 
         return $control;
@@ -71,6 +79,20 @@ trait CObservable_Trait_ControlTrait {
      */
     public function addTextareaControl($id = null) {
         $control = new CElement_FormInput_Textarea($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Text Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Textarea_Summernote
+     */
+    public function addSummerNoteControl($id = null) {
+        $control = new CElement_FormInput_Textarea_Summernote($id);
         $this->wrapper->add($control);
 
         return $control;
@@ -357,7 +379,7 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
-     * Create Text Control.
+     * Create Radio Control.
      *
      * @param null|string $id
      *
@@ -365,6 +387,20 @@ trait CObservable_Trait_ControlTrait {
      */
     public function addRadioControl($id = null) {
         $control = new CElement_FormInput_Radio($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Radio List Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_RadioList
+     */
+    public function addRadioListControl($id = null) {
+        $control = new CElement_FormInput_RadioList($id);
         $this->wrapper->add($control);
 
         return $control;
@@ -379,6 +415,20 @@ trait CObservable_Trait_ControlTrait {
      */
     public function addCheckboxControl($id = null) {
         $control = new CElement_FormInput_Checkbox($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Checkbox List Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_CheckboxList
+     */
+    public function addCheckboxListControl($id = null) {
+        $control = new CElement_FormInput_CheckboxList($id);
         $this->wrapper->add($control);
 
         return $control;
@@ -407,6 +457,20 @@ trait CObservable_Trait_ControlTrait {
      */
     public function addQueryBuilderControl($id = null) {
         $control = new CElement_FormInput_QueryBuilder($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Sortable Control.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Sortable
+     */
+    public function addSortableControl($id = null) {
+        $control = new CElement_FormInput_Sortable($id);
         $this->wrapper->add($control);
 
         return $control;

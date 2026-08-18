@@ -1,6 +1,8 @@
 <?php
 
-class CAuth_Access_Response implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CAuth_Access_Response implements Arrayable {
     /**
      * Indicates whether the response was allowed.
      *
@@ -133,6 +135,7 @@ class CAuth_Access_Response implements CInterface_Arrayable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->message();
     }

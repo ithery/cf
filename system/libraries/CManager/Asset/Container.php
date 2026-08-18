@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2018, 1:18:28 AM
- */
 abstract class CManager_Asset_Container implements CManager_Asset_ContainerInterface {
     use CManager_Asset_Trait_JsTrait,
         CManager_Asset_Trait_CssTrait;

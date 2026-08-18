@@ -5,10 +5,6 @@ use Http\Message\MessageFactory;
 use Psr\Http\Message\RequestInterface;
 use Http\Discovery\MessageFactoryDiscovery;
 
-/**
- * @author William Durand <william.durand1@gmail.com>
- * @author Tobias Nyholm <tobias.nyholm@gmail.com>
- */
 abstract class CGeo_ProviderHttpAbstract extends CGeo_ProviderAbstract {
     /**
      * @var HttpClient
@@ -24,7 +20,7 @@ abstract class CGeo_ProviderHttpAbstract extends CGeo_ProviderAbstract {
      * @param HttpClient          $client
      * @param null|MessageFactory $factory
      */
-    public function __construct(HttpClient $client, MessageFactory $factory = null) {
+    public function __construct(HttpClient $client, ?MessageFactory $factory = null) {
         $this->client = $client;
         $this->messageFactory = $factory ?: MessageFactoryDiscovery::find();
     }

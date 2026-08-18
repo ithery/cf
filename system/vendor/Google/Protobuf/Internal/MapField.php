@@ -134,6 +134,7 @@ class MapField implements \ArrayAccess, \IteratorAggregate, \Countable
      * @throws \ErrorException Invalid type for index.
      * @throws \ErrorException Non-existing index.
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->container[$key];

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2018, 10:04:13 PM
- */
 class CElement_Component_DataTable_Options {
     /**
      * Page number buttons only (1.10.8).
@@ -39,8 +33,14 @@ class CElement_Component_DataTable_Options {
      */
     const OPTION_PAGING_TYPE_FIRST_LAST_NUMBERS = 'first_last_numbers';
 
+    /**
+     * @var array
+     */
     protected $options;
 
+    /**
+     * @var array
+     */
     private $keyPreviousVersion = [
         'bPaginate' => 'paging',
         'bLengthChange' => 'lengthChange',
@@ -54,6 +54,9 @@ class CElement_Component_DataTable_Options {
         'sPaginationType' => 'pagingType',
     ];
 
+    /**
+     * @return void
+     */
     public function __construct() {
         $defaultOptions = [
             'deferRender' => true,
@@ -79,16 +82,30 @@ class CElement_Component_DataTable_Options {
         $this->options = $defaultOptions;
     }
 
+    /**
+     * @return array
+     */
     public function getOptions() {
         return $this->options;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return $this
+     */
     public function setOptions(array $options) {
         $this->options = $options;
 
         return $this;
     }
 
+    /**
+     * @param string $key
+     * @param mixed  $option
+     *
+     * @return $this
+     */
     public function setOption($key, $option) {
         $key = $this->normalizeKey($key);
         carr::set($this->options, $key, $option);
@@ -96,12 +113,23 @@ class CElement_Component_DataTable_Options {
         return $this;
     }
 
+    /**
+     * @param string $key
+     * @param mixed  $defaultValue
+     *
+     * @return mixed
+     */
     public function getOption($key, $defaultValue = null) {
         $key = $this->normalizeKey($key);
 
         return carr::get($this->options, $key, $defaultValue);
     }
 
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
     public function normalizeKey($key) {
         if (!isset($this->options[$key])) {
             //locate previous version for this key
@@ -113,6 +141,12 @@ class CElement_Component_DataTable_Options {
         return $key;
     }
 
+    /**
+     * @param string $key
+     * @param bool   $withTrailingComma
+     *
+     * @return string
+     */
     public function toJsonRow($key, $withTrailingComma = true) {
         $value = $this->getOption($key);
         $keys = [$key];

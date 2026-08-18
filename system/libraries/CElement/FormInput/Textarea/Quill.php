@@ -2,35 +2,59 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2019, 7:17:38 PM
- */
 class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
     use CTrait_Element_Property_Value;
+
+    /**
+     * Quill theme name (`'snow'`|`'bubble'`).
+     *
+     * @var string
+     */
     protected $theme;
 
+    /**
+     * Quill `modules.toolbar` config, either a decoded JSON array of
+     * toolbar groups or a raw JSON string.
+     *
+     * @var array|string
+     */
     protected $toolbar;
 
+    /**
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
         CManager::registerModule('quill');
         $this->theme = 'snow';
-        $this->toolbar = $this->setToolbar('full');
+        $this->setToolbar('full');
     }
 
+    /**
+     * @param string $theme
+     *
+     * @return $this
+     */
     public function setTheme($theme) {
         $this->theme = $theme;
 
         return $this;
     }
 
+    /**
+     * @param array|string $toolbar
+     *
+     * @return void
+     */
     public function setToolbarType($toolbar) {
         $this->setToolbar($toolbar);
     }
 
+    /**
+     * @param array|string $toolbar
+     *
+     * @return void
+     */
     public function setToolbar($toolbar) {
         if (!is_array($toolbar)) {
             $toolbarValue = $this->getToolbarJson($toolbar);
@@ -45,6 +69,11 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
         $this->toolbar = $toolbar;
     }
 
+    /**
+     * @param null|string $toolbarType
+     *
+     * @return null|string
+     */
     protected function getToolbarJson($toolbarType = null) {
         $json = null;
         switch ($toolbarType) {
@@ -77,11 +106,19 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
         return $json;
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         $this->addClass('quill-control');
         $this->add($this->value);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         switch ($this->theme) {
             case 'bubble':

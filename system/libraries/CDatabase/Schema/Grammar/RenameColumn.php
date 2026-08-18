@@ -7,11 +7,11 @@ class CDatabase_Schema_Grammar_RenameColumn {
      * @param \CDatabase_Schema_Grammar   $grammar
      * @param \CDatabase_Schema_Blueprint $blueprint
      * @param \CBase_Fluent               $command
-     * @param \CDatabase                  $connection
+     * @param \CDatabase_Connection       $connection
      *
      * @return array
      */
-    public static function compile(CDatabase_Schema_Grammar $grammar, CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase $connection) {
+    public static function compile(CDatabase_Schema_Grammar $grammar, CDatabase_Schema_Blueprint $blueprint, CBase_Fluent $command, CDatabase_Connection $connection) {
         $schema = $connection->getSchemaManager();
         $databasePlatform = $schema->getDatabasePlatform();
         $databasePlatform->registerDoctrineTypeMapping('enum', 'string');

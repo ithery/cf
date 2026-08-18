@@ -5,8 +5,10 @@ namespace PHPStan\PhpDoc\Tag;
 use PHPStan\Reflection\PassedByReference;
 use PHPStan\Type\Type;
 
-/** @api */
-class MethodTagParameter
+/**
+ * @api
+ */
+final class MethodTagParameter
 {
 
 	public function __construct(

@@ -4,36 +4,48 @@ namespace PHPStan\Rules\DeadCode;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredExtensions;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\ExtensionsCollection;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\ClassPropertiesNode;
+use PHPStan\Node\ClassPropertyNode;
 use PHPStan\Node\Property\PropertyRead;
-use PHPStan\Rules\Properties\ReadWritePropertiesExtensionProvider;
+use PHPStan\Reflection\MethodReflection;
+use PHPStan\Reflection\Php\PhpMethodFromParserNodeReflection;
+use PHPStan\Rules\Properties\ReadWritePropertiesExtension;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\Constant\ConstantStringType;
-use PHPStan\Type\MixedType;
 use PHPStan\Type\ObjectType;
-use PHPStan\Type\TypeUtils;
 use function array_key_exists;
 use function array_map;
 use function count;
+use function is_string;
+use function lcfirst;
 use function sprintf;
-use function strpos;
+use function str_contains;
 
 /**
  * @implements Rule<ClassPropertiesNode>
  */
-class UnusedPrivatePropertyRule implements Rule
+#[RegisteredRule(level: 4)]
+final class UnusedPrivatePropertyRule implements Rule
 {
 
 	/**
+	 * @param ExtensionsCollection<ReadWritePropertiesExtension> $extensions
 	 * @param string[] $alwaysWrittenTags
 	 * @param string[] $alwaysReadTags
 	 */
 	public function __construct(
-		private ReadWritePropertiesExtensionProvider $extensionProvider,
+		#[AutowiredExtensions(of: ReadWritePropertiesExtension::class)]
+		private ExtensionsCollection $extensions,
+		#[AutowiredParameter(ref: '%propertyAlwaysWrittenTags%')]
 		private array $alwaysWrittenTags,
+		#[AutowiredParameter(ref: '%propertyAlwaysReadTags%')]
 		private array $alwaysReadTags,
+		#[AutowiredParameter]
 		private bool $checkUninitializedProperties,
 	)
 	{
@@ -49,12 +61,8 @@ class UnusedPrivatePropertyRule implements Rule
 		if (!$node->getClass() instanceof Node\Stmt\Class_) {
 			return [];
 		}
-		if (!$scope->isInClass()) {
-			throw new ShouldNotHappenException();
-		}
-		$classReflection = $scope->getClassReflection();
-		$classType = new ObjectType($classReflection->getName());
-
+		$classReflection = $node->getClassReflection();
+		$classType = new ObjectType($classReflection->getName(), classReflection: $classReflection);
 		$properties = [];
 		foreach ($node->getProperties() as $property) {
 			if (!$property->isPrivate()) {
@@ -64,12 +72,12 @@ class UnusedPrivatePropertyRule implements Rule
 				continue;
 			}
 
-			$alwaysRead = false;
-			$alwaysWritten = false;
+			$alwaysRead = !$property->isReadable();
+			$alwaysWritten = !$property->isWritable();
 			if ($property->getPhpDoc() !== null) {
 				$text = $property->getPhpDoc();
 				foreach ($this->alwaysReadTags as $tag) {
-					if (strpos($text, $tag) === false) {
+					if (!str_contains($text, $tag)) {
 						continue;
 					}
 
@@ -78,7 +86,7 @@ class UnusedPrivatePropertyRule implements Rule
 				}
 
 				foreach ($this->alwaysWrittenTags as $tag) {
-					if (strpos($text, $tag) === false) {
+					if (!str_contains($text, $tag)) {
 						continue;
 					}
 
@@ -95,7 +103,7 @@ class UnusedPrivatePropertyRule implements Rule
 
 				$propertyReflection = $classReflection->getNativeProperty($propertyName);
 
-				foreach ($this->extensionProvider->getExtensions() as $extension) {
+				foreach ($this->extensions->getAll() as $extension) {
 					if ($alwaysRead && $alwaysWritten) {
 						break;
 					}
@@ -116,49 +124,121 @@ class UnusedPrivatePropertyRule implements Rule
 				'read' => $read,
 				'written' => $written,
 				'node' => $property,
+				'onlyReadable' => $property->isReadable() && !$property->isWritable(),
+				'onlyWritable' => $property->isWritable() && !$property->isReadable(),
+				'hasTrueRead' => $alwaysRead,
 			];
 		}
 
 		foreach ($node->getPropertyUsages() as $usage) {
+			$usageScope = $usage->getScope();
 			$fetch = $usage->getFetch();
 			if ($fetch->name instanceof Node\Identifier) {
-				$propertyNames = [$fetch->name->toString()];
+				$propertyName = $fetch->name->toString();
+				$propertyNames = [$propertyName];
+				if (
+					$usageScope->getFunction() !== null
+					&& $fetch instanceof Node\Expr\PropertyFetch
+					&& $fetch->var instanceof Node\Expr\Variable
+					&& is_string($fetch->var->name)
+					&& $fetch->var->name === 'this'
+				) {
+					$methodReflection = $usageScope->getFunction();
+					if (
+						$methodReflection instanceof PhpMethodFromParserNodeReflection
+						&& $methodReflection->isPropertyHook()
+						&& $methodReflection->getHookedPropertyName() === $propertyName
+						&& (
+							$methodReflection->getPropertyHookName() === 'set'
+							|| $usage instanceof PropertyRead
+						)
+					) {
+						continue;
+					}
+				}
 			} else {
-				$propertyNameType = $usage->getScope()->getType($fetch->name);
-				$strings = TypeUtils::getConstantStrings($propertyNameType);
+				$propertyNameType = $usageScope->getType($fetch->name);
+				$strings = $propertyNameType->getConstantStrings();
 				if (count($strings) === 0) {
-					return [];
+					// handle subtractions of a dynamic property fetch
+					foreach ($properties as $propertyName => $data) {
+						if ((new ConstantStringType($propertyName))->isSuperTypeOf($propertyNameType)->no()) {
+							continue;
+						}
+
+						unset($properties[$propertyName]);
+					}
+
+					continue;
 				}
 
 				$propertyNames = array_map(static fn (ConstantStringType $type): string => $type->getValue(), $strings);
 			}
+
 			if ($fetch instanceof Node\Expr\PropertyFetch) {
-				$fetchedOnType = $usage->getScope()->getType($fetch->var);
+				$fetchedOnType = $usageScope->getType($fetch->var);
 			} else {
-				if (!$fetch->class instanceof Node\Name) {
-					continue;
+				if ($fetch->class instanceof Node\Name) {
+					$fetchedOnType = $usageScope->resolveTypeByName($fetch->class);
+				} else {
+					$fetchedOnType = $usageScope->getType($fetch->class)->getObjectTypeOrClassStringObjectType();
 				}
-
-				$fetchedOnType = $usage->getScope()->resolveTypeByName($fetch->class);
-			}
-
-			if ($classType->isSuperTypeOf($fetchedOnType)->no()) {
-				continue;
-			}
-			if ($fetchedOnType instanceof MixedType) {
-				continue;
 			}
 
 			foreach ($propertyNames as $propertyName) {
 				if (!array_key_exists($propertyName, $properties)) {
 					continue;
 				}
+
+				$propertyNode = $properties[$propertyName]['node'];
+				if ($propertyNode->isStatic()) {
+					$propertyReflection = $usageScope->getStaticPropertyReflection($fetchedOnType, $propertyName);
+				} else {
+					$propertyReflection = $usageScope->getInstancePropertyReflection($fetchedOnType, $propertyName);
+				}
+
+				if ($propertyReflection === null) {
+					if (!$classType->isSuperTypeOf($fetchedOnType)->no()) {
+						if ($usage instanceof PropertyRead) {
+							$properties[$propertyName]['read'] = true;
+							$properties[$propertyName]['hasTrueRead'] = true;
+						} else {
+							$properties[$propertyName]['written'] = true;
+						}
+					}
+					continue;
+				}
+				if ($propertyReflection->getDeclaringClass()->getName() !== $classReflection->getName()) {
+					if (!$classType->isSuperTypeOf($fetchedOnType)->no()) {
+						if ($usage instanceof PropertyRead) {
+							$properties[$propertyName]['read'] = true;
+							$properties[$propertyName]['hasTrueRead'] = true;
+						} else {
+							$properties[$propertyName]['written'] = true;
+						}
+					}
+					continue;
+				}
+
 				if ($usage instanceof PropertyRead) {
 					$properties[$propertyName]['read'] = true;
+					if (!$this->isPropertySelfWrite($usageScope, $propertyName, $propertyNode, $classReflection->getName())) {
+						$properties[$propertyName]['hasTrueRead'] = true;
+					}
 				} else {
 					$properties[$propertyName]['written'] = true;
 				}
 			}
+		}
+
+		foreach ($properties as $propertyName => $data) {
+			if (!$data['read'] || $data['hasTrueRead']) {
+				continue;
+			}
+			if (!$data['node']->isPromoted()) {
+				continue;
+			}
+			$properties[$propertyName]['read'] = false;
 		}
 
 		[$uninitializedProperties] = $node->getUninitializedProperties($scope, []);
@@ -167,33 +247,87 @@ class UnusedPrivatePropertyRule implements Rule
 		foreach ($properties as $name => $data) {
 			$propertyNode = $data['node'];
 			if ($propertyNode->isStatic()) {
-				$propertyName = sprintf('Static property %s::$%s', $scope->getClassReflection()->getDisplayName(), $name);
+				$propertyName = sprintf('Static property %s::$%s', $classReflection->getDisplayName(), $name);
 			} else {
-				$propertyName = sprintf('Property %s::$%s', $scope->getClassReflection()->getDisplayName(), $name);
+				$propertyName = sprintf('Property %s::$%s', $classReflection->getDisplayName(), $name);
 			}
 			$tip = sprintf('See: %s', 'https://phpstan.org/developing-extensions/always-read-written-properties');
 			if (!$data['read']) {
 				if (!$data['written']) {
 					$errors[] = RuleErrorBuilder::message(sprintf('%s is unused.', $propertyName))
 						->line($propertyNode->getStartLine())
-						->identifier('deadCode.unusedProperty')
-						->metadata([
-							'classOrder' => $node->getClass()->getAttribute('statementOrder'),
-							'classDepth' => $node->getClass()->getAttribute('statementDepth'),
-							'classStartLine' => $node->getClass()->getStartLine(),
-							'propertyName' => $name,
-						])
 						->tip($tip)
+						->identifier('property.unused')
 						->build();
 				} else {
-					$errors[] = RuleErrorBuilder::message(sprintf('%s is never read, only written.', $propertyName))->line($propertyNode->getStartLine())->tip($tip)->build();
+					if ($data['onlyReadable']) {
+						$errors[] = RuleErrorBuilder::message(sprintf('Readable %s is never read.', lcfirst($propertyName)))
+							->line($propertyNode->getStartLine())
+							->identifier('property.neverRead')
+							->build();
+					} else {
+						$errors[] = RuleErrorBuilder::message(sprintf('%s is never read, only written.', $propertyName))
+							->line($propertyNode->getStartLine())
+							->identifier('property.onlyWritten')
+							->tip($tip)
+							->build();
+					}
 				}
 			} elseif (!$data['written'] && (!array_key_exists($name, $uninitializedProperties) || !$this->checkUninitializedProperties)) {
-				$errors[] = RuleErrorBuilder::message(sprintf('%s is never written, only read.', $propertyName))->line($propertyNode->getStartLine())->tip($tip)->build();
+				if ($data['onlyWritable']) {
+					$errors[] = RuleErrorBuilder::message(sprintf('Writable %s is never written.', lcfirst($propertyName)))
+						->line($propertyNode->getStartLine())
+						->identifier('property.neverWritten')
+						->build();
+				} else {
+					$errors[] = RuleErrorBuilder::message(sprintf('%s is never written, only read.', $propertyName))
+						->line($propertyNode->getStartLine())
+						->identifier('property.onlyRead')
+						->tip($tip)
+						->build();
+				}
 			}
 		}
 
 		return $errors;
+	}
+
+	private function isPropertySelfWrite(
+		Scope $usageScope,
+		string $propertyName,
+		ClassPropertyNode $propertyNode,
+		string $className,
+	): bool
+	{
+		if (!$propertyNode->isPromoted()) {
+			return false;
+		}
+
+		$callStack = $usageScope->getFunctionCallStackWithParameters();
+		if ($callStack === []) {
+			return false;
+		}
+
+		$lastCall = $callStack[count($callStack) - 1];
+		[$calleeReflection, $parameterReflection] = $lastCall;
+
+		if (!$calleeReflection instanceof MethodReflection) {
+			return false;
+		}
+
+		if ($calleeReflection->getName() !== '__construct') {
+			return false;
+		}
+
+		if ($calleeReflection->getDeclaringClass()->getName() !== $className) {
+			return false;
+		}
+
+		if ($parameterReflection === null) {
+			return false;
+		}
+
+		return $parameterReflection->getName() === $propertyName;
 	}
 
 }

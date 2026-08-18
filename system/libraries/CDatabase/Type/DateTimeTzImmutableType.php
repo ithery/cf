@@ -3,25 +3,18 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 11:09:44 AM
- */
-
-/**
  * Immutable type of {@see DateTimeTzType}.
  */
 class CDatabase_Type_DateTimeTzImmutableType extends CDatabase_Type_DateTimeTzType {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getName() {
         return CDatabase_Type::DATETIMETZ_IMMUTABLE;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function convertToDatabaseValue($value, CDatabase_Platform $platform) {
         if (null === $value) {
@@ -40,7 +33,7 @@ class CDatabase_Type_DateTimeTzImmutableType extends CDatabase_Type_DateTimeTzTy
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function convertToPHPValue($value, CDatabase_Platform $platform) {
         if ($value === null || $value instanceof \DateTimeImmutable) {
@@ -61,7 +54,7 @@ class CDatabase_Type_DateTimeTzImmutableType extends CDatabase_Type_DateTimeTzTy
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function requiresSQLCommentHint(CDatabase_Platform $platform) {
         return true;

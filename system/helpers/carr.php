@@ -2,6 +2,8 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * Class carr.
  */
@@ -58,7 +60,7 @@ class carr {
     /**
      * Alias of isAssoc.
      *
-     * @param array $value array to check
+     * @param array $array array to check
      *
      * @return bool
      *
@@ -350,10 +352,10 @@ class carr {
      * @return array
      */
     public static function merge($array1, $array2) {
-        if ($array1 instanceof CInterface_Arrayable) {
+        if ($array1 instanceof Arrayable) {
             $array1 = $array1->toArray();
         }
-        if ($array2 instanceof CInterface_Arrayable) {
+        if ($array2 instanceof Arrayable) {
             $array2 = $array2->toArray();
         }
         if (carr::isAssoc($array2)) {
@@ -605,7 +607,7 @@ class carr {
      *
      * @return mixed
      */
-    public static function first($array, callable $callback = null, $default = null) {
+    public static function first($array, ?callable $callback = null, $default = null) {
         if (is_null($callback)) {
             if (empty($array)) {
                 return c::value($default);
@@ -634,7 +636,7 @@ class carr {
      *
      * @return mixed
      */
-    public static function last($array, callable $callback = null, $default = null) {
+    public static function last($array, ?callable $callback = null, $default = null) {
         if (is_null($callback)) {
             return empty($array) ? c::value($default) : end($array);
         }
@@ -724,6 +726,29 @@ class carr {
     }
 
     /**
+     * Conditionally compile styles from an array into a style list.
+     *
+     * @param array $array
+     *
+     * @return string
+     */
+    public static function toCssStyles($array) {
+        $styleList = static::wrap($array);
+
+        $styles = [];
+
+        foreach ($styleList as $class => $constraint) {
+            if (is_numeric($class)) {
+                $styles[] = cstr::finish($constraint, ';');
+            } elseif ($constraint) {
+                $styles[] = cstr::finish($class, ';');
+            }
+        }
+
+        return implode(' ', $styles);
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param array    $array
@@ -747,6 +772,19 @@ class carr {
         }
 
         return $new_array;
+    }
+
+    /**
+     * Filter items where the value is not null.
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function whereNotNull($array) {
+        return static::where($array, function ($value) {
+            return !is_null($value);
+        });
     }
 
     /**
@@ -821,6 +859,10 @@ class carr {
         }
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
+        }
+
+        if (is_float($key)) {
+            $key = (string) $key;
         }
 
         return array_key_exists($key, $array);
@@ -1165,12 +1207,14 @@ class carr {
         $ret = '';
         foreach ($array as $item) {
             if (is_array($item)) {
-                $ret .= self::implodes($item, $glue) . $glue;
+                $ret .= self::implodes($glue, $item) . $glue;
             } else {
                 $ret .= $item . $glue;
             }
         }
-        $ret = substr($ret, 0, 0 - strlen($glue));
+        //cast wajib: pada larik kosong ini menjadi substr('', 0, -1), yang di
+        //PHP 7.4 menjawab false dan baru menjawab '' sejak PHP 8.0
+        $ret = (string) substr($ret, 0, 0 - strlen($glue));
 
         return $ret;
     }
@@ -1222,6 +1266,18 @@ class carr {
     }
 
     /**
+     * Sort the array in descending order using the given callback or "dot" notation.
+     *
+     * @param array                      $array
+     * @param null|callable|array|string $callback
+     *
+     * @return array
+     */
+    public static function sortDesc($array, $callback = null) {
+        return CCollection::make($array)->sortByDesc($callback)->all();
+    }
+
+    /**
      * Recursively sort an array by keys and values.
      *
      * @param array $array
@@ -1266,11 +1322,19 @@ class carr {
             return null;
         }
         $func = function ($array, $iteratee, $accumulator, $initAccum = null) {
-            $length = \count(\is_array($array) ? $array : \iterator_to_array($array));
+            $array = \is_array($array) ? $array : \iterator_to_array($array);
+            $length = \count($array);
+            $skipFirstKey = null;
             if ($initAccum && $length) {
-                $accumulator = \current($array);
+                $accumulator = \reset($array);
+                $skipFirstKey = \key($array);
             }
             foreach ($array as $key => $value) {
+                if ($skipFirstKey !== null && $key === $skipFirstKey) {
+                    $skipFirstKey = null;
+
+                    continue;
+                }
                 $accumulator = $iteratee($accumulator, $value, $key, $array);
             }
 
@@ -1299,9 +1363,9 @@ class carr {
      * `predicate` returns truthy for. The predicate is invoked with three
      * arguments: (value, index|key, collection).
      *
-     * @param iterable $collection the collection to inspect
-     * @param callable $predicate  the function invoked per iteration
-     * @param int      $fromIndex  the index to search from
+     * @param Traversable $collection the collection to inspect
+     * @param callable    $predicate  the function invoked per iteration
+     * @param int         $fromIndex  the index to search from
      *
      * @return mixed returns the matched element, else `null`
      *
@@ -1612,6 +1676,34 @@ class carr {
      */
     public static function mirror(array $array) {
         return array_combine($array, $array);
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function transpose(array $array): array {
+        if (count($array) === 1) {
+            $array = static::first($array);
+
+            return array_map(function ($element) {
+                return [$element];
+            }, $array);
+        }
+
+        $numHits = count($array[0]);
+        $groups = array_keys($array);
+        $result = [];
+        for ($hit = 0; $hit < $numHits; $hit++) {
+            $group = [];
+            foreach ($groups as $groupName) {
+                $group[$groupName] = $array[$groupName][$hit];
+            }
+            $result[] = $group;
+        }
+
+        return $result;
     }
 }
 

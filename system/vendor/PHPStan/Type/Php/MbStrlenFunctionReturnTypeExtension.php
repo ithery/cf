@@ -4,11 +4,11 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\ShouldNotHappenException;
-use PHPStan\Type\BooleanType;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\Constant\ConstantStringType;
@@ -19,7 +19,7 @@ use PHPStan\Type\IntegerType;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeUtils;
+use PHPStan\Type\UnionType;
 use function array_map;
 use function array_merge;
 use function array_unique;
@@ -34,7 +34,8 @@ use function sort;
 use function sprintf;
 use function var_export;
 
-class MbStrlenFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class MbStrlenFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	private const UNSUPPORTED_ENCODING = 'unsupported';
@@ -54,23 +55,22 @@ class MbStrlenFunctionReturnTypeExtension implements DynamicFunctionReturnTypeEx
 		FunctionReflection $functionReflection,
 		FuncCall $functionCall,
 		Scope $scope,
-	): Type
+	): ?Type
 	{
 		$args = $functionCall->getArgs();
-		$returnType = ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
 		if (count($args) === 0) {
-			return $returnType;
+			return null;
 		}
 
 		$encodings = [];
 
-		if (count($functionCall->getArgs()) === 1) {
+		if (count($args) === 1) {
 			// there is a chance to get an unsupported encoding 'pass' or 'none' here on PHP 7.3-7.4
 			$encodings = [mb_internal_encoding()];
-		} elseif (count($functionCall->getArgs()) === 2) { // custom encoding is specified
+		} elseif (count($args) === 2) { // custom encoding is specified
 			$encodings = array_map(
 				static fn (ConstantStringType $t) => $t->getValue(),
-				TypeUtils::getConstantStrings($scope->getType($functionCall->getArgs()[1]->value)),
+				$scope->getType($args[1]->value)->getConstantStrings(),
 			);
 		}
 
@@ -95,41 +95,27 @@ class MbStrlenFunctionReturnTypeExtension implements DynamicFunctionReturnTypeEx
 		}
 
 		$argType = $scope->getType($args[0]->value);
-
-		if ($argType->isSuperTypeOf(new BooleanType())->yes()) {
-			$constantScalars = TypeUtils::getConstantScalars(TypeCombinator::remove($argType, new BooleanType()));
-			if (count($constantScalars) > 0) {
-				$constantScalars[] = new ConstantBooleanType(true);
-				$constantScalars[] = new ConstantBooleanType(false);
-			}
-		} else {
-			$constantScalars = TypeUtils::getConstantScalars($argType);
-		}
+		$constantScalars = $argType->getConstantScalarValues();
 
 		$lengths = [];
 		foreach ($constantScalars as $constantScalar) {
-			$stringScalar = $constantScalar->toString();
-			if (!($stringScalar instanceof ConstantStringType)) {
-				$lengths = [];
-				break;
-			}
+			$stringScalar = (string) $constantScalar;
 
 			foreach ($encodings as $encoding) {
 				if (!$this->isSupportedEncoding($encoding)) {
 					continue;
 				}
 
-				$length = @mb_strlen($stringScalar->getValue(), $encoding);
+				$length = @mb_strlen($stringScalar, $encoding);
 				if ($length === false) {
-					throw new ShouldNotHappenException(sprintf('Got false on a supported encoding %s and value %s', $encoding, var_export($stringScalar->getValue(), true)));
+					throw new ShouldNotHappenException(sprintf('Got false on a supported encoding %s and value %s', $encoding, var_export($stringScalar, true)));
 				}
 				$lengths[] = $length;
 			}
 		}
 
-		$range = null;
 		$isNonEmpty = $argType->isNonEmptyString();
-		$numeric = TypeCombinator::union(new IntegerType(), new FloatType());
+		$numeric = new UnionType([new IntegerType(), new FloatType()]);
 		if (count($lengths) > 0) {
 			$lengths = array_unique($lengths);
 			sort($lengths);
@@ -138,7 +124,7 @@ class MbStrlenFunctionReturnTypeExtension implements DynamicFunctionReturnTypeEx
 			} else {
 				$range = TypeCombinator::union(...array_map(static fn ($l) => new ConstantIntegerType($l), $lengths));
 			}
-		} elseif ((new BooleanType())->isSuperTypeOf($argType)->yes()) {
+		} elseif ($argType->isBoolean()->yes()) {
 			$range = IntegerRangeType::fromInterval(0, 1);
 		} elseif (
 			$isNonEmpty->yes()
@@ -150,7 +136,11 @@ class MbStrlenFunctionReturnTypeExtension implements DynamicFunctionReturnTypeEx
 			$range = new ConstantIntegerType(0);
 		} else {
 			$range = TypeCombinator::remove(
-				ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType(),
+				ParametersAcceptorSelector::selectFromArgs(
+					$scope,
+					$args,
+					$functionReflection->getVariants(),
+				)->getReturnType(),
 				new ConstantBooleanType(false),
 			);
 		}

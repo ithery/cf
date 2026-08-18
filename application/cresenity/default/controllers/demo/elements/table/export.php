@@ -6,27 +6,31 @@ class Controller_Demo_Elements_Table_Export extends \Cresenity\Demo\Controller {
         $app->setTitle('Table Export Data');
         $isExport = (bool) c::request()->export;
 
-        $app->addP()->add('Demo for table Export who use data from model setDataFromModel()');
+        $app->addDiv()->addClass('mb-3')->add(
+            'Demo for DataTable export. Click the Export button to download as Excel.'
+        );
 
-        // widget is optional, use for wrapper of button
-        $widget = $app->addWidget()->setTitle('Widget Function')->addClass('mb-2');
+        $widget = $app->addWidget()->setTitle('Product Data');
+        $widget->addHeaderAction()->setIcon('ti-download')->setLabel('Export Excel')
+            ->setLink(c::url('demo/elements/table/export/index?export=1'))
+            ->setLinkTarget('_blank');
+        $widget->setNoPadding(true);
 
-        // button export
-        $widget->addA()->add('Export Data')->addClass('btn btn-info text-white')->setAttr('target', '_blank')->setAttr('href', c::url('demo/elements/table/export/index?export=1'));
-
-        $table = $app->addTable();
-        $table->setDataFromModel(Cresenity\Demo\Model\Item::class, function (CModel_Query $query) {
-            $query->with('category');
-        });
-        $table->addColumn('name')->setLabel('Name');
-        $table->addColumn('category.name')->setLabel('Category')->setWidth('200')->setExportCallback(function ($row, $value) {
-            return 'category Name : ' . $value;
-        });
+        $table = $widget->addTable();
+        $table->setDataFromModel(\Cresenity\Demo\Model\Product::class);
+        $table->addColumn('sku')->setLabel('SKU')->setWidth('100');
+        $table->addColumn('name')->setLabel('Product Name');
+        $table->addColumn('category')->setLabel('Category')->setWidth('150');
+        $table->addColumn('price')->setLabel('Price')->setCallback(function ($row, $value) {
+            return 'Rp ' . number_format($value);
+        })->setExportCallback(function ($row, $value) {
+            return $value;
+        })->setDataType('currency');
+        $table->addColumn('stock')->setLabel('Stock')->setWidth('80');
         $table->setAjax(false);
 
-        // export table here
         if ($isExport) {
-            $table->downloadexcel('export-data-' . date('Ymdhis') . '.xls');
+            return $table->downloadExcel('products-' . date('Ymd-His') . '.xlsx');
         }
 
         return $app;

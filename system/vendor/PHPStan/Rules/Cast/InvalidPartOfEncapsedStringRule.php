@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Cast;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\Printer\ExprPrinter;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -14,9 +15,10 @@ use PHPStan\Type\VerbosityLevel;
 use function sprintf;
 
 /**
- * @implements Rule<Node\Scalar\Encapsed>
+ * @implements Rule<Node\Scalar\InterpolatedString>
  */
-class InvalidPartOfEncapsedStringRule implements Rule
+#[RegisteredRule(level: 2)]
+final class InvalidPartOfEncapsedStringRule implements Rule
 {
 
 	public function __construct(
@@ -28,14 +30,14 @@ class InvalidPartOfEncapsedStringRule implements Rule
 
 	public function getNodeType(): string
 	{
-		return Node\Scalar\Encapsed::class;
+		return Node\Scalar\InterpolatedString::class;
 	}
 
 	public function processNode(Node $node, Scope $scope): array
 	{
 		$messages = [];
 		foreach ($node->parts as $part) {
-			if ($part instanceof Node\Scalar\EncapsedStringPart) {
+			if ($part instanceof Node\InterpolatedStringPart) {
 				continue;
 			}
 
@@ -58,7 +60,7 @@ class InvalidPartOfEncapsedStringRule implements Rule
 				'Part %s (%s) of encapsed string cannot be cast to string.',
 				$this->exprPrinter->printExpr($part),
 				$partType->describe(VerbosityLevel::value()),
-			))->line($part->getLine())->build();
+			))->identifier('encapsedStringPart.nonString')->line($part->getStartLine())->build();
 		}
 
 		return $messages;

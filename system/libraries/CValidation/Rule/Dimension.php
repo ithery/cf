@@ -123,6 +123,7 @@ class CValidation_Rule_Dimension {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $result = '';
 

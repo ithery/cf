@@ -3,7 +3,7 @@
 class CExporter_Helper_SqlHelper {
     public static function chunkSqlResult($sql, $count, callable $callback, $db = null) {
         if ($db == null) {
-            $db = CDatabase::instance();
+            $db = c::db();
         }
 
         $page = 1;

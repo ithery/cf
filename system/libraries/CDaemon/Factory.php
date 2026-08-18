@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 16, 2019, 3:36:29 AM
- */
 class CDaemon_Factory {
     /**
      * @var CDaemon_Factory
@@ -29,7 +23,7 @@ class CDaemon_Factory {
      * @param string $socketName
      * @param array  $contextOption
      *
-     * @return \CDaemon_Worker_Listener_WebSocketListener
+     * @return CDaemon_Worker_Listener_SocketListener
      */
     public static function createSocketListenerWorker($socketName = '', $contextOption = []) {
         $worker = new CDaemon_Worker_Listener_SocketListener();

@@ -22,7 +22,7 @@ class CApi_Exception_InternalHttpException extends HttpException {
      *
      * @return void
      */
-    public function __construct(Response $response, $message = null, Exception $previous = null, array $headers = [], $code = 0) {
+    public function __construct(Response $response, $message = null, ?Exception $previous = null, array $headers = [], $code = 0) {
         $this->response = $response;
 
         parent::__construct($response->getStatusCode(), $message, $previous, $headers, $code);

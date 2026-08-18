@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 5:12:31 PM
- */
 trait CObservable_Javascript_JQuery_Trait_EventsTrait {
     /**
      * @return string
@@ -33,7 +27,6 @@ trait CObservable_Javascript_JQuery_Trait_EventsTrait {
 
         return $this;
     }
-
 
     public function onHover($statements, $options = []) {
         $retFalse = carr::get($options, 'retFalse', true);

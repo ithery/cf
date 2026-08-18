@@ -2,8 +2,6 @@
 
 /**
  * Description of BasicDriver
- *
- * @author Hery
  */
 class CDevSuite_Driver_BasicDevSuiteDriver extends CDevSuite_DevSuiteDriver {
     /**

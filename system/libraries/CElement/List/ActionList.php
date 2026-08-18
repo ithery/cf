@@ -2,21 +2,43 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 class CElement_List_ActionList extends CElement_List {
     use CTrait_Compat_Element_ActionList,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
 
+    /**
+     * Unused -- child actions are tracked via CElement_List::add()/htmlChild(), not this array.
+     *
+     * @var array
+     */
     public $actions = [];
 
+    /**
+     * @var string
+     */
     protected $style;
 
+    /**
+     * @var array
+     */
+    protected $btn_dropdown_classes;
+
+    /**
+     * @var int
+     */
+    protected $label_size;
+
+    /**
+     * @var bool
+     */
     protected $withCaret;
 
+    /**
+     * @param null|string $listId
+     *
+     * @return void
+     */
     public function __construct($listId = null) {
         parent::__construct($listId);
 
@@ -28,6 +50,11 @@ class CElement_List_ActionList extends CElement_List {
         $this->withCaret = true;
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         /** @phpstan-ignore-next-line */
         return new static($id);
@@ -41,33 +68,55 @@ class CElement_List_ActionList extends CElement_List {
      * @return $this
      */
     public function setStyle($style) {
-        if (in_array($style, ['form-action', 'btn-group', 'btn-group-toggle', 'btn-group-toggle-checkbox', 'btn-group-toggle-radio', 'btn-icon-group', 'btn-list', 'icon-segment', 'btn-dropdown', 'widget-action', 'table-header-action'])) {
+        $availableStyles = ['form-action', 'btn-group', 'btn-group-toggle', 'btn-group-toggle-checkbox', 'btn-group-toggle-radio', 'btn-icon-group', 'btn-list', 'icon-segment', 'btn-dropdown', 'widget-action', 'table-header-action'];
+        if (in_array($style, $availableStyles)) {
             $this->style = $style;
         } else {
-            trigger_error('style is not defined');
+            throw new Exception('style ' . $style . 'is not defined, available styles:[' . implode(',', $availableStyles) . ']');
         }
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getStyle() {
         return $this->style;
     }
 
+    /**
+     * @return $this
+     */
     public function removeCaret() {
         $this->withCaret = false;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     protected function htmlCaret() {
         return $this->withCaret ? '<span class="caret"></span>' : '';
     }
 
+    /**
+     * Propagates $style to every child CElement_Component_Action, so they
+     * render appropriately for the list style (e.g. plain buttons vs. a
+     * dropdown's menu items).
+     *
+     * @return void
+     */
     protected function applyStyleToChild() {
         $this->apply('style', $this->style, [CElement_Component_Action::class]);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $this->applyStyleToChild();
 
@@ -177,6 +226,11 @@ class CElement_List_ActionList extends CElement_List {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

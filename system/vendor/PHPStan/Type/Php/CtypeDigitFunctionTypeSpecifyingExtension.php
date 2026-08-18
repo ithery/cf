@@ -2,23 +2,28 @@
 
 namespace PHPStan\Type\Php;
 
+use PhpParser\Node\Expr\Cast;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Analyser\SpecifiedTypes;
 use PHPStan\Analyser\TypeSpecifier;
 use PHPStan\Analyser\TypeSpecifierAwareExtension;
 use PHPStan\Analyser\TypeSpecifierContext;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\Accessory\AccessoryNumericStringType;
+use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\FunctionTypeSpecifyingExtension;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntersectionType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\TypeCombinator;
+use PHPStan\Type\UnionType;
 use function strtolower;
 
-class CtypeDigitFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
+#[AutowiredService]
+final class CtypeDigitFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
 {
 
 	private TypeSpecifier $typeSpecifier;
@@ -38,7 +43,8 @@ class CtypeDigitFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyin
 			throw new ShouldNotHappenException();
 		}
 
-		if ($context->true() && $scope->getType($node->getArgs()[0]->value)->isNumericString()->yes()) {
+		$exprArg = $node->getArgs()[0]->value;
+		if ($context->true() && $scope->getType($exprArg)->isNumericString()->yes()) {
 			return new SpecifiedTypes();
 		}
 
@@ -54,7 +60,25 @@ class CtypeDigitFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyin
 			]);
 		}
 
-		return $this->typeSpecifier->create($node->getArgs()[0]->value, TypeCombinator::union(...$types), $context, false, $scope);
+		$unionType = TypeCombinator::union(...$types);
+		$specifiedTypes = $this->typeSpecifier->create($exprArg, $unionType, $context, $scope);
+
+		if ($exprArg instanceof Cast\String_) {
+			$accessories = [
+				new StringType(),
+				new AccessoryNumericStringType(),
+			];
+			$castedType = new UnionType([
+				IntegerRangeType::fromInterval(0, null),
+				new IntersectionType($accessories),
+				new ConstantBooleanType(true),
+			]);
+			$specifiedTypes = $specifiedTypes->unionWith(
+				$this->typeSpecifier->create($exprArg->expr, $castedType, $context, $scope),
+			);
+		}
+
+		return $specifiedTypes;
 	}
 
 	public function setTypeSpecifier(TypeSpecifier $typeSpecifier): void

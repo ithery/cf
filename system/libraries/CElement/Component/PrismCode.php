@@ -2,25 +2,43 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 7, 2018, 7:50:27 PM
- */
 class CElement_Component_PrismCode extends CElement_Component {
+    /**
+     * @var string
+     */
     protected $prismLanguage = 'php';
 
+    /**
+     * @var string
+     */
     protected $prismTheme = 'okaidia';
 
+    /**
+     * @var CElement_Element_Code
+     */
     protected $codeElement;
 
+    /**
+     * @var bool|null
+     */
     protected $haveCopyToClipboard;
 
+    /**
+     * @var bool|null
+     */
     protected $haveSelectCode;
 
+    /**
+     * @var bool
+     */
     protected $isWrap;
 
+    /**
+     * @param string $id
+     * @param string $tag
+     *
+     * @return void
+     */
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
         $this->tag = 'pre';
@@ -30,49 +48,81 @@ class CElement_Component_PrismCode extends CElement_Component {
         $this->isWrap = false;
     }
 
+    /**
+     * @param string $lang
+     *
+     * @return $this
+     */
     public function setLanguage($lang) {
         $this->prismLanguage = $lang;
 
         return $this;
     }
 
+    /**
+     * @param string $theme
+     *
+     * @return $this
+     */
     public function setTheme($theme) {
         $this->prismTheme = $theme;
 
         return $this;
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
-        $cs = CManager::clientScript();
-        $cs->registerJsFile('plugins/prism/prism.min.js');
-        $cs->registerJsFile('plugins/prism/plugins/prism-toolbar.js');
-        $cs->registerJsFile('plugins/prism/components/prism-' . $this->prismLanguage . '.js');
-        $cs->registerCssFile('plugins/prism/themes/prism-' . $this->prismTheme . '.css');
-        $cs->registerCssFile('plugins/prism/plugins/prism-toolbar.css');
+        c::manager()->registerJs('plugins/prism/prism.min.js');
+        c::manager()->registerJs('plugins/prism/plugins/prism-toolbar.js');
+        c::manager()->registerJs('plugins/prism/components/prism-' . $this->prismLanguage . '.js');
+        c::manager()->registerCss('plugins/prism/themes/prism-' . $this->prismTheme . '.css');
+        c::manager()->registerCss('plugins/prism/plugins/prism-toolbar.css');
         $this->codeElement->addClass('language-' . $this->prismLanguage);
         if ($this->isWrap) {
             $this->codeElement->customCss('white-space', 'pre-wrap');
         }
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setHaveCopyToClipboard($bool = true) {
         $this->haveCopyToClipboard = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setHaveSelectCode($bool = true) {
         $this->haveSelectCode = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setWrap($bool = true) {
         $this->isWrap = $bool;
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = '';
 

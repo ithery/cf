@@ -3,7 +3,11 @@
 namespace PHPStan\Rules\PhpDoc;
 
 use PhpParser\Node;
+use PhpParser\NodeAbstract;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
+use PHPStan\Node\VirtualNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
@@ -11,31 +15,35 @@ use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function in_array;
 use function sprintf;
-use function strpos;
+use function str_starts_with;
 
 /**
- * @implements Rule<Node>
+ * @implements Rule<NodeAbstract>
  */
-class InvalidPHPStanDocTagRule implements Rule
+#[RegisteredRule(level: 2)]
+#[ValidatesStubFiles]
+final class InvalidPHPStanDocTagRule implements Rule
 {
 
 	private const POSSIBLE_PHPSTAN_TAGS = [
 		'@phpstan-param',
 		'@phpstan-param-out',
 		'@phpstan-var',
-		'@phpstan-template',
 		'@phpstan-extends',
 		'@phpstan-implements',
 		'@phpstan-use',
 		'@phpstan-template',
+		'@phpstan-template-contravariant',
 		'@phpstan-template-covariant',
 		'@phpstan-return',
 		'@phpstan-throws',
+		'@phpstan-ignore',
 		'@phpstan-ignore-next-line',
 		'@phpstan-ignore-line',
 		'@phpstan-method',
 		'@phpstan-pure',
 		'@phpstan-impure',
+		'@phpstan-immutable',
 		'@phpstan-type',
 		'@phpstan-import-type',
 		'@phpstan-property',
@@ -47,28 +55,48 @@ class InvalidPHPStanDocTagRule implements Rule
 		'@phpstan-assert-if-false',
 		'@phpstan-self-out',
 		'@phpstan-this-out',
+		'@phpstan-allow-private-mutation',
+		'@phpstan-readonly',
+		'@phpstan-readonly-allow-private-mutation',
+		'@phpstan-require-extends',
+		'@phpstan-require-implements',
+		'@phpstan-sealed',
+		'@phpstan-param-immediately-invoked-callable',
+		'@phpstan-param-later-invoked-callable',
+		'@phpstan-param-closure-this',
+		'@phpstan-all-methods-pure',
+		'@phpstan-all-methods-impure',
 	];
 
-	public function __construct(private Lexer $phpDocLexer, private PhpDocParser $phpDocParser)
+	public function __construct(
+		private Lexer $phpDocLexer,
+		private PhpDocParser $phpDocParser,
+	)
 	{
 	}
 
 	public function getNodeType(): string
 	{
-		return Node::class;
+		return NodeAbstract::class;
 	}
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		if (
-			!$node instanceof Node\Stmt\ClassLike
-			&& !$node instanceof Node\FunctionLike
-			&& !$node instanceof Node\Stmt\Foreach_
-			&& !$node instanceof Node\Stmt\Property
-			&& !$node instanceof Node\Expr\Assign
-			&& !$node instanceof Node\Expr\AssignRef
-		) {
+		// mirrored with InvalidPhpDocTagValueRule
+		if ($node instanceof VirtualNode) {
 			return [];
+		}
+		if (!$node instanceof Node\Stmt && !$node instanceof Node\PropertyHook) {
+			return [];
+		}
+		if ($node instanceof Node\Stmt\Expression) {
+			if (
+				!$node->expr instanceof Node\Expr\Assign
+				&& !$node->expr instanceof Node\Expr\AssignRef
+				&& !$node->expr instanceof Node\Expr\AssignOp
+			) {
+				return [];
+			}
 		}
 
 		$docComment = $node->getDocComment();
@@ -81,7 +109,7 @@ class InvalidPHPStanDocTagRule implements Rule
 
 		$errors = [];
 		foreach ($phpDocNode->getTags() as $phpDocTag) {
-			if (strpos($phpDocTag->name, '@phpstan-') !== 0
+			if (!str_starts_with($phpDocTag->name, '@phpstan-')
 				|| in_array($phpDocTag->name, self::POSSIBLE_PHPSTAN_TAGS, true)
 			) {
 				continue;
@@ -90,7 +118,9 @@ class InvalidPHPStanDocTagRule implements Rule
 			$errors[] = RuleErrorBuilder::message(sprintf(
 				'Unknown PHPDoc tag: %s',
 				$phpDocTag->name,
-			))->build();
+			))
+				->line(PhpDocLineHelper::detectLine($node, $phpDocTag))
+				->identifier('phpDoc.phpstanTag')->build();
 		}
 
 		return $errors;

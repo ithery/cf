@@ -1,0 +1,128 @@
+name: CI
+
+# Gerbang otomatis CF. Rancangan lengkap berikut tahap berikutnya ada di
+# docs/TODO-CI.md (gitignored, hanya di mesin Hery).
+#
+# Isinya sengaja baru dua: lint yang memblokir, dan gaya kode yang belum
+# memblokir. Test dan PHPStan belum masuk karena keduanya menuntut keputusan
+# lebih dulu - lihat docs/TODO-CI.md bagian "Yang perlu diputuskan".
+
+on:
+  push:
+    branches: [master, development]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Push beruntun membatalkan jalan sebelumnya. Menit Actions gratis 2.000/bulan,
+# dan menjalankan commit yang sudah usang tidak ada gunanya.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # 7.4 target CF - menangkap sintaks 8.1+ yang tidak sengaja masuk.
+        # 8.4 yang benar-benar melayani produksi (lsphp84 di aid.cresenity.com) -
+        # menangkap fatal seperti tanda tangan fail() di ADApi_Portal_MethodAbstract
+        # yang mematikan seluruh Portal dan baru ketahuan berbulan kemudian.
+        php: ['7.4', '8.4']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: php -l
+        run: |
+          set -o pipefail
+          # system/vendor dilewati dengan sengaja: SDK Brevo di dalamnya menuntut
+          # PHP 8.1 dan tidak dapat diurai pada 7.4 - itu keadaan yang memang
+          # dikehendaki, bukan kesalahan. modules/ juga dilewati: 8.598 berkas
+          # warisan yang targetnya memang hendak dihapus di CF 1.9.
+          PATHS="system/libraries system/core system/helpers system/data tests application/cresenity"
+
+          if [ "${{ matrix.php }}" = "7.4" ]; then
+            # CQC_Phpstan sengaja ditulis dengan sintaks PHP 8: ia perkakas
+            # pengembangan yang dimuat container PHPStan, tidak pernah oleh
+            # runtime aplikasi. Alasan yang sama membuat tests/Qc membacanya
+            # sebagai teks alih-alih memuatnya.
+            find $PATHS -path system/libraries/CQC -prune -o \
+              \( -name '*.php' ! -name '*.blade.php' -print0 \) > /tmp/files.bin
+          else
+            find $PATHS -name '*.php' ! -name '*.blade.php' -print0 > /tmp/files.bin
+          fi
+
+          xargs -0 -n1 -P4 php -l < /tmp/files.bin > /tmp/lint.log \
+            || { grep -v '^No syntax errors detected' /tmp/lint.log; exit 1; }
+          echo "berkas diperiksa: $(grep -c '^No syntax errors detected' /tmp/lint.log)"
+
+  style:
+    name: Gaya kode (belum memblokir)
+    runs-on: ubuntu-latest
+
+    # Sengaja tidak memblokir sampai jalan pertamanya terlihat. Gerbang yang
+    # merah sejak hari pertama akan diabaikan dalam seminggu; hapus baris ini
+    # begitu berkas yang berubah terbukti bersih.
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # perlu riwayat secukupnya untuk mencari berkas yang berubah, tetapi
+          # bukan seluruhnya - repo ini besar
+          fetch-depth: 50
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Unduh php-cs-fixer 3.95.18
+        run: |
+          # versinya dipatok sama dengan yang dipakai di mesin lokal (changelog 1.9);
+          # versi lain menghasilkan diff yang berbeda untuk kode yang sama
+          curl -sSLf -o /tmp/php-cs-fixer.phar \
+            https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/download/v3.95.18/php-cs-fixer.phar
+          php /tmp/php-cs-fixer.phar --version
+
+      - name: Periksa berkas yang berubah saja
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          if [ -z "$BASE" ]; then BASE="${{ github.event.before }}"; fi
+
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "Titik banding tidak terjangkau - dilewati."
+            exit 0
+          fi
+
+          # .php-cs-fixer.dist.php tidak menyebut ->in() apa pun, jadi tanpa
+          # lintasan eksplisit ia akan menyapu system/vendor dan modules juga
+          git diff --name-only --diff-filter=ACMR "$BASE" "${{ github.sha }}" -- '*.php' \
+            | grep -v '^system/vendor/' \
+            | grep -v '^modules/' \
+            | grep -v '\.blade\.php$' > /tmp/changed.txt || true
+
+          if [ ! -s /tmp/changed.txt ]; then
+            echo "Tidak ada berkas PHP yang berubah."
+            exit 0
+          fi
+
+          echo "berkas yang diperiksa:"
+          cat /tmp/changed.txt
+
+          xargs -a /tmp/changed.txt php /tmp/php-cs-fixer.phar fix \
+            --dry-run --diff --using-cache=no \
+            --config=.php-cs-fixer.dist.php

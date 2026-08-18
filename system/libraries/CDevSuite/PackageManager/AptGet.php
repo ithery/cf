@@ -1,10 +1,13 @@
 <?php
 
 class CDevSuite_PackageManager_AptGet extends CDevSuite_PackageManager {
+    /**
+     * @var CDevSuite_CommandLine
+     */
     public $cli;
 
     /**
-     * Create a new Apt instance.
+     * Create a new AptGet instance.
      *
      * @return void
      */
@@ -78,7 +81,9 @@ class CDevSuite_PackageManager_AptGet extends CDevSuite_PackageManager {
     /**
      * Restart dnsmasq in Ubuntu.
      *
-     * @param mixed $sm
+     * @param CDevSuite_ServiceManager $sm
+     *
+     * @return void
      */
     public function nmRestart($sm) {
         $sm->restart(['network-manager']);

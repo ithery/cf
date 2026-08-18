@@ -1,0 +1,36 @@
+.cres\:element\:control\:Sortable {
+    ul.sortable-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #fafafa;
+    }
+
+    ul.sortable-list li {
+        margin: 4px;
+        padding: 10px 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background: #fff;
+        cursor: grab;
+        transition: background 0.2s ease;
+    }
+
+    ul.sortable-list li:active {
+        cursor: grabbing;
+        background: #e6f0ff;
+    }
+
+    /* efek saat drag */
+    .sortable-chosen {
+        background: #d9ecff !important;
+        opacity: 0.9;
+    }
+
+    .sortable-ghost {
+        opacity: 0.4;
+        background: #f0f0f0;
+    }
+}

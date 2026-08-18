@@ -40,9 +40,8 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
      */
     public function addConstraints() {
         if (static::$constraints) {
+            $this->getRelationQuery()->where($this->morphType, $this->morphClass);
             parent::addConstraints();
-
-            $this->query->where($this->morphType, $this->morphClass);
         }
     }
 
@@ -56,7 +55,21 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
     public function addEagerConstraints(array $models) {
         parent::addEagerConstraints($models);
 
-        $this->query->where($this->morphType, $this->morphClass);
+        $this->getRelationQuery()->where($this->morphType, $this->morphClass);
+    }
+
+    /**
+     * Create a new instance of the related model. Allow mass-assignment.
+     *
+     * @param array $attributes
+     *
+     * @return \CModel
+     */
+    public function forceCreate(array $attributes = []) {
+        $attributes[$this->getForeignKeyName()] = $this->getParentKey();
+        $attributes[$this->getMorphType()] = $this->morphClass;
+
+        return $this->related->forceCreate($attributes);
     }
 
     /**

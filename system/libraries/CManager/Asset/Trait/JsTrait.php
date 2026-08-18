@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2018, 1:41:39 AM
- */
 trait CManager_Asset_Trait_JsTrait {
     public function fullpathJsFile($file) {
         foreach ($this->mediaPaths as $dir) {
@@ -55,8 +49,15 @@ trait CManager_Asset_Trait_JsTrait {
         return $this;
     }
 
-    public function registerJsFile($file, $pos = 'end') {
+    /**
+     * @param array|string $file
+     * @param string       $pos
+     *
+     * @return CManager_Asset_Container
+     */
+    public function registerJsFile($file, $pos = CManager_Asset::POS_END) {
         $fileOptions = $file;
+
         if (!is_array($fileOptions)) {
             $fileOptions = [
                 'script' => $file,

@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @see https://github.com/ander7agar/namecheap-sdk
+ */
 class CVendor_Namecheap_Api {
     use CVendor_Namecheap_Trait_CommandTrait;
 
@@ -83,7 +85,7 @@ class CVendor_Namecheap_Api {
         return !empty($v) ? $v : null;
     }
 
-    protected function checkRequiredFields($dataArr, $requiredFields) {
+    public function checkRequiredFields($dataArr, $requiredFields) {
         $reqFields = [];
         foreach ($requiredFields as $key => $f) {
             if (empty($dataArr[$f])) {
@@ -143,7 +145,6 @@ class CVendor_Namecheap_Api {
         if (!empty($error)) {
             throw new \Exception($error);
         }
-
         if ($this->returnType === 'json') {
             return json_encode(CVendor_Namecheap_Xml::createArray($xmlData));
         } elseif ($this->returnType === 'array') {

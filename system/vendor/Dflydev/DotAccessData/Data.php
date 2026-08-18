@@ -198,6 +198,7 @@ class Data implements DataInterface, ArrayAccess {
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->get($key, null);
     }

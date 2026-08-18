@@ -1,13 +1,20 @@
 <?php
 
-/**
- * Description of Data
- *
- * @author Hery
- */
 class CManager_Lang_Data {
+    /**
+     * The language data.
+     *
+     * @var array
+     */
     protected static $langData = [];
 
+    /**
+     * Get the first character of the message to use as a folder name.
+     *
+     * @param string $message
+     *
+     * @return string
+     */
     protected static function getCharForFolder($message) {
         $char = '_';
         if (strlen($message) > 0) {
@@ -27,6 +34,14 @@ class CManager_Lang_Data {
         return $dir;
     }
 
+    /**
+     * Get the language file for the given message.
+     *
+     * @param string      $message
+     * @param string|null $lang
+     *
+     * @return string
+     */
     public static function getLangFile($message, $lang = null) {
         if ($lang == null) {
             $lang = CManager_Lang::getLang();
@@ -43,6 +58,15 @@ class CManager_Lang_Data {
         return $file;
     }
 
+    /**
+     * Check if the language data exists for the given message.
+     *
+     * @param string      $lang
+     * @param string      $char
+     * @param string      $message
+     *
+     * @return bool
+     */
     public static function langDataExists($lang, $char, $message) {
         if (static::langDataLoaded($lang, $char)) {
             return isset(static::$langData[$lang][$char][$message]);
@@ -51,6 +75,14 @@ class CManager_Lang_Data {
         return false;
     }
 
+    /**
+     * Check if the language data is loaded for the given character.
+     *
+     * @param string      $lang
+     * @param string      $char
+     *
+     * @return bool
+     */
     public static function langDataLoaded($lang, $char) {
         if (!is_array(static::$langData)) {
             return false;

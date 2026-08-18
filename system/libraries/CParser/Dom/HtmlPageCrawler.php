@@ -889,6 +889,7 @@ class CParser_Dom_HtmlPageCrawler extends Crawler {
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->saveHTML();
     }

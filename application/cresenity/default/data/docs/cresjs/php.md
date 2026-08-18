@@ -1,13 +1,10 @@
-# Cres JS - PHPJS Function
-### Introduction
+# Cres JS - PHP Functions
 
-Keseluruhan fungsi berada dalam scope `cresenity.php`
-
-
+JavaScript implementations of common PHP functions, available under `cresenity.php`.
 
 ### echo
 
-Fungsi echo untuk menulis ke javascript console
+Write to the browser console:
 
 ```js
 cresenity.php.echo('hello world');
@@ -16,20 +13,18 @@ cresenity.php.echo('hello world');
 
 ### ucfirst
 
-Membuat karakter pertama dari string menjadi uppercase
-
-[PHP Documentation](https://www.php.net/manual/en/function.ucfirst.php)
+Capitalize the first character of a string:
 
 ```js
 cresenity.php.ucfirst('hello world');
 // Hello world
 ```
 
+[PHP Documentation](https://www.php.net/manual/en/function.ucfirst.php)
+
 ### strtotime
 
-Parsing string dengan english language ke unix timestamp
-
-[PHP Documentation](https://www.php.net/manual/en/function.strtotime.php)
+Parse an English date/time string into a Unix timestamp:
 
 ```js
 cresenity.php.strtotime('now');
@@ -39,26 +34,19 @@ cresenity.php.strtotime('+1 week');
 cresenity.php.strtotime('+1 week 2 days 4 hours 2 seconds');
 cresenity.php.strtotime('next Thursday');
 cresenity.php.strtotime('last Monday');
-cresenity.php.strtotime('2021-1-01 22:33');
 ```
+
+[PHP Documentation](https://www.php.net/manual/en/function.strtotime.php)
 
 ### is_numeric
 
-Melakukan check apakah variabel adalah angka atau string numerik
-
-[PHP Documentation](https://www.php.net/manual/en/function.is-numeric.php)
+Check if a value is numeric or a numeric string:
 
 ```js
-cresenity.php.is_numeric('42');
-//true
-cresenity.php.is_numeric(1337);
-//true
-cresenity.php.is_numeric(0x539);
-//true
-cresenity.php.is_numeric(1337e0);
-//true
-cresenity.php.is_numeric('0x539');
-//true
-cresenity.php.is_numeric(9.1);
-//true
+cresenity.php.is_numeric('42');     // true
+cresenity.php.is_numeric(1337);    // true
+cresenity.php.is_numeric(9.1);     // true
+cresenity.php.is_numeric('hello'); // false
 ```
+
+[PHP Documentation](https://www.php.net/manual/en/function.is-numeric.php)

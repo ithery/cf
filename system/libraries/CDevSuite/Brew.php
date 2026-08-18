@@ -1,10 +1,7 @@
 <?php
 
 /**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 15, 2020
+ * Description of Brew.
  */
 class CDevSuite_Brew {
     const SUPPORTED_PHP_VERSIONS = [
@@ -26,8 +23,14 @@ class CDevSuite_Brew {
 
     const LATEST_PHP_VERSION = 'php@7.4';
 
+    /**
+     * @var CDevSuite_CommandLine
+     */
     public $cli;
 
+    /**
+     * @var CDevSuite_Filesystem
+     */
     public $files;
 
     /**
@@ -75,9 +78,11 @@ class CDevSuite_Brew {
      * Get the aliased formula version from Homebrew.
      *
      * @param mixed $formula
+     *
+     * @return string
      */
     public function determineAliasedVersion($formula) {
-        $details = json_decode($this->cli->runAsUser("brew info ${formula} --json"));
+        $details = json_decode($this->cli->runAsUser("brew info {$formula} --json"));
 
         return $details[0]->aliases[0] ?: 'ERROR - NO BREW ALIAS FOUND';
     }
@@ -177,6 +182,8 @@ class CDevSuite_Brew {
      * Restart the given Homebrew services.
      *
      * @param mixed $services
+     *
+     * @return void
      */
     public function restartService($services) {
         $services = is_array($services) ? $services : func_get_args();
@@ -195,6 +202,8 @@ class CDevSuite_Brew {
      * Stop the given Homebrew services.
      *
      * @param mixed $services
+     *
+     * @return void
      */
     public function stopService($services) {
         $services = is_array($services) ? $services : func_get_args();
@@ -272,7 +281,7 @@ class CDevSuite_Brew {
                 return $resolvedVersionNormalized === $versionNormalized;
             },
             function () use ($resolvedPhpVersion) {
-                throw new DomainException("Unable to determine linked PHP when parsing '${resolvedPhpVersion}'");
+                throw new DomainException("Unable to determine linked PHP when parsing '{$resolvedPhpVersion}'");
             }
         );
     }

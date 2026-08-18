@@ -2,40 +2,80 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Oct 12, 2018, 1:48:18 PM
- */
 class CElement_Component_Nestable extends CElement_Component {
     use CTrait_Compat_Element_Nestable,
         CTrait_Element_ActionList_Row;
 
+    /**
+     * @var array
+     */
     protected $data;
 
+    /**
+     * @var null|string
+     */
     protected $idKey;
 
+    /**
+     * @var null|string
+     */
     protected $valueKey;
 
+    /**
+     * @var bool
+     */
     protected $applyjs;
 
+    /**
+     * @var string
+     */
     protected $input;
 
+    /**
+     * @var bool|callable|string
+     */
     protected $displayCallback;
 
+    /**
+     * @var callable|string
+     */
     protected $filterActionCallbackFunc;
 
+    /**
+     * @var array
+     */
     protected $requires;
 
+    /**
+     * @var bool
+     */
     protected $checkbox;
 
-    protected $disable_dnd;
+    /**
+     * @var bool
+     */
+    protected $disableDnd;
 
+    /**
+     * @var string
+     */
     protected $js_cell;
 
+    /**
+     * @var bool
+     */
     protected $isCollapsed = false;
 
+    /**
+     * @var null|CManager_DataProviderAbstract
+     */
+    protected $query;
+
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         CManager::registerModule('jquery.nestable');
@@ -49,13 +89,25 @@ class CElement_Component_Nestable extends CElement_Component {
         $this->checkbox = false;
         $this->requires = [];
         $this->js_cell = '';
+        $this->disableDnd = false;
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CElement_Component_Nestable
+     */
     public static function factory($id) {
         /** @phpstan-ignore-next-line */
         return new static($id);
     }
 
+    /**
+     * @param callable|string $func
+     * @param string          $require
+     *
+     * @return $this
+     */
     public function setDisplayCallback($func, $require = '') {
         $this->displayCallback = $func;
         if (strlen($require) > 0) {
@@ -65,6 +117,12 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param callable|string $func
+     * @param string          $require
+     *
+     * @return $this
+     */
     public function filterActionCallbackFunc($func, $require = '') {
         $this->filterActionCallbackFunc = $func;
         if (strlen($require) > 0) {
@@ -74,6 +132,12 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param CTreeDB  $treedb
+     * @param null|int $parentId
+     *
+     * @return $this
+     */
     public function setDataFromTreeDb(CTreeDB $treedb, $parentId = null) {
         $this->data = $treedb->getChildrenData($parentId);
 
@@ -91,13 +155,24 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
-    public function setDataFromModel(CModel $root) {
+    /**
+     * @param CModel|string $model
+     * @param null|callable $queryCallback
+     *
+     * @return $this
+     */
+    public function setDataFromModel($model, $queryCallback = null) {
+        if (is_string($model)) {
+            $this->query = CManager::createModelDataProvider($model, $queryCallback);
+
+            return $this;
+        }
         /**
          * NOT DONE.
          */
         $orgId = CApp_Base::orgId();
 
-        $root = $root->descendants();
+        $root = $model->descendants();
         if (strlen($orgId) > 0) {
             $root = $root->where(function ($query) use ($orgId) {
                 $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
@@ -124,65 +199,145 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param array $array
+     *
+     * @return $this
+     */
     public function setDataFromArray($array = []) {
         $this->data = $array;
 
         return $this;
     }
 
+    /**
+     * @param string $idKey
+     *
+     * @return $this
+     */
     public function setIdKey($idKey) {
         $this->idKey = $idKey;
 
         return $this;
     }
 
+    /**
+     * @param bool $disableDnd
+     *
+     * @return $this
+     */
     public function setDisableDnd($disableDnd) {
-        $this->disable_dnd = $disableDnd;
+        $this->disableDnd = $disableDnd;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function disableDnd() {
-        $this->disable_dnd = true;
+        $this->disableDnd = true;
 
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function enableDnd() {
-        $this->disable_dnd = false;
+        $this->disableDnd = false;
 
         return $this;
     }
 
+    /**
+     * @param bool $checkbox
+     *
+     * @return $this
+     */
     public function setHaveCheckbox($checkbox) {
         $this->checkbox = $checkbox;
 
         return $this;
     }
 
+    /**
+     * @param string $input
+     *
+     * @return $this
+     */
     public function setInput($input) {
         $this->input = $input;
 
         return $this;
     }
 
+    /**
+     * @param string $valueKey
+     *
+     * @return $this
+     */
     public function setValueKey($valueKey) {
         $this->valueKey = $valueKey;
 
         return $this;
     }
 
+    /**
+     * @param bool $boolean
+     *
+     * @return $this
+     */
     public function setApplyJs($boolean) {
         $this->applyjs = $boolean;
 
         return $this;
     }
 
+    /**
+     * @return void
+     */
+    protected function getDataFromQuery() {
+        $models = $this->query->toEnumerable();
+        $childArray = [];
+
+        if ($models instanceof CModel_Nested_Collection) {
+            $tree = $models->toTree();
+            $traverse = function ($nodes) use (&$traverse, &$childArray) {
+                foreach ($nodes as $node) {
+                    if ($node->status == 0) {
+                        continue;
+                    }
+                    $childArray[] = $node->toArray();
+                    $traverse($node->getChildren()->orderBy('lft', 'asc')->get());
+                }
+            };
+
+            $traverse($tree);
+        }
+
+        $this->data = $childArray;
+    }
+
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
+        if ($this->query != null) {
+            $this->getDataFromQuery();
+        }
+        $classes = $this->classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $styles = $this->disable_dnd ? 'pointer-events: none;' : '';
-        $html->appendln('<div id="' . $this->id . '" cres-element="component:Nestable" class="dd nestable cres-nestable cres:element:component:Nestable" style="' . $styles . '">')->incIndent();
+        $styles = '';
+        // $styles = $this->disableDnd ? 'pointer-events: none;' : '';
+        $html->appendln('<div id="' . $this->id . '" cres-element="component:Nestable" class="dd nestable cres-nestable cres:element:component:Nestable ' . $classes . '" style="' . $styles . '">')->incIndent();
         if (count($this->data) > 0) {
             $depthBefore = -1;
             $in = 0;
@@ -202,13 +357,17 @@ class CElement_Component_Nestable extends CElement_Component {
                     $in++;
                     $html->appendln('<ol class="dd-list">')->incIndent();
                 }
-                $html->appendln('<li class="dd-item" data-id="' . $d[$this->idKey] . '">')->incIndent();
+                $itemClass = '';
+                if ($this->disableDnd) {
+                    $itemClass = ' dd-nodrag';
+                }
+                $html->appendln('<li class="dd-item ' . $itemClass . '" data-id="' . $d[$this->idKey] . '">')->incIndent();
 
                 $html->appendln('<div class="dd-handle">')->incIndent();
                 if ($this->checkbox) {
                     $html->appendln('<input id="cb_' . $d[$this->idKey] . '" name="cb[' . $d[$this->idKey] . ']" data-parent-id="' . $d['parent_id'] . '" type="checkbox" value="' . $d[$this->idKey] . '"/>')->incIndent();
                 }
-                $val = carr::get($d, $this->valueKey);
+                $val = carr::get($d, $this->valueKey, null);
                 $newV = $val;
                 if ($this->displayCallback !== false && is_callable($this->displayCallback)) {
                     $newV = CFunction::factory($this->displayCallback)
@@ -218,7 +377,14 @@ class CElement_Component_Nestable extends CElement_Component {
                         ->setRequire($this->requires)
                         ->execute();
                 }
-                $html->appendln($newV);
+
+                if ($newV instanceof CRenderable) {
+                    $html->appendln($newV->html());
+                    $this->js_cell .= $newV->js();
+                } else {
+                    $html->appendln($newV);
+                }
+
                 $html->decIndent()->appendln('</div>');
                 if ($this->haveRowAction()) {
                     $this->js_cell .= $this->drawActionAndGetJs($html, $d, $this->idKey);
@@ -236,25 +402,21 @@ class CElement_Component_Nestable extends CElement_Component {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);
         if ($this->applyjs) {
-            if ($this->disable_dnd) {
-                $js->appendln("
-                    jQuery('#" . $this->id . "').nestable({
-                        /* config options */
-                        maxDepth:0
-                    });
-                ")->incIndent();
-            } else {
-                $js->appendln("
-                    jQuery('#" . $this->id . "').nestable({
-                        /* config options */
-                        maxDepth:100
-                    });
-                ")->incIndent();
-            }
+            $js->appendln("
+                jQuery('#" . $this->id . "').nestable({
+                    maxDepth:100
+                });
+            ")->incIndent();
+
             if (strlen($this->input) > 0) {
                 $js->appendln("
                     jQuery('#" . $this->id . "').on('change', function() {
@@ -288,6 +450,13 @@ class CElement_Component_Nestable extends CElement_Component {
         return $js->text();
     }
 
+    /**
+     * @param CStringBuilder $html
+     * @param array          $row
+     * @param int|string     $key
+     *
+     * @return string
+     */
     protected function drawActionAndGetJs(CStringBuilder $html, array $row, $key) {
         $js = '';
         if ($this->haveRowAction()) {

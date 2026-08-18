@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 15, 2019, 6:47:31 PM
- */
 final class CModel_Activity {
     use CEvent_Trait_Eventable;
 

@@ -1,13 +1,5 @@
 <?php
 
-use DigitalOceanV2\DigitalOceanV2;
-
-/**
- * Description of Image
- *
- * @author Hery
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 class CResources_Loader_Image extends CResources_LoaderAbstract {
     protected $appCode = '';
 
@@ -81,6 +73,7 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
         $temp .= $filename;
         $dir = '/application/' . $this->appCode . '/' . (strlen($this->orgCode) > 0 ? $this->orgCode : 'default') . '/resources/';
         $basepath = $dir . $temp;
+
         return $basepath;
     }
 
@@ -125,6 +118,7 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
             ]);
         }
         $this->sizeName = $sizeName;
+
         return $this;
     }
 
@@ -170,6 +164,7 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
             $temp .= rawurlencode($this->resourceName);
             $path .= $temp;
         }
+
         return $path;
     }
 

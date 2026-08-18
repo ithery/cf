@@ -5,6 +5,8 @@ namespace PHPStan\Rules\Functions;
 use PhpParser\Node;
 use PHPStan\Analyser\NullsafeOperatorHelper;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\FunctionCallableNode;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\ReflectionProvider;
@@ -20,10 +22,19 @@ use function strtolower;
 /**
  * @implements Rule<FunctionCallableNode>
  */
-class FunctionCallableRule implements Rule
+#[RegisteredRule(level: 0)]
+final class FunctionCallableRule implements Rule
 {
 
-	public function __construct(private ReflectionProvider $reflectionProvider, private RuleLevelHelper $ruleLevelHelper, private PhpVersion $phpVersion, private bool $checkFunctionNameCase, private bool $reportMaybes)
+	public function __construct(
+		private ReflectionProvider $reflectionProvider,
+		private RuleLevelHelper $ruleLevelHelper,
+		private PhpVersion $phpVersion,
+		#[AutowiredParameter]
+		private bool $checkFunctionNameCase,
+		#[AutowiredParameter]
+		private bool $reportMaybes,
+	)
 	{
 	}
 
@@ -38,6 +49,7 @@ class FunctionCallableRule implements Rule
 			return [
 				RuleErrorBuilder::message('First-class callables are supported only on PHP 8.1 and later.')
 					->nonIgnorable()
+					->identifier('callable.notSupported')
 					->build(),
 			];
 		}
@@ -60,7 +72,7 @@ class FunctionCallableRule implements Rule
 								'Call to function %s() with incorrect case: %s',
 								$function->getName(),
 								$functionNameName,
-							))->build(),
+							))->identifier('function.nameCase')->build(),
 						];
 					}
 				}
@@ -74,6 +86,7 @@ class FunctionCallableRule implements Rule
 
 			return [
 				RuleErrorBuilder::message(sprintf('Function %s not found.', $functionNameName))
+					->identifier('function.notFound')
 					->build(),
 			];
 		}
@@ -94,14 +107,14 @@ class FunctionCallableRule implements Rule
 			return [
 				RuleErrorBuilder::message(
 					sprintf('Creating callable from %s but it\'s not a callable.', $type->describe(VerbosityLevel::value())),
-				)->build(),
+				)->identifier('callable.nonCallable')->build(),
 			];
 		}
 		if ($this->reportMaybes && $isCallable->maybe()) {
 			return [
 				RuleErrorBuilder::message(
 					sprintf('Creating callable from %s but it might not be a callable.', $type->describe(VerbosityLevel::value())),
-				)->build(),
+				)->identifier('callable.nonCallable')->build(),
 			];
 		}
 

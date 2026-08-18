@@ -30,6 +30,7 @@ final class ComparisonMethodDoesNotAcceptParameterTypeException extends Exceptio
         );
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->getMessage() . PHP_EOL;
     }

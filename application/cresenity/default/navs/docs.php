@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Dec 5, 2020
- */
 return [
     [
         'name' => 'starter',
@@ -32,29 +26,22 @@ return [
     [
         'name' => 'forminput',
         'label' => c::__('Form Input'),
-        'subnav' => [
-            [
-                'name' => 'forminput.standard',
-                'label' => c::__('Standard Control'),
-                'uri' => 'docs/forminput/standard',
-            ],
-            [
-                'name' => 'forminput.selectsearch',
-                'label' => c::__('Select Search'),
-                'uri' => 'docs/forminput/selectsearch',
-            ],
-
-        ]
+        'subnav' => include dirname(__FILE__) . '/docs/forminput.php',
     ],
     [
         'name' => 'helper',
         'label' => c::__('Helpers'),
-        'subnav' => include dirname(__FILE__) . '/docs/element.php',
+        'subnav' => include dirname(__FILE__) . '/docs/helper.php',
     ],
     [
         'name' => 'module',
         'label' => c::__('Modules'),
         'subnav' => include dirname(__FILE__) . '/docs/module.php',
+    ],
+    [
+        'name' => 'api',
+        'label' => c::__('API (CApi)'),
+        'subnav' => include dirname(__FILE__) . '/docs/api.php',
     ],
     [
         'name' => 'cresjs',
@@ -87,9 +74,24 @@ return [
         'label' => c::__('Other'),
         'subnav' => [
             [
+                'name' => 'other.websocket',
+                'label' => c::__('CWebSocket'),
+                'uri' => 'docs/other/websocket',
+            ],
+            [
+                'name' => 'other.ccolor',
+                'label' => c::__('CColor'),
+                'uri' => 'docs/other/ccolor',
+            ],
+            [
                 'name' => 'other.maintenance',
                 'label' => c::__('Maintenance'),
                 'uri' => 'docs/other/maintenance',
+            ],
+            [
+                'name' => 'other.htaccess',
+                'label' => c::__('.htaccess Protection'),
+                'uri' => 'docs/other/htaccess',
             ],
         ]
     ],

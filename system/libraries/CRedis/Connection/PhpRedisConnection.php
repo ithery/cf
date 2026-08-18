@@ -4,6 +4,8 @@
  * @mixin \Redis
  */
 class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
+    use CRedis_Connection_Trait_PacksPhpRedisValuesTrait;
+
     /**
      * The connection creation callback.
      *
@@ -23,14 +25,13 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      *
      * @param \Redis        $client
      * @param null|callable $connector
-     * @param array         $config
      *
      * @return void
      */
     public function __construct($client, $connector = null, array $config = []) {
         $this->client = $client;
-        $this->connector = $connector;
         $this->config = $config;
+        $this->connector = $connector;
     }
 
     /**
@@ -48,8 +49,6 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
 
     /**
      * Get the values of all the given keys.
-     *
-     * @param array $keys
      *
      * @return array
      */
@@ -119,6 +118,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
             $dictionary = $dictionary[0];
         } else {
             $input = c::collect($dictionary);
+
             $dictionary = $input->nth(2)->combine($input->nth(2, 1))->toArray();
         }
 
@@ -185,8 +185,8 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      *
      * @return mixed|false
      */
-    public function spop($key, $count = null) {
-        return $this->command('spop', [$key]);
+    public function spop($key, $count = 1) {
+        return $this->command('spop', func_get_args());
     }
 
     /**
@@ -204,9 +204,18 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
                 $dictionary[] = $member;
             }
         }
-        $key = $this->applyPrefix($key);
 
-        return $this->executeRaw(array_merge(['zadd', $key], $dictionary));
+        $options = [];
+
+        foreach (array_slice($dictionary, 0, 3) as $i => $value) {
+            if (in_array($value, ['nx', 'xx', 'ch', 'incr', 'gt', 'lt', 'NX', 'XX', 'CH', 'INCR', 'GT', 'LT'], true)) {
+                $options[] = $value;
+
+                unset($dictionary[$i]);
+            }
+        }
+
+        return $this->command('zadd', array_merge([$key], [$options], array_values($dictionary)));
     }
 
     /**
@@ -241,7 +250,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * @return array
      */
     public function zrevrangebyscore($key, $min, $max, $options = []) {
-        if (isset($options['limit'])) {
+        if (isset($options['limit']) && !c::arrayIsList($options['limit'])) {
             $options['limit'] = [
                 $options['limit']['offset'],
                 $options['limit']['count'],
@@ -292,6 +301,9 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * @return mixed
      */
     public function scan($cursor, $options = []) {
+        //phpredis menandai awal iterasi dengan null; 0 berarti sudah selesai
+        $cursor = $cursor === 0 ? null : $cursor;
+
         $result = $this->client->scan(
             $cursor,
             isset($options['match']) && $options['match'] ? $options['match'] : '*',
@@ -301,6 +313,10 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
         if ($result === false) {
             $result = [];
         }
+
+        //dikembalikan ke 0 supaya penanda "habis" tidak bergantung pada apakah
+        //klien sempat menimpa iteratornya
+        $cursor = $cursor === null ? 0 : $cursor;
 
         return $cursor === 0 && empty($result) ? false : [$cursor, $result];
     }
@@ -315,6 +331,9 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * @return mixed
      */
     public function zscan($key, $cursor, $options = []) {
+        //phpredis menandai awal iterasi dengan null; 0 berarti sudah selesai
+        $cursor = $cursor === 0 ? null : $cursor;
+
         $result = $this->client->zscan(
             $key,
             $cursor,
@@ -325,6 +344,10 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
         if ($result === false) {
             $result = [];
         }
+
+        //dikembalikan ke 0 supaya penanda "habis" tidak bergantung pada apakah
+        //klien sempat menimpa iteratornya
+        $cursor = $cursor === null ? 0 : $cursor;
 
         return $cursor === 0 && empty($result) ? false : [$cursor, $result];
     }
@@ -339,6 +362,9 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * @return mixed
      */
     public function hscan($key, $cursor, $options = []) {
+        //phpredis menandai awal iterasi dengan null; 0 berarti sudah selesai
+        $cursor = $cursor === 0 ? null : $cursor;
+
         $result = $this->client->hscan(
             $key,
             $cursor,
@@ -349,6 +375,10 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
         if ($result === false) {
             $result = [];
         }
+
+        //dikembalikan ke 0 supaya penanda "habis" tidak bergantung pada apakah
+        //klien sempat menimpa iteratornya
+        $cursor = $cursor === null ? 0 : $cursor;
 
         return $cursor === 0 && empty($result) ? false : [$cursor, $result];
     }
@@ -363,6 +393,9 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * @return mixed
      */
     public function sscan($key, $cursor, $options = []) {
+        //phpredis menandai awal iterasi dengan null; 0 berarti sudah selesai
+        $cursor = $cursor === 0 ? null : $cursor;
+
         $result = $this->client->sscan(
             $key,
             $cursor,
@@ -374,17 +407,19 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
             $result = [];
         }
 
+        //dikembalikan ke 0 supaya penanda "habis" tidak bergantung pada apakah
+        //klien sempat menimpa iteratornya
+        $cursor = $cursor === null ? 0 : $cursor;
+
         return $cursor === 0 && empty($result) ? false : [$cursor, $result];
     }
 
     /**
      * Execute commands in a pipeline.
      *
-     * @param null|callable $callback
-     *
      * @return \Redis|array
      */
-    public function pipeline(callable $callback = null) {
+    public function pipeline(?callable $callback = null) {
         $pipeline = $this->client()->pipeline();
 
         return is_null($callback) ? $pipeline : c::tap($pipeline, $callback)->exec();
@@ -393,14 +428,14 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
     /**
      * Execute commands in a transaction.
      *
-     * @param null|callable $callback
-     *
      * @return \Redis|array
      */
-    public function transaction(callable $callback = null) {
+    public function transaction(?callable $callback = null) {
         $transaction = $this->client()->multi();
 
-        return is_null($callback) ? $transaction : c::tap($transaction, $callback)->exec();
+        return is_null($callback)
+            ? $transaction
+            : c::tap($transaction, $callback)->exec();
     }
 
     /**
@@ -427,7 +462,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      *
      * @return mixed
      */
-    public function doEval($script, $numberOfKeys, ...$arguments) {
+    public function eval($script, $numberOfKeys, ...$arguments) {
         return $this->command('eval', [$script, $arguments, $numberOfKeys]);
     }
 
@@ -435,7 +470,6 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * Subscribe to a set of given channels for messages.
      *
      * @param array|string $channels
-     * @param \Closure     $callback
      *
      * @return void
      */
@@ -449,7 +483,6 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * Subscribe to a set of given channels with wildcards.
      *
      * @param array|string $channels
-     * @param \Closure     $callback
      *
      * @return void
      */
@@ -463,7 +496,6 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * Subscribe to a set of given channels for messages.
      *
      * @param array|string $channels
-     * @param \Closure     $callback
      * @param string       $method
      *
      * @return void
@@ -477,22 +509,17 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * @return void
      */
     public function flushdb() {
-        if (!$this->client instanceof RedisCluster) {
-            return $this->command('flushdb');
+        $arguments = func_get_args();
+
+        if (strtoupper((string) (isset($arguments[0]) ? $arguments[0] : null)) === 'ASYNC') {
+            return $this->command('flushdb', [true]);
         }
-        $client = $this->client;
-        if ($client instanceof RedisCluster) {
-            foreach ($client->_masters() as $hostPort) {
-                list($host, $port) = $hostPort;
-                c::tap(new Redis())->connect($host, $port)->flushDb();
-            }
-        }
+
+        return $this->command('flushdb');
     }
 
     /**
      * Execute a raw command.
-     *
-     * @param array $parameters
      *
      * @return mixed
      */
@@ -504,7 +531,6 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * Run a command against the Redis database.
      *
      * @param string $method
-     * @param array  $parameters
      *
      * @throws \RedisException
      *
@@ -514,8 +540,12 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
         try {
             return parent::command($method, $parameters);
         } catch (RedisException $e) {
-            if (cstr::contains($e->getMessage(), 'went away')) {
-                $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+            foreach (['went away', 'socket', 'read error on connection', 'Connection lost'] as $errorMessage) {
+                if (str_contains($e->getMessage(), $errorMessage)) {
+                    $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+
+                    break;
+                }
             }
 
             throw $e;
@@ -529,19 +559,6 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      */
     public function disconnect() {
         $this->client->close();
-    }
-
-    /**
-     * Apply prefix to the given key if necessary.
-     *
-     * @param string $key
-     *
-     * @return string
-     */
-    private function applyPrefix($key) {
-        $prefix = (string) $this->client->getOption(Redis::OPT_PREFIX);
-
-        return $prefix . $key;
     }
 
     /**

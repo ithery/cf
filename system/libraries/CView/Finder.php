@@ -131,7 +131,7 @@ class CView_Finder implements CView_Contract_ViewFinderInterface {
 
         foreach ((array) $paths as $path) {
             foreach ($this->getPossibleViewFiles($name) as $file) {
-                if (file_exists($viewPath = $path . $file)) {
+                if (file_exists($viewPath = c::untrailingslashit($path) . '/' . $file)) {
                     return $viewPath;
                 }
             }

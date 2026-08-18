@@ -25,10 +25,11 @@ export default {
     },
 
     onwarn(warning, warn) {
-        // suppress eval warnings
         if (warning.code === 'EVAL') {return;}
-        // suppress circular dependency warnings
         if (warning.code === 'CIRCULAR_DEPENDENCY') {return;}
+        if (warning.code === 'EMPTY_BUNDLE') {return;}
+        if (warning.message && warning.message.includes('output file') && warning.message.includes('cres.css')) {return;}
+        if (warning.code === 'NAMESPACE_CONFLICT' || (warning.message && warning.message.includes('re-exports'))) {return;}
         warn(warning);
     },
     plugins: [
@@ -36,7 +37,7 @@ export default {
         resolve(),
         commonjs({
             // These npm packages still use common-js modules. Ugh.
-            include: /node_modules\/(get-value|isobject|core-js|locutus|pusher-js|event-source-polyfill|lodash.merge|lodash.clonedeep|@babel\/runtime)/
+            include: /node_modules\/(get-value|isobject|core-js|locutus|pusher-js|event-source-polyfill|lodash.merge|lodash.clonedeep|@babel\/runtime|collect.js)/
         }),
         postcss({
             config: {
@@ -45,7 +46,6 @@ export default {
             extensions: ['.css'],
             extract: true,
             minimize: isProduction
-            // modules: true,
         }),
         filesize(),
         terser({ format: { comments: false } }),

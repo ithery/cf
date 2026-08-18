@@ -38,6 +38,12 @@ class CCurl {
 
     private $post_data;
 
+    private $last_caseless;
+
+    private $opened;
+
+    private $last_headers;
+
     private function __construct($url = null, $engine = 'curl') {
         $this->autoinit = true;
         $this->opened = false;
@@ -313,7 +319,7 @@ class CCurl {
         } else {
             $caseless = strtoupper($caseless);
             if (isset($this->last_caseless[$caseless])) {
-                return $this->last_header[$this->last_caseless[$caseless]];
+                return $this->last_headers[$this->last_caseless[$caseless]];
             } else {
                 return false;
             }
@@ -414,5 +420,9 @@ class CCurl {
 
     public function getPostData() {
         return $this->post_data;
+    }
+
+    public static function builder() {
+        return new CCurl_Builder();
     }
 }

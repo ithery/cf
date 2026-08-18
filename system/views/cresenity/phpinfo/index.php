@@ -1,6 +1,6 @@
 <?php
-    $phpinfo = CPHPInfo::instance();
-    $info = $phpinfo->get_array();
+    $phpinfo = CServer_PhpInfo::instance();
+    $info = $phpinfo->toCollection();
 ?>
 
 <?php

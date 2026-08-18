@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 2, 2019, 1:24:01 AM
- */
 class CResources_PathGenerator implements CResources_PathGeneratorInterface {
     /**
      * Get the path for the given resource, relative to the root storage path.
@@ -36,6 +30,12 @@ class CResources_PathGenerator implements CResources_PathGeneratorInterface {
     protected function getBasePath(CModel_Resource_ResourceInterface $resource) {
         /** @var CModel $resource */
         $ymd = date('Ymd', strtotime($resource->created));
+
+        if ($resource->version == 2) {
+            $appCode = CF::appCode();
+
+            return 'resources' . '/' . $appCode . '/' . $ymd . '/' . $resource->model_type . '/' . $resource->getKey();
+        }
 
         return 'resources' . '/' . $ymd . '/' . $resource->model_type . '/' . $resource->getKey();
     }

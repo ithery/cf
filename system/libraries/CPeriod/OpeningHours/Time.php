@@ -123,7 +123,7 @@ class CPeriod_OpeningHours_Time {
      *
      * @return DateTimeInterface
      */
-    public function toDateTime(DateTimeInterface $date = null) {
+    public function toDateTime(?DateTimeInterface $date = null) {
         $date = $date ? $this->copyDateTime($date) : new DateTime('1970-01-01 00:00:00');
 
         return $date->setTime($this->hours, $this->minutes);
@@ -159,6 +159,7 @@ class CPeriod_OpeningHours_Time {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->format();
     }

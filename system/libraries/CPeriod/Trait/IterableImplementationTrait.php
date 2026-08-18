@@ -8,6 +8,7 @@ trait CPeriod_Trait_IterableImplementationTrait {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return carr::get($this->periods, $offset);
     }
@@ -18,6 +19,7 @@ trait CPeriod_Trait_IterableImplementationTrait {
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         if (is_null($offset)) {
             $this->periods[] = $value;
@@ -28,10 +30,12 @@ trait CPeriod_Trait_IterableImplementationTrait {
         $this->periods[$offset] = $value;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return array_key_exists($offset, $this->periods);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         unset($this->periods[$offset]);
     }
@@ -39,6 +43,7 @@ trait CPeriod_Trait_IterableImplementationTrait {
     /**
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function next() {
         $this->position++;
     }
@@ -46,6 +51,7 @@ trait CPeriod_Trait_IterableImplementationTrait {
     /**
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function key() {
         return $this->position;
     }
@@ -53,6 +59,7 @@ trait CPeriod_Trait_IterableImplementationTrait {
     /**
      * @return boolean
      */
+    #[\ReturnTypeWillChange]
     public function valid() {
         return array_key_exists($this->position, $this->periods);
     }
@@ -60,6 +67,7 @@ trait CPeriod_Trait_IterableImplementationTrait {
     /**
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function rewind() {
         $this->position = 0;
     }
@@ -67,6 +75,7 @@ trait CPeriod_Trait_IterableImplementationTrait {
     /**
      * @return integer
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->periods);
     }

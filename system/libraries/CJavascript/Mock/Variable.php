@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 3, 2018, 3:15:46 AM
- */
 class CJavascript_Mock_Variable {
     protected $propStack = [];
 
@@ -19,11 +13,13 @@ class CJavascript_Mock_Variable {
 
     public function __get($name) {
         $cloned = clone $this;
+
         return $cloned->addProp($name);
     }
 
     public function addProp($name) {
         $this->propStack[] = $name;
+
         return $this;
     }
 
@@ -32,9 +28,11 @@ class CJavascript_Mock_Variable {
         foreach ($this->propStack as $prop) {
             $var .= '.' . $prop;
         }
+
         return $var;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->getScript();
     }

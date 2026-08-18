@@ -2,14 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * CGeo_Location_Ellipsoid
- *
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 7:36:05 PM
- */
 class CGeo_Location_Ellipsoid {
     /**
      * @var string
@@ -17,21 +9,21 @@ class CGeo_Location_Ellipsoid {
     protected $name;
 
     /**
-     * The semi-major axis
+     * The semi-major axis.
      *
      * @var float
      */
     protected $a;
 
     /**
-     * The Inverse Flattening (1/f)
+     * The Inverse Flattening (1/f).
      *
      * @var float
      */
     protected $f;
 
     /**
-     * Some often used ellipsoids
+     * Some often used ellipsoids.
      *
      * @var array
      */
@@ -92,7 +84,7 @@ class CGeo_Location_Ellipsoid {
     }
 
     /**
-     * Calculation of the semi-minor axis
+     * Calculation of the semi-minor axis.
      *
      * @return float
      */
@@ -108,7 +100,7 @@ class CGeo_Location_Ellipsoid {
     }
 
     /**
-     * Calculates the arithmetic mean radius
+     * Calculates the arithmetic mean radius.
      *
      * @see http://home.online.no/~sigurdhu/WGS84_Eng.html
      *

@@ -37,9 +37,22 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         $modelClass .= '_' . $model;
 
         $content = CFile::get($modelFile);
-        $content = preg_replace('/.*@property.*/', '{properties}', $content);
-        $content = preg_replace('/{properties}/', $this->getUpdatedProperties(), $content, 1);
-        $content = str_replace("{properties}\n", '', $content);
+        $hasProperties = preg_match('/@property/', $content) === 1;
+
+        if ($hasProperties) {
+            $content = preg_replace('/.*@property.*/', '{properties}', $content);
+            $content = preg_replace('/{properties}/', $this->getUpdatedProperties(), $content, 1);
+            $content = str_replace("{properties}\n", '', $content);
+        } else {
+            $updatedProperties = $this->getUpdatedProperties();
+            $docBlock = "/**\n" . $updatedProperties . "\n */\n";
+            $hasDocBlock = preg_match('#/\*\*.*?\*/\s*\nclass\s#s', $content) === 1;
+            if ($hasDocBlock) {
+                $content = preg_replace('#/\*\*.*?\*/\s*\n(class\s)#s', $docBlock . '$1', $content);
+            } else {
+                $content = preg_replace('/(class\s)/', $docBlock . '$1', $content, 1);
+            }
+        }
 
         CFile::put($modelFile, $content);
 
@@ -79,6 +92,11 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         return $result;
     }
 
+    /**
+     * @param array $properties
+     *
+     * @return array
+     */
     public function updateFieldProperties($properties) {
         $fields = Helper::getFields($this->getTable(), $this->prefix);
         $currentPropertyFields = array_column($properties, 'field');
@@ -103,7 +121,7 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
             }
         }
         while (true) {
-            $missingIndex = $this->getMissingPropertyIndex($properties, $fields);
+            $missingIndex = $this->getMissingPropertyIndex($properties);
             if ($missingIndex !== false) {
                 unset($properties[$missingIndex]);
             } else {
@@ -114,6 +132,11 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         return $properties;
     }
 
+    /**
+     * @param array $properties
+     *
+     * @return int|false
+     */
     private function getMissingPropertyIndex($properties) {
         $fieldsKey = c::collect(Helper::getFields($this->getTable(), $this->prefix))->keys()->toArray();
         $classMethods = get_class_methods($this->prefix . 'Model_' . Helper::getModel($this->getTable()));
@@ -130,6 +153,11 @@ class CConsole_Command_Model_ModelUpdateCommand extends CConsole_Command_AppComm
         return false;
     }
 
+    /**
+     * @param array $properties
+     *
+     * @return array
+     */
     public function updateFieldRelation($properties) {
         $compared = [];
 

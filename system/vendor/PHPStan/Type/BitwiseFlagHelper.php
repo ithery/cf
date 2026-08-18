@@ -7,10 +7,12 @@ use PhpParser\Node\Expr\BinaryOp\BitwiseOr;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Name\FullyQualified;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Constant\ConstantIntegerType;
 
+#[AutowiredService]
 final class BitwiseFlagHelper
 {
 
@@ -18,6 +20,9 @@ final class BitwiseFlagHelper
 	{
 	}
 
+	/**
+	 * @param non-empty-string $constName
+	 */
 	public function bitwiseOrContainsConstant(Expr $expr, Scope $scope, string $constName): TrinaryLogic
 	{
 		if ($expr instanceof ConstFetch) {
@@ -35,8 +40,8 @@ final class BitwiseFlagHelper
 		}
 
 		if ($expr instanceof BitwiseOr) {
-			return TrinaryLogic::createFromBoolean($this->bitwiseOrContainsConstant($expr->left, $scope, $constName)->yes() ||
-				$this->bitwiseOrContainsConstant($expr->right, $scope, $constName)->yes());
+			return $this->bitwiseOrContainsConstant($expr->left, $scope, $constName)
+				->or($this->bitwiseOrContainsConstant($expr->right, $scope, $constName));
 		}
 
 		$fqcn = new FullyQualified($constName);
@@ -94,8 +99,7 @@ final class BitwiseFlagHelper
 			return TrinaryLogic::createNo();
 		}
 
-		$integerType = new IntegerType();
-		if ($integerType->isSuperTypeOf($type)->yes() || $type instanceof MixedType) {
+		if ($type->isInteger()->yes() || $type instanceof MixedType) {
 			return TrinaryLogic::createMaybe();
 		}
 

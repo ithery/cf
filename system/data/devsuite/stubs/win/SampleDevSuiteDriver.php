@@ -1,13 +1,13 @@
 <?php
 
 class SampleDevSuiteDriver extends CDevSuite_DevSuiteDriver {
-
     /**
      * Determine if the driver serves the request.
      *
      * @param string $sitePath
      * @param string $siteName
      * @param string $uri
+     *
      * @return bool
      */
     public function serves($sitePath, $siteName, $uri) {
@@ -24,6 +24,7 @@ class SampleDevSuiteDriver extends CDevSuite_DevSuiteDriver {
      * @param string $sitePath
      * @param string $siteName
      * @param string $uri
+     *
      * @return string|false
      */
     public function isStaticFile($sitePath, $siteName, $uri) {
@@ -40,10 +41,10 @@ class SampleDevSuiteDriver extends CDevSuite_DevSuiteDriver {
      * @param string $sitePath
      * @param string $siteName
      * @param string $uri
+     *
      * @return string
      */
     public function frontControllerPath($sitePath, $siteName, $uri) {
         return $sitePath . '/index.php';
     }
-
 }

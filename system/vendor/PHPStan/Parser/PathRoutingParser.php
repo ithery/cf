@@ -4,14 +4,21 @@ namespace PHPStan\Parser;
 
 use PHPStan\File\FileHelper;
 use function array_fill_keys;
-use function strpos;
+use function array_slice;
+use function count;
+use function explode;
+use function implode;
+use function is_link;
+use function realpath;
+use function str_contains;
+use const DIRECTORY_SEPARATOR;
 
-class PathRoutingParser implements Parser
+final class PathRoutingParser implements Parser
 {
 
 	private ?string $singleReflectionFile;
 
-	/** @var bool[] filePath(string) => bool(true) */
+	/** @var array<string, true> filePath(string) => bool(true) */
 	private array $analysedFiles = [];
 
 	public function __construct(
@@ -36,15 +43,33 @@ class PathRoutingParser implements Parser
 	public function parseFile(string $file): array
 	{
 		$normalizedPath = $this->fileHelper->normalizePath($file, '/');
-		if (strpos($normalizedPath, 'vendor/jetbrains/phpstorm-stubs') !== false) {
+		if (str_contains($normalizedPath, 'vendor/jetbrains/phpstorm-stubs')) {
 			return $this->php8Parser->parseFile($file);
 		}
-		if (strpos($normalizedPath, 'vendor/phpstan/php-8-stubs/stubs') !== false) {
+		if (str_contains($normalizedPath, 'vendor/phpstan/php-8-stubs/stubs')) {
 			return $this->php8Parser->parseFile($file);
 		}
 
 		$file = $this->fileHelper->normalizePath($file);
 		if (!isset($this->analysedFiles[$file]) && $file !== $this->singleReflectionFile) {
+			// check symlinked file that still might be in analysedFiles
+			$pathParts = explode(DIRECTORY_SEPARATOR, $file);
+			for ($i = count($pathParts); $i > 1; $i--) {
+				$joinedPartOfPath = implode(DIRECTORY_SEPARATOR, array_slice($pathParts, 0, $i));
+				if (!@is_link($joinedPartOfPath)) {
+					continue;
+				}
+
+				$realFilePath = realpath($file);
+				if ($realFilePath !== false) {
+					$normalizedRealFilePath = $this->fileHelper->normalizePath($realFilePath);
+					if (isset($this->analysedFiles[$normalizedRealFilePath])) {
+						return $this->currentPhpVersionRichParser->parseFile($file);
+					}
+				}
+				break;
+			}
+
 			return $this->currentPhpVersionSimpleParser->parseFile($file);
 		}
 

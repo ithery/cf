@@ -121,6 +121,7 @@ class RepeatedField implements \ArrayAccess, \IteratorAggregate, \Countable
      * @throws \ErrorException Invalid type for index.
      * @throws \ErrorException Non-existing index.
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->container[$offset];

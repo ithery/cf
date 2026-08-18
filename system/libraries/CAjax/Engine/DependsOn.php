@@ -15,7 +15,6 @@ class CAjax_Engine_DependsOn extends CAjax_Engine {
         if ($data instanceof CApp) {
             $data = $data->toArray();
         }
-
         if ($data instanceof CRenderable) {
             $app = c::app();
             $app->add($data);

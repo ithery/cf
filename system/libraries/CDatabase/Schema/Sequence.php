@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 12:32:57 PM
- */
-
-/**
  * Sequence structure.
  */
 class CDatabase_Schema_Sequence extends CDatabase_AbstractAsset {
@@ -24,7 +17,7 @@ class CDatabase_Schema_Sequence extends CDatabase_AbstractAsset {
     protected $initialValue = 1;
 
     /**
-     * @var int|null
+     * @var null|int
      */
     protected $cache = null;
 
@@ -32,10 +25,10 @@ class CDatabase_Schema_Sequence extends CDatabase_AbstractAsset {
      * @param string   $name
      * @param int      $allocationSize
      * @param int      $initialValue
-     * @param int|null $cache
+     * @param null|int $cache
      */
     public function __construct($name, $allocationSize = 1, $initialValue = 1, $cache = null) {
-        $this->_setName($name);
+        $this->setName($name);
         $this->allocationSize = is_numeric($allocationSize) ? $allocationSize : 1;
         $this->initialValue = is_numeric($initialValue) ? $initialValue : 1;
         $this->cache = $cache;
@@ -56,7 +49,7 @@ class CDatabase_Schema_Sequence extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @return int|null
+     * @return null|int
      */
     public function getCache() {
         return $this->cache;

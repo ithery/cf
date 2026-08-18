@@ -1,5 +1,7 @@
 <?php
 
+use Beste\Json;
+
 final class CVendor_Firebase_Messaging_RawMessageFromArray implements CVendor_Firebase_Messaging_MessageInterface {
     /**
      * @var array
@@ -10,7 +12,8 @@ final class CVendor_Firebase_Messaging_RawMessageFromArray implements CVendor_Fi
         $this->data = $data;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
-        return $this->data;
+        return Json::decode(Json::encode($this->data), true);
     }
 }

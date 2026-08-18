@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 17, 2019, 4:35:16 PM
+ * @deprecated Use CDaemon_Server_ProtocolAbstract instead.
  */
-abstract class CDaemon_Worker_ProtocolAbstract implements CDaemon_Worker_ProtocolInterface {
+abstract class CDaemon_Worker_ProtocolAbstract extends CDaemon_Server_ProtocolAbstract implements CDaemon_Worker_ProtocolInterface {
 }

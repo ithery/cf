@@ -1,22 +1,68 @@
 <?php
 
+ use CElement_FormInput_QueryBuilder_Constant as Constant;
+
 class CElement_FormInput_QueryBuilder_Parser {
     use CElement_FormInput_QueryBuilder_Parser_FunctionTrait;
 
-    protected $modelClass;
+    /**
+     * @var CModel_Query|CDatabase_Query_Builder
+     */
+    protected $modelQuery;
 
+    /**
+     * The allowed list of fields, used by `ensureFieldIsAllowed()`.
+     *
+     * @var array
+     */
     protected $fields;
 
-    public function __construct($modelClass, $fields = []) {
-        $this->modelClass = $modelClass;
+    /**
+     * Per-field callbacks (`field => callable`) that override the default rule-to-query conversion.
+     *
+     * @var array
+     */
+    protected $ruleCallbacks;
+
+    /**
+     * @param string|CModel_Query|CDatabase_Query_Builder $modelQuery a `CModel` class name, or an existing query instance
+     * @param array                                        $fields
+     *
+     * @return void
+     */
+    public function __construct($modelQuery, $fields = []) {
+        if (is_string($modelQuery) && class_exists($modelQuery)) {
+            $modelQuery = $modelQuery::query();
+        }
+        $this->modelQuery = $modelQuery;
         $this->fields = $fields;
+        $this->ruleCallbacks = [];
     }
 
+    /**
+     * @param string   $field
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function addRuleCallback($field, $callback) {
+        $this->ruleCallbacks[$field] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Parses the ruleset and returns a CModel_Query object.
+     *
+     * @param string $rules the ruleset as a JSON string
+     *
+     * @return CModel_Query|CDatabase_Query_Builder
+     */
     public function parse($rules) {
-        $modelClass = $this->modelClass;
+
         // do a JSON decode (throws exceptions if there is a JSON error...)
         $query = $this->decodeJSON($rules);
-        $modelQuery = $modelClass::query();
+        $modelQuery = $this->modelQuery;
         // This can happen if the querybuilder had no rules...
         if (!isset($query->rules) || !is_array($query->rules)) {
             return $modelQuery;
@@ -47,7 +93,6 @@ class CElement_FormInput_QueryBuilder_Parser {
              * If makeQuery does not see the correct fields, it will return the QueryBuilder without modifications
              */
             $querybuilder = $this->makeQuery($querybuilder, $rule, $queryCondition);
-
             if ($this->isNested($rule)) {
                 $querybuilder = $this->createNestedQuery($querybuilder, $rule, $queryCondition);
             }
@@ -59,7 +104,7 @@ class CElement_FormInput_QueryBuilder_Parser {
     /**
      * Determine if a particular rule is actually a group of other rules.
      *
-     * @param $rule
+     * @param stdClass $rule
      *
      * @return bool
      */
@@ -80,7 +125,7 @@ class CElement_FormInput_QueryBuilder_Parser {
      * @param stdClass     $rule
      * @param null|string  $condition
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      */
     protected function createNestedQuery(CModel_Query $querybuilder, stdClass $rule, $condition = null) {
         if ($condition === null) {
@@ -88,7 +133,7 @@ class CElement_FormInput_QueryBuilder_Parser {
         }
 
         $condition = $this->validateCondition($condition);
-
+        /** @phpstan-ignore-next-line */
         return $querybuilder->whereNested(function ($query) use (&$rule, &$querybuilder, &$condition) {
             foreach ($rule->rules as $loopRule) {
                 $function = 'makeQuery';
@@ -116,7 +161,7 @@ class CElement_FormInput_QueryBuilder_Parser {
             return false;
         }
 
-        if (!isset($this->operators[$rule->operator])) {
+        if (!isset(Constant::getOperatorData()[$rule->operator])) {
             return false;
         }
 
@@ -126,7 +171,7 @@ class CElement_FormInput_QueryBuilder_Parser {
     /**
      * Give back the correct value when we don't accept one.
      *
-     * @param $rule
+     * @param stdClass $rule
      *
      * @return null|string
      */
@@ -143,13 +188,13 @@ class CElement_FormInput_QueryBuilder_Parser {
      *
      * Append/Prepend values for SQL statements, etc.
      *
-     * @param $operator
+     * @param string   $operator
      * @param stdClass $rule
-     * @param $value
+     * @param mixed    $value
      *
-     * @throws QBParseException
+     * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
-     * @return string
+     * @return mixed
      */
     protected function getCorrectValue($operator, stdClass $rule, $value) {
         $field = $rule->field;
@@ -175,15 +220,15 @@ class CElement_FormInput_QueryBuilder_Parser {
      * the query that was given by the user to the QueryBuilder.
      * makeQuery: The money maker!
      *
-     * @param CModel_Query $query
-     * @param stdClass     $rule
-     * @param string       $queryCondition and/or...
+     * @param CModel_Query|CDatabase_Query_Builder $query
+     * @param stdClass                             $rule
+     * @param string                               $queryCondition and/or...
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      */
-    protected function makeQuery(CModel_Query $query, stdClass $rule, $queryCondition = 'AND') {
+    protected function makeQuery($query, stdClass $rule, $queryCondition = 'AND') {
         /*
          * Ensure that the value is correct for the rule, return query on exception
          */
@@ -202,14 +247,14 @@ class CElement_FormInput_QueryBuilder_Parser {
      * (This used to be part of makeQuery, where the name made sense, but I pulled it
      * out to reduce some duplicated code inside JoinSupportingQueryBuilder)
      *
-     * @param CModel_Query $query
-     * @param stdClass     $rule
-     * @param mixed        $value          the value that needs to be queried in the database
-     * @param string       $queryCondition and/or...
+     * @param CModel_Query|CDatabase_Query_Builder $query
+     * @param stdClass                             $rule
+     * @param mixed                                $value          the value that needs to be queried in the database
+     * @param string                               $queryCondition and/or...
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      */
-    protected function convertIncomingQBtoQuery(CModel_Query $query, stdClass $rule, $value, $queryCondition = 'AND') {
+    protected function convertIncomingQBtoQuery($query, stdClass $rule, $value, $queryCondition = 'AND') {
         /*
          * Convert the Operator (LIKE/NOT LIKE/GREATER THAN) given to us by QueryBuilder
          * into on one that we can use inside the SQL query
@@ -217,7 +262,12 @@ class CElement_FormInput_QueryBuilder_Parser {
         $sqlOperator = $this->operator_sql[$rule->operator];
         $operator = $sqlOperator['operator'];
         $condition = strtolower($queryCondition);
+        if (isset($this->ruleCallbacks[$rule->field])) {
+            $callback = $this->ruleCallbacks[$rule->field];
+            $query = $callback($query, $rule, $value, $condition);
 
+            return $query;
+        }
         if ($this->operatorRequiresArray($operator)) {
             return $this->makeQueryWhenArray($query, $rule, $sqlOperator, $value, $condition);
         } elseif ($this->operatorIsNull($operator)) {
@@ -232,8 +282,8 @@ class CElement_FormInput_QueryBuilder_Parser {
      *
      * @param stdClass $rule
      *
-     * @throws QBRuleException
-     * @throws \timgws\QBParseException
+     * @throws CElement_FormInput_QueryBuilder_Exception_RuleException
+     * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
      * @return mixed
      */
@@ -251,7 +301,8 @@ class CElement_FormInput_QueryBuilder_Parser {
         /*
          * If the SQL Operator is set not to have a value, make sure that we set the value to null.
          */
-        if ($this->operators[$rule->operator]['accept_values'] === false) {
+        $operatorData = Constant::getOperatorData();
+        if ($operatorData[$rule->operator]['accept_values'] === false) {
             return $this->operatorValueWhenNotAcceptingOne($rule);
         }
 

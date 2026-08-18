@@ -262,6 +262,7 @@ class CVendor_Firebase_Messaging_CloudMessage implements CVendor_Firebase_Messag
         return $this->target ? true : false;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         $data = [
             'data' => $this->data,

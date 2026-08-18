@@ -61,6 +61,7 @@ final class CVendor_Firebase_Messaging_WebPushConfig implements JsonSerializable
     /**
      * @return array<string, mixed>
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return \array_filter($this->rawConfig, static function ($value) {
             return $value !== null;

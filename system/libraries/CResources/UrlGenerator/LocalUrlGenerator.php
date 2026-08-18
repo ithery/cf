@@ -11,7 +11,7 @@ class CResources_UrlGenerator_LocalUrlGenerator extends CResources_UrlGeneratorA
     public function getUrl() {
         $url = rtrim($this->getBaseResourceDirectoryUrl(), '/') . '/' . $this->getPathRelativeToRoot();
         $url = $this->makeCompatibleForNonUnixHosts($url);
-        $url = $this->rawUrlEncodeFilename($url);
+        // $url = $this->rawUrlEncodeFilename($url);
         return $url;
     }
 

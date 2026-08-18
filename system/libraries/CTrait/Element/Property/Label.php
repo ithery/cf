@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2018, 5:11:13 AM
+ * @see CElement_Component_Form_Field
  */
 trait CTrait_Element_Property_Label {
     /**
@@ -30,6 +27,9 @@ trait CTrait_Element_Property_Label {
      * @return $this
      */
     public function setLabel($label, $lang = true) {
+        if (!is_string($label)) {
+            $label = '';
+        }
         $this->rawLabel = $label;
         if ($lang !== false) {
             $label = c::__($label, is_array($lang) ? $lang : []);

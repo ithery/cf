@@ -14,7 +14,7 @@ namespace Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
-
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 /**
  * Request represents an HTTP request.
  *
@@ -317,7 +317,7 @@ class Request {
 
         $request = self::createRequestFromFactory($_GET, $_POST, [], $_COOKIE, $_FILES, $server);
 
-        if (0 === strpos($request->headers->get('CONTENT_TYPE'), 'application/x-www-form-urlencoded') && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), ['PUT', 'DELETE', 'PATCH'])
+        if (0 === strpos($request->headers->get('CONTENT_TYPE', ''), 'application/x-www-form-urlencoded') && in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), ['PUT', 'DELETE', 'PATCH'])
         ) {
             parse_str($request->getContent(), $data);
             $request->request = new ParameterBag($data);
@@ -806,7 +806,16 @@ class Request {
      * @return null|SessionInterface The session
      */
     public function getSession() {
-        return $this->session;
+        $session = $this->session;
+        if (!$session instanceof SessionInterface && null !== $session) {
+            $this->setSession($session = $session());
+        }
+
+        if (null === $session) {
+            throw new SessionNotFoundException('Session has not been set.');
+        }
+
+        return $session;
     }
 
     /**
@@ -1047,7 +1056,7 @@ class Request {
 
         $pass = $this->getPassword();
         if ('' != $pass) {
-            $userinfo .= ":${pass}";
+            $userinfo .= ":" . $pass;
         }
 
         return $userinfo;
@@ -1171,7 +1180,7 @@ class Request {
         // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used
         // as the first segment of a relative-path reference, as it would be mistaken for a scheme name
         // (see http://tools.ietf.org/html/rfc3986#section-4.2).
-        return !isset($path[0]) || '/' === $path[0] || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos) ? "./${path}" : $path;
+        return !isset($path[0]) || '/' === $path[0] || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos) ? "./".$path : $path;
     }
 
     /**

@@ -4,18 +4,20 @@ namespace PHPStan\Rules\Methods;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Internal\SprintfHelper;
 use PHPStan\Node\InClassMethodNode;
-use PHPStan\Reflection\Php\PhpMethodFromParserNodeReflection;
 use PHPStan\Rules\FunctionDefinitionCheck;
 use PHPStan\Rules\Rule;
-use PHPStan\ShouldNotHappenException;
 use function sprintf;
 
 /**
  * @implements Rule<InClassMethodNode>
  */
-class ExistingClassesInTypehintsRule implements Rule
+#[RegisteredRule(level: 0)]
+#[ValidatesStubFiles]
+final class ExistingClassesInTypehintsRule implements Rule
 {
 
 	public function __construct(private FunctionDefinitionCheck $check)
@@ -29,18 +31,12 @@ class ExistingClassesInTypehintsRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$methodReflection = $scope->getFunction();
-		if (!$methodReflection instanceof PhpMethodFromParserNodeReflection) {
-			throw new ShouldNotHappenException();
-		}
-		if (!$scope->isInClass()) {
-			throw new ShouldNotHappenException();
-		}
-
-		$className = SprintfHelper::escapeFormatString($scope->getClassReflection()->getDisplayName());
+		$methodReflection = $node->getMethodReflection();
+		$className = SprintfHelper::escapeFormatString($node->getClassReflection()->getDisplayName());
 		$methodName = SprintfHelper::escapeFormatString($methodReflection->getName());
 
 		return $this->check->checkClassMethod(
+			$scope,
 			$methodReflection,
 			$node->getOriginalNode(),
 			sprintf(
@@ -62,6 +58,16 @@ class ExistingClassesInTypehintsRule implements Rule
 			),
 			sprintf(
 				'Method %s::%s() has unresolvable native return type.',
+				$className,
+				$methodName,
+			),
+			sprintf(
+				'Method %s::%s() has invalid @phpstan-self-out type %%s.',
+				$className,
+				$methodName,
+			),
+			sprintf(
+				'Attribute NoDiscard cannot be used on %%s method %s::%s().',
 				$className,
 				$methodName,
 			),

@@ -30,6 +30,7 @@
     </head>
     <body>
         <div id="framework_error" style="width:42em;margin:20px auto;">
+
             <h3><?php echo c::e($error); ?></h3>
             <p><?php echo c::e($description); ?></p>
             <?php if (!CF::isProduction() || (isset($_GET['show_debug_error']) && $_GET['show_debug_error'] == '1') || (isset($show_debug_error) && $show_debug_error)): ?>

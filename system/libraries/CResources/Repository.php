@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 6, 2019, 7:25:37 AM
- */
 class CResources_Repository {
     /**
      * @var CModel_Resource_ResourceInterface|CModel
@@ -17,7 +11,7 @@ class CResources_Repository {
     /**
      * @param CModel_Resource_ResourceInterface $model
      */
-    public function __construct(CModel_Resource_ResourceInterface $model = null) {
+    public function __construct(?CModel_Resource_ResourceInterface $model = null) {
         if ($model == null) {
             $resourceModel = CF::config('resource.resource_model', CApp_Model_Resource::class);
             $model = new $resourceModel();

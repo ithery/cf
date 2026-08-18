@@ -7,6 +7,7 @@ return  [
     'uploadFile' => 'Unggah File',
     'errorMessageLimitFile' => 'Hanya :limit file yang dapat diupload',
     'errorMessageMaxUploadSize' => 'Ukuran file melebihi :sizeMB MB',
+    'errorMessageAcceptFileNotAllowed' => 'Tipe file tidak diperbolehkan: :fileName. Yang diperbolehkan: :acceptFile',
     'selectFile' => 'Pilih File',
     'change' => 'Ubah',
 

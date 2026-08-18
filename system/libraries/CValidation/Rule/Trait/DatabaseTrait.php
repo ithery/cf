@@ -167,6 +167,32 @@ trait CValidation_Rule_Trait_DatabaseTrait {
     }
 
     /**
+     * Ignore soft deleted models during the existence check.
+     *
+     * @param string $statusColumn
+     *
+     * @return $this
+     */
+    public function withoutTrashed($statusColumn = 'status') {
+        $this->where($statusColumn, 1);
+
+        return $this;
+    }
+
+    /**
+     * Only include soft deleted models during the existence check.
+     *
+     * @param string $statusColumn
+     *
+     * @return $this
+     */
+    public function onlyTrashed($statusColumn = 'status') {
+        $this->where($statusColumn, 0);
+
+        return $this;
+    }
+
+    /**
      * Register a custom query callback.
      *
      * @param \Closure $callback

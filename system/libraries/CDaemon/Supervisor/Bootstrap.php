@@ -6,12 +6,31 @@ class CDaemon_Supervisor_Bootstrap {
     public static function boot() {
         if (!static::$booted) {
             //boot logic
+            if (!CF::config('daemon.supervisor.enabled')) {
+                return;
+            }
+            $connection = CF::config('daemon.supervisor.use', 'default');
+
+            if (!is_null($config = CDatabase::manager()->getConfig("redis.clusters.{$connection}.0"))) {
+                CDatabase::manager()->getConfig(["database.redis.{$connection}" => $config]);
+            } elseif (is_null($config) && is_null($config = CDatabase::manager()->getConfig("redis.{$connection}"))) {
+                throw new Exception("Redis connection [{$connection}] has not been configured.");
+            }
+
+            $config['options']['prefix'] = CF::config('daemon.supervisor.prefix') ?: 'supervisor:';
+
+            CDatabase::manager()->addRedisConnection($config, 'supervisor');
+
             $queuer = CQueue::queuer();
             $queuer->addConnector('redis', function () {
                 return new CDaemon_Supervisor_Queue_RedisConnector(CRedis::instance());
             });
             static::listenForEvents();
 
+            if (CF::config('daemon.supervisor.metrics.cron.enabled', false)) {
+                $cronExpression = CF::config('daemon.supervisor.metrics.cron.expression', '*/5 * * * *');
+                c::cron()->job(new CDaemon_Supervisor_TaskQueue_SupervisorSnapshot())->cron($cronExpression);
+            }
             static::$booted = true;
         }
     }
@@ -37,15 +56,19 @@ class CDaemon_Supervisor_Bootstrap {
                 CDaemon_Supervisor_Listener_UpdateJobMetrics::class,
             ],
 
-            CDaemon_Supervisor_Event_RedisEvent_JobsMigrated::class => [
+            CDaemon_Supervisor_Event_JobsMigrated::class => [
                 CDaemon_Supervisor_Listener_MarkJobsAsMigrated::class,
             ],
 
+            CQueue_Event_JobExceptionOccurred::class => [
+                CDaemon_Supervisor_Listener_ForgetJobTimer::class,
+            ],
             CQueue_Event_JobFailed::class => [
+                CDaemon_Supervisor_Listener_ForgetJobTimer::class,
                 CDaemon_Supervisor_Listener_MarshalFailedEvent::class,
             ],
 
-            CDaemon_Supervisor_Event_JobFailed::class => [
+            CDaemon_Supervisor_Event_RedisEvent_JobFailed::class => [
                 CDaemon_Supervisor_Listener_MarkJobAsFailed::class,
                 CDaemon_Supervisor_Listener_StoreTagsForFailedJob::class,
             ],
@@ -64,7 +87,7 @@ class CDaemon_Supervisor_Bootstrap {
                 CDaemon_Supervisor_Listener_MonitorWaitTimes::class,
             ],
 
-            CDaemon_Supervisor_Event_WorkerProcessRestarting::class => [
+            CDaemon_Event_WorkerProcessRestarting::class => [
 
             ],
 
@@ -76,5 +99,11 @@ class CDaemon_Supervisor_Bootstrap {
                 //CDaemon_Supervisor_Listener_SendNotification::class,
             ],
         ];
+
+        foreach ($events as $event => $listeners) {
+            foreach ($listeners as $listener) {
+                CEvent::dispatcher()->listen($event, $listener);
+            }
+        }
     }
 }

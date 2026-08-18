@@ -4,11 +4,13 @@ namespace PHPStan\PhpDoc\Tag;
 
 use PHPStan\Type\Type;
 
-/** @api */
-class VarTag implements TypedTag
+/**
+ * @api
+ */
+final class VarTag implements TypedTag
 {
 
-	public function __construct(private Type $type)
+	public function __construct(private Type $type, private bool $isExplicit)
 	{
 	}
 
@@ -17,12 +19,19 @@ class VarTag implements TypedTag
 		return $this->type;
 	}
 
-	/**
-	 * @return self
-	 */
-	public function withType(Type $type): TypedTag
+	public function withType(Type $type): self
 	{
-		return new self($type);
+		return new self($type, $this->isExplicit);
+	}
+
+	public function isExplicit(): bool
+	{
+		return $this->isExplicit;
+	}
+
+	public function toImplicit(): self
+	{
+		return new self($this->type, false);
 	}
 
 }

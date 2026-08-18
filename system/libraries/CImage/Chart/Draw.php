@@ -2,12 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 30, 2019, 2:57:31 AM
- */
+
 use CImage_Chart_Constant as Constant;
 use CImage_Chart_Helper as Helper;
 

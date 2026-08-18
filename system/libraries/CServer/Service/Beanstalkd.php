@@ -5,20 +5,70 @@ use Pheanstalk\Pheanstalk;
 use Pheanstalk\Job as PheanstalkJob;
 
 class CServer_Service_Beanstalkd {
+    /**
+     * @var null|Pheanstalk
+     */
     protected $client;
 
+    /**
+     * @var null|CServer_Server
+     */
+    protected $server;
+
+    /**
+     * @var string
+     */
+    protected $host;
+
+    /**
+     * @var int
+     */
+    protected $port;
+
+    /**
+     * @var string
+     */
     protected $contentType;
 
-    public function __construct($options = []) {
-        $host = carr::get($options, 'host', 'localhost');
-        $port = carr::get($options, 'port', Pheanstalk::DEFAULT_PORT);
-        $timeout = carr::get($options, 'timeout', Connection::DEFAULT_CONNECT_TIMEOUT);
+    /**
+     * @param null|CServer_Server|array $server
+     * @param array                     $options
+     */
+    public function __construct($server = null, $options = []) {
+        if (is_array($server)) {
+            $options = $server;
+            $server = null;
+        }
+        $this->server = $server;
+        $this->host = carr::get($options, 'host', 'localhost');
+        $this->port = carr::get($options, 'port', Pheanstalk::DEFAULT_PORT);
 
-        $this->client = Pheanstalk::create($host, $port, $timeout);
+        if ($this->server === null || $this->server->isLocal()) {
+            $timeout = carr::get($options, 'timeout', Connection::DEFAULT_CONNECT_TIMEOUT);
+            $this->client = Pheanstalk::create($this->host, $this->port, $timeout);
+        }
     }
 
+    /**
+     * @return bool
+     */
+    protected function isRemote() {
+        return $this->client === null && $this->server !== null && $this->server->isRemote();
+    }
+
+    /**
+     * @return array
+     */
     public function getTubes() {
-        $tubes = $this->client->listTubes();
+        if (!$this->isRemote()) {
+            $tubes = $this->client->listTubes();
+            sort($tubes);
+
+            return $tubes;
+        }
+
+        $output = $this->sendRawCommand('list-tubes');
+        $tubes = $this->parseListOutput($output);
         sort($tubes);
 
         return $tubes;
@@ -33,10 +83,26 @@ class CServer_Service_Beanstalkd {
         return $stats;
     }
 
+    /**
+     * @param string $tube
+     *
+     * @return array
+     */
     public function getRawTubeStats($tube) {
-        return $this->client->statsTube($tube);
+        if (!$this->isRemote()) {
+            return $this->client->statsTube($tube);
+        }
+
+        $output = $this->sendRawCommand('stats-tube ' . $tube);
+
+        return $this->parseStatsOutput($output);
     }
 
+    /**
+     * @param string $tube
+     *
+     * @return array
+     */
     public function getTubeStats($tube) {
         $stats = [];
         $descr = [
@@ -67,7 +133,9 @@ class CServer_Service_Beanstalkd {
             'cmd-pause-tube' => 'Pause(cmd)',
             'pause' => 'Pause(sec)',
             'pause-time-left' => 'Pause(left)'];
-        foreach ($this->client->statsTube($tube) as $key => $value) {
+
+        $rawStats = $this->getRawTubeStats($tube);
+        foreach ($rawStats as $key => $value) {
             if (!array_key_exists($key, $nameTube)) {
                 continue;
             }
@@ -131,10 +199,20 @@ class CServer_Service_Beanstalkd {
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getServerStats() {
         $fields = $this->getServerStatsFields();
         $stats = [];
-        $object = $this->client->stats();
+
+        if (!$this->isRemote()) {
+            $object = $this->client->stats();
+        } else {
+            $output = $this->sendRawCommand('stats');
+            $object = $this->parseStatsOutput($output);
+        }
+
         foreach ($fields as $key => $description) {
             if (isset($object[$key])) {
                 $stats[$key] = [
@@ -167,11 +245,31 @@ class CServer_Service_Beanstalkd {
             'buried' => $this->peekBuried($tube)];
     }
 
+    /**
+     * @param string $tube
+     * @param int    $limit
+     *
+     * @return void
+     */
     public function kick($tube, $limit) {
+        if ($this->isRemote()) {
+            $this->sendRawCommand('use ' . $tube);
+            $this->sendRawCommand('kick ' . $limit);
+
+            return;
+        }
         $this->client->useTube($tube)->kick($limit);
     }
 
+    /**
+     * @param string $tube
+     *
+     * @return bool
+     */
     public function deleteReady($tube) {
+        if ($this->isRemote()) {
+            return $this->remoteDeletePeek($tube, 'peek-ready');
+        }
         $job = $this->client->useTube($tube)->peekReady();
         if ($job) {
             $this->client->delete($job);
@@ -182,7 +280,15 @@ class CServer_Service_Beanstalkd {
         return false;
     }
 
+    /**
+     * @param string $tube
+     *
+     * @return bool
+     */
     public function deleteBuried($tube) {
+        if ($this->isRemote()) {
+            return $this->remoteDeletePeek($tube, 'peek-buried');
+        }
         $job = $this->client->useTube($tube)->peekBuried();
         if ($job) {
             $this->client->delete($job);
@@ -193,7 +299,15 @@ class CServer_Service_Beanstalkd {
         return false;
     }
 
+    /**
+     * @param string $tube
+     *
+     * @return bool
+     */
     public function deleteDelayed($tube) {
+        if ($this->isRemote()) {
+            return $this->remoteDeletePeek($tube, 'peek-delayed');
+        }
         $job = $this->client->useTube($tube)->peekDelayed();
         if ($job) {
             $this->client->delete($job);
@@ -204,7 +318,18 @@ class CServer_Service_Beanstalkd {
         return false;
     }
 
+    /**
+     * @param string $tube
+     * @param int    $delay
+     *
+     * @return void
+     */
     public function pauseTube($tube, $delay) {
+        if ($this->isRemote()) {
+            $this->sendRawCommand('pause-tube ' . $tube . ' ' . $delay);
+
+            return;
+        }
         $this->client->pauseTube($tube, $delay);
     }
 
@@ -212,23 +337,44 @@ class CServer_Service_Beanstalkd {
         return $this->contentType;
     }
 
+    /**
+     * @param string $tubeName
+     * @param string $tubeData
+     * @param int    $tubePriority
+     * @param int    $tubeDelay
+     * @param int    $tubeTtr
+     *
+     * @return mixed
+     */
     public function addJob($tubeName, $tubeData, $tubePriority = Pheanstalk::DEFAULT_PRIORITY, $tubeDelay = Pheanstalk::DEFAULT_DELAY, $tubeTtr = Pheanstalk::DEFAULT_TTR) {
-        $this->_client->useTube($tubeName);
-        $result = $this->_client->useTube($tubeName)->put($tubeData, $tubePriority, $tubeDelay, $tubeTtr);
+        if ($this->isRemote()) {
+            throw new Exception('addJob is not supported on remote server');
+        }
+        $this->client->useTube($tubeName);
+        $result = $this->client->useTube($tubeName)->put($tubeData, $tubePriority, $tubeDelay, $tubeTtr);
 
         return $result;
     }
 
     /**
-     * Pheanstalk class instance.
-     *
      * @param string $tube
      * @param string $method
      * @param bool   $autoDecode
+     *
+     * @return array
      */
     private function peek($tube, $method, $autoDecode = false) {
+        if ($this->isRemote()) {
+            $peekTypeMap = [
+                'peekReady' => 'peek-ready',
+                'peekDelayed' => 'peek-delayed',
+                'peekBuried' => 'peek-buried',
+            ];
+
+            return $this->remotePeek($tube, carr::get($peekTypeMap, $method, $method));
+        }
+
         $peek = [];
-        $a = null;
 
         try {
             $job = $this->client->useTube($tube)->{$method}();
@@ -250,8 +396,13 @@ class CServer_Service_Beanstalkd {
         return $peek;
     }
 
+    /**
+     * @param string $pData
+     *
+     * @return mixed
+     */
     private function decodeData($pData) {
-        $this->contentType = false;
+        $this->contentType = '';
         $out = $pData;
         $data = null;
 
@@ -266,17 +417,152 @@ class CServer_Service_Beanstalkd {
             }
         }
         if ($data) {
-            $this->_contentType = 'php';
+            $this->contentType = 'php';
             $out = $data;
         } else {
             $data = @json_decode($pData, true);
 
             if ($data) {
-                $this->_contentType = 'json';
+                $this->contentType = 'json';
                 $out = $data;
             }
         }
 
         return $out;
+    }
+
+    /**
+     * @param string $command
+     *
+     * @return string
+     */
+    private function sendRawCommand($command) {
+        $escapedCmd = addcslashes($command, '"\\');
+        $phpCode = implode('', [
+            '$f=@fsockopen("' . $this->host . '",' . $this->port . ',$e,$m,5);',
+            'if(!$f){echo "CONNECT_ERROR:".$m;exit(1);}',
+            'fwrite($f,"' . $escapedCmd . '\\r\\n");',
+            'stream_set_timeout($f,2);',
+            '$h=fgets($f);',
+            'if(strpos($h,"OK")===0){$n=(int)substr($h,3);echo fread($f,$n);}',
+            'else{echo trim($h);}',
+            'fclose($f);',
+        ]);
+
+        return trim($this->server->runCommand("php -r '" . $phpCode . "'"));
+    }
+
+    /**
+     * @param string $tube
+     * @param string $peekType
+     *
+     * @return array
+     */
+    private function remotePeek($tube, $peekType) {
+        $escapedTube = addcslashes($tube, '"\\');
+        $phpCode = implode('', [
+            '$f=@fsockopen("' . $this->host . '",' . $this->port . ',$e,$m,5);',
+            'if(!$f){echo "{}";exit(1);}',
+            'fwrite($f,"use ' . $escapedTube . '\\r\\n");',
+            'fgets($f);',
+            'fwrite($f,"' . $peekType . '\\r\\n");',
+            '$h=trim(fgets($f));',
+            'if(strpos($h,"FOUND")!==0){echo "{}";fclose($f);exit;}',
+            '$p=explode(" ",$h);$id=$p[1];$n=(int)$p[2];',
+            '$data="";$r=$n+2;',
+            'while(strlen($data)<$r){$c=fread($f,$r-strlen($data));if($c===false)break;$data.=$c;}',
+            '$data=substr($data,0,$n);',
+            'fwrite($f,"stats-job ".$id."\\r\\n");',
+            '$sh=fgets($f);$stats="";',
+            'if(strpos($sh,"OK")===0){$sn=(int)substr($sh,3);while(strlen($stats)<$sn){$c=fread($f,$sn-strlen($stats));if($c===false)break;$stats.=$c;}}',
+            'fclose($f);',
+            'echo json_encode(["id"=>(int)$id,"data"=>$data,"stats"=>$stats]);',
+        ]);
+
+        $output = trim($this->server->runCommand("php -r '" . $phpCode . "'"));
+        $result = json_decode($output, true);
+        if (!is_array($result) || !isset($result['id'])) {
+            return [];
+        }
+
+        return [
+            'id' => $result['id'],
+            'rawData' => $result['data'],
+            'data' => $result['data'],
+            'stats' => $this->parseStatsOutput(carr::get($result, 'stats', '')),
+        ];
+    }
+
+    /**
+     * @param string $tube
+     * @param string $peekType
+     *
+     * @return bool
+     */
+    private function remoteDeletePeek($tube, $peekType) {
+        $escapedTube = addcslashes($tube, '"\\');
+        $phpCode = implode('', [
+            '$f=@fsockopen("' . $this->host . '",' . $this->port . ',$e,$m,5);',
+            'if(!$f)exit(1);',
+            'fwrite($f,"use ' . $escapedTube . '\\r\\n");',
+            'fgets($f);',
+            'fwrite($f,"' . $peekType . '\\r\\n");',
+            '$h=trim(fgets($f));',
+            'if(strpos($h,"FOUND")!==0){echo "0";fclose($f);exit;}',
+            '$p=explode(" ",$h);$id=$p[1];$n=(int)$p[2];',
+            '$data="";$r=$n+2;',
+            'while(strlen($data)<$r){$c=fread($f,$r-strlen($data));if($c===false)break;$data.=$c;}',
+            'fwrite($f,"delete ".$id."\\r\\n");',
+            '$dh=trim(fgets($f));',
+            'fclose($f);',
+            'echo $dh==="DELETED"?"1":"0";',
+        ]);
+
+        $output = trim($this->server->runCommand("php -r '" . $phpCode . "'"));
+
+        return $output === '1';
+    }
+
+    /**
+     * @param string $output
+     *
+     * @return array
+     */
+    private function parseStatsOutput($output) {
+        $result = [];
+        $lines = explode("\n", $output);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '' || $line === '---') {
+                continue;
+            }
+            if (strpos($line, ': ') !== false) {
+                list($key, $value) = explode(': ', $line, 2);
+                $result[trim($key)] = trim($value);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $output
+     *
+     * @return array
+     */
+    private function parseListOutput($output) {
+        $result = [];
+        $lines = explode("\n", $output);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '' || $line === '---') {
+                continue;
+            }
+            if (strpos($line, '- ') === 0) {
+                $result[] = substr($line, 2);
+            }
+        }
+
+        return $result;
     }
 }

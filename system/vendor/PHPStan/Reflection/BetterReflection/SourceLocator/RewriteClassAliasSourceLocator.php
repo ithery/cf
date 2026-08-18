@@ -2,6 +2,7 @@
 
 namespace PHPStan\Reflection\BetterReflection\SourceLocator;
 
+use Override;
 use PHPStan\BetterReflection\Identifier\Identifier;
 use PHPStan\BetterReflection\Identifier\IdentifierType;
 use PHPStan\BetterReflection\Reflection\Reflection;
@@ -12,13 +13,14 @@ use function class_exists;
 use function interface_exists;
 use function trait_exists;
 
-class RewriteClassAliasSourceLocator implements SourceLocator
+final class RewriteClassAliasSourceLocator implements SourceLocator
 {
 
 	public function __construct(private SourceLocator $originalSourceLocator)
 	{
 	}
 
+	#[Override]
 	public function locateIdentifier(Reflector $reflector, Identifier $identifier): ?Reflection
 	{
 		if (!$identifier->isClass()) {
@@ -38,6 +40,7 @@ class RewriteClassAliasSourceLocator implements SourceLocator
 		return $this->originalSourceLocator->locateIdentifier($reflector, $identifier);
 	}
 
+	#[Override]
 	public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType): array
 	{
 		return $this->originalSourceLocator->locateIdentifiersByType($reflector, $identifierType);

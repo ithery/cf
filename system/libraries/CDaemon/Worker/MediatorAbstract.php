@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 15, 2019, 12:12:16 PM
- */
 abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     /**
      * The version is used in case formats change in the future.
@@ -146,6 +140,22 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @var int
      */
     protected $callCount = 1;
+
+    /**
+     * @return int
+     */
+    public function getCallCount() {
+        return $this->callCount;
+    }
+
+    /**
+     * @param int $count
+     *
+     * @return void
+     */
+    public function setCallCount($count) {
+        $this->callCount = $count;
+    }
 
     /**
      * Array of Call ID's of calls currently running on one of the worker processes.
@@ -306,18 +316,14 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         //#
         //# Wrap the current $via object in a DebugShell mediator
         //#
-        $this->via = new CDaemon_DebugShell($this->via);
-        $this->via->service = $this->service;
-        $this->via->setupShell();
-        //# We'll use these in the many closures below..
+        /** @var CDaemon_DebugShell $shell */
+        $shell = new CDaemon_DebugShell($this->via);
+        $this->via = $shell;
+        $shell->service = $this->service;
+        $shell->setupShell();
         $that = $this;
-        $shell = $this->via;
         $alias = $this->alias;
-        //#
-        //# Set callbacks to empower the indentation feature (for easy visual grouping)
-        //# and the prompt-prefix (for prompt pid/alias/status identification)
-        //#
-        $this->via->indentCallback = function ($method, $args) use ($shell, $alias) {
+        $shell->indentCallback = function ($method, $args) use ($shell, $alias) {
             $callId = null;
             switch ($method) {
                 case 'drop':
@@ -335,13 +341,13 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
 
             return 0;
         };
-        $this->via->prompt_prefix_callback = function ($method, $args) use ($alias) {
+        $shell->prompt_prefix_callback = function ($method, $args) use ($alias) {
             return sprintf('%s %s %s', $alias, getmypid(), (CDaemon::getRunningService()->isParent()) ? 'D' : 'W');
         };
         //#
         //# Set more specific and informative prompts for certain methods
         //#
-        $this->via->prompts['put'] = function ($method, $args) use ($alias) {
+        $shell->prompts['put'] = function ($method, $args) use ($alias) {
             $statuses = [
                 CDaemon_Worker_MediatorAbstract::UNCALLED => 'Daemon sending Call message to Worker',
                 CDaemon_Worker_MediatorAbstract::RUNNING => 'Worker sending "running" ack message to Daemon',
@@ -353,14 +359,11 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
 
             return "[Call {$args[0]->id}] " . $statuses[$args[0]->status];
         };
-        $this->via->prompts['drop'] = function ($method, $args) use ($alias) {
+        $shell->prompts['drop'] = function ($method, $args) use ($alias) {
             return "[Call {$args[0]}] Garbage-collect this call?";
         };
-        $this->via->prompts['state'] = 'Load IPC state details?';
-        //#
-        //# Add any methods to the blacklist that shouldn't trigger a debug prompt. Mostly ones that would just be noise.
-        //#
-        $this->via->blacklist = [
+        $shell->prompts['state'] = 'Load IPC state details?';
+        $shell->blacklist = [
             'get', 'setup',
         ];
         //#
@@ -390,7 +393,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 $printer("Calling Function {$matches[1]}()...");
                 $return = call_user_func_array($function, $args);
                 if (is_scalar($return)) {
-                    $printer("Return: ${return}", 100);
+                    $printer("Return: {$return}", 100);
                 } else {
                     $printer('Return: [' . gettype($return) . ']');
                 }
@@ -456,7 +459,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                     $out[] = 'Processes:';
                     if ($processes) {
                         foreach ($processes as $pid => $process) {
-                            $out[] = "[${pid}] Runtime: " . $process->runtime();
+                            $out[] = "[{$pid}] Runtime: " . $process->runtime();
                         }
                     } else {
                         $out[] = 'None';
@@ -474,7 +477,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                 }
             }
         ];
-        $this->via->loadParsers($parsers);
+        $shell->loadParsers($parsers);
     }
 
     /**
@@ -495,20 +498,21 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
         $call = debug_backtrace();
         $call = $call[1];
         $method = sprintf('%s::%s', $call['class'], $call['function']);
-        $this->via->prompts[$method] = $prompt;
-        if ($indent) {
-            $indent = $this->via->incrementIndent($this->alias . $indent);
-            $tmp = $this->via->indent_callback;
-            $this->via->indent_callback = function () use ($indent) {
-                return $indent;
-            };
-        }
-        $return = true;
         if ($this->via instanceof CDaemon_DebugShell) {
+            $this->via->prompts[$method] = $prompt;
+            if ($indent) {
+                $indent = $this->via->incrementIndent($this->alias . $indent);
+                $tmp = $this->via->indent_callback;
+                $this->via->indent_callback = function () use ($indent) {
+                    return $indent;
+                };
+            }
             $return = $this->via->prompt($method, $call['args']);
-        }
-        if (isset($tmp)) {
-            $this->via->indentCallback = $tmp;
+            if (isset($tmp)) {
+                $this->via->indentCallback = $tmp;
+            }
+        } else {
+            $return = true;
         }
 
         return $return;
@@ -545,8 +549,10 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
             });
             $this->fork();
         } else {
-            unset($this->calls, $this->runningCalls, $this->onReturn, $this->onTimeout, $this->callCount);
-            $this->calls = $this->callCount = $this->runningCalls = [];
+            unset($this->calls, $this->runningCalls, $this->onReturn, $this->onTimeout);
+            $this->calls = [];
+            $this->callCount = 0;
+            $this->runningCalls = [];
             $this->via->setup();
             $eventRestart = function () use ($that) {
                 $that->log('Restarting Worker Process...');
@@ -703,7 +709,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
                         if (!$this->breakpoint("[{$this->alias} Call {$callId}] Enforcing timeout at runtime: " . $call->runtime(), $callId - 1)) {
                             continue;
                         }
-                        $this->log("Enforcing Timeout on Call ${callId} in pid " . $call->pid);
+                        $this->log("Enforcing Timeout on Call {$callId} in pid " . $call->pid);
                         if ($this->process($call->pid) instanceof CDaemon_Process) {
                             $this->process($call->pid)->kill();
                         }
@@ -934,7 +940,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
     public function countError($type) {
         $this->errorCounts[$type]++;
         if ($this->errorCounts[$type] > $this->errorThresholds[$type][(int) $this->service->isParent()]) {
-            $this->fatalError("IPC '${type}' Error Threshold Reached");
+            $this->fatalError("IPC '{$type}' Error Threshold Reached");
         }
     }
 
@@ -1089,7 +1095,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return void
      */
     public function log($message, $indent = 0) {
-        $this->service->log("${message}", $this->alias, $indent);
+        $this->service->log("{$message}", $this->alias, $indent);
     }
 
     /**
@@ -1102,7 +1108,7 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      * @return void
      */
     public function error($message) {
-        $this->service->error("${message}", $this->alias);
+        $this->service->error("{$message}", $this->alias);
     }
 
     /**
@@ -1116,9 +1122,9 @@ abstract class CDaemon_Worker_MediatorAbstract extends CDaemon_TaskAbstract {
      */
     public function fatalError($message) {
         if ($this->service->isParent()) {
-            $this->service->fatalError("Fatal Error: ${message}", $this->alias);
+            $this->service->fatalError("Fatal Error: {$message}", $this->alias);
         } else {
-            $this->service->fatalError("Fatal Error: ${message}\nWorker process will restart", $this->alias);
+            $this->service->fatalError("Fatal Error: {$message}\nWorker process will restart", $this->alias);
         }
     }
 

@@ -5,31 +5,35 @@ namespace PHPStan\Rules\Missing;
 use Generator;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\ExecutionEndNode;
-use PHPStan\Reflection\MethodReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
+use PHPStan\Reflection\Php\PhpMethodFromParserNodeReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\ShouldNotHappenException;
+use PHPStan\Type\ErrorType;
 use PHPStan\Type\Generic\TemplateMixedType;
-use PHPStan\Type\GenericTypeVariableResolver;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\TypeUtils;
-use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\VerbosityLevel;
 use PHPStan\Type\VoidType;
 use function sprintf;
+use function ucfirst;
 
 /**
  * @implements Rule<ExecutionEndNode>
  */
-class MissingReturnRule implements Rule
+#[RegisteredRule(level: 0)]
+final class MissingReturnRule implements Rule
 {
 
 	public function __construct(
+		#[AutowiredParameter]
 		private bool $checkExplicitMixedMissingReturn,
+		#[AutowiredParameter]
 		private bool $checkPhpDocMissingReturn,
 	)
 	{
@@ -56,9 +60,13 @@ class MissingReturnRule implements Rule
 				return [];
 			}
 		} elseif ($scopeFunction !== null) {
-			$returnType = ParametersAcceptorSelector::selectSingle($scopeFunction->getVariants())->getReturnType();
-			if ($scopeFunction instanceof MethodReflection) {
-				$description = sprintf('Method %s::%s()', $scopeFunction->getDeclaringClass()->getDisplayName(), $scopeFunction->getName());
+			$returnType = $scopeFunction->getReturnType();
+			if ($scopeFunction instanceof PhpMethodFromParserNodeReflection) {
+				if (!$scopeFunction->isPropertyHook()) {
+					$description = sprintf('Method %s::%s()', $scopeFunction->getDeclaringClass()->getDisplayName(), $scopeFunction->getName());
+				} else {
+					$description = sprintf('%s hook for property %s::$%s', ucfirst($scopeFunction->getPropertyHookName()), $scopeFunction->getDeclaringClass()->getDisplayName(), $scopeFunction->getHookedPropertyName());
+				}
 			} else {
 				$description = sprintf('Function %s()', $scopeFunction->getName());
 			}
@@ -74,22 +82,21 @@ class MissingReturnRule implements Rule
 		}
 
 		if ($statementResult->hasYield()) {
-			if ($returnType instanceof TypeWithClassName && $this->checkPhpDocMissingReturn) {
-				$generatorReturnType = GenericTypeVariableResolver::getType(
-					$returnType,
-					Generator::class,
-					'TReturn',
-				);
-				if ($generatorReturnType !== null) {
+			if ($this->checkPhpDocMissingReturn) {
+				$generatorReturnType = $returnType->getTemplateType(Generator::class, 'TReturn');
+				if (!$generatorReturnType instanceof ErrorType) {
 					$returnType = $generatorReturnType;
-					if ($returnType instanceof VoidType) {
+					if ($returnType->isVoid()->yes()) {
 						return [];
 					}
 					if (!$returnType instanceof MixedType) {
 						return [
 							RuleErrorBuilder::message(
 								sprintf('%s should return %s but return statement is missing.', $description, $returnType->describe(VerbosityLevel::typeOnly())),
-							)->line($node->getNode()->getStartLine())->build(),
+							)
+								->line($node->getNode()->getStartLine())
+								->identifier('return.missing')
+								->build(),
 						];
 					}
 				}
@@ -111,6 +118,8 @@ class MissingReturnRule implements Rule
 			if ($node->hasNativeReturnTypehint()) {
 				$errorBuilder->nonIgnorable();
 			}
+
+			$errorBuilder->identifier('return.never');
 
 			return [
 				$errorBuilder->build(),
@@ -136,6 +145,8 @@ class MissingReturnRule implements Rule
 		if ($node->hasNativeReturnTypehint()) {
 			$errorBuilder->nonIgnorable();
 		}
+
+		$errorBuilder->identifier('return.missing');
 
 		return [
 			$errorBuilder->build(),

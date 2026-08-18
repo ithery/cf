@@ -66,6 +66,7 @@ class NotInArrayToken implements TokenInterface
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         $arrayAsString = implode(', ', $this->token);

@@ -2,22 +2,28 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2018, 2:00:52 PM
- */
 class CElement_FormInput_Text extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Text,
         CTrait_Element_Property_Placeholder;
 
-    protected $input_style;
+    /**
+     * @var string
+     */
+    protected $inputStyle;
 
-    protected $button_position;
+    /**
+     * @var string
+     */
+    protected $icon;
 
-    protected $action;
+    /**
+     * @var string
+     */
+    protected $themeType = 'text';
 
+    /**
+     * @param null|string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -25,9 +31,7 @@ class CElement_FormInput_Text extends CElement_FormInput {
 
         $this->placeholder = '';
 
-        $this->input_style = 'default';
-        $this->button_position = null;
-        $this->action = null;
+        $this->inputStyle = 'default';
 
         $this->addClass('form-control');
     }
@@ -41,48 +45,69 @@ class CElement_FormInput_Text extends CElement_FormInput {
         return new CElement_FormInput_Text($id);
     }
 
-    public function html($indent = 0) {
-        $html = new CStringBuilder();
-        $html->setIndent($indent);
-        $disabled = '';
-        if ($this->disabled) {
-            $disabled = ' disabled="disabled"';
-        }
+    /**
+     * Show an icon (eg. a Tabler `ti ti-mail` class) inside a Bootstrap
+     * input-group prepended to this field. Not set (default) renders the
+     * bare `<input>` exactly as before -- purely additive.
+     *
+     * @param string $icon
+     *
+     * @return $this
+     */
+    public function setIcon($icon) {
+        $this->icon = $icon;
 
-        if ($this->readonly) {
-            $disabled = ' readonly="readonly"';
-        }
-
-        $classes = $this->classes;
-        $classes = implode(' ', $classes);
-        if (strlen($classes) > 0) {
-            $classes = ' ' . $classes;
-        }
-
-        $custom_css = $this->custom_css;
-        $custom_css = $this->renderStyle($custom_css);
-        if (strlen($custom_css) > 0) {
-            $custom_css = ' style="' . $custom_css . '"';
-        }
-        $addition_attribute = '';
-        foreach ($this->attr as $k => $v) {
-            $addition_attribute .= ' ' . $k . '="' . $v . '"';
-        }
-        $html->appendln('<input type="text" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" class="form-control input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . '/>')->br();
-
-        return $html->text();
+        return $this;
     }
 
-    public function js($indent = 0) {
-        $js = new CStringBuilder();
-        $js->setIndent($indent);
+    /**
+     * @return void
+     */
+    protected function build() {
+        parent::build();
 
-        if ($this->action != null) {
-            $js->appendln($this->action->js());
+        $this->setAttr('type', $this->type);
+        $this->setAttr('placeholder', $this->placeholder);
+        $this->addClass('input-unstyled');
+        $this->addClass('cres:element:control:Text');
+        $this->setAttr('cres-element', 'control:Text');
+        $this->setAttr('cres-config', c::json($this->buildControlConfig()));
+    }
+
+    /**
+     * No options yet -- this hook exists so CElement_FormInput_Text is a
+     * recognized cres-element (auto-init observer, Repeater clone
+     * re-init) the same way every other control is, ready for whatever
+     * client-side behavior it picks up next.
+     *
+     * @return array
+     */
+    protected function buildControlConfig() {
+        return [];
+    }
+
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
+    public function html($indent = 0) {
+        $inputHtml = parent::html($indent);
+
+        if ($this->icon === null || strlen($this->icon) === 0) {
+            return $inputHtml;
         }
 
-        $js->append(parent::js());
+        $html = new CStringBuilder();
+        $html->setIndent($indent);
+        $html->appendln('<div class="input-group">')
+            ->incIndent()
+            ->appendln('<span class="input-group-text"><i class="' . c::e($this->icon) . '"></i></span>')
+            ->append($inputHtml)
+            ->decIndent()
+            ->appendln('</div>')
+            ->br();
 
-        return $js->text();
+        return $html->text();
     }
 }

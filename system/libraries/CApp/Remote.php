@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 14, 2018, 4:33:53 AM
- */
 class CApp_Remote {
     /**
      * @var array array of CApp_Remote
@@ -35,7 +29,7 @@ class CApp_Remote {
     protected $client;
 
     /**
-     * Variable to store available options for this object
+     * Variable to store available options for this object.
      *
      * @var options
      */
@@ -57,6 +51,7 @@ class CApp_Remote {
         if (!isset(self::$instance[$domain])) {
             self::$instance[$domain] = new static($domain, $options);
         }
+
         return self::$instance[$domain];
     }
 

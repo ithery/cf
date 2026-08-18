@@ -2,26 +2,34 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 trait CApp_Concern_ViewTrait {
+    /** @var callable */
     protected static $viewCallback;
 
-    private $viewName = 'capp/page';
+    /**
+     * @var string
+     */
+    private $viewName = 'cresenity/capp/page';
 
-    private $viewLoginName = 'capp/login';
+    /**
+     * @var string
+     */
+    private $viewLoginName = 'cresenity/capp/login';
 
     /**
      * View.
      *
-     * @var CView_View}string
+     * @var CView_View|string
      */
     private $view;
 
+    /**
+     * Set the view.
+     *
+     * @param CView_View|string $view
+     *
+     * @return $this
+     */
     public function setView($view) {
         if (!($view instanceof CView_View)) {
             $view = CView::factory($view);
@@ -40,7 +48,7 @@ trait CApp_Concern_ViewTrait {
      * @return CView_View
      */
     public function getView() {
-        /** @var CApp $this */
+        /** @var CApp|CApp_Concern_ViewTrait $this */
         if (!$this->isUserLogin() && $this->isAuthEnabled()) {
             $view = $this->viewLoginName;
 
@@ -72,22 +80,40 @@ trait CApp_Concern_ViewTrait {
         return $this->view;
     }
 
+    /**
+     * @param callable $viewCallback
+     *
+     * @return void
+     */
     public function setViewCallback(callable $viewCallback) {
         self::$viewCallback = $viewCallback;
     }
 
+    /**
+     * @param string $viewName
+     *
+     * @return $this
+     */
     public function setViewName($viewName) {
         $this->setView($viewName);
 
         return $this;
     }
 
+    /**
+     * @param string $viewLoginName
+     *
+     * @return $this
+     */
     public function setViewLoginName($viewLoginName) {
         $this->viewLoginName = $viewLoginName;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isUsingBlade() {
         /** @var CApp $this */
         if (!$this->isUserLogin() && $this->config('have_user_login') && $this->isAuthEnabled()) {

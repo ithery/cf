@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 9:10:32 PM
- */
 final class CGeo_Model_AddressCollection implements CGeo_Interface_CollectionInterface {
     /**
      * @var Location[]
@@ -24,6 +18,7 @@ final class CGeo_Model_AddressCollection implements CGeo_Interface_CollectionInt
     /**
      * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new \ArrayIterator($this->all());
     }
@@ -31,6 +26,7 @@ final class CGeo_Model_AddressCollection implements CGeo_Interface_CollectionInt
     /**
      * @inheritdoc
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->locations);
     }

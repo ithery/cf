@@ -30,6 +30,7 @@ class CVendor_SendGrid_Contacts_RecipientForm {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->html;
     }

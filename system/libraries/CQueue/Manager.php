@@ -3,20 +3,15 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 4:03:10 AM
- */
-
-/**
  * @mixin CQueue_QueueInterface
  */
 class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_MonitorInterface {
+    use CQueue_Trait_ResolvesQueueRoutesTrait;
+
     /**
      * The array of resolved queue connections.
      *
-     * @var array
+     * @var array<CQueue_QueueInterface>
      */
     protected $connections = [];
 
@@ -35,15 +30,24 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
     protected $dispatcher;
 
     /**
+     * The default driver name.
+     *
+     * @var string
+     */
+    protected $defaultDriver;
+
+    /**
      * Create a new queue manager instance.
      *
      * @return void
      */
-    public function __construct(CEvent_Dispatcher $dispatcher = null) {
+    public function __construct(?CEvent_Dispatcher $dispatcher = null) {
         if ($dispatcher == null) {
             $dispatcher = CEvent::dispatcher();
         }
         $this->dispatcher = $dispatcher;
+
+        $this->defaultDriver = CF::config('queue.default');
     }
 
     /**
@@ -77,6 +81,17 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
      */
     public function exceptionOccurred($callback) {
         $this->dispatcher->listen(CQueue_Event_JobExceptionOccurred::class, $callback);
+    }
+
+    /**
+     * Register an event listener for the daemon queue starting.
+     *
+     * @param mixed $callback
+     *
+     * @return void
+     */
+    public function starting($callback) {
+        $this->dispatcher->listen(CQueue_Event_WorkerStarting::class, $callback);
     }
 
     /**
@@ -153,6 +168,12 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
      */
     protected function resolve($name) {
         $config = $this->getConfig($name);
+        //tanpa penjagaan ini sebuah nama koneksi yang salah ketik berakhir
+        //sebagai "Trying to access array offset on value of type null", yang
+        //tidak menyebut nama koneksinya sama sekali
+        if (is_null($config)) {
+            throw new InvalidArgumentException("The [{$name}] queue connection has not been configured.");
+        }
 
         return $this->getConnector($config['driver'])
             ->connect($config)
@@ -170,7 +191,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
      */
     protected function getConnector($driver) {
         if (!isset($this->connectors[$driver])) {
-            throw new InvalidArgumentException("No connector for [${driver}]");
+            throw new InvalidArgumentException("No connector for [{$driver}]");
         }
 
         return call_user_func($this->connectors[$driver]);
@@ -221,7 +242,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
      * @return string
      */
     public function getDefaultDriver() {
-        return CQueue::config('default', 'database');
+        return $this->defaultDriver ?: 'database';
     }
 
     /**
@@ -229,10 +250,12 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
      *
      * @param string $name
      *
-     * @return void
+     * @return $this
      */
     public function setDefaultDriver($name) {
-        $this->app['config']['queue.default'] = $name;
+        $this->defaultDriver = $name;
+
+        return $this;
     }
 
     /**
@@ -244,6 +267,94 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_Contract_Monitor
      */
     public function getName($connection = null) {
         return $connection ?: $this->getDefaultDriver();
+    }
+
+    /**
+     * Cache key holding the paused state of one queue.
+     *
+     * @param string $connection
+     * @param string $queue
+     *
+     * @return string
+     */
+    protected function pausedCacheKey($connection, $queue) {
+        return 'cresenity:queue:paused:' . $connection . ':' . $queue;
+    }
+
+    /**
+     * Pause a queue by its connection and name.
+     *
+     * @param string $connection
+     * @param string $queue
+     *
+     * @return void
+     */
+    public function pause($connection, $queue) {
+        c::cache()->store()->forever($this->pausedCacheKey($connection, $queue), true);
+        $this->dispatcher->dispatch(new CQueue_Event_QueuePaused($connection, $queue));
+    }
+
+    /**
+     * Pause a queue by its connection and name for a given amount of time.
+     *
+     * @param string                      $connection
+     * @param string                      $queue
+     * @param DateInterval|DateTime|int $ttl
+     *
+     * @return void
+     */
+    public function pauseFor($connection, $queue, $ttl) {
+        c::cache()->store()->put($this->pausedCacheKey($connection, $queue), true, $ttl);
+        $this->dispatcher->dispatch(new CQueue_Event_QueuePaused($connection, $queue, $ttl));
+    }
+
+    /**
+     * Resume a paused queue by its connection and name.
+     *
+     * @param string $connection
+     * @param string $queue
+     *
+     * @return void
+     */
+    public function resume($connection, $queue) {
+        c::cache()->store()->forget($this->pausedCacheKey($connection, $queue));
+        $this->dispatcher->dispatch(new CQueue_Event_QueueResumed($connection, $queue));
+    }
+
+    /**
+     * Determine if a queue is paused.
+     *
+     * @param string $connection
+     * @param string $queue
+     *
+     * @return bool
+     */
+    public function isPaused($connection, $queue) {
+        return (bool) c::cache()->store()->get($this->pausedCacheKey($connection, $queue), false);
+    }
+
+    /**
+     * Determine which of the given queues are currently paused.
+     *
+     * @param string $connection
+     * @param array  $queueList
+     *
+     * @return array
+     */
+    public function getPausedQueues($connection, $queueList) {
+        $keyList = [];
+        foreach ($queueList as $queue) {
+            $keyList[$queue] = $this->pausedCacheKey($connection, $queue);
+        }
+        $stateList = c::cache()->store()->many(array_values($keyList));
+        $pausedList = [];
+        foreach ($keyList as $queue => $key) {
+            if (carr::get($stateList, $key, false)) {
+                $pausedList[] = $queue;
+            }
+        }
+
+        return $pausedList;
     }
 
     /**

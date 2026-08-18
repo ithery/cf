@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 1:19:47 PM
- */
 trait CObservable_Listener_Trait_HandlerTrait {
     /**
      * @return \CObservable_Listener_Handler_ReloadHandler
@@ -84,6 +78,16 @@ trait CObservable_Listener_Trait_HandlerTrait {
      */
     public function addCloseDialogHandler() {
         $handler = new CObservable_Listener_Handler_CloseDialogHandler($this);
+        $this->handlers[] = $handler;
+
+        return $handler;
+    }
+
+    /**
+     * @return \CObservable_Listener_Handler_CloseAllDialogHandler
+     */
+    public function addCloseAllDialogHandler() {
+        $handler = new CObservable_Listener_Handler_CloseAllDialogHandler($this);
         $this->handlers[] = $handler;
 
         return $handler;

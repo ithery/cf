@@ -2,15 +2,26 @@
 
 namespace PHPStan\DependencyInjection;
 
-use function array_key_exists;
-
-class MemoizingContainer implements Container
+#[AutowiredService(as: Container::class)]
+final class MemoizingContainer implements Container
 {
 
 	/** @var array<string, mixed> */
 	private array $servicesByType = [];
 
-	public function __construct(private Container $originalContainer)
+	/** @var array<string, mixed> */
+	private array $servicesByName = [];
+
+	/** @var array<string, mixed> */
+	private array $servicesByTag = [];
+
+	/** @var array<class-string, ExtensionsCollection<object>> */
+	private array $extensionsCollections = [];
+
+	public function __construct(
+		#[AutowiredParameter(ref: '@PHPStan\DependencyInjection\Nette\NetteContainer')]
+		private Container $originalContainer,
+	)
 	{
 	}
 
@@ -21,19 +32,12 @@ class MemoizingContainer implements Container
 
 	public function getService(string $serviceName)
 	{
-		return $this->originalContainer->getService($serviceName);
+		return $this->servicesByName[$serviceName] ??= $this->originalContainer->getService($serviceName);
 	}
 
 	public function getByType(string $className)
 	{
-		if (array_key_exists($className, $this->servicesByType)) {
-			return $this->servicesByType[$className];
-		}
-
-		$service = $this->originalContainer->getByType($className);
-		$this->servicesByType[$className] = $service;
-
-		return $service;
+		return $this->servicesByType[$className] ??= $this->originalContainer->getByType($className);
 	}
 
 	public function findServiceNamesByType(string $className): array
@@ -43,7 +47,18 @@ class MemoizingContainer implements Container
 
 	public function getServicesByTag(string $tagName): array
 	{
-		return $this->originalContainer->getServicesByTag($tagName);
+		return $this->servicesByTag[$tagName] ??= $this->originalContainer->getServicesByTag($tagName);
+	}
+
+	/**
+	 * @template T of object
+	 * @param class-string<T> $extensionInterfaceName
+	 * @return ExtensionsCollection<T>
+	 */
+	public function getExtensionsCollection(string $extensionInterfaceName): ExtensionsCollection
+	{
+		/** @var ExtensionsCollection<T> */
+		return $this->extensionsCollections[$extensionInterfaceName] ??= $this->originalContainer->getExtensionsCollection($extensionInterfaceName);
 	}
 
 	public function getParameters(): array

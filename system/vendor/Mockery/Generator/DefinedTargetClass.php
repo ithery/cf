@@ -66,6 +66,7 @@ class DefinedTargetClass implements TargetClassInterface
         }, $this->rfc->getInterfaces());
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return $this->getName();

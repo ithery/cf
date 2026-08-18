@@ -2,24 +2,27 @@
 
 namespace PHPStan\Reflection\Annotations;
 
+use PHPStan\PhpDoc\ResolvedPhpDocBlock;
 use PHPStan\Reflection\Assertions;
 use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ExtendedFunctionVariant;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\FunctionVariant;
-use PHPStan\Reflection\ParametersAcceptor;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Generic\TemplateTypeMap;
+use PHPStan\Type\MixedType;
+use PHPStan\Type\ThisType;
 use PHPStan\Type\Type;
 
-class AnnotationMethodReflection implements ExtendedMethodReflection
+final class AnnotationMethodReflection implements ExtendedMethodReflection
 {
 
-	/** @var FunctionVariant[]|null */
+	/** @var list<ExtendedFunctionVariant>|null */
 	private ?array $variants = null;
 
 	/**
-	 * @param AnnotationsMethodParameterReflection[] $parameters
+	 * @param list<AnnotationsMethodParameterReflection> $parameters
 	 */
 	public function __construct(
 		private string $name,
@@ -29,6 +32,7 @@ class AnnotationMethodReflection implements ExtendedMethodReflection
 		private bool $isStatic,
 		private bool $isVariadic,
 		private ?Type $throwType,
+		private TemplateTypeMap $templateTypeMap,
 	)
 	{
 	}
@@ -63,23 +67,29 @@ class AnnotationMethodReflection implements ExtendedMethodReflection
 		return $this->name;
 	}
 
-	/**
-	 * @return ParametersAcceptor[]
-	 */
 	public function getVariants(): array
 	{
-		if ($this->variants === null) {
-			$this->variants = [
-				new FunctionVariant(
-					TemplateTypeMap::createEmpty(),
-					null,
-					$this->parameters,
-					$this->isVariadic,
-					$this->returnType,
-				),
-			];
-		}
-		return $this->variants;
+		return $this->variants ??= [
+			new ExtendedFunctionVariant(
+				$this->templateTypeMap,
+				null,
+				$this->parameters,
+				$this->isVariadic,
+				$this->returnType,
+				$this->returnType,
+				new MixedType(),
+			),
+		];
+	}
+
+	public function getOnlyVariant(): ExtendedParametersAcceptor
+	{
+		return $this->getVariants()[0];
+	}
+
+	public function getNamedArgumentsVariants(): ?array
+	{
+		return null;
 	}
 
 	public function isDeprecated(): TrinaryLogic
@@ -97,7 +107,17 @@ class AnnotationMethodReflection implements ExtendedMethodReflection
 		return TrinaryLogic::createNo();
 	}
 
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
 	public function isInternal(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isBuiltin(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
@@ -109,6 +129,14 @@ class AnnotationMethodReflection implements ExtendedMethodReflection
 
 	public function hasSideEffects(): TrinaryLogic
 	{
+		if ($this->returnType->isVoid()->yes()) {
+			return TrinaryLogic::createYes();
+		}
+
+		if ((new ThisType($this->declaringClass))->isSuperTypeOf($this->returnType)->yes()) {
+			return TrinaryLogic::createYes();
+		}
+
 		return TrinaryLogic::createMaybe();
 	}
 
@@ -122,6 +150,11 @@ class AnnotationMethodReflection implements ExtendedMethodReflection
 		return Assertions::createEmpty();
 	}
 
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean($this->declaringClass->acceptsNamedArguments());
+	}
+
 	public function getSelfOutType(): ?Type
 	{
 		return null;
@@ -130,6 +163,40 @@ class AnnotationMethodReflection implements ExtendedMethodReflection
 	public function returnsByReference(): TrinaryLogic
 	{
 		return TrinaryLogic::createMaybe();
+	}
+
+	public function isAbstract(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isPure(): TrinaryLogic
+	{
+		if ($this->hasSideEffects()->yes()) {
+			return TrinaryLogic::createNo();
+		}
+
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function getPureUnlessCallableIsImpureParameters(): array
+	{
+		return [];
+	}
+
+	public function getAttributes(): array
+	{
+		return [];
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getResolvedPhpDoc(): ?ResolvedPhpDocBlock
+	{
+		return null;
 	}
 
 }

@@ -141,15 +141,17 @@ class CDatabase_Driver_PDO_Sqlite_Result extends CDatabase_Result {
         return $field_names;
     }
 
+    #[\ReturnTypeWillChange]
     public function seek($offset) {
         // To request a scrollable cursor for your PDOStatement object, you must
         // set the PDO::ATTR_CURSOR attribute to PDO::CURSOR_SCROLL when you
         // prepare the statement.
-        //CF::log('error', get_class($this) . ' does not support scrollable cursors, ' . __FUNCTION__ . ' call ignored');
+        CF::log('error', get_class($this) . ' does not support scrollable cursors, ' . __FUNCTION__ . ' call ignored');
 
         return false;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         try {
             return $this->result->fetch($this->fetch_type, PDO::FETCH_ORI_ABS, $offset);
@@ -158,6 +160,7 @@ class CDatabase_Driver_PDO_Sqlite_Result extends CDatabase_Result {
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind() {
         // Same problem that seek() has, see above.
         return $this->seek(0);

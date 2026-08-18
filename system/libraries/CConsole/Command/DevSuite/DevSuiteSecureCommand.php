@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteSecureCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteSecureCommand extends CConsole_Command_DevSuiteCommand {
     /**
@@ -11,9 +9,15 @@ class CConsole_Command_DevSuite_DevSuiteSecureCommand extends CConsole_Command_D
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_SecureCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Secure_Command::class;
 
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:secure';
 
+    /**
+     * @var string
+     */
     protected $description = 'Secure the given domain with a trusted TLS certificate';
 }

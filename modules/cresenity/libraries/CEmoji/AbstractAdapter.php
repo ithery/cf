@@ -1,14 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @since May 16, 2019, 9:57:36 PM
- * @license Ittron Global Teknologi <ittron.co.id>
+ * @deprecated 1.8
  */
 abstract class CEmoji_AbstractAdapter implements CEmoji_AdapterInterface {
-
     protected $baseUrl;
 
     /**
@@ -17,7 +14,7 @@ abstract class CEmoji_AbstractAdapter implements CEmoji_AdapterInterface {
     protected $imageHtmlTemplate = '<img alt=":{{name}}:" class="emoji" src="{{baseUrl}}{{size}}x{{size}}/{{unicode}}.png">';
 
     /**
-     * Supported icon sizes for emoji. empty array for support all size
+     * Supported icon sizes for emoji. empty array for support all size.
      *
      * @var array
      */
@@ -31,7 +28,7 @@ abstract class CEmoji_AbstractAdapter implements CEmoji_AdapterInterface {
     protected $iconSize;
 
     /**
-     * Object of mappings twemoji name to unicode representation and description of twemoji
+     * Object of mappings twemoji name to unicode representation and description of twemoji.
      *
      * @var CEmoji_AbstractIndex
      */
@@ -80,7 +77,7 @@ abstract class CEmoji_AbstractAdapter implements CEmoji_AdapterInterface {
     }
 
     /**
-     * @param array $emoji
+     * @param array  $emoji
      * @param string $imageHtmlTemplate
      *
      * @return string
@@ -100,11 +97,11 @@ abstract class CEmoji_AbstractAdapter implements CEmoji_AdapterInterface {
             $this->baseUrl,
             $this->iconSize,
         ];
+
         return str_replace($search, $replace, $imageHtmlTemplate !== null ? $imageHtmlTemplate : $this->imageHtmlTemplate);
     }
 
     public function getEmojiList() {
         return $this->index->getEmojis();
     }
-
 }

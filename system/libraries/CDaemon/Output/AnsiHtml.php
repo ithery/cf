@@ -14,7 +14,7 @@ class CDaemon_Output_AnsiHtml {
 
     protected $colorNames;
 
-    public function __construct(CDaemon_Output_AnsiHtml_Theme $theme = null, $inlineStyles = true, $charset = 'UTF-8') {
+    public function __construct(?CDaemon_Output_AnsiHtml_Theme $theme = null, $inlineStyles = true, $charset = 'UTF-8') {
         $this->theme = null === $theme ? new CDaemon_Output_AnsiHtml_Theme() : $theme;
         $this->inlineStyles = $inlineStyles;
         $this->charset = $charset;

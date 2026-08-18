@@ -93,7 +93,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     protected $robots;
 
     /**
-     * @var Config
+     * @var array
      */
     protected $config;
 
@@ -118,6 +118,9 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
      */
     private static $instance = null;
 
+    /**
+     * CApp_SEO_MetaTags constructor.
+     */
     private function __construct() {
         $this->config = CF::config('seo.meta');
     }
@@ -153,7 +156,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
         $html = [];
 
         if ($title) {
-            $html[] = carr::get($this->config, 'add_notranslate_class', false) ? "<title class=\"notranslate\">${title}</title>" : "<title>${title}</title>";
+            $html[] = carr::get($this->config, 'add_notranslate_class', false) ? "<title class=\"notranslate\">{$title}</title>" : "<title>{$title}</title>";
         }
 
         if ($description) {
@@ -326,7 +329,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
      *
      * @param string $url
      *
-     * @return MetaTagsContract
+     * @return static
      */
     public function setAmpHtml($url) {
         $this->amphtml = $url;
@@ -375,7 +378,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
      *
      * @param string $robots
      *
-     * @return MetaTagsContract
+     * @return static
      */
     public function setRobots($robots) {
         $this->robots = $robots;
@@ -524,6 +527,8 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
 
     /**
      * Load webmaster tags from configuration.
+     *
+     * @return void
      */
     protected function loadWebMasterTags() {
         foreach (carr::get($this->config, 'webmaster_tags', []) as $name => $value) {

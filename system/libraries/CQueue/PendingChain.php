@@ -1,6 +1,8 @@
 <?php
 
 class CQueue_PendingChain {
+    use CTrait_Conditionable;
+
     /**
      * The class name of the job being dispatched.
      *
@@ -151,5 +153,27 @@ class CQueue_PendingChain {
         $firstJob->chainCatchCallbacks = $this->catchCallbacks();
 
         return CQueue::dispatcher()->dispatch($firstJob);
+    }
+
+    /**
+     * Dispatch the job chain if the given truth test passes.
+     *
+     * @param bool|\Closure $boolean
+     *
+     * @return null|\CQueue_PendingDispatch
+     */
+    public function dispatchIf($boolean) {
+        return c::value($boolean) ? $this->dispatch() : null;
+    }
+
+    /**
+     * Dispatch the job chain unless the given truth test passes.
+     *
+     * @param bool|\Closure $boolean
+     *
+     * @return null|\CQueue_PendingDispatch
+     */
+    public function dispatchUnless($boolean) {
+        return !c::value($boolean) ? $this->dispatch() : null;
     }
 }

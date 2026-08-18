@@ -2,19 +2,25 @@
 
 namespace PHPStan\Type\Generic;
 
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\Reflection\ClassMemberAccessAnswerer;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\PropertyReflection;
+use PHPStan\Reflection\ExtendedPropertyReflection;
 use PHPStan\Reflection\ReflectionProviderStaticAccessor;
 use PHPStan\Reflection\Type\UnresolvedMethodPrototypeReflection;
 use PHPStan\Reflection\Type\UnresolvedPropertyPrototypeReflection;
 use PHPStan\ShouldNotHappenException;
-use PHPStan\TrinaryLogic;
+use PHPStan\Type\AcceptsResult;
 use PHPStan\Type\CompoundType;
 use PHPStan\Type\ErrorType;
+use PHPStan\Type\InstanceofDeprecated;
 use PHPStan\Type\IntersectionType;
+use PHPStan\Type\IsSuperTypeOfResult;
 use PHPStan\Type\ObjectType;
+use PHPStan\Type\RecursionGuard;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\UnionType;
@@ -25,18 +31,21 @@ use function implode;
 use function sprintf;
 
 /** @api */
+#[InstanceofDeprecated]
 class GenericObjectType extends ObjectType
 {
 
 	/**
 	 * @api
 	 * @param array<int, Type> $types
+	 * @param array<int, TemplateTypeVariance> $variances
 	 */
 	public function __construct(
 		string $mainType,
 		private array $types,
 		?Type $subtractedType = null,
 		private ?ClassReflection $classReflection = null,
+		private array $variances = [],
 	)
 	{
 		parent::__construct($mainType, $subtractedType, $classReflection);
@@ -47,7 +56,11 @@ class GenericObjectType extends ObjectType
 		return sprintf(
 			'%s<%s>',
 			parent::describe($level),
-			implode(', ', array_map(static fn (Type $type): string => $type->describe($level), $this->types)),
+			implode(', ', array_map(
+				static fn (Type $type, ?TemplateTypeVariance $variance = null): string => TypeProjectionHelper::describe($type, $variance, $level),
+				$this->types,
+				$this->variances,
+			)),
 		);
 	}
 
@@ -70,19 +83,26 @@ class GenericObjectType extends ObjectType
 			if (!$genericType->equals($otherGenericType)) {
 				return false;
 			}
+
+			$variance = $this->variances[$i] ?? TemplateTypeVariance::createInvariant();
+			$otherVariance = $type->variances[$i] ?? TemplateTypeVariance::createInvariant();
+			if (!$variance->equals($otherVariance)) {
+				return false;
+			}
 		}
 
 		return true;
 	}
 
-	/**
-	 * @return string[]
-	 */
 	public function getReferencedClasses(): array
 	{
 		$classes = parent::getReferencedClasses();
 		foreach ($this->types as $type) {
-			foreach ($type->getReferencedClasses() as $referencedClass) {
+			$referencedClasses = RecursionGuard::runOnObjectIdentity($type, static fn () => $type->getReferencedClasses());
+			if ($referencedClasses instanceof ErrorType) {
+				continue;
+			}
+			foreach ($referencedClasses as $referencedClass) {
 				$classes[] = $referencedClass;
 			}
 		}
@@ -96,16 +116,22 @@ class GenericObjectType extends ObjectType
 		return $this->types;
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	/** @return array<int, TemplateTypeVariance> */
+	public function getVariances(): array
+	{
+		return $this->variances;
+	}
+
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
 		if ($type instanceof CompoundType) {
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
-		return $this->isSuperTypeOfInternal($type, true);
+		return $this->isSuperTypeOfInternal($type, true)->toAcceptsResult();
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
@@ -114,7 +140,7 @@ class GenericObjectType extends ObjectType
 		return $this->isSuperTypeOfInternal($type, false);
 	}
 
-	private function isSuperTypeOfInternal(Type $type, bool $acceptsContext): TrinaryLogic
+	private function isSuperTypeOfInternal(Type $type, bool $acceptsContext): IsSuperTypeOfResult
 	{
 		$nakedSuperTypeOf = parent::isSuperTypeOf($type);
 		if ($nakedSuperTypeOf->no()) {
@@ -134,11 +160,11 @@ class GenericObjectType extends ObjectType
 				return $nakedSuperTypeOf;
 			}
 
-			return $nakedSuperTypeOf->and(TrinaryLogic::createMaybe());
+			return $nakedSuperTypeOf->and(IsSuperTypeOfResult::createMaybe());
 		}
 
 		if (count($this->types) !== count($ancestor->types)) {
-			return TrinaryLogic::createNo();
+			return IsSuperTypeOfResult::createNo();
 		}
 
 		$classReflection = $this->getClassReflection();
@@ -162,14 +188,27 @@ class GenericObjectType extends ObjectType
 				throw new ShouldNotHappenException();
 			}
 
-			$results[] = $templateType->isValidVariance($this->types[$i], $ancestor->types[$i]);
+			$thisVariance = $this->variances[$i] ?? TemplateTypeVariance::createInvariant();
+			$ancestorVariance = $ancestor->variances[$i] ?? TemplateTypeVariance::createInvariant();
+			if (!$thisVariance->invariant()) {
+				$results[] = $thisVariance->isValidVariance($templateType, $this->types[$i], $ancestor->types[$i]);
+			} else {
+				$results[] = $templateType->isValidVariance($this->types[$i], $ancestor->types[$i]);
+			}
+
+			$results[] = IsSuperTypeOfResult::createFromBoolean($thisVariance->validPosition($ancestorVariance));
 		}
 
 		if (count($results) === 0) {
 			return $nakedSuperTypeOf;
 		}
 
-		return $nakedSuperTypeOf->and(...$results);
+		$result = IsSuperTypeOfResult::createYes();
+		foreach ($results as $innerResult) {
+			$result = $result->and($innerResult);
+		}
+
+		return $result;
 	}
 
 	public function getClassReflection(): ?ClassReflection
@@ -183,10 +222,12 @@ class GenericObjectType extends ObjectType
 			return null;
 		}
 
-		return $this->classReflection = $reflectionProvider->getClass($this->getClassName())->withTypes($this->types);
+		return $this->classReflection = $reflectionProvider->getClass($this->getClassName())
+			->withTypes($this->types)
+			->withVariances($this->variances);
 	}
 
-	public function getProperty(string $propertyName, ClassMemberAccessAnswerer $scope): PropertyReflection
+	public function getProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
 	{
 		return $this->getUnresolvedPropertyPrototype($propertyName, $scope)->getTransformedProperty();
 	}
@@ -194,6 +235,30 @@ class GenericObjectType extends ObjectType
 	public function getUnresolvedPropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
 	{
 		$prototype = parent::getUnresolvedPropertyPrototype($propertyName, $scope);
+
+		return $prototype->doNotResolveTemplateTypeMapToBounds();
+	}
+
+	public function getInstanceProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
+	{
+		return $this->getUnresolvedInstancePropertyPrototype($propertyName, $scope)->getTransformedProperty();
+	}
+
+	public function getUnresolvedInstancePropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
+	{
+		$prototype = parent::getUnresolvedInstancePropertyPrototype($propertyName, $scope);
+
+		return $prototype->doNotResolveTemplateTypeMapToBounds();
+	}
+
+	public function getStaticProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
+	{
+		return $this->getUnresolvedStaticPropertyPrototype($propertyName, $scope)->getTransformedProperty();
+	}
+
+	public function getUnresolvedStaticPropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
+	{
+		$prototype = parent::getUnresolvedStaticPropertyPrototype($propertyName, $scope);
 
 		return $prototype->doNotResolveTemplateTypeMapToBounds();
 	}
@@ -253,11 +318,12 @@ class GenericObjectType extends ObjectType
 		$references = [];
 
 		foreach ($this->types as $i => $type) {
-			$variance = $positionVariance->compose(
-				isset($typeList[$i]) && $typeList[$i] instanceof TemplateType
-					? $typeList[$i]->getVariance()
-					: TemplateTypeVariance::createInvariant(),
-			);
+			$effectiveVariance = $this->variances[$i] ?? TemplateTypeVariance::createInvariant();
+			if ($effectiveVariance->invariant() && isset($typeList[$i]) && $typeList[$i] instanceof TemplateType) {
+				$effectiveVariance = $typeList[$i]->getVariance();
+			}
+
+			$variance = $positionVariance->compose($effectiveVariance);
 			foreach ($type->getReferencedTemplateTypes($variance) as $reference) {
 				$references[] = $reference;
 			}
@@ -283,7 +349,42 @@ class GenericObjectType extends ObjectType
 		}
 
 		if ($subtractedType !== $this->getSubtractedType() || $typesChanged) {
-			return $this->recreate($this->getClassName(), $types, $subtractedType);
+			return $this->recreate($this->getClassName(), $types, $subtractedType, $this->variances);
+		}
+
+		return $this;
+	}
+
+	public function traverseSimultaneously(Type $right, callable $cb): Type
+	{
+		if (!$right instanceof TypeWithClassName) {
+			return $this;
+		}
+
+		$ancestor = $right->getAncestorWithClassName($this->getClassName());
+		if (!$ancestor instanceof self) {
+			return $this;
+		}
+
+		if (count($this->types) !== count($ancestor->types)) {
+			return $this;
+		}
+
+		$typesChanged = false;
+		$types = [];
+		foreach ($this->types as $i => $leftType) {
+			$rightType = $ancestor->types[$i];
+			$newType = $cb($leftType, $rightType);
+			$types[] = $newType;
+			if ($newType === $leftType) {
+				continue;
+			}
+
+			$typesChanged = true;
+		}
+
+		if ($typesChanged) {
+			return $this->recreate($this->getClassName(), $types, null);
 		}
 
 		return $this;
@@ -291,31 +392,66 @@ class GenericObjectType extends ObjectType
 
 	/**
 	 * @param Type[] $types
+	 * @param TemplateTypeVariance[] $variances
 	 */
-	protected function recreate(string $className, array $types, ?Type $subtractedType): self
+	protected function recreate(string $className, array $types, ?Type $subtractedType, array $variances = []): self
 	{
 		return new self(
 			$className,
 			$types,
 			$subtractedType,
+			null,
+			$variances,
 		);
+	}
+
+	/**
+	 * @param TemplateTypeVariance[] $variances
+	 */
+	public function changeVariances(array $variances): self
+	{
+		return $this->recreate($this->getClassName(), $this->getTypes(), $this->getSubtractedType(), $variances);
 	}
 
 	public function changeSubtractedType(?Type $subtractedType): Type
 	{
-		return new self($this->getClassName(), $this->types, $subtractedType);
+		$result = parent::changeSubtractedType($subtractedType);
+
+		// Parent handles sealed type exhaustiveness (returning NeverType when all
+		// allowed subtypes are subtracted, or a single remaining subtype).
+		if (!$result instanceof ObjectType || $result->getClassName() !== $this->getClassName()) {
+			return $result;
+		}
+
+		return new self($this->getClassName(), $this->types, $subtractedType, null, $this->variances);
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function toPhpDocNode(): TypeNode
 	{
-		return new self(
-			$properties['className'],
-			$properties['types'],
-			$properties['subtractedType'] ?? null,
+		/** @var IdentifierTypeNode $parent */
+		$parent = parent::toPhpDocNode();
+		return new GenericTypeNode(
+			$parent,
+			array_map(static fn (Type $type) => $type->toPhpDocNode(), $this->types),
+			array_map(static fn (TemplateTypeVariance $variance) => $variance->toPhpDocNodeVariance(), $this->variances),
 		);
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		foreach ($this->types as $type) {
+			if (!$type->hasTemplateOrLateResolvableType()) {
+				continue;
+			}
+
+			return true;
+		}
+
+		if ($this->getSubtractedType() === null) {
+			return false;
+		}
+
+		return $this->getSubtractedType()->hasTemplateOrLateResolvableType();
 	}
 
 }

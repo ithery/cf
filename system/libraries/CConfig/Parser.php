@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 17, 2019, 3:35:10 AM
- */
 use PhpParser\Node;
 use PhpParser\Error;
 use PhpParser\NodeDumper;

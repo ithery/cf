@@ -5,17 +5,18 @@ namespace PHPStan\Type\Php;
 use PhpParser\Node\Expr\StaticCall;
 use PhpParser\Node\Name;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Type\DynamicStaticMethodThrowTypeExtension;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeUtils;
 use ReflectionFunction;
 use function count;
 
-class ReflectionFunctionConstructorThrowTypeExtension implements DynamicStaticMethodThrowTypeExtension
+#[AutowiredService]
+final class ReflectionFunctionConstructorThrowTypeExtension implements DynamicStaticMethodThrowTypeExtension
 {
 
 	public function __construct(private ReflectionProvider $reflectionProvider)
@@ -34,7 +35,11 @@ class ReflectionFunctionConstructorThrowTypeExtension implements DynamicStaticMe
 		}
 
 		$valueType = $scope->getType($methodCall->getArgs()[0]->value);
-		foreach (TypeUtils::getConstantStrings($valueType) as $constantString) {
+		foreach ($valueType->getConstantStrings() as $constantString) {
+			if ($constantString->getValue() === '') {
+				return null;
+			}
+
 			if (!$this->reflectionProvider->hasFunction(new Name($constantString->getValue()), $scope)) {
 				return $methodReflection->getThrowType();
 			}

@@ -26,10 +26,28 @@ const showDelete = (element) => {
     });
 };
 
-export const updateUi = (element) =>{
-    if(element.minItem >= element.blocks.length) {
+const hideAdd = (element) => {
+    for (let i = 0; i < element.addNew.length; i++) {
+        element.addNew[i].style.display = 'none';
+    }
+};
+
+const showAdd = (element) => {
+    for (let i = 0; i < element.addNew.length; i++) {
+        element.addNew[i].style.display = '';
+    }
+};
+
+export const updateUi = (element) => {
+    if (element.minItem >= element.blocks.length) {
         hideDelete(element);
     } else {
         showDelete(element);
+    }
+
+    if (element.maxItem && element.blocks.length >= element.maxItem) {
+        hideAdd(element);
+    } else {
+        showAdd(element);
     }
 };

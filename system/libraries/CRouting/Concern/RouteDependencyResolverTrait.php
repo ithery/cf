@@ -41,14 +41,14 @@ trait CRouting_Concern_RouteDependencyResolverTrait {
                 // If the parameter has a type-hinted class, we will check to see if it is already in
                 // the list of parameters. If it is we will just skip it as it is probably a model
                 // binding and we do not want to mess with those; otherwise, we resolve it here.
-                $class = $parameter->getClass();
+                $className = CBase_Reflector::getParameterClassName($parameter);
 
-                if ($class && !$this->alreadyInParameters($class->name, $parameters)) {
+                if ($className && !$this->alreadyInParameters($className, $parameters)) {
                     array_splice(
                         $parameters,
                         $key,
                         0,
-                        [$this->container->make($class->name)]
+                        [$this->container->make($className)]
                     );
                 }
             }

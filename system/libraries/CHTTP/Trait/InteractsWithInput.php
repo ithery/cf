@@ -345,7 +345,7 @@ trait CHTTP_Trait_InteractsWithInput {
      * @param null|string $format
      * @param null|string $tz
      *
-     * @throws \CarbonV3\Exceptions\InvalidFormatException
+     * @throws \Carbon\Exceptions\InvalidFormatException
      *
      * @return null|\CCarbon
      */

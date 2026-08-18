@@ -192,7 +192,7 @@ class CServer_Process_FakeProcessResult implements CServer_Process_Contract_Proc
      * @param  callable|null  $callback
      * @return $this
      */
-    public function throwIf(bool $condition, callable $callback = null)
+    public function throwIf(bool $condition, ?callable $callback = null)
     {
         if ($condition) {
             return $this->throw($callback);

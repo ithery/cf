@@ -2,7 +2,10 @@
 
 namespace PHPStan\DependencyInjection;
 
-/** @api */
+/**
+ * @api
+ * @api-do-not-implement
+ */
 interface Container
 {
 
@@ -10,14 +13,15 @@ interface Container
 
 	/**
 	 * @return mixed
+	 * @throws MissingServiceException
 	 */
 	public function getService(string $serviceName);
 
 	/**
-	 * @phpstan-template T of object
-	 * @phpstan-param class-string<T> $className
-	 * @phpstan-return T
-	 * @return mixed
+	 * @template T of object
+	 * @param class-string<T> $className
+	 * @return T
+	 * @throws MissingServiceException
 	 */
 	public function getByType(string $className);
 
@@ -26,6 +30,18 @@ interface Container
 	 * @return string[]
 	 */
 	public function findServiceNamesByType(string $className): array;
+
+	/**
+	 * Returns a lazy collection of all registered extensions implementing the given extension interface.
+	 *
+	 * The interface must be marked with the #[ExtensionInterface] attribute.
+	 *
+	 * @template T of object
+	 * @param class-string<T> $extensionInterfaceName
+	 * @return ExtensionsCollection<T>
+	 * @throws MissingServiceException
+	 */
+	public function getExtensionsCollection(string $extensionInterfaceName): ExtensionsCollection;
 
 	/**
 	 * @return mixed[]

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 2, 2019, 2:47:36 AM
- */
 class CResources_ResourceCollection {
     /**
      * @var string
@@ -57,12 +51,12 @@ class CResources_ResourceCollection {
     /**
      * @var string
      */
-    public $fallbackUrl = '';
+    public $fallbackUrls = [];
 
     /**
      * @var string
      */
-    public $fallbackPath = '';
+    public $fallbackPaths = [];
 
     public function __construct($name) {
         $this->name = $name;
@@ -101,10 +95,18 @@ class CResources_ResourceCollection {
         return $this;
     }
 
+    /**
+     * @return CResources_ResourceCollection
+     */
     public function singleFile() {
         return $this->onlyKeepLatest(1);
     }
 
+    /**
+     * @param int $maximumNumberOfItemsInCollection
+     *
+     * @return CResources_ResourceCollection
+     */
     public function onlyKeepLatest($maximumNumberOfItemsInCollection) {
         if ($maximumNumberOfItemsInCollection < 1) {
             throw new InvalidArgumentException("You should pass a value higher than 0. `{$maximumNumberOfItemsInCollection}` given.");
@@ -119,14 +121,22 @@ class CResources_ResourceCollection {
         $this->resourceConversionRegistrations = $resourceConversionRegistrations;
     }
 
-    public function useFallbackUrl($url) {
-        $this->fallbackUrl = $url;
+    public function useFallbackUrl($url, string $conversionName = '') {
+        if ($conversionName === '') {
+            $conversionName = 'default';
+        }
+
+        $this->fallbackUrls[$conversionName] = $url;
 
         return $this;
     }
 
-    public function useFallbackPath($path) {
-        $this->fallbackPath = $path;
+    public function useFallbackPath($path, string $conversionName = '') {
+        if ($conversionName === '') {
+            $conversionName = 'default';
+        }
+
+        $this->fallbackPaths[$conversionName] = $path;
 
         return $this;
     }

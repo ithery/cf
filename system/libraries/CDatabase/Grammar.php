@@ -2,6 +2,13 @@
 
 abstract class CDatabase_Grammar {
     /**
+     * The connection used for escaping values.
+     *
+     * @var \CDatabase_Connection
+     */
+    protected $connection;
+
+    /**
      * The grammar table prefix.
      *
      * @var string
@@ -10,8 +17,6 @@ abstract class CDatabase_Grammar {
 
     /**
      * Wrap an array of values.
-     *
-     * @param array $values
      *
      * @return array
      */
@@ -22,23 +27,48 @@ abstract class CDatabase_Grammar {
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param CDatabase_Query_Expression|string $table
+     * @param CDatabase_Contract_Query_ExpressionInterface|string $table
+     * @param null|string                                         $prefix
      *
      * @return string
      */
-    public function wrapTable($table) {
-        if (!$this->isExpression($table)) {
-            return $this->wrap($this->tablePrefix . $table, true);
+    public function wrapTable($table, $prefix = null) {
+        if ($this->isExpression($table)) {
+            return $this->getValue($table);
         }
 
-        return $this->getValue($table);
+        if ($prefix === null) {
+            $prefix = $this->connection->getTablePrefix();
+        }
+
+        // If the table being wrapped has an alias we'll need to separate the pieces
+        // so we can prefix the table and then wrap each of the segments on their
+        // own and then join these both back together using the "as" connector.
+        if (stripos($table, ' as ') !== false) {
+            return $this->wrapAliasedTable($table, $prefix);
+        }
+
+        // If the table being wrapped has a custom schema name specified, we need to
+        // prefix the last segment as the table name then wrap each segment alone
+        // and eventually join them both back together using the dot connector.
+        if (strpos($table, '.') !== false) {
+            $table = substr_replace($table, '.' . $prefix, strrpos($table, '.'), 1);
+
+            return (new CCollection(explode('.', $table)))
+                ->map(function ($value) {
+                    return $this->wrapValue($value);
+                })
+                ->implode('.');
+        }
+
+        return $this->wrapValue($prefix . $table);
     }
 
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param CDatabase_Query_Expression|string $value
-     * @param bool                              $prefixAlias
+     * @param CDatabase_Contract_Query_ExpressionInterface|string $value
+     * @param bool                                                $prefixAlias
      *
      * @return string
      */
@@ -52,6 +82,13 @@ abstract class CDatabase_Grammar {
         // own, and then joins them both back together with the "as" connector.
         if (strpos(strtolower($value), ' as ') !== false) {
             return $this->wrapAliasedValue($value, $prefixAlias);
+        }
+
+        // If the given value is a JSON selector we will wrap it differently than a
+        // traditional value. We will need to split this path and wrap each part
+        // wrapped, etc. Otherwise, we will simply wrap the value as a string.
+        if ($this->isJsonSelector($value)) {
+            return $this->wrapJsonSelector($value);
         }
 
         return $this->wrapSegments(explode('.', $value));
@@ -79,6 +116,24 @@ abstract class CDatabase_Grammar {
     }
 
     /**
+     * Wrap a table that has an alias.
+     *
+     * @param string      $value
+     * @param null|string $prefix
+     *
+     * @return string
+     */
+    protected function wrapAliasedTable($value, $prefix = null) {
+        $segments = preg_split('/\s+as\s+/i', $value);
+
+        if ($prefix === null) {
+            $prefix = $this->connection->getTablePrefix();
+        }
+
+        return $this->wrapTable($segments[0], $prefix) . ' as ' . $this->wrapValue($prefix . $segments[1]);
+    }
+
+    /**
      * Wrap the given value segments.
      *
      * @param array $segments
@@ -89,7 +144,9 @@ abstract class CDatabase_Grammar {
         $collection = c::collect($segments);
 
         return $collection->map(function ($segment, $key) use ($segments) {
-            return $key == 0 && count($segments) > 1 ? $this->wrapTable($segment) : $this->wrapValue($segment);
+            return $key == 0 && count($segments) > 1
+                ? $this->wrapTable($segment)
+                : $this->wrapValue($segment);
         })->implode('.');
     }
 
@@ -109,6 +166,19 @@ abstract class CDatabase_Grammar {
     }
 
     /**
+     * Wrap the given JSON selector.
+     *
+     * @param string $value
+     *
+     * @throws \RuntimeException
+     *
+     * @return string
+     */
+    protected function wrapJsonSelector($value) {
+        throw new RuntimeException('This database engine does not support JSON operations.');
+    }
+
+    /**
      * Determine if the given string is a JSON selector.
      *
      * @param string $value
@@ -116,13 +186,11 @@ abstract class CDatabase_Grammar {
      * @return bool
      */
     protected function isJsonSelector($value) {
-        return str_contains($value, '->');
+        return strpos($value, '->') !== false;
     }
 
     /**
      * Convert an array of column names into a delimited string.
-     *
-     * @param array $columns
      *
      * @return string
      */
@@ -132,8 +200,6 @@ abstract class CDatabase_Grammar {
 
     /**
      * Create query parameter place-holders for an array.
-     *
-     * @param array $values
      *
      * @return string
      */
@@ -164,7 +230,23 @@ abstract class CDatabase_Grammar {
             return implode(', ', array_map([$this, __FUNCTION__], $value));
         }
 
-        return "'${value}'";
+        return "'" . $value . "'";
+    }
+
+    /**
+     * Escapes a value for safe SQL embedding.
+     *
+     * @param null|string|float|int|bool $value
+     * @param bool                       $binary
+     *
+     * @return string
+     */
+    public function escape($value, $binary = false) {
+        if (is_null($this->connection)) {
+            throw new RuntimeException("The database driver's grammar implementation does not support escaping values.");
+        }
+
+        return $this->connection->escape($value, $binary);
     }
 
     /**
@@ -175,18 +257,22 @@ abstract class CDatabase_Grammar {
      * @return bool
      */
     public function isExpression($value) {
-        return $value instanceof CDatabase_Query_Expression;
+        return $value instanceof CDatabase_Contract_Query_ExpressionInterface;
     }
 
     /**
      * Get the value of a raw expression.
      *
-     * @param CDatabase_Query_Expression $expression
+     * @param CDatabase_Contract_Query_ExpressionInterface $expression
      *
      * @return string
      */
     public function getValue($expression) {
-        return $expression->getValue();
+        if ($this->isExpression($expression)) {
+            return $this->getValue($expression->getValue($this));
+        }
+
+        return $expression;
     }
 
     /**
@@ -216,6 +302,19 @@ abstract class CDatabase_Grammar {
      */
     public function setTablePrefix($prefix) {
         $this->tablePrefix = $prefix;
+
+        return $this;
+    }
+
+    /**
+     * Set the grammar's database connection.
+     *
+     * @param \CDatabase_Connection $connection
+     *
+     * @return $this
+     */
+    public function setConnection($connection) {
+        $this->connection = $connection;
 
         return $this;
     }

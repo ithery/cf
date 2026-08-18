@@ -67,7 +67,7 @@ class CliTestDoxPrinter extends TestDoxPrinter
         " \e[36m◒\e[0m running tests",
     ];
 
-    public $STATUS_STYLES = [
+    public static $STATUS_STYLES = [
         BaseTestRunner::STATUS_PASSED => [
             'symbol' => '✔',
             'color'  => 'fg-green',

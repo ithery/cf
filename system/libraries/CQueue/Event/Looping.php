@@ -2,13 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2019, 6:27:33 AM
- */
-
 class CQueue_Event_Looping {
     /**
      * The connection name.
@@ -16,6 +9,7 @@ class CQueue_Event_Looping {
      * @var string
      */
     public $connectionName;
+
     /**
      * The queue name.
      *
@@ -24,15 +18,24 @@ class CQueue_Event_Looping {
     public $queue;
 
     /**
+     * The worker options.
+     *
+     * @var null|CQueue_WorkerOptions
+     */
+    public $options;
+
+    /**
      * Create a new event instance.
      *
-     * @param string $connectionName
-     * @param string $queue
+     * @param string                    $connectionName
+     * @param string                    $queue
+     * @param null|CQueue_WorkerOptions $options
      *
      * @return void
      */
-    public function __construct($connectionName, $queue) {
+    public function __construct($connectionName, $queue, $options = null) {
         $this->queue = $queue;
         $this->connectionName = $connectionName;
+        $this->options = $options;
     }
 }

@@ -3,13 +3,10 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see CManager_DataProvider_SqlDataProvider
  * @see CManager_DataProvider_ModelDataProvider
  * @see CManager_DataProvider_ClosureDataProvider
- * @since Jul 8, 2018, 2:58:18 AM
+ * @see CManager_DataProvider_CollectionDataProvider
  */
 class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTable_Processor {
     use CAjax_Engine_DataTable_Trait_ProcessorTrait;
@@ -37,8 +34,12 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
         } else {
             $collections = $query->toEnumerable();
             $totalItem = $collections->count();
+            $paginationResult = $query->paginate($totalItem, ['*'], 'page', $this->parameter->page());
+            $collections = $paginationResult->items();
+            $totalItem = $paginationResult->total();
             $totalFilteredItem = $totalItem;
         }
+
         $output = [
             'sEcho' => intval(carr::get($request, 'sEcho')),
             'iTotalRecords' => $totalItem,
@@ -95,6 +96,23 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
         return $searchData;
     }
 
+    protected function createSortCallable($callback, $direction) {
+        return function ($q) use ($direction, $callback) {
+            $args = [$q, $direction];
+            if (is_callable($callback)) {
+                return call_user_func_array($callback, $args);
+            }
+            if ($callback instanceof \Opis\Closure\SerializableClosure) {
+                return $callback->__invoke(...$args);
+            }
+            if ($callback instanceof \CFunction_SerializableClosure) {
+                return $callback->__invoke(...$args);
+            }
+
+            throw new Exception('callback is not callable on ' . __CLASS__);
+        };
+    }
+
     protected function createSearchCallable($callback, $keyword) {
         return function ($q) use ($keyword, $callback) {
             $args = [$q, $keyword];
@@ -102,6 +120,9 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                 return call_user_func_array($callback, $args);
             }
             if ($callback instanceof \Opis\Closure\SerializableClosure) {
+                return $callback->__invoke(...$args);
+            }
+            if ($callback instanceof \CFunction_SerializableClosure) {
                 return $callback->__invoke(...$args);
             }
 
@@ -139,7 +160,7 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                     $transforms = json_decode($transforms, true);
                     if (is_array($transforms)) {
                         foreach ($transforms as $transforms_k => $transforms_v) {
-                            $value = ctransform::{$transforms_v['func']}($value, true);
+                            $value = CManager::transform()->call($transforms_v['func'], $value);
                         }
                     }
                 }
@@ -180,8 +201,18 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
                     $column = carr::get($columns, intval($request['iSortCol_' . $i]) - $i2);
                     $sortDirection = $request['sSortDir_' . $i];
                     if ($column) {
+                        /** @var CElement_Component_DataTable_Column $column */
                         $fieldName = $column->getFieldname();
-                        $sortData[$fieldName] = $sortDirection;
+                        if ($callback = $column->getSortCallback()) {
+                            $table = $this->table();
+                            $query = $table->getQuery();
+                            if (!($query instanceof CManager_DataProvider_ModelDataProvider)) {
+                                throw new Exception('SortCallback only running on ModelDataProvider');
+                            }
+                            $sortData[$fieldName] = $this->createSortCallable($callback, $sortDirection);
+                        } else {
+                            $sortData[$fieldName] = $sortDirection;
+                        }
                     }
                 }
             }

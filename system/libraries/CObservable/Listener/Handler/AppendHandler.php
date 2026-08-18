@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 3:06:27 PM
- */
 class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Handler {
     use CTrait_Compat_Handler_Driver_Append,
         CObservable_Listener_Handler_Trait_TargetHandlerTrait,
@@ -16,23 +10,35 @@ class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Ha
         CObservable_Listener_Handler_Trait_BlockerHandlerTrait,
         CObservable_Listener_Handler_Trait_ParamHandlerTrait;
 
+    /**
+     * @var string
+     */
     protected $content;
 
+    /**
+     * @var array
+     */
     protected $param;
 
+    /**
+     * @var string
+     */
     protected $checkDuplicateSelector;
 
+    /**
+     * @param CObservable_Listener $listener
+     */
     public function __construct($listener) {
         parent::__construct($listener);
         $this->name = 'Append';
         $this->method = 'get';
         $this->target = '';
-        $this->content = CHandlerElement::factory();
+        $this->content = CObservable_HandlerElement::factory();
         $this->paramInputs = [];
         $this->paramInputsByName = [];
         $this->paramRequest = [];
         $this->url = '';
-        $this->urlParam = [];
+        // $this->urlParam = [];
     }
 
     public function content() {

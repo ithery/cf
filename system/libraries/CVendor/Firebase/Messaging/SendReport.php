@@ -27,7 +27,7 @@ class CVendor_Firebase_Messaging_SendReport {
         $this->target = $target;
     }
 
-    public static function success(CVendor_Firebase_Messaging_MessageTarget $target, $response, CVendor_Firebase_Messaging_MessageInterface $message = null) {
+    public static function success(CVendor_Firebase_Messaging_MessageTarget $target, $response, ?CVendor_Firebase_Messaging_MessageInterface $message = null) {
         $report = new self($target);
         $report->result = $response;
         $report->message = $message;
@@ -35,7 +35,7 @@ class CVendor_Firebase_Messaging_SendReport {
         return $report;
     }
 
-    public static function failure(CVendor_Firebase_Messaging_MessageTarget $target, $error, CVendor_Firebase_Messaging_MessageInterface $message = null) {
+    public static function failure(CVendor_Firebase_Messaging_MessageTarget $target, $error, ?CVendor_Firebase_Messaging_MessageInterface $message = null) {
         $report = new self($target);
         $report->error = $error;
         $report->message = $message;

@@ -614,6 +614,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
      *
      * @return \ArrayIterator
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return $this->items->getIterator();
     }
@@ -641,6 +642,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return $this->items->count();
     }
@@ -683,6 +685,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($key) {
         return $this->items->has($key);
     }
@@ -694,6 +697,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->items->get($key);
     }
@@ -706,6 +710,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value) {
         $this->items->put($key, $value);
     }
@@ -717,6 +722,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key) {
         $this->items->forget($key);
     }
@@ -747,6 +753,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->render();
     }

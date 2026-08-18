@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 3:18:55 PM
- */
 class CModel_HasSlug_SlugOptions {
     /**
      * @var array|callable
@@ -63,41 +57,49 @@ class CModel_HasSlug_SlugOptions {
             $fieldName = [$fieldName];
         }
         $this->generateSlugFrom = $fieldName;
+
         return $this;
     }
 
     public function saveSlugsTo($fieldName) {
         $this->slugField = $fieldName;
+
         return $this;
     }
 
     public function allowDuplicateSlugs() {
         $this->generateUniqueSlugs = false;
+
         return $this;
     }
 
     public function slugsShouldBeNoLongerThan($maximumLength) {
         $this->maximumLength = $maximumLength;
+
         return $this;
     }
 
     public function doNotGenerateSlugsOnCreate() {
         $this->generateSlugsOnCreate = false;
+
         return $this;
     }
 
     public function doNotGenerateSlugsOnUpdate() {
         $this->generateSlugsOnUpdate = false;
+
         return $this;
     }
 
     public function usingSeparator($separator) {
         $this->slugSeparator = $separator;
+
         return $this;
     }
 
     public function usingLanguage($language) {
         $this->slugLanguage = $language;
+
         return $this;
     }
 }

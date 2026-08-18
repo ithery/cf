@@ -3,11 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- *
- * @since Oct 1, 2019, 5:23:33 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
+ * @deprecated 1.8
  */
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder as PhpSpreadsheetDefaultValueBinder;

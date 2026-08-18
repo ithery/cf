@@ -2,10 +2,13 @@
 
 /**
  * Description of PruneBootstrapper.
- *
- * @author Hery
  */
 class CDevSuite_Bootstrap_PruneBootstrapper extends CDevSuite_Bootstrap_Bootstrapper {
+    /**
+     * Prune missing directories/symlinks and ensure base configuration exists.
+     *
+     * @return void
+     */
     public function bootstrap() {
         /*
          * Prune missing directories and symbolic links on every command.

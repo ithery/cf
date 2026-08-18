@@ -4,7 +4,7 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Validation\UncompromisedVerifier;
 
-class Password implements CValidation_RuleInterface, CValidation_Contract_DataAwareRuleInterface, CValidation_Contract_ValidatorAwareRuleInterface {
+class CValidation_Rule_Password implements CValidation_RuleInterface, CValidation_Contract_DataAwareRuleInterface, CValidation_Contract_ValidatorAwareRuleInterface {
     use CTrait_Conditionable;
 
     /**
@@ -157,7 +157,7 @@ class Password implements CValidation_RuleInterface, CValidation_Contract_DataAw
     /**
      * Set the performing validator.
      *
-     * @param \Illuminate\Contracts\Validation\Validator $validator
+     * @param \CValidation_Contract_ValidatorInterface $validator
      *
      * @return $this
      */
@@ -274,7 +274,7 @@ class Password implements CValidation_RuleInterface, CValidation_Contract_DataAw
     public function passes($attribute, $value) {
         $this->messages = [];
 
-        $validator = Validator::make(
+        $validator = CValidation::createValidator(
             $this->data,
             [$attribute => array_merge(['string', 'min:' . $this->min], $this->customRules)],
             $this->validator->customMessages,

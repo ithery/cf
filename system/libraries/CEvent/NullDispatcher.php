@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 17, 2019, 11:36:21 PM
- */
 class CEvent_NullDispatcher implements CEvent_DispatcherInterface {
     use CTrait_ForwardsCalls;
 
@@ -58,7 +52,7 @@ class CEvent_NullDispatcher implements CEvent_DispatcherInterface {
      * @param string|object $event
      * @param mixed         $payload
      *
-     * @return array|null
+     * @return null|array
      */
     public function until($event, $payload = []) {
     }
@@ -67,7 +61,7 @@ class CEvent_NullDispatcher implements CEvent_DispatcherInterface {
      * Register an event listener with the dispatcher.
      *
      * @param \Closure|string|array $events
-     * @param \Closure|string|null  $listener
+     * @param null|\Closure|string  $listener
      *
      * @return void
      */

@@ -5,7 +5,9 @@ namespace PHPStan\Rules\Methods;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
 use PHPStan\BetterReflection\Reflector\Exception\IdentifierNotFound;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\InClassNode;
+use PHPStan\Reflection\ClassReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function sprintf;
@@ -13,7 +15,8 @@ use function sprintf;
 /**
  * @implements Rule<InClassNode>
  */
-class MissingMethodImplementationRule implements Rule
+#[RegisteredRule(level: 0)]
+final class MissingMethodImplementationRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -45,6 +48,17 @@ class MissingMethodImplementationRule implements Rule
 
 			$declaringClass = $method->getDeclaringClass();
 
+			if (
+				$declaringClass->isInterface()
+				&& $this->isProvidedByBuiltinAncestor($classReflection, $declaringClass->getName())
+			) {
+				// A non-abstract built-in class implementing the interface always
+				// provides its methods at runtime, even when a stub reports one as
+				// abstract because it is version-gated (e.g. IntlBreakIterator +
+				// IteratorAggregate::getIterator(), SimpleXMLElement + RecursiveIterator).
+				continue;
+			}
+
 			$classLikeDescription = 'Non-abstract class';
 			if ($classReflection->isEnum()) {
 				$classLikeDescription = 'Enum';
@@ -57,10 +71,27 @@ class MissingMethodImplementationRule implements Rule
 				$method->getName(),
 				$declaringClass->isInterface() ? 'interface' : 'class',
 				$declaringClass->getName(),
-			))->nonIgnorable()->build();
+			))->nonIgnorable()->identifier('method.abstract')->build();
 		}
 
 		return $messages;
+	}
+
+	private function isProvidedByBuiltinAncestor(ClassReflection $classReflection, string $interfaceName): bool
+	{
+		foreach ($classReflection->getParents() as $parent) {
+			if (!$parent->isBuiltin()) {
+				continue;
+			}
+			if ($parent->isAbstract()) {
+				continue;
+			}
+			if ($parent->implementsInterface($interfaceName)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }

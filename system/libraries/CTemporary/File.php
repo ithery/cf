@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2019, 10:15:15 PM
- */
 class CTemporary_File {
     /**
      * @var CTemporary_Directory
@@ -56,7 +50,7 @@ class CTemporary_File {
     }
 
     public function getPath() {
-        return rtrim($this->directory->getPath(), '/') . '/' . $this->filename;
+        return $this->directory->getPath($this->filename);
     }
 
     public function getUrl() {

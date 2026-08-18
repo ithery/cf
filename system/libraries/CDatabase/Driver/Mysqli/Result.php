@@ -2,14 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:31:26 AM
- */
 class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
     use CTrait_Compat_Database_Driver_Mysqli_Result;
+
     /**
      * @var \mysqli
      */
@@ -138,6 +133,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
         return $field_names;
     }
 
+    #[\ReturnTypeWillChange]
     public function seek($offset) {
         if ($this->offsetExists($offset) and $this->result->data_seek($offset)) {
             // Set the current row to the offset
@@ -149,6 +145,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
         return false;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         if (!$this->seek($offset)) {
             return false;

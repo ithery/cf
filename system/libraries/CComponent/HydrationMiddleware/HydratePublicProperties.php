@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 29, 2020
- */
 use Carbon\Carbon;
 
 class CComponent_HydrationMiddleware_HydratePublicProperties implements CComponent_HydrationMiddlewareInterface {
@@ -92,11 +86,11 @@ class CComponent_HydrationMiddleware_HydratePublicProperties implements CCompone
 
     protected static function hydrateModel($serialized, $property, $request, $instance) {
         if (isset($serialized['id'])) {
-            $model = (new static)->getRestoredPropertyValue(
+            $model = (new static())->getRestoredPropertyValue(
                 new CModel_Identifier($serialized['class'], $serialized['id'], $serialized['relations'], $serialized['connection'])
             );
         } else {
-            $model = new $serialized['class'];
+            $model = new $serialized['class']();
         }
 
         $dirtyModelData = $request->memo['data'][$property];
@@ -117,7 +111,7 @@ class CComponent_HydrationMiddleware_HydratePublicProperties implements CCompone
     protected static function hydrateModels($serialized, $property, $request, $instance) {
         $idsWithNullsIntersparsed = $serialized['id'];
 
-        $models = (new static)->getRestoredPropertyValue(
+        $models = (new static())->getRestoredPropertyValue(
             new CModel_Identifier($serialized['class'], $serialized['id'], $serialized['relations'], $serialized['connection'])
         );
 
@@ -133,7 +127,7 @@ class CComponent_HydrationMiddleware_HydratePublicProperties implements CCompone
                     ->map->__toString();
 
                 if (is_null($id)) {
-                    $model = new $serialized['class'];
+                    $model = new $serialized['class']();
                     $models->splice($index, 0, [$model]);
                 }
 
@@ -147,7 +141,7 @@ class CComponent_HydrationMiddleware_HydratePublicProperties implements CCompone
     }
 
     protected static function dehydrateModel($value, $property, $response, $instance) {
-        $serializedModel = $value instanceof CQueue_QueueableEntityInterface && !$value->exists ? ['class' => get_class($value)] : (array) (new static)->getSerializedPropertyValue($value);
+        $serializedModel = $value instanceof CQueue_QueueableEntityInterface && !$value->exists ? ['class' => get_class($value)] : (array) (new static())->getSerializedPropertyValue($value);
 
         // Deserialize the models into the "meta" bag.
         c::set($response, 'memo.dataMeta.models.' . $property, $serializedModel);
@@ -170,7 +164,7 @@ class CComponent_HydrationMiddleware_HydratePublicProperties implements CCompone
     }
 
     protected static function dehydrateModels($value, $property, $response, $instance) {
-        $serializedModel = (array) (new static)->getSerializedPropertyValue($value);
+        $serializedModel = (array) (new static())->getSerializedPropertyValue($value);
 
         // Deserialize the models into the "meta" bag.
         c::set($response, 'memo.dataMeta.modelCollections.' . $property, $serializedModel);

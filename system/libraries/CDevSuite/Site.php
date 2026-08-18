@@ -2,8 +2,6 @@
 
 /**
  * Description of Site.
- *
- * @author Hery
  */
 abstract class CDevSuite_Site {
     /**
@@ -30,6 +28,11 @@ abstract class CDevSuite_Site {
         $this->config = CDevSuite::configuration();
     }
 
+    /**
+     * Get the DevSuite home path.
+     *
+     * @return string
+     */
     public function devSuiteHomePath() {
         return CDevSuite::homePath();
     }
@@ -75,6 +78,8 @@ abstract class CDevSuite_Site {
      * Get the path to Nginx site configuration files.
      *
      * @param null|mixed $additionalPath
+     *
+     * @return string
      */
     public function nginxPath($additionalPath = null) {
         return $this->devSuiteHomePath() . 'Nginx' . ($additionalPath ? '/' . $additionalPath : '');
@@ -285,6 +290,14 @@ abstract class CDevSuite_Site {
         return $host;
     }
 
+    /**
+     * Get the contents of the Nginx configuration file for the given site.
+     *
+     * @param string      $site
+     * @param null|string $suffix
+     *
+     * @return null|string
+     */
     public function getSiteConfigFileContents($site, $suffix = null) {
         $config = $this->config->read();
         $suffix = $suffix ?: '.' . $config['tld'];
@@ -309,8 +322,8 @@ abstract class CDevSuite_Site {
      * Get list of sites and return them formatted
      * Will work for symlink and normal site paths.
      *
-     * @param $path
-     * @param $certs
+     * @param string      $path
+     * @param CCollection $certs
      *
      * @return CCollection
      */
@@ -375,7 +388,7 @@ abstract class CDevSuite_Site {
      * @return int
      */
     public function port($url) {
-        if ($this->files->exists($path = CDevSuite::homePath() . "/Nginx/${url}.conf")) {
+        if ($this->files->exists($path = CDevSuite::homePath() . "/Nginx/{$url}.conf")) {
             if (strpos($this->files->get($path), '443') !== false) {
                 return 443;
             }
@@ -490,10 +503,15 @@ abstract class CDevSuite_Site {
         $this->cli->run(sprintf(
             'sudo security find-certificate -e "%s%s" -a -Z | grep SHA-1 | sudo awk \'{system("security delete-certificate -Z \'$NF\' /Library/Keychains/System.keychain")}\'',
             $url,
-            '@laravel.valet'
+            '@cf.valet'
         ));
     }
 
+    /**
+     * Unsecure all currently secured sites (parked and linked).
+     *
+     * @return void
+     */
     public function unsecureAll() {
         $tld = $this->config->read()['tld'];
 

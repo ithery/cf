@@ -41,14 +41,23 @@ class CApp_OpenGraph_Tag {
     }
 
     /**
-     * @inheritDoc
+     * Magic getter for the tag's attributes.
+     *
+     * @param string $name The name of the object attribute
+     *
+     * @return mixed
      */
     public function __get($name) {
         return $this->$name;
     }
 
     /**
-     * @inheritDoc
+     * Magic setter for the tag's attributes.
+     *
+     * @param string $name  The name of the object attribute
+     * @param mixed  $value The value of the object attribute
+     *
+     * @return void
      */
     public function __set($name, $value) {
         $this->setAttribute($name, $value);
@@ -59,6 +68,8 @@ class CApp_OpenGraph_Tag {
      *
      * @param string $name  The name of the object attribute
      * @param mixed  $value The value of the object attribute
+     *
+     * @return void
      */
     protected function setAttribute($name, $value) {
         // Convert values

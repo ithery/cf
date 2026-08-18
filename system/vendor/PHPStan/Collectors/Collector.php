@@ -4,22 +4,37 @@ namespace PHPStan\Collectors;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\ExtensionInterface;
 
 /**
+ * This is the interface custom collectors implement. To register it in the configuration file
+ * use the `phpstan.collector` service tag:
+ *
+ * ```
+ * services:
+ * 	-
+ *		class: App\MyCollector
+ *		tags:
+ *			- phpstan.collector
+ * ```
+ *
+ * Learn more: https://phpstan.org/developing-extensions/collectors
+ *
  * @api
- * @phpstan-template-covariant TNodeType of Node
- * @phpstan-template-covariant TValue
+ * @template-covariant TNodeType of Node
+ * @template-covariant TValue
  */
+#[ExtensionInterface(tag: RegistryFactory::COLLECTOR_TAG)]
 interface Collector
 {
 
 	/**
-	 * @phpstan-return class-string<TNodeType>
+	 * @return class-string<TNodeType>
 	 */
 	public function getNodeType(): string;
 
 	/**
-	 * @phpstan-param TNodeType $node
+	 * @param TNodeType $node
 	 * @return TValue|null Collected data
 	 */
 	public function processNode(Node $node, Scope $scope);

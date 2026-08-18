@@ -1,12 +1,8 @@
-# Cres JS - Css
-### Introduction
+# Cres JS - CSS
 
-Secara basic, cresenity mempunyai default css yaitu cres.css
+Cresenity includes a default stylesheet `cres.css` that provides utility CSS classes similar to Tailwind CSS.
 
-<br/>
-
-### Helper - Typography
-<br/>
+### Typography
 
 ##### Font Family
 <div class="table-wrapper table-cell-css" markdown="block">
@@ -33,8 +29,7 @@ whitespace-pre-wrap | white-space: pre-wrap; |
 
 </div>
 
-### Helper - Transform
-<br/>
+### Transform
 
 ##### Scale
 <div class="table-wrapper table-cell-css" markdown="block">

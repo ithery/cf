@@ -1,7 +1,5 @@
 <?php
 
-use Opis\Closure\SerializableClosure;
-
 class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstract implements CManager_Contract_DataProviderInterface {
     protected $connection = '';
 
@@ -23,12 +21,12 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
     }
 
     public function setConnection($connection) {
-        $this->connection = $connection instanceof Closure ? new SerializableClosure($connection) : $connection;
+        $this->connection = $connection instanceof Closure ? new CFunction_SerializableClosure($connection) : $connection;
     }
 
     public function getConnection() {
         $connection = c::value($this->connection) ?: 'default';
-        if ($connection instanceof SerializableClosure) {
+        if ($connection instanceof CFunction_SerializableClosure) {
             $connection = $connection->__invoke();
         }
 
@@ -38,7 +36,7 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
     public function getDb() {
         $connection = $this->getConnection();
 
-        return $connection instanceof CDatabase ? $connection : c::db($connection);
+        return $connection instanceof CDatabase_Connection ? $connection : c::db($connection);
     }
 
     public function toEnumerable() {
@@ -60,13 +58,15 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
             $query = $this->getQueryForPage($page, $perPage);
 
             $resultQ = $this->executeQuery($query);
-            $results = c::collect($resultQ->result(false));
+            $results = new CCollection_LazyCollection($resultQ->result(false));
         }
 
-        return c::paginator($results, $total, $perPage, $page, [
+        $paginator = c::paginator($results, $total, $perPage, $page, [
             'path' => CPagination_Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
+
+        return $paginator;
     }
 
     public function getCountForPagination() {
@@ -105,12 +105,17 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
     }
 
     protected function getQueryLimit($page, $perPage) {
+        $connection = $this->getDb();
+        $driver = $connection->getDriverName();
         if ($page <= 0) {
             return '';
         }
         $offset = ($page - 1) * $perPage;
         $limit = $perPage;
         $sLimit = 'LIMIT ' . intval($offset) . ', ' . intval($limit);
+        if ($driver == 'pgsql') {
+            $sLimit = 'LIMIT ' . intval($limit) . ' OFFSET ' . intval($offset);
+        }
 
         return $sLimit;
     }
@@ -119,10 +124,16 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         $sortData = $this->sort;
 
         $sOrder = '';
+        $connection = $this->getDb();
+        $driver = $connection->getDriverName();
         //process ordering
-        if (count($this->sort) > 0) {
-            foreach ($this->sort as $fieldName => $sortDirection) {
-                $sOrder .= ', ' . $this->getDb()->escapeColumn($fieldName) . ' ' . $this->getDb()->escapeStr($sortDirection);
+        if (count($sortData) > 0) {
+            foreach ($sortData as $fieldName => $sortDirection) {
+                $fieldNameEscaped = $connection->escapeColumn($fieldName);
+                if ($driver === 'pgsql') {
+                    $fieldNameEscaped = '' . $fieldName . '';
+                }
+                $sOrder .= ', ' . $fieldNameEscaped . ' ' . $connection->escapeStr($sortDirection);
             }
         }
 
@@ -168,12 +179,19 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
         $sWhereOr = '';
         $sWhereAnd = '';
         $sWhere = '';
+
+        $connection = $this->getDb();
+        $driver = $connection->getDriverName();
         //process search
         if (count($this->searchOr) > 0) {
             $dataSearchOr = $this->searchOr;
 
             foreach ($dataSearchOr as $fieldName => $value) {
-                $sWhereOr .= 'OR ' . $this->getDb()->escapeColumn($fieldName) . " LIKE '%" . $this->getDb()->escapeLike($value) . "%' ";
+                $column = $this->getDb()->escapeColumn($fieldName);
+                if ($driver === 'pgsql') {
+                    $column = '"' . $fieldName . '"' . '::text';
+                }
+                $sWhereOr .= 'OR ' . $column . " LIKE '%" . $this->getDb()->escapeLike($value) . "%' ";
             }
             if (strlen($sWhereOr) > 0) {
                 $sWhereOr = '(' . substr($sWhereOr, 3) . ')';
@@ -184,7 +202,11 @@ class CManager_DataProvider_SqlDataProvider extends CManager_DataProviderAbstrac
             $dataSearchAnd = $this->searchAnd;
 
             foreach ($dataSearchAnd as $fieldName => $value) {
-                $sWhereAnd .= 'AND ' . $this->getDb()->escapeColumn($fieldName) . " LIKE '%" . $this->getDb()->escapeLike($value) . "%' ";
+                $column = $this->getDb()->escapeColumn($fieldName);
+                if ($driver === 'pgsql') {
+                    $column = '"' . $fieldName . '"' . '::text';
+                }
+                $sWhereAnd .= 'AND ' . $column . " LIKE '%" . $this->getDb()->escapeLike($value) . "%' ";
             }
             if (strlen($sWhereAnd) > 0) {
                 $sWhereAnd = '(' . substr($sWhereAnd, 4) . ')';

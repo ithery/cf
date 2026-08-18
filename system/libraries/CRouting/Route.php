@@ -5,7 +5,6 @@
  *
  * @author Hery
  */
-use Opis\Closure\SerializableClosure;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class CRouting_Route {
@@ -735,7 +734,7 @@ class CRouting_Route {
     public function prefix($prefix) {
         $this->updatePrefixOnAction($prefix);
 
-        $uri = rtrim($prefix, '/') . '/' . ltrim($this->uri, '/');
+        $uri = rtrim((string) $prefix, '/') . '/' . ltrim($this->uri, '/');
 
         return $this->setUri($uri !== '/' ? trim($uri, '/') : $uri);
     }
@@ -748,7 +747,7 @@ class CRouting_Route {
      * @return void
      */
     protected function updatePrefixOnAction($prefix) {
-        if (!empty($newPrefix = trim(rtrim($prefix, '/') . '/' . ltrim(carr::get($this->action, 'prefix', ''), '/'), '/'))) {
+        if (!empty($newPrefix = trim(rtrim((string) $prefix, '/') . '/' . ltrim(carr::get($this->action, 'prefix', ''), '/'), '/'))) {
             $this->action['prefix'] = $newPrefix;
         }
     }
@@ -1147,7 +1146,7 @@ class CRouting_Route {
      */
     public function prepareForSerialization() {
         if ($this->action['uses'] instanceof Closure) {
-            $this->action['uses'] = serialize(new SerializableClosure($this->action['uses']));
+            $this->action['uses'] = serialize(new CFunction_SerializableClosure($this->action['uses']));
 
             // throw new LogicException("Unable to prepare route [{$this->uri}] for serialization. Uses Closure.");
         }

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 12:07:32 PM
- */
 class CDatabase_Schema_Exception extends CDatabase_Exception {
     const TABLE_DOESNT_EXIST = 10;
 

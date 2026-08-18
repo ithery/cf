@@ -4,9 +4,12 @@ namespace PHPStan\Command\ErrorFormatter;
 
 use PHPStan\Command\AnalysisResult;
 use PHPStan\Command\Output;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\File\RelativePathHelper;
 use function array_walk;
 use function implode;
+use function preg_replace;
 use function sprintf;
 use function str_replace;
 
@@ -14,10 +17,12 @@ use function str_replace;
  * Allow errors to be reported in pull-requests diff when run in a GitHub Action
  * @see https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
  */
-class GithubErrorFormatter implements ErrorFormatter
+#[AutowiredService(name: 'errorFormatter.github')]
+final class GithubErrorFormatter implements ErrorFormatter
 {
 
 	public function __construct(
+		#[AutowiredParameter(ref: '@simpleRelativePathHelper')]
 		private RelativePathHelper $relativePathHelper,
 	)
 	{
@@ -36,9 +41,7 @@ class GithubErrorFormatter implements ErrorFormatter
 			});
 
 			$message = $fileSpecificError->getMessage();
-			// newlines need to be encoded
-			// see https://github.com/actions/starter-workflows/issues/68#issuecomment-581479448
-			$message = str_replace("\n", '%0A', $message);
+			$message = $this->formatMessage($message);
 
 			$line = sprintf('::error %s::%s', implode(',', $metas), $message);
 
@@ -47,9 +50,7 @@ class GithubErrorFormatter implements ErrorFormatter
 		}
 
 		foreach ($analysisResult->getNotFileSpecificErrors() as $notFileSpecificError) {
-			// newlines need to be encoded
-			// see https://github.com/actions/starter-workflows/issues/68#issuecomment-581479448
-			$notFileSpecificError = str_replace("\n", '%0A', $notFileSpecificError);
+			$notFileSpecificError = $this->formatMessage($notFileSpecificError);
 
 			$line = sprintf('::error ::%s', $notFileSpecificError);
 
@@ -58,8 +59,7 @@ class GithubErrorFormatter implements ErrorFormatter
 		}
 
 		foreach ($analysisResult->getWarnings() as $warning) {
-			// newlines need to be encoded
-			// see https://github.com/actions/starter-workflows/issues/68#issuecomment-581479448
+			$warning = $this->formatMessage($warning);
 			$warning = str_replace("\n", '%0A', $warning);
 
 			$line = sprintf('::warning ::%s', $warning);
@@ -69,6 +69,15 @@ class GithubErrorFormatter implements ErrorFormatter
 		}
 
 		return $analysisResult->hasErrors() ? 1 : 0;
+	}
+
+	private function formatMessage(string $message): string
+	{
+		// newlines need to be encoded
+		// see https://github.com/actions/starter-workflows/issues/68#issuecomment-581479448
+		$message = str_replace("\n", '%0A', $message);
+
+		return preg_replace('/(^|\s)@([a-zA-Z0-9_\-]+)(\s|$)/', '$1`@$2`$3', $message) ?? $message;
 	}
 
 }

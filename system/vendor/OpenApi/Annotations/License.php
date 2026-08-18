@@ -11,7 +11,7 @@ use OpenApi\Generator;
 /**
  * License information for the exposed API.
  *
- * A "License Object": https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#license-object
+ * @see [OAI License Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#license-object)
  *
  * @Annotation
  */
@@ -32,7 +32,7 @@ class License extends AbstractAnnotation
     public $identifier = Generator::UNDEFINED;
 
     /**
-     * A URL to the license used for the API. This MUST be in the form of a URL.
+     * An URL to the license used for the API. This MUST be in the form of a URL.
      *
      * The `url` field is mutually exclusive of the `identifier` field.
      *
@@ -86,9 +86,9 @@ class License extends AbstractAnnotation
     /**
      * @inheritdoc
      */
-    public function validate(array $parents = [], array $skip = [], string $ref = ''): bool
+    public function validate(array $stack = [], array $skip = [], string $ref = '', $context = null): bool
     {
-        $valid = parent::validate($parents, $skip);
+        $valid = parent::validate($stack, $skip, $ref, $context);
 
         if ($this->_context->isVersion(OpenApi::VERSION_3_1_0)) {
             if (!Generator::isDefault($this->url) && $this->identifier !== Generator::UNDEFINED) {

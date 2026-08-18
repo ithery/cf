@@ -2,25 +2,27 @@
 
 namespace PHPStan\Type\Php;
 
-use PhpParser\Node;
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Analyser\SpecifiedTypes;
 use PHPStan\Analyser\TypeSpecifier;
 use PHPStan\Analyser\TypeSpecifierAwareExtension;
 use PHPStan\Analyser\TypeSpecifierContext;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\FunctionTypeSpecifyingExtension;
 use PHPStan\Type\MixedType;
 use function count;
-use function explode;
-use function ltrim;
 
-class DefinedConstantTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
+#[AutowiredService]
+final class DefinedConstantTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
 {
 
 	private TypeSpecifier $typeSpecifier;
+
+	public function __construct(private ConstantHelper $constantHelper)
+	{
+	}
 
 	public function setTypeSpecifier(TypeSpecifier $typeSpecifier): void
 	{
@@ -35,7 +37,7 @@ class DefinedConstantTypeSpecifyingExtension implements FunctionTypeSpecifyingEx
 	{
 		return $functionReflection->getName() === 'defined'
 			&& count($node->getArgs()) >= 1
-			&& $context->truthy();
+			&& $context->true();
 	}
 
 	public function specifyTypes(
@@ -45,35 +47,22 @@ class DefinedConstantTypeSpecifyingExtension implements FunctionTypeSpecifyingEx
 		TypeSpecifierContext $context,
 	): SpecifiedTypes
 	{
-		$constantName = $scope->getType($node->getArgs()[0]->value);
-		if (
-			!$constantName instanceof ConstantStringType
-			|| $constantName->getValue() === ''
-		) {
+		$args = $node->getArgs();
+		$constantNames = $scope->getType($args[0]->value)->getConstantStrings();
+
+		if (count($constantNames) !== 1 || $constantNames[0]->getValue() === '') {
 			return new SpecifiedTypes([], []);
 		}
 
-		$classConstParts = explode('::', $constantName->getValue());
-		if (count($classConstParts) >= 2) {
-			$classConstName = new Node\Name\FullyQualified(ltrim($classConstParts[0], '\\'));
-			if ($classConstName->isSpecialClassName()) {
-				$classConstName = new Node\Name($classConstName->toString());
-			}
-			$constNode = new Node\Expr\ClassConstFetch(
-				$classConstName,
-				new Node\Identifier($classConstParts[1]),
-			);
-		} else {
-			$constNode = new Node\Expr\ConstFetch(
-				new Node\Name\FullyQualified($constantName->getValue()),
-			);
+		$expr = $this->constantHelper->createExprFromConstantName($constantNames[0]->getValue());
+		if ($expr === null) {
+			return new SpecifiedTypes([], []);
 		}
 
 		return $this->typeSpecifier->create(
-			$constNode,
+			$expr,
 			new MixedType(),
 			$context,
-			false,
 			$scope,
 		);
 	}

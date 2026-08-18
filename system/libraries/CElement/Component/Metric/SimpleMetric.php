@@ -2,20 +2,34 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-class CElement_Component_Metric_ValueMetric extends CElement_Component {
+class CElement_Component_Metric_SimpleMetric extends CElement_Component {
     use CElement_Trait_UseViewTrait;
     use CTrait_Element_Property_Icon;
     use CTrait_Element_Property_Label;
     use CTrait_Element_Property_Value;
 
+    /**
+     * @param null|string $id
+     *
+     * @return void
+     */
     public function __construct($id = null) {
         parent::__construct($id);
         $this->view = 'cresenity/element/component/metric/simple';
     }
 
+    /**
+     * @param mixed    $model
+     * @param callable $callback
+     *
+     * @return void
+     */
     public function setValueFromModel($model, $callback) {
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         if ($this->icon) {
             $this->viewData['icon'] = $this->icon;

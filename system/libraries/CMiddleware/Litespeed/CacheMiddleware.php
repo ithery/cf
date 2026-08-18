@@ -32,7 +32,7 @@ class CMiddleware_Litespeed_CacheMiddleware {
             return $response;
         }
 
-        $lscache_string = "max-age=${maxage},${cacheability}";
+        $lscache_string = "max-age={$maxage},{$cacheability}";
 
         if (isset($lscache_control)) {
             $lscache_string = str_replace(';', ',', $lscache_control);

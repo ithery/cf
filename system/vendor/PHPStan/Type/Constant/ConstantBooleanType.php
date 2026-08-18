@@ -2,21 +2,33 @@
 
 namespace PHPStan\Type\Constant;
 
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\TrinaryLogic;
+use PHPStan\Turbo\ReferencedByTurboExtension;
 use PHPStan\Type\BooleanType;
 use PHPStan\Type\ConstantScalarType;
+use PHPStan\Type\ErrorType;
 use PHPStan\Type\GeneralizePrecision;
+use PHPStan\Type\InstanceofDeprecated;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\StaticTypeFactory;
 use PHPStan\Type\Traits\ConstantScalarTypeTrait;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\VerbosityLevel;
 
 /** @api */
+#[ReferencedByTurboExtension(key: 'constantBooleanType')]
+#[InstanceofDeprecated(insteadUse: 'Type::isTrue() or Type::isFalse()')]
 class ConstantBooleanType extends BooleanType implements ConstantScalarType
 {
 
-	use ConstantScalarTypeTrait;
+	use ConstantScalarTypeTrait {
+		looseCompare as private scalarLooseCompare;
+	}
 
 	/** @api */
 	public function __construct(private bool $value)
@@ -34,7 +46,7 @@ class ConstantBooleanType extends BooleanType implements ConstantScalarType
 		return $this->value ? 'true' : 'false';
 	}
 
-	public function getSmallerType(): Type
+	public function getSmallerType(PhpVersion $phpVersion): Type
 	{
 		if ($this->value) {
 			return StaticTypeFactory::falsey();
@@ -42,7 +54,7 @@ class ConstantBooleanType extends BooleanType implements ConstantScalarType
 		return new NeverType();
 	}
 
-	public function getSmallerOrEqualType(): Type
+	public function getSmallerOrEqualType(PhpVersion $phpVersion): Type
 	{
 		if ($this->value) {
 			return new MixedType();
@@ -50,7 +62,7 @@ class ConstantBooleanType extends BooleanType implements ConstantScalarType
 		return StaticTypeFactory::falsey();
 	}
 
-	public function getGreaterType(): Type
+	public function getGreaterType(PhpVersion $phpVersion): Type
 	{
 		if ($this->value) {
 			return new NeverType();
@@ -58,7 +70,7 @@ class ConstantBooleanType extends BooleanType implements ConstantScalarType
 		return StaticTypeFactory::truthy();
 	}
 
-	public function getGreaterOrEqualType(): Type
+	public function getGreaterOrEqualType(PhpVersion $phpVersion): Type
 	{
 		if ($this->value) {
 			return StaticTypeFactory::truthy();
@@ -74,6 +86,16 @@ class ConstantBooleanType extends BooleanType implements ConstantScalarType
 	public function toNumber(): Type
 	{
 		return new ConstantIntegerType((int) $this->value);
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toAbsoluteNumber(): Type
+	{
+		return $this->toNumber()->toAbsoluteNumber();
 	}
 
 	public function toString(): Type
@@ -96,17 +118,42 @@ class ConstantBooleanType extends BooleanType implements ConstantScalarType
 		return new ConstantIntegerType((int) $this->value);
 	}
 
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		if (!$strictTypes) {
+			return TypeCombinator::union($this->toInteger(), $this->toFloat(), $this->toString(), $this);
+		}
+
+		return $this;
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean($this->value === true);
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		return TrinaryLogic::createFromBoolean($this->value === false);
+	}
+
 	public function generalize(GeneralizePrecision $precision): Type
 	{
 		return new BooleanType();
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function toPhpDocNode(): TypeNode
 	{
-		return new self($properties['value']);
+		return new IdentifierTypeNode($this->value ? 'true' : 'false');
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		if ($type->isObject()->yes()) {
+			return $this;
+		}
+
+		return $this->scalarLooseCompare($type, $phpVersion);
 	}
 
 }

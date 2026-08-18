@@ -1,11 +1,8 @@
 <?php
 
-/**
- * Description of MethodAbstract.
- *
- * @author Hery
- */
-abstract class CApi_MethodAbstract implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+abstract class CApi_MethodAbstract implements Arrayable {
     /**
      * @var int
      */
@@ -36,6 +33,9 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
      */
     protected $sessionId = null;
 
+    /**
+     * @var null|CApi_Session
+     */
     protected $session;
 
     /**
@@ -55,10 +55,19 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         'expiration' => null,
     ];
 
+    /**
+     * @var int
+     */
     protected $orgId;
 
+    /**
+     * @var string
+     */
     protected $sessionIdParameter = 'sessionId';
 
+    /**
+     * @var string
+     */
     protected $group;
 
     public function __construct($orgId = null, $sessionId = null, $request = null) {
@@ -79,10 +88,24 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         return $this;
     }
 
+    /**
+     * Set the group for the method.
+     *
+     * @param string $group
+     *
+     * @return $this
+     */
     public function setGroup($group) {
         $this->group = $group;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroup() {
+        return $this->group;
     }
 
     public function getApiRequest() {
@@ -171,6 +194,14 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         return $this->errCode > 0;
     }
 
+    /**
+     * Get the translated message for the given key.
+     *
+     * @param string $message
+     * @param array  $params
+     *
+     * @return string
+     */
     public function lang($message, $params = []) {
         return c::__($message, $params, $this->lang);
     }
@@ -190,11 +221,39 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
         return CApi::session($this->sessionId(), $this->sessionOptions);
     }
 
+    /**
+     * Validate the given data against the specified rules.
+     *
+     * @param array|null $data
+     * @param array      $rules
+     * @param array      $messages
+     *
+     * @return void
+     */
     protected function validate($data, $rules, $messages = []) {
         if ($data == null) {
             $data = $this->request();
         }
         $validator = CValidation::createValidator($data, $rules, $messages);
         $validator->validate();
+    }
+
+    protected function manager() {
+        return CApi_Manager::instance($this->group);
+    }
+
+    protected function auth() {
+        return $this->manager()->auth();
+    }
+
+    /**
+     * @param string   $message
+     * @param null|int $errCode when null, increments the current errCode
+     *
+     * @return void
+     */
+    protected function fail($message, $errCode = null) {
+        $this->errCode = $errCode !== null ? $errCode : $this->errCode + 1;
+        $this->errMessage = $message;
     }
 }

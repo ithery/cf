@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2019, 1:01:13 PM
- */
 use Psr\Cache\CacheItemInterface;
 
 class CCache_PsrBridge_CacheItem implements CacheItemInterface {

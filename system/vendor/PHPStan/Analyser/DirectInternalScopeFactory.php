@@ -2,108 +2,143 @@
 
 namespace PHPStan\Analyser;
 
-use PHPStan\DependencyInjection\Type\DynamicReturnTypeExtensionRegistryProvider;
+use PhpParser\Node;
+use PHPStan\Analyser\Fiber\FiberScope;
+use PHPStan\DependencyInjection\Container;
+use PHPStan\DependencyInjection\ExtensionsCollection;
 use PHPStan\Node\Printer\ExprPrinter;
 use PHPStan\Parser\Parser;
 use PHPStan\Php\PhpVersion;
-use PHPStan\Reflection\FunctionReflection;
+use PHPStan\Reflection\AttributeReflectionFactory;
 use PHPStan\Reflection\InitializerExprTypeResolver;
-use PHPStan\Reflection\MethodReflection;
-use PHPStan\Reflection\ParametersAcceptor;
+use PHPStan\Reflection\Php\PhpFunctionFromParserNodeReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Properties\PropertyReflectionFinder;
-use PHPStan\ShouldNotHappenException;
-use function is_a;
+use PHPStan\Type\ClosureType;
+use PHPStan\Type\ExpressionTypeResolverExtension;
 
-class DirectInternalScopeFactory implements InternalScopeFactory
+final class DirectInternalScopeFactory implements InternalScopeFactory
 {
 
 	/**
-	 * @param class-string $scopeClass
+	 * @param int|array{min: int, max: int}|null $configPhpVersion
+	 * @param callable(Node $node, Scope $scope): void|null $nodeCallback
+	 * @param ExtensionsCollection<ExpressionTypeResolverExtension> $expressionTypeResolverExtensions
 	 */
 	public function __construct(
-		private string $scopeClass,
+		private Container $container,
 		private ReflectionProvider $reflectionProvider,
 		private InitializerExprTypeResolver $initializerExprTypeResolver,
-		private DynamicReturnTypeExtensionRegistryProvider $dynamicReturnTypeExtensionRegistryProvider,
+		private ExtensionsCollection $expressionTypeResolverExtensions,
 		private ExprPrinter $exprPrinter,
 		private TypeSpecifier $typeSpecifier,
 		private PropertyReflectionFinder $propertyReflectionFinder,
 		private Parser $parser,
-		private NodeScopeResolver $nodeScopeResolver,
-		private bool $treatPhpDocTypesAsCertain,
 		private PhpVersion $phpVersion,
-		private bool $explicitMixedInUnknownGenericNew,
-		private bool $explicitMixedForGlobalVariables,
+		private AttributeReflectionFactory $attributeReflectionFactory,
+		private int|array|null $configPhpVersion,
+		private $nodeCallback,
 		private ConstantResolver $constantResolver,
+		private bool $fiber = false,
 	)
 	{
 	}
 
-	/**
-	 * @param ExpressionTypeHolder[] $expressionTypes
-	 * @param array<string, ConditionalExpressionHolder[]> $conditionalExpressions
-	 * @param array<string, true> $currentlyAssignedExpressions
-	 * @param array<string, true> $currentlyAllowedUndefinedExpressions
-	 * @param ExpressionTypeHolder[] $nativeExpressionTypes
-	 * @param array<(FunctionReflection|MethodReflection)> $inFunctionCallsStack
-	 *
-	 */
 	public function create(
 		ScopeContext $context,
 		bool $declareStrictTypes = false,
-		FunctionReflection|MethodReflection|null $function = null,
+		PhpFunctionFromParserNodeReflection|null $function = null,
 		?string $namespace = null,
 		array $expressionTypes = [],
+		array $nativeExpressionTypes = [],
 		array $conditionalExpressions = [],
-		?string $inClosureBindScopeClass = null,
-		?ParametersAcceptor $anonymousFunctionReflection = null,
+		array $inClosureBindScopeClasses = [],
+		?ClosureType $anonymousFunctionReflection = null,
 		bool $inFirstLevelStatement = true,
 		array $currentlyAssignedExpressions = [],
 		array $currentlyAllowedUndefinedExpressions = [],
-		array $nativeExpressionTypes = [],
 		array $inFunctionCallsStack = [],
 		bool $afterExtractCall = false,
-		?Scope $parentScope = null,
+		?MutatingScope $parentScope = null,
 		bool $nativeTypesPromoted = false,
 	): MutatingScope
 	{
-		$scopeClass = $this->scopeClass;
-		if (!is_a($scopeClass, MutatingScope::class, true)) {
-			throw new ShouldNotHappenException();
+		$className = MutatingScope::class;
+		if ($this->fiber) {
+			$className = FiberScope::class;
 		}
 
-		return new $scopeClass(
+		return new $className(
+			$this->container,
 			$this,
 			$this->reflectionProvider,
 			$this->initializerExprTypeResolver,
-			$this->dynamicReturnTypeExtensionRegistryProvider->getRegistry(),
+			$this->expressionTypeResolverExtensions,
 			$this->exprPrinter,
 			$this->typeSpecifier,
 			$this->propertyReflectionFinder,
 			$this->parser,
-			$this->nodeScopeResolver,
 			$this->constantResolver,
 			$context,
 			$this->phpVersion,
+			$this->attributeReflectionFactory,
+			$this->configPhpVersion,
+			$this->nodeCallback,
 			$declareStrictTypes,
 			$function,
 			$namespace,
 			$expressionTypes,
+			$nativeExpressionTypes,
 			$conditionalExpressions,
-			$inClosureBindScopeClass,
+			$inClosureBindScopeClasses,
 			$anonymousFunctionReflection,
 			$inFirstLevelStatement,
 			$currentlyAssignedExpressions,
 			$currentlyAllowedUndefinedExpressions,
-			$nativeExpressionTypes,
 			$inFunctionCallsStack,
-			$this->treatPhpDocTypesAsCertain,
 			$afterExtractCall,
 			$parentScope,
 			$nativeTypesPromoted,
-			$this->explicitMixedInUnknownGenericNew,
-			$this->explicitMixedForGlobalVariables,
+		);
+	}
+
+	public function toFiberFactory(): InternalScopeFactory
+	{
+		return new self(
+			$this->container,
+			$this->reflectionProvider,
+			$this->initializerExprTypeResolver,
+			$this->expressionTypeResolverExtensions,
+			$this->exprPrinter,
+			$this->typeSpecifier,
+			$this->propertyReflectionFinder,
+			$this->parser,
+			$this->phpVersion,
+			$this->attributeReflectionFactory,
+			$this->configPhpVersion,
+			$this->nodeCallback,
+			$this->constantResolver,
+			true,
+		);
+	}
+
+	public function toMutatingFactory(): InternalScopeFactory
+	{
+		return new self(
+			$this->container,
+			$this->reflectionProvider,
+			$this->initializerExprTypeResolver,
+			$this->expressionTypeResolverExtensions,
+			$this->exprPrinter,
+			$this->typeSpecifier,
+			$this->propertyReflectionFinder,
+			$this->parser,
+			$this->phpVersion,
+			$this->attributeReflectionFactory,
+			$this->configPhpVersion,
+			$this->nodeCallback,
+			$this->constantResolver,
+			false,
 		);
 	}
 

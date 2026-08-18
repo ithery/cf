@@ -21,6 +21,11 @@ class CElement_FormInput_GoogleRecaptcha extends CElement_FormInput {
      */
     protected $recaptchaInputName;
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'hidden';
@@ -31,12 +36,18 @@ class CElement_FormInput_GoogleRecaptcha extends CElement_FormInput {
         $this->addClass('capp-google-recaptcha-control');
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
         parent::build();
     }
 
+    /**
+     * @return CVendor_Google_Recaptcha_AbstractRecaptcha
+     */
     public function getRecaptcha() {
         if ($this->recaptcha == null) {
             $this->recaptcha = CVendor_Google::recaptchaV3();
@@ -45,34 +56,62 @@ class CElement_FormInput_GoogleRecaptcha extends CElement_FormInput {
         return $this->recaptcha;
     }
 
+    /**
+     * @param CVendor_Google_Recaptcha_AbstractRecaptcha $recaptcha
+     *
+     * @return $this
+     */
     public function setRecaptcha(CVendor_Google_Recaptcha_AbstractRecaptcha $recaptcha) {
         $this->recaptcha = $recaptcha;
 
         return $this;
     }
 
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
     public function setRecaptchaType($type) {
         $this->recaptchaType = $type;
 
         return $this;
     }
 
+    /**
+     * @param string $label
+     *
+     * @return $this
+     */
     public function setRecaptchaLabel($label) {
         $this->recaptchaLabel = $label;
 
         return $this;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
     public function setRecaptchaInputName($name) {
         $this->recaptchaInputName = $name;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     protected function buttonCallbackName() {
         return cstr::camel($this->id) . 'CallbackSubmit';
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $recaptcha = $this->getRecaptcha();
         $html = '';
@@ -94,6 +133,11 @@ class CElement_FormInput_GoogleRecaptcha extends CElement_FormInput {
         return $html;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $recaptcha = $this->getRecaptcha();
         $js = '';

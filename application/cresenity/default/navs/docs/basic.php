@@ -2,9 +2,9 @@
 
 return [
     [
-        'name' => 'basic.auto',
-        'label' => c::__('Auto Loading'),
-        'uri' => 'docs/basic/auto',
+        'name' => 'basic.coding',
+        'label' => c::__('Coding Standard'),
+        'uri' => 'docs/basic/coding',
     ],
     [
         'name' => 'basic.bootstrap',
@@ -35,5 +35,15 @@ return [
         'name' => 'basic.base',
         'label' => c::__('Base Class'),
         'uri' => 'docs/basic/base',
+    ],
+    [
+        'name' => 'basic.database',
+        'label' => c::__('Database'),
+        'uri' => 'docs/basic/database',
+    ],
+    [
+        'name' => 'basic.i18n',
+        'label' => c::__('Translation (i18n)'),
+        'uri' => 'docs/basic/i18n',
     ],
 ];

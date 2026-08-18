@@ -1,8 +1,17 @@
 <?php
 
+/**
+ * Description of Nginx.
+ */
 class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
+    /**
+     * @var CDevSuite_PackageManager
+     */
     public $pm;
 
+    /**
+     * @var CDevSuite_ServiceManager
+     */
     public $sm;
 
     /**
@@ -10,10 +19,19 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
      */
     public $site;
 
+    /**
+     * @var string
+     */
     public $nginx_conf;
 
+    /**
+     * @var string
+     */
     public $sites_available_conf;
 
+    /**
+     * @var string
+     */
     public $sites_enabled_conf;
 
     /**

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 15, 2019, 12:16:50 PM
- */
 final class CDaemon_Worker_MediatorObject extends CDaemon_Worker_MediatorAbstract {
     /**
      * @var CDaemon_WorkerAbstract
@@ -15,7 +9,7 @@ final class CDaemon_Worker_MediatorObject extends CDaemon_Worker_MediatorAbstrac
     protected $object;
 
     /**
-     * The mediated $object's class
+     * The mediated $object's class.
      *
      * @var
      */
@@ -46,6 +40,7 @@ final class CDaemon_Worker_MediatorObject extends CDaemon_Worker_MediatorAbstrac
         if (is_array($object_errors)) {
             $errors = array_merge($errors, $object_errors);
         }
+
         return parent::checkEnvironment($errors);
     }
 
@@ -54,6 +49,7 @@ final class CDaemon_Worker_MediatorObject extends CDaemon_Worker_MediatorAbstrac
         if (is_callable($cb)) {
             return $cb;
         }
+
         throw new Exception("$method() is Not Callable.");
     }
 
@@ -61,7 +57,7 @@ final class CDaemon_Worker_MediatorObject extends CDaemon_Worker_MediatorAbstrac
      * Return an instance of $object, allowing inline (synchronous) calls that bypass the mediator.
      * Useful if you want to call methods in-process for some reason.
      * Note: Timeouts will not be enforced
-     * Note: Your daemon event loop will be blocked until your method calls return.frr
+     * Note: Your daemon event loop will be blocked until your method calls return.frr.
      *
      * @example Your worker object returns data from a webservice, you can put methods in the class to format the data.
      *          In that case you can call it in-process for brevity and convenience.

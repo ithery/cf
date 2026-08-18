@@ -2,15 +2,18 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 8, 2018, 4:19:33 AM
- */
 class CApp_Message {
+    /**
+     * @param string $type
+     * @param string $message
+     *
+     * @return void
+     */
     public static function add($type, $message) {
-        $session = CSession::instance();
+        $session = CSession::store();
+        if ($session == null) {
+            return;
+        }
         $msgs = $session->get('cmsg_' . $type);
         if (!is_array($msgs)) {
             $msgs = [];
@@ -19,17 +22,36 @@ class CApp_Message {
         $session->set('cmsg_' . $type, $msgs);
     }
 
+    /**
+     * @param string $type
+     *
+     * @return null|array|string
+     */
     public static function get($type) {
-        $session = CSession::instance();
+        $session = CSession::store();
+        if ($session == null) {
+            return;
+        }
 
         return $session->get('cmsg_' . $type);
     }
 
+    /**
+     * @param string $type
+     *
+     * @return void
+     */
     public static function clear($type) {
-        $session = CSession::instance();
+        $session = CSession::store();
+        if ($session == null) {
+            return;
+        }
         $session->set('cmsg_' . $type, null);
     }
 
+    /**
+     * @return void
+     */
     public static function clearAll() {
         self::clear('error');
         self::clear('warning');
@@ -37,6 +59,11 @@ class CApp_Message {
         self::clear('success');
     }
 
+    /**
+     * @param string $type
+     *
+     * @return string
+     */
     public static function flash($type) {
         $msgs = static::get($type);
         $message = '';
@@ -63,6 +90,9 @@ class CApp_Message {
         return $message;
     }
 
+    /**
+     * @return string
+     */
     public static function flashAll() {
         return static::flash('error') . static::flash('warning') . static::flash('info') . static::flash('success');
     }

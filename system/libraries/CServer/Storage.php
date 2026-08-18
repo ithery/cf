@@ -2,13 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 13, 2018, 10:20:40 AM
- */
-class CServer_Storage extends CServer_Base {
+class CServer_Storage {
     const SHOW_MOUNT_OPTION = true;
 
     const SHOW_MOUNT_POINT = true;
@@ -17,7 +11,15 @@ class CServer_Storage extends CServer_Base {
 
     const SHOW_INODES = true;
 
-    protected static $instance = [];
+    /**
+     * @var CServer_Server
+     */
+    protected $server;
+
+    /**
+     * @var CServer_Storage_Info
+     */
+    protected $info;
 
     /**
      * @var CServer_Storage_OS
@@ -25,44 +27,26 @@ class CServer_Storage extends CServer_Base {
     protected $os;
 
     /**
-     * @var CServer_Storage_Info
+     * @param CServer_Server $server
      */
-    protected $info;
-
-    protected $freeSpace;
-
-    protected $totalSpace;
-
-    public function __construct($sshConfig = null) {
-        $os = CServer::getOS();
+    public function __construct(CServer_Server $server) {
+        $this->server = $server;
         $this->info = new CServer_Storage_Info();
-        $osClass = 'CServer_Storage_OS_' . $os;
-        $this->os = new $osClass($this, $this->info);
-        $this->sshConfig = $sshConfig;
-        $this->host = carr::get($sshConfig, 'host');
+        $osName = $server->getOS();
+        $osClass = 'CServer_Storage_OS_' . $osName;
+        $this->os = new $osClass($server, $this->info);
     }
 
     /**
-     * @param array $sshConfig
-     *
-     * @return CServer_Storage
+     * @return CServer_Server
      */
-    public static function instance(array $sshConfig = null) {
-        if (!is_array(self::$instance)) {
-            self::$instance = [];
-        }
-        $host = 'localhost';
-
-        if ($sshConfig != null) {
-            $host = carr::get($sshConfig, 'host');
-        }
-        if (!isset(self::$instance[$host])) {
-            self::$instance[$host] = new CServer_Storage($sshConfig);
-        }
-
-        return self::$instance[$host];
+    public function getServer() {
+        return $this->server;
     }
 
+    /**
+     * @return array
+     */
     public function getDiskDevices() {
         if (!$this->info->getDiskDevices()) {
             $this->os->buildDiskDevices();
@@ -75,18 +59,35 @@ class CServer_Storage extends CServer_Base {
      * @return float
      */
     public function getFreeSpace() {
-        if ($this->freeSpace == null) {
-            $this->freeSpace = disk_free_space('/');
+        if ($this->server->isRemote()) {
+            $output = '';
+            $this->server->executeProgram('df', '-k / | tail -1', $output);
+            $parts = preg_split('/\s+/', trim($output));
+            if (isset($parts[3])) {
+                return (float) $parts[3] * 1024;
+            }
+
+            return 0.0;
         }
 
-        return $this->freeSpace;
+        return (float) disk_free_space('/');
     }
 
+    /**
+     * @return float
+     */
     public function getTotalSpace() {
-        if ($this->totalSpace == null) {
-            $this->totalSpace = @disk_total_space('/');
+        if ($this->server->isRemote()) {
+            $output = '';
+            $this->server->executeProgram('df', '-k / | tail -1', $output);
+            $parts = preg_split('/\s+/', trim($output));
+            if (isset($parts[1])) {
+                return (float) $parts[1] * 1024;
+            }
+
+            return 0.0;
         }
 
-        return $this->totalSpace;
+        return (float) @disk_total_space('/');
     }
 }

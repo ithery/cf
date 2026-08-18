@@ -4,18 +4,19 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
-use PHPStan\Type\ArrayType;
+use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
-use PHPStan\Type\MixedType;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeUtils;
 use SimpleXMLElement;
+use function extension_loaded;
 
-class SimpleXMLElementXpathMethodReturnTypeExtension implements DynamicMethodReturnTypeExtension
+#[AutowiredService]
+final class SimpleXMLElementXpathMethodReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {
 
 	public function getClass(): string
@@ -25,34 +26,37 @@ class SimpleXMLElementXpathMethodReturnTypeExtension implements DynamicMethodRet
 
 	public function isMethodSupported(MethodReflection $methodReflection): bool
 	{
-		return $methodReflection->getName() === 'xpath';
+		return extension_loaded('simplexml') && $methodReflection->getName() === 'xpath';
 	}
 
-	public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): Type
+	public function getTypeFromMethodCall(MethodReflection $methodReflection, MethodCall $methodCall, Scope $scope): ?Type
 	{
-		if (!isset($methodCall->getArgs()[0])) {
-			return ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+		$args = $methodCall->getArgs();
+		if (!isset($args[0])) {
+			return null;
 		}
 
-		$argType = $scope->getType($methodCall->getArgs()[0]->value);
+		$argType = $scope->getType($args[0]->value);
 
 		$xmlElement = new SimpleXMLElement('<foo />');
 
-		foreach (TypeUtils::getConstantStrings($argType) as $constantString) {
+		foreach ($argType->getConstantStrings() as $constantString) {
 			$result = @$xmlElement->xpath($constantString->getValue());
 			if ($result === false) {
 				// We can't be sure since it's maybe a namespaced xpath
-				return ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+				return null;
 			}
 
 			$argType = TypeCombinator::remove($argType, $constantString);
 		}
 
 		if (!$argType instanceof NeverType) {
-			return ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+			return null;
 		}
 
-		return new ArrayType(new MixedType(), $scope->getType($methodCall->var));
+		$variant = ParametersAcceptorSelector::selectFromArgs($scope, $args, $methodReflection->getVariants());
+
+		return TypeCombinator::remove($variant->getReturnType(), new ConstantBooleanType(false));
 	}
 
 }

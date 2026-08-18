@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 1:22:39 PM
- */
 class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Handler {
     use CTrait_Compat_Handler_Driver_Reload,
         CObservable_Listener_Handler_Trait_TargetHandlerTrait,
@@ -20,11 +14,13 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
 
     protected $param;
 
+    protected $urlParam;
+
     public function __construct($listener) {
         parent::__construct($listener);
         $this->method = 'get';
         $this->target = '';
-        $this->content = CHandlerElement::factory();
+        $this->content = CObservable_HandlerElement::factory();
         $this->paramInputs = [];
         $this->paramInputsByName = [];
         $this->paramRequest = [];

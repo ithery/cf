@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Nov 28, 2020
- */
 trait CView_Trait_ManageLoopTrait {
     /**
      * The stack of in-progress loops.
@@ -73,7 +67,7 @@ trait CView_Trait_ManageLoopTrait {
     /**
      * Get an instance of the last loop in the stack.
      *
-     * @return \stdClass|null
+     * @return null|\stdClass
      */
     public function getLastLoop() {
         if ($last = carr::last($this->loopsStack)) {

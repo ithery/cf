@@ -2,6 +2,8 @@
 
 namespace PHPStan\File;
 
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use function count;
 use function explode;
 use function implode;
@@ -9,12 +11,13 @@ use function in_array;
 use function ltrim;
 use function realpath;
 use function str_ends_with;
+use function str_starts_with;
 use function strlen;
-use function strpos;
 use function substr;
 use const DIRECTORY_SEPARATOR;
 
-class FuzzyRelativePathHelper implements RelativePathHelper
+#[AutowiredService(name: 'relativePathHelper', as: RelativePathHelper::class)]
+final class FuzzyRelativePathHelper implements RelativePathHelper
 {
 
 	private string $directorySeparator;
@@ -26,8 +29,11 @@ class FuzzyRelativePathHelper implements RelativePathHelper
 	 * @param non-empty-string|null $directorySeparator
 	 */
 	public function __construct(
+		#[AutowiredParameter(ref: '@parentDirectoryRelativePathHelper')]
 		private RelativePathHelper $fallbackRelativePathHelper,
+		#[AutowiredParameter]
 		string $currentWorkingDirectory,
+		#[AutowiredParameter]
 		array $analysedPaths,
 		?string $directorySeparator = null,
 	)
@@ -40,7 +46,7 @@ class FuzzyRelativePathHelper implements RelativePathHelper
 		$pathBeginning = null;
 		$pathToTrimArray = null;
 		$trimBeginning = static function (string $path): array {
-			if (substr($path, 0, 1) === '/') {
+			if (str_starts_with($path, '/')) {
 				return [
 					'/',
 					substr($path, 1),
@@ -61,17 +67,16 @@ class FuzzyRelativePathHelper implements RelativePathHelper
 		) {
 			[$pathBeginning, $currentWorkingDirectory] = $trimBeginning($currentWorkingDirectory);
 
-			/** @var string[] $pathToTrimArray */
 			$pathToTrimArray = explode($directorySeparator, $currentWorkingDirectory);
 		}
 		foreach ($analysedPaths as $pathNumber => $path) {
 			[$tempPathBeginning, $path] = $trimBeginning($path);
 
-			/** @var string[] $pathArray */
 			$pathArray = explode($directorySeparator, $path);
 			$pathTempParts = [];
+			$pathArraySize = count($pathArray);
 			foreach ($pathArray as $i => $pathPart) {
-				if (str_ends_with($pathPart, '.php')) {
+				if ($i === $pathArraySize - 1 && str_ends_with($pathPart, '.php')) {
 					continue;
 				}
 				if (!isset($pathToTrimArray[$i])) {
@@ -108,7 +113,7 @@ class FuzzyRelativePathHelper implements RelativePathHelper
 	{
 		if (
 			$this->pathToTrim !== null
-			&& strpos($filename, $this->pathToTrim) === 0
+			&& str_starts_with($filename, $this->pathToTrim)
 		) {
 			return ltrim(substr($filename, strlen($this->pathToTrim)), $this->directorySeparator);
 		}

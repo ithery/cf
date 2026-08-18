@@ -1,11 +1,55 @@
 # Element - ShowMore
-### Introduction
 
-Element ShowMore digunakan untuk mempresentasikan ui jika suatu content terlalu panjang
+The `CElement_Component_ShowMore` component truncates long content and adds a "Show More" / "Show Less" toggle button.
 
-Contoh Sederhana untuk show more
+Add a show more element using `addShowMore()`:
+
 ```php
+$app = c::app();
+$app->addShowMore()->setLimit(100)->add(
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, '
+    . 'sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. '
+    . 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.'
+);
 
-$app->addShowMore()->setLimit(50)->add('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.');
+return $app;
+```
 
+---
+
+### Character Limit
+
+Set the number of characters to show before truncating:
+
+```php
+$showMore = $app->addShowMore();
+$showMore->setLimit(50);
+$showMore->add('Very long text content...');
+```
+
+---
+
+### Usage in Data Table
+
+ShowMore is commonly used inside table column callbacks for displaying long text:
+
+```php
+$table->addColumn('description')->setLabel('Description')
+    ->setCallback(function ($row, $value) {
+        return CElement_Component_ShowMore::factory()
+            ->setLimit(100)
+            ->add($value);
+    });
+```
+
+With JSON formatting:
+
+```php
+$table->addColumn('payload')->setLabel('Payload')
+    ->setCallback(function ($row, $value) {
+        return CElement_Component_ShowMore::factory()
+            ->addClass('whitespace-pre')
+            ->setLimit(200)
+            ->add(json_encode(json_decode($value, true), JSON_PRETTY_PRINT));
+    });
 ```

@@ -24,6 +24,7 @@ class CPeriod_Collection implements ArrayAccess, Iterator, Countable {
     /**
      * @return CPeriod
      */
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->periods[$this->position];
     }
@@ -113,7 +114,7 @@ class CPeriod_Collection implements ArrayAccess, Iterator, Countable {
      *
      * @return static
      */
-    public function add(Period ...$periods) {
+    public function add(CPeriod ...$periods) {
         $collection = clone $this;
 
         foreach ($periods as $period) {

@@ -132,7 +132,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
         $subject = null,
         $plainTextContent = null,
         $htmlContent = null,
-        array $globalSubstitutions = null
+        ?array $globalSubstitutions = null
     ) {
         if (!isset($from) && !isset($to) && !isset($subject) && !isset($plainTextContent) && !isset($htmlContent) && !isset($globalSubstitutions)
         ) {
@@ -1858,6 +1858,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      *
      * @return null|array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         // Detect if we are using the new dynamic templates
         $template_id = $this->getTemplateId();

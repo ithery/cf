@@ -4,15 +4,20 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
+use PHPStan\Type\ErrorType;
+use PHPStan\Type\FloatType;
+use PHPStan\Type\IntegerType;
 use PHPStan\Type\NullType;
 use PHPStan\Type\Type;
 use function count;
 use function in_array;
 
-class StrvalFamilyFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class StrvalFamilyFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	private const FUNCTIONS = [
@@ -44,12 +49,14 @@ class StrvalFamilyFunctionReturnTypeExtension implements DynamicFunctionReturnTy
 			case 'strval':
 				return $argType->toString();
 			case 'intval':
-				return $argType->toInteger();
+				$type = $argType->toInteger();
+				return $type instanceof ErrorType ? new IntegerType() : $type;
 			case 'boolval':
 				return $argType->toBoolean();
 			case 'floatval':
 			case 'doubleval':
-				return $argType->toFloat();
+				$type = $argType->toFloat();
+				return $type instanceof ErrorType ? new FloatType() : $type;
 			default:
 				throw new ShouldNotHappenException();
 		}

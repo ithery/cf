@@ -114,7 +114,6 @@ class CDaemon_Supervisor_ProvisioningPlan {
      * @return void
      */
     protected function add(CDaemon_Supervisor_SupervisorOptions $options) {
-        CDaemon::log('master:' . $this->master);
         CDaemon_Supervisor::supervisorCommandQueue()->push(
             CDaemon_Supervisor_MasterSupervisor::commandQueueFor($this->master),
             CDaemon_Supervisor_MasterSupervisorCommand_AddSupervisor::class,

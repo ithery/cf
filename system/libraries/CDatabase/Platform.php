@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:57:18 AM
- */
 abstract class CDatabase_Platform {
     /**
      * @var int
@@ -381,6 +375,7 @@ abstract class CDatabase_Platform {
         if ($this->doctrineTypeMapping === null) {
             $this->initializeAllDoctrineTypeMappings();
         }
+
         $dbType = strtolower($dbType);
 
         if (!isset($this->doctrineTypeMapping[$dbType])) {
@@ -1434,8 +1429,7 @@ abstract class CDatabase_Platform {
         $columns = [];
 
         foreach ($table->getColumns() as $column) {
-            /* @var CDatabase_Schema_Column $column */
-
+            /** @var CDatabase_Schema_Column $column */
             if (null !== $this->eventDispatcher) {
                 $eventArgs = new CDatabase_Event_Schema_OnCreateTableColumn($column, $table, $this);
                 $this->eventDispatcher->dispatch($eventArgs);
@@ -1478,7 +1472,6 @@ abstract class CDatabase_Platform {
                 return array_merge($eventArgs->getSql(), $columnSql);
             }
         }
-
         $sql = $this->protectedGetCreateTableSQL($tableName, $columns, $options);
         if ($this->supportsCommentOnStatement()) {
             foreach ($table->getColumns() as $column) {

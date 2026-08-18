@@ -2,18 +2,20 @@
 
 namespace PHPStan\Rules\Generics;
 
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Rules\RuleError;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\VerbosityLevel;
 use function array_key_exists;
 use function sprintf;
 
-class CrossCheckInterfacesHelper
+#[AutowiredService]
+final class CrossCheckInterfacesHelper
 {
 
 	/**
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
 	public function check(ClassReflection $classReflection): array
 	{
@@ -44,7 +46,7 @@ class CrossCheckInterfacesHelper
 							$interface->getName(),
 							$type->describe(VerbosityLevel::value()),
 							$otherType->describe(VerbosityLevel::value()),
-						))->build();
+						))->identifier('generics.interfaceConflict')->build();
 					}
 					continue;
 				}

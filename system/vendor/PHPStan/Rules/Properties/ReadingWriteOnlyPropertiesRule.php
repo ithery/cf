@@ -4,6 +4,8 @@ namespace PHPStan\Rules\Properties;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
@@ -12,13 +14,15 @@ use function sprintf;
 /**
  * @implements Rule<Node\Expr>
  */
-class ReadingWriteOnlyPropertiesRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ReadingWriteOnlyPropertiesRule implements Rule
 {
 
 	public function __construct(
 		private PropertyDescriptor $propertyDescriptor,
 		private PropertyReflectionFinder $propertyReflectionFinder,
 		private RuleLevelHelper $ruleLevelHelper,
+		#[AutowiredParameter]
 		private bool $checkThisOnly,
 	)
 	{
@@ -54,18 +58,20 @@ class ReadingWriteOnlyPropertiesRule implements Rule
 		if ($propertyReflection === null) {
 			return [];
 		}
-		if (!$scope->canAccessProperty($propertyReflection)) {
+		if (!$scope->canReadProperty($propertyReflection)) {
 			return [];
 		}
 
 		if (!$propertyReflection->isReadable()) {
-			$propertyDescription = $this->propertyDescriptor->describeProperty($propertyReflection, $node);
+			$propertyDescription = $this->propertyDescriptor->describeProperty($propertyReflection, $scope, $node);
 
 			return [
 				RuleErrorBuilder::message(sprintf(
 					'%s is not readable.',
 					$propertyDescription,
-				))->build(),
+				))
+					->identifier('property.writeOnly')
+					->build(),
 			];
 		}
 

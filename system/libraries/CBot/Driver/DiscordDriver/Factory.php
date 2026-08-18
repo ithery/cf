@@ -17,8 +17,8 @@ class CBot_Driver_DiscordDriver_Factory {
     public static function createForDiscord(
         array $config,
         LoopInterface $loop,
-        CCache_Repository $cache = null,
-        CBot_Contract_StorageInterface $storageDriver = null
+        ?CCache_Repository $cache = null,
+        ?CBot_Contract_StorageInterface $storageDriver = null
     ) {
         $client = new Discord([
             'token' => CCollection::make($config['discord'])->get('token'),
@@ -43,8 +43,8 @@ class CBot_Driver_DiscordDriver_Factory {
     public static function createUsingDiscord(
         array $config,
         Discord $client,
-        CCache_Repository $cache = null,
-        CBot_Contract_StorageInterface $storageDriver = null
+        ?CCache_Repository $cache = null,
+        ?CBot_Contract_StorageInterface $storageDriver = null
     ) {
         if (empty($cache)) {
             $cache = CCache::manager()->driver('array');

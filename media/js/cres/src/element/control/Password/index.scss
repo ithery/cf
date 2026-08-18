@@ -1,0 +1,68 @@
+/*
+ * Tombol tampilkan/sembunyikan kata sandi.
+ *
+ * Tombolnya diletakkan *di atas* input, bukan sebagai kolom di sebelahnya.
+ * Sebagai kolom, tata letaknya bergantung pada Bootstrap: `.input-group` harus
+ * flex dan `.form-control` di dalamnya harus `width: 1%`. Bila salah satunya
+ * tidak ada — aplikasi tanpa Bootstrap, atau tema yang menimpa lebar input —
+ * tombolnya turun ke baris berikutnya tanpa bingkai apa pun. Diposisikan
+ * absolut, tata letaknya hanya bergantung pada wadahnya sendiri.
+ *
+ * Semua pemilihnya dinaikkan kekhususannya (dua kelas atau lebih) dengan
+ * sengaja: cres.css dimuat *sebelum* stylesheet tema, jadi aturan berkekhususan
+ * sama akan kalah.
+ */
+.cres-password-group {
+    position: relative;
+
+    > .cres\:element\:control\:Password {
+        /* ruang untuk tombolnya, supaya teks kata sandi tidak tertimpa */
+        padding-right: 2.5rem;
+    }
+
+    > .input-group-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 4; /* di atas .form-control:focus milik Bootstrap (z-index 3) */
+        display: flex;
+        align-items: center;
+        margin: 0;
+        width: auto;
+
+        > .btn-view {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 0 0.75rem;
+            border: 0;
+            background: none;
+            box-shadow: none;
+            /* mengikuti warna teks tema, jadi terbaca di terang maupun gelap */
+            color: inherit;
+            opacity: 0.5;
+            cursor: pointer;
+            transition: opacity 0.15s ease-in-out;
+
+            &:hover,
+            &:focus {
+                opacity: 1;
+                background: none;
+                box-shadow: none;
+            }
+
+            &:focus-visible {
+                outline: 2px solid currentColor;
+                outline-offset: -2px;
+            }
+
+            svg {
+                display: block;
+                width: 16px;
+                height: 16px;
+            }
+        }
+    }
+}

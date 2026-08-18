@@ -43,77 +43,67 @@ class CConsole_Command_Phpcs_InstallCommand extends CConsole_Command {
     }
 
     public function handle() {
-        $phpStan = CQC::phpcs();
         $this->downloadPhpcsPharOnBinPath();
         $this->downloadPhpcbfPharOnBinPath();
         $this->setupPhpcsConfig();
     }
 
     protected function downloadPhpcsPharOnBinPath() {
-        $pharPath = CQC::phpcs()->phpcsPhar();
-        if (!file_exists($pharPath)) {
-            $this->info('Downloading phpcs.phar');
-            $errCode = 0;
-            $errMessage = '';
-
-            try {
-                if (!CFile::isDirectory(dirname($pharPath))) {
-                    CFile::makeDirectory(dirname($pharPath), 0755, true);
-                }
-                copy('http://cpanel.ittron.co.id/application/devcloud/default/data/bin/phpcs/phpcs.phar', $pharPath);
-                $this->info($pharPath . ' downloaded');
-            } catch (Exception $ex) {
-                $errCode++;
-                $errMessage = $ex->getMessage();
-            }
-
-            if ($errCode > 0) {
-                $this->error($errMessage);
-
-                return false;
-            }
-        }
-
-        return true;
+        return $this->installPhar('phpcs', CQC::phpcs()->phpcsPhar());
     }
-
-
 
     protected function downloadPhpcbfPharOnBinPath() {
-        $pharPath = CQC::phpcs()->phpcbfPhar();
-        if (!file_exists($pharPath)) {
-            $this->info('Downloading phpcbf.phar');
-            $errCode = 0;
-            $errMessage = '';
+        //phpcbf harus seversi dengan phpcs - keduanya berbagi sniff yang sama,
+        //dan yang satu memperbaiki apa yang dilaporkan yang lain.
+        return $this->installPhar('phpcbf', CQC::phpcs()->phpcbfPhar());
+    }
 
-            try {
-                if (!CFile::isDirectory(dirname($pharPath))) {
-                    CFile::makeDirectory(dirname($pharPath), 0755, true);
-                }
-                copy('http://cpanel.ittron.co.id/application/devcloud/default/data/bin/phpcs/phpcbf.phar', $pharPath);
-                $this->info($pharPath . ' downloaded');
-            } catch (Exception $ex) {
-                $errCode++;
-                $errMessage = $ex->getMessage();
-            }
+    /**
+     * @param string $name     phpcs atau phpcbf
+     * @param string $pharPath
+     *
+     * @return bool
+     */
+    protected function installPhar($name, $pharPath) {
+        $version = CQC_Phpcs::VERSION;
+        $installed = CQC_Phpcs::installedVersion($pharPath);
 
-            if ($errCode > 0) {
-                $this->error($errMessage);
+        if ($installed === $version) {
+            $this->info($pharPath . ' is already installed (' . $version . ')');
 
-                return false;
-            }
+            return true;
         }
+
+        //Yang diperiksa versinya, bukan keberadaan berkasnya. Phar lama tetap
+        //ada di tempatnya dan lolos file_exists() walau versinya bukan yang
+        //didukung - sehingga tidak pernah tergantikan.
+        if (file_exists($pharPath)) {
+            $this->info('Replacing ' . $name . ' ' . ($installed == null ? '(unreadable)' : $installed) . ' with ' . $version);
+        }
+
+        $url = 'https://devcloud.cresenity.com/application/devcloud/default/data/bin/phpcs/' . $name . '.' . $version . '.phar';
+
+        $this->info('Downloading ' . basename($url));
+
+        try {
+            CQC::downloadPhar($url, $pharPath, $version);
+        } catch (Exception $ex) {
+            $this->error($ex->getMessage());
+
+            return false;
+        }
+
+        $this->info($pharPath . ' downloaded (' . $version . ')');
 
         return true;
     }
-
 
     protected function setupPhpcsConfig() {
         $configFile = CQC::phpcs()->phpcsConfiguration();
         if (!CFile::exists($configFile)) {
-            $stubFile = DOCROOT.'phpcs.xml';
+            $stubFile = DOCROOT . 'phpcs.xml';
             if (!$stubFile) {
-                $this->error('phpcs.xml not found on '.$stubFile);
+                $this->error('phpcs.xml not found on ' . $stubFile);
                 exit(1);
             }
             $content = CFile::get($stubFile);

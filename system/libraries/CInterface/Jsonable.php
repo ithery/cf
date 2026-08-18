@@ -1,17 +1,8 @@
 <?php
-
-defined('SYSPATH') or die('No direct access allowed.');
+use Illuminate\Contracts\Support\Jsonable;
 
 /**
- * @author Hery Kurniawan
+ * @deprecated 1.8 use Illuminate\Contracts\Support\Jsonable
  */
-interface CInterface_Jsonable {
-    /**
-     * Convert the object to its JSON representation.
-     *
-     * @param int $options
-     *
-     * @return string
-     */
-    public function toJson($options = 0);
+interface CInterface_Jsonable extends Jsonable {
 }

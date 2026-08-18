@@ -2,14 +2,21 @@
 
 /**
  * Description of DnsMasq
- *
- * @author Hery
  */
 class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
+    /**
+     * @var CDevSuite_PackageManager
+     */
     public $pm;
 
+    /**
+     * @var CDevSuite_ServiceManager
+     */
     public $sm;
 
+    /**
+     * @var string
+     */
     public $rclocal;
 
     /**
@@ -175,15 +182,15 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
     }
 
     /**
-     * Update the domain used by DnsMasq.
+     * Update the TLD/domain resolved by DnsMasq.
      *
-     * @param string $oldDomain Old TLD
-     * @param string $newDomain New TLD
+     * @param string $oldTld Old TLD
+     * @param string $newTld New TLD
      *
      * @return void
      */
-    public function updateDomain($oldDomain, $newDomain) {
-        $this->createCustomConfigFile($newDomain);
+    public function updateTld($oldTld, $newTld) {
+        $this->createCustomConfigFile($newTld);
         $this->sm->restart('dnsmasq');
     }
 

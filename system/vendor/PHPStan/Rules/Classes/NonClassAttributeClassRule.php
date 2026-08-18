@@ -4,17 +4,20 @@ namespace PHPStan\Rules\Classes;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\InClassNode;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\ShouldNotHappenException;
 use function sprintf;
+use function strtolower;
 
 /**
  * @implements Rule<InClassNode>
  */
-class NonClassAttributeClassRule implements Rule
+#[RegisteredRule(level: 0)]
+final class NonClassAttributeClassRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -38,7 +41,7 @@ class NonClassAttributeClassRule implements Rule
 	}
 
 	/**
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
 	private function check(Scope $scope): array
 	{
@@ -50,13 +53,17 @@ class NonClassAttributeClassRule implements Rule
 			return [
 				RuleErrorBuilder::message(sprintf(
 					'%s cannot be an Attribute class.',
-					$classReflection->isInterface() ? 'Interface' : 'Enum',
-				))->build(),
+					$classReflection->getClassTypeDescription(),
+				))
+					->identifier(sprintf('attribute.%s', strtolower($classReflection->getClassTypeDescription())))
+					->build(),
 			];
 		}
 		if ($classReflection->isAbstract()) {
 			return [
-				RuleErrorBuilder::message(sprintf('Abstract class %s cannot be an Attribute class.', $classReflection->getDisplayName()))->build(),
+				RuleErrorBuilder::message(sprintf('Abstract class %s cannot be an Attribute class.', $classReflection->getDisplayName()))
+					->identifier('attribute.abstract')
+					->build(),
 			];
 		}
 
@@ -66,7 +73,9 @@ class NonClassAttributeClassRule implements Rule
 
 		if (!$classReflection->getConstructor()->isPublic()) {
 			return [
-				RuleErrorBuilder::message(sprintf('Attribute class %s constructor must be public.', $classReflection->getDisplayName()))->build(),
+				RuleErrorBuilder::message(sprintf('Attribute class %s constructor must be public.', $classReflection->getDisplayName()))
+					->identifier('attribute.constructorNotPublic')
+					->build(),
 			];
 		}
 

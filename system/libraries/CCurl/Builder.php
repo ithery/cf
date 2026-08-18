@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @see CCurl
+ */
 class CCurl_Builder {
     /**
      * @var resource cURL request

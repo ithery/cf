@@ -200,6 +200,7 @@ class CPeriod_OpeningHours_OpeningHoursForDay implements ArrayAccess, Countable,
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return isset($this->openingHours[$offset]);
     }
@@ -222,6 +223,7 @@ class CPeriod_OpeningHours_OpeningHoursForDay implements ArrayAccess, Countable,
     /**
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->openingHours);
     }
@@ -276,6 +278,7 @@ class CPeriod_OpeningHours_OpeningHoursForDay implements ArrayAccess, Countable,
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $values = [];
 

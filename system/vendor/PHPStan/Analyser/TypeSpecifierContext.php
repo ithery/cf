@@ -4,8 +4,10 @@ namespace PHPStan\Analyser;
 
 use PHPStan\ShouldNotHappenException;
 
-/** @api */
-class TypeSpecifierContext
+/**
+ * @api
+ */
+final class TypeSpecifierContext
 {
 
 	public const CONTEXT_TRUE = 0b0001;
@@ -25,8 +27,9 @@ class TypeSpecifierContext
 
 	private static function create(?int $value): self
 	{
-		self::$registry[$value] ??= new self($value);
-		return self::$registry[$value];
+		$key = $value ?? '';
+		self::$registry[$key] ??= new self($value);
+		return self::$registry[$key];
 	}
 
 	public static function createTrue(): self

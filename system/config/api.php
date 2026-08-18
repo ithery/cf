@@ -58,11 +58,6 @@ return [
                 'jsonp' => CApi_HTTP_Response_Format_JsonFormat::class,
                 'default' => CApi_HTTP_Response_Format_DefaultFormat::class,
             ],
-            'formats' => [
-                'json' => CApi_HTTP_Response_Format_JsonFormat::class,
-                'jsonp' => CApi_HTTP_Response_Format_JsonFormat::class,
-                'default' => CApi_HTTP_Response_Format_DefaultFormat::class,
-            ],
             'formats_options' => [
 
                 'json' => [

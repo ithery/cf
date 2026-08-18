@@ -2,10 +2,13 @@
 
 /**
  * Description of DependencyBootstrapper.
- *
- * @author Hery
  */
 class CDevSuite_Bootstrap_WindowsBootstrapper_DependencyChecker extends CDevSuite_Bootstrap_Bootstrapper {
+    /**
+     * Check Windows/PHP compatibility and architecture.
+     *
+     * @return void
+     */
     public function bootstrap() {
         $inTestingEnvironment = strpos($_SERVER['SCRIPT_NAME'], 'phpunit') !== false;
 

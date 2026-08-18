@@ -1,7 +1,9 @@
 /* eslint-disable camelcase */
 
+if(window.Dropzone) {
+    window.Dropzone.autoDiscover = false;
+}
 
-window.Dropzone.autoDiscover = false;
 
 // eslint-disable-next-line no-unused-vars
 var CFileManager = function (options) {
@@ -780,3 +782,6 @@ var CFileManager = function (options) {
 
     this.initializeUploadForm();
 };
+
+
+window.CFileManager = CFileManager;

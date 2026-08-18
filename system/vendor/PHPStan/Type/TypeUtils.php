@@ -2,105 +2,27 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\Internal\CombinationsHelper;
 use PHPStan\Type\Accessory\AccessoryType;
 use PHPStan\Type\Accessory\HasPropertyType;
-use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantIntegerType;
-use PHPStan\Type\Constant\ConstantStringType;
-use PHPStan\Type\Enum\EnumCaseObjectType;
+use PHPStan\Type\Generic\TemplateBenevolentUnionType;
 use PHPStan\Type\Generic\TemplateType;
+use PHPStan\Type\Generic\TemplateUnionType;
+use PHPStan\Type\Traverser\LateResolvableTraverser;
 use function array_merge;
-use function array_unique;
-use function array_values;
+use function count;
+use function max;
+use const PHP_INT_MAX;
 
-/** @api */
-class TypeUtils
+/**
+ * @api
+ */
+final class TypeUtils
 {
 
 	/**
-	 * @return ArrayType[]
-	 *
-	 * @deprecated Use PHPStan\Type\Type::getArrays() instead and handle optional ConstantArrayType keys if necessary.
-	 */
-	public static function getArrays(Type $type): array
-	{
-		if ($type instanceof ConstantArrayType) {
-			return $type->getAllArrays();
-		}
-
-		if ($type instanceof ArrayType) {
-			return [$type];
-		}
-
-		if ($type instanceof UnionType) {
-			$matchingTypes = [];
-			foreach ($type->getTypes() as $innerType) {
-				if (!$innerType instanceof ArrayType) {
-					return [];
-				}
-				foreach (self::getArrays($innerType) as $innerInnerType) {
-					$matchingTypes[] = $innerInnerType;
-				}
-			}
-
-			return $matchingTypes;
-		}
-
-		if ($type instanceof IntersectionType) {
-			$matchingTypes = [];
-			foreach ($type->getTypes() as $innerType) {
-				if (!$innerType instanceof ArrayType) {
-					continue;
-				}
-				foreach (self::getArrays($innerType) as $innerInnerType) {
-					$matchingTypes[] = $innerInnerType;
-				}
-			}
-
-			return $matchingTypes;
-		}
-
-		return [];
-	}
-
-	/**
-	 * @return ConstantArrayType[]
-	 *
-	 * @deprecated Use PHPStan\Type\Type::getConstantArrays() instead and handle optional keys if necessary.
-	 */
-	public static function getConstantArrays(Type $type): array
-	{
-		if ($type instanceof ConstantArrayType) {
-			return $type->getAllArrays();
-		}
-
-		if ($type instanceof UnionType) {
-			$matchingTypes = [];
-			foreach ($type->getTypes() as $innerType) {
-				if (!$innerType instanceof ConstantArrayType) {
-					return [];
-				}
-				foreach (self::getConstantArrays($innerType) as $innerInnerType) {
-					$matchingTypes[] = $innerInnerType;
-				}
-			}
-
-			return $matchingTypes;
-		}
-
-		return [];
-	}
-
-	/**
-	 * @return ConstantStringType[]
-	 */
-	public static function getConstantStrings(Type $type): array
-	{
-		return self::map(ConstantStringType::class, $type, false);
-	}
-
-	/**
-	 * @return ConstantIntegerType[]
+	 * @return list<ConstantIntegerType>
 	 */
 	public static function getConstantIntegers(Type $type): array
 	{
@@ -108,64 +30,7 @@ class TypeUtils
 	}
 
 	/**
-	 * @return ConstantType[]
-	 */
-	public static function getConstantTypes(Type $type): array
-	{
-		return self::map(ConstantType::class, $type, false);
-	}
-
-	/**
-	 * @return ConstantType[]
-	 */
-	public static function getAnyConstantTypes(Type $type): array
-	{
-		return self::map(ConstantType::class, $type, false, false);
-	}
-
-	/**
-	 * @return ArrayType[]
-	 *
-	 * @deprecated Use PHPStan\Type\Type::getArrays() instead.
-	 */
-	public static function getAnyArrays(Type $type): array
-	{
-		return self::map(ArrayType::class, $type, true, false);
-	}
-
-	/**
-	 * @deprecated Use PHPStan\Type\Type::generalize() instead.
-	 */
-	public static function generalizeType(Type $type, GeneralizePrecision $precision): Type
-	{
-		return $type->generalize($precision);
-	}
-
-	/**
-	 * @return list<string>
-	 */
-	public static function getDirectClassNames(Type $type): array
-	{
-		if ($type instanceof TypeWithClassName) {
-			return [$type->getClassName()];
-		}
-
-		if ($type instanceof UnionType || $type instanceof IntersectionType) {
-			$classNames = [];
-			foreach ($type->getTypes() as $innerType) {
-				foreach (self::getDirectClassNames($innerType) as $n) {
-					$classNames[] = $n;
-				}
-			}
-
-			return array_values(array_unique($classNames));
-		}
-
-		return [];
-	}
-
-	/**
-	 * @return IntegerRangeType[]
+	 * @return list<IntegerRangeType>
 	 */
 	public static function getIntegerRanges(Type $type): array
 	{
@@ -173,34 +38,7 @@ class TypeUtils
 	}
 
 	/**
-	 * @return ConstantScalarType[]
-	 */
-	public static function getConstantScalars(Type $type): array
-	{
-		return self::map(ConstantScalarType::class, $type, false);
-	}
-
-	/**
-	 * @return EnumCaseObjectType[]
-	 */
-	public static function getEnumCaseObjects(Type $type): array
-	{
-		return self::map(EnumCaseObjectType::class, $type, false);
-	}
-
-	/**
-	 * @internal
-	 * @return ConstantArrayType[]
-	 *
-	 * @deprecated Use PHPStan\Type\Type::getConstantArrays().
-	 */
-	public static function getOldConstantArrays(Type $type): array
-	{
-		return self::map(ConstantArrayType::class, $type, false);
-	}
-
-	/**
-	 * @return mixed[]
+	 * @return list<mixed>
 	 */
 	private static function map(
 		string $typeClass,
@@ -216,7 +54,9 @@ class TypeUtils
 		if ($type instanceof UnionType) {
 			$matchingTypes = [];
 			foreach ($type->getTypes() as $innerType) {
-				if (!$innerType instanceof $typeClass) {
+				$matchingInner = self::map($typeClass, $innerType, $inspectIntersections, $stopOnUnmatched);
+
+				if ($matchingInner === []) {
 					if ($stopOnUnmatched) {
 						return [];
 					}
@@ -224,7 +64,9 @@ class TypeUtils
 					continue;
 				}
 
-				$matchingTypes[] = $innerType;
+				foreach ($matchingInner as $innerMapped) {
+					$matchingTypes[] = $innerMapped;
+				}
 			}
 
 			return $matchingTypes;
@@ -264,28 +106,87 @@ class TypeUtils
 	}
 
 	/**
+	 * @return ($type is UnionType ? UnionType : Type)
+	 */
+	public static function toStrictUnion(Type $type): Type
+	{
+		if ($type instanceof TemplateBenevolentUnionType) {
+			return new TemplateUnionType(
+				$type->getScope(),
+				$type->getStrategy(),
+				$type->getVariance(),
+				$type->getName(),
+				static::toStrictUnion($type->getBound()),
+				$type->getDefault(),
+			);
+		}
+
+		if ($type instanceof BenevolentUnionType) {
+			return new UnionType($type->getTypes());
+		}
+
+		return $type;
+	}
+
+	/**
 	 * @return Type[]
 	 */
 	public static function flattenTypes(Type $type): array
 	{
-		if ($type instanceof ConstantArrayType) {
-			return $type->getAllArrays();
-		}
-
 		if ($type instanceof UnionType) {
 			$types = [];
 			foreach ($type->getTypes() as $innerType) {
-				if ($innerType instanceof ConstantArrayType) {
-					foreach ($innerType->getAllArrays() as $array) {
-						$types[] = $array;
-					}
-					continue;
+				$flattenTypes = self::flattenTypes($innerType);
+				foreach ($flattenTypes as $flattenType) {
+					$types[] = $flattenType;
 				}
-
-				$types[] = $innerType;
 			}
 
 			return $types;
+		}
+
+		$constantArrays = $type->getConstantArrays();
+		if ($constantArrays !== []) {
+			// Estimate the total number of power-set variants before expanding.
+			// Each ConstantArrayType with N optional keys produces 2^N variants
+			// from getAllArrays(). The cartesian product across multiple constant
+			// arrays multiplies these counts. Bail out to avoid O(2^N) allocation
+			// when the total would be large.
+			$estimatedCount = 1;
+			$bail = false;
+			foreach ($constantArrays as $constantArray) {
+				$optionalCount = count($constantArray->getOptionalKeys());
+				$arrayCount = $optionalCount <= 20 ? (1 << $optionalCount) : PHP_INT_MAX;
+				if ($arrayCount > 16384 || $estimatedCount > 16384 / max($arrayCount, 1)) {
+					$bail = true;
+					break;
+				}
+				$estimatedCount *= $arrayCount;
+			}
+
+			if ($bail) {
+				return [$type];
+			}
+
+			$newTypes = [];
+			foreach ($constantArrays as $constantArray) {
+				$newTypes[] = $constantArray->getAllArrays();
+			}
+
+			$result = [];
+			foreach (CombinationsHelper::combinations($newTypes) as $combination) {
+				$intersected = $combination[0];
+				for ($i = 1, $count = count($combination); $i < $count; $i++) {
+					$intersected = TypeCombinator::intersect($intersected, $combination[$i]);
+				}
+				if ($intersected instanceof NeverType) {
+					continue;
+				}
+
+				$result[] = $intersected;
+			}
+
+			return $result;
 		}
 
 		return [$type];
@@ -302,6 +203,24 @@ class TypeUtils
 				$thisType = self::findThisType($innerType);
 				if ($thisType !== null) {
 					return $thisType;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public static function findCallableType(Type $type): ?Type
+	{
+		if ($type->isCallable()->yes()) {
+			return $type;
+		}
+
+		if ($type instanceof UnionType) {
+			foreach ($type->getTypes() as $innerType) {
+				$callableType = self::findCallableType($innerType);
+				if ($callableType !== null) {
+					return $callableType;
 				}
 			}
 		}
@@ -331,29 +250,11 @@ class TypeUtils
 	}
 
 	/**
-	 * @return AccessoryType[]
+	 * @return list<AccessoryType>
 	 */
 	public static function getAccessoryTypes(Type $type): array
 	{
-		return self::map(AccessoryType::class, $type, true, false);
-	}
-
-	/** @deprecated Use PHPStan\Type\Type::isCallable() instead. */
-	public static function containsCallable(Type $type): bool
-	{
-		if ($type->isCallable()->yes()) {
-			return true;
-		}
-
-		if ($type instanceof UnionType) {
-			foreach ($type->getTypes() as $innerType) {
-				if ($innerType->isCallable()->yes()) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return self::map(AccessoryType::class, $type, inspectIntersections: true, stopOnUnmatched: false);
 	}
 
 	public static function containsTemplateType(Type $type): bool
@@ -372,15 +273,11 @@ class TypeUtils
 
 	public static function resolveLateResolvableTypes(Type $type, bool $resolveUnresolvableTypes = true): Type
 	{
-		return TypeTraverser::map($type, static function (Type $type, callable $traverse) use ($resolveUnresolvableTypes): Type {
-			$type = $traverse($type);
-
-			if ($type instanceof LateResolvableType && ($resolveUnresolvableTypes || $type->isResolvable())) {
-				$type = $type->resolve();
-			}
-
+		if (!$type->hasTemplateOrLateResolvableType()) {
 			return $type;
-		});
+		}
+
+		return TypeTraverser::map($type, new LateResolvableTraverser($resolveUnresolvableTypes));
 	}
 
 }

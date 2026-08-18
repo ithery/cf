@@ -2,11 +2,13 @@
 
 namespace PHPStan\Node;
 
-use PhpParser\Node\Expr\ArrayItem;
+use PhpParser\Node\ArrayItem;
 use PHPStan\Analyser\Scope;
 
-/** @api */
-class LiteralArrayItem
+/**
+ * @api
+ */
+final class LiteralArrayItem
 {
 
 	public function __construct(private Scope $scope, private ?ArrayItem $arrayItem)

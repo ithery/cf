@@ -33,6 +33,13 @@ class CBase {
      */
     private static $session;
 
+    /**
+     * Vite instance.
+     *
+     * @var CBase_Vite
+     */
+    private static $vite;
+
     public static function createRecursionContext() {
         return new CBase_RecursionContext();
     }
@@ -86,5 +93,13 @@ class CBase {
 
     public static function originalFilesData() {
         return static::$originalPost;
+    }
+
+    public static function vite() {
+        if (self::$vite == null) {
+            self::$vite = new CBase_Vite();
+        }
+
+        return self::$vite;
     }
 }

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 3:27:04 PM
- */
 class CObservable_Listener_Handler_DispatchWindowEventHandler extends CObservable_Listener_Handler {
     protected $method;
 

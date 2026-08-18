@@ -1,13 +1,8 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
+use Mockery\MockInterface;
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 10:21:59 AM
- */
 abstract class CFacade {
     /**
      * The application instance being facaded.
@@ -88,7 +83,7 @@ abstract class CFacade {
     /**
      * Get the mockable class for the bound instance.
      *
-     * @return string|null
+     * @return null|string
      */
     protected static function getMockableClass() {
         if ($root = static::getFacadeRoot()) {
@@ -123,9 +118,9 @@ abstract class CFacade {
     /**
      * Get the registered name of the component.
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     protected static function getFacadeAccessor() {
         throw new RuntimeException('Facade does not implement getFacadeAccessor method.');
@@ -196,9 +191,9 @@ abstract class CFacade {
      * @param string $method
      * @param array  $args
      *
-     * @return mixed
-     *
      * @throws \RuntimeException
+     *
+     * @return mixed
      */
     public static function __callStatic($method, $args) {
         $instance = static::getFacadeRoot();

@@ -89,6 +89,9 @@ interface CQC_Phpstan_Contract_Method_PassableInterface {
      */
     public function sendToPipeline(string $class, $staticAllowed = false): bool;
 
+    /**
+     * @return ReflectionProvider
+     */
     public function getReflectionProvider(): ReflectionProvider;
 
     /**

@@ -241,7 +241,7 @@ class CVendor_LiteSpeed_Msg {
 
     public static function utilSortMsg($lang, $option) {
         if (!array_key_exists($lang, self::$supported)) {
-            echo "language ${lang} not supported! \n"
+            echo "language {$lang} not supported! \n"
             . 'Currently supported:' . print_r(array_keys(self::$supported), true);
 
             return;

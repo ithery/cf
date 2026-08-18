@@ -4,20 +4,21 @@ namespace PHPStan\Rules\Functions;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Node\InFunctionNode;
-use PHPStan\Reflection\ParametersAcceptorSelector;
-use PHPStan\Reflection\Php\PhpFunctionFromParserNodeReflection;
 use PHPStan\Rules\MissingTypehintCheck;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\MixedType;
 use PHPStan\Type\VerbosityLevel;
-use function implode;
 use function sprintf;
 
 /**
  * @implements Rule<InFunctionNode>
  */
+#[RegisteredRule(level: 6)]
+#[ValidatesStubFiles]
 final class MissingFunctionReturnTypehintRule implements Rule
 {
 
@@ -34,26 +35,24 @@ final class MissingFunctionReturnTypehintRule implements Rule
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$functionReflection = $scope->getFunction();
-		if (!$functionReflection instanceof PhpFunctionFromParserNodeReflection) {
-			return [];
-		}
-
-		$returnType = ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+		$functionReflection = $node->getFunctionReflection();
+		$returnType = $functionReflection->getReturnType();
 
 		if ($returnType instanceof MixedType && !$returnType->isExplicitMixed()) {
 			return [
 				RuleErrorBuilder::message(sprintf(
 					'Function %s() has no return type specified.',
 					$functionReflection->getName(),
-				))->build(),
+				))->identifier('missingType.return')->build(),
 			];
 		}
 
 		$messages = [];
-		foreach ($this->missingTypehintCheck->getIterableTypesWithMissingValueTypehint($returnType) as $iterableType) {
-			$iterableTypeDescription = $iterableType->describe(VerbosityLevel::typeOnly());
-			$messages[] = RuleErrorBuilder::message(sprintf('Function %s() return type has no value type specified in iterable type %s.', $functionReflection->getName(), $iterableTypeDescription))->tip(MissingTypehintCheck::MISSING_ITERABLE_VALUE_TYPE_TIP)->build();
+		foreach ($this->missingTypehintCheck->getIterableTypesWithMissingValueTypehint($returnType) as $iterableTypeDescription) {
+			$messages[] = RuleErrorBuilder::message(sprintf('Function %s() return type has no value type specified in %s.', $functionReflection->getName(), $iterableTypeDescription))
+				->tip(MissingTypehintCheck::MISSING_ITERABLE_VALUE_TYPE_TIP)
+				->identifier('missingType.iterableValue')
+				->build();
 		}
 
 		foreach ($this->missingTypehintCheck->getNonGenericObjectTypesWithGenericClass($returnType) as [$name, $genericTypeNames]) {
@@ -61,8 +60,10 @@ final class MissingFunctionReturnTypehintRule implements Rule
 				'Function %s() return type with generic %s does not specify its types: %s',
 				$functionReflection->getName(),
 				$name,
-				implode(', ', $genericTypeNames),
-			))->tip(MissingTypehintCheck::TURN_OFF_NON_GENERIC_CHECK_TIP)->build();
+				$genericTypeNames,
+			))
+				->identifier('missingType.generics')
+				->build();
 		}
 
 		foreach ($this->missingTypehintCheck->getCallablesWithMissingSignature($returnType) as $callableType) {
@@ -70,7 +71,7 @@ final class MissingFunctionReturnTypehintRule implements Rule
 				'Function %s() return type has no signature specified for %s.',
 				$functionReflection->getName(),
 				$callableType->describe(VerbosityLevel::typeOnly()),
-			))->build();
+			))->identifier('missingType.callable')->build();
 		}
 
 		return $messages;

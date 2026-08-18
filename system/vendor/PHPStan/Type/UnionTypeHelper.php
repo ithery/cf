@@ -3,66 +3,23 @@
 namespace PHPStan\Type;
 
 use PHPStan\Type\Accessory\AccessoryType;
-use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantFloatType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\Constant\ConstantStringType;
-use function array_map;
-use function array_merge;
+use PHPStan\Type\Enum\EnumCaseObjectType;
 use function count;
 use function strcasecmp;
 use function usort;
 use const PHP_INT_MIN;
 
-class UnionTypeHelper
+final class UnionTypeHelper
 {
 
 	/**
-	 * @param Type[] $types
-	 * @return string[]
-	 */
-	public static function getReferencedClasses(array $types): array
-	{
-		return array_merge(
-			...array_map(
-				static fn (Type $type) => $type->getReferencedClasses(),
-				$types,
-			),
-		);
-	}
-
-	/**
-	 * @param Type[] $types
-	 * @return list<ArrayType>
-	 */
-	public static function getArrays(array $types): array
-	{
-		return array_merge(
-			...array_map(
-				static fn (Type $type) => $type->getArrays(),
-				$types,
-			),
-		);
-	}
-
-	/**
-	 * @param Type[] $types
-	 * @return list<ConstantArrayType>
-	 */
-	public static function getConstantArrays(array $types): array
-	{
-		return array_merge(
-			...array_map(
-				static fn (Type $type) => $type->getConstantArrays(),
-				$types,
-			),
-		);
-	}
-
-	/**
-	 * @param Type[] $types
-	 * @return Type[]
+	 * @template T of Type
+	 * @param list<T> $types
+	 * @return list<T>
 	 */
 	public static function sortTypes(array $types): array
 	{
@@ -140,6 +97,20 @@ class UnionTypeHelper
 				return self::compareStrings($a->getValue(), $b->getValue());
 			}
 
+			if ($a instanceof EnumCaseObjectType && $b instanceof EnumCaseObjectType) {
+				return self::compareStrings(
+					$a->getClassName() . '::' . $a->getEnumCaseName(),
+					$b->getClassName() . '::' . $b->getEnumCaseName(),
+				);
+			}
+
+			if (
+				($a instanceof CallableType || $a instanceof ClosureType)
+				&& ($b instanceof CallableType || $b instanceof ClosureType)
+			) {
+				return self::compareStrings($a->describe(VerbosityLevel::value()), $b->describe(VerbosityLevel::value()));
+			}
+
 			if ($a->isConstantArray()->yes() && $b->isConstantArray()->yes()) {
 				if ($a->isIterableAtLeastOnce()->no()) {
 					if ($b->isIterableAtLeastOnce()->no()) {
@@ -152,6 +123,10 @@ class UnionTypeHelper
 				}
 
 				return self::compareStrings($a->describe(VerbosityLevel::value()), $b->describe(VerbosityLevel::value()));
+			}
+
+			if ($a->isString()->yes() && $b->isString()->yes()) {
+				return self::compareStrings($a->describe(VerbosityLevel::precise()), $b->describe(VerbosityLevel::precise()));
 			}
 
 			return self::compareStrings($a->describe(VerbosityLevel::typeOnly()), $b->describe(VerbosityLevel::typeOnly()));

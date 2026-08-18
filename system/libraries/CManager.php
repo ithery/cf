@@ -4,16 +4,40 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 final class CManager {
     use CTrait_Compat_Manager;
+
+    /**
+     * @var array
+     */
     protected $controls = [];
 
+    /**
+     * @var array
+     */
     protected $controlsCode = [];
 
+    /**
+     * @var array
+     */
     protected $elements = [];
 
+    /**
+     * @var array
+     */
     protected $elements_code = [];
 
+    /**
+     * @var CManager_GoogleFonts
+     */
+    protected $googleFonts = null;
+
+    /**
+     * @var null|callable
+     */
     protected static $langObjectCallback = null;
 
+    /**
+     * @var bool
+     */
     protected static $useRequireJs = false;
 
     /**
@@ -36,6 +60,9 @@ final class CManager {
      */
     protected static $navigation = null;
 
+    /**
+     * @var CManager
+     */
     private static $instance;
 
     /**
@@ -76,22 +103,34 @@ final class CManager {
 
     /**
      * @return CClientScript
+     *
+     * @deprecated since 1.6 use CManager::asset()->runTime()
      */
     public static function clientScript() {
         return CClientScript::instance();
     }
 
     /**
-     * @return CClientModule
+     * @return CClientModules
+     *
+     * @deprecated since 1.6 dont use this anymore, use c::manager()->assets->module
      */
     public static function clientModule() {
         return CClientModules::instance();
     }
 
+    /**
+     * @return array
+     */
     public function getThemeData() {
         return $this->theme()->getThemeData();
     }
 
+    /**
+     * @param array $themeData
+     *
+     * @return $this
+     */
     public function setThemeData($themeData) {
         $this->theme()->setThemeData($themeData);
 
@@ -106,29 +145,43 @@ final class CManager {
      */
     public static function registerModule($module, $data = []) {
         if (!empty($data)) {
-            CClientModules::instance()->defineModule($module, $data);
+            CManager::asset()->module()->defineModule($module, $data);
         }
-        if (!CClientModules::instance()->isRegisteredModule($module)) {
-            return CClientModules::instance()->registerModule($module);
+        if (!CManager::asset()->module()->isRegisteredModule($module)) {
+            return CManager::asset()->module()->registerRunTimeModule($module);
         }
 
         return false;
     }
 
+    /**
+     * @param string $module
+     * @param array  $data   optional
+     *
+     * @return bool
+     */
     public static function registerThemeModule($module, $data = []) {
         if (!empty($data)) {
-            CClientModules::instance()->defineModule($module, $data);
+            CManager::asset()->module()->defineModule($module, $data);
         }
 
-        return CClientModules::instance()->registerThemeModule($module);
+        return CManager::asset()->module()->registerThemeModule($module);
     }
 
+    /**
+     * @param string $module
+     *
+     * @return bool
+     */
     public static function isRegisteredModule($module) {
-        return CClientModules::instance()->isRegisteredModule($module);
+        return CManager::asset()->module()->isRegisteredModule($module);
     }
 
+    /**
+     * @return array
+     */
     public static function getRegisteredModule() {
-        return CClientModules::instance()->getRegisteredModule();
+        return CManager::asset()->module()->getRegisteredModule();
     }
 
     /**
@@ -137,9 +190,14 @@ final class CManager {
      * @return bool
      */
     public static function unregisterModule($module) {
-        return CClientModules::instance()->unregisterModule($module);
+        return CManager::asset()->module()->unregisterRunTimeModule($module);
     }
 
+    /**
+     * @param array $controls map of control type => class name
+     *
+     * @return void
+     */
     public function registerControls($controls) {
         foreach ($controls as $type => $class) {
             $this->controls[$type] = $class;
@@ -152,7 +210,7 @@ final class CManager {
      * @param string $class
      * @param string $codePath
      *
-     * @throws CException
+     * @throws Exception
      *
      * @return bool
      */
@@ -163,7 +221,7 @@ final class CManager {
             if (file_exists($codePath)) {
                 include $codePath;
             } else {
-                throw new CException('File :code_path not exists', [':code_path' => $code_path]);
+                throw new Exception(c::__('File :code_path not exists', [':code_path' => $code_path]));
             }
         }
 
@@ -175,7 +233,7 @@ final class CManager {
      * @param string $class
      * @param string $code_path optional
      *
-     * @throws CException
+     * @throws Exception
      *
      * @return bool true if no error
      */
@@ -186,7 +244,7 @@ final class CManager {
             if (file_exists($code_path)) {
                 include $code_path;
             } else {
-                throw new CException('File :code_path not exists', [':code_path' => $code_path]);
+                throw new Exception(c::__('File :code_path not exists', [':code_path' => $code_path]));
             }
         }
 
@@ -253,13 +311,13 @@ final class CManager {
      * @param string $id
      * @param string $type
      *
-     * @throws CException
+     * @throws Exception
      *
      * @return CElement_Element
      */
     public function createElement($id, $type) {
         if (!isset($this->elements[$type])) {
-            throw new CException('Type of element :type not registered', [':type' => $type]);
+            throw new Exception(c::__('Type of element :type not registered', [':type' => $type]));
         }
         $class = $this->elements[$type];
 
@@ -270,6 +328,9 @@ final class CManager {
         return call_user_func([$class, 'factory'], ($id));
     }
 
+    /**
+     * @return CManager_Lang
+     */
     public static function lang() {
         if (self::$langObjectCallback != null) {
             return call_user_func(self::$langObjectCallback);
@@ -278,16 +339,33 @@ final class CManager {
         return new CManager_Lang();
     }
 
+    /**
+     * @param callable $callback
+     *
+     * @return void
+     */
     public static function setLangObjectCallback(callable $callback) {
         self::$langObjectCallback = $callback;
     }
 
+    /**
+     * @param string   $method
+     * @param callable $callback
+     *
+     * @return bool
+     */
     public static function registerTransform($method, callable $callback) {
         $transformManager = CManager_Transform::instance();
 
         return $transformManager->addCallback($method, $callback);
     }
 
+    /**
+     * @param string   $method
+     * @param callable $callback
+     *
+     * @return bool
+     */
     public static function addTransformCallback($method, callable $callback) {
         return static::registerTransform($method, $callback);
     }
@@ -303,6 +381,9 @@ final class CManager {
         self::$useRequireJs = $bool;
     }
 
+    /**
+     * @return bool
+     */
     public static function getUseRequireJs() {
         if (CApp::isAjax()) {
             return true;
@@ -311,12 +392,24 @@ final class CManager {
         return false;
     }
 
-    public static function registerCss($file, $pos = CClientScript::POS_HEAD) {
-        $cs = CClientScript::instance()->registerCssFile($file, $pos);
+    /**
+     * @param string $file
+     * @param string $pos
+     *
+     * @return CManager_Asset_Container
+     */
+    public static function registerCss($file, $pos = CManager_Asset::POS_HEAD) {
+        return CManager::asset()->runTime()->registerCssFile($file, $pos);
     }
 
-    public static function registerJs($file, $pos = CClientScript::POS_END) {
-        $cs = CClientScript::instance()->registerJsFile($file, $pos);
+    /**
+     * @param string|array $file
+     * @param string       $pos
+     *
+     * @return CManager_Asset_Container
+     */
+    public static function registerJs($file, $pos = CManager_Asset::POS_END) {
+        return CManager::asset()->runTime()->registerJsFile($file, $pos);
     }
 
     /**
@@ -341,10 +434,20 @@ final class CManager {
         return self::$asset;
     }
 
+    /**
+     * @param string      $class
+     * @param null|string $name
+     * @param null|string $group
+     *
+     * @return bool
+     */
     public static function registerDaemon($class, $name = null, $group = null) {
         return CManager_Daemon::instance()->registerDaemon($class, $name, $group);
     }
 
+    /**
+     * @return array
+     */
     public static function getRegisteredDaemon() {
         return CManager_Daemon::instance()->daemons();
     }
@@ -386,7 +489,6 @@ final class CManager {
 
     /**
      * @param string $sql
-     * @param array  $bindings
      *
      * @return CManager_DataProvider_SqlDataProvider
      */
@@ -405,8 +507,6 @@ final class CManager {
     }
 
     /**
-     * @param CCollection $collection
-     *
      * @return CManager_DataProvider_CollectionDataProvider
      */
     public static function createCollectionDataProvider(CCollection $collection) {
@@ -427,5 +527,61 @@ final class CManager {
      */
     public static function editorJs() {
         return CManager_EditorJs::instance();
+    }
+
+    /**
+     * @return CManager_OnBoarding_Steps
+     */
+    public static function onBoarding() {
+        return CManager_OnBoarding_Steps::instance();
+    }
+
+    /**
+     * @return CManager_Factory
+     */
+    public static function factory() {
+        return new CBase_ForwarderStaticClass(CManager_Factory::class);
+    }
+
+    /**
+     * @return CManager_FileProvider_FileProvider
+     */
+    public static function createFileProvider() {
+        return new CManager_FileProvider_FileProvider();
+    }
+
+    /**
+     * @return CManager_FileProvider_ImageFileProvider
+     */
+    public static function createImageFileProvider() {
+        return new CManager_FileProvider_ImageFileProvider();
+    }
+
+    /**
+     * @return CManager_GoogleFonts
+     */
+    public function googleFonts() {
+        if ($this->googleFonts == null) {
+            $this->googleFonts = new CManager_GoogleFonts(
+                CStorage::instance()->disk(CF::config('assets.google_fonts.disk')),
+                CF::config('assets.google_fonts.path'),
+                CF::config('assets.google_fonts.inline'),
+                CF::config('assets.google_fonts.fallback'),
+                CF::config('assets.google_fonts.user_agent'),
+                CF::config('assets.google_fonts.fonts'),
+                CF::config('assets.google_fonts.preload', false)
+            );
+        }
+
+        return $this->googleFonts;
+    }
+
+    /**
+     * @return void
+     */
+    public static function registerBlade() {
+        CView::blade()->directive('googlefonts', function ($expression) {
+            return "<?php echo c::manager()->googleFonts()->load($expression)->toHtml(); ?>";
+        });
     }
 }

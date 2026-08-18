@@ -39,4 +39,11 @@ interface CApp_Contract_BaseInterface {
      * @return string
      */
     public static function username();
+
+    /**
+     * Get role name.
+     *
+     * @return string
+     */
+    public static function roleName();
 }

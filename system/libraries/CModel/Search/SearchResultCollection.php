@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 28, 2019, 9:56:28 PM
- */
 class CModel_Search_SearchResultCollection extends CCollection {
     /**
      * The total number of items before slicing.
@@ -22,6 +16,7 @@ class CModel_Search_SearchResultCollection extends CCollection {
         c::collect($results->items())->each(function ($result) use ($type) {
             $this->items[] = $result->getSearchResult()->setType($type);
         });
+
         return $this;
     }
 
@@ -39,6 +34,7 @@ class CModel_Search_SearchResultCollection extends CCollection {
         if ($type == null) {
             return $this->paginator;
         }
+
         return carr::get($this->paginator, $type);
     }
 }

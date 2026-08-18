@@ -2,32 +2,48 @@
 
 namespace PHPStan\Type\Enum;
 
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstFetchNode;
+use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\Reflection\ClassMemberAccessAnswerer;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ExtendedPropertyReflection;
 use PHPStan\Reflection\Php\EnumPropertyReflection;
-use PHPStan\Reflection\PropertyReflection;
+use PHPStan\Reflection\Php\EnumUnresolvedPropertyPrototypeReflection;
+use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\Reflection\Type\UnresolvedPropertyPrototypeReflection;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\TrinaryLogic;
+use PHPStan\Type\AcceptsResult;
+use PHPStan\Type\Accessory\AccessoryLiteralStringType;
 use PHPStan\Type\CompoundType;
 use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\GeneralizePrecision;
+use PHPStan\Type\Generic\GenericClassStringType;
+use PHPStan\Type\InstanceofDeprecated;
+use PHPStan\Type\IntersectionType;
+use PHPStan\Type\IsSuperTypeOfResult;
+use PHPStan\Type\NeverType;
 use PHPStan\Type\ObjectType;
+use PHPStan\Type\SubtractableType;
 use PHPStan\Type\Type;
 use PHPStan\Type\VerbosityLevel;
 use function sprintf;
 
 /** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::getEnumCaseObject() or Type::getEnumCases()')]
 class EnumCaseObjectType extends ObjectType
 {
 
 	/** @api */
 	public function __construct(
 		string $className,
-		private string $enumCaseName,
+		private readonly string $enumCaseName,
 		?ClassReflection $classReflection = null,
 	)
 	{
-		parent::__construct($className, null, $classReflection);
+		parent::__construct($className, classReflection: $classReflection);
 	}
 
 	public function getEnumCaseName(): string
@@ -48,21 +64,20 @@ class EnumCaseObjectType extends ObjectType
 			return false;
 		}
 
-		return $this->getClassName() === $type->getClassName()
-			&& $this->enumCaseName === $type->enumCaseName;
+		return $this->enumCaseName === $type->enumCaseName &&
+			$this->getClassName() === $type->getClassName();
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
-		return $this->isSuperTypeOf($type);
+		return $this->isSuperTypeOf($type)->toAcceptsResult();
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof self) {
-			return TrinaryLogic::createFromBoolean(
-				$this->getClassName() === $type->getClassName()
-				&& $this->enumCaseName === $type->enumCaseName,
+			return IsSuperTypeOfResult::createFromBoolean(
+				$this->enumCaseName === $type->enumCaseName && $this->getClassName() === $type->getClassName(),
 			);
 		}
 
@@ -70,14 +85,24 @@ class EnumCaseObjectType extends ObjectType
 			return $type->isSubTypeOf($this);
 		}
 
+		if (
+			$type instanceof SubtractableType
+			&& $type->getSubtractedType() !== null
+		) {
+			$isSuperType = $type->getSubtractedType()->isSuperTypeOf($this);
+			if ($isSuperType->yes()) {
+				return IsSuperTypeOfResult::createNo();
+			}
+		}
+
 		$parent = new parent($this->getClassName(), $this->getSubtractedType(), $this->getClassReflection());
 
-		return $parent->isSuperTypeOf($type)->and(TrinaryLogic::createMaybe());
+		return $parent->isSuperTypeOf($type)->and(IsSuperTypeOfResult::createMaybe());
 	}
 
 	public function subtract(Type $type): Type
 	{
-		return $this;
+		return $this->changeSubtractedType($type);
 	}
 
 	public function getTypeWithoutSubtractedType(): Type
@@ -87,7 +112,11 @@ class EnumCaseObjectType extends ObjectType
 
 	public function changeSubtractedType(?Type $subtractedType): Type
 	{
-		return $this;
+		if ($subtractedType === null || ! $this->equals($subtractedType)) {
+			return $this;
+		}
+
+		return new NeverType();
 	}
 
 	public function getSubtractedType(): ?Type
@@ -104,15 +133,22 @@ class EnumCaseObjectType extends ObjectType
 		return null;
 	}
 
-	public function getProperty(string $propertyName, ClassMemberAccessAnswerer $scope): PropertyReflection
+	public function getUnresolvedPropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
+	{
+		return $this->getUnresolvedInstancePropertyPrototype($propertyName, $scope);
+	}
+
+	public function getUnresolvedInstancePropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
 	{
 		$classReflection = $this->getClassReflection();
 		if ($classReflection === null) {
-			return parent::getProperty($propertyName, $scope);
+			return parent::getUnresolvedInstancePropertyPrototype($propertyName, $scope);
 
 		}
 		if ($propertyName === 'name') {
-			return new EnumPropertyReflection($classReflection, new ConstantStringType($this->enumCaseName));
+			return new EnumUnresolvedPropertyPrototypeReflection(
+				new EnumPropertyReflection($propertyName, $classReflection, new ConstantStringType($this->enumCaseName)),
+			);
 		}
 
 		if ($classReflection->isBackedEnum() && $propertyName === 'value') {
@@ -123,11 +159,48 @@ class EnumCaseObjectType extends ObjectType
 					throw new ShouldNotHappenException();
 				}
 
-				return new EnumPropertyReflection($classReflection, $valueType);
+				return new EnumUnresolvedPropertyPrototypeReflection(
+					new EnumPropertyReflection($propertyName, $classReflection, $valueType),
+				);
 			}
 		}
 
-		return parent::getProperty($propertyName, $scope);
+		return parent::getUnresolvedInstancePropertyPrototype($propertyName, $scope);
+	}
+
+	public function hasStaticProperty(string $propertyName): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getStaticProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
+	{
+		throw new ShouldNotHappenException();
+	}
+
+	public function getUnresolvedStaticPropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
+	{
+		throw new ShouldNotHappenException();
+	}
+
+	public function getBackingValueType(): ?Type
+	{
+		$classReflection = $this->getClassReflection();
+		if ($classReflection === null) {
+			return null;
+		}
+
+		if (!$classReflection->isBackedEnum()) {
+			return null;
+		}
+
+		if ($classReflection->hasEnumCase($this->enumCaseName)) {
+			$enumCase = $classReflection->getEnumCase($this->enumCaseName);
+
+			return $enumCase->getBackingValueType();
+		}
+
+		return null;
 	}
 
 	public function generalize(GeneralizePrecision $precision): Type
@@ -135,22 +208,50 @@ class EnumCaseObjectType extends ObjectType
 		return new parent($this->getClassName(), null, $this->getClassReflection());
 	}
 
-	public function isSmallerThan(Type $otherType): TrinaryLogic
+	public function isSmallerThan(Type $otherType, PhpVersion $phpVersion): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
 
-	public function isSmallerThanOrEqual(Type $otherType): TrinaryLogic
+	public function isSmallerThanOrEqual(Type $otherType, PhpVersion $phpVersion): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function getEnumCases(): array
 	{
-		return new self($properties['className'], $properties['enumCaseName'], null);
+		return [$this];
+	}
+
+	public function getEnumCaseObject(): ?EnumCaseObjectType
+	{
+		return $this;
+	}
+
+	public function getClassStringType(): Type
+	{
+		return new GenericClassStringType(new ObjectType($this->getClassName()));
+	}
+
+	public function toClassConstantType(ReflectionProvider $reflectionProvider): Type
+	{
+		// Enum cases always read their `::class` as the bare enum class
+		// name. Skip the parent's finality collapse: even though enum
+		// classes are reported as `final` by reflection, `Foo::Bar::class`
+		// in user code should resolve to `class-string<Foo>&literal-string`,
+		// not the literal `'Foo'`, to keep the case-binding visible at
+		// downstream sites.
+		return new IntersectionType([$this->getClassStringType(), new AccessoryLiteralStringType()]);
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new ConstTypeNode(
+			new ConstFetchNode(
+				$this->getClassName(),
+				$this->getEnumCaseName(),
+			),
+		);
 	}
 
 }

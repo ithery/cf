@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 1, 2018, 3:50:35 PM
- */
 abstract class CObservable_Listener_Handler implements CObservable_Listener_Handler_Contract_ParamableInterface {
     use CTrait_Compat_Handler_Driver;
 

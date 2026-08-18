@@ -299,7 +299,7 @@ class CEmail_Message {
 
         $this->message->embedFromPath($file, $cid);
 
-        return "cid:${cid}";
+        return "cid:{$cid}";
     }
 
     /**
@@ -314,7 +314,7 @@ class CEmail_Message {
     public function embedData($data, $name, $contentType = null) {
         $this->message->embed($data, $name, $contentType);
 
-        return "cid:${name}";
+        return "cid:{$name}";
     }
 
     /**

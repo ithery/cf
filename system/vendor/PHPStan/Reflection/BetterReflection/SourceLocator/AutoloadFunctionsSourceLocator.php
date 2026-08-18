@@ -2,6 +2,7 @@
 
 namespace PHPStan\Reflection\BetterReflection\SourceLocator;
 
+use Override;
 use PHPStan\BetterReflection\Identifier\Identifier;
 use PHPStan\BetterReflection\Identifier\IdentifierType;
 use PHPStan\BetterReflection\Reflection\Reflection;
@@ -12,7 +13,7 @@ use function interface_exists;
 use function PHPStan\autoloadFunctions;
 use function trait_exists;
 
-class AutoloadFunctionsSourceLocator implements SourceLocator
+final class AutoloadFunctionsSourceLocator implements SourceLocator
 {
 
 	public function __construct(
@@ -22,6 +23,7 @@ class AutoloadFunctionsSourceLocator implements SourceLocator
 	{
 	}
 
+	#[Override]
 	public function locateIdentifier(Reflector $reflector, Identifier $identifier): ?Reflection
 	{
 		if (!$identifier->isClass()) {
@@ -50,6 +52,7 @@ class AutoloadFunctionsSourceLocator implements SourceLocator
 		return null;
 	}
 
+	#[Override]
 	public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType): array
 	{
 		return [];

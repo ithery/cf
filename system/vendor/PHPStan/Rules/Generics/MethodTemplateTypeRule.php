@@ -4,6 +4,8 @@ namespace PHPStan\Rules\Generics;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Internal\SprintfHelper;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -17,7 +19,9 @@ use function sprintf;
 /**
  * @implements Rule<Node\Stmt\ClassMethod>
  */
-class MethodTemplateTypeRule implements Rule
+#[RegisteredRule(level: 2)]
+#[ValidatesStubFiles]
+final class MethodTemplateTypeRule implements Rule
 {
 
 	public function __construct(
@@ -58,6 +62,7 @@ class MethodTemplateTypeRule implements Rule
 		$escapedClassName = SprintfHelper::escapeFormatString($className);
 		$escapedMethodName = SprintfHelper::escapeFormatString($methodName);
 		$messages = $this->templateTypeCheck->check(
+			$scope,
 			$node,
 			TemplateTypeScope::createWithMethod($className, $methodName),
 			$methodTemplateTags,
@@ -65,6 +70,9 @@ class MethodTemplateTypeRule implements Rule
 			sprintf('PHPDoc tag @template for method %s::%s() cannot have existing type alias %%s as its name.', $escapedClassName, $escapedMethodName),
 			sprintf('PHPDoc tag @template %%s for method %s::%s() has invalid bound type %%s.', $escapedClassName, $escapedMethodName),
 			sprintf('PHPDoc tag @template %%s for method %s::%s() with bound type %%s is not supported.', $escapedClassName, $escapedMethodName),
+			sprintf('PHPDoc tag @template %%s for method %s::%s() has invalid default type %%s.', $escapedClassName, $escapedMethodName),
+			sprintf('Default type %%s in PHPDoc tag @template %%s for method %s::%s() is not subtype of bound type %%s.', $escapedClassName, $escapedMethodName),
+			sprintf('PHPDoc tag @template %%s for method %s::%s() does not have a default type but follows an optional @template %%s.', $escapedClassName, $escapedMethodName),
 		);
 
 		$classTemplateTypes = $classReflection->getTemplateTypeMap()->getTypes();
@@ -73,7 +81,9 @@ class MethodTemplateTypeRule implements Rule
 				continue;
 			}
 
-			$messages[] = RuleErrorBuilder::message(sprintf('PHPDoc tag @template %s for method %s::%s() shadows @template %s for class %s.', $name, $className, $methodName, $classTemplateTypes[$name]->describe(VerbosityLevel::typeOnly()), $classReflection->getDisplayName(false)))->build();
+			$messages[] = RuleErrorBuilder::message(sprintf('PHPDoc tag @template %s for method %s::%s() shadows @template %s for class %s.', $name, $className, $methodName, $classTemplateTypes[$name]->describe(VerbosityLevel::typeOnly()), $classReflection->getDisplayName(false)))
+				->identifier('method.shadowTemplate')
+				->build();
 		}
 
 		return $messages;

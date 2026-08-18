@@ -164,6 +164,7 @@ class Expectation implements ExpectationInterface
      * @param array $args List of arguments to the method
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return \Mockery::formatArgs($this->_name, $this->_expectedArgs);

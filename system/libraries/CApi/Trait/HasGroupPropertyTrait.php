@@ -1,6 +1,9 @@
 <?php
 
 trait CApi_Trait_HasGroupPropertyTrait {
+    /**
+     * @var string
+     */
     protected $group;
 
     /**

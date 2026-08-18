@@ -1,74 +1,77 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
+use Illuminate\Contracts\Support\Arrayable;
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Dec 26, 2017, 2:22:28 AM
- */
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Class CModel_Query.
  *
- * @template TModelClass of CModel
+ * @template TModel of CModel
  *
- * @method static TModelClass         create($attributes = [])                                                                 Find a model by its primary key.
- * @method        mixed               value($column)                                                                           Get a single column's value from the first result of a query.
- * @method        mixed               pluck($column)                                                                           Get a single column's value from the first result of a query.
- * @method        void                chunk($count, callable $callback)                                                        Chunk the results of the query.
- * @method        \CCollection        lists($column, $key = null)                                                              Get an array with the values of a given column.
- * @method        void                onDelete(Closure $callback)                                                              Register a replacement for the default delete function.
- * @method        CModel[]            getModels($columns = ['*'])                                                              Get the hydrated models without eager loading.
- * @method        array               eagerLoadRelations(array $models)                                                        Eager load the relationships for the models.
- * @method        array               loadRelation(array $models, $name, Closure $constraints)                                 Eagerly load the relationship on a set of models.
- * @method static CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
- * @method static CModel_Query|static whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)              Add a relationship count / exists condition to the query with where clauses.
- * @method static CModel_Query|static orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
- * @method static CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
- * @method static CModel_Query|static whereRaw($sql, array $bindings = [])
- * @method static CModel_Query|static whereBetween($column, array $values)
- * @method static CModel_Query|static whereNotBetween($column, array $values)
- * @method static CModel_Query|static whereNested(Closure $callback)
- * @method static CModel_Query|static addNestedWhereQuery($query)
- * @method static CModel_Query|static whereExists(Closure $callback)
- * @method static CModel_Query|static whereNotExists(Closure $callback)
- * @method static CModel_Query|static whereIn($column, $values)
- * @method static CModel_Query|static whereNotIn($column, $values)
- * @method static CModel_Query|static whereNull($column)
- * @method static CModel_Query|static whereNotNull($column)
- * @method        CModel_Query|static orWhereRaw($sql, array $bindings = [])
- * @method        CModel_Query|static orWhereBetween($column, array $values)
- * @method        CModel_Query|static orWhereNotBetween($column, array $values)
- * @method        CModel_Query|static orWhereExists(Closure $callback)
- * @method        CModel_Query|static orWhereNotExists(Closure $callback)
- * @method        CModel_Query|static orWhereIn($column, $values)
- * @method        CModel_Query|static orWhereNotIn($column, $values)
- * @method        CModel_Query|static orWhereNull($column)
- * @method        CModel_Query|static orWhereNotNull($column)
- * @method        CModel_Query|static whereDate($column, $operator, $value)
- * @method        CModel_Query|static whereDay($column, $operator, $value)
- * @method        CModel_Query|static whereMonth($column, $operator, $value)
- * @method        CModel_Query|static whereYear($column, $operator, $value)
- * @method        CModel_Query|static join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
- * @method        CModel_Query|static select($columns = ['*'])
- * @method        CModel_Query|static groupBy(...$groups)
- * @method        CModel_Query|static newQuery()
- * @method        CModel_Query|static withTrashed()
- * @method        CModel_Query|static from($table)
- * @method        CModel_Query|static leftJoinSub($query, $as, $first, $operator = null, $second = null)
- * @method        CModel_Query|static addSelect($column)
- * @method        CModel_Query|static selectRaw($expression, array $bindings = [])
- * @method        CModel_Query|static orderBy($column, $direction = 'asc')
- * @method        CModel_Query|static orderByDesc($column)
- * @method        CModel_Query|static skip($value)
- * @method        CModel_Query|static offset($value)
- * @method        CModel_Query|static take($value)
- * @method        CModel_Query|static limit($value)
- * @method        CModel_Query|static lockForUpdate()                                                                          Lock the selected rows in the table for updating.
- * @method        bool                exists()                                                                                 Determine if any rows exist for the current query
- * @method        mixed               sum($column)                                                                             Retrieve the sum of the values of a given column..
+ * @property-read CModel_HigherOrderBuilderProxy $orWhere
+ * @property-read CModel_HigherOrderBuilderProxy $whereNot
+ * @property-read CModel_HigherOrderBuilderProxy $orWhereNot
+ *
+ * @mixin CDatabase_Query_Builder
+ *
+ * @method static              TModel         create($attributes = [])                                                  Find a model by its primary key.
+ * @method mixed               value($column)                                                                           Get a single column's value from the first result of a query.
+ * @method mixed               pluck($column)                                                                           Get a single column's value from the first result of a query.
+ * @method void                chunk($count, callable $callback)                                                        Chunk the results of the query.
+ * @method \CCollection        lists($column, $key = null)                                                              Get an array with the values of a given column.
+ * @method void                onDelete(Closure $callback)                                                              Register a replacement for the default delete function.
+ * @method CModel[]            getModels($columns = null)                                                               Get the hydrated models without eager loading.
+ * @method array               eagerLoadRelations(array $models)                                                        Eager load the relationships for the models.
+ * @method array               loadRelation(array $models, $name, Closure $constraints)                                 Eagerly load the relationship on a set of models.
+ * @method CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
+ * @method CModel_Query|static whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)              Add a relationship count / exists condition to the query with where clauses.
+ * @method CModel_Query|static orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
+ * @method CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
+ * @method CModel_Query|static whereRaw($sql, array $bindings = [])
+ * @method CModel_Query|static whereBetween($column, array $values, $boolean = 'and', $not = false)
+ * @method CModel_Query|static whereNotBetween($column, array $values, $boolean = 'and')
+ * @method CModel_Query|static whereNested(Closure $callback, $boolean = 'and')
+ * @method CModel_Query|static addNestedWhereQuery($query, $boolean = 'and')
+ * @method CModel_Query|static whereExists(Closure $callback, $boolean = 'and', $not = false)
+ * @method CModel_Query|static whereNotExists(Closure $callback, $boolean = 'and')
+ * @method CModel_Query|static whereIn($column, $values)
+ * @method CModel_Query|static whereNotIn($column, $values, $boolean = 'and')
+ * @method CModel_Query|static whereNull($column, $boolean = 'and')
+ * @method CModel_Query|static whereNotNull($column, $boolean = 'and')
+ * @method CModel_Query|static orWhereRaw($sql, array $bindings = [])
+ * @method CModel_Query|static orWhereBetween($column, array $values)
+ * @method CModel_Query|static orWhereNotBetween($column, array $values)
+ * @method CModel_Query|static orWhereExists(Closure $callback)
+ * @method CModel_Query|static orWhereNotExists(Closure $callback)
+ * @method CModel_Query|static orWhereIn($column, $values)
+ * @method CModel_Query|static orWhereNotIn($column, $values)
+ * @method CModel_Query|static orWhereNull($column)
+ * @method CModel_Query|static orWhereNotNull($column)
+ * @method CModel_Query|static whereDate($column, $operator, $value = null)
+ * @method CModel_Query|static whereDay($column, $operator, $value = null)
+ * @method CModel_Query|static whereMonth($column, $operator, $value = null)
+ * @method CModel_Query|static whereYear($column, $operator, $value = null)
+ * @method CModel_Query|static join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+ * @method CModel_Query|static select($columns = null, ...$args)
+ * @method CModel_Query|static groupBy(...$groups)
+ * @method CModel_Query|static newQuery()
+ * @method CModel_Query|static withTrashed()
+ * @method CModel_Query|static from($table)
+ * @method CModel_Query|static leftJoinSub($query, $as, $first, $operator = null, $second = null)
+ * @method CModel_Query|static addSelect($column)
+ * @method CModel_Query|static selectRaw($expression, array $bindings = [])
+ * @method CModel_Query|static orderBy($column, $direction = 'asc')
+ * @method CModel_Query|static orderByDesc($column)
+ * @method CModel_Query|static skip($value)
+ * @method CModel_Query|static offset($value)
+ * @method CModel_Query|static take($value)
+ * @method CModel_Query|static limit($value)
+ * @method CModel_Query|static lockForUpdate()                                                                          Lock the selected rows in the table for updating.
+ * @method bool                exists()                                                                                 Determine if any rows exist for the current query
+ * @method mixed               sum($column)                                                                             Retrieve the sum of the values of a given column..
+ * @method void                truncate()                                                                               Run a truncate statement on the table.
+ * @method CDatabase_Result    insert(array $values)                                                                     Insert new records into the table.
  *
  * @property-read CModel_HigherOrderBuilderProxy $orWhere
  * @property-read CModel_HigherOrderBuilderProxy $whereNot
@@ -81,6 +84,13 @@ class CModel_Query {
     use CDatabase_Trait_Builder,
         CModel_Trait_QueriesRelationships,
         CTrait_ForwardsCalls;
+
+    /**
+     * The attributes that should be added to new models created by this builder.
+     *
+     * @var array
+     */
+    public $pendingAttributes = [];
 
     /**
      * The base query builder instance.
@@ -127,11 +137,37 @@ class CModel_Query {
     /**
      * The methods that should be returned from query builder.
      *
-     * @var array
+     * @var string[]
      */
     protected $passthru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql', 'toCompiledSql', 'dump', 'dd',
-        'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection', 'raw',
+        'aggregate',
+        'average',
+        'avg',
+        'count',
+        'dd',
+        'ddRawSql',
+        'doesntExist',
+        'doesntExistOr',
+        'dump',
+        'dumpRawSql',
+        'exists',
+        'existsOr',
+        'explain',
+        'getBindings',
+        'getConnection',
+        'getGrammar',
+        'implode',
+        'insert',
+        'insertGetId',
+        'insertOrIgnore',
+        'insertUsing',
+        'max',
+        'min',
+        'raw',
+        'rawValue',
+        'sum',
+        'toSql',
+        'toRawSql',
     ];
 
     /**
@@ -216,7 +252,7 @@ class CModel_Query {
      *
      * @return $this
      */
-    public function withoutGlobalScopes(array $scopes = null) {
+    public function withoutGlobalScopes(?array $scopes = null) {
         if (is_array($scopes)) {
             foreach ($scopes as $scope) {
                 $this->withoutGlobalScope($scope);
@@ -245,7 +281,7 @@ class CModel_Query {
      * @return $this
      */
     public function whereKey($id) {
-        if (is_array($id) || $id instanceof CInterface_Arrayable) {
+        if (is_array($id) || $id instanceof Arrayable) {
             $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
@@ -262,7 +298,7 @@ class CModel_Query {
      * @return $this
      */
     public function whereKeyNot($id) {
-        if (is_array($id) || $id instanceof CInterface_Arrayable) {
+        if (is_array($id) || $id instanceof Arrayable) {
             $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
@@ -296,15 +332,35 @@ class CModel_Query {
     }
 
     /**
+     * Add a basic where clause to the query, and return the first result.
+     *
+     * @param \Closure|string|array|\CDatabase_Query_Expression $column
+     * @param mixed                                             $operator
+     * @param mixed                                             $value
+     * @param string                                            $boolean
+     *
+     * @return null|\CModel|static
+     */
+    public function firstWhere($column, $operator = null, $value = null, $boolean = 'and') {
+        return $this->where(...func_get_args())->first();
+    }
+
+    /**
      * Add an "or where" clause to the query.
      *
-     * @param \Closure|array|string $column
-     * @param string                $operator
-     * @param mixed                 $value
+     * @param \Closure|array|string|\CDatabase_Query_Expression $column
+     * @param string                                            $operator
+     * @param mixed                                             $value
      *
      * @return CModel_Query|static
      */
     public function orWhere($column, $operator = null, $value = null) {
+        list($value, $operator) = $this->query->prepareValueAndOperator(
+            $value,
+            $operator,
+            func_num_args() === 2
+        );
+
         return $this->where($column, $operator, $value, 'or');
     }
 
@@ -345,10 +401,10 @@ class CModel_Query {
      *
      * @return null|static|CModel|CModel_Collection|static[]
      *
-     * @phpstan-return ($id is (\CInterface_Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModelClass> : TModelClass)|null
+     * @phpstan-return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModel> : TModel)|null
      */
     public function find($id, $columns = ['*']) {
-        if (is_array($id) || $id instanceof CInterface_Arrayable) {
+        if (is_array($id) || $id instanceof Arrayable) {
             return $this->findMany($id, $columns);
         }
 
@@ -358,8 +414,8 @@ class CModel_Query {
     /**
      * Find multiple models by their primary keys.
      *
-     * @param CInterface_Arrayable|array $ids
-     * @param array                      $columns
+     * @param \Illuminate\Contracts\Support\Arrayable|array $ids
+     * @param array                                         $columns
      *
      * @return CModel_Collection
      */
@@ -381,7 +437,7 @@ class CModel_Query {
      *
      * @return CModel|CModel_Collection
      *
-     * @phpstan-return ($id is (\CInterface_Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModelClass> : TModelClass)
+     * @phpstan-return ($id is (\Illuminate\Contracts\Support\Arrayable<array-key, mixed>|array<mixed>) ? \CModel_Collection<int, TModel> : TModel)
      */
     public function findOrFail($id, $columns = ['*']) {
         $result = $this->find($id, $columns);
@@ -408,7 +464,7 @@ class CModel_Query {
      *
      * @return CModel
      *
-     * @phpstan-return TModelClass
+     * @phpstan-return TModel
      */
     public function findOrNew($id, $columns = ['*']) {
         if (!is_null($model = $this->find($id, $columns))) {
@@ -426,7 +482,7 @@ class CModel_Query {
      *
      * @return CModel
      *
-     * @phpstan-return TModelClass
+     * @phpstan-return TModel
      */
     public function firstOrNew(array $attributes, array $values = []) {
         if (!is_null($instance = $this->where($attributes)->first())) {
@@ -445,7 +501,7 @@ class CModel_Query {
      * @return CModel
      */
     public function firstOrCreate(array $attributes, array $values = []) {
-        if (!is_null($instance = $this->where($attributes)->first())) {
+        if (!is_null($instance = (clone $this)->where($attributes)->first())) {
             return $instance;
         }
 
@@ -493,7 +549,7 @@ class CModel_Query {
      *
      * @return CModel|static|mixed
      */
-    public function firstOr($columns = ['*'], Closure $callback = null) {
+    public function firstOr($columns = ['*'], ?Closure $callback = null) {
         if ($columns instanceof Closure) {
             $callback = $columns;
 
@@ -516,8 +572,41 @@ class CModel_Query {
      */
     public function value($column) {
         if ($result = $this->first([$column])) {
-            return $result->{$column};
+            $column = $column instanceof CDatabase_Contract_Query_ExpressionInterface ? $column->getValue($this->getGrammar()) : $column;
+
+            return $result->{cstr::afterLast($column, '.')};
         }
+    }
+
+    /**
+     * Get a single column's value from the first result of a query if it's the sole matching record.
+     *
+     * @param string|\CDatabase_Contract_Query_ExpressionInterface $column
+     *
+     * @throws \CModel_Exception_ModelNotFoundException<\CModel>
+     * @throws \CDatabase_Exception_MultipleRecordsFoundException
+     *
+     * @return mixed
+     */
+    public function soleValue($column) {
+        $column = $column instanceof CDatabase_Contract_Query_ExpressionInterface ? $column->getValue($this->getGrammar()) : $column;
+
+        return $this->sole([$column])->{cstr::afterLast($column, '.')};
+    }
+
+    /**
+     * Get a single column's value from the first result of the query or throw an exception.
+     *
+     * @param string|\CDatabase_Contract_Query_ExpressionInterface $column
+     *
+     * @throws \CModel_Exception_ModelNotFoundException<\CModel>
+     *
+     * @return mixed
+     */
+    public function valueOrFail($column) {
+        $column = $column instanceof CDatabase_Contract_Query_ExpressionInterface ? $column->getValue($this->getGrammar()) : $column;
+
+        return $this->firstOrFail([$column])->{cstr::afterLast($column, '.')};
     }
 
     /**
@@ -744,6 +833,8 @@ class CModel_Query {
     public function pluck($column, $key = null) {
         $results = $this->toBase()->pluck($column, $key);
 
+        $column = $column instanceof CDatabase_Contract_Query_ExpressionInterface ? $column->getValue($this->getGrammar()) : $column;
+
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
         // columns are returned as you would expect from these Eloquent models.
@@ -936,21 +1027,42 @@ class CModel_Query {
      * @return array
      */
     protected function addUpdatedAtColumn(array $values) {
-        if (!$this->model->usesTimestamps()) {
+        if (! $this->model->usesTimestamps() || is_null($this->model->getUpdatedAtColumn())) {
             return $values;
         }
 
-        return carr::add(
-            $values,
-            $this->model->getUpdatedAtColumn(),
-            $this->model->freshTimestampString()
-        );
+        $column = $this->model->getUpdatedAtColumn();
+
+        if (! array_key_exists($column, $values)) {
+            $timestamp = $this->model->freshTimestampString();
+
+            if ($this->model->hasSetMutator($column)
+                || $this->model->hasAttributeSetMutator($column)
+                || $this->model->hasCast($column)
+            ) {
+                $timestamp = $this->model->newInstance()
+                    ->forceFill([$column => $timestamp])
+                    ->getAttributes()[$column] ?? $timestamp;
+            }
+
+            $values = array_merge([$column => $timestamp], $values);
+        }
+
+        $segments = preg_split('/\s+as\s+/i', $this->query->from);
+
+        $qualifiedColumn = c::arrayLast($segments).'.'.$column;
+
+        $values[$qualifiedColumn] = carr::get($values, $qualifiedColumn, $values[$column]);
+
+        unset($values[$column]);
+
+        return $values;
     }
 
     /**
      * Delete a record from the database.
      *
-     * @return mixed
+     * @return int
      */
     public function delete() {
         if (isset($this->onDelete)) {
@@ -983,16 +1095,27 @@ class CModel_Query {
     }
 
     /**
+     * Determine if the given model has a scope.
+     *
+     * @param string $scope
+     *
+     * @return bool
+     */
+    public function hasNamedScope($scope) {
+        return $this->model && $this->model->hasNamedScope($scope);
+    }
+
+    /**
      * Call the given local model scopes.
      *
-     * @param array $scopes
+     * @param array|string $scopes
      *
      * @return mixed
      */
-    public function scopes(array $scopes) {
+    public function scopes($scopes) {
         $builder = $this;
 
-        foreach ($scopes as $scope => $parameters) {
+        foreach (carr::wrap($scopes) as $scope => $parameters) {
             // If the scope key is an integer, then the scope was passed as the value and
             // the parameter list is empty, so we will format the scope name and these
             // parameters here. Then, we'll be ready to call the scope on the model.
@@ -1003,10 +1126,14 @@ class CModel_Query {
             // Next we'll pass the scope callback to the callScope method which will take
             // care of grouping the "wheres" properly so the logical order doesn't get
             // messed up when adding scopes. Then we'll return back out the builder.
-            $builder = $builder->callScope(
-                [$this->model, 'scope' . ucfirst($scope)],
-                (array) $parameters
+            $builder = $builder->callNamedScope(
+                $scope,
+                carr::wrap($parameters)
             );
+            // $builder = $builder->callScope(
+            //     [$this->model, 'scope' . ucfirst($scope)],
+            //     (array) $parameters
+            // );
         }
 
         return $builder;
@@ -1069,7 +1196,7 @@ class CModel_Query {
 
         //$result = $scope(...array_values($parameters)) ?? $this;
         //$result = isset($scope(array_values($parameters))) ? $scope(array_values($parameters)) : $this;
-        $result = call_user_func_array($scope, array_values($parameters));
+        $result = call_user_func_array($scope, array_values($parameters)) ?? $this;
 
         $result = isset($result) && !is_null($result) ? $result : $this;
 
@@ -1078,6 +1205,20 @@ class CModel_Query {
         }
 
         return $result;
+    }
+
+    /**
+     * Apply the given named scope on the current builder instance.
+     *
+     * @param string $scope
+     * @param array  $parameters
+     *
+     * @return mixed
+     */
+    protected function callNamedScope($scope, array $parameters = []) {
+        return $this->callScope(function (...$parameters) use ($scope) {
+            return $this->model->callNamedScope($scope, $parameters);
+        }, $parameters);
     }
 
     /**
@@ -1121,10 +1262,10 @@ class CModel_Query {
         // Here we'll check if the given subset of where clauses contains any "or"
         // booleans and in this case create a nested where expression. That way
         // we don't add any unnecessary nesting thus keeping the query clean.
-        if ($whereBooleans->contains('or')) {
+        if ($whereBooleans->contains(fn ($logicalOperator) => cstr::contains($logicalOperator, 'or'))) {
             $query->wheres[] = $this->createNestedWhere(
                 $whereSlice,
-                $whereBooleans->first()
+                str_replace(' not', '', $whereBooleans->first())
             );
         } else {
             $query->wheres = array_merge($query->wheres, $whereSlice);
@@ -1150,12 +1291,17 @@ class CModel_Query {
     /**
      * Set the relationships that should be eager loaded.
      *
-     * @param mixed $relations
+     * @param mixed      $relations
+     * @param null|mixed $callback
      *
      * @return $this
      */
-    public function with($relations) {
-        $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+    public function with($relations, $callback = null) {
+        if ($callback instanceof Closure) {
+            $eagerLoad = $this->parseWithRelations([$relations => $callback]);
+        } else {
+            $eagerLoad = $this->parseWithRelations(is_string($relations) ? func_get_args() : $relations);
+        }
 
         $this->eagerLoad = array_merge($this->eagerLoad, $eagerLoad);
 
@@ -1178,6 +1324,19 @@ class CModel_Query {
     }
 
     /**
+     * Set the relationships that should be eager loaded while removing any previously added eager loading specifications.
+     *
+     * @param  array<array-key, array|(\Closure(\CModel_Relation<*,*,*>): mixed)|string>|string  $relations
+     *
+     * @return $this
+     */
+    public function withOnly($relations) {
+        $this->eagerLoad = [];
+
+        return $this->with($relations);
+    }
+
+    /**
      * Create a new instance of the model being queried.
      *
      * @param array $attributes
@@ -1185,12 +1344,12 @@ class CModel_Query {
      * @return CModel
      */
     public function newModelInstance($attributes = []) {
-        return $this->model->newInstance($attributes);
-        /*
+        $attributes = array_merge($this->pendingAttributes, $attributes);
+        // return $this->model->newInstance($attributes);
+
         return $this->model->newInstance($attributes)->setConnection(
             $this->query->getConnection()->getName()
         );
-        */
     }
 
     /**
@@ -1201,28 +1360,105 @@ class CModel_Query {
      * @return array
      */
     protected function parseWithRelations(array $relations) {
+        if ($relations === []) {
+            return [];
+        }
+
         $results = [];
 
-        foreach ($relations as $name => $constraints) {
-            // If the "relation" value is actually a numeric key, we can assume that no
-            // constraints have been specified for the eager load and we'll just put
-            // an empty Closure with the loader so that we can treat all the same.
-            if (is_numeric($name)) {
-                $name = $constraints;
-
-                list($name, $constraints) = cstr::contains($name, ':') ? $this->createSelectWithConstraint($name) : [$name, function () {
-                }];
-            }
-
-            // We need to separate out any nested includes. Which allows the developers
+        foreach ($this->prepareNestedWithRelationships($relations) as $name => $constraints) {
+            // We need to separate out any nested includes, which allows the developers
             // to load deep relationships using "dots" without stating each level of
-            // the relationship with its own key in the array of eager load names.
+            // the relationship with its own key in the array of eager-load names.
             $results = $this->addNestedWiths($name, $results);
 
             $results[$name] = $constraints;
         }
 
         return $results;
+    }
+
+    /**
+     * Prepare nested with relationships.
+     *
+     * @param array  $relations
+     * @param string $prefix
+     *
+     * @return array
+     */
+    protected function prepareNestedWithRelationships($relations, $prefix = '') {
+        $preparedRelationships = [];
+
+        if ($prefix !== '') {
+            $prefix .= '.';
+        }
+
+        // If any of the relationships are formatted with the [$attribute => array()]
+        // syntax, we shall loop over the nested relations and prepend each key of
+        // this array while flattening into the traditional dot notation format.
+        foreach ($relations as $key => $value) {
+            if (!is_string($key) || !is_array($value)) {
+                continue;
+            }
+
+            list($attribute, $attributeSelectConstraint) = $this->parseNameAndAttributeSelectionConstraint($key);
+
+            $preparedRelationships = array_merge(
+                $preparedRelationships,
+                ["{$prefix}{$attribute}" => $attributeSelectConstraint],
+                $this->prepareNestedWithRelationships($value, "{$prefix}{$attribute}"),
+            );
+
+            unset($relations[$key]);
+        }
+
+        // We now know that the remaining relationships are in a dot notation format
+        // and may be a string or Closure. We'll loop over them and ensure all of
+        // the present Closures are merged + strings are made into constraints.
+        foreach ($relations as $key => $value) {
+            if (is_numeric($key) && is_string($value)) {
+                list($key, $value) = $this->parseNameAndAttributeSelectionConstraint($value);
+            }
+
+            $preparedRelationships[$prefix . $key] = $this->combineConstraints([
+                $value,
+                $preparedRelationships[$prefix . $key] ?? static function () {
+                },
+            ]);
+        }
+
+        return $preparedRelationships;
+    }
+
+    /**
+     * Combine an array of constraints into a single constraint.
+     *
+     * @param array $constraints
+     *
+     * @return \Closure
+     */
+    protected function combineConstraints(array $constraints) {
+        return function ($builder) use ($constraints) {
+            foreach ($constraints as $constraint) {
+                $builder = $constraint($builder) ?? $builder;
+            }
+
+            return $builder;
+        };
+    }
+
+    /**
+     * Parse the attribute select constraints from the name.
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    protected function parseNameAndAttributeSelectionConstraint($name) {
+        return cstr::contains($name, ':')
+            ? $this->createSelectWithConstraint($name)
+            : [$name, static function () {
+            }];
     }
 
     /**
@@ -1262,6 +1498,72 @@ class CModel_Query {
         }
 
         return $results;
+    }
+
+    /**
+     * Specify attributes that should be added to any new models created by this builder.
+     *
+     * The given key / value pairs will also be added as where conditions to the query.
+     *
+     * @param \CDatabase_Query_Expression|array|string $attributes
+     * @param mixed                                    $value
+     * @param bool                                     $asConditions
+     *
+     * @return $this
+     */
+    public function withAttributes($attributes, $value = null, $asConditions = true) {
+        if (!is_array($attributes)) {
+            $attributes = [$attributes => $value];
+        }
+
+        if ($asConditions) {
+            foreach ($attributes as $column => $columnValue) {
+                $this->where($this->qualifyColumn($column), $columnValue);
+            }
+        }
+
+        $this->pendingAttributes = array_merge($this->pendingAttributes, $attributes);
+
+        return $this;
+    }
+
+    /**
+     * Apply query-time casts to the model instance.
+     *
+     * @param array $casts
+     *
+     * @return $this
+     */
+    public function withCasts($casts) {
+        $this->model->mergeCasts($casts);
+
+        return $this;
+    }
+
+    /**
+     * Execute the given Closure within a transaction savepoint if needed.
+     *
+     * @template TModelValue
+     *
+     * @param  \Closure(): TModelValue  $scope
+     *
+     * @return TModelValue
+     */
+    public function withSavepointIfNeeded($scope) {
+        return $this->getQuery()->getConnection()->transactionLevel() > 0
+            ? $this->getQuery()->getConnection()->transaction($scope)
+            : $scope();
+    }
+
+    /**
+     * Get the Eloquent builder instances that are used in the union of the query.
+     *
+     * @return \CCollection
+     */
+    protected function getUnionBuilders() {
+        return isset($this->query->unions)
+            ? (new CCollection($this->query->unions))->pluck('query')
+            : new CCollection();
     }
 
     /**
@@ -1318,6 +1620,37 @@ class CModel_Query {
     }
 
     /**
+     * Indicate that the given relationships should not be eagerly loaded.
+     *
+     * @param array $relations
+     *
+     * @return $this
+     */
+    public function withoutEagerLoad(array $relations) {
+        $relations = array_diff(array_keys($this->model->getRelations()), $relations);
+
+        return $this->with($relations);
+    }
+
+    /**
+     * Flush the relationships being eagerly loaded.
+     *
+     * @return $this
+     */
+    public function withoutEagerLoads() {
+        return $this->setEagerLoads([]);
+    }
+
+    /**
+     * Get the "limit" value from the query or null if it's not set.
+     *
+     * @return mixed
+     */
+    public function getLimit() {
+        return $this->query->getLimit();
+    }
+
+    /**
      * Get the model instance being queried.
      *
      * @return CModel
@@ -1344,12 +1677,25 @@ class CModel_Query {
     /**
      * Qualify the given column name by the model's table.
      *
-     * @param string|CDatabase_Query_Expression $column
+     * @param string|CDatabase_Contract_Query_ExpressionInterface $column
      *
      * @return string
      */
     public function qualifyColumn($column) {
+        $column = $column instanceof CDatabase_Contract_Query_ExpressionInterface ? $column->getValue($this->getGrammar()) : $column;
+
         return $this->model->qualifyColumn($column);
+    }
+
+    /**
+     * Qualify the given columns with the model's table.
+     *
+     * @param array|\CDatabase_Contract_Query_ExpressionInterface $columns
+     *
+     * @return array
+     */
+    public function qualifyColumns($columns) {
+        return $this->model->qualifyColumns($columns);
     }
 
     /**

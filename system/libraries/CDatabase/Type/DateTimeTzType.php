@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 11:09:44 AM
- */
-
-/**
  * DateTime type saving additional timezone information.
  *
  * Caution: Databases are not necessarily experts at storing timezone related
@@ -27,21 +20,21 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDatabase_Type_DateTimeTzType extends CDatabase_Type implements CDatabase_Type_Interface_PhpDateTimeMappingTypeInterface {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getName() {
         return CDatabase_Type::DATETIMETZ;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getSQLDeclaration(array $fieldDeclaration, CDatabase_Platform $platform) {
         return $platform->getDateTimeTzTypeDeclarationSQL($fieldDeclaration);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function convertToDatabaseValue($value, CDatabase_Platform $platform) {
         if (null === $value) {
@@ -56,7 +49,7 @@ class CDatabase_Type_DateTimeTzType extends CDatabase_Type implements CDatabase_
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function convertToPHPValue($value, CDatabase_Platform $platform) {
         if ($value === null || $value instanceof \DateTimeInterface) {

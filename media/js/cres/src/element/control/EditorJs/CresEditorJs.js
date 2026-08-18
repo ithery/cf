@@ -76,7 +76,7 @@ class CresEditorJs {
         );
 
         // We apply the persistent config and return the editor instance
-        console.log(merge(editorConfig, this.persistentConfigObject));
+        // console.log(merge(editorConfig, this.persistentConfigObject));
         return new EditorJS(merge(editorConfig, this.persistentConfigObject));
     }
 

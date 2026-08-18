@@ -6,17 +6,24 @@ use DateTime;
 use DateTimeImmutable;
 use PhpParser\Node\Expr\StaticCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicStaticMethodThrowTypeExtension;
 use PHPStan\Type\NeverType;
+use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeUtils;
 use function count;
 use function in_array;
 
-class DateTimeConstructorThrowTypeExtension implements DynamicStaticMethodThrowTypeExtension
+#[AutowiredService]
+final class DateTimeConstructorThrowTypeExtension implements DynamicStaticMethodThrowTypeExtension
 {
+
+	public function __construct(private PhpVersion $phpVersion)
+	{
+	}
 
 	public function isStaticMethodSupported(MethodReflection $methodReflection): bool
 	{
@@ -30,23 +37,32 @@ class DateTimeConstructorThrowTypeExtension implements DynamicStaticMethodThrowT
 		}
 
 		$valueType = $scope->getType($methodCall->getArgs()[0]->value);
-		$constantStrings = TypeUtils::getConstantStrings($valueType);
+		$constantStrings = $valueType->getConstantStrings();
 
 		foreach ($constantStrings as $constantString) {
 			try {
 				new DateTime($constantString->getValue());
 			} catch (\Exception $e) { // phpcs:ignore
-				return $methodReflection->getThrowType();
+				return $this->exceptionType();
 			}
 
 			$valueType = TypeCombinator::remove($valueType, $constantString);
 		}
 
 		if (!$valueType instanceof NeverType) {
-			return $methodReflection->getThrowType();
+			return $this->exceptionType();
 		}
 
 		return null;
+	}
+
+	private function exceptionType(): Type
+	{
+		if ($this->phpVersion->hasDateTimeExceptions()) {
+			return new ObjectType('DateMalformedStringException');
+		}
+
+		return new ObjectType('Exception');
 	}
 
 }

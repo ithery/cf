@@ -5,23 +5,24 @@ namespace PHPStan\Type\Php;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Name\FullyQualified;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\TrinaryLogic;
 use PHPStan\Type\BitwiseFlagHelper;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantStringType;
-use PHPStan\Type\ConstantScalarType;
 use PHPStan\Type\ConstantTypeHelper;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
-use PHPStan\Type\ObjectType;
+use PHPStan\Type\ObjectWithoutClassType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use stdClass;
 use function is_bool;
 use function json_decode;
 
-class JsonThrowOnErrorDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class JsonThrowOnErrorDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	/** @var array<string, int> */
@@ -45,7 +46,7 @@ class JsonThrowOnErrorDynamicReturnTypeExtension implements DynamicFunctionRetur
 			return true;
 		}
 
-		return $this->reflectionProvider->hasConstant(new FullyQualified('JSON_THROW_ON_ERROR'), null) && $functionReflection->getName() === 'json_encode';
+		return $functionReflection->getName() === 'json_encode' && $this->reflectionProvider->hasConstant(new FullyQualified('JSON_THROW_ON_ERROR'), null);
 	}
 
 	public function getTypeFromFunctionCall(
@@ -55,17 +56,22 @@ class JsonThrowOnErrorDynamicReturnTypeExtension implements DynamicFunctionRetur
 	): Type
 	{
 		$argumentPosition = $this->argumentPositions[$functionReflection->getName()];
-		$defaultReturnType = ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
+		$args = $functionCall->getArgs();
+		$defaultReturnType = ParametersAcceptorSelector::selectFromArgs(
+			$scope,
+			$args,
+			$functionReflection->getVariants(),
+		)->getReturnType();
 
 		if ($functionReflection->getName() === 'json_decode') {
 			$defaultReturnType = $this->narrowTypeForJsonDecode($functionCall, $scope, $defaultReturnType);
 		}
 
-		if (!isset($functionCall->getArgs()[$argumentPosition])) {
+		if (!isset($args[$argumentPosition])) {
 			return $defaultReturnType;
 		}
 
-		$optionsExpr = $functionCall->getArgs()[$argumentPosition]->value;
+		$optionsExpr = $args[$argumentPosition]->value;
 		if ($functionReflection->getName() === 'json_encode' && $this->bitwiseFlagAnalyser->bitwiseOrContainsConstant($optionsExpr, $scope, 'JSON_THROW_ON_ERROR')->yes()) {
 			return TypeCombinator::remove($defaultReturnType, new ConstantBooleanType(false));
 		}
@@ -76,18 +82,24 @@ class JsonThrowOnErrorDynamicReturnTypeExtension implements DynamicFunctionRetur
 	private function narrowTypeForJsonDecode(FuncCall $funcCall, Scope $scope, Type $fallbackType): Type
 	{
 		$args = $funcCall->getArgs();
-		$isArrayWithoutStdClass = $this->isForceArrayWithoutStdClass($funcCall, $scope);
+		$isForceArray = $this->isForceArray($funcCall, $scope);
 		if (!isset($args[0])) {
 			return $fallbackType;
 		}
 
 		$firstValueType = $scope->getType($args[0]->value);
-		if ($firstValueType instanceof ConstantStringType) {
-			return $this->resolveConstantStringType($firstValueType, $isArrayWithoutStdClass);
+		if ($firstValueType->getConstantStrings() !== []) {
+			$types = [];
+
+			foreach ($firstValueType->getConstantStrings() as $constantString) {
+				$types[] = $this->resolveConstantStringType($constantString, $isForceArray);
+			}
+
+			return TypeCombinator::union(...$types);
 		}
 
-		if ($isArrayWithoutStdClass) {
-			return TypeCombinator::remove($fallbackType, new ObjectType(stdClass::class));
+		if ($isForceArray->yes()) {
+			return TypeCombinator::remove($fallbackType, new ObjectWithoutClassType());
 		}
 
 		return $fallbackType;
@@ -96,33 +108,55 @@ class JsonThrowOnErrorDynamicReturnTypeExtension implements DynamicFunctionRetur
 	/**
 	 * Is "json_decode(..., true)"?
 	 */
-	private function isForceArrayWithoutStdClass(FuncCall $funcCall, Scope $scope): bool
+	private function isForceArray(FuncCall $funcCall, Scope $scope): TrinaryLogic
 	{
 		$args = $funcCall->getArgs();
+		$flagValue = $this->getFlagValue($funcCall, $scope);
 		if (!isset($args[1])) {
-			return false;
+			return TrinaryLogic::createNo();
 		}
 
 		$secondArgType = $scope->getType($args[1]->value);
-		$secondArgValue = $secondArgType instanceof ConstantScalarType ? $secondArgType->getValue() : null;
-
-		if (is_bool($secondArgValue)) {
-			return $secondArgValue;
+		$secondArgValues = [];
+		foreach ($secondArgType->getConstantScalarValues() as $value) {
+			if ($value === null) {
+				$secondArgValues[] = $flagValue;
+				continue;
+			}
+			if (!is_bool($value)) {
+				return TrinaryLogic::createNo();
+			}
+			$secondArgValues[] = TrinaryLogic::createFromBoolean($value);
 		}
 
-		if ($secondArgValue !== null || !isset($args[3])) {
-			return false;
+		if ($secondArgValues === []) {
+			return TrinaryLogic::createNo();
+		}
+
+		return TrinaryLogic::extremeIdentity(...$secondArgValues);
+	}
+
+	private function resolveConstantStringType(ConstantStringType $constantStringType, TrinaryLogic $isForceArray): Type
+	{
+		$types = [];
+		/** @var bool $asArray */
+		foreach ($isForceArray->toBooleanType()->getConstantScalarValues() as $asArray) {
+			$decodedValue = json_decode($constantStringType->getValue(), $asArray);
+			$types[] = ConstantTypeHelper::getTypeFromValue($decodedValue);
+		}
+
+		return TypeCombinator::union(...$types);
+	}
+
+	private function getFlagValue(FuncCall $funcCall, Scope $scope): TrinaryLogic
+	{
+		$args = $funcCall->getArgs();
+		if (!isset($args[3])) {
+			return TrinaryLogic::createNo();
 		}
 
 		// depends on used constants, @see https://www.php.net/manual/en/json.constants.php#constant.json-object-as-array
-		return $this->bitwiseFlagAnalyser->bitwiseOrContainsConstant($args[3]->value, $scope, 'JSON_OBJECT_AS_ARRAY')->yes();
-	}
-
-	private function resolveConstantStringType(ConstantStringType $constantStringType, bool $isForceArray): Type
-	{
-		$decodedValue = json_decode($constantStringType->getValue(), $isForceArray);
-
-		return ConstantTypeHelper::getTypeFromValue($decodedValue);
+		return $this->bitwiseFlagAnalyser->bitwiseOrContainsConstant($args[3]->value, $scope, 'JSON_OBJECT_AS_ARRAY');
 	}
 
 }

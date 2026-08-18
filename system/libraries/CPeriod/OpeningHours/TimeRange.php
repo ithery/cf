@@ -169,6 +169,7 @@ class CPeriod_OpeningHours_TimeRange {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->format();
     }

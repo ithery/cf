@@ -6,8 +6,10 @@ use PhpParser\Node;
 use PhpParser\Node\Stmt\Return_;
 use PHPStan\Analyser\Scope;
 
-/** @api */
-class ReturnStatement
+/**
+ * @api
+ */
+final class ReturnStatement
 {
 
 	private Node\Stmt\Return_ $returnNode;

@@ -3,14 +3,17 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @property      string  $createdby
- * @property      string  $updatedby
- * @property      CCarbon $created
- * @property      CCarbon $updated
- * @property      int     $status
- * @property-read int     $org_id
+ * @property      null|string                                         $createdby
+ * @property      null|string                                         $updatedby
+ * @property      null|string|CCarbon|\Carbon\Carbon|\CarbonV3\Carbon $created
+ * @property      null|string|CCarbon|\Carbon\Carbon|\CarbonV3\Carbon $updated
+ * @property      int                                                 $status
+ * @property-read int                                                 $org_id
  */
 trait CApp_Model_Trait_Org {
+    /**
+     * @param array $attributes
+     */
     public function __construct(array $attributes = []) {
         parent::__construct($attributes);
         $this->primaryKey = 'org_id';

@@ -2,22 +2,16 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 28, 2019, 3:11:25 AM
- */
 interface CManager_File_Connector_ElFinder_SessionInterface {
     /**
-     * Session start
+     * Session start.
      *
      * @return self
      * */
     public function start();
 
     /**
-     * Session write & close
+     * Session write & close.
      *
      * @return self
      * */
@@ -46,7 +40,7 @@ interface CManager_File_Connector_ElFinder_SessionInterface {
     public function set($key, $data);
 
     /**
-     * Get session data
+     * Get session data.
      *
      * @param string $key Target key
      *

@@ -117,6 +117,7 @@ class CBase_ViewErrorBag implements Countable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->getBag('default');
     }

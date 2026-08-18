@@ -74,12 +74,10 @@ class CQC_Phpstan_Service_RelationParserHelper {
             return null;
         }
 
-        $scope = $this->scopeFactory->create(
-            ScopeContext::create($fileName),
-            false,
-            [],
-            $methodReflection
-        );
+        //PHPStan 2.x mempersempit ScopeFactory::create() menjadi konteks saja;
+        //kelas dan methodnya dimasuki di langkah berikutnya, sama seperti yang
+        //dilakukan Larastan 3.x
+        $scope = $this->scopeFactory->create(ScopeContext::create($fileName));
 
         $methodScope = $scope
             ->enterClass($methodReflection->getDeclaringClass())
@@ -110,10 +108,7 @@ class CQC_Phpstan_Service_RelationParserHelper {
     }
 
     /**
-     * @param string $method
-     * @param mixed  $statements
-     *
-     * @return null|Node
+     * @param mixed $statements
      */
     private function findMethod(string $method, $statements): ?Node {
         return (new NodeFinder())->findFirst($statements, static function (Node $node) use ($method) {

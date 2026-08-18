@@ -1,6 +1,9 @@
 <?php
 
-class CApi_OAuth_Scope implements CInterface_Arrayable, CInterface_Jsonable {
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
+
+class CApi_OAuth_Scope implements Arrayable, Jsonable {
     /**
      * The name / ID of the scope.
      *

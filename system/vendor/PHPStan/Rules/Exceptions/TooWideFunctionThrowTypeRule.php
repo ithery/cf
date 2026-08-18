@@ -5,16 +5,14 @@ namespace PHPStan\Rules\Exceptions;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
 use PHPStan\Node\FunctionReturnStatementsNode;
-use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\ShouldNotHappenException;
 use function sprintf;
 
 /**
  * @implements Rule<FunctionReturnStatementsNode>
  */
-class TooWideFunctionThrowTypeRule implements Rule
+final class TooWideFunctionThrowTypeRule implements Rule
 {
 
 	public function __construct(private TooWideThrowTypeCheck $check)
@@ -29,10 +27,7 @@ class TooWideFunctionThrowTypeRule implements Rule
 	public function processNode(Node $node, Scope $scope): array
 	{
 		$statementResult = $node->getStatementResult();
-		$functionReflection = $scope->getFunction();
-		if (!$functionReflection instanceof FunctionReflection) {
-			throw new ShouldNotHappenException();
-		}
+		$functionReflection = $node->getFunctionReflection();
 
 		$throwType = $functionReflection->getThrowType();
 		if ($throwType === null) {
@@ -46,12 +41,7 @@ class TooWideFunctionThrowTypeRule implements Rule
 				$functionReflection->getName(),
 				$throwClass,
 			))
-				->identifier('exceptions.tooWideThrowType')
-				->metadata([
-					'exceptionName' => $throwClass,
-					'statementDepth' => $node->getAttribute('statementDepth'),
-					'statementOrder' => $node->getAttribute('statementOrder'),
-				])
+				->identifier('throws.unusedType')
 				->build();
 		}
 

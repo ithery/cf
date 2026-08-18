@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 19, 2019, 12:38:07 PM
- */
 class CCache_Driver_ArrayDriver extends CCache_DriverTaggableAbstract implements CCache_LockProviderInterface {
     use CTrait_Helper_InteractsWithTime, CCache_Trait_RetrievesMultipleKeys;
 
@@ -154,6 +148,7 @@ class CCache_Driver_ArrayDriver extends CCache_DriverTaggableAbstract implements
      */
     public function flush() {
         $this->storage = [];
+        $this->locks = [];
 
         return true;
     }

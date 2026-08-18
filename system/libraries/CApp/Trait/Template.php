@@ -3,24 +3,43 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 10, 2019, 12:34:27 AM
+ * @deprecated since 1.6 Apr 10, 2019, 12:34:27 AM
  */
+/** @phpstan-ignore-next-line */
 trait CApp_Trait_Template {
+    /**
+     * @var null|string
+     */
     protected $templateName;
 
+    /**
+     * @var array|null
+     */
     protected $templateData;
 
+    /**
+     * @var string
+     */
     protected $htmlOutput = '';
 
+    /**
+     * @var string
+     */
     protected $jsOutput = '';
 
+    /**
+     * @var callable|null
+     */
     protected $onBeforeParse = null;
 
+    /**
+     * @var CElement_PseudoElement[]
+     */
     protected $sections = [];
 
+    /**
+     * @var string
+     */
     protected $skeleton = '';
 
     /**
@@ -28,6 +47,9 @@ trait CApp_Trait_Template {
      */
     protected $helpers = [];
 
+    /**
+     * @var string
+     */
     private $sectionJs = '';
 
     /**
@@ -52,6 +74,9 @@ trait CApp_Trait_Template {
         return $this;
     }
 
+    /**
+     * @return array|null
+     */
     public function getData() {
         return $this->templateData;
     }
@@ -71,6 +96,11 @@ trait CApp_Trait_Template {
         return $this->sections[$sectionName];
     }
 
+    /**
+     * @param mixed $data
+     *
+     * @return $this
+     */
     public function setData($data) {
         if (is_array($data)) {
             foreach ($data as $k => $v) {
@@ -81,26 +111,53 @@ trait CApp_Trait_Template {
         return $this;
     }
 
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
     public function getVar($key) {
         return carr::get($this->templateData, $key);
     }
 
+    /**
+     * @param string $key
+     * @param mixed  $val
+     *
+     * @return $this
+     */
     public function setVar($key, $val) {
         $this->templateData[$key] = $val;
 
         return $this;
     }
 
+    /**
+     * @param string $templateName
+     *
+     * @return string
+     */
     public function getTemplatePath($templateName) {
         $viewPath = $templateName;
 
         return $viewPath;
     }
 
+    /**
+     * @param string   $helperName
+     * @param callable $callable
+     *
+     * @return void
+     */
     public function addHelper($helperName, callable $callable) {
         $this->helpers[$helperName] = $callable;
     }
 
+    /**
+     * @param bool $noSkeleton
+     *
+     * @return array
+     */
     private function parseTemplate($noSkeleton = false) {
         if ($this->onBeforeParse != null) {
             $callable = $this->onBeforeParse;
@@ -187,6 +244,9 @@ trait CApp_Trait_Template {
         ];
     }
 
+    /**
+     * @return bool
+     */
     private function collectHtmlJsOnce() {
         if ($this->htmlOutput == null) {
             $this->collectHtmlJs();
@@ -195,6 +255,9 @@ trait CApp_Trait_Template {
         return true;
     }
 
+    /**
+     * @return bool
+     */
     protected function collectHtmlJs() {
         $obLevel = ob_get_level();
         $resultContent = '';
@@ -223,18 +286,33 @@ trait CApp_Trait_Template {
         return true;
     }
 
+    /**
+     * @param callable $callable
+     *
+     * @return $this
+     */
     public function onBeforeParse(callable $callable) {
         $this->onBeforeParse = $callable;
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function getTemplateHtml($indent = 0) {
         $this->collectHtmlJsOnce();
 
         return $this->htmlOutput;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function getTemplateJs($indent = 0) {
         $this->collectHtmlJsOnce();
 

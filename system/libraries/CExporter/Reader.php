@@ -78,7 +78,7 @@ class CExporter_Reader {
      *
      * @return \CQueue_PendingDispatch|$this
      */
-    public function read($import, $filePath, string $readerType = null, string $disk = null) {
+    public function read($import, $filePath, ?string $readerType = null, ?string $disk = null) {
         $this->reader = $this->getReader($import, $filePath, $readerType, $disk);
 
         if ($import instanceof CExporter_Concern_WithChunkReading) {

@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Oct 1, 2019, 5:19:41 PM
+ * @deprecated 1.8
  */
 trait CExcel_Trait_HasEventBusTrait {
     /**

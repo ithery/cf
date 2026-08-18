@@ -1,14 +1,10 @@
 <?php
 
+use Illuminate\Contracts\Support\Jsonable;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2018, 9:59:28 PM
- */
-class CAjax_Method implements CInterface_Jsonable {
+class CAjax_Method implements Jsonable {
     public $name = '';
 
     public $method = 'GET';
@@ -18,14 +14,29 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public $data = [];
 
+    /**
+     * @var string
+     */
     public $type = '';
 
+    /**
+     * @var string
+     */
     public $target = '';
 
+    /**
+     * @var array
+     */
     public $param = [];
 
+    /**
+     * @var array
+     */
     public $args = [];
 
+    /**
+     * @var int|DateTimeInterface
+     */
     public $expiration;
 
     /**
@@ -68,6 +79,11 @@ class CAjax_Method implements CInterface_Jsonable {
         return $this;
     }
 
+    /**
+     * @param int|DateTimeInterface $expiration
+     *
+     * @return $this
+     */
     public function setExpiration($expiration) {
         $expiration = $expiration instanceof DateTimeInterface
         ? $expiration->getTimestamp() : $expiration;
@@ -99,8 +115,6 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * @param array $type
-     *
      * @return $this
      */
     public function setArgs(array $args) {
@@ -223,8 +237,7 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * @param CAjax_Method $ajaxMethod
-     * @param null|array   $input
+     * @param null|array $input
      *
      * @throws CAjax_Exception
      *
@@ -286,10 +299,11 @@ class CAjax_Method implements CInterface_Jsonable {
         if (!$this->checkAuth()) {
             throw new CAjax_Exception_AuthAjaxException('Unauthenticated');
         }
+
         $engine = self::createEngine($this, $input);
         $response = $engine->execute();
         if ($response != null && $response instanceof CHTTP_JsonResponse) {
-            return $response->getContent();
+            return $response;
         }
 
         return $response;

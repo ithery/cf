@@ -8,14 +8,15 @@ use PHPStan\Analyser\SpecifiedTypes;
 use PHPStan\Analyser\TypeSpecifier;
 use PHPStan\Analyser\TypeSpecifierAwareExtension;
 use PHPStan\Analyser\TypeSpecifierContext;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\Constant\ConstantBooleanType;
-use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\FunctionTypeSpecifyingExtension;
 use function count;
 use function strtolower;
 
-class IsAFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
+#[AutowiredService]
+final class IsAFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtension, TypeSpecifierAwareExtension
 {
 
 	private TypeSpecifier $typeSpecifier;
@@ -34,23 +35,30 @@ class IsAFunctionTypeSpecifyingExtension implements FunctionTypeSpecifyingExtens
 
 	public function specifyTypes(FunctionReflection $functionReflection, FuncCall $node, Scope $scope, TypeSpecifierContext $context): SpecifiedTypes
 	{
-		if (count($node->getArgs()) < 2) {
+		$args = $node->getArgs();
+		if (count($args) < 2) {
 			return new SpecifiedTypes();
 		}
-		$objectOrClassType = $scope->getType($node->getArgs()[0]->value);
-		$classType = $scope->getType($node->getArgs()[1]->value);
-		$allowStringType = isset($node->getArgs()[2]) ? $scope->getType($node->getArgs()[2]->value) : new ConstantBooleanType(false);
+		$classType = $scope->getType($args[1]->value);
+
+		// is_a() will only assure one of the classes to exist.
+		if (count($classType->getConstantStrings()) !== 1 && !$context->true()) {
+			return new SpecifiedTypes([], []);
+		}
+
+		$objectOrClassType = $scope->getType($args[0]->value);
+		$allowStringType = isset($args[2]) ? $scope->getType($args[2]->value) : new ConstantBooleanType(false);
 		$allowString = !$allowStringType->equals(new ConstantBooleanType(false));
 
-		if (!$classType instanceof ConstantStringType && !$context->truthy()) {
+		$resultType = $this->isAFunctionTypeSpecifyingHelper->determineType($objectOrClassType, $classType, $allowString, true);
+		if ($resultType === null) {
 			return new SpecifiedTypes([], []);
 		}
 
 		return $this->typeSpecifier->create(
-			$node->getArgs()[0]->value,
-			$this->isAFunctionTypeSpecifyingHelper->determineType($objectOrClassType, $classType, $allowString, true),
+			$args[0]->value,
+			$resultType,
 			$context,
-			false,
 			$scope,
 		);
 	}

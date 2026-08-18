@@ -1,6 +1,7 @@
 <?php
 
 use CTesting_Assert as PHPUnit;
+use Illuminate\Contracts\Support\Jsonable;
 
 class CTesting_AssertableJsonString implements ArrayAccess, Countable {
     /**
@@ -13,14 +14,14 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
     /**
      * The decoded json contents.
      *
-     * @var array|null
+     * @var null|array
      */
     protected $decoded;
 
     /**
      * Create a new assertable JSON string instance.
      *
-     * @param CInterface_Jsonable|\JsonSerializable|array|string $jsonable
+     * @param \Illuminate\Contracts\Support\Jsonable|\JsonSerializable|array|string $jsonable
      *
      * @return void
      */
@@ -29,7 +30,7 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
 
         if ($jsonable instanceof JsonSerializable) {
             $this->decoded = $jsonable->jsonSerialize();
-        } elseif ($jsonable instanceof CInterface_Jsonable) {
+        } elseif ($jsonable instanceof Jsonable) {
             $this->decoded = json_decode($jsonable->toJson(), true);
         } elseif (is_array($jsonable)) {
             $this->decoded = $jsonable;
@@ -41,19 +42,19 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
     /**
      * Validate and return the decoded response JSON.
      *
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return mixed
      */
     public function json($key = null) {
-        return CF::get($this->decoded, $key);
+        return c::get($this->decoded, $key);
     }
 
     /**
      * Assert that the response JSON has the expected count of items at the given key.
      *
      * @param int         $count
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return $this
      */
@@ -61,7 +62,7 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
         if (!is_null($key)) {
             PHPUnit::assertCount(
                 $count,
-                CF::get($this->decoded, $key),
+                c::get($this->decoded, $key),
                 "Failed to assert that the response count matched the expected {$count}"
             );
 
@@ -217,12 +218,12 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
     /**
      * Assert that the response has a given JSON structure.
      *
-     * @param array|null $structure
-     * @param array|null $responseData
+     * @param null|array $structure
+     * @param null|array $responseData
      *
      * @return $this
      */
-    public function assertStructure(array $structure = null, $responseData = null) {
+    public function assertStructure(?array $structure = null, $responseData = null) {
         if (is_null($structure)) {
             return $this->assertSimilar($this->decoded);
         }
@@ -330,6 +331,7 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return count($this->decoded);
     }
@@ -341,6 +343,7 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
      *
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return isset($this->decoded[$offset]);
     }
@@ -352,6 +355,7 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->decoded[$offset];
     }
@@ -364,6 +368,7 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->decoded[$offset] = $value;
     }
@@ -375,6 +380,7 @@ class CTesting_AssertableJsonString implements ArrayAccess, Countable {
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         unset($this->decoded[$offset]);
     }

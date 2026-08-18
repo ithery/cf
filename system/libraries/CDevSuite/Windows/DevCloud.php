@@ -1,13 +1,15 @@
 <?php
 
 /**
- * Description of DevCloud
- *
- * @author Hery
+ * Description of DevCloud.
  */
 class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
+    /**
+     * @var array
+     */
     protected $requiredFiles = [
         'winsw.exe',
+        'php.ps1',
         'php71.ps1',
         'php72.ps1',
         'php73.ps1',
@@ -29,8 +31,9 @@ class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
         'nginx/contrib/vim/indent/nginx.vim',
         'nginx/contrib/vim/syntax/nginx.vim',
         'nginx/contrib/unicode2nginx/koi-utf',
-        'nginx/contrib/unicode2nginx/unicode-to-nginx',
+        'nginx/contrib/unicode2nginx/unicode-to-nginx.pl',
         'nginx/contrib/unicode2nginx/win-utf',
+        'nginx/docs/CHANGES',
         'nginx/docs/LICENSE',
         'nginx/docs/OpenSSL.LICENSE',
         'nginx/docs/PCRE.LICENSE',
@@ -44,15 +47,25 @@ class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
         'acrylic/AcrylicService.exe',
         'acrylic/AcrylicUI.exe',
         'acrylic/AcrylicUI.exe.manifest',
+        'acrylic/AcrylicUI.ini',
         'acrylic/License.txt',
         'acrylic/Readme.txt',
+        'winsw/LICENSE.txt',
+        'winsw/README.md',
+        'winsw/WinSW.NET4.exe',
     ];
 
+    /**
+     * @var array
+     */
     protected $requiredFolders = [
         'nginx/logs',
         'nginx/temp',
     ];
 
+    /**
+     * @var array
+     */
     protected $requiredMariaDBFiles = [
         'mariadb/bin/mysql.exe',
         'mariadb/bin/mysqld.exe',
@@ -151,6 +164,11 @@ class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
         'mariadb/share/english/errmsg.sys',
     ];
 
+    /**
+     * Create a new DevCloud instance.
+     *
+     * @return void
+     */
     public function __construct() {
         parent::__construct();
         $this->requiredSSHFiles = [

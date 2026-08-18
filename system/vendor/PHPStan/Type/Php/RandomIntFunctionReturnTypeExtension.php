@@ -4,8 +4,8 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\IntegerRangeType;
@@ -18,26 +18,28 @@ use function in_array;
 use function max;
 use function min;
 
-class RandomIntFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class RandomIntFunctionReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
 	{
-		return in_array($functionReflection->getName(), ['random_int', 'rand'], true);
+		return in_array($functionReflection->getName(), ['random_int', 'rand', 'mt_rand'], true);
 	}
 
-	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
+	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		if ($functionReflection->getName() === 'rand' && count($functionCall->getArgs()) === 0) {
+		$args = $functionCall->getArgs();
+		if (in_array($functionReflection->getName(), ['rand', 'mt_rand'], true) && count($args) === 0) {
 			return IntegerRangeType::fromInterval(0, null);
 		}
 
-		if (count($functionCall->getArgs()) < 2) {
-			return ParametersAcceptorSelector::selectFromArgs($scope, $functionCall->getArgs(), $functionReflection->getVariants())->getReturnType();
+		if (count($args) < 2) {
+			return null;
 		}
 
-		$minType = $scope->getType($functionCall->getArgs()[0]->value)->toInteger();
-		$maxType = $scope->getType($functionCall->getArgs()[1]->value)->toInteger();
+		$minType = $scope->getType($args[0]->value)->toInteger();
+		$maxType = $scope->getType($args[1]->value)->toInteger();
 
 		return $this->createRange($minType, $maxType);
 	}

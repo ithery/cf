@@ -12,8 +12,14 @@ class CApi {
 
     const SESSION_DRIVER_NULL = 'Null';
 
+    /**
+     * @var null|CApi_HTTP_Request
+     */
     protected static $request;
 
+    /**
+     * @var array $oauth
+     */
     protected static $oauth = [];
 
     /**
@@ -21,6 +27,9 @@ class CApi {
      */
     protected static $dispatcher;
 
+    /**
+     * @var int
+     */
     protected static $call = 0;
 
     /**
@@ -36,6 +45,14 @@ class CApi {
         return CApi_SessionFactory::createSession($options);
     }
 
+    /**
+     * Get the session instance.
+     *
+     * @param string $sessionId
+     * @param array  $options
+     *
+     * @return CApi_Session
+     */
     public static function session($sessionId, $options = []) {
         return CApi_SessionFactory::getSession($sessionId, $options);
     }
@@ -62,7 +79,7 @@ class CApi {
         return static::$dispatcher;
     }
 
-    public static function setCurrentDispatcher(CApi_Dispatcher $dispatcher = null) {
+    public static function setCurrentDispatcher(?CApi_Dispatcher $dispatcher = null) {
         static::$dispatcher = $dispatcher;
     }
 

@@ -1,10 +1,14 @@
 <?php
 
 class CApp_Notification_ServiceWorkerService {
+    /**
+     * @param array $config
+     *
+     * @return string
+     */
     public function generate($config) {
         $driver = carr::get($config, 'driver');
         $options = carr::get($config, 'options');
-
         $output = '';
 
         if ($driver == 'firebase') {
@@ -14,13 +18,18 @@ class CApp_Notification_ServiceWorkerService {
         return $output;
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     protected function firebaseScript($options) {
         $jsonOptions = json_encode($options);
 
         return <<<JAVASCRIPT
 importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.2.0/firebase-messaging-compat.js');
-firebase.initializeApp(${jsonOptions});
+firebase.initializeApp({$jsonOptions});
 const messaging = firebase.messaging();
 messaging.onBackgroundMessage(function(payload) {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);

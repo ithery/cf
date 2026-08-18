@@ -544,6 +544,7 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
         return $buffer . $this->getDataSetAsString();
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return 1;
     }

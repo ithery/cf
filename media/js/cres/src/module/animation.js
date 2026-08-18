@@ -29,7 +29,7 @@ export const fadeOut = async (el, durationInMs = 1000, config = defaultFadeConfi
         );
         animation.onfinish = () => resolve();
     });
-}
+};
 
 /**
  * @param {HTMLElement} el
@@ -49,4 +49,4 @@ export const fadeIn = async (el, durationInMs = 1000, config = defaultFadeConfig
         );
         animation.onfinish = () => resolve();
     });
-}
+};

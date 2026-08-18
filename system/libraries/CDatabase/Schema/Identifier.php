@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 11:57:45 AM
- */
-
-/**
  * An abstraction class for an asset identifier.
  *
  * Wraps identifier names like column names in indexes / foreign keys
@@ -25,7 +18,7 @@ class CDatabase_Schema_Identifier extends CDatabase_AbstractAsset {
     public function __construct($identifier, $quote = false) {
         $this->setName($identifier);
 
-        if ($quote && !$this->_quoted) {
+        if ($quote && !$this->quoted) {
             $this->setName('"' . $this->getName() . '"');
         }
     }

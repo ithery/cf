@@ -72,7 +72,7 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
                 $exportOptions['queued'] = $queued;
                 CExporter::store($exportable, $filename, $exportOptions);
             } else {
-                return CExporter::toDownloadResponse($exportable, $filename, $writerType);
+                return CExporter::download($exportable, $filename, $writerType);
             }
         }
 

@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 20, 2019, 3:45:46 PM
+ * @see CObservable_Listener_Handler_RemoveHandler
  */
 // @codingStandardsIgnoreStart
 

@@ -160,7 +160,7 @@ class CVendor_BunnyCDN_Api_StreamApi extends CVendor_BunnyCDN_ApiAbstract {
         if ($streamLibraryId == null) {
             $streamLibraryId = $this->streamLibraryId;
         }
-        $path = "library/{$streamLibraryId}/videos/{$videoId}/thumbnail?{$thumbnailUrl}";
+        $path = "library/{$streamLibraryId}/videos/{$videoId}/thumbnail?thumbnailUrl={$thumbnailUrl}";
 
         return $this->client->request($path, 'POST');
     }

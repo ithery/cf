@@ -16,6 +16,16 @@ class CExporter_Snappy_PdfWrapper {
     protected $options = [];
 
     /**
+     * @var string
+     */
+    protected $html;
+
+    /**
+     * @var string
+     */
+    protected $file;
+
+    /**
      * @param \Knp\Snappy\Pdf $snappy
      */
     public function __construct(SnappyPDF $snappy) {

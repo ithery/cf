@@ -112,6 +112,7 @@ class CResources_HtmlableMedia implements CInterface_Htmlable, \Stringable {
         ))->render();
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->toHtml();
     }

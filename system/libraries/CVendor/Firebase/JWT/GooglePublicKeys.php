@@ -24,7 +24,7 @@ final class CVendor_Firebase_JWT_GooglePublicKeys implements CVendor_Firebase_JW
      * @param null|CVendor_Firebase_JWT_Action_FetchGooglePublicKeys_HandlerInterface $handler
      * @param null|ClockInterface                                                     $clock
      */
-    public function __construct(CVendor_Firebase_JWT_Action_FetchGooglePublicKeys_HandlerInterface $handler = null, ClockInterface $clock = null) {
+    public function __construct(?CVendor_Firebase_JWT_Action_FetchGooglePublicKeys_HandlerInterface $handler = null, ?ClockInterface $clock = null) {
         $this->clock = $clock ?: SystemClock::create();
         $this->handler = $handler ?: new CVendor_Firebase_JWT_Action_FetchGooglePublicKeys_WithGuzzle(new Client(['http_errors' => false]), $this->clock);
     }

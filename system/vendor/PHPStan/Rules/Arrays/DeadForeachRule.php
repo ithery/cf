@@ -4,13 +4,15 @@ namespace PHPStan\Rules\Arrays;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
 /**
  * @implements Rule<Node\Stmt\Foreach_>
  */
-class DeadForeachRule implements Rule
+#[RegisteredRule(level: 4)]
+final class DeadForeachRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -30,7 +32,9 @@ class DeadForeachRule implements Rule
 		}
 
 		return [
-			RuleErrorBuilder::message('Empty array passed to foreach.')->build(),
+			RuleErrorBuilder::message('Empty array passed to foreach.')
+				->identifier('foreach.emptyArray')
+				->build(),
 		];
 	}
 

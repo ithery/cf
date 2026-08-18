@@ -2,28 +2,45 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 24, 2018, 6:55:42 PM
- */
 class CElement_FormInput_Image extends CElement_FormInput {
     use CElement_Trait_UseViewTrait,
         CTrait_Compat_Element_FormInput_Image;
 
+    /**
+     * @var string
+     */
     protected $imgSrc;
 
+    /**
+     * @var int|string
+     */
     protected $maxWidth;
 
+    /**
+     * @var int|string
+     */
     protected $maxHeight;
 
+    /**
+     * @var bool
+     */
     protected $disabledUpload;
 
+    /**
+     * @var string
+     */
     protected $accept;
 
+    /**
+     * @var array
+     */
     protected $labels = [];
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'image';
@@ -32,6 +49,7 @@ class CElement_FormInput_Image extends CElement_FormInput {
         $this->maxWidth = '200';
         $this->maxHeight = '150';
         $this->disabledUpload = false;
+        $this->accept = 'image/*';
         $this->view = 'cresenity/element/form-input/image';
 
         $this->onBeforeParse(function (CView_View $view) {
@@ -40,6 +58,7 @@ class CElement_FormInput_Image extends CElement_FormInput {
             $view->with('maxWidth', $this->maxWidth);
             $view->with('maxHeight', $this->maxHeight);
             $view->with('disabledUpload', $this->disabledUpload);
+            $view->with('accept', $this->accept);
             $view->with('preTag', $this->pretag());
             $view->with('postTag', $this->posttag());
             $view->with('name', $this->name);
@@ -50,7 +69,7 @@ class CElement_FormInput_Image extends CElement_FormInput {
     /**
      * @param string $imgsrc
      *
-     * @return $this'
+     * @return $this
      */
     public function setImgSrc($imgsrc) {
         $this->imgSrc = $imgsrc;
@@ -102,6 +121,11 @@ class CElement_FormInput_Image extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $templateHtml = $this->getViewHtml();
         $html = $templateHtml;
@@ -109,6 +133,11 @@ class CElement_FormInput_Image extends CElement_FormInput {
         return $html;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $templateJs = $this->getViewJs();
         $js = $templateJs;

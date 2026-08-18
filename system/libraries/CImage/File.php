@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 2, 2019, 2:34:07 AM
- */
 class CImage_File {
     /**
      * @var string
@@ -58,7 +52,7 @@ class CImage_File {
             throw CImage_Exception_InvalidImageDriverException::driver($imageDriver);
         }
         $this->imageDriver = $imageDriver;
-        \Intervention\Image\Facades\Image::configure([
+        CImage::interventionImageManager()->configure([
             'driver' => $this->imageDriver,
         ]);
 
@@ -91,11 +85,11 @@ class CImage_File {
     }
 
     public function getWidth() {
-        return \Intervention\Image\Facades\Image::make($this->pathToImage)->width();
+        return CImage::interventionImageManager()->make($this->pathToImage)->width();
     }
 
     public function getHeight() {
-        return \Intervention\Image\Facades\Image::make($this->pathToImage)->height();
+        return CImage::interventionImageManager()->make($this->pathToImage)->height();
     }
 
     public function getManipulationSequence() {

@@ -4,17 +4,18 @@ namespace PHPStan\Rules\Properties;
 
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ExtendedMethodReflection;
+use PHPStan\Reflection\ExtendedPropertyReflection;
 use PHPStan\Reflection\Php\PhpPropertyReflection;
-use PHPStan\Reflection\PropertyReflection;
 use PHPStan\Reflection\WrapperPropertyReflection;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Type;
 
-class FoundPropertyReflection implements PropertyReflection
+final class FoundPropertyReflection implements ExtendedPropertyReflection
 {
 
 	public function __construct(
-		private PropertyReflection $originalPropertyReflection,
+		private ExtendedPropertyReflection $originalPropertyReflection,
 		private Scope $scope,
 		private string $propertyName,
 		private Type $readableType,
@@ -56,6 +57,26 @@ class FoundPropertyReflection implements PropertyReflection
 	public function getDocComment(): ?string
 	{
 		return $this->originalPropertyReflection->getDocComment();
+	}
+
+	public function hasPhpDocType(): bool
+	{
+		return $this->originalPropertyReflection->hasPhpDocType();
+	}
+
+	public function getPhpDocType(): Type
+	{
+		return $this->originalPropertyReflection->getPhpDocType();
+	}
+
+	public function hasNativeType(): bool
+	{
+		return $this->originalPropertyReflection->hasNativeType();
+	}
+
+	public function getNativeType(): Type
+	{
+		return $this->originalPropertyReflection->getNativeType();
 	}
 
 	public function getReadableType(): Type
@@ -103,16 +124,6 @@ class FoundPropertyReflection implements PropertyReflection
 		return $this->getNativeReflection() !== null;
 	}
 
-	public function getNativeType(): ?Type
-	{
-		$reflection = $this->getNativeReflection();
-		if ($reflection === null) {
-			return null;
-		}
-
-		return $reflection->getNativeType();
-	}
-
 	public function getNativeReflection(): ?PhpPropertyReflection
 	{
 		$reflection = $this->originalPropertyReflection;
@@ -125,6 +136,56 @@ class FoundPropertyReflection implements PropertyReflection
 		}
 
 		return $reflection;
+	}
+
+	public function isAbstract(): TrinaryLogic
+	{
+		return $this->originalPropertyReflection->isAbstract();
+	}
+
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return $this->originalPropertyReflection->isFinalByKeyword();
+	}
+
+	public function isFinal(): TrinaryLogic
+	{
+		return $this->originalPropertyReflection->isFinal();
+	}
+
+	public function isVirtual(): TrinaryLogic
+	{
+		return $this->originalPropertyReflection->isVirtual();
+	}
+
+	public function hasHook(string $hookType): bool
+	{
+		return $this->originalPropertyReflection->hasHook($hookType);
+	}
+
+	public function getHook(string $hookType): ExtendedMethodReflection
+	{
+		return $this->originalPropertyReflection->getHook($hookType);
+	}
+
+	public function isProtectedSet(): bool
+	{
+		return $this->originalPropertyReflection->isProtectedSet();
+	}
+
+	public function isPrivateSet(): bool
+	{
+		return $this->originalPropertyReflection->isPrivateSet();
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->originalPropertyReflection->getAttributes();
+	}
+
+	public function isDummy(): TrinaryLogic
+	{
+		return $this->originalPropertyReflection->isDummy();
 	}
 
 }

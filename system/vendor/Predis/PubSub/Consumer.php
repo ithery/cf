@@ -3,7 +3,8 @@
 /*
  * This file is part of the Predis package.
  *
- * (c) Daniele Alessandri <suppakilla@gmail.com>
+ * (c) 2009-2020 Daniele Alessandri
+ * (c) 2021-2023 Till Krüss
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,20 +15,16 @@ namespace Predis\PubSub;
 use Predis\ClientException;
 use Predis\ClientInterface;
 use Predis\Command\Command;
-use Predis\Connection\AggregateConnectionInterface;
+use Predis\Connection\Cluster\ClusterInterface;
 use Predis\NotSupportedException;
-use Predis\Response\ServerException;
-use Predis\Response\Error;
 
 /**
- * PUB/SUB consumer abstraction.
- *
- * @author Daniele Alessandri <suppakilla@gmail.com>
+ * PUB/SUB consumer.
  */
 class Consumer extends AbstractConsumer
 {
-    private $client;
-    private $options;
+    protected $client;
+    protected $options;
 
     /**
      * @param ClientInterface $client  Client instance used by the consumer.
@@ -37,7 +34,7 @@ class Consumer extends AbstractConsumer
     {
         $this->checkCapabilities($client);
 
-        $this->options = $options ?: array();
+        $this->options = $options ?: [];
         $this->client = $client;
 
         $this->genericSubscribeInit('subscribe');
@@ -62,19 +59,19 @@ class Consumer extends AbstractConsumer
      *
      * @throws NotSupportedException
      */
-    private function checkCapabilities(ClientInterface $client)
+    protected function checkCapabilities(ClientInterface $client)
     {
-        if ($client->getConnection() instanceof AggregateConnectionInterface) {
+        if ($client->getConnection() instanceof ClusterInterface) {
             throw new NotSupportedException(
-                'Cannot initialize a PUB/SUB consumer over aggregate connections.'
+                'Cannot initialize a PUB/SUB consumer over cluster connections.'
             );
         }
 
-        $commands = array('publish', 'subscribe', 'unsubscribe', 'psubscribe', 'punsubscribe');
+        $commands = ['publish', 'subscribe', 'unsubscribe', 'psubscribe', 'punsubscribe'];
 
-        if ($client->getProfile()->supportsCommands($commands) === false) {
+        if (!$client->getCommandFactory()->supports(...$commands)) {
             throw new NotSupportedException(
-                'The current profile does not support PUB/SUB related commands.'
+                'PUB/SUB commands are not supported by the current command factory.'
             );
         }
     }
@@ -84,7 +81,7 @@ class Consumer extends AbstractConsumer
      *
      * @param string $subscribeAction Type of subscription.
      */
-    private function genericSubscribeInit($subscribeAction)
+    protected function genericSubscribeInit($subscribeAction)
     {
         if (isset($this->options[$subscribeAction])) {
             $this->$subscribeAction($this->options[$subscribeAction]);
@@ -118,10 +115,6 @@ class Consumer extends AbstractConsumer
     {
         $response = $this->client->getConnection()->read();
 
-        if ($response instanceof Error) {
-            throw new ServerException($response->getMessage());
-        }
-
         switch ($response[0]) {
             case self::SUBSCRIBE:
             case self::UNSUBSCRIBE:
@@ -135,25 +128,25 @@ class Consumer extends AbstractConsumer
                 // no break
 
             case self::MESSAGE:
-                return (object) array(
+                return (object) [
                     'kind' => $response[0],
                     'channel' => $response[1],
                     'payload' => $response[2],
-                );
+                ];
 
             case self::PMESSAGE:
-                return (object) array(
+                return (object) [
                     'kind' => $response[0],
                     'pattern' => $response[1],
                     'channel' => $response[2],
                     'payload' => $response[3],
-                );
+                ];
 
             case self::PONG:
-                return (object) array(
+                return (object) [
                     'kind' => $response[0],
                     'payload' => $response[1],
-                );
+                ];
 
             default:
                 throw new ClientException(

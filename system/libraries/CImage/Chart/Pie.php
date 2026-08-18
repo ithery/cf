@@ -4,11 +4,14 @@ use CImage_Chart_Constant as Constant;
 
 class CImage_Chart_Pie {
     use CImage_Chart_Concern_Pie_Draw;
+
     protected $chartObject;
 
     protected $dataObject;
 
     protected $labelPos = [];
+
+    protected $shadow;
 
     public function __construct(CImage_Chart_Image $image, CImage_Chart_Data $data) {
         $this->chartObject = $image;

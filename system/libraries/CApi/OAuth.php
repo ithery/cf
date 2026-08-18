@@ -3,6 +3,9 @@
 use League\OAuth2\Server\ResourceServer;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * @see https://github.com/rinvex/laravel-oauth/
+ */
 class CApi_OAuth {
     /**
      * Indicates if the implicit grant type is enabled.
@@ -28,29 +31,11 @@ class CApi_OAuth {
     ];
 
     /**
-     * The date when access tokens expire.
-     *
-     * @var null|\DateTimeInterface
-     *
-     * @deprecated will be removed in the next major OAuth release
-     */
-    public $tokensExpireAt;
-
-    /**
      * The interval when access tokens expire.
      *
      * @var null|\DateInterval
      */
     public $tokensExpireIn;
-
-    /**
-     * The date when refresh tokens expire.
-     *
-     * @var null|\DateTimeInterface
-     *
-     * @deprecated will be removed in the next major OAuth release
-     */
-    public $refreshTokensExpireAt;
 
     /**
      * The date when refresh tokens expire.
@@ -62,18 +47,16 @@ class CApi_OAuth {
     /**
      * The date when personal access tokens expire.
      *
-     * @var null|\DateTimeInterface
-     *
-     * @deprecated will be removed in the next major OAuth release
+     * @var null|\DateInterval
      */
-    public $personalAccessTokensExpireAt;
+    public $personalAccessTokensExpireIn;
 
     /**
      * The date when personal access tokens expire.
      *
      * @var null|\DateInterval
      */
-    public $personalAccessTokensExpireIn;
+    public $socialAccessTokensExpireIn;
 
     /**
      * The name for API token cookies.
@@ -197,6 +180,7 @@ class CApi_OAuth {
         $this->apiGroup = $apiGroup;
         $this->routeManager = new CApi_OAuth_RouteManager();
         $this->viewManager = new CApi_OAuth_ViewManager();
+        $this->clientModel = CF::config('api.groups.' . $apiGroup . '.model.client', CApi_OAuth_Model_OAuthClient::class);
     }
 
     /**
@@ -347,14 +331,12 @@ class CApi_OAuth {
      *
      * @return \DateInterval|static
      */
-    public function tokensExpireIn(DateTimeInterface $date = null) {
+    public function tokensExpireIn(?DateTimeInterface $date = null) {
         if (is_null($date)) {
-            return $this->tokensExpireAt
-                            ? CCarbon::now()->diff($this->tokensExpireAt)
-                            : new DateInterval('P1Y');
+            return $this->tokensExpireIn ?: new DateInterval('P1Y');
         }
 
-        $this->tokensExpireAt = $date;
+        $this->tokensExpireIn = CCarbon::now()->diff($date);
 
         return $this;
     }
@@ -366,14 +348,12 @@ class CApi_OAuth {
      *
      * @return \DateInterval|static
      */
-    public function refreshTokensExpireIn(DateTimeInterface $date = null) {
+    public function refreshTokensExpireIn(?DateTimeInterface $date = null) {
         if (is_null($date)) {
-            return $this->refreshTokensExpireAt
-                            ? CCarbon::now()->diff($this->refreshTokensExpireAt)
-                            : new DateInterval('P1Y');
+            return $this->refreshTokensExpireIn ?: new DateInterval('P1Y');
         }
 
-        $this->refreshTokensExpireAt = $date;
+        $this->refreshTokensExpireIn = CCarbon::now()->diff($date);
 
         return $this;
     }
@@ -385,14 +365,29 @@ class CApi_OAuth {
      *
      * @return \DateInterval|static
      */
-    public function personalAccessTokensExpireIn(DateTimeInterface $date = null) {
+    public function personalAccessTokensExpireIn(?DateTimeInterface $date = null) {
         if (is_null($date)) {
-            return $this->personalAccessTokensExpireAt
-                ? CCarbon::now()->diff($this->personalAccessTokensExpireAt)
-                : new DateInterval('P1Y');
+            return $this->personalAccessTokensExpireIn ?: new DateInterval('P1Y');
         }
 
-        $this->personalAccessTokensExpireAt = $date;
+        $this->personalAccessTokensExpireIn = CCarbon::now()->diff($date);
+
+        return $this;
+    }
+
+    /**
+     * Get or set when personal access tokens expire.
+     *
+     * @param null|\DateTimeInterface $date
+     *
+     * @return \DateInterval|static
+     */
+    public function socialAccessTokensExpireIn(?DateTimeInterface $date = null) {
+        if (is_null($date)) {
+            return $this->socialAccessTokensExpireIn ?: $this->tokensExpireIn();
+        }
+
+        $this->socialAccessTokensExpireIn = CCarbon::now()->diff($date);
 
         return $this;
     }

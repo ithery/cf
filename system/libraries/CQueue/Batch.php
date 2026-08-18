@@ -1,6 +1,8 @@
 <?php
 
-class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CQueue_Batch implements Arrayable, JsonSerializable {
     /**
      * The batch ID.
      *
@@ -53,21 +55,21 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
     /**
      * The date indicating when the batch was created.
      *
-     * @var \CarbonV3\CarbonImmutable
+     * @var \Carbon\CarbonImmutable
      */
     public $createdAt;
 
     /**
      * The date indicating when the batch was cancelled.
      *
-     * @var null|\CarbonV3\CarbonImmutable
+     * @var null|\Carbon\CarbonImmutable
      */
     public $cancelledAt;
 
     /**
      * The date indicating when the batch was finished.
      *
-     * @var null|\CarbonV3\CarbonImmutable
+     * @var null|\Carbon\CarbonImmutable
      */
     public $finishedAt;
 
@@ -81,7 +83,7 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
     /**
      * The repository implementation.
      *
-     * @var \CQueue_Contract_BatchRepositoryInterface
+     * @var \CQueue_BatchRepository
      */
     protected $repository;
 
@@ -97,9 +99,9 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
      * @param int                                       $failedJobs
      * @param array                                     $failedJobIds
      * @param array                                     $options
-     * @param \CarbonV3\CarbonImmutable                 $createdAt
-     * @param null|\CarbonV3\CarbonImmutable            $cancelledAt
-     * @param null|\CarbonV3\CarbonImmutable            $finishedAt
+     * @param \Carbon\CarbonImmutable                   $createdAt
+     * @param null|\Carbon\CarbonImmutable              $cancelledAt
+     * @param null|\Carbon\CarbonImmutable              $finishedAt
      *
      * @return void
      */
@@ -431,6 +433,7 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->toArray();
     }

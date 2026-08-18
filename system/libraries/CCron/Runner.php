@@ -7,7 +7,7 @@ class CCron_Runner {
 
     protected $startedAt;
 
-    public function run(OutputInterface $output = null) {
+    public function run(?OutputInterface $output = null) {
         $this->eventsRan = false;
         $this->startedAt = c::now();
         foreach (c::cron()->dueEvents() as $event) {
@@ -41,7 +41,7 @@ class CCron_Runner {
      *
      * @return void
      */
-    protected function runSingleServerEvent($event, OutputInterface $output = null) {
+    protected function runSingleServerEvent($event, ?OutputInterface $output = null) {
         if (c::cron()->serverShouldRun($event, $this->startedAt)) {
             $this->runEvent($event);
         } else {
@@ -60,7 +60,7 @@ class CCron_Runner {
      *
      * @return void
      */
-    protected function runEvent($event, OutputInterface $output = null) {
+    protected function runEvent($event, ?OutputInterface $output = null) {
         CCron::setEvent($event);
         if ($output) {
             $output->writeln('<info>[' . date('c') . '] Running scheduled command:</info> ' . $event->getSummaryForDisplay());
@@ -73,7 +73,7 @@ class CCron_Runner {
             $event->log('Starting scheduled job : ' . $event->getSummaryForDisplay());
             $event->run();
             $runtime = round(microtime(true) - $start, 2);
-            $event->log('Ended scheduled job : ' . $event->getSummaryForDisplay() . " [${runtime}s]");
+            $event->log('Ended scheduled job : ' . $event->getSummaryForDisplay() . " [{$runtime}s]");
 
             CEvent::dispatch(new CCron_Event_ScheduledTaskFinished(
                 $event,
@@ -97,6 +97,7 @@ class CCron_Runner {
         $event->log();
         $event->log(str_repeat('#', 64));
         $event->log('# Error : ' . $exception->getMessage() . "\n# " . $exception->getFile() . ' (' . $exception->getLine() . ')');
+        $event->log($exception->getTraceAsString());
         $event->log(str_repeat('#', 64));
         $event->log();
     }

@@ -5,6 +5,7 @@ namespace PHPStan\Rules\Arrays;
 use PhpParser\Node;
 use PHPStan\Analyser\NullsafeOperatorHelper;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Rules\RuleLevelHelper;
@@ -17,7 +18,8 @@ use function sprintf;
 /**
  * @implements Rule<Node\Expr\ArrayDimFetch>
  */
-class OffsetAccessAssignmentRule implements Rule
+#[RegisteredRule(level: 3)]
+final class OffsetAccessAssignmentRule implements Rule
 {
 
 	public function __construct(private RuleLevelHelper $ruleLevelHelper)
@@ -82,7 +84,7 @@ class OffsetAccessAssignmentRule implements Rule
 				RuleErrorBuilder::message(sprintf(
 					'Cannot assign new offset to %s.',
 					$varType->describe(VerbosityLevel::typeOnly()),
-				))->build(),
+				))->identifier('offsetAssign.dimType')->build(),
 			];
 		}
 
@@ -91,7 +93,7 @@ class OffsetAccessAssignmentRule implements Rule
 				'Cannot assign offset %s to %s.',
 				$dimType->describe(VerbosityLevel::value()),
 				$varType->describe(VerbosityLevel::typeOnly()),
-			))->build(),
+			))->identifier('offsetAssign.dimType')->build(),
 		];
 	}
 

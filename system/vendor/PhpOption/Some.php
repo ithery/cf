@@ -25,16 +25,16 @@ use ArrayIterator;
  *
  * @extends Option<T>
  */
-final class Some extends Option
-{
-    /** @var T */
+final class Some extends Option {
+    /**
+     * @var T
+     */
     private $value;
 
     /**
      * @param T $value
      */
-    public function __construct($value)
-    {
+    public function __construct($value) {
         $this->value = $value;
     }
 
@@ -45,65 +45,53 @@ final class Some extends Option
      *
      * @return Some<U>
      */
-    public static function create($value)
-    {
+    public static function create($value) {
         return new self($value);
     }
 
-    public function isDefined()
-    {
+    public function isDefined() {
         return true;
     }
 
-    public function isEmpty()
-    {
+    public function isEmpty() {
         return false;
     }
 
-    public function get()
-    {
+    public function get() {
         return $this->value;
     }
 
-    public function getOrElse($default)
-    {
+    public function getOrElse($default) {
         return $this->value;
     }
 
-    public function getOrCall($callable)
-    {
+    public function getOrCall($callable) {
         return $this->value;
     }
 
-    public function getOrThrow(\Exception $ex)
-    {
+    public function getOrThrow(\Exception $ex) {
         return $this->value;
     }
 
-    public function orElse(Option $else)
-    {
+    public function orElse(Option $else) {
         return $this;
     }
 
-    public function ifDefined($callable)
-    {
+    public function ifDefined($callable) {
         $this->forAll($callable);
     }
 
-    public function forAll($callable)
-    {
+    public function forAll($callable) {
         $callable($this->value);
 
         return $this;
     }
 
-    public function map($callable)
-    {
+    public function map($callable) {
         return new self($callable($this->value));
     }
 
-    public function flatMap($callable)
-    {
+    public function flatMap($callable) {
         /** @var mixed */
         $rs = $callable($this->value);
         if (!$rs instanceof Option) {
@@ -113,8 +101,7 @@ final class Some extends Option
         return $rs;
     }
 
-    public function filter($callable)
-    {
+    public function filter($callable) {
         if (true === $callable($this->value)) {
             return $this;
         }
@@ -122,8 +109,7 @@ final class Some extends Option
         return None::create();
     }
 
-    public function filterNot($callable)
-    {
+    public function filterNot($callable) {
         if (false === $callable($this->value)) {
             return $this;
         }
@@ -131,8 +117,7 @@ final class Some extends Option
         return None::create();
     }
 
-    public function select($value)
-    {
+    public function select($value) {
         if ($this->value === $value) {
             return $this;
         }
@@ -140,8 +125,7 @@ final class Some extends Option
         return None::create();
     }
 
-    public function reject($value)
-    {
+    public function reject($value) {
         if ($this->value === $value) {
             return None::create();
         }
@@ -149,18 +133,16 @@ final class Some extends Option
         return $this;
     }
 
-    public function getIterator()
-    {
+    #[\ReturnTypeWillChange]
+    public function getIterator() {
         return new ArrayIterator([$this->value]);
     }
 
-    public function foldLeft($initialValue, $callable)
-    {
+    public function foldLeft($initialValue, $callable) {
         return $callable($initialValue, $this->value);
     }
 
-    public function foldRight($initialValue, $callable)
-    {
+    public function foldRight($initialValue, $callable) {
         return $callable($this->value, $initialValue);
     }
 }

@@ -3,13 +3,14 @@
 namespace PHPStan\Dependency\ExportedNode;
 
 use JsonSerializable;
+use Override;
 use PHPStan\Dependency\ExportedNode;
 use PHPStan\ShouldNotHappenException;
 use ReturnTypeWillChange;
 use function array_map;
 use function count;
 
-class ExportedParameterNode implements ExportedNode, JsonSerializable
+final class ExportedParameterNode implements ExportedNode, JsonSerializable
 {
 
 	/**
@@ -22,6 +23,8 @@ class ExportedParameterNode implements ExportedNode, JsonSerializable
 		private bool $variadic,
 		private bool $hasDefault,
 		private array $attributes,
+		private ?ExportedPhpDocNode $phpDoc = null,
+		private int $flags = 0,
 	)
 	{
 	}
@@ -42,18 +45,30 @@ class ExportedParameterNode implements ExportedNode, JsonSerializable
 			}
 		}
 
+		if ($this->phpDoc === null) {
+			if ($node->phpDoc !== null) {
+				return false;
+			}
+		} elseif ($node->phpDoc !== null) {
+			if (!$this->phpDoc->equals($node->phpDoc)) {
+				return false;
+			}
+		} else {
+			return false;
+		}
+
 		return $this->name === $node->name
 			&& $this->type === $node->type
 			&& $this->byRef === $node->byRef
 			&& $this->variadic === $node->variadic
-			&& $this->hasDefault === $node->hasDefault;
+			&& $this->hasDefault === $node->hasDefault
+			&& $this->flags === $node->flags;
 	}
 
 	/**
 	 * @param mixed[] $properties
-	 * @return self
 	 */
-	public static function __set_state(array $properties): ExportedNode
+	public static function __set_state(array $properties): self
 	{
 		return new self(
 			$properties['name'],
@@ -62,6 +77,8 @@ class ExportedParameterNode implements ExportedNode, JsonSerializable
 			$properties['variadic'],
 			$properties['hasDefault'],
 			$properties['attributes'],
+			$properties['phpDoc'] ?? null,
+			$properties['flags'] ?? 0,
 		);
 	}
 
@@ -69,6 +86,7 @@ class ExportedParameterNode implements ExportedNode, JsonSerializable
 	 * @return mixed
 	 */
 	#[ReturnTypeWillChange]
+	#[Override]
 	public function jsonSerialize()
 	{
 		return [
@@ -80,15 +98,16 @@ class ExportedParameterNode implements ExportedNode, JsonSerializable
 				'variadic' => $this->variadic,
 				'hasDefault' => $this->hasDefault,
 				'attributes' => $this->attributes,
+				'phpDoc' => $this->phpDoc,
+				'flags' => $this->flags,
 			],
 		];
 	}
 
 	/**
 	 * @param mixed[] $data
-	 * @return self
 	 */
-	public static function decode(array $data): ExportedNode
+	public static function decode(array $data): self
 	{
 		return new self(
 			$data['name'],
@@ -102,6 +121,8 @@ class ExportedParameterNode implements ExportedNode, JsonSerializable
 				}
 				return ExportedAttributeNode::decode($attributeData['data']);
 			}, $data['attributes']),
+			isset($data['phpDoc']) ? ExportedPhpDocNode::decode($data['phpDoc']['data']) : null,
+			$data['flags'] ?? 0,
 		);
 	}
 

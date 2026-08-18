@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Jun 9, 2020
+ * @deprecated 1.8
  */
 class CXMPP_Ejabberd_Command_DestroyRoom extends CXMPP_Ejabberd_CommandAbstract {
     private $name;

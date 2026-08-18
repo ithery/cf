@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 2, 2019, 12:31:21 AM
- */
 return [
     /*
      * The disk on which to store added files and derived images by default. Choose
@@ -122,19 +116,6 @@ return [
         'perform_conversions' => CResources_TaskQueue_PerformConversions::class,
         'generate_responsive_images' => CResources_TaskQueue_GenerateResponsiveImage::class,
     ],
-    'remote' => [
-        /*
-         * Any extra headers that should be included when uploading resource to
-         * a remote disk. Even though supported headers may vary between
-         * different drivers, a sensible default has been provided.
-         *
-         * Supported by S3: CacheControl, Expires, StorageClass,
-         * ServerSideEncryption, Metadata, ACL, ContentEncoding
-         */
-        'extra_headers' => [
-            'CacheControl' => 'max-age=604800',
-        ],
-    ],
     'responsive_images' => [
         /*
          * This class is responsible for calculating the target widths of the responsive
@@ -162,7 +143,15 @@ return [
      * This is particularly useful when the url of the image is behind a firewall and
      * need to add additional flags, possibly using curl.
      */
-    'media_downloader' => CResources_Downloader_DefaultDownloader::class,
+    'resource_downloader' => CResources_Downloader_DefaultDownloader::class,
+    'resource_downloader_ssl' => c::env('RESOURCE_DOWNLOADER_SSL', false),
+
+    /*
+     * The default lifetime in minutes for temporary urls.
+     * This is used when you call the `getLastTemporaryUrl` or `getLastTemporaryUrl` method on a media item.
+     */
+    'temporary_url_default_lifetime' => c::env('RESOURCE_TEMPORARY_URL_DEFAULT_LIFETIME', 5),
+
     /*
      * When converting Resource instances to response the resource library will add
      * a `loading` attribute to the `img` tag. Here you can set the default
@@ -173,4 +162,16 @@ return [
      * More info: https://css-tricks.com/native-lazy-loading/
      */
     'default_loading_attribute_value' => null,
+
+    /*
+     * You can specify a prefix for that is used for storing all resource.
+     * If you set this to `/my-subdir`, all your resource will be stored in a `/my-subdir` directory.
+     */
+    'prefix' => c::env('RESOURCE_PREFIX', ''),
+
+    /*
+     * When forcing lazy loading, media will be loaded even if you don't eager load media and you have
+     * disabled lazy loading globally in the service provider.
+     */
+    'force_lazy_loading' => c::env('FORCE_RESOURCE_LIBRARY_LAZY_LOADING', true),
 ];

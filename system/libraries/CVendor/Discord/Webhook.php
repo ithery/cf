@@ -1,6 +1,8 @@
 <?php
 
-class CVendor_Discord_Webhook implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CVendor_Discord_Webhook implements Arrayable {
     private $url;
 
     private $content = '';

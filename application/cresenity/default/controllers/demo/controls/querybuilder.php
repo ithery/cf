@@ -12,6 +12,8 @@ class Controller_Demo_Controls_Querybuilder extends \Cresenity\Demo\Controller {
 
         </style>
         HTML);
+        c::db()->enableBenchmark();
+
         if ($query) {
             $modelQuery = CElement_FormInput_QueryBuilder::parseToModelQuery($query, \Cresenity\Demo\Model\Country::class);
             /** @var CModel_Query $modelQuery */

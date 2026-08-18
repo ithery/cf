@@ -54,7 +54,7 @@ class CVendor_OneSignal {
      * @param CVendor_OneSignal_Config $config
      * @param Client                   $client
      */
-    public function __construct(CVendor_OneSignal_Config $config = null, ClientInterface $httpClient = null, RequestFactoryInterface $requestFactory = null, StreamFactoryInterface $streamFactory = null) {
+    public function __construct(?CVendor_OneSignal_Config $config = null, ?ClientInterface $httpClient = null, ?RequestFactoryInterface $requestFactory = null, ?StreamFactoryInterface $streamFactory = null) {
         if ($httpClient == null) {
             $httpClient = new GuzzleClient();
         }
@@ -133,7 +133,7 @@ class CVendor_OneSignal {
         $contentType = $response->getHeader('Content-Type')[0] ?? 'application/json';
 
         if (!preg_match('/\bjson\b/i', $contentType)) {
-            throw new CVendor_OneSignal_Exception_JsonException("Response content-type is '${contentType}' while a JSON-compatible one was expected.");
+            throw new CVendor_OneSignal_Exception_JsonException("Response content-type is '{$contentType}' while a JSON-compatible one was expected.");
         }
 
         $content = $response->getBody()->__toString();

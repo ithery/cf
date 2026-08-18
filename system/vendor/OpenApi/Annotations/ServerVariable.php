@@ -9,9 +9,9 @@ namespace OpenApi\Annotations;
 use OpenApi\Generator;
 
 /**
- * A Server Variable Object https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#server-variable-object.
+ * An object representing a server variable for server URL template substitution.
  *
- * An object representing a Server Variable for server URL template substitution.
+ * @see [OAI Server Variable Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md#server-variable-object)
  *
  * @Annotation
  */
@@ -25,14 +25,15 @@ class ServerVariable extends AbstractAnnotation
     public $serverVariable = Generator::UNDEFINED;
 
     /**
-     * An enumeration of string values to be used if the substitution options are from a limited set.
+     * An enumeration of values to be used if the substitution options are from a limited set.
      *
-     * @var string[]
+     * @var string[]|int[]|float[]|\UnitEnum[]|class-string
      */
     public $enum = Generator::UNDEFINED;
 
     /**
      * The default value to use for substitution, and to send, if an alternate value is not supplied.
+     *
      * Unlike the Schema Object's default, this value must be provided by the consumer.
      *
      * @var string
@@ -41,6 +42,7 @@ class ServerVariable extends AbstractAnnotation
 
     /**
      * A map between a variable name and its value.
+     *
      * The value is used for substitution in the server's URL template.
      *
      * @var array
@@ -49,6 +51,7 @@ class ServerVariable extends AbstractAnnotation
 
     /**
      * An optional description for the server variable.
+     *
      * CommonMark syntax MAY be used for rich text representation.
      *
      * @var string

@@ -9,12 +9,6 @@
  */
 // @codingStandardsIgnoreStart
 trait CFDeprecatedTrait {
-    public static function doDeprecated() {
-        if (class_exists('cdbg')) {
-            cdbg::deprecated();
-        }
-    }
-
     /**
      * @deprecated
      *

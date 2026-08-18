@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2019, 1:39:19 AM
- */
 class CString {
     public static function initials($name = null) {
         return new CString_Initials($name);
@@ -38,5 +32,12 @@ class CString {
      */
     public static function formatter() {
         return new CBase_ForwarderStaticClass(CString_Formatter::class);
+    }
+
+    /**
+     * @return CString_Regex
+     */
+    public static function regex() {
+        return new CBase_ForwarderStaticClass(CString_Regex::class);
     }
 }

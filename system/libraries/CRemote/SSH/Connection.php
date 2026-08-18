@@ -10,87 +10,46 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     /**
-     * The SSH gateway implementation.
-     *
-     * @var \CRemote_SSH_Gateway
+     * @var CRemote_SSH_Gateway
      */
     protected $gateway;
 
     /**
-     * The SSH gateway implementation.
-     *
-     * @var \CRemote_SSH_Gateway
-     */
-    protected $ftpGateway;
-
-    /**
-     * The name of the connection.
-     *
      * @var string
      */
     protected $name;
 
     /**
-     * The port of the connection.
-     *
-     * @var int
+     * @var CRemote_SSH_Config
      */
-    protected $port;
+    protected $config;
 
     /**
-     * The host name of the server.
-     *
-     * @var string
-     */
-    protected $host;
-
-    /**
-     * The username for the connection.
-     *
-     * @var string
-     */
-    protected $username;
-
-    /**
-     * All of the defined tasks.
-     *
      * @var array
      */
     protected $tasks = [];
 
     /**
-     * The output implementation for the connection.
-     *
      * @var \Symfony\Component\Console\Output\OutputInterface
      */
     protected $output;
 
     /**
-     * Create a new SSH connection instance.
-     *
      * @param string                       $name
-     * @param string                       $host
-     * @param string                       $username
-     * @param array                        $auth
+     * @param CRemote_SSH_Config           $config
      * @param CRemote_SSH_GatewayInterface $gateway
-     * @param int                          $timeout
-     * @param mixed                        $port
      */
-    public function __construct($name, $host, $port, $username, array $auth, CRemote_SSH_GatewayInterface $gateway = null, $timeout = 10) {
+    public function __construct($name, CRemote_SSH_Config $config, ?CRemote_SSH_GatewayInterface $gateway = null) {
         $this->name = $name;
-        $this->host = $host;
-        $this->port = $port;
-        $this->username = $username;
-        $this->gateway = $gateway ?: new CRemote_SSH_Gateway($host, $port, $auth, $timeout);
+        $this->config = $config;
+        $this->gateway = $gateway ?: new CRemote_SSH_Gateway($config);
     }
 
     /**
-     * Define a set of commands as a task.
-     *
      * @param string       $task
      * @param string|array $commands
      *
-     * @return void
+     * @return $this
      */
     public function define($task, $commands) {
         $this->tasks[$task] = $commands;
@@ -99,93 +58,74 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Run a task against the connection.
-     *
      * @param string   $task
      * @param \Closure $callback
      *
      * @return void
      */
-    public function task($task, Closure $callback = null) {
+    public function task($task, ?Closure $callback = null) {
         if (isset($this->tasks[$task])) {
             $this->run($this->tasks[$task], $callback);
         }
     }
 
     /**
-     * Run a set of commands against the connection.
-     *
      * @param string|array $commands
      * @param \Closure     $callback
      *
-     * @return $this
+     * @return mixed
      */
-    public function run($commands, Closure $callback = null) {
-        // First, we will initialize the SSH gateway, and then format the commands so
-        // they can be run. Once we have the commands formatted and the server is
-        // ready to go we will just fire off these commands against the server.
+    public function run($commands, ?Closure $callback = null) {
         $gateway = $this->getGateway();
-
         $callback = $this->getCallback($callback);
 
-        $response = $gateway->run($this->formatCommands($commands), $callback);
-
-        return $response;
+        return $gateway->run($this->formatCommands($commands), $callback);
     }
 
     /**
-     * Run a set of commands against the connection.
-     *
      * @param string|array $commands
      *
      * @return string
      */
     public function exec($commands) {
-        // First, we will initialize the SSH gateway, and then format the commands so
-        // they can be run. Once we have the commands formatted and the server is
-        // ready to go we will just fire off these commands against the server.
         $gateway = $this->getGateway();
 
-        $response = $gateway->run($this->formatCommands($commands));
-
-        return $response;
+        return $gateway->run($this->formatCommands($commands));
     }
 
     /**
-     * Run a set of commands against the connection (blocking).
-     *
      * @param string|array $commands
      * @param mixed        $timeout
      *
      * @return string
      */
     public function runBlocking($commands, $timeout = 2) {
-        // First, we will initialize the SSH gateway, and then format the commands so
-        // they can be run. Once we have the commands formatted and the server is
-        // ready to go we will just fire off these commands against the server.
         $gateway = $this->getGateway();
 
         return $gateway->runBlocking($this->formatCommands($commands), $timeout);
     }
 
     /**
-     * Get the gateway implementation.
-     *
      * @throws \RuntimeException
      *
-     * @return \CRemote_SSH_Gateway
+     * @return CRemote_SSH_Gateway
      */
     public function getGateway() {
-        if (!$this->gateway->connected() && !$this->gateway->connect($this->username)) {
-            throw new \RuntimeException('Unable to connect to remote server.');
+        if (!$this->gateway->connected()) {
+            try {
+                $connected = $this->gateway->connect($this->config->getUsername());
+            } catch (\Exception $ex) {
+                throw new \RuntimeException('Unable to connect to remote server: ' . $ex->getMessage(), 0, $ex);
+            }
+            if (!$connected) {
+                throw new \RuntimeException('Unable to connect to remote server: authentication failed for user ' . $this->config->getUsername());
+            }
         }
 
         return $this->gateway;
     }
 
     /**
-     * Get the display callback for the connection.
-     *
      * @param null|\Closure $callback
      *
      * @return \Closure
@@ -201,23 +141,17 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Display the given line using the default output.
-     *
      * @param string $line
      *
      * @return void
      */
     public function display($line) {
-        $server = $this->username . '@' . $this->host;
-
+        $server = $this->config->getUsername() . '@' . $this->config->getConnectionHost();
         $lead = '<comment>[' . $server . ']</comment> <info>(' . $this->name . ')</info>';
-
         $this->getOutput()->writeln($lead . ' ' . $line);
     }
 
     /**
-     * Get the output implementation for the connection.
-     *
      * @return \Symfony\Component\Console\Output\OutputInterface
      */
     public function getOutput() {
@@ -229,8 +163,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Set the output implementation.
-     *
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      *
      * @return void
@@ -240,8 +172,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Format the given command set.
-     *
      * @param string|array $commands
      *
      * @return string
@@ -251,8 +181,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Download the contents of a remote file.
-     *
      * @param string $remote
      * @param string $local
      *
@@ -263,8 +191,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Get the contents of a remote file.
-     *
      * @param string $remote
      *
      * @return string
@@ -274,8 +200,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Upload a local file to the server.
-     *
      * @param string $local
      * @param string $remote
      *
@@ -286,8 +210,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Upload a string to to the given file on the server.
-     *
      * @param string $remote
      * @param string $contents
      *
@@ -298,8 +220,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Check whether a given file exists on the server.
-     *
      * @param string $remote
      *
      * @return bool
@@ -309,8 +229,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Rename a remote file.
-     *
      * @param string $remote
      * @param string $newRemote
      *
@@ -321,8 +239,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Delete a remote file from the server.
-     *
      * @param string $remote
      *
      * @return bool
@@ -332,8 +248,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Get the exit status of the last command.
-     *
      * @return int|bool
      */
     public function status() {
@@ -341,8 +255,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Set the time out of current gateway.
-     *
      * @param int $second
      *
      * @return int|bool
@@ -352,15 +264,16 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Get the time out of current gateway.
-     *
      * @return int
      */
     public function getTimeout() {
         return $this->gateway->getTimeout();
     }
 
+    /**
+     * @return void
+     */
     public function disconnect() {
-        return $this->gateway->disconnect();
+        $this->gateway->disconnect();
     }
 }

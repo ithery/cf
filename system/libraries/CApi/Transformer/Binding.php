@@ -38,7 +38,7 @@ class CApi_Transformer_Binding {
      *
      * @return void
      */
-    public function __construct($resolver, array $parameters = [], Closure $callback = null) {
+    public function __construct($resolver, array $parameters = [], ?Closure $callback = null) {
         $this->resolver = $resolver;
         $this->parameters = $parameters;
         $this->callback = $callback;

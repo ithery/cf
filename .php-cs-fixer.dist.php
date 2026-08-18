@@ -38,11 +38,16 @@ return $config->setFinder($finder)->setRules([
     'function_declaration' => true,
     // 'blank_line_after_opening_tag' => true,
     // 'blank_line_before_return' => true,
-    'braces' => [
-        'allow_single_line_closure' => true,
-        'position_after_functions_and_oop_constructs' => 'same',
-        'position_after_anonymous_constructs' => 'same',
-        'position_after_control_structures' => 'same',
+    // 'braces' => [
+    //     'allow_single_line_closure' => true,
+    //     'position_after_functions_and_oop_constructs' => 'same',
+    //     'position_after_anonymous_constructs' => 'same',
+    //     'position_after_control_structures' => 'same',
+    // ],
+    'control_structure_braces' => true,
+    'braces_position' => [
+        'classes_opening_brace' => 'same_line',
+        'functions_opening_brace' => 'same_line',
     ],
     'cast_spaces' => true,
     'class_definition' => [
@@ -54,7 +59,8 @@ return $config->setFinder($finder)->setRules([
     'clean_namespace' => true,
     'concat_space' => ['spacing' => 'one'],
     'declare_equal_normalize' => true,
-    'function_typehint_space' => true,
+    'type_declaration_spaces' => true,
+    // 'function_typehint_space' => true, deprecated
     //'hash_to_slash_comment' => true,
     'include' => true,
     'lowercase_cast' => true,
@@ -83,15 +89,17 @@ return $config->setFinder($finder)->setRules([
     // 'no_leading_import_slash' => true,
     // 'no_leading_namespace_whitespace' => true,
     // 'no_mixed_echo_print' => array('use' => 'echo'),
-    'no_multiline_whitespace_around_double_arrow' => true,
     // 'no_short_bool_cast' => true,
     'elseif' => true,
     'no_singleline_whitespace_before_semicolons' => true,
     'no_spaces_around_offset' => true,
-    'no_spaces_inside_parenthesis' => true,
+    // 'no_spaces_inside_parenthesis' => true,
+    'spaces_inside_parentheses' => [
+        'space' => 'none',
+    ],
     //'ereg_to_preg' => true, // risky
     //'no_superfluous_elseif' => true,
-    'no_superfluous_phpdoc_tags' => true,
+    'no_superfluous_phpdoc_tags' => ['allow_mixed' => true],
     'no_trailing_whitespace' => true,
     'no_unneeded_control_parentheses' => true,
     // 'no_trailing_comma_in_list_call' => true,
@@ -194,7 +202,6 @@ return $config->setFinder($finder)->setRules([
     // 'phpdoc_to_comment' => true,
     'phpdoc_trim' => true,
     'phpdoc_trim_consecutive_blank_line_separation' => true,
-    'phpdoc_var_annotation_correct_order' => true,
     'phpdoc_types_order' => [
         'null_adjustment' => 'always_first',
         'sort_algorithm' => 'none',
@@ -216,7 +223,8 @@ return $config->setFinder($finder)->setRules([
     // 'return_type_declaration' => true,
     // 'self_accessor' => true,
     // 'short_scalar_cast' => true,
-    'single_blank_line_before_namespace' => true,
+    // 'single_blank_line_before_namespace' => true,
+    'blank_lines_before_namespace' => true,
     // 'single_class_element_per_statement' => true,
     // 'space_after_semicolon' => true,
     // 'standardize_not_equals' => true,
@@ -231,7 +239,8 @@ return $config->setFinder($finder)->setRules([
         'position' => 'beginning',
     ],
     'native_function_casing' => true,
-    'native_function_type_declaration_casing' => true,
+    // 'native_function_type_declaration_casing' => true, deprecated
+    'native_type_declaration_casing' => true,
     'magic_constant_casing' => true,
     'magic_method_casing' => true,
     'lowercase_static_reference' => true,
@@ -243,7 +252,8 @@ return $config->setFinder($finder)->setRules([
         'on_multiline' => 'ensure_fully_multiline',
     ],
     'semicolon_after_instruction' => true,
-    'new_with_braces' => true,
+    // 'new_with_braces' => true, deprecated
+    'new_with_parentheses' => true,
     'types_spaces' => [
         'space' => 'none',
     ],
@@ -253,17 +263,18 @@ return $config->setFinder($finder)->setRules([
         'shorten_simple_statements_only' => true,
     ],
     'method_chaining_indentation' => true,
-    'no_superfluous_phpdoc_tags' => false,
     'multiline_comment_opening_closing' => true,
 
     'ordered_imports' => [
         'sort_algorithm' => 'length'
     ],
-    'fully_qualified_strict_types' => true,
+    // 'fully_qualified_strict_types' => true,
     'line_ending' => true,
     'list_syntax' => [
         'syntax' => 'long',
     ],
     'single_import_per_statement' => true,
     'single_line_after_imports' => true,
-])->setLineEnding("\n");
+])->setLineEnding("\n")->setRiskyAllowed(true)->setParallelConfig(
+    PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect()
+);

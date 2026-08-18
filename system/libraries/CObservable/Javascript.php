@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 11:07:35 PM
+ * @deprecated 1.8 Use cres-config + cres.js pattern instead (e.g. SelectTwo, Repeater)
  */
 class CObservable_Javascript {
     /**
@@ -237,7 +234,7 @@ class CObservable_Javascript {
     }
 
     public function createFunction($funcName, $callback) {
-        $serializedClosure = new \Opis\Closure\SerializableClosure($callback);
+        $serializedClosure = new CFunction_SerializableClosure($callback);
         $serialized = serialize($serializedClosure);
         $regex = "#\:\"(function\s*+\(.+?})\";#ims";
         if (preg_match($regex, $serialized, $matches)) {

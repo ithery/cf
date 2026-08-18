@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:09:14 AM
- */
 class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
     /**
      * @inheritdoc
@@ -87,7 +81,6 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
 
         $scale = null;
         $precision = null;
-
         $type = $this->platform->getDoctrineTypeMapping($dbType);
 
         // In cases where not connected to a database DESCRIBE $table does not return 'Comment'
@@ -149,7 +142,6 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
 
                 break;
         }
-
         if ($this->platform instanceof CDatabase_Platform_MariaDb1027) {
             $columnDefault = $this->getMariaDb1027ColumnDefault($this->platform, $tableColumn['default']);
         } else {

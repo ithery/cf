@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 3:27:37 PM
- */
 trait CModel_Validating_Injector_UniqueWithInjectorTrait {
     /**
      * Prepare a unique_with rule, adding the model identifier if required.
@@ -26,6 +20,7 @@ trait CModel_Validating_Injector_UniqueWithInjectorTrait {
                 $parameters[] = $this->getModel()->getKey();
             }
         }
+
         return 'unique_with:' . implode(',', $parameters);
     }
 }

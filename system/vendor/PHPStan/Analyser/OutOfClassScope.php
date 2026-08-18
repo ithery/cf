@@ -2,13 +2,14 @@
 
 namespace PHPStan\Analyser;
 
+use PHPStan\Reflection\ClassConstantReflection;
 use PHPStan\Reflection\ClassMemberAccessAnswerer;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\ConstantReflection;
+use PHPStan\Reflection\ExtendedPropertyReflection;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\PropertyReflection;
 
-class OutOfClassScope implements ClassMemberAccessAnswerer
+final class OutOfClassScope implements ClassMemberAccessAnswerer
 {
 
 	/** @api */
@@ -31,12 +32,24 @@ class OutOfClassScope implements ClassMemberAccessAnswerer
 		return $propertyReflection->isPublic();
 	}
 
+	public function canReadProperty(ExtendedPropertyReflection $propertyReflection): bool
+	{
+		return $propertyReflection->isPublic();
+	}
+
+	public function canWriteProperty(ExtendedPropertyReflection $propertyReflection): bool
+	{
+		return $propertyReflection->isPublic()
+			&& !$propertyReflection->isProtectedSet()
+			&& !$propertyReflection->isPrivateSet();
+	}
+
 	public function canCallMethod(MethodReflection $methodReflection): bool
 	{
 		return $methodReflection->isPublic();
 	}
 
-	public function canAccessConstant(ConstantReflection $constantReflection): bool
+	public function canAccessConstant(ClassConstantReflection $constantReflection): bool
 	{
 		return $constantReflection->isPublic();
 	}

@@ -1,22 +1,59 @@
 <?php
 
+use PHPStan\Type\Type;
+use PHPStan\Type\MixedType;
+use PHPStan\Type\NeverType;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\StringType;
-use PHPStan\ShouldNotHappenException;
+use PHPStan\Type\IntegerType;
+use PHPStan\Type\TypeCombinator;
 use PHPStan\PhpDoc\TypeStringResolver;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Broker\ClassNotFoundException;
+use PHPStan\Reflection\ExtendedMethodReflection;
 use PHPStan\Reflection\PropertyReflection;
 use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\Type\Generic\GenericObjectType;
 use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Reflection\PropertiesClassReflectionExtension;
 
 /**
+ * Properti model yang tidak ditulis sebagai `@property`.
+ *
+ * Tanpa ini PHPStan melapor `Access to an undefined property` untuk dua bentuk
+ * yang sah dan lazim: relasi yang dibaca sebagai properti (`$model->customer`)
+ * dan accessor (`$model->full_name` dari `getFullNameAttribute()`). Keduanya
+ * diturunkan dari kode, bukan dari anotasi - anotasi `@property` di CF dirawat
+ * tidak merata, dan salah lapor yang banyak justru membuat orang mematikan
+ * pemeriksaannya.
+ *
+ * Anotasi tetap menang: bila `@property` ada, ekstensi ini mundur.
+ *
+ * Satu hal yang berbeda dari Larastan dan menentukan bentuk kodenya: relasi di
+ * Laravel punya template `TResult`, sehingga hasil sebuah relasi dapat dibaca
+ * langsung dari tipenya. CF tidak punya - jadi jamak atau tunggalnya diputuskan
+ * dari kelas relasinya, dan daftar di MANY_RELATION diturunkan dari isi
+ * `getResults()` masing-masing: yang memanggil `->get()`/`newCollection()`
+ * jamak, yang memanggil `->first()` tunggal.
+ *
  * @internal
  */
 final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements PropertiesClassReflectionExtension {
     /**
-     * @var array<string, SchemaTable>
+     * Relasi yang hasilnya koleksi. Selebihnya satu model atau null.
+     *
+     * @var string[]
+     */
+    const MANY_RELATION = [
+        CModel_Relation_HasMany::class,
+        CModel_Relation_HasManyThrough::class,
+        CModel_Relation_HasManyDeep::class,
+        CModel_Relation_BelongsToMany::class,
+        CModel_Relation_MorphMany::class,
+        CModel_Relation_MorphToMany::class,
+    ];
+
+    /**
+     * @var array<string, CQC_Phpstan_Service_Property_SchemaTable>
      */
     private $tables = [];
 
@@ -35,9 +72,19 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
      */
     private $reflectionProvider;
 
-    public function __construct(TypeStringResolver $stringResolver, ReflectionProvider $reflectionProvider) {
+    /**
+     * @var CQC_Phpstan_Service_RelationParserHelper
+     */
+    private $relationParserHelper;
+
+    public function __construct(
+        TypeStringResolver $stringResolver,
+        ReflectionProvider $reflectionProvider,
+        CQC_Phpstan_Service_RelationParserHelper $relationParserHelper
+    ) {
         $this->stringResolver = $stringResolver;
         $this->reflectionProvider = $reflectionProvider;
+        $this->relationParserHelper = $relationParserHelper;
     }
 
     public function hasProperty(ClassReflection $classReflection, string $propertyName): bool {
@@ -49,13 +96,19 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
             return false;
         }
 
-        if ($this->hasAttribute($classReflection, $propertyName)) {
-            return false;
-        }
-
+        //anotasi yang ditulis tangan tetap menang
         if (CQC_Phpstan_Reflection_ReflectionHelper::hasPropertyTag($classReflection, $propertyName)) {
             return false;
         }
+
+        if ($this->hasAttribute($classReflection, $propertyName)) {
+            return true;
+        }
+
+        if ($this->findRelationMethod($classReflection, $propertyName) !== null) {
+            return true;
+        }
+
         if ($propertyName == 'pivot') {
             //TODO: check for belongsToMany relation
             return true;
@@ -68,7 +121,22 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
         ClassReflection $classReflection,
         string $propertyName
     ): PropertyReflection {
-        $modelName = $classReflection->getNativeReflection()->getName();
+        if ($this->hasAttribute($classReflection, $propertyName)) {
+            $type = $this->attributeType($classReflection, $propertyName);
+
+            return new CQC_Phpstan_Service_Property_ModelProperty($classReflection, $type, $type);
+        }
+
+        $relationMethod = $this->findRelationMethod($classReflection, $propertyName);
+        if ($relationMethod !== null) {
+            //hanya dibaca: menulis ke properti relasi tidak menyimpan apa pun
+            return new CQC_Phpstan_Service_Property_ModelProperty(
+                $classReflection,
+                $this->relationResultType($relationMethod),
+                new NeverType(),
+                false
+            );
+        }
 
         if ($propertyName == 'pivot') {
             return new CQC_Phpstan_Service_Property_PivotProperty(
@@ -92,8 +160,6 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
     }
 
     /**
-     * @param CModel $modelInstance
-     *
      * @return string[]
      *
      * @phpstan-return array<int, string>
@@ -122,7 +188,7 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
                 return false;
             }
 
-            $returnType = ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType();
+            $returnType = $methodReflection->getOnlyVariant()->getReturnType();
 
             if (!(new ObjectType(CModel_Casts_Attribute::class))->isSuperTypeOf($returnType)->yes()) {
                 return false;
@@ -132,5 +198,81 @@ final class CQC_Phpstan_Service_Property_ModelPropertyExtension implements Prope
         }
 
         return false;
+    }
+
+    /**
+     * Tipe yang dibaca dari sebuah accessor.
+     */
+    private function attributeType(ClassReflection $classReflection, string $propertyName): Type {
+        $getter = 'get' . cstr::studly($propertyName) . 'Attribute';
+
+        if ($classReflection->hasNativeMethod($getter)) {
+            return $classReflection->getNativeMethod($getter)->getOnlyVariant()->getReturnType();
+        }
+
+        //gaya CModel_Casts_Attribute: yang dikembalikan pembungkusnya, bukan
+        //nilainya, dan CF belum memberinya template - jadi berhenti di sini
+        //alih-alih mengarang tipe yang lebih sempit daripada yang diketahui
+        return new MixedType();
+    }
+
+    /**
+     * Method relasi yang namanya cocok dengan properti ini, bila ada.
+     *
+     * @return null|ExtendedMethodReflection
+     */
+    private function findRelationMethod(ClassReflection $classReflection, string $propertyName) {
+        $methodName = $propertyName;
+
+        if (!$classReflection->hasNativeMethod($methodName)) {
+            //`$model->other_list` menunjuk method `otherList()`
+            $methodName = cstr::camel($propertyName);
+
+            if (strlen($methodName) == 0 || !$classReflection->hasNativeMethod($methodName)) {
+                return null;
+            }
+        }
+
+        $methodReflection = $classReflection->getNativeMethod($methodName);
+
+        //relasi selalu publik; yang tersembunyi biasanya accessor gaya baru
+        if (!$methodReflection->isPublic()) {
+            return null;
+        }
+
+        $returnType = $methodReflection->getOnlyVariant()->getReturnType();
+
+        if (!(new ObjectType(CModel_Relation::class))->isSuperTypeOf($returnType)->yes()) {
+            return null;
+        }
+
+        return $methodReflection;
+    }
+
+    /**
+     * Hasil sebuah relasi bila dibaca sebagai properti.
+     */
+    private function relationResultType(ExtendedMethodReflection $methodReflection): Type {
+        $returnType = $methodReflection->getOnlyVariant()->getReturnType();
+
+        //model terkait diturunkan dari badan methodnya - tipe kembalian yang
+        //ditulis tangan hampir selalu tanpa generik (`@return CModel_Relation_HasMany`)
+        $relatedModel = $this->relationParserHelper->findRelatedModelInRelationMethod($methodReflection);
+
+        $relatedType = $relatedModel !== null
+            ? new ObjectType($relatedModel)
+            : new ObjectType(CModel::class);
+
+        foreach (static::MANY_RELATION as $manyRelation) {
+            if ((new ObjectType($manyRelation))->isSuperTypeOf($returnType)->yes()) {
+                return new GenericObjectType(CModel_Collection::class, [
+                    new IntegerType(),
+                    $relatedType,
+                ]);
+            }
+        }
+
+        //relasi tunggal boleh kosong - baris induknya bisa saja sudah terhapus
+        return TypeCombinator::addNull($relatedType);
     }
 }

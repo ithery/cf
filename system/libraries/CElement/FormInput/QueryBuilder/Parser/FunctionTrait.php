@@ -1,33 +1,15 @@
 <?php
 
-use Carbon\Carbon;
+use CElement_FormInput_QueryBuilder_Constant as Constant;
 
 trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
-    protected $operators = [
-        'equal' => ['accept_values' => true,  'apply_to' => ['string', 'number', 'datetime']],
-        'not_equal' => ['accept_values' => true,  'apply_to' => ['string', 'number', 'datetime']],
-        'in' => ['accept_values' => true,  'apply_to' => ['string', 'number', 'datetime']],
-        'not_in' => ['accept_values' => true,  'apply_to' => ['string', 'number', 'datetime']],
-        'less' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
-        'less_or_equal' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
-        'greater' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
-        'greater_or_equal' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
-        'between' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
-        'not_between' => ['accept_values' => true,  'apply_to' => ['number', 'datetime']],
-        'begins_with' => ['accept_values' => true,  'apply_to' => ['string']],
-        'not_begins_with' => ['accept_values' => true,  'apply_to' => ['string']],
-        'contains' => ['accept_values' => true,  'apply_to' => ['string']],
-        'not_contains' => ['accept_values' => true,  'apply_to' => ['string']],
-        'ends_with' => ['accept_values' => true,  'apply_to' => ['string']],
-        'not_ends_with' => ['accept_values' => true,  'apply_to' => ['string']],
-        'is_empty' => ['accept_values' => false, 'apply_to' => ['string']],
-        'is_not_empty' => ['accept_values' => false, 'apply_to' => ['string']],
-        'is_null' => ['accept_values' => false, 'apply_to' => ['string', 'number', 'datetime']],
-        'is_not_null' => ['accept_values' => false, 'apply_to' => ['string', 'number', 'datetime']]
-    ];
-
+    /**
+     * Maps each jQuery QueryBuilder operator to its SQL operator, plus optional `append`/`prepend` wildcards.
+     *
+     * @var array
+     */
     protected $operator_sql = [
-        'equal' => ['operator' => '='],
+        Constant::FILTER_OPERATOR_EQUAL => ['operator' => '='],
         'not_equal' => ['operator' => '!='],
         'in' => ['operator' => 'IN'],
         'not_in' => ['operator' => 'NOT IN'],
@@ -49,19 +31,26 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
         'is_not_null' => ['operator' => 'NOT NULL']
     ];
 
+    /**
+     * SQL operators that require their value to be an array.
+     *
+     * @var string[]
+     */
     protected $needs_array = [
         'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN',
     ];
 
     /**
      * @param stdClass $rule
+     *
+     * @return bool
      */
     abstract protected function checkRuleCorrect(stdClass $rule);
 
     /**
      * Determine if an operator (LIKE/IN) requires an array.
      *
-     * @param $operator
+     * @param string $operator
      *
      * @return bool
      */
@@ -72,7 +61,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Determine if an operator is NULL/NOT NULL.
      *
-     * @param $operator
+     * @param string $operator
      *
      * @return bool
      */
@@ -83,7 +72,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Make sure that a condition is either 'or' or 'and'.
      *
-     * @param $condition
+     * @param string $condition
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
@@ -123,17 +112,19 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Ensure that a given field is an array if required.
      *
-     * @param bool $requireArray
-     * @param $value
+     * @param bool   $requireArray
+     * @param mixed  $value
      * @param string $field
      *
      * @see enforceArrayOrString
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
+     *
+     * @return void
      */
     protected function checkFieldIsAnArray($requireArray, $value, $field) {
         if ($requireArray && !is_array($value)) {
-            throw new CElement_FormInput_QueryBuilder_Exception_ParseException("Field (${field}) should be an array, but it isn't.");
+            throw new CElement_FormInput_QueryBuilder_Exception_ParseException("Field ({$field}) should be an array, but it isn't.");
         }
     }
 
@@ -143,7 +134,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      * In some instances, and array may be given when we want a string.
      *
      * @param string $field
-     * @param $value
+     * @param array  $value
      *
      * @see enforceArrayOrString
      *
@@ -153,7 +144,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      */
     protected function convertArrayToFlatValue($field, $value) {
         if (count($value) !== 1) {
-            throw new CElement_FormInput_QueryBuilder_Exception_ParseException("Field (${field}) should not be an array, but it is.");
+            throw new CElement_FormInput_QueryBuilder_Exception_ParseException("Field ({$field}) should not be an array, but it is.");
         }
 
         return $value[0];
@@ -162,7 +153,7 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Convert a Datetime field to Carbon items to be used for comparisons.
      *
-     * @param $value
+     * @param array|string $value
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
@@ -215,7 +206,6 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
             $json = json_encode($json);
         }
         $query = json_decode($json);
-
         if (json_last_error()) {
             throw new CElement_FormInput_QueryBuilder_Exception_ParseException('JSON parsing threw an error: ' . json_last_error_msg());
         }
@@ -235,6 +225,8 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      * @param stdClass $rule
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_RuleException
+     *
+     * @return mixed
      */
     private function getRuleValue(stdClass $rule) {
         if (!$this->checkRuleCorrect($rule)) {
@@ -247,10 +239,12 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Check that a given field is in the allowed list if set.
      *
-     * @param $fields
-     * @param $field
+     * @param null|array $fields
+     * @param string     $field
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
+     *
+     * @return void
      */
     private function ensureFieldIsAllowed($fields, $field) {
         if (is_array($fields) && !in_array($field, $fields)) {
@@ -263,17 +257,17 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
      * This function enforces those requirements.
      * makeQuery, for arrays.
      *
-     * @param CModel_Query $query
-     * @param stdClass     $rule
-     * @param array        $sqlOperator
-     * @param array        $value
-     * @param string       $condition
+     * @param CModel_Query|CDatabase_Query_Builder $query
+     * @param stdClass                             $rule
+     * @param array                                $sqlOperator
+     * @param array                                $value
+     * @param string                               $condition
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      */
-    protected function makeQueryWhenArray(CModel_Query $query, stdClass $rule, array $sqlOperator, array $value, $condition) {
+    protected function makeQueryWhenArray($query, stdClass $rule, array $sqlOperator, array $value, $condition) {
         if ($sqlOperator['operator'] == 'IN' || $sqlOperator['operator'] == 'NOT IN') {
             return $this->makeArrayQueryIn($query, $rule, $sqlOperator['operator'], $value, $condition);
         } elseif ($sqlOperator['operator'] == 'BETWEEN' || $sqlOperator['operator'] == 'NOT BETWEEN') {
@@ -286,16 +280,16 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * Create a 'null' query when required.
      *
-     * @param CModel_Query $query
-     * @param stdClass     $rule
-     * @param array        $sqlOperator
-     * @param string       $condition
+     * @param CModel_Query|CDatabase_Query_Builder $query
+     * @param stdClass                             $rule
+     * @param array                                $sqlOperator
+     * @param string                               $condition
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException when SQL operator is !null
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
      */
-    protected function makeQueryWhenNull(CModel_Query $query, stdClass $rule, array $sqlOperator, $condition) {
+    protected function makeQueryWhenNull($query, stdClass $rule, array $sqlOperator, $condition) {
         if ($sqlOperator['operator'] == 'NULL') {
             return $query->whereNull($rule->field, $condition);
         } elseif ($sqlOperator['operator'] == 'NOT NULL') {
@@ -308,48 +302,54 @@ trait CElement_FormInput_QueryBuilder_Parser_FunctionTrait {
     /**
      * MakeArrayQueryIn, when the query is an IN or NOT IN...
      *
-     * @param CModel_Query $query
-     * @param stdClass     $rule
-     * @param string       $operator
-     * @param array        $value
-     * @param string       $condition
+     * @param CModel_Query|CDatabase_Query_Builder $query
+     * @param stdClass                             $rule
+     * @param string                               $operator
+     * @param array                                $value
+     * @param string                               $condition
      *
      * @see makeQueryWhenArray
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
+     * @phpstan-ignore-next-line
      */
-    private function makeArrayQueryIn(CModel_Query $query, stdClass $rule, $operator, array $value, $condition) {
+    private function makeArrayQueryIn($query, stdClass $rule, $operator, array $value, $condition) {
         if ($operator == 'NOT IN') {
+            /** @phpstan-ignore-next-line */
             return $query->whereNotIn($rule->field, $value, $condition);
         }
 
+        /** @phpstan-ignore-next-line */
         return $query->whereIn($rule->field, $value, $condition);
     }
 
     /**
      * MakeArrayQueryBetween, when the query is a BETWEEN or NOT BETWEEN...
      *
-     * @param CModel_Query $query
-     * @param stdClass     $rule
-     * @param string       $operator  the SQL operator used. [BETWEEN|NOT BETWEEN]
-     * @param array        $value
-     * @param string       $condition
+     * @param CModel_Query|CDatabase_Query_Builder $query
+     * @param stdClass                             $rule
+     * @param string                               $operator  the SQL operator used. [BETWEEN|NOT BETWEEN]
+     * @param array                                $value
+     * @param string                               $condition
      *
      * @see makeQueryWhenArray
      *
      * @throws CElement_FormInput_QueryBuilder_Exception_ParseException when more then two items given for the between
      *
-     * @return CModel_Query
+     * @return CModel_Query|CDatabase_Query_Builder
+     * @phpstan-ignore-next-line
      */
-    private function makeArrayQueryBetween(CModel_Query $query, stdClass $rule, $operator, array $value, $condition) {
+    private function makeArrayQueryBetween($query, stdClass $rule, $operator, array $value, $condition) {
         if (count($value) !== 2) {
             throw new CElement_FormInput_QueryBuilder_Exception_ParseException("{$rule->field} should be an array with only two items.");
         }
 
         if ($operator == 'NOT BETWEEN') {
+            /** @phpstan-ignore-next-line */
             return $query->whereNotBetween($rule->field, $value, $condition);
         }
 
+        /** @phpstan-ignore-next-line */
         return $query->whereBetween($rule->field, $value, $condition);
     }
 }

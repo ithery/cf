@@ -2,8 +2,6 @@
 
 /**
  * Description of DevSuiteSshCreateCommand
- *
- * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteSshCreateCommand extends CConsole_Command_DevSuiteCommand {
     /**
@@ -11,6 +9,10 @@ class CConsole_Command_DevSuite_DevSuiteSshCreateCommand extends CConsole_Comman
      *
      * @var string
      */
-    protected $devSuiteCommandClass = CDevSuite_Command_SshCreateCommand::class;
+    protected $devSuiteCommandClass = CDevSuite_Command_Ssh_CreateCommand::class;
+
+    /**
+     * @var string
+     */
     protected $signature = 'devsuite:ssh:create';
 }

@@ -29,7 +29,7 @@ trait CTrait_Controller_Application_Server_Info {
         $cardData['chart']['color'] = '#d9534f';
 
         $divCol = $divRow->addDiv()->addClass('col-md-4');
-        $divCol->addTemplate()->setTemplate('CApp/Card/Info')->setData($cardData);
+        $divCol->addView('cresenity.template.card.info', $cardData);
 
         //memory
         $cardData = [];
@@ -51,7 +51,7 @@ trait CTrait_Controller_Application_Server_Info {
         $cardData['chart']['color'] = '#d9534f';
 
         $divCol = $divRow->addDiv()->addClass('col-md-4');
-        $divCol->addTemplate()->setTemplate('CApp/Card/Info')->setData($cardData);
+        $divCol->addView('cresenity.template.card.info', $cardData);
 
         //storage
         $cardData = [];
@@ -73,7 +73,7 @@ trait CTrait_Controller_Application_Server_Info {
         $cardData['chart']['color'] = '#d9534f';
 
         $divCol = $divRow->addDiv()->addClass('col-md-4');
-        $divCol->addTemplate()->setTemplate('CApp/Card/Info')->setData($cardData);
+        $divCol->addView('cresenity.template.card.info', $cardData);
 
         $divRow = $app->addDiv()->addClass('row');
         $cardData = [];
@@ -105,7 +105,7 @@ trait CTrait_Controller_Application_Server_Info {
         $processesText = sprintf('%d (%d running, %d sleep, %d waiting, %d other)', $allProcess, $runningProcess, $sleepProcess, $waitProcess, $otherProcess);
         $cardData['rows'][] = ['Processes', $processesText];
         $divCol = $divRow->addDiv()->addClass('col-md-6');
-        $divCol->addTemplate()->setTemplate('CApp/Card/Table')->setData($cardData);
+        $divCol->addView('cresenity.template.card.table', $cardData);
 
         //hardware
         $cardData = [];
@@ -131,7 +131,7 @@ trait CTrait_Controller_Application_Server_Info {
         }
 
         $divCol = $divRow->addDiv()->addClass('col-md-6');
-        $divCol->addTemplate()->setTemplate('CApp/Card/Table')->setData($cardData);
+        $divCol->addView('cresenity.template.card.table', $cardData);
 
         /* new row */
         $divRow = $app->addDiv()->addClass('row');
@@ -161,7 +161,7 @@ trait CTrait_Controller_Application_Server_Info {
         ];
 
         $divCol = $divRow->addDiv()->addClass('col-md-12');
-        $divCol->addTemplate()->setTemplate('CApp/Card/Table')->setData($cardData);
+        $divCol->addView('cresenity.template.card.table', $cardData);
 
         /* new row */
         $divRow = $app->addDiv()->addClass('row');
@@ -194,7 +194,7 @@ trait CTrait_Controller_Application_Server_Info {
         }
 
         $divCol = $divRow->addDiv()->addClass('col-md-12');
-        $divCol->addTemplate()->setTemplate('CApp/Card/Table')->setData($cardData);
+        $divCol->addView('cresenity.template.card.table', $cardData);
 
         $cardData = [];
 
@@ -211,7 +211,7 @@ trait CTrait_Controller_Application_Server_Info {
         $cardData['rows'][] = ['Build Date', $serverBuildDate];
 
         $divCol = $divRow->addDiv()->addClass('col-md-6');
-        $divCol->addTemplate()->setTemplate('CApp/Card/Table')->setData($cardData);
+        $divCol->addView('cresenity.template.card.table', $cardData);
 
         return $app;
     }

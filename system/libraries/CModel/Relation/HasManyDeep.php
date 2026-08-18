@@ -74,7 +74,7 @@ class CModel_Relation_HasManyDeep extends CModel_Relation_HasManyThrough {
      *
      * @return void
      */
-    protected function performJoin(CModel_Query $query = null) {
+    protected function performJoin(?CModel_Query $query = null) {
         $query = $query ?: $this->query;
 
         $throughParents = array_reverse($this->throughParents);
@@ -126,10 +126,10 @@ class CModel_Relation_HasManyDeep extends CModel_Relation_HasManyThrough {
         $query->join($throughParent->getTable(), $first, '=', $second);
 
         if ($this->throughParentInstanceSoftDeletes($throughParent)) {
-            $column = $throughParent->getQualifiedDeletedAtColumn();
+            $column = $throughParent->getQualifiedStatusColumn();
 
-            $query->withGlobalScope(__CLASS__ . ":${column}", function (CModel_Query $query) use ($column) {
-                $query->whereNull($column);
+            $query->withGlobalScope(__CLASS__ . ":{$column}", function (CModel_Query $query) use ($column) {
+                $query->where($column, '<>', 0);
             });
         }
     }
@@ -288,7 +288,7 @@ class CModel_Relation_HasManyDeep extends CModel_Relation_HasManyThrough {
 
                     throw new Exception(
                         <<<EOT
-This query requires an additional trait. Please add the ${traitClass} trait to ${parentClass}.
+This query requires an additional trait. Please add the {$traitClass} trait to {$parentClass}.
 EOT
                     );
                 }
@@ -356,7 +356,7 @@ EOT
         }
 
         foreach ($columns as $column) {
-            $this->query->withoutGlobalScope(__CLASS__ . ":${column}");
+            $this->query->withoutGlobalScope(__CLASS__ . ":{$column}");
         }
 
         return $this;

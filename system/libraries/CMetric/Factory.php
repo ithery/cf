@@ -42,6 +42,6 @@ class CMetric_Factory {
             return $this->$method($config);
         }
 
-        throw new InvalidArgumentException("Driver [${driver}] not supported.");
+        throw new InvalidArgumentException("Driver [{$driver}] not supported.");
     }
 }

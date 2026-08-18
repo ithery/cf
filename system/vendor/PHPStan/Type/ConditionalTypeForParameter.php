@@ -2,7 +2,8 @@
 
 namespace PHPStan\Type;
 
-use PHPStan\TrinaryLogic;
+use PHPStan\PhpDocParser\Ast\Type\ConditionalTypeForParameterNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\Type\Generic\TemplateTypeVariance;
 use PHPStan\Type\Traits\LateResolvableTypeTrait;
 use PHPStan\Type\Traits\NonGeneralizableTypeTrait;
@@ -73,7 +74,7 @@ final class ConditionalTypeForParameter implements CompoundType, LateResolvableT
 		);
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof self) {
 			return $this->if->isSuperTypeOf($type->if)
@@ -132,9 +133,6 @@ final class ConditionalTypeForParameter implements CompoundType, LateResolvableT
 		return TypeCombinator::union($this->if, $this->else);
 	}
 
-	/**
-	 * @param callable(Type): Type $cb
-	 */
 	public function traverse(callable $cb): Type
 	{
 		$target = $cb($this->target);
@@ -145,20 +143,34 @@ final class ConditionalTypeForParameter implements CompoundType, LateResolvableT
 			return $this;
 		}
 
-		return new ConditionalTypeForParameter($this->parameterName, $target, $if, $else, $this->negated);
+		return new self($this->parameterName, $target, $if, $else, $this->negated);
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function traverseSimultaneously(Type $right, callable $cb): Type
 	{
-		return new self(
-			$properties['parameterName'],
-			$properties['target'],
-			$properties['if'],
-			$properties['else'],
-			$properties['negated'],
+		if (!$right instanceof self) {
+			return $this;
+		}
+
+		$target = $cb($this->target, $right->target);
+		$if = $cb($this->if, $right->if);
+		$else = $cb($this->else, $right->else);
+
+		if ($this->target === $target && $this->if === $if && $this->else === $else) {
+			return $this;
+		}
+
+		return new self($this->parameterName, $target, $if, $else, $this->negated);
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new ConditionalTypeForParameterNode(
+			$this->parameterName,
+			$this->target->toPhpDocNode(),
+			$this->if->toPhpDocNode(),
+			$this->else->toPhpDocNode(),
+			$this->negated,
 		);
 	}
 

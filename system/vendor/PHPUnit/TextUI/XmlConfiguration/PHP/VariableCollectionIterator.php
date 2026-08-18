@@ -33,26 +33,32 @@ final class VariableCollectionIterator implements Countable, Iterator {
         $this->variables = $variables->asArray();
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return iterator_count($this);
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind() {
         $this->position = 0;
     }
 
+    #[\ReturnTypeWillChange]
     public function valid() {
         return $this->position < count($this->variables);
     }
 
+    #[\ReturnTypeWillChange]
     public function key() {
         return $this->position;
     }
 
+    #[\ReturnTypeWillChange]
     public function current() {
         return $this->variables[$this->position];
     }
 
+    #[\ReturnTypeWillChange]
     public function next() {
         $this->position++;
     }

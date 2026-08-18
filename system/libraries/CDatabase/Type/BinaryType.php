@@ -3,25 +3,18 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 11:09:44 AM
- */
-
-/**
  * Type that maps ab SQL BINARY/VARBINARY to a PHP resource stream.
  */
 class CDatabase_Type_BinaryType extends CDatabase_Type {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getSQLDeclaration(array $fieldDeclaration, CDatabase_Platform $platform) {
         return $platform->getBinaryTypeDeclarationSQL($fieldDeclaration);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function convertToPHPValue($value, CDatabase_Platform $platform) {
         if (null === $value) {
@@ -43,14 +36,14 @@ class CDatabase_Type_BinaryType extends CDatabase_Type {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getName() {
         return CDatabase_Type::BINARY;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getBindingType() {
         return CDatabase_ParameterType::BINARY;

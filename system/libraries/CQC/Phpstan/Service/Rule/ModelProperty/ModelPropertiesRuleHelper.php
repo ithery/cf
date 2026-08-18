@@ -20,10 +20,7 @@ use PHPStan\Reflection\ParametersAcceptorSelector;
 
 class CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertiesRuleHelper {
     /**
-     * @param MethodReflection     $methodReflection
-     * @param Scope                $scope
-     * @param Node\Arg[]           $args
-     * @param null|ClassReflection $modelReflection
+     * @param Node\Arg[] $args
      *
      * @throws ShouldNotHappenException
      *
@@ -107,7 +104,7 @@ class CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertiesRuleHelper {
         if (!$modelType->hasProperty($argType->getValue())->yes()) {
             $error = sprintf('Property \'%s\' does not exist in %s model.', $argType->getValue(), $modelType->describe(VerbosityLevel::typeOnly()));
 
-            if ((new ObjectType(CModel_Relation_BelongsToMany::class))->isSuperTypeOf(ParametersAcceptorSelector::selectSingle($methodReflection->getVariants())->getReturnType())->yes()) {
+            if ((new ObjectType(CModel_Relation_BelongsToMany::class))->isSuperTypeOf($methodReflection->getVariants()[0]->getReturnType())->yes()) {
                 $error .= sprintf(" If '%s' exists as a column on the pivot table, consider using 'wherePivot' or prefix the column with table name instead.", $argType->getValue());
             }
 
@@ -118,10 +115,7 @@ class CQC_Phpstan_Service_Rule_ModelProperty_ModelPropertiesRuleHelper {
     }
 
     /**
-     * @param MethodReflection     $methodReflection
-     * @param Scope                $scope
-     * @param Node\Arg[]           $args
-     * @param null|ClassReflection $modelReflection
+     * @param Node\Arg[] $args
      *
      * @return array<int, int|Type>
      */

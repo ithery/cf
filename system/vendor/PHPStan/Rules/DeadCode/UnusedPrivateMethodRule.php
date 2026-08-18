@@ -5,16 +5,16 @@ namespace PHPStan\Rules\DeadCode;
 use PhpParser\Node;
 use PhpParser\Node\Identifier;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredExtensions;
+use PHPStan\DependencyInjection\ExtensionsCollection;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\ClassMethodsNode;
 use PHPStan\Reflection\MethodReflection;
+use PHPStan\Rules\Methods\AlwaysUsedMethodExtension;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\ShouldNotHappenException;
-use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantStringType;
-use PHPStan\Type\MixedType;
 use PHPStan\Type\ObjectType;
-use PHPStan\Type\TypeUtils;
 use function array_map;
 use function count;
 use function sprintf;
@@ -23,8 +23,19 @@ use function strtolower;
 /**
  * @implements Rule<ClassMethodsNode>
  */
-class UnusedPrivateMethodRule implements Rule
+#[RegisteredRule(level: 4)]
+final class UnusedPrivateMethodRule implements Rule
 {
+
+	/**
+	 * @param ExtensionsCollection<AlwaysUsedMethodExtension> $extensions
+	 */
+	public function __construct(
+		#[AutowiredExtensions(of: AlwaysUsedMethodExtension::class)]
+		private ExtensionsCollection $extensions,
+	)
+	{
+	}
 
 	public function getNodeType(): string
 	{
@@ -36,15 +47,12 @@ class UnusedPrivateMethodRule implements Rule
 		if (!$node->getClass() instanceof Node\Stmt\Class_ && !$node->getClass() instanceof Node\Stmt\Enum_) {
 			return [];
 		}
-		if (!$scope->isInClass()) {
-			throw new ShouldNotHappenException();
-		}
-		$classReflection = $scope->getClassReflection();
+		$classReflection = $node->getClassReflection();
+		$classType = new ObjectType($classReflection->getName(), classReflection: $classReflection);
 		$constructor = null;
 		if ($classReflection->hasConstructor()) {
 			$constructor = $classReflection->getConstructor();
 		}
-		$classType = new ObjectType($classReflection->getName());
 
 		$methods = [];
 		foreach ($node->getMethods() as $method) {
@@ -61,7 +69,15 @@ class UnusedPrivateMethodRule implements Rule
 			if (strtolower($methodName) === '__clone') {
 				continue;
 			}
-			$methods[$methodName] = $method;
+
+			$methodReflection = $classReflection->getNativeMethod($methodName);
+			foreach ($this->extensions->getAll() as $extension) {
+				if ($extension->isAlwaysUsed($methodReflection)) {
+					continue 2;
+				}
+			}
+
+			$methods[strtolower($methodName)] = $method;
 		}
 
 		$arrayCalls = [];
@@ -76,9 +92,18 @@ class UnusedPrivateMethodRule implements Rule
 				$methodNames = [$methodCallNode->name->toString()];
 			} else {
 				$methodNameType = $callScope->getType($methodCallNode->name);
-				$strings = TypeUtils::getConstantStrings($methodNameType);
+				$strings = $methodNameType->getConstantStrings();
 				if (count($strings) === 0) {
-					return [];
+					// handle subtractions of a dynamic method call
+					foreach ($methods as $lowerMethodName => $method) {
+						if ((new ConstantStringType($method->getNode()->name->toString()))->isSuperTypeOf($methodNameType)->no()) {
+							continue;
+						}
+
+						unset($methods[$lowerMethodName]);
+					}
+
+					continue;
 				}
 
 				$methodNames = array_map(static fn (ConstantStringType $type): string => $type->getValue(), $strings);
@@ -87,27 +112,36 @@ class UnusedPrivateMethodRule implements Rule
 			if ($methodCallNode instanceof Node\Expr\MethodCall) {
 				$calledOnType = $callScope->getType($methodCallNode->var);
 			} else {
-				if (!$methodCallNode->class instanceof Node\Name) {
-					continue;
+				if ($methodCallNode->class instanceof Node\Name) {
+					$calledOnType = $callScope->resolveTypeByName($methodCallNode->class);
+				} else {
+					$calledOnType = $callScope->getType($methodCallNode->class)->getObjectTypeOrClassStringObjectType();
 				}
-				$calledOnType = $scope->resolveTypeByName($methodCallNode->class);
 			}
-			if ($classType->isSuperTypeOf($calledOnType)->no()) {
-				continue;
-			}
-			if ($calledOnType instanceof MixedType) {
-				continue;
-			}
+
 			$inMethod = $callScope->getFunction();
 			if (!$inMethod instanceof MethodReflection) {
 				continue;
 			}
 
 			foreach ($methodNames as $methodName) {
+				$methodReflection = $callScope->getMethodReflection($calledOnType, $methodName);
+				if ($methodReflection === null) {
+					if (!$classType->isSuperTypeOf($calledOnType)->no()) {
+						unset($methods[strtolower($methodName)]);
+					}
+					continue;
+				}
+				if ($methodReflection->getDeclaringClass()->getName() !== $classReflection->getName()) {
+					if (!$classType->isSuperTypeOf($calledOnType)->no()) {
+						unset($methods[strtolower($methodName)]);
+					}
+					continue;
+				}
 				if ($inMethod->getName() === $methodName) {
 					continue;
 				}
-				unset($methods[$methodName]);
+				unset($methods[strtolower($methodName)]);
 			}
 		}
 
@@ -116,51 +150,53 @@ class UnusedPrivateMethodRule implements Rule
 				/** @var Node\Expr\Array_ $array */
 				$array = $arrayCall->getNode();
 				$arrayScope = $arrayCall->getScope();
-				$arrayType = $scope->getType($array);
-				if (!$arrayType instanceof ConstantArrayType) {
+				$arrayType = $arrayScope->getType($array);
+				if (!$arrayType->isCallable()->yes()) {
 					continue;
 				}
-				foreach ($arrayType->findTypeAndMethodNames() as $typeAndMethod) {
-					if ($typeAndMethod->isUnknown()) {
-						return [];
+				foreach ($arrayType->getConstantArrays() as $constantArray) {
+					foreach ($constantArray->findTypeAndMethodNames() as $typeAndMethod) {
+						if ($typeAndMethod->isUnknown()) {
+							return [];
+						}
+						if (!$typeAndMethod->getCertainty()->yes()) {
+							return [];
+						}
+
+						$inMethod = $arrayScope->getFunction();
+						if (!$inMethod instanceof MethodReflection) {
+							continue;
+						}
+						if ($inMethod->getName() === $typeAndMethod->getMethod()) {
+							continue;
+						}
+
+						$calledOnType = $typeAndMethod->getType();
+						$methodReflection = $arrayScope->getMethodReflection($calledOnType, $typeAndMethod->getMethod());
+						if ($methodReflection === null) {
+							continue;
+						}
+
+						if ($methodReflection->getDeclaringClass()->getName() !== $classReflection->getName()) {
+							continue;
+						}
+
+						unset($methods[strtolower($typeAndMethod->getMethod())]);
 					}
-					if (!$typeAndMethod->getCertainty()->yes()) {
-						return [];
-					}
-					$calledOnType = $typeAndMethod->getType();
-					if ($classType->isSuperTypeOf($calledOnType)->no()) {
-						continue;
-					}
-					if ($calledOnType instanceof MixedType) {
-						continue;
-					}
-					$inMethod = $arrayScope->getFunction();
-					if (!$inMethod instanceof MethodReflection) {
-						continue;
-					}
-					if ($inMethod->getName() === $typeAndMethod->getMethod()) {
-						continue;
-					}
-					unset($methods[$typeAndMethod->getMethod()]);
 				}
 			}
 		}
 
 		$errors = [];
-		foreach ($methods as $methodName => $method) {
+		foreach ($methods as $method) {
+			$originalMethodName = $method->getNode()->name->toString();
 			$methodType = 'Method';
 			if ($method->getNode()->isStatic()) {
 				$methodType = 'Static method';
 			}
-			$errors[] = RuleErrorBuilder::message(sprintf('%s %s::%s() is unused.', $methodType, $classReflection->getDisplayName(), $methodName))
-				->line($method->getNode()->getLine())
-				->identifier('deadCode.unusedMethod')
-				->metadata([
-					'classOrder' => $node->getClass()->getAttribute('statementOrder'),
-					'classDepth' => $node->getClass()->getAttribute('statementDepth'),
-					'classStartLine' => $node->getClass()->getStartLine(),
-					'methodName' => $methodName,
-				])
+			$errors[] = RuleErrorBuilder::message(sprintf('%s %s::%s() is unused.', $methodType, $classReflection->getDisplayName(), $originalMethodName))
+				->line($method->getNode()->getStartLine())
+				->identifier('method.unused')
 				->build();
 		}
 

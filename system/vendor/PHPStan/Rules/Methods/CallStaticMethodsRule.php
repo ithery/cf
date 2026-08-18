@@ -3,11 +3,17 @@
 namespace PHPStan\Rules\Methods;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr\BinaryOp\Identical;
 use PhpParser\Node\Expr\StaticCall;
+use PhpParser\Node\Scalar\String_;
+use PHPStan\Analyser\CollectedDataEmitter;
+use PHPStan\Analyser\NodeCallbackInvoker;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Internal\SprintfHelper;
 use PHPStan\Reflection\ParametersAcceptorSelector;
 use PHPStan\Rules\FunctionCallParametersCheck;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
 use function array_merge;
 use function sprintf;
@@ -15,7 +21,8 @@ use function sprintf;
 /**
  * @implements Rule<Node\Expr\StaticCall>
  */
-class CallStaticMethodsRule implements Rule
+#[RegisteredRule(level: 0)]
+final class CallStaticMethodsRule implements Rule
 {
 
 	public function __construct(
@@ -30,14 +37,37 @@ class CallStaticMethodsRule implements Rule
 		return StaticCall::class;
 	}
 
-	public function processNode(Node $node, Scope $scope): array
+	public function processNode(Node $node, Scope&NodeCallbackInvoker&CollectedDataEmitter $scope): array
 	{
-		if (!$node->name instanceof Node\Identifier) {
-			return [];
+		$errors = [];
+		if ($node->name instanceof Node\Identifier) {
+			$methodNameScopes = [$node->name->name => $scope];
+		} else {
+			$nameType = $scope->getType($node->name);
+			$methodNameScopes = [];
+			foreach ($nameType->getConstantStrings() as $constantString) {
+				$name = $constantString->getValue();
+				$methodNameScopes[$name] = $scope->filterByTruthyValue(new Identical($node->name, new String_($name)));
+			}
 		}
-		$methodName = $node->name->name;
 
-		[$errors, $method] = $this->methodCallCheck->check($scope, $methodName, $node->class);
+		foreach ($methodNameScopes as $methodName => $methodScope) {
+			$errors = array_merge($errors, $this->processSingleMethodCall(
+				$methodScope,
+				$node,
+				(string) $methodName, // @phpstan-ignore cast.useless
+			));
+		}
+
+		return $errors;
+	}
+
+	/**
+	 * @return list<IdentifierRuleError>
+	 */
+	private function processSingleMethodCall(Scope&NodeCallbackInvoker&CollectedDataEmitter $scope, StaticCall $node, string $methodName): array
+	{
+		[$errors, $method] = $this->methodCallCheck->check($scope, $methodName, $node->class, $node->name);
 		if ($method === null) {
 			return $errors;
 		}
@@ -58,26 +88,32 @@ class CallStaticMethodsRule implements Rule
 				$scope,
 				$node->getArgs(),
 				$method->getVariants(),
+				$method->getNamedArgumentsVariants(),
 			),
 			$scope,
 			$method->getDeclaringClass()->isBuiltin(),
 			$node,
-			[
-				$displayMethodName . ' invoked with %d parameter, %d required.',
-				$displayMethodName . ' invoked with %d parameters, %d required.',
-				$displayMethodName . ' invoked with %d parameter, at least %d required.',
-				$displayMethodName . ' invoked with %d parameters, at least %d required.',
-				$displayMethodName . ' invoked with %d parameter, %d-%d required.',
-				$displayMethodName . ' invoked with %d parameters, %d-%d required.',
-				'Parameter %s of ' . $lowercasedMethodName . ' expects %s, %s given.',
-				'Result of ' . $lowercasedMethodName . ' (void) is used.',
-				'Parameter %s of ' . $lowercasedMethodName . ' is passed by reference, so it expects variables only.',
-				'Unable to resolve the template type %s in call to method ' . $lowercasedMethodName,
-				'Missing parameter $%s in call to ' . $lowercasedMethodName . '.',
-				'Unknown parameter $%s in call to ' . $lowercasedMethodName . '.',
-				'Return type of call to ' . $lowercasedMethodName . ' contains unresolvable type.',
-				'Parameter %s of ' . $lowercasedMethodName . ' contains unresolvable type.',
-			],
+			'staticMethod',
+			$method->acceptsNamedArguments(),
+			$displayMethodName . ' invoked with %d parameter, %d required.',
+			$displayMethodName . ' invoked with %d parameters, %d required.',
+			$displayMethodName . ' invoked with %d parameter, at least %d required.',
+			$displayMethodName . ' invoked with %d parameters, at least %d required.',
+			$displayMethodName . ' invoked with %d parameter, %d-%d required.',
+			$displayMethodName . ' invoked with %d parameters, %d-%d required.',
+			'%s of ' . $lowercasedMethodName . ' expects %s, %s given.',
+			'Result of ' . $lowercasedMethodName . ' (void) is used.',
+			'%s of ' . $lowercasedMethodName . ' is passed by reference, so it expects variables only.',
+			'Unable to resolve the template type %s in call to ' . $lowercasedMethodName,
+			'Missing parameter $%s in call to ' . $lowercasedMethodName . '.',
+			'Unknown parameter $%s in call to ' . $lowercasedMethodName . '.',
+			'Return type of call to ' . $lowercasedMethodName . ' contains unresolvable type.',
+			'%s of ' . $lowercasedMethodName . ' contains unresolvable type.',
+			$displayMethodName . ' invoked with %s, but it\'s not allowed because of @no-named-arguments.',
+			'Constant %s is not allowed for %s of ' . $lowercasedMethodName . '.',
+			'Constants %s cannot be combined for %s of ' . $lowercasedMethodName . '.',
+			'Combining constants with | is not allowed for %s of ' . $lowercasedMethodName . '.',
+			null,
 		));
 
 		return $errors;

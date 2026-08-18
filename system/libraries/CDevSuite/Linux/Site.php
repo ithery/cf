@@ -2,23 +2,6 @@
 
 class CDevSuite_Linux_Site extends CDevSuite_Site {
     /**
-     * Get all certificates from config folder.
-     *
-     * @param string $path
-     *
-     * @return \CCollection
-     */
-    public function getCertificates($path = null) {
-        $path = $path ?: $this->certificatesPath();
-
-        return c::collect($this->files->scanDir($path))->filter(function ($value, $key) {
-            return cstr::endsWith($value, '.crt');
-        })->map(function ($cert) {
-            return substr($cert, 0, -9);
-        })->flip();
-    }
-
-    /**
      * Return http port suffix.
      *
      * @return string
@@ -88,6 +71,10 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
         $this->createCertificate($url, $certificateExpireInDays);
 
         $this->createSecureNginxServer($url);
+        $this->files->putAsUser(
+            $this->nginxPath($url),
+            $this->buildSecureNginxServer($url, $siteConf)
+        );
     }
 
     /**
@@ -121,7 +108,9 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
             'rootcertificate@cf.devsuite',
             $caKeyPath,
             $caPemPath
-        ));
+        ), function ($code, $output) {
+            CDevSuite::warning('Could not generate the DevSuite CA: ' . $output);
+        });
         // $this->cli->runAsUser(sprintf(
         //     'openssl genrsa -des3 -out %s 2048',
         //     $caKeyPath
@@ -131,6 +120,47 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
         //     $caKeyPath,
         //     $caPemPath
         // ));
+
+        $this->trustCa($caPemPath);
+    }
+
+    /**
+     * Trust the given root certificate authority in the system trust store,
+     * so that anything validating a real certificate chain (curl, wget, git,
+     * PHP, and browsers that don't keep their own NSS database) will accept
+     * certificates signed by it.
+     *
+     * @param string $caPemPath
+     *
+     * @return void
+     */
+    public function trustCa($caPemPath) {
+        $this->cli->run(sprintf(
+            'sudo bash -c \'' .
+                'if command -v update-ca-certificates >/dev/null 2>&1; then ' .
+                    'mkdir -p /usr/local/share/ca-certificates && ' .
+                    'cp "%1$s" /usr/local/share/ca-certificates/devsuite-ca.crt && ' .
+                    'update-ca-certificates; ' .
+                'elif command -v update-ca-trust >/dev/null 2>&1; then ' .
+                    'mkdir -p /etc/pki/ca-trust/source/anchors && ' .
+                    'cp "%1$s" /etc/pki/ca-trust/source/anchors/devsuite-ca.crt && ' .
+                    'update-ca-trust extract; ' .
+                'elif command -v trust >/dev/null 2>&1; then ' .
+                    'mkdir -p /etc/ca-certificates/trust-source/anchors && ' .
+                    'cp "%1$s" /etc/ca-certificates/trust-source/anchors/devsuite-ca.crt && ' .
+                    'trust extract-compat; ' .
+                'else ' .
+                    'exit 1; ' .
+                'fi' .
+            '\'',
+            $caPemPath
+        ), function ($code, $output) {
+            CDevSuite::warning(
+                'Could not install the DevSuite CA into the system trust store (tried update-ca-certificates, '
+                . 'update-ca-trust and trust). Sites secured with `devsuite:secure` will still show as untrusted '
+                . 'outside of the browser NSS databases. ' . $output
+            );
+        });
     }
 
     /**
@@ -153,9 +183,9 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
         $this->createPrivateKey($keyPath);
         $this->createSigningRequest($url, $keyPath, $csrPath, $confPath);
 
-        $caSrlParam = '-CAserial "' . $caSrlPath . '"';
-        if (!$this->files->exists($caSrlPath)) {
-            $caSrlParam .= ' -CAcreateserial';
+        $caSrlParam = ' -CAcreateserial';
+        if ($this->files->exists($caSrlPath)) {
+            $caSrlParam = ' -CAserial ' . $caSrlPath;
         }
 
         $commandOpenSSL = sprintf(
@@ -169,7 +199,9 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
             $confPath
         );
 
-        $this->cli->runAsUser($commandOpenSSL);
+        $this->cli->runAsUser($commandOpenSSL, function ($code, $output) {
+            CDevSuite::warning('Could not generate the SSL certificate: ' . $output);
+        });
 
         $this->trustCertificate($crtPath, $url);
     }
@@ -182,7 +214,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      * @return void
      */
     public function createPrivateKey($keyPath) {
-        $this->cli->runAsUser(sprintf('openssl genrsa -out %s 2048', $keyPath));
+        $this->cli->runAsUser(sprintf('openssl genrsa -out "%s" 2048', $keyPath));
     }
 
     /**
@@ -197,7 +229,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      */
     public function createSigningRequest($url, $keyPath, $csrPath, $confPath) {
         $this->cli->runAsUser(sprintf(
-            'openssl req -new -key %s -out %s -subj "/C=US/ST=MN/O=DevSuite/localityName=DevSuite/commonName=%s/organizationalUnitName=DevSuite/emailAddress=devsuite/" -config %s -passin pass:',
+            'openssl req -new -key "%s" -out "%s" -subj "/C=US/ST=MN/O=DevSuite/localityName=DevSuite/commonName=%s/organizationalUnitName=DevSuite/emailAddress=devsuite/" -config "%s" -passin pass:',
             $keyPath,
             $csrPath,
             $url,
@@ -283,9 +315,29 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
             $this->files->unlink($this->certificatesPath() . '/' . $url . '.csr');
             $this->files->unlink($this->certificatesPath() . '/' . $url . '.crt');
 
-            $this->cli->run(sprintf('certutil -d sql:$HOME/.pki/nssdb -D -n "%s"', $url));
-            $this->cli->run(sprintf('certutil -d $HOME/.mozilla/firefox/*.default -D -n "%s"', $url));
+            $this->cli->run(sprintf('certutil -d sql:$HOME/.pki/nssdb -D -n "%s"', $url), function ($code, $output) {
+                CDevSuite::warning('Could not remove the certificate from the Chrome/Chromium NSS database: ' . $output);
+            });
+            $this->cli->run($this->firefoxCertutilCommand('-D -n "' . $url . '"'), function ($code, $output) {
+                CDevSuite::warning('Could not remove the certificate from Firefox profiles: ' . $output);
+            });
         }
+    }
+
+    /**
+     * Build a shell command that runs `certutil` against every installed Firefox
+     * profile. Firefox profile folders are not always suffixed ".default" (recent
+     * versions use ".default-release", ".default-esr", or a custom profile name),
+     * so we loop over every profile directory instead of relying on a single glob.
+     *
+     * @param string $certutilArgs certutil arguments, excluding "-d <profile>"
+     *
+     * @return string
+     */
+    private function firefoxCertutilCommand($certutilArgs) {
+        return 'bash -c \'shopt -s nullglob; for profile in "$HOME"/.mozilla/firefox/*.*/ "$HOME"/snap/firefox/common/.mozilla/firefox/*.*/; do '
+            . 'certutil -d "sql:$profile" ' . $certutilArgs . ' 2>/dev/null; '
+            . 'done\'';
     }
 
     /**
@@ -300,10 +352,12 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
     }
 
     /**
-     * Trust the given certificate file in the Mac Keychain.
+     * Trust the given certificate file in the Chrome/Chromium NSS database and
+     * every installed Firefox profile, so browsers using their own trust store
+     * (instead of the system one) accept it.
      *
-     * @param string $crtPath
-     * @param mixed  $url
+     * @param string      $crtPath
+     * @param null|string $url
      *
      * @return void
      */
@@ -312,12 +366,15 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
             'certutil -d sql:$HOME/.pki/nssdb -A -t TC -n "%s" -i "%s"',
             $url,
             $crtPath
-        ));
+        ), function ($code, $output) {
+            CDevSuite::warning('Could not trust the certificate in the Chrome/Chromium NSS database: ' . $output);
+        });
 
-        $this->cli->run(sprintf(
-            'certutil -d $HOME/.mozilla/firefox/*.default -A -t TC -n "%s" -i "%s"',
-            $url,
-            $crtPath
-        ));
+        $this->cli->run(
+            $this->firefoxCertutilCommand('-A -t TC -n "' . $url . '" -i "' . $crtPath . '"'),
+            function ($code, $output) {
+                CDevSuite::warning('Could not trust the certificate in any Firefox profile: ' . $output);
+            }
+        );
     }
 }

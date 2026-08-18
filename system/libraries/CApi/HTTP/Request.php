@@ -10,12 +10,22 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
      */
     protected $accept;
 
+    /**
+     * The API data for the request.
+     *
+     * @var array
+     */
     protected $apiData = [];
 
+    /**
+     * The session resolver callback.
+     *
+     * @var \Closure
+     */
     protected $sessionResolver;
 
     /**
-     * Create a new Dingo request instance from an Illuminate request instance.
+     * Create a new Api request instance from an HTTP request instance.
      *
      * @param \CHTTP_Request $old
      *
@@ -31,6 +41,12 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
             $old->server->all(),
             $old->content
         );
+
+        // Headers are normally re-derived from the `server` bag above, but that
+        // misses any header set directly on $old->headers (e.g. via ->set())
+        // without a matching HTTP_* server entry. Reapply those explicitly, same
+        // as createFrom() already does, so they survive this reconstruction.
+        $new->headers->replace($old->headers->all());
 
         if ($session = $old->getSession()) {
             $new->setSession($session);
@@ -51,6 +67,13 @@ class CApi_HTTP_Request extends CHTTP_Request implements CApi_Contract_HTTP_Requ
         return $this->accept['version'];
     }
 
+    /**
+     * Set the group for the request.
+     *
+     * @param null|mixed $group
+     *
+     * @return void
+     */
     public function setGroup($group) {
         $this->group = $group;
         $this->parseAcceptHeader();

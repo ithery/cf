@@ -1,6 +1,9 @@
 <?php
 
-interface CInterface_Enumerable extends CInterface_Arrayable, Countable, IteratorAggregate, CInterface_Jsonable, JsonSerializable {
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
+
+interface CInterface_Enumerable extends Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable {
     /**
      * Create a new collection instance if the value isn't one already.
      *
@@ -18,7 +21,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return static
      */
-    public static function times($number, callable $callback = null);
+    public static function times($number, ?callable $callback = null);
 
     /**
      * Create a collection with the given range.
@@ -283,7 +286,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return static
      */
-    public function filter(callable $callback = null);
+    public function filter(?callable $callback = null);
 
     /**
      * Apply the callback if the value is truthy.
@@ -294,7 +297,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return static|mixed
      */
-    public function when($value, callable $callback, callable $default = null);
+    public function when($value, ?callable $callback = null, ?callable $default = null);
 
     /**
      * Apply the callback if the collection is empty.
@@ -304,7 +307,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return static|mixed
      */
-    public function whenEmpty(callable $callback, callable $default = null);
+    public function whenEmpty(callable $callback, ?callable $default = null);
 
     /**
      * Apply the callback if the collection is not empty.
@@ -314,7 +317,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return static|mixed
      */
-    public function whenNotEmpty(callable $callback, callable $default = null);
+    public function whenNotEmpty(callable $callback, ?callable $default = null);
 
     /**
      * Apply the callback if the value is falsy.
@@ -325,7 +328,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return static|mixed
      */
-    public function unless($value, callable $callback, callable $default = null);
+    public function unless($value, ?callable $callback = null, ?callable $default = null);
 
     /**
      * Apply the callback unless the collection is empty.
@@ -335,7 +338,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return static|mixed
      */
-    public function unlessEmpty(callable $callback, callable $default = null);
+    public function unlessEmpty(callable $callback, ?callable $default = null);
 
     /**
      * Apply the callback unless the collection is not empty.
@@ -345,7 +348,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return static|mixed
      */
-    public function unlessNotEmpty(callable $callback, callable $default = null);
+    public function unlessNotEmpty(callable $callback, ?callable $default = null);
 
     /**
      * Filter items by the given key value pair.
@@ -465,7 +468,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return mixed
      */
-    public function first(callable $callback = null, $default = null);
+    public function first(?callable $callback = null, $default = null);
 
     /**
      * Get the first item by the given key value pair.
@@ -599,7 +602,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return mixed
      */
-    public function last(callable $callback = null, $default = null);
+    public function last(?callable $callback = null, $default = null);
 
     /**
      * Run a map over each of the items.

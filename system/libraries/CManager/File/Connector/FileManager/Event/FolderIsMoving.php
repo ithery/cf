@@ -2,30 +2,37 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 9:55:39 PM
- */
 class CManager_File_Connector_FileManager_Event_FolderIsMoving {
-    private $old_path;
+    /**
+     * @var string
+     */
+    private $oldPath;
 
-    private $new_path;
+    /**
+     * @var string
+     */
+    private $newPath;
 
-    public function __construct($old_path, $new_path) {
-        $this->old_path = $old_path;
-        $this->new_path = $new_path;
+    /**
+     * @param string $oldPath
+     * @param string $newPath
+     */
+    public function __construct($oldPath, $newPath) {
+        $this->oldPath = $oldPath;
+        $this->newPath = $newPath;
     }
 
     /**
      * @return string
      */
     public function oldPath() {
-        return $this->old_path;
+        return $this->oldPath;
     }
 
+    /**
+     * @return string
+     */
     public function newPath() {
-        return $this->new_path;
+        return $this->newPath;
     }
 }

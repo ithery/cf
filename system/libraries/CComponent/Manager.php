@@ -50,9 +50,12 @@ class CComponent_Manager {
     }
 
     public function getClass($alias) {
+        $class = null;
         $finder = CComponent_Finder::instance();
 
-        $class = carr::get($this->componentAliases, $alias);
+        if ($alias) {
+            $class = carr::get($this->componentAliases, $alias);
+        }
 
         if (!$class) {
             $class = $finder->find($alias);
@@ -71,7 +74,6 @@ class CComponent_Manager {
 
     public function getInstance($component, $id) {
         $componentClass = $this->getClass($component);
-
         c::throwUnless(class_exists($componentClass), new CComponent_Exception_ComponentNotFoundException(
             "Component [{$component}] class not found: [{$componentClass}]"
         ));
@@ -200,22 +202,6 @@ HTML;
 
         $nonce = isset($options['nonce']) ? "nonce=\"{$options['nonce']}\"" : '';
 
-        // Use static assets if they have been published
-        if (file_exists(c::publicPath('vendor/livewire/manifest.json'))) {
-            $publishedManifest = json_decode(file_get_contents(c::publicPath('vendor/livewire/manifest.json')), true);
-            $versionedFileName = $publishedManifest['/livewire.js'];
-
-            $fullAssetPath = ($this->isOnVapor() ? CF::config('app.asset_url') : $appUrl) . '/vendor/livewire' . $versionedFileName;
-
-            if ($manifest !== $publishedManifest) {
-                $assetWarning = <<<'HTML'
-<script {$nonce}>
-    console.warn("Livewire: The published Livewire assets are out of date\n See: https://laravel-livewire.com/docs/installation/")
-</script>
-HTML;
-            }
-        }
-
         // Adding semicolons for this JavaScript is important,
         // because it will be minified in production.
         return <<<HTML
@@ -309,6 +295,7 @@ HTML;
         if (is_array($args) && count($args) > 0) {
             $method = carr::get($args, 0);
             $args = array_slice($args, 1);
+
             $handler = new CComponent_ControllerHandler($method);
 
             return $handler->execute($method);

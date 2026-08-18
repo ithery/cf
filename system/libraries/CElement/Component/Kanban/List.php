@@ -3,18 +3,19 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 3, 2019, 1:46:52 AM
- */
-
-/**
- * @method string setDataFromCallback($callback,$require)
+ * @method CElement_Component_ListGroup setDataFromCallback($callback, $callbackOptions = [], $require = null)
  */
 class CElement_Component_Kanban_List extends CElement_Component_Widget {
+    /**
+     * @var CElement_Component_ListGroup
+     */
     protected $kanbanBox;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->setNoPadding();
@@ -22,10 +23,19 @@ class CElement_Component_Kanban_List extends CElement_Component_Widget {
         $this->wrapper = $this->kanbanBox;
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         parent::build();
     }
 
+    /**
+     * @param string $method
+     * @param array  $parameters
+     *
+     * @return mixed
+     */
     public function __call($method, $parameters) {
         if (is_callable([$this->kanbanBox, $method])) {
             return call_user_func_array([$this->kanbanBox, $method], $parameters);

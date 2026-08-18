@@ -55,6 +55,17 @@ class CWebsocket_Channel {
     }
 
     /**
+     * Get connection by socketId.
+     *
+     * @param  string socketId
+     *
+     * @return ?ConnectionInterface
+     */
+    public function getConnection(string $socketId) {
+        return $this->connections[$socketId] ?? null;
+    }
+
+    /**
      * Check if the channel has connections.
      *
      * @return bool

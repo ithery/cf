@@ -4,16 +4,18 @@ namespace PHPStan\Rules\Api;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use function sprintf;
-use function strpos;
+use function str_contains;
 
 /**
  * @implements Rule<Node\Expr\New_>
  */
-class ApiInstantiationRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ApiInstantiationRule implements Rule
 {
 
 	public function __construct(
@@ -47,7 +49,7 @@ class ApiInstantiationRule implements Rule
 		$ruleError = RuleErrorBuilder::message(sprintf(
 			'Creating new %s is not covered by backward compatibility promise. The class might change in a minor PHPStan version.',
 			$classReflection->getDisplayName(),
-		))->tip(sprintf(
+		))->identifier('phpstanApi.constructor')->tip(sprintf(
 			"If you think it should be covered by backward compatibility promise, open a discussion:\n   %s\n\n   See also:\n   https://phpstan.org/developing-extensions/backward-compatibility-promise",
 			'https://github.com/phpstan/phpstan/discussions',
 		))->build();
@@ -62,7 +64,7 @@ class ApiInstantiationRule implements Rule
 			return [$ruleError];
 		}
 
-		if (strpos($docComment, '@api') === false) {
+		if (!str_contains($docComment, '@api')) {
 			return [$ruleError];
 		}
 

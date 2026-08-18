@@ -2,12 +2,16 @@
 
 namespace PHPStan\Type;
 
-use PHPStan\Broker\Broker;
-use PHPStan\Reflection\BrokerAwareExtension;
+use PHPStan\DependencyInjection\AutowiredExtensions;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\DependencyInjection\ExtensionsCollection;
+use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use function array_merge;
+use function strtolower;
 
-class DynamicReturnTypeExtensionRegistry
+#[AutowiredService]
+final class DynamicReturnTypeExtensionRegistry
 {
 
 	/** @var DynamicMethodReturnTypeExtension[][]|null */
@@ -16,26 +20,24 @@ class DynamicReturnTypeExtensionRegistry
 	/** @var DynamicStaticMethodReturnTypeExtension[][]|null */
 	private ?array $dynamicStaticMethodReturnTypeExtensionsByClass = null;
 
+	/** @var array<string, list<DynamicFunctionReturnTypeExtension>> */
+	private array $dynamicReturnTypeExtensionsByFunction = [];
+
 	/**
-	 * @param DynamicMethodReturnTypeExtension[] $dynamicMethodReturnTypeExtensions
-	 * @param DynamicStaticMethodReturnTypeExtension[] $dynamicStaticMethodReturnTypeExtensions
-	 * @param DynamicFunctionReturnTypeExtension[] $dynamicFunctionReturnTypeExtensions
+	 * @param ExtensionsCollection<DynamicMethodReturnTypeExtension> $dynamicMethodReturnTypeExtensions
+	 * @param ExtensionsCollection<DynamicStaticMethodReturnTypeExtension> $dynamicStaticMethodReturnTypeExtensions
+	 * @param ExtensionsCollection<DynamicFunctionReturnTypeExtension> $dynamicFunctionReturnTypeExtensions
 	 */
 	public function __construct(
-		Broker $broker,
 		private ReflectionProvider $reflectionProvider,
-		private array $dynamicMethodReturnTypeExtensions,
-		private array $dynamicStaticMethodReturnTypeExtensions,
-		private array $dynamicFunctionReturnTypeExtensions,
+		#[AutowiredExtensions(of: DynamicMethodReturnTypeExtension::class)]
+		private ExtensionsCollection $dynamicMethodReturnTypeExtensions,
+		#[AutowiredExtensions(of: DynamicStaticMethodReturnTypeExtension::class)]
+		private ExtensionsCollection $dynamicStaticMethodReturnTypeExtensions,
+		#[AutowiredExtensions(of: DynamicFunctionReturnTypeExtension::class)]
+		private ExtensionsCollection $dynamicFunctionReturnTypeExtensions,
 	)
 	{
-		foreach (array_merge($dynamicMethodReturnTypeExtensions, $dynamicStaticMethodReturnTypeExtensions, $dynamicFunctionReturnTypeExtensions) as $extension) {
-			if (!($extension instanceof BrokerAwareExtension)) {
-				continue;
-			}
-
-			$extension->setBroker($broker);
-		}
 	}
 
 	/**
@@ -45,8 +47,8 @@ class DynamicReturnTypeExtensionRegistry
 	{
 		if ($this->dynamicMethodReturnTypeExtensionsByClass === null) {
 			$byClass = [];
-			foreach ($this->dynamicMethodReturnTypeExtensions as $extension) {
-				$byClass[$extension->getClass()][] = $extension;
+			foreach ($this->dynamicMethodReturnTypeExtensions->getAll() as $extension) {
+				$byClass[strtolower($extension->getClass())][] = $extension;
 			}
 
 			$this->dynamicMethodReturnTypeExtensionsByClass = $byClass;
@@ -61,8 +63,8 @@ class DynamicReturnTypeExtensionRegistry
 	{
 		if ($this->dynamicStaticMethodReturnTypeExtensionsByClass === null) {
 			$byClass = [];
-			foreach ($this->dynamicStaticMethodReturnTypeExtensions as $extension) {
-				$byClass[$extension->getClass()][] = $extension;
+			foreach ($this->dynamicStaticMethodReturnTypeExtensions->getAll() as $extension) {
+				$byClass[strtolower($extension->getClass())][] = $extension;
 			}
 
 			$this->dynamicStaticMethodReturnTypeExtensionsByClass = $byClass;
@@ -83,6 +85,7 @@ class DynamicReturnTypeExtensionRegistry
 		$extensionsForClass = [[]];
 		$class = $this->reflectionProvider->getClass($className);
 		foreach (array_merge([$className], $class->getParentClassesNames(), $class->getNativeReflection()->getInterfaceNames()) as $extensionClassName) {
+			$extensionClassName = strtolower($extensionClassName);
 			if (!isset($extensions[$extensionClassName])) {
 				continue;
 			}
@@ -96,9 +99,23 @@ class DynamicReturnTypeExtensionRegistry
 	/**
 	 * @return DynamicFunctionReturnTypeExtension[]
 	 */
-	public function getDynamicFunctionReturnTypeExtensions(): array
+	public function getDynamicFunctionReturnTypeExtensions(FunctionReflection $functionReflection): array
 	{
-		return $this->dynamicFunctionReturnTypeExtensions;
+		$functionName = $functionReflection->getName();
+		if (isset($this->dynamicReturnTypeExtensionsByFunction[$functionName])) {
+			return $this->dynamicReturnTypeExtensionsByFunction[$functionName];
+		}
+
+		$supportedFunctions = [];
+		foreach ($this->dynamicFunctionReturnTypeExtensions->getAll() as $dynamicFunctionReturnTypeExtension) {
+			if (!$dynamicFunctionReturnTypeExtension->isFunctionSupported($functionReflection)) {
+				continue;
+			}
+
+			$supportedFunctions[] = $dynamicFunctionReturnTypeExtension;
+		}
+
+		return $this->dynamicReturnTypeExtensionsByFunction[$functionName] = $supportedFunctions;
 	}
 
 }

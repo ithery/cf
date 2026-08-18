@@ -5,9 +5,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Implementation of distance calculation with Vincenty Method.
  *
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see      http://www.movable-type.co.uk/scripts/latlong-vincenty.html
  */
 class CGeo_Location_Distance_Vincenty implements CGeo_Location_Distance_DistanceInterface {

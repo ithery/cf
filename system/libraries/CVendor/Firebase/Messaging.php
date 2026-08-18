@@ -95,6 +95,7 @@ class CVendor_Firebase_Messaging {
      * @throws CVendor_Firebase_Exception if something very unexpected happened (never :))
      */
     public function sendAll($messages) {
+        $messages = $this->ensureMessages($messages);
         $ensuredMessages = [];
 
         foreach ($messages as $message) {
@@ -201,15 +202,27 @@ class CVendor_Firebase_Messaging {
     }
 
     /**
-     * @param mixed $message
+     * @param iterable<Message|array<non-empty-string, mixed>> $messages
+     *
+     * @return list<Message>
+     */
+    private function ensureMessages($messages): array {
+        $ensured = [];
+
+        foreach ($messages as $message) {
+            $ensured[] = $this->makeMessage($message);
+        }
+
+        return $ensured;
+    }
+
+    /**
+     * @param Message|array $message
      *
      * @throws InvalidArgumentException
      */
     private function makeMessage($message) {
-        if ($message instanceof CVendor_Firebase_Messaging_MessageInterface) {
-            return $message;
-        }
-
+        $message = $message instanceof CVendor_Firebase_Messaging_MessageInterface ? $message : new CVendor_Firebase_Messaging_RawMessageFromArray($message);
         if (!\is_array($message)) {
             throw new CVendor_Firebase_Exception_InvalidArgumentException(
                 'Unsupported message type. Use an array or a class implementing %s' . CVendor_Firebase_Messaging_MessageInterface::class

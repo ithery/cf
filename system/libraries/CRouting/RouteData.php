@@ -1,34 +1,81 @@
 <?php
 
 class CRouting_RouteData {
+    /**
+     * @var string
+     */
     protected $uri;
 
+    /**
+     * @var string
+     */
     protected $queryString;
 
+    /**
+     * @var string
+     */
     protected $completeUri;
 
+    /**
+     * @var string
+     */
     protected $urlSuffix;
 
+    /**
+     * @var array
+     */
     protected $segments;
 
+    /**
+     * @var array
+     */
     protected $routedSegments;
 
+    /**
+     * @var string
+     */
     protected $routedUri;
 
+    /**
+     * @var string
+     */
     protected $controllerPath;
 
+    /**
+     * @var string
+     */
     protected $controller;
 
+    /**
+     * @var string
+     */
     protected $controllerDirUcFirst;
 
+    /**
+     * @var string
+     */
     protected $controllerDir;
 
+    /**
+     * @var string
+     */
     protected $controllerClass;
 
+    /**
+     * @var string
+     */
     protected $method;
 
+    /**
+     * @var array
+     */
     protected $arguments;
 
+    /**
+     * Create a new route data instance.
+     *
+     * @param string $uri
+     */
     public function __construct($uri) {
         $this->uri = $uri;
         if ($this->uri == '') {
@@ -127,6 +174,13 @@ class CRouting_RouteData {
         }
     }
 
+    /**
+     * Get the routed URI from the URI routing.
+     *
+     * @param string $uri
+     *
+     * @return string
+     */
     public function getRoutedUriFromUriRouting($uri) {
         $routes = CRouting_Manager::instance()->getUriRoutings();
         // Prepare variables
@@ -196,58 +250,137 @@ class CRouting_RouteData {
         return trim($routedUri, '/');
     }
 
+    /**
+     * Get the URI.
+     *
+     * @return string
+     */
     public function getUri() {
         return $this->uri;
     }
 
+    /**
+     * Get the query string.
+     *
+     * @return string
+     */
     public function getQueryString() {
         return $this->queryString;
     }
 
+    /**
+     * Get the routed URI.
+     *
+     * @return string
+     */
     public function getRoutedUri() {
         return $this->routedUri;
     }
 
+    /**
+     * Get the routed segments.
+     *
+     * @return array
+     */
     public function getRoutedSegments() {
         return $this->routedSegments;
     }
 
+    /**
+     * Get the controller directory with ucfirst.
+     *
+     * @return string
+     */
+    public function getControllerDirUcFirst() {
+        return $this->controllerDirUcFirst;
+    }
+
+    /**
+     * Get the segments.
+     *
+     * @return array
+     */
     public function getSegments() {
         return $this->segments;
     }
 
+    /**
+     * Get the complete URI.
+     *
+     * @return string
+     */
     public function getCompleteUri() {
         return $this->completeUri;
     }
 
+    /**
+     * Get the URL suffix.
+     *
+     * @return string
+     */
     public function getUrlSuffix() {
         return $this->urlSuffix;
     }
 
+    /**
+     * Get the controller class.
+     *
+     * @return string
+     */
     public function getControllerClass() {
         return $this->controllerClass;
     }
 
+    /**
+     * Get the controller.
+     *
+     * @return string
+     */
     public function getController() {
         return $this->controller;
     }
 
+    /**
+     * Get the controller directory.
+     *
+     * @return string
+     */
     public function getControllerDir() {
         return $this->controllerDir;
     }
 
+    /**
+     * Get the controller path.
+     *
+     * @return string
+     */
     public function getControllerPath() {
         return $this->controllerPath;
     }
 
+    /**
+     * Get the method.
+     *
+     * @return string
+     */
     public function getMethod() {
         return $this->method;
     }
 
+    /**
+     * Get the arguments.
+     *
+     * @return array
+     */
     public function getArguments() {
         return $this->arguments ?: [];
     }
 
+    /**
+     * Convert the route data to an array.
+     *
+     * @return array
+     */
     public function toArray() {
         $data = [];
         $data['uri'] = $this->getUri();

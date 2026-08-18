@@ -5,6 +5,7 @@ namespace PHPStan\Type\Php;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\Constant\ConstantArrayTypeBuilder;
@@ -16,9 +17,11 @@ use PHPStan\Type\IntegerType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 use SplFileObject;
+use function count;
 use function in_array;
 
-class StatDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension, DynamicMethodReturnTypeExtension
+#[AutowiredService]
+final class StatDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension, DynamicMethodReturnTypeExtension
 {
 
 	public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -66,7 +69,7 @@ class StatDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtensi
 			'blocks',
 		];
 
-		foreach ($keys as $key) {
+		for ($i = 0; $i < count($keys); $i++) {
 			$builder->setOffsetValueType(null, $valueType);
 		}
 

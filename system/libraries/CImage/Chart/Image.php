@@ -2,23 +2,21 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 30, 2019, 2:17:49 AM
- */
 use CImage_Chart_Data as Data;
 use CImage_Chart_Constant as Constant;
 
 class CImage_Chart_Image extends CImage_Chart_Draw {
+    protected $imageMapStorageFolder;
+
+    protected $imageMapFileName;
+
     /**
      * @param int  $xSize
      * @param int  $ySize
      * @param Data $dataSet
      * @param bool $transparentBackground
      */
-    public function __construct($xSize, $ySize, Data $dataSet = null, $transparentBackground = false) {
+    public function __construct($xSize, $ySize, ?Data $dataSet = null, $transparentBackground = false) {
         parent::__construct();
         $this->transparentBackground = $transparentBackground;
         if ($dataSet) {
@@ -132,6 +130,8 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
 
         return ob_get_clean();
     }
+
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->toData();
     }

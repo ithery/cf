@@ -39,6 +39,7 @@ class CValidation_Rule_In {
      *
      * @see \CValidation_RuleParser::parseParameters
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         $values = array_map(function ($value) {
             return '"' . str_replace('"', '""', $value) . '"';

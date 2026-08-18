@@ -3,25 +3,20 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
  * @see CModel
- * @since Dec 25, 2017, 10:08:50 PM
  */
-
 trait CModel_Trait_GlobalScopes {
     /**
      * Register a new global scope on the model.
      *
      * @param CModel_Interface_Scope|\Closure|string $scope
-     * @param \Closure|null                          $implementation
-     *
-     * @return mixed
+     * @param null|\Closure                          $implementation
      *
      * @throws \InvalidArgumentException
+     *
+     * @return mixed
      */
-    public static function addGlobalScope($scope, Closure $implementation = null) {
+    public static function addGlobalScope($scope, ?Closure $implementation = null) {
         /** @var CModel $this */
         if (is_string($scope) && !is_null($implementation)) {
             return static::$globalScopes[static::class][$scope] = $implementation;
@@ -50,7 +45,7 @@ trait CModel_Trait_GlobalScopes {
      *
      * @param CModel_Interface_Scope|string $scope
      *
-     * @return CModel_Interface_Scope|\Closure|null
+     * @return null|CModel_Interface_Scope|\Closure
      */
     public static function getGlobalScope($scope) {
         /** @var CModel $this */

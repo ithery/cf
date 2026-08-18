@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 8:54:25 AM
- */
-
-/**
  * The MySqlPlatform provides the behavior, features and SQL dialect of the
  * MySQL database platform. This platform represents a MySQL 5.0 or greater platform that
  * uses the InnoDB storage engine.
@@ -1006,7 +999,15 @@ SQL
             'varbinary' => 'binary',
             'varchar' => 'string',
             'year' => 'date',
-
+            'point' => 'point',
+            'linestring' => 'linestring',
+            'multipoint' => 'multipoint',
+            'polygon' => 'polygon',
+            'multilinestring' => 'multilinestring',
+            'multipolygon' => 'multipolygon',
+            'geometry' => 'geometry',
+            'geometrycollection' => 'geometrycollection',
+            'geomcollection' => 'geometrycollection',
         ];
     }
 

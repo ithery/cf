@@ -44,6 +44,7 @@ abstract class CServer_NodeJs_WrapperAbstract implements CServer_NodeJs_Contract
         return file_put_contents($path, $this->getResult());
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->getResult();
     }

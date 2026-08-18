@@ -1,6 +1,11 @@
 <?php
 
 class CApp_PWA_ServiceWorkerService {
+    /**
+     * @param string $theme
+     *
+     * @return string
+     */
     public function generate($theme) {
         $output = '';
         $output .= 'var staticCacheName = "pwa-v" + new Date().getTime();' . PHP_EOL;
@@ -10,6 +15,11 @@ class CApp_PWA_ServiceWorkerService {
         return $output;
     }
 
+    /**
+     * @param string $theme
+     *
+     * @return array
+     */
     protected function getAssetUrl($theme) {
         return [];
         // c::manager()->theme()->setTheme($theme);
@@ -20,6 +30,9 @@ class CApp_PWA_ServiceWorkerService {
         // return array_merge($cssUrl, $jsUrl);
     }
 
+    /**
+     * @return string
+     */
     protected function installScript() {
         return <<<JAVASCRIPT
 // Cache on install

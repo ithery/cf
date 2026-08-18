@@ -59,12 +59,31 @@ class CManager_Transform_MethodExecutor {
         return c::formatter()->unformatCurrency($value);
     }
 
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
     public function transformUppercase($value) {
         return cstr::upper($value);
     }
 
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
     public function transformLowercase($value) {
         return cstr::lower($value);
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
+    public function transformUcfirst($value) {
+        return cstr::ucfirst($value);
     }
 
     public function transformYesNo($value) {
@@ -175,6 +194,34 @@ class CManager_Transform_MethodExecutor {
         return c::manager()->editorJs()->generateHtmlOutput($data)->__toString();
     }
 
-    public static function transformLink($value, $url) {
+    public static function transformToCarbon($value) {
+        return new CCarbon($value);
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
+    public static function transformToString($value) {
+        return (string) $value;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return int
+     */
+    public static function transformToInt($value) {
+        return (int) $value;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return float
+     */
+    public static function transformToFloat($value) {
+        return (float) $value;
     }
 }

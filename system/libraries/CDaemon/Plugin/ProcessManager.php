@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 12, 2019, 6:02:29 PM
- */
 class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
     /**
      * The length (in seconds) of the rolling window used to detect process churn.
@@ -101,6 +95,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
      *
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count($group = null) {
         if ($group) {
             if (isset($this->processes[$group])) {

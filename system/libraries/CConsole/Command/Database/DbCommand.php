@@ -1,7 +1,6 @@
 <?php
 
 use Symfony\Component\Process\Process;
-use Illuminate\Support\ConfigurationUrlParser;
 
 class CConsole_Command_Database_DbCommand extends CConsole_Command {
     /**
@@ -49,7 +48,6 @@ class CConsole_Command_Database_DbCommand extends CConsole_Command {
     public function getConnection() {
         $connectionName = $this->argument('connection') ?: 'default';
         $connection = CDatabase_Config::resolve($connectionName);
-
         if (empty($connection)) {
             throw new UnexpectedValueException("Invalid database connection [{$connectionName}].");
         }

@@ -49,7 +49,7 @@ class CVendor_LiteSpeed_OWS_PageDef {
             } else {
                 $funcname = 'add_FileMap_' . $type;
                 if (!method_exists($this, $funcname)) {
-                    die("invalid func name ${funcname}");
+                    die("invalid func name {$funcname}");
                 }
                 $this->$funcname();
             }
@@ -212,7 +212,7 @@ class CVendor_LiteSpeed_OWS_PageDef {
 
     public function getTabDef($view) {
         if (!isset($this->pageDef[$view])) {
-            die("Invalid tabs ${view}");
+            die("Invalid tabs {$view}");
         }
 
         $tabs = [];

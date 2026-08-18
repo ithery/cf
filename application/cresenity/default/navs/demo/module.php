@@ -1,6 +1,11 @@
 <?php
 return [
     [
+        'name' => 'module.string',
+        'label' => c::__('String'),
+        'subnav' => include dirname(__FILE__) . '/module/string.php',
+    ],
+    [
         'name' => 'module.formatter',
         'label' => c::__('Formatter'),
         'uri' => 'demo/module/formatter/index',
@@ -11,6 +16,16 @@ return [
         'uri' => 'demo/module/transform/index',
     ],
     [
+        'name' => 'module.validation',
+        'label' => c::__('Validation'),
+        'subnav' => include dirname(__FILE__) . '/module/validation.php',
+    ],
+    [
+        'name' => 'module.geo',
+        'label' => c::__('Geo'),
+        'uri' => 'demo/module/geo/index',
+    ],
+    [
         'name' => 'module.color',
         'label' => c::__('Color'),
         'uri' => 'demo/module/color/index',
@@ -19,6 +34,12 @@ return [
         'name' => 'module.broadcast',
         'label' => c::__('Broadcast'),
         'subnav' => include dirname(__FILE__) . '/module/broadcast.php',
+    ],
+    [
+        'name' => 'module.ml',
+        'label' => c::__('ML'),
+        'uri' => 'demo/module/ml/index',
+        'badge' => 'DEV',
     ],
     [
         'name' => 'module.bot',

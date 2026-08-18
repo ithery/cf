@@ -2,8 +2,9 @@
 
 use GeoJson\GeoJson;
 use GeoJson\Feature\FeatureCollection;
+use Illuminate\Contracts\Support\Arrayable;
 
-class CModel_Spatial_Geometry_GeometryCollection extends CModel_Spatial_GeometryAbstract implements IteratorAggregate, ArrayAccess, CInterface_Arrayable, Countable {
+class CModel_Spatial_Geometry_GeometryCollection extends CModel_Spatial_GeometryAbstract implements IteratorAggregate, ArrayAccess, Arrayable, Countable {
     /**
      * The minimum number of items required to create this collection.
      *
@@ -47,6 +48,7 @@ class CModel_Spatial_Geometry_GeometryCollection extends CModel_Spatial_Geometry
         return sprintf('GEOMETRYCOLLECTION(%s)', (string) $this);
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return implode(',', array_map(function (CModel_Spatial_Contract_GeometryInterface $geometry) {
             return $geometry->toWKT();
@@ -84,6 +86,7 @@ class CModel_Spatial_Geometry_GeometryCollection extends CModel_Spatial_Geometry
         return isset($this->items[$offset]);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->offsetExists($offset) ? $this->items[$offset] : null;
     }
@@ -131,6 +134,7 @@ class CModel_Spatial_Geometry_GeometryCollection extends CModel_Spatial_Geometry
      *
      * @return \GeoJson\Geometry\GeometryCollection
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         $geometries = [];
         foreach ($this->items as $geometry) {

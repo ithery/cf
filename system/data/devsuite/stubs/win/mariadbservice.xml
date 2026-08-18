@@ -5,6 +5,6 @@
   <executable>MARIADB_PATH\bin\mysqld.exe</executable>
   <arguments>--defaults-extra-file="MARIADB_INI_FILE" --console</arguments>
   <logpath>DEVSUITE_HOME_PATH\Log\</logpath>
-  <logmode>reset</logmode>
+  <log mode="reset"></log>
   <onfailure action="restart"/>
 </service>

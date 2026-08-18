@@ -4,6 +4,8 @@ namespace PHPStan\Rules\Generics;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Internal\SprintfHelper;
 use PHPStan\Node\InClassNode;
 use PHPStan\PhpDoc\Tag\ExtendsTag;
@@ -17,7 +19,9 @@ use function sprintf;
 /**
  * @implements Rule<InClassNode>
  */
-class EnumAncestorsRule implements Rule
+#[RegisteredRule(level: 2)]
+#[ValidatesStubFiles]
+final class EnumAncestorsRule implements Rule
 {
 
 	public function __construct(
@@ -38,10 +42,7 @@ class EnumAncestorsRule implements Rule
 		if (!$originalNode instanceof Node\Stmt\Enum_) {
 			return [];
 		}
-		if (!$scope->isInClass()) {
-			return [];
-		}
-		$classReflection = $scope->getClassReflection();
+		$classReflection = $node->getClassReflection();
 
 		$enumName = $classReflection->getName();
 		$escapedEnumName = SprintfHelper::escapeFormatString($enumName);
@@ -50,7 +51,9 @@ class EnumAncestorsRule implements Rule
 			[],
 			array_map(static fn (ExtendsTag $tag): Type => $tag->getType(), $classReflection->getExtendsTags()),
 			sprintf('Enum %s @extends tag contains incompatible type %%s.', $escapedEnumName),
+			sprintf('Enum %s @extends tag contains unresolvable type.', $enumName),
 			sprintf('Enum %s has @extends tag, but cannot extend anything.', $escapedEnumName),
+			'',
 			'',
 			'',
 			'',
@@ -65,12 +68,14 @@ class EnumAncestorsRule implements Rule
 			$originalNode->implements,
 			array_map(static fn (ImplementsTag $tag): Type => $tag->getType(), $classReflection->getImplementsTags()),
 			sprintf('Enum %s @implements tag contains incompatible type %%s.', $escapedEnumName),
+			sprintf('Enum %s @implements tag contains unresolvable type.', $enumName),
 			sprintf('Enum %s has @implements tag, but does not implement any interface.', $escapedEnumName),
-			sprintf('The @implements tag of eunm %s describes %%s but the enum implements: %%s', $escapedEnumName),
+			sprintf('The @implements tag of enum %s describes %%s but the enum implements: %%s', $escapedEnumName),
 			'PHPDoc tag @implements contains generic type %s but %s %s is not generic.',
 			'Generic type %s in PHPDoc tag @implements does not specify all template types of %s %s: %s',
 			'Generic type %s in PHPDoc tag @implements specifies %d template types, but %s %s supports only %d: %s',
 			'Type %s in generic type %s in PHPDoc tag @implements is not subtype of template type %s of %s %s.',
+			'Call-site variance annotation of %s in generic type %s in PHPDoc tag @implements is not allowed.',
 			'PHPDoc tag @implements has invalid type %s.',
 			sprintf('Enum %s implements generic interface %%s but does not specify its types: %%s', $escapedEnumName),
 			sprintf('in implemented type %%s of enum %s', $escapedEnumName),

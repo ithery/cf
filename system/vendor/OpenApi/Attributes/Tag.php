@@ -8,12 +8,12 @@ namespace OpenApi\Attributes;
 
 use OpenApi\Generator;
 
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Tag extends \OpenApi\Annotations\Tag
 {
     /**
-     * @param array<string,string>|null $x
-     * @param Attachable[]|null         $attachables
+     * @param array<string,mixed>|null $x
+     * @param Attachable[]|null        $attachables
      */
     public function __construct(
         ?string $name = null,

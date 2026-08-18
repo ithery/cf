@@ -3,10 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2019, 6:35:39 AM
+ * @deprecated High security risk — do not use
  */
 class CApp_Cloud {
     /**
@@ -33,13 +30,18 @@ class CApp_Cloud {
     /**
      * @param CApp_Cloud_AdapterInterface $adapter
      */
-    private function __construct(CApp_Cloud_AdapterInterface $adapter = null) {
+    private function __construct(?CApp_Cloud_AdapterInterface $adapter = null) {
         if ($adapter == null) {
             $adapter = new CApp_Cloud_Adapter_GuzzleAdapter();
         }
         $this->adapter = $adapter;
     }
 
+    /**
+     * @param string $apiName
+     *
+     * @return mixed
+     */
     public function api($apiName) {
         $api = new CApp_Cloud_Api($this->adapter);
 

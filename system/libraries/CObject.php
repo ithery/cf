@@ -13,7 +13,7 @@ class CObject {
     protected function __construct($id = null) {
         $observer = CObserver::instance();
         if ($id == null) {
-            $id = 'c' . spl_object_hash($this);
+            $id = CObserver::instance()->newId();
         }
 
         $this->id = $id;

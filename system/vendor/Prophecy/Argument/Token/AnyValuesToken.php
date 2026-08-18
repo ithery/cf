@@ -45,6 +45,7 @@ class AnyValuesToken implements TokenInterface
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return '* [, ...]';

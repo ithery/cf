@@ -90,7 +90,7 @@ class CBot_Command {
      */
     public function driver($driver) {
         $this->driver = c::collect($driver)->transform(function ($driver) {
-            if (class_exists($driver) && is_subclass_of($driver, DriverInterface::class)) {
+            if (class_exists($driver) && is_subclass_of($driver, CBot_Contract_DriverInterface::class)) {
                 $driver = basename(str_replace('\\', '/', $driver));
                 $driver = preg_replace('/(.*)(Driver)$/', '$1', $driver);
             }

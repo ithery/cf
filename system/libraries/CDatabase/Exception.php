@@ -3,7 +3,7 @@
 /**
  * Database exceptions.
  */
-class CDatabase_Exception extends CException {
+class CDatabase_Exception extends Exception {
     /**
      * @param string $method
      *
@@ -27,7 +27,7 @@ class CDatabase_Exception extends CException {
             return new self(
                 sprintf(
                     "Option 'platform' must be a subtype of '%s', instance of '%s' given",
-                    AbstractPlatform::class,
+                    CDatabase_Platform::class,
                     \get_class($invalidPlatform)
                 )
             );
@@ -36,7 +36,7 @@ class CDatabase_Exception extends CException {
         return new self(
             sprintf(
                 "Option 'platform' must be an object and subtype of '%s'. Got '%s'",
-                AbstractPlatform::class,
+                CDatabase_Platform::class,
                 \gettype($invalidPlatform)
             )
         );

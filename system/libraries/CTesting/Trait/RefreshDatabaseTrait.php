@@ -1,6 +1,6 @@
 <?php
 
-trait CTesting_Trait_RefreshDatabase {
+trait CTesting_Trait_RefreshDatabaseTrait {
     /**
      * Define hooks to migrate the database before and after each test.
      *
@@ -30,7 +30,7 @@ trait CTesting_Trait_RefreshDatabase {
      */
     public function beginDatabaseTransaction() {
         foreach ($this->connectionsToTransact() as $name) {
-            $connection = CDatabase::instance($name);
+            $connection = CDatabase::manager()->connection($name);
             $dispatcher = $connection->getEventDispatcher();
 
             $connection->unsetEventDispatcher();
@@ -46,13 +46,19 @@ trait CTesting_Trait_RefreshDatabase {
 
         $this->beforeApplicationDestroyed(function () {
             foreach ($this->connectionsToTransact() as $name) {
-                $connection = CDatabase::instance($name);
+                $connection = CDatabase::manager()->connection($name);
                 $dispatcher = $connection->getEventDispatcher();
 
                 $connection->unsetEventDispatcher();
                 $connection->rollBack();
                 $connection->setEventDispatcher($dispatcher);
-                //$connection->disconnect();
+                // Deliberately not calling $connection->disconnect() here: Laravel's
+                // RefreshDatabase can do that safely because every test gets a freshly
+                // booted application (a new lazy PDO resolver). CTesting_TestCase reuses
+                // one already-booted global CContainer for the whole PHPUnit process, so
+                // disconnecting here would null out the shared PDO with nothing left to
+                // lazily reconnect it — the next query in any later test would fatal with
+                // "Call to a member function quote() on null".
             }
         });
     }

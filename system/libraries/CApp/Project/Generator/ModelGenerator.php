@@ -2,27 +2,44 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 12, 2019, 3:49:01 AM
- */
 class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerator {
+    /**
+     * @var string
+     */
     public $fieldsFillable;
 
+    /**
+     * @var string
+     */
     public $fieldsHidden;
 
+    /**
+     * @var string
+     */
     public $fieldsCast;
 
+    /**
+     * @var string
+     */
     public $fieldsDate;
 
+    /**
+     * @var CCollection
+     */
     public $columns;
 
+    /**
+     * CApp_Project_Generator_ModelGenerator constructor.
+     */
     public function __construct() {
         parent::__construct();
     }
 
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
     public function generate($options = []) {
         if (!is_array($options)) {
             $options = [];
@@ -36,7 +53,7 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
         }
         // generate the file name for the model based on the table name
         $filename = cstr::studly($table);
-        $db = CDatabase::instance($this->option('database'), null, CF::domain());
+        $db = c::db($this->option('database'));
         $schemaManager = $db->getSchemaManager();
         $columns = $schemaManager->listTableColumns($table);
         $columnNames = array_keys($columns);
@@ -52,7 +69,7 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
         ];
 
         $descQuery = 'describe ' . $table;
-        $resultDesc = $db->query($descQuery);
+        $resultDesc = $db->select($descQuery);
         $this->columns = new CCollection();
         foreach ($resultDesc as $col) {
             $this->columns->push([
@@ -108,32 +125,32 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
         foreach ($modelInformation['fillable'] as $field) {
             // fillable and hidden
             if ($field != $modelInformation['table'] . '_id') {
-                $this->fieldsFillable .= (strlen($this->fieldsFillable) > 0 ? ', ' : '') . "'${field}'";
+                $this->fieldsFillable .= (strlen($this->fieldsFillable) > 0 ? ', ' : '') . "'{$field}'";
                 $fieldsFiltered = $this->columns->where('field', $field);
                 if ($fieldsFiltered) {
                     // check type
                     switch (strtolower($fieldsFiltered->first()['type'])) {
                         case 'timestamp':
-                            $this->fieldsDate .= (strlen($this->fieldsDate) > 0 ? ', ' : '') . "'${field}'";
+                            $this->fieldsDate .= (strlen($this->fieldsDate) > 0 ? ', ' : '') . "'{$field}'";
 
                             break;
                         case 'datetime':
-                            $this->fieldsDate .= (strlen($this->fieldsDate) > 0 ? ', ' : '') . "'${field}'";
+                            $this->fieldsDate .= (strlen($this->fieldsDate) > 0 ? ', ' : '') . "'{$field}'";
 
                             break;
                         case 'date':
-                            $this->fieldsDate .= (strlen($this->fieldsDate) > 0 ? ', ' : '') . "'${field}'";
+                            $this->fieldsDate .= (strlen($this->fieldsDate) > 0 ? ', ' : '') . "'{$field}'";
 
                             break;
                         case 'tinyint(1)':
-                            $this->fieldsCast .= (strlen($this->fieldsCast) > 0 ? ', ' : '') . "'${field}' => 'boolean'";
+                            $this->fieldsCast .= (strlen($this->fieldsCast) > 0 ? ', ' : '') . "'{$field}' => 'boolean'";
 
                             break;
                     }
                 }
             } else {
                 if ($field != $modelInformation['table'] . '_id' && $field != 'created' && $field != 'updated') {
-                    $this->fieldsHidden .= (strlen($this->fieldsHidden) > 0 ? ', ' : '') . "'${field}'";
+                    $this->fieldsHidden .= (strlen($this->fieldsHidden) > 0 ? ', ' : '') . "'{$field}'";
                 }
             }
         }
@@ -148,6 +165,8 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
 
     /**
      * Returns the stub to use to generate the class.
+     *
+     * @return string
      */
     public function getStub() {
         return DOCROOT . 'modules/cresenity/data/stub/generator/model.stub';
@@ -155,6 +174,8 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
 
     /**
      * Returns all the options that the user specified.
+     *
+     * @return void
      */
     protected function fixOptions() {
         // debug
@@ -165,6 +186,8 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
 
     /**
      * Reset all variables to be filled again when using multiple.
+     *
+     * @return void
      */
     public function resetFields() {
         $this->fieldsFillable = '';

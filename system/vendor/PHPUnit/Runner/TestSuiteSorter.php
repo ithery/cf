@@ -65,7 +65,7 @@ final class TestSuiteSorter
     /**
      * List of sorting weights for all test result codes. A higher number gives higher priority.
      */
-    public $DEFECT_SORT_WEIGHT = [
+    public static $DEFECT_SORT_WEIGHT = [
         BaseTestRunner::STATUS_ERROR      => 6,
         BaseTestRunner::STATUS_FAILURE    => 5,
         BaseTestRunner::STATUS_WARNING    => 4,
@@ -75,7 +75,7 @@ final class TestSuiteSorter
         BaseTestRunner::STATUS_UNKNOWN    => 0,
     ];
 
-    public $SIZE_SORT_WEIGHT = [
+    public static $SIZE_SORT_WEIGHT = [
         TestUtil::SMALL   => 1,
         TestUtil::MEDIUM  => 2,
         TestUtil::LARGE   => 3,

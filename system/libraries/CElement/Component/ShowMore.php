@@ -21,6 +21,11 @@ class CElement_Component_ShowMore extends CElement_Component {
      */
     protected $type;
 
+    /**
+     * @param string|null $id
+     *
+     * @return void
+     */
     public function __construct($id = null) {
         parent::__construct($id);
         $this->showMoreLabel = '→ show more';
@@ -29,6 +34,11 @@ class CElement_Component_ShowMore extends CElement_Component {
         $this->type = 'text';
     }
 
+    /**
+     * @param string|null $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         // @phpstan-ignore-next-line
         return new static($id);
@@ -45,6 +55,9 @@ class CElement_Component_ShowMore extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         $this->addClass('cres:element:component:ShowMore');
         $config = [
@@ -65,6 +78,6 @@ class CElement_Component_ShowMore extends CElement_Component {
         }
         */
         $this->setAttr('cres-element', 'component:ShowMore');
-        $this->setAttr('cres-config', htmlspecialchars(json_encode($config), ENT_QUOTES, 'UTF-8'));
+        $this->setAttr('cres-config', c::json($config));
     }
 }

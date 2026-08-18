@@ -16,11 +16,19 @@ class CElement_Component_Metric_TrendMetric extends CElement_Component_Metric_Va
 
     const BY_MINUTES = 'minute';
 
+    /**
+     * @param null|string $id
+     *
+     * @return void
+     */
     public function __construct($id = null) {
         parent::__construct($id);
         $this->view = 'cresenity/element/component/metric/trend';
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         parent::build();
     }

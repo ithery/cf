@@ -11,11 +11,11 @@ class CModel_Casts_AsArrayObject implements CModel_Contract_CastableInterface {
     public static function castUsing(array $arguments) {
         return new class() implements CModel_Contract_CastsAttributesInterface {
             public function get($model, $key, $value, $attributes) {
-                return isset($attributes[$key]) ? new ArrayObject(json_decode($attributes[$key], true)) : null;
+                return isset($attributes[$key]) ? new CModel_Casts_ArrayObject(json_decode($attributes[$key], true)) : null;
             }
 
             public function set($model, $key, $value, $attributes) {
-                return [$key => json_encode($value)];
+                return [$key => CModel_Casts_Json::encode($value)];
             }
 
             public function serialize($model, $key, $value, array $attributes) {

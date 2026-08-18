@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Apr 14, 2019, 1:27:17 PM
- */
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CJavascript_Validation_MessageParser {

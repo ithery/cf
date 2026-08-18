@@ -5,9 +5,12 @@ namespace PHPStan\Rules\Classes;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Instanceof_;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Rules\ClassCaseSensitivityCheck;
+use PHPStan\Rules\ClassNameCheck;
 use PHPStan\Rules\ClassNameNodePair;
+use PHPStan\Rules\ClassNameUsageLocation;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\VerbosityLevel;
@@ -19,13 +22,17 @@ use function strtolower;
 /**
  * @implements Rule<Node\Expr\Instanceof_>
  */
-class ExistingClassInInstanceOfRule implements Rule
+#[RegisteredRule(level: 0)]
+final class ExistingClassInInstanceOfRule implements Rule
 {
 
 	public function __construct(
 		private ReflectionProvider $reflectionProvider,
-		private ClassCaseSensitivityCheck $classCaseSensitivityCheck,
+		private ClassNameCheck $classCheck,
+		#[AutowiredParameter]
 		private bool $checkClassCaseSensitivity,
+		#[AutowiredParameter(ref: '%tips.discoveringSymbols%')]
+		private bool $discoveringSymbolsTip,
 	)
 	{
 	}
@@ -52,7 +59,10 @@ class ExistingClassInInstanceOfRule implements Rule
 		], true)) {
 			if (!$scope->isInClass()) {
 				return [
-					RuleErrorBuilder::message(sprintf('Using %s outside of class scope.', $lowercaseName))->line($class->getLine())->build(),
+					RuleErrorBuilder::message(sprintf('Using %s outside of class scope.', $lowercaseName))
+						->identifier(sprintf('outOfClass.%s', $lowercaseName))
+						->line($class->getStartLine())
+						->build(),
 				];
 			}
 
@@ -66,25 +76,39 @@ class ExistingClassInInstanceOfRule implements Rule
 				return [];
 			}
 
+			$errorBuilder = RuleErrorBuilder::message(sprintf('Class %s not found.', $name))
+				->identifier('class.notFound')
+				->line($class->getStartLine());
+
+			if ($this->discoveringSymbolsTip) {
+				$errorBuilder->discoveringSymbolsTip();
+			}
+
 			return [
-				RuleErrorBuilder::message(sprintf('Class %s not found.', $name))->line($class->getLine())->discoveringSymbolsTip()->build(),
+				$errorBuilder->build(),
 			];
-		} elseif ($this->checkClassCaseSensitivity) {
-			$errors = array_merge(
-				$errors,
-				$this->classCaseSensitivityCheck->checkClassNames([new ClassNameNodePair($name, $class)]),
-			);
 		}
 
+		$errors = array_merge(
+			$errors,
+			$this->classCheck->checkClassNames(
+				$scope,
+				[new ClassNameNodePair($name, $class)],
+				ClassNameUsageLocation::from(ClassNameUsageLocation::INSTANCEOF),
+				$this->checkClassCaseSensitivity,
+			),
+		);
+
 		$classReflection = $this->reflectionProvider->getClass($name);
-		$expressionType = $scope->getType($node->expr);
 
 		if ($classReflection->isTrait()) {
+			$expressionType = $scope->getType($node->expr);
+
 			$errors[] = RuleErrorBuilder::message(sprintf(
 				'Instanceof between %s and trait %s will always evaluate to false.',
 				$expressionType->describe(VerbosityLevel::typeOnly()),
 				$name,
-			))->build();
+			))->identifier('instanceof.trait')->build();
 		}
 
 		return $errors;

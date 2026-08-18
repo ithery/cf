@@ -2,10 +2,17 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\DependencyInjection\ReportUnsafeArrayStringKeyCastingToggle;
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\Reflection\ReflectionProviderStaticAccessor;
+use PHPStan\ShouldNotHappenException;
 use PHPStan\TrinaryLogic;
+use PHPStan\Type\Accessory\AccessoryDecimalIntegerStringType;
 use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
 use PHPStan\Type\Constant\ConstantArrayType;
+use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\Traits\MaybeCallableTypeTrait;
@@ -16,8 +23,10 @@ use PHPStan\Type\Traits\NonIterableTypeTrait;
 use PHPStan\Type\Traits\NonObjectTypeTrait;
 use PHPStan\Type\Traits\UndecidedBooleanTypeTrait;
 use PHPStan\Type\Traits\UndecidedComparisonTypeTrait;
+use function count;
 
 /** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::isString()')]
 class StringType implements Type
 {
 
@@ -41,14 +50,24 @@ class StringType implements Type
 		return 'string';
 	}
 
+	public function getConstantStrings(): array
+	{
+		return [];
+	}
+
 	public function isOffsetAccessible(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function isOffsetAccessLegal(): TrinaryLogic
 	{
 		return TrinaryLogic::createYes();
 	}
 
 	public function hasOffsetValueType(Type $offsetType): TrinaryLogic
 	{
-		return (new IntegerType())->isSuperTypeOf($offsetType)->and(TrinaryLogic::createMaybe());
+		return $offsetType->isInteger()->and(TrinaryLogic::createMaybe());
 	}
 
 	public function getOffsetValueType(Type $offsetType): Type
@@ -57,7 +76,10 @@ class StringType implements Type
 			return new ErrorType();
 		}
 
-		return new StringType();
+		return new IntersectionType([
+			new StringType(),
+			new AccessoryNonEmptyStringType(),
+		]);
 	}
 
 	public function setOffsetValueType(?Type $offsetType, Type $valueType, bool $unionValues = true): Type
@@ -71,11 +93,19 @@ class StringType implements Type
 			return new ErrorType();
 		}
 
-		if ((new IntegerType())->isSuperTypeOf($offsetType)->yes() || $offsetType instanceof MixedType) {
-			return new StringType();
+		if ($offsetType->isInteger()->yes() || $offsetType instanceof MixedType) {
+			return new IntersectionType([
+				new StringType(),
+				new AccessoryNonEmptyStringType(),
+			]);
 		}
 
 		return new ErrorType();
+	}
+
+	public function setExistingOffsetValueType(Type $offsetType, Type $valueType): Type
+	{
+		return $this;
 	}
 
 	public function unsetOffset(Type $offsetType): Type
@@ -83,32 +113,47 @@ class StringType implements Type
 		return new ErrorType();
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
 		if ($type instanceof self) {
-			return TrinaryLogic::createYes();
+			return AcceptsResult::createYes();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
-		if ($type instanceof TypeWithClassName && !$strictTypes) {
-			$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
-			if (!$reflectionProvider->hasClass($type->getClassName())) {
-				return TrinaryLogic::createNo();
-			}
-
-			$typeClass = $reflectionProvider->getClass($type->getClassName());
-			return TrinaryLogic::createFromBoolean(
-				$typeClass->hasNativeMethod('__toString'),
-			);
+		$thatClassNames = $type->getObjectClassNames();
+		if (count($thatClassNames) > 1) {
+			throw new ShouldNotHappenException();
 		}
 
-		return TrinaryLogic::createNo();
+		if ($thatClassNames === [] || $strictTypes) {
+			return AcceptsResult::createNo();
+		}
+
+		$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
+		if (!$reflectionProvider->hasClass($thatClassNames[0])) {
+			return AcceptsResult::createNo();
+		}
+
+		$typeClass = $reflectionProvider->getClass($thatClassNames[0]);
+		return AcceptsResult::createFromBoolean(
+			$typeClass->hasNativeMethod('__toString'),
+		);
 	}
 
 	public function toNumber(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new StringType();
+	}
+
+	public function toAbsoluteNumber(): Type
 	{
 		return new ErrorType();
 	}
@@ -134,12 +179,70 @@ class StringType implements Type
 			[new ConstantIntegerType(0)],
 			[$this],
 			[1],
+			isList: TrinaryLogic::createYes(),
 		);
 	}
 
 	public function toArrayKey(): Type
 	{
+		$level = ReportUnsafeArrayStringKeyCastingToggle::getLevel();
+		if ($level !== ReportUnsafeArrayStringKeyCastingToggle::PREVENT) {
+			return $this;
+		}
+
+		$isDecimalIntString = $this->isDecimalIntegerString();
+		if ($isDecimalIntString->no()) {
+			return $this;
+		} elseif ($isDecimalIntString->yes()) {
+			return new IntegerType();
+		}
+
+		return new UnionType([
+			new IntegerType(),
+			TypeCombinator::intersect($this, new AccessoryDecimalIntegerStringType(inverse: true)),
+		]);
+	}
+
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		if (!$strictTypes) {
+			if ($this->isNumericString()->no()) {
+				return TypeCombinator::union($this, $this->toBoolean());
+			}
+			return TypeCombinator::union($this->toInteger(), $this->toFloat(), $this, $this->toBoolean());
+		}
+
 		return $this;
+	}
+
+	public function isNull(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isBoolean(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFloat(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isInteger(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
 	}
 
 	public function isString(): TrinaryLogic
@@ -148,6 +251,11 @@ class StringType implements Type
 	}
 
 	public function isNumericString(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isDecimalIntegerString(): TrinaryLogic
 	{
 		return TrinaryLogic::createMaybe();
 	}
@@ -167,6 +275,53 @@ class StringType implements Type
 		return TrinaryLogic::createMaybe();
 	}
 
+	public function isLowercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isUppercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isClassString(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		return new ObjectWithoutClassType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return new ObjectWithoutClassType();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		if ($type->isArray()->yes()) {
+			return new ConstantBooleanType(false);
+		}
+
+		return new BooleanType();
+	}
+
+	public function hasMethod(string $methodName): TrinaryLogic
+	{
+		if ($this->isClassString()->yes()) {
+			return TrinaryLogic::createMaybe();
+		}
+		return TrinaryLogic::createNo();
+	}
+
 	public function tryRemove(Type $typeToRemove): ?Type
 	{
 		if ($typeToRemove instanceof ConstantStringType && $typeToRemove->getValue() === '') {
@@ -180,12 +335,24 @@ class StringType implements Type
 		return null;
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function getFiniteTypes(): array
 	{
-		return new self();
+		return [];
+	}
+
+	public function exponentiate(Type $exponent): Type
+	{
+		return ExponentiateHelper::exponentiate($this, $exponent);
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode('string');
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		return false;
 	}
 
 }

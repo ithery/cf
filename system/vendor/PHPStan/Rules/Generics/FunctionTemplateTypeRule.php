@@ -4,6 +4,8 @@ namespace PHPStan\Rules\Generics;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Internal\SprintfHelper;
 use PHPStan\Rules\Rule;
 use PHPStan\ShouldNotHappenException;
@@ -14,7 +16,9 @@ use function sprintf;
 /**
  * @implements Rule<Node\Stmt\Function_>
  */
-class FunctionTemplateTypeRule implements Rule
+#[RegisteredRule(level: 2)]
+#[ValidatesStubFiles]
+final class FunctionTemplateTypeRule implements Rule
 {
 
 	public function __construct(
@@ -52,6 +56,7 @@ class FunctionTemplateTypeRule implements Rule
 		$escapedFunctionName = SprintfHelper::escapeFormatString($functionName);
 
 		return $this->templateTypeCheck->check(
+			$scope,
 			$node,
 			TemplateTypeScope::createWithFunction($functionName),
 			$resolvedPhpDoc->getTemplateTags(),
@@ -59,6 +64,9 @@ class FunctionTemplateTypeRule implements Rule
 			sprintf('PHPDoc tag @template for function %s() cannot have existing type alias %%s as its name.', $escapedFunctionName),
 			sprintf('PHPDoc tag @template %%s for function %s() has invalid bound type %%s.', $escapedFunctionName),
 			sprintf('PHPDoc tag @template %%s for function %s() with bound type %%s is not supported.', $escapedFunctionName),
+			sprintf('PHPDoc tag @template %%s for function %s() has invalid default type %%s.', $escapedFunctionName),
+			sprintf('Default type %%s in PHPDoc tag @template %%s for function %s() is not subtype of bound type %%s.', $escapedFunctionName),
+			sprintf('PHPDoc tag @template %%s for function %s() does not have a default type but follows an optional @template %%s.', $escapedFunctionName),
 		);
 	}
 

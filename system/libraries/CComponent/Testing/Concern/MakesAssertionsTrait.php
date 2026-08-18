@@ -226,7 +226,7 @@ trait CComponent_Testing_Concern_MakesAssertionsTrait {
 
         foreach ($keys as $key => $value) {
             if (is_int($key)) {
-                PHPUnit::assertTrue($errors->has($value), "Component missing error: ${value}");
+                PHPUnit::assertTrue($errors->has($value), "Component missing error: {$value}");
             } else {
                 $failed = c::optional($this->lastValidator)->failed() ?: [];
                 $rules = array_keys(carr::get($failed, $key, []));
@@ -253,7 +253,7 @@ trait CComponent_Testing_Concern_MakesAssertionsTrait {
 
         foreach ($keys as $key => $value) {
             if (is_int($key)) {
-                PHPUnit::assertFalse($errors->has($value), "Component has error: ${value}");
+                PHPUnit::assertFalse($errors->has($value), "Component has error: {$value}");
             } else {
                 $failed = c::optional($this->lastValidator)->failed() ?: [];
                 $rules = array_keys(carr::get($failed, $key, []));

@@ -12,7 +12,7 @@ trait CModel_MongoDB_Trait_QueriesRelationshipTrait {
      *
      * @return Builder|static
      */
-    public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) {
+    public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', ?Closure $callback = null) {
         if (strpos($relation, '.') !== false) {
             return $this->hasNested($relation, $operator, $count, $boolean, $callback);
         }
@@ -67,7 +67,7 @@ trait CModel_MongoDB_Trait_QueriesRelationshipTrait {
      *
      * @throws Exception
      */
-    public function addHybridHas($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) {
+    public function addHybridHas($relation, $operator = '>=', $count = 1, $boolean = 'and', ?Closure $callback = null) {
         $hasQuery = $relation->getQuery();
         if ($callback) {
             $hasQuery->callScope($callback);

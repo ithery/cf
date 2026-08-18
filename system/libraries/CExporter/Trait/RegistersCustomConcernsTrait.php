@@ -17,7 +17,7 @@ trait CExporter_Trait_RegistersCustomConcernsTrait {
      * @param string   $event
      */
     public static function extend($concern, callable $handler, $event = CExporter_Event_BeforeWriting::class) {
-        /** @var HasEventBus $delegate */
+        /** @var CExporter_Trait_HasEventBusTrait $delegate */
         $delegate = isset(static::$eventMap[$event]) ? static::$eventMap[$event] : CExporter_Event_BeforeWriting::class;
 
         $delegate::listen($event, function (CExporter_Event $event) use ($concern, $handler) {

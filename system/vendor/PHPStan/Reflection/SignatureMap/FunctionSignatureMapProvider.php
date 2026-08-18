@@ -4,6 +4,9 @@ namespace PHPStan\Reflection\SignatureMap;
 
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionFunction;
 use PHPStan\BetterReflection\Reflection\Adapter\ReflectionMethod;
+use PHPStan\Cache\ArenaCache;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\InitializerExprContext;
 use PHPStan\Reflection\InitializerExprTypeResolver;
@@ -19,19 +22,34 @@ use function sprintf;
 use function strtolower;
 use const CASE_LOWER;
 
-class FunctionSignatureMapProvider implements SignatureMapProvider
+#[AutowiredService(as: FunctionSignatureMapProvider::class)]
+final class FunctionSignatureMapProvider implements SignatureMapProvider
 {
 
-	/** @var mixed[]|null */
-	private ?array $signatureMap = null;
+	/** @var array<string, mixed[]> */
+	private static array $signatureMaps = [];
+
+	/**
+	 * Rows already fetched from the shared arena (false = authoritatively
+	 * absent there), so steady-state lookups cost one local array access —
+	 * the same as reading the full map would.
+	 *
+	 * @var array<string, mixed[]|false>
+	 */
+	private static array $arenaSignatureRows = [];
 
 	/** @var array<string, array{hasSideEffects: bool}>|null */
-	private ?array $functionMetadata = null;
+	private static ?array $functionMetadata = null;
+
+	/** @var array<string, array{hasSideEffects: bool}|false> */
+	private static array $arenaMetadataRows = [];
 
 	public function __construct(
 		private SignatureMapParser $parser,
 		private InitializerExprTypeResolver $initializerExprTypeResolver,
 		private PhpVersion $phpVersion,
+		#[AutowiredParameter(ref: '%featureToggles.stricterFunctionMap%')]
+		private bool $stricterFunctionMap,
 	)
 	{
 	}
@@ -43,7 +61,42 @@ class FunctionSignatureMapProvider implements SignatureMapProvider
 
 	public function hasFunctionSignature(string $name): bool
 	{
-		return array_key_exists(strtolower($name), $this->getSignatureMap());
+		return $this->getSignatureMapEntry(strtolower($name)) !== null;
+	}
+
+	/**
+	 * A row of the merged signature map, preferring the run's shared arena:
+	 * the first process to need the map builds and publishes it, workers
+	 * after that materialize only the rows they touch instead of the whole
+	 * multi-megabyte map.
+	 *
+	 * @return mixed[]|null
+	 */
+	private function getSignatureMapEntry(string $lowerName): ?array
+	{
+		$cacheKey = sprintf('%d-%d', $this->phpVersion->getVersionId(), $this->stricterFunctionMap ? 1 : 0);
+		if (array_key_exists($cacheKey, self::$signatureMaps)) {
+			return self::$signatureMaps[$cacheKey][$lowerName] ?? null;
+		}
+
+		$memoKey = $cacheKey . '/' . $lowerName;
+		if (array_key_exists($memoKey, self::$arenaSignatureRows)) {
+			$row = self::$arenaSignatureRows[$memoKey];
+			return $row === false ? null : $row;
+		}
+
+		$recordKey = 'sigmap-' . $cacheKey;
+		if (ArenaCache::hasRecord($recordKey)) {
+			$row = ArenaCache::lookupHash($recordKey, $lowerName);
+			if (!is_array($row)) {
+				$row = null;
+			}
+			self::$arenaSignatureRows[$memoKey] = $row ?? false;
+
+			return $row;
+		}
+
+		return $this->getSignatureMap()[$lowerName] ?? null;
 	}
 
 	public function getMethodSignatures(string $className, string $methodName, ?ReflectionMethod $reflectionMethod): array
@@ -64,7 +117,7 @@ class FunctionSignatureMapProvider implements SignatureMapProvider
 			$variantFunctionName = $functionName . '\'' . $i;
 		}
 
-		return $signatures;
+		return ['positional' => $signatures, 'named' => null];
 	}
 
 	private function createSignature(string $functionName, ?string $className, ?ReflectionFunctionAbstract $reflectionFunction): FunctionSignature
@@ -72,9 +125,12 @@ class FunctionSignatureMapProvider implements SignatureMapProvider
 		if (!$reflectionFunction instanceof ReflectionMethod && !$reflectionFunction instanceof ReflectionFunction && $reflectionFunction !== null) {
 			throw new ShouldNotHappenException();
 		}
-		$signatureMap = self::getSignatureMap();
+		$signatureRow = $this->getSignatureMapEntry($functionName);
+		if ($signatureRow === null) {
+			throw new ShouldNotHappenException(sprintf('Function %s is not in the signature map.', $functionName));
+		}
 		$signature = $this->parser->getFunctionSignature(
-			$signatureMap[$functionName],
+			$signatureRow,
 			$className,
 		);
 		$parameters = [];
@@ -125,8 +181,36 @@ class FunctionSignatureMapProvider implements SignatureMapProvider
 
 	public function hasFunctionMetadata(string $name): bool
 	{
-		$signatureMap = $this->getFunctionMetadataMap();
-		return array_key_exists(strtolower($name), $signatureMap);
+		return $this->getFunctionMetadataEntry(strtolower($name)) !== null;
+	}
+
+	/**
+	 * @return array{hasSideEffects: bool}|null
+	 */
+	private function getFunctionMetadataEntry(string $lowerName): ?array
+	{
+		if (self::$functionMetadata !== null) {
+			return self::$functionMetadata[$lowerName] ?? null;
+		}
+
+		if (array_key_exists($lowerName, self::$arenaMetadataRows)) {
+			$row = self::$arenaMetadataRows[$lowerName];
+			return $row === false ? null : $row;
+		}
+
+		if (ArenaCache::hasRecord('funcmeta')) {
+			$row = ArenaCache::lookupHash('funcmeta', $lowerName);
+			if (!is_array($row)) {
+				$row = null;
+			}
+
+			/** @var array{hasSideEffects: bool}|null $row */
+			self::$arenaMetadataRows[$lowerName] = $row ?? false;
+
+			return $row;
+		}
+
+		return self::getFunctionMetadataMap()[$lowerName] ?? null;
 	}
 
 	/**
@@ -142,27 +226,27 @@ class FunctionSignatureMapProvider implements SignatureMapProvider
 	 */
 	public function getFunctionMetadata(string $functionName): array
 	{
-		$functionName = strtolower($functionName);
-
-		if (!$this->hasFunctionMetadata($functionName)) {
+		$entry = $this->getFunctionMetadataEntry(strtolower($functionName));
+		if ($entry === null) {
 			throw new ShouldNotHappenException();
 		}
 
-		return $this->getFunctionMetadataMap()[$functionName];
+		return $entry;
 	}
 
 	/**
 	 * @return array<string, array{hasSideEffects: bool}>
 	 */
-	private function getFunctionMetadataMap(): array
+	private static function getFunctionMetadataMap(): array
 	{
-		if ($this->functionMetadata === null) {
+		if (self::$functionMetadata === null) {
 			/** @var array<string, array{hasSideEffects: bool}> $metadata */
 			$metadata = require __DIR__ . '/../../../resources/functionMetadata.php';
-			$this->functionMetadata = array_change_key_case($metadata, CASE_LOWER);
+			self::$functionMetadata = array_change_key_case($metadata, CASE_LOWER);
+			ArenaCache::publishHash('funcmeta', self::$functionMetadata);
 		}
 
-		return $this->functionMetadata;
+		return self::$functionMetadata;
 	}
 
 	/**
@@ -170,54 +254,72 @@ class FunctionSignatureMapProvider implements SignatureMapProvider
 	 */
 	public function getSignatureMap(): array
 	{
-		if ($this->signatureMap === null) {
-			$signatureMap = require __DIR__ . '/../../../resources/functionMap.php';
-			if (!is_array($signatureMap)) {
-				throw new ShouldNotHappenException('Signature map could not be loaded.');
-			}
-
-			$signatureMap = array_change_key_case($signatureMap, CASE_LOWER);
-
-			if ($this->phpVersion->getVersionId() >= 70400) {
-				$php74MapDelta = require __DIR__ . '/../../../resources/functionMap_php74delta.php';
-				if (!is_array($php74MapDelta)) {
-					throw new ShouldNotHappenException('Signature map could not be loaded.');
-				}
-
-				$signatureMap = $this->computeSignatureMap($signatureMap, $php74MapDelta);
-			}
-
-			if ($this->phpVersion->getVersionId() >= 80000) {
-				$php80MapDelta = require __DIR__ . '/../../../resources/functionMap_php80delta.php';
-				if (!is_array($php80MapDelta)) {
-					throw new ShouldNotHappenException('Signature map could not be loaded.');
-				}
-
-				$signatureMap = $this->computeSignatureMap($signatureMap, $php80MapDelta);
-			}
-
-			if ($this->phpVersion->getVersionId() >= 80100) {
-				$php81MapDelta = require __DIR__ . '/../../../resources/functionMap_php81delta.php';
-				if (!is_array($php81MapDelta)) {
-					throw new ShouldNotHappenException('Signature map could not be loaded.');
-				}
-
-				$signatureMap = $this->computeSignatureMap($signatureMap, $php81MapDelta);
-			}
-
-			if ($this->phpVersion->getVersionId() >= 80200) {
-				$php82MapDelta = require __DIR__ . '/../../../resources/functionMap_php82delta.php';
-				if (!is_array($php82MapDelta)) {
-					throw new ShouldNotHappenException('Signature map could not be loaded.');
-				}
-
-				$signatureMap = $this->computeSignatureMap($signatureMap, $php82MapDelta);
-			}
-
-			$this->signatureMap = $signatureMap;
+		$cacheKey = sprintf('%d-%d', $this->phpVersion->getVersionId(), $this->stricterFunctionMap ? 1 : 0);
+		if (array_key_exists($cacheKey, self::$signatureMaps)) {
+			return self::$signatureMaps[$cacheKey];
 		}
 
-		return $this->signatureMap;
+		$signatureMap = require __DIR__ . '/../../../resources/functionMap.php';
+		if (!is_array($signatureMap)) {
+			throw new ShouldNotHappenException('Signature map could not be loaded.');
+		}
+
+		$signatureMap = array_change_key_case($signatureMap, CASE_LOWER);
+
+		if ($this->stricterFunctionMap) {
+			$signatureMap = $this->computeSignatureMapFile($signatureMap, __DIR__ . '/../../../resources/functionMap_bleedingEdge.php');
+		}
+
+		if ($this->phpVersion->getVersionId() >= 70400) {
+			$signatureMap = $this->computeSignatureMapFile($signatureMap, __DIR__ . '/../../../resources/functionMap_php74delta.php');
+		}
+
+		if ($this->phpVersion->getVersionId() >= 80000) {
+			$signatureMap = $this->computeSignatureMapFile($signatureMap, __DIR__ . '/../../../resources/functionMap_php80delta.php');
+
+			if ($this->stricterFunctionMap) {
+				$signatureMap = $this->computeSignatureMapFile($signatureMap, __DIR__ . '/../../../resources/functionMap_php80delta_bleedingEdge.php');
+			}
+		}
+
+		if ($this->phpVersion->getVersionId() >= 80100) {
+			$signatureMap = $this->computeSignatureMapFile($signatureMap, __DIR__ . '/../../../resources/functionMap_php81delta.php');
+		}
+
+		if ($this->phpVersion->getVersionId() >= 80200) {
+			$signatureMap = $this->computeSignatureMapFile($signatureMap, __DIR__ . '/../../../resources/functionMap_php82delta.php');
+		}
+
+		if ($this->phpVersion->getVersionId() >= 80300) {
+			$signatureMap = $this->computeSignatureMapFile($signatureMap, __DIR__ . '/../../../resources/functionMap_php83delta.php');
+		}
+
+		if ($this->phpVersion->getVersionId() >= 80400) {
+			$signatureMap = $this->computeSignatureMapFile($signatureMap, __DIR__ . '/../../../resources/functionMap_php84delta.php');
+		}
+
+		if ($this->phpVersion->getVersionId() >= 80500) {
+			$signatureMap = $this->computeSignatureMapFile($signatureMap, __DIR__ . '/../../../resources/functionMap_php85delta.php');
+		}
+
+		self::$signatureMaps[$cacheKey] = $signatureMap;
+		ArenaCache::publishHash('sigmap-' . $cacheKey, $signatureMap);
+
+		return $signatureMap;
+	}
+
+	/**
+	 * @param array<string, mixed> $signatureMap
+	 * @return array<string, mixed>
+	 */
+	private function computeSignatureMapFile(array $signatureMap, string $file): array
+	{
+		$signatureMapDelta = include $file;
+		if (!is_array($signatureMapDelta)) {
+			throw new ShouldNotHappenException(sprintf('Signature map file "%s" could not be loaded.', $file));
+		}
+
+		return $this->computeSignatureMap($signatureMap, $signatureMapDelta);
 	}
 
 	/**
@@ -235,6 +337,16 @@ class FunctionSignatureMapProvider implements SignatureMapProvider
 		}
 
 		return $signatureMap;
+	}
+
+	public function hasClassConstantMetadata(string $className, string $constantName): bool
+	{
+		return false;
+	}
+
+	public function getClassConstantMetadata(string $className, string $constantName): array
+	{
+		throw new ShouldNotHappenException();
 	}
 
 }

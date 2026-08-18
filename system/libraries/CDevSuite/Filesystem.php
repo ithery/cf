@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Description of Filesystem.
+ */
 class CDevSuite_Filesystem {
     /**
      * Determine if the given path is a directory.
@@ -33,9 +36,21 @@ class CDevSuite_Filesystem {
         return true;
     }
 
-    public function mkdirAsRoot($path) {
-        $command = sprintf('sudo mkdir "%s"', $path);
-        CDevSuite::commandLine()->run($command);
+    /**
+     * Create a directory as root.
+     *
+     * @param string      $path
+     * @param null|string $owner
+     * @param int         $mode
+     *
+     * @return void
+     */
+    public function mkdirAsRoot($path, $owner = null, $mode = 0755) {
+        CDevSuite::commandLine()->run(sprintf('sudo mkdir -m %o "%s"', $mode, $path));
+
+        if ($owner) {
+            CDevSuite::commandLine()->run(sprintf('sudo chown %s "%s"', $owner, $path));
+        }
     }
 
     /**
@@ -55,10 +70,26 @@ class CDevSuite_Filesystem {
         return false;
     }
 
+    /**
+     * Rename the given file or directory.
+     *
+     * @param string $oldname
+     * @param string $newname
+     *
+     * @return void
+     */
     public function rename($oldname, $newname) {
         rename($oldname, $newname);
     }
 
+    /**
+     * Rename the given file or directory as root.
+     *
+     * @param string $oldname
+     * @param string $newname
+     *
+     * @return void
+     */
     public function renameAsRoot($oldname, $newname) {
         $command = sprintf('sudo mv %s %s', $oldname, $newname);
         CDevSuite::commandLine()->run($command);
@@ -173,13 +204,30 @@ class CDevSuite_Filesystem {
         $this->put($path, $contents, CDevSuite::user());
     }
 
+    /**
+     * Write to the given file as root, via a temporary file copied into place.
+     *
+     * @param string $path
+     * @param string $contents
+     *
+     * @return void
+     */
     public function putAsRoot($path, $contents) {
-        $localFile = CTemporary::createLocalFile($contents, 'devsuite');
-        $localFilename = $localFile->getFileName();
+        $tmp = tempnam(sys_get_temp_dir(), 'devsuite_');
+        file_put_contents($tmp, $contents);
+        // $localFile = CTemporary::createLocalFile($contents, 'devsuite');
+        // $localFilename = $localFile->getFileName();
 
-        $this->copyAsRoot($localFilename, $path);
+        try {
+            $this->copyAsRoot($tmp, $path);
+        } catch (Exception $e) {
+            throw $e;
+        } finally {
+            @unlink($tmp);
+        }
+        // $this->copyAsRoot($localFilename, $path);
 
-        $localFile->delete();
+        // $localFile->delete();
     }
 
     /**
@@ -333,6 +381,8 @@ class CDevSuite_Filesystem {
      *
      * @param string $path
      * @param string $user
+     *
+     * @return void
      */
     public function chown($path, $user) {
         chown($path, $user);
@@ -343,6 +393,8 @@ class CDevSuite_Filesystem {
      *
      * @param string $path
      * @param string $group
+     *
+     * @return void
      */
     public function chgrp($path, $group) {
         chgrp($path, $group);
@@ -421,6 +473,13 @@ class CDevSuite_Filesystem {
             })->values()->all();
     }
 
+    /**
+     * Delete the given directory and its contents.
+     *
+     * @param string $directory
+     *
+     * @return bool
+     */
     public function deleteDirectory($directory) {
         return CFile::deleteDirectory($directory);
     }
@@ -454,13 +513,20 @@ class CDevSuite_Filesystem {
                     }
                 } else {
                     if (true !== @unlink($file)) {
-                        throw new \Exception(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
+                        throw new \Exception(sprintf('Failed to remove file "%s".', $file));
                     }
                 }
             }
         }
     }
 
+    /**
+     * Convert the given argument into a Traversable of file paths.
+     *
+     * @param mixed $files
+     *
+     * @return \Traversable
+     */
     protected function toIterator($files) {
         if (!$files instanceof \Traversable) {
             $files = new \ArrayObject(is_array($files) ? $files : [$files]);

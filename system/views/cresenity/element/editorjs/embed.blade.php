@@ -1,5 +1,5 @@
 <div class="cres-editor-js-block">
-    <table class="cres-editor-js-embed">
+    <div class="cres-editor-js-embed">
         <iframe
                 width="{{ $width }}px"
                 height="{{ $height }}px"
@@ -10,5 +10,5 @@
         <div class="caption">
             {{ $caption }}
         </div>
-    </table>
+    </div>
 </div>

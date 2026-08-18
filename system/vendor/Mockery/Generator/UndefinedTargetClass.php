@@ -87,6 +87,7 @@ class UndefinedTargetClass implements TargetClassInterface
         return false;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return $this->name;

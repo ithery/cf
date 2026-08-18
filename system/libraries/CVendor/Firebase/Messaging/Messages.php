@@ -15,10 +15,12 @@ final class CVendor_Firebase_Messaging_Messages implements Countable, IteratorAg
      *
      * @return Generator|CVendor_Firebase_Messaging_MessageInterface[]
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new ArrayIterator($this->messages);
     }
 
+    #[\ReturnTypeWillChange]
     public function count() {
         return \count($this->messages);
     }

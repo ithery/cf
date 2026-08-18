@@ -1,8 +1,16 @@
 <?php
 
 class CApp_SEO {
+    /**
+     * Singleton instance of this class.
+     *
+     * @var CApp_SEO
+     */
     private static $instance = null;
 
+    /**
+     * CApp_SEO constructor.
+     */
     private function __construct() {
         //do nothing
     }
@@ -47,7 +55,10 @@ class CApp_SEO {
     }
 
     /**
-     * @inheritdoc
+     * @param string $title
+     * @param bool   $appendDefault
+     *
+     * @return static
      */
     public function setTitle($title, $appendDefault = true) {
         $this->metatags()->setTitle($title, $appendDefault);
@@ -59,7 +70,9 @@ class CApp_SEO {
     }
 
     /**
-     * @inheritdoc
+     * @param string $description
+     *
+     * @return static
      */
     public function setDescription($description) {
         $this->metatags()->setDescription($description);
@@ -71,7 +84,9 @@ class CApp_SEO {
     }
 
     /**
-     * @inheritdoc
+     * @param string $url
+     *
+     * @return static
      */
     public function setCanonical($url) {
         $this->metatags()->setCanonical($url);
@@ -79,6 +94,11 @@ class CApp_SEO {
         return $this;
     }
 
+    /**
+     * @param string|array $urls
+     *
+     * @return static
+     */
     public function setImages($urls) {
         $this->opengraph()->setImages(carr::wrap($urls));
         $this->twitter()->setImage($urls);
@@ -88,7 +108,9 @@ class CApp_SEO {
     }
 
     /**
-     * @inheritdoc
+     * @param string|array $urls
+     *
+     * @return static
      */
     public function addImages($urls) {
         if (is_array($urls)) {
@@ -105,7 +127,9 @@ class CApp_SEO {
     }
 
     /**
-     * @inheritdoc
+     * @param bool $session
+     *
+     * @return string
      */
     public function getTitle($session = false) {
         if ($session) {
@@ -116,7 +140,9 @@ class CApp_SEO {
     }
 
     /**
-     * @inheritdoc
+     * @param bool $minify
+     *
+     * @return string
      */
     public function generate($minify = false) {
         $html = $this->metatags()->generate();

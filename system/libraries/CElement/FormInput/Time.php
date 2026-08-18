@@ -2,24 +2,35 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 24, 2018, 6:09:43 PM
- */
 class CElement_FormInput_Time extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Time,
         CTrait_Element_Property_Placeholder;
 
+    /**
+     * @var bool
+     */
     protected $show_second;
 
+    /**
+     * bootstrap-timepicker `template` option (eg. `'dropdown'`|`'modal'`).
+     *
+     * @var string
+     */
     protected $template;
 
+    /**
+     * @var bool
+     */
     protected $show_meridian;
 
+    /**
+     * @var int
+     */
     protected $minute_step;
 
+    /**
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -34,6 +45,11 @@ class CElement_FormInput_Time extends CElement_FormInput {
         CManager::instance()->registerModule('timepicker');
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -63,12 +79,17 @@ class CElement_FormInput_Time extends CElement_FormInput {
         }
 
         $html->appendln('<div class="bootstrap-timepicker">');
-        $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
+        $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
         $html->appendln('</div>');
 
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);
@@ -100,7 +121,6 @@ class CElement_FormInput_Time extends CElement_FormInput {
             $js->appendln('	showMeridian: false,');
         }
 
-        $js->appendln("	template: 'dropdown',");
         $js->appendln('	disableFocus: true');
         $js->appendln('});');
 

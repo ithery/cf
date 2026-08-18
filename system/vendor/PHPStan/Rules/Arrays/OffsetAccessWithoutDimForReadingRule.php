@@ -4,13 +4,15 @@ namespace PHPStan\Rules\Arrays;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
 /**
  * @implements Rule<Node\Expr\ArrayDimFetch>
  */
-class OffsetAccessWithoutDimForReadingRule implements Rule
+#[RegisteredRule(level: 0)]
+final class OffsetAccessWithoutDimForReadingRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -29,7 +31,10 @@ class OffsetAccessWithoutDimForReadingRule implements Rule
 		}
 
 		return [
-			RuleErrorBuilder::message('Cannot use [] for reading.')->nonIgnorable()->build(),
+			RuleErrorBuilder::message('Cannot use [] for reading.')
+				->identifier('offsetAccess.noDim')
+				->nonIgnorable()
+				->build(),
 		];
 	}
 

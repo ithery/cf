@@ -2,35 +2,27 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- */
 class CServer_Storage_OS_Linux extends CServer_Storage_OS {
     /**
-     * Filesystem information.
-     *
      * @return void
      */
     public function buildDiskDevices() {
-        $cmd = $this->createCommand();
-        $df_args = '';
+        $dfArgs = '';
         $hideFstypes = [];
-        if (is_string(CServer::config()->getHideFsTypes())) {
-            if (preg_match(CServer::ARRAY_EXP, CServer::config()->getHideFsTypes())) {
-                $hideFstypes = eval(CServer::config()->getHideFsTypes());
+        $config = $this->server->config();
+        if (is_string($config->getHideFsTypes())) {
+            if (preg_match(CServer::ARRAY_EXP, $config->getHideFsTypes())) {
+                $hideFstypes = eval($config->getHideFsTypes());
             } else {
-                $hideFstypes = [CServer::config()->getHideFsTypes()];
+                $hideFstypes = [$config->getHideFsTypes()];
             }
         }
-        foreach ($hideFstypes as $Fstype) {
-            $df_args .= "-x ${Fstype} ";
+        foreach ($hideFstypes as $fstype) {
+            $dfArgs .= '-x ' . $fstype . ' ';
         }
-        if ($df_args !== '') {
-            $df_args = trim($df_args); //trim spaces
-            $arrResult = $cmd->df("-P ${df_args} 2>/dev/null");
-        } else {
-            $arrResult = $cmd->df('-P 2>/dev/null');
-        }
+        $dfArgs = trim($dfArgs);
+        $param = $dfArgs !== '' ? '-P ' . $dfArgs . ' 2>/dev/null' : '-P 2>/dev/null';
+        $arrResult = $this->server->df($param);
         foreach ($arrResult as $dev) {
             $this->info->setDiskDevices($dev);
         }

@@ -1,12 +1,26 @@
 <?php
 
 class CElement_Component_DataTable_Renderer {
+    /**
+     * @var CElement_Component_DataTable
+     */
     protected $table;
 
+    /**
+     * @param CElement_Component_DataTable $table
+     *
+     * @return void
+     */
     public function __construct(CElement_Component_DataTable $table) {
         $this->table = $table;
     }
 
+    /**
+     * @param CElement_Component_DataTable $table
+     * @param array|CModel                 $row
+     *
+     * @return string
+     */
     public static function checkboxCell($table, $row) {
         $checkboxValue = $table->getCheckboxValue();
         $rowKey = '';

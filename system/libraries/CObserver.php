@@ -1,8 +1,14 @@
 <?php
 
 class CObserver {
+    /**
+     * @var CObserver
+     */
     private static $instance;
 
+    /**
+     * @var CObject[]
+     */
     private $objectList;
 
     private function __construct() {
@@ -15,6 +21,21 @@ class CObserver {
         }
 
         return self::$instance;
+    }
+
+    /**
+     * Drop the singleton so the next instance() call starts with a clean
+     * object-id registry. In production this never matters (each HTTP
+     * request is a fresh PHP process), but CTesting_TestCase reuses one
+     * process for the whole test run, so without this, a second simulated
+     * request that renders the same view (e.g. a table id like "divTable")
+     * hits the "Object :id is exists" guard in add() from the first
+     * request's leftover state.
+     *
+     * @return void
+     */
+    public static function reset() {
+        self::$instance = null;
     }
 
     public function objects() {

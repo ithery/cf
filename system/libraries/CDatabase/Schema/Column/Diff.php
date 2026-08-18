@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 3:41:22 PM
- */
 
 /**
  * Represents the change of a column.
@@ -39,7 +33,7 @@ class CDatabase_Schema_Column_Diff {
      * @param string[]                $changedProperties
      * @param CDatabase_Schema_Column $fromColumn
      */
-    public function __construct($oldColumnName, CDatabase_Schema_Column $column, array $changedProperties = [], CDatabase_Schema_Column $fromColumn = null) {
+    public function __construct($oldColumnName, CDatabase_Schema_Column $column, array $changedProperties = [], ?CDatabase_Schema_Column $fromColumn = null) {
         $this->oldColumnName = $oldColumnName;
         $this->column = $column;
         $this->changedProperties = $changedProperties;

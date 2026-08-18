@@ -53,7 +53,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
      *
      * @throws \ReflectionException
      */
-    public function __construct(Symfony\Component\Console\Output\ConsoleOutputInterface $output = null, $verbose = false, $colors = 'always') {
+    public function __construct(?Symfony\Component\Console\Output\ConsoleOutputInterface $output = null, $verbose = false, $colors = 'always') {
         $this->timer = CTesting_PhpUnit_Timer::start();
 
         $decorated = $colors === 'always' || $colors === 'auto';

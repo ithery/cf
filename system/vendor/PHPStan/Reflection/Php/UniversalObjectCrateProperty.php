@@ -3,19 +3,28 @@
 namespace PHPStan\Reflection\Php;
 
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\PropertyReflection;
+use PHPStan\Reflection\ExtendedMethodReflection;
+use PHPStan\Reflection\ExtendedPropertyReflection;
+use PHPStan\ShouldNotHappenException;
 use PHPStan\TrinaryLogic;
+use PHPStan\Type\MixedType;
 use PHPStan\Type\Type;
 
-class UniversalObjectCrateProperty implements PropertyReflection
+final class UniversalObjectCrateProperty implements ExtendedPropertyReflection
 {
 
 	public function __construct(
+		private string $name,
 		private ClassReflection $declaringClass,
 		private Type $readableType,
 		private Type $writableType,
 	)
 	{
+	}
+
+	public function getName(): string
+	{
+		return $this->name;
 	}
 
 	public function getDeclaringClass(): ClassReflection
@@ -36,6 +45,26 @@ class UniversalObjectCrateProperty implements PropertyReflection
 	public function isPublic(): bool
 	{
 		return true;
+	}
+
+	public function hasPhpDocType(): bool
+	{
+		return false;
+	}
+
+	public function getPhpDocType(): Type
+	{
+		return new MixedType();
+	}
+
+	public function hasNativeType(): bool
+	{
+		return false;
+	}
+
+	public function getNativeType(): Type
+	{
+		return new MixedType();
 	}
 
 	public function getReadableType(): Type
@@ -81,6 +110,56 @@ class UniversalObjectCrateProperty implements PropertyReflection
 	public function getDocComment(): ?string
 	{
 		return null;
+	}
+
+	public function isAbstract(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFinal(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isVirtual(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function hasHook(string $hookType): bool
+	{
+		return false;
+	}
+
+	public function getHook(string $hookType): ExtendedMethodReflection
+	{
+		throw new ShouldNotHappenException();
+	}
+
+	public function isProtectedSet(): bool
+	{
+		return false;
+	}
+
+	public function isPrivateSet(): bool
+	{
+		return false;
+	}
+
+	public function getAttributes(): array
+	{
+		return [];
+	}
+
+	public function isDummy(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
 	}
 
 }

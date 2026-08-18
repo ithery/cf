@@ -1,25 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan
- * @since Aug 18, 2018, 9:15:04 PM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * A Country has either a name or a code. A Country will never be without data.
  */
 final class CGeo_Model_Country {
-
     /**
-     * @var string|null
+     * @var null|string
      */
     private $name;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $code;
 
@@ -38,7 +31,7 @@ final class CGeo_Model_Country {
     /**
      * Returns the country name.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getName() {
         return $this->name;
@@ -47,7 +40,7 @@ final class CGeo_Model_Country {
     /**
      * Returns the country ISO code.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getCode() {
         return $this->code;
@@ -58,8 +51,8 @@ final class CGeo_Model_Country {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->getName() ? $this->getName() : '';
     }
-
 }

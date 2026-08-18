@@ -4,6 +4,7 @@ namespace PHPStan\Rules\Exceptions;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Node\FinallyExitPointsNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
@@ -13,7 +14,8 @@ use function sprintf;
 /**
  * @implements Rule<FinallyExitPointsNode>
  */
-class OverwrittenExitPointByFinallyRule implements Rule
+#[RegisteredRule(level: 4)]
+final class OverwrittenExitPointByFinallyRule implements Rule
 {
 
 	public function getNodeType(): string
@@ -29,11 +31,17 @@ class OverwrittenExitPointByFinallyRule implements Rule
 
 		$errors = [];
 		foreach ($node->getTryCatchExitPoints() as $exitPoint) {
-			$errors[] = RuleErrorBuilder::message(sprintf('This %s is overwritten by a different one in the finally block below.', $this->describeExitPoint($exitPoint->getStatement())))->line($exitPoint->getStatement()->getLine())->build();
+			$errors[] = RuleErrorBuilder::message(sprintf('This %s is overwritten by a different one in the finally block below.', $this->describeExitPoint($exitPoint->getStatement())))
+				->line($exitPoint->getStatement()->getStartLine())
+				->identifier('finally.exitPoint')
+				->build();
 		}
 
 		foreach ($node->getFinallyExitPoints() as $exitPoint) {
-			$errors[] = RuleErrorBuilder::message(sprintf('The overwriting %s is on this line.', $this->describeExitPoint($exitPoint->getStatement())))->line($exitPoint->getStatement()->getLine())->build();
+			$errors[] = RuleErrorBuilder::message(sprintf('The overwriting %s is on this line.', $this->describeExitPoint($exitPoint->getStatement())))
+				->line($exitPoint->getStatement()->getStartLine())
+				->identifier('finally.exitPoint')
+				->build();
 		}
 
 		return $errors;
@@ -45,7 +53,7 @@ class OverwrittenExitPointByFinallyRule implements Rule
 			return 'return';
 		}
 
-		if ($stmt instanceof Node\Stmt\Throw_) {
+		if ($stmt instanceof Node\Stmt\Expression && $stmt->expr instanceof Node\Expr\Throw_) {
 			return 'throw';
 		}
 

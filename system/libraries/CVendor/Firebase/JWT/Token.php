@@ -50,6 +50,7 @@ final class CVendor_Firebase_JWT_Token implements CVendor_Firebase_JWT_Contract_
         return $this->encodedString;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->toString();
     }

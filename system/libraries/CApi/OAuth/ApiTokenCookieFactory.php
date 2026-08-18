@@ -27,7 +27,7 @@ class CApi_OAuth_ApiTokenCookieFactory {
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function make($userId, $csrfToken) {
-        $config = $this->config->get('session');
+        $config = CConfig::repository()->get('session');
 
         $expiration = Carbon::now()->addMinutes($config['lifetime']);
 
@@ -58,6 +58,6 @@ class CApi_OAuth_ApiTokenCookieFactory {
             'sub' => $userId,
             'csrf' => $csrfToken,
             'expiry' => $expiration->getTimestamp(),
-        ], CApi::oauth()->tokenEncryptionKey($this->encrypter), 'HS256');
+        ], CApi::oauth()->tokenEncryptionKey(CCrypt::encrypter()), 'HS256');
     }
 }

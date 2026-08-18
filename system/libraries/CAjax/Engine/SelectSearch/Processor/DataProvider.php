@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 8, 2018, 2:58:18 AM
- */
 class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_SelectSearch_Processor {
     use CAjax_Engine_DataTable_Trait_ProcessorTrait;
 
@@ -15,16 +9,20 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
         $dataProvider = $this->dataProvider();
         /** @var CElement_Depends_DependsOn[] $dependsOn */
         $dependsOn = $this->dependsOn();
-
+        $searchIds = $this->searchIds();
+        $keyField = $this->keyField();
         /** @var CManager_Contract_DataProviderInterface $query */
         $dataProvider->searchOr($this->getSearchDataOr());
+        $dataProvider->searchFullTextOr($this->getSearchFullTextDataOr());
         $dataProvider->sort($this->getSortData());
+
         $page = $this->parameter->page();
         $prependData = [];
+        $prependDataCount = count($this->prependData());
         if ($page == 1) {
             $prependData = $this->prependData();
         }
-        $paginationResult = $dataProvider->paginate($this->parameter->pageSize(), ['*'], 'page', $page, function ($q) use ($dependsOn) {
+        $paginationResult = $dataProvider->paginate($this->parameter->pageSize(), ['*'], 'page', $page, function ($q) use ($dependsOn, $searchIds, $keyField) {
             foreach ($dependsOn as $key => $dependOn) {
                 $resolver = $dependOn->getResolver();
 
@@ -32,15 +30,26 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
 
                 $this->engine->invokeCallback($resolver, [$q, $value]);
             }
+            if ($searchIds) {
+                if ($q instanceof CModel_Query) {
+                    $q->whereIn($keyField, $searchIds);
+                }
+            }
         });
 
         $items = c::collect($prependData)->merge($paginationResult->items());
 
         $data = $items->map(function ($model) {
             $data = $model;
+            if (is_string($data)) {
+                $str = $data;
+                $data = [
+                    'id' => $str
+                ];
+            }
             if ($model instanceof CModel) {
                 $data = $model->toArray();
-                if ($this->keyField() && !isset($data['id'])) {
+                if ($this->keyField() && $model->{$this->keyField()}) {
                     $data['id'] = $model->{$this->keyField()};
                 }
             } else {
@@ -48,32 +57,14 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
                     $data['id'] = carr::get($data, $this->keyField());
                 }
             }
-            $formatResult = $this->formatResult();
-            if ($formatResult instanceof \Opis\Closure\SerializableClosure) {
-                $formatResult = $formatResult->__invoke($model);
-                if ($formatResult instanceof CRenderable) {
-                    $data['cappFormatResult'] = $formatResult->html();
-                    $data['cappFormatResultIsHtml'] = true;
-                } else {
-                    $data['cappFormatResult'] = $formatResult;
-                    $data['cappFormatResultIsHtml'] = c::isHtml($formatResult);
-                }
-            }
-            $formatSelection = $this->formatSelection();
-            if ($formatSelection instanceof \Opis\Closure\SerializableClosure) {
-                $formatSelection = $formatSelection->__invoke($model);
-                if ($formatSelection instanceof CRenderable) {
-                    $data['cappFormatSelection'] = $formatSelection->html();
-                    $data['cappFormatSelectionIsHtml'] = true;
-                } else {
-                    $data['cappFormatSelection'] = $formatSelection;
-                    $data['cappFormatSelectionIsHtml'] = c::isHtml($formatSelection);
-                }
-            }
+
+            $data = $this->addCAppFormatToData($this->formatResult(), $data, $model, 'result');
+
+            $data = $this->addCAppFormatToData($this->formatSelection(), $data, $model, 'selection');
 
             return $data;
         });
-        $total = $paginationResult->total();
+        $total = $paginationResult->total() + $prependDataCount;
 
         return c::response()->jsonp($this->callback(), [
             'data' => $data,
@@ -86,6 +77,20 @@ class CAjax_Engine_SelectSearch_Processor_DataProvider extends CAjax_Engine_Sele
         $searchTerm = $this->searchTerm();
         if (strlen($searchTerm) > 0) {
             foreach ($this->searchField() as $field) {
+                if (strlen($field) > 0) {
+                    $searchData[$field] = $this->searchTerm();
+                }
+            }
+        }
+
+        return $searchData;
+    }
+
+    protected function getSearchFullTextDataOr() {
+        $searchData = [];
+        $searchTerm = $this->searchTerm();
+        if (strlen($searchTerm) > 0) {
+            foreach ($this->searchFullTextField() as $field) {
                 if (strlen($field) > 0) {
                     $searchData[$field] = $this->searchTerm();
                 }

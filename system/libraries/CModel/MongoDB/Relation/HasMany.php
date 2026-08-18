@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 6, 2019, 8:34:10 PM
- */
 class CModel_MongoDB_Relation_HasMany extends CModel_Relation_HasMany {
     /**
      * Get the plain foreign key.
@@ -41,6 +35,7 @@ class CModel_MongoDB_Relation_HasMany extends CModel_Relation_HasMany {
      */
     public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         $foreignKey = $this->getHasCompareKey();
+
         return $query->select($foreignKey)->where($foreignKey, 'exists', true);
     }
 
@@ -54,6 +49,7 @@ class CModel_MongoDB_Relation_HasMany extends CModel_Relation_HasMany {
      */
     public function getRelationCountQuery(CModel_Query $query, CModel_Query $parent) {
         $foreignKey = $this->getHasCompareKey();
+
         return $query->select($foreignKey)->where($foreignKey, 'exists', true);
     }
 
@@ -69,6 +65,7 @@ class CModel_MongoDB_Relation_HasMany extends CModel_Relation_HasMany {
     public function getRelationQuery(CModel_Query $query, CModel_Query $parent, $columns = ['*']) {
         $query->select($columns);
         $key = $this->wrap($this->getQualifiedParentKeyName());
+
         return $query->where($this->getHasCompareKey(), 'exists', true);
     }
 

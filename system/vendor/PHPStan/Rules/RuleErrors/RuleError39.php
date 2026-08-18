@@ -10,7 +10,7 @@ use PHPStan\Rules\RuleError;
 /**
  * @internal Use PHPStan\Rules\RuleErrorBuilder instead.
  */
-class RuleError39 implements RuleError, LineRuleError, FileRuleError, MetadataRuleError
+final class RuleError39 implements RuleError, LineRuleError, FileRuleError, MetadataRuleError
 {
 
 	public string $message;
@@ -18,6 +18,8 @@ class RuleError39 implements RuleError, LineRuleError, FileRuleError, MetadataRu
 	public int $line;
 
 	public string $file;
+
+	public string $fileDescription;
 
 	/** @var mixed[] */
 	public array $metadata;
@@ -35,6 +37,11 @@ class RuleError39 implements RuleError, LineRuleError, FileRuleError, MetadataRu
 	public function getFile(): string
 	{
 		return $this->file;
+	}
+
+	public function getFileDescription(): string
+	{
+		return $this->fileDescription;
 	}
 
 	/**

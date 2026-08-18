@@ -4,7 +4,7 @@ abstract class CDebug_CollectorAbstract {
     public function put($data) {
         $type = $this->getType();
         if (!in_array($type, CDebug_CollectorManager::allCollectorType())) {
-            throw new Exception("Type ${type} is not found");
+            throw new Exception("Type {$type} is not found");
         }
 
         if (!is_string($data)) {
@@ -22,6 +22,7 @@ abstract class CDebug_CollectorAbstract {
             mkdir($path, 0777, true);
         }
         $path .= date('Ymd') . $this->getExt();
+
         file_put_contents($path, $data . PHP_EOL, FILE_APPEND | LOCK_EX);
 
         return true;

@@ -35,7 +35,7 @@ trait CTrait_Element_Handler_ReloadHandler {
         if ($this->reloadHandler) {
             $attributes = $this->reloadHandler->toAttributeArray();
             foreach ($attributes as $key => $value) {
-                $this->setAttr('data-' . cstr::snake($key, '-'), c::html($value, ENT_QUOTES));
+                $this->setAttr('data-' . cstr::snake($key, '-'), c::e($value));
             }
         }
     }

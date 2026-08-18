@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 6, 2018, 11:32:00 AM
- */
 class CAjax {
     const TYPE_SELECT_SEARCH = 'SelectSearch';
 
@@ -25,6 +19,12 @@ class CAjax {
 
     const TYPE_VALIDATION = 'Validation';
 
+    const TYPE_DEPENDS_ON = 'DependsOn';
+
+    const TYPE_TREE_VIEW = 'TreeView';
+
+    const TYPE_CALENDAR = 'Calendar';
+
     /**
      * @param null|array|string $options
      *
@@ -40,6 +40,13 @@ class CAjax {
         return new CAjax_Method($options);
     }
 
+    /**
+     * @param string $file
+     *
+     * @throws Exception
+     *
+     * @return array
+     */
     public static function getData($file) {
         $filename = $file . '.tmp';
 
@@ -56,6 +63,12 @@ class CAjax {
         return $data;
     }
 
+    /**
+     * @param string $file
+     * @param array  $data
+     *
+     * @return array
+     */
     public static function setData($file, $data) {
         $filename = $file . '.tmp';
 
@@ -68,6 +81,9 @@ class CAjax {
         return $data;
     }
 
+    /**
+     * @return int
+     */
     public static function getDefaultExpiration() {
         return c::now()->addMinutes(CF::config('app.ajax.expiration', 60))->getTimestamp();
     }

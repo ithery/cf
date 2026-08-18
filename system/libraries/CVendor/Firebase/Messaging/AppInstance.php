@@ -77,6 +77,7 @@ final class CVendor_Firebase_Messaging_AppInstance implements JsonSerializable {
     /**
      * @return array<string, mixed>
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->rawData;
     }

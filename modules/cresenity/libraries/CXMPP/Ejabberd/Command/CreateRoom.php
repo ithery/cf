@@ -1,10 +1,7 @@
 <?php
 
 /**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since May 31, 2020
+ * @deprecated 1.8
  */
 class CXMPP_Ejabberd_Command_CreateRoom extends CXMPP_Ejabberd_CommandAbstract {
     private $name;
@@ -56,6 +53,7 @@ class CXMPP_Ejabberd_Command_CreateRoom extends CXMPP_Ejabberd_CommandAbstract {
         if (count($this->options) > 0) {
             $data['options'] = $this->options;
         }
+
         return $data;
     }
 }

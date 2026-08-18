@@ -3,6 +3,11 @@
 class CApi_HTTP_Pipeline extends CHTTP_Pipeline {
     use CApi_Trait_HasGroupPropertyTrait;
 
+    /**
+     * Create a new pipeline instance.
+     *
+     * @param string $group
+     */
     public function __construct($group) {
         parent::__construct();
         $this->group = $group;

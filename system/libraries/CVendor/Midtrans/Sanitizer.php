@@ -26,7 +26,7 @@ class CVendor_Midtrans_Sanitizer {
                 continue;
             }
             $camel = static::upperCamelize($key);
-            $function = "field${camel}";
+            $function = "field{$camel}";
             static::$function($json[$key]);
         }
     }
@@ -73,7 +73,7 @@ class CVendor_Midtrans_Sanitizer {
                 }
 
                 $camel = static::upperCamelize($key);
-                $function = "field${camel}";
+                $function = "field{$camel}";
                 static::$function($field[$key]);
             }
         }
@@ -140,7 +140,7 @@ class CVendor_Midtrans_Sanitizer {
 
     private function whitelist($regex) {
         $this->filters[] = function ($input) use ($regex) {
-            return preg_replace("/[^${regex}]/", '', $input);
+            return preg_replace("/[^{$regex}]/", '', $input);
         };
 
         return $this;

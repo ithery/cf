@@ -1,6 +1,8 @@
 <?php
 
-class CException_ErrorModel implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CException_ErrorModel implements Arrayable {
     protected $throwable;
 
     /**

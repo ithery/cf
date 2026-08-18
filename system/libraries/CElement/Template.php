@@ -3,14 +3,18 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 1, 2018, 4:15:30 PM
+ * @deprecated use CElement_View instead
  */
 class CElement_Template extends CElement {
     use CElement_Trait_Template;
 
+    /**
+     * @param string $id
+     * @param string $templateName
+     * @param array  $data
+     *
+     * @return void
+     */
     public function __construct($id, $templateName = '', $data = []) {
         parent::__construct($id);
         $this->templateData = [];
@@ -18,10 +22,20 @@ class CElement_Template extends CElement {
         $this->setData($data);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         return $this->getTemplateHtml();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         return $this->getTemplateJs();
     }

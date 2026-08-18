@@ -4,16 +4,17 @@ namespace PHPStan\Rules\PhpDoc;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\DependencyInjection\ValidatesStubFiles;
 use PHPStan\Internal\SprintfHelper;
-use PHPStan\Reflection\ClassConstantReflection;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\InitializerExprContext;
-use PHPStan\Reflection\InitializerExprTypeResolver;
 use PHPStan\Rules\Generics\GenericObjectTypeCheck;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\ShouldNotHappenException;
+use PHPStan\Type\ParserNodeTypeToPHPStanType;
+use PHPStan\Type\Type;
 use PHPStan\Type\VerbosityLevel;
 use function array_merge;
 use function sprintf;
@@ -21,13 +22,14 @@ use function sprintf;
 /**
  * @implements Rule<Node\Stmt\ClassConst>
  */
-class IncompatibleClassConstantPhpDocTypeRule implements Rule
+#[RegisteredRule(level: 2)]
+#[ValidatesStubFiles]
+final class IncompatibleClassConstantPhpDocTypeRule implements Rule
 {
 
 	public function __construct(
 		private GenericObjectTypeCheck $genericObjectTypeCheck,
 		private UnresolvableTypeHelper $unresolvableTypeHelper,
-		private InitializerExprTypeResolver $initializerExprTypeResolver,
 	)
 	{
 	}
@@ -43,61 +45,62 @@ class IncompatibleClassConstantPhpDocTypeRule implements Rule
 			throw new ShouldNotHappenException();
 		}
 
+		$nativeType = null;
+		if ($node->type !== null) {
+			$nativeType = ParserNodeTypeToPHPStanType::resolve($node->type, $scope->getClassReflection());
+		}
+
 		$errors = [];
 		foreach ($node->consts as $const) {
 			$constantName = $const->name->toString();
-			$errors = array_merge($errors, $this->processSingleConstant($scope->getClassReflection(), $constantName));
+			$errors = array_merge($errors, $this->processSingleConstant($scope->getClassReflection(), $nativeType, $constantName));
 		}
 
 		return $errors;
 	}
 
 	/**
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
-	private function processSingleConstant(ClassReflection $classReflection, string $constantName): array
+	private function processSingleConstant(ClassReflection $classReflection, ?Type $nativeType, string $constantName): array
 	{
 		$constantReflection = $classReflection->getConstant($constantName);
-		if (!$constantReflection instanceof ClassConstantReflection) {
+		$phpDocType = $constantReflection->getPhpDocType();
+		if ($phpDocType === null) {
 			return [];
 		}
-
-		if (!$constantReflection->hasPhpDocType()) {
-			return [];
-		}
-
-		$phpDocType = $constantReflection->getValueType();
 
 		$errors = [];
-		if (
-			$this->unresolvableTypeHelper->containsUnresolvableType($phpDocType)
-		) {
-			$errors[] = RuleErrorBuilder::message(sprintf(
+		$unresolvableType = $this->unresolvableTypeHelper->getUnresolvableType($phpDocType);
+		if ($unresolvableType !== null) {
+			$errorBuilder = RuleErrorBuilder::message(sprintf(
 				'PHPDoc tag @var for constant %s::%s contains unresolvable type.',
 				$constantReflection->getDeclaringClass()->getName(),
 				$constantName,
-			))->build();
-		} else {
-			$nativeType = $this->initializerExprTypeResolver->getType($constantReflection->getValueExpr(), InitializerExprContext::fromClassReflection($constantReflection->getDeclaringClass()));
-			$isSuperType = $phpDocType->isSuperTypeOf($nativeType);
-			$verbosity = VerbosityLevel::getRecommendedLevelByType($phpDocType, $nativeType);
+			))->identifier('classConstant.unresolvableType');
+			foreach ($unresolvableType->reasons as $reason) {
+				$errorBuilder->addTip($reason);
+			}
+			$errors[] = $errorBuilder->build();
+		} elseif ($nativeType !== null) {
+			$isSuperType = $nativeType->isSuperTypeOf($phpDocType);
 			if ($isSuperType->no()) {
 				$errors[] = RuleErrorBuilder::message(sprintf(
-					'PHPDoc tag @var for constant %s::%s with type %s is incompatible with value %s.',
+					'PHPDoc tag @var for constant %s::%s with type %s is incompatible with native type %s.',
 					$constantReflection->getDeclaringClass()->getDisplayName(),
 					$constantName,
-					$phpDocType->describe($verbosity),
-					$nativeType->describe(VerbosityLevel::value()),
-				))->build();
+					$phpDocType->describe(VerbosityLevel::typeOnly()),
+					$nativeType->describe(VerbosityLevel::typeOnly()),
+				))->identifier('classConstant.phpDocType')->build();
 
 			} elseif ($isSuperType->maybe()) {
 				$errors[] = RuleErrorBuilder::message(sprintf(
-					'PHPDoc tag @var for constant %s::%s with type %s is not subtype of value %s.',
+					'PHPDoc tag @var for constant %s::%s with type %s is not subtype of native type %s.',
 					$constantReflection->getDeclaringClass()->getDisplayName(),
 					$constantName,
-					$phpDocType->describe($verbosity),
-					$nativeType->describe(VerbosityLevel::value()),
-				))->build();
+					$phpDocType->describe(VerbosityLevel::typeOnly()),
+					$nativeType->describe(VerbosityLevel::typeOnly()),
+				))->identifier('classConstant.phpDocType')->build();
 			}
 		}
 
@@ -123,6 +126,16 @@ class IncompatibleClassConstantPhpDocTypeRule implements Rule
 			),
 			sprintf(
 				'Type %%s in generic type %%s in PHPDoc tag @var for constant %s::%s is not subtype of template type %%s of %%s %%s.',
+				$className,
+				$escapedConstantName,
+			),
+			sprintf(
+				'Call-site variance of %%s in generic type %%s in PHPDoc tag @var for constant %s::%s is in conflict with %%s template type %%s of %%s %%s.',
+				$className,
+				$escapedConstantName,
+			),
+			sprintf(
+				'Call-site variance of %%s in generic type %%s in PHPDoc tag @var for constant %s::%s is redundant, template type %%s of %%s %%s has the same variance.',
 				$className,
 				$escapedConstantName,
 			),

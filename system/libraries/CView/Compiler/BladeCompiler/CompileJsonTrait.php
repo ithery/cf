@@ -22,7 +22,7 @@ trait CView_Compiler_BladeCompiler_CompileJsonTrait {
 
         $depth = isset($parts[2]) ? trim($parts[2]) : 512;
 
-        return "<?php echo json_encode({$parts[0]}, ${options}, ${depth}) ?>";
+        return "<?php echo json_encode({$parts[0]}, {$options}, {$depth}) ?>";
     }
 
     /**
@@ -39,20 +39,6 @@ trait CView_Compiler_BladeCompiler_CompileJsonTrait {
 
         $depth = isset($parts[2]) ? trim($parts[2]) : 512;
 
-        return "<?php echo htmlspecialchars(json_encode({$parts[0]}, ${options}, ${depth}), ENT_QUOTES, 'UTF-8') ?>";
-    }
-
-    public static function compileJs($expression) {
-        return <<<EOT
-<?php
-    if (is_object({$expression}) || is_array({$expression})) {
-        echo "JSON.parse(atob('".base64_encode(json_encode({$expression}))."'))";
-    } elseif (is_string({$expression})) {
-        echo "'".str_replace("'", "\'", {$expression})."'";
-    } else {
-        echo json_encode({$expression});
-    }
-?>
-EOT;
+        return "<?php echo htmlspecialchars(json_encode({$parts[0]}, {$options}, {$depth}), ENT_QUOTES, 'UTF-8') ?>";
     }
 }

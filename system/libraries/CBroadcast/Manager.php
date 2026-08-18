@@ -43,7 +43,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      *
      * @return void
      */
-    public function routes(array $attributes = null) {
+    public function routes(?array $attributes = null) {
         $attributes = $attributes ?: ['middleware' => ['web']];
         CRouting::router()->group($attributes, function ($router) {
             $router->match(
@@ -189,11 +189,19 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      * @return \CBroadcast_Contract_BroadcasterInterface
      */
     protected function createPusherDriver(array $config) {
+        $options = $config['options'] ? $config['options'] : [];
+
+        $client = null;
+        if (array_key_exists('verify', $options)) {
+            $client = new \GuzzleHttp\Client(['verify' => $options['verify']]);
+        }
+
         $pusher = new Pusher(
             $config['key'],
             $config['secret'],
             $config['app_id'],
-            $config['options'] ? $config['options'] : []
+            $options,
+            $client
         );
 
         $log = isset($config['log']) ? $config['log'] : false;

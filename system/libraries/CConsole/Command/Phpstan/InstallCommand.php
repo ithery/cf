@@ -61,7 +61,7 @@ class CConsole_Command_Phpstan_InstallCommand extends CConsole_Command {
                 if (!CFile::isDirectory(dirname($binPath))) {
                     CFile::makeDirectory(dirname($binPath), 0755, true);
                 }
-                copy('http://cpanel.ittron.co.id/application/devcloud/default/data/bin/phpstan/phpstan', $binPath);
+                copy('https://devcloud.cresenity.com/application/devcloud/default/data/bin/phpstan/phpstan', $binPath);
                 $this->info($binPath . ' downloaded');
             } catch (Exception $ex) {
                 $errCode++;
@@ -78,30 +78,47 @@ class CConsole_Command_Phpstan_InstallCommand extends CConsole_Command {
         return true;
     }
 
+    /**
+     * Memasang phar pada versi yang didukung.
+     *
+     * Yang diperiksa versinya, bukan keberadaan berkasnya - sama seperti
+     * phpcs dan php-cs-fixer sejak 1.9. Pemeriksaan file_exists() saja membuat
+     * phar lama menetap selamanya: yang terpasang di sini sempat tertinggal di
+     * build pengembangan 1.9.x sementara kodenya sudah menuntut API yang lebih
+     * baru.
+     *
+     * @return bool
+     */
     protected function downloadPhpstanPharOnBinPath() {
         $pharPath = CQC::phpstan()->phpstanPhar();
-        if (!file_exists($pharPath)) {
-            $this->info('Downloading phpstan.phar');
-            $errCode = 0;
-            $errMessage = '';
+        $version = CQC_Phpstan::VERSION;
+        $installed = CQC_Phpstan::installedVersion($pharPath);
 
-            try {
-                if (!CFile::isDirectory(dirname($pharPath))) {
-                    CFile::makeDirectory(dirname($pharPath), 0755, true);
-                }
-                copy('http://cpanel.ittron.co.id/application/devcloud/default/data/bin/phpstan/phpstan.phar', $pharPath);
-                $this->info($pharPath . ' downloaded');
-            } catch (Exception $ex) {
-                $errCode++;
-                $errMessage = $ex->getMessage();
-            }
+        if ($installed === $version) {
+            $this->info($pharPath . ' is already installed (' . $version . ')');
 
-            if ($errCode > 0) {
-                $this->error($errMessage);
-
-                return false;
-            }
+            return true;
         }
+
+        if (file_exists($pharPath)) {
+            $this->info('Replacing phpstan.phar ' . ($installed == null ? '(unknown)' : $installed)
+                . ' with ' . $version);
+        } else {
+            $this->info('Downloading phpstan.phar ' . $version);
+        }
+
+        $url = 'https://devcloud.cresenity.com/application/devcloud/default/data/bin/phpstan/phpstan.'
+            . $version . '.phar';
+
+        try {
+            CQC::downloadPhar($url, $pharPath, $version);
+        } catch (Exception $ex) {
+            $this->error($ex->getMessage());
+
+            return false;
+        }
+
+        $this->info($pharPath . ' installed (' . $version . ')');
 
         return true;
     }

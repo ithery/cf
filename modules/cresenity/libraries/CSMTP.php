@@ -4,12 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * CSMTP. Helper class to make smtp mail creation easier.
  *
- * @package    CLibrary
- *
- * @author     Hery Kurniawan
- * @website    http://www.cresenitytech.com/
- *
- * @license    NA
+ * @deprecated 1.8
  */
 require_once dirname(__FILE__) . '/Lib/phpmailer/class.phpmailer.php';
 require_once dirname(__FILE__) . '/Lib/phpmailer/class.smtp.php';
@@ -32,32 +27,38 @@ class CSMTP {
 
     public static function factory($headers = []) {
         $s = new CSMTP();
+
         return $s;
     }
 
     public function set_username($username) {
         $this->smtp->SMTPAuth = true;
         $this->smtp->Username = $username;
+
         return $this;
     }
 
     public function set_host($host) {
         $this->smtp->Host = $host;
+
         return $this;
     }
 
     public function set_port($port) {
         $this->smtp->Port = $port;
+
         return $this;
     }
 
     public function set_password($password) {
         $this->smtp->Password = $password;
+
         return $this;
     }
 
     public function set_subject($subject) {
         $this->smtp->Subject = $subject;
+
         return $this;
     }
 
@@ -83,21 +84,25 @@ class CSMTP {
 
     public function set_charset($charset) {
         $this->smtp->CharSet = $charset;
+
         return $this;
     }
 
     public function set_ssl() {
         $this->smtp->SMTPSecure = 'ssl';
+
         return $this;
     }
 
     public function set_tls() {
         $this->smtp->SMTPSecure = 'tls';
+
         return $this;
     }
 
     public function set_secure($secure_type) {
         $this->smtp->SMTPSecure = $secure_type;
+
         return $this;
     }
 
@@ -106,6 +111,7 @@ class CSMTP {
             $from_name = $from_email;
         }
         $this->smtp->setFrom($from_email, $from_name);
+
         return $this;
     }
 
@@ -114,16 +120,19 @@ class CSMTP {
             $name = $email;
         }
         $this->smtp->AddReplyTo($email, $name);
+
         return $this;
     }
 
     public function add_attachment($path, $name = '') {
         $this->smtp->AddAttachment($path, $name);
+
         return $this;
     }
 
     public function add_attachment_string($str, $filename = '', $encoding = 'base64', $type = 'application/octet-stream') {
         $this->smtp->AddStringAttachment($str, $filename, $encoding, $type);
+
         return $this;
     }
 
@@ -132,6 +141,7 @@ class CSMTP {
             $name = $email;
         }
         $this->smtp->AddAddress($email, $name);
+
         return $this;
     }
 
@@ -140,6 +150,7 @@ class CSMTP {
             $name = $email;
         }
         $this->smtp->AddCC($email, $name);
+
         return $this;
     }
 
@@ -148,6 +159,7 @@ class CSMTP {
             $name = $email;
         }
         $this->smtp->AddBCC($email, $name);
+
         return $this;
     }
 

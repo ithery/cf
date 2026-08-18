@@ -2,23 +2,34 @@
 
 namespace PHPStan\Type\Traits;
 
+use PHPStan\Php\PhpVersion;
+use PHPStan\Reflection\ClassConstantReflection;
 use PHPStan\Reflection\ClassMemberAccessAnswerer;
-use PHPStan\Reflection\ConstantReflection;
-use PHPStan\Reflection\Dummy\DummyConstantReflection;
+use PHPStan\Reflection\Dummy\DummyClassConstantReflection;
 use PHPStan\Reflection\Dummy\DummyMethodReflection;
 use PHPStan\Reflection\Dummy\DummyPropertyReflection;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\PropertyReflection;
+use PHPStan\Reflection\ExtendedPropertyReflection;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Reflection\Type\CallbackUnresolvedMethodPrototypeReflection;
 use PHPStan\Reflection\Type\CallbackUnresolvedPropertyPrototypeReflection;
 use PHPStan\Reflection\Type\UnresolvedMethodPrototypeReflection;
 use PHPStan\Reflection\Type\UnresolvedPropertyPrototypeReflection;
 use PHPStan\TrinaryLogic;
+use PHPStan\Type\Accessory\AccessoryLiteralStringType;
 use PHPStan\Type\ArrayType;
+use PHPStan\Type\BooleanType;
+use PHPStan\Type\ClassNameToObjectTypeResult;
+use PHPStan\Type\ClassStringType;
+use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\ErrorType;
+use PHPStan\Type\IntersectionType;
 use PHPStan\Type\MixedType;
-use PHPStan\Type\StringType;
+use PHPStan\Type\ObjectWithoutClassType;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
+use PHPStan\Type\UnionType;
+use function count;
 
 trait ObjectTypeTrait
 {
@@ -28,6 +39,61 @@ trait ObjectTypeTrait
 	use MaybeOffsetAccessibleTypeTrait;
 	use NonArrayTypeTrait;
 	use TruthyBooleanTypeTrait;
+
+	public function getTemplateType(string $ancestorClassName, string $templateTypeName): Type
+	{
+		return new MixedType();
+	}
+
+	public function isObject(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function toGetClassResultType(): Type
+	{
+		return $this->getClassStringType();
+	}
+
+	public function toClassConstantType(ReflectionProvider $reflectionProvider): Type
+	{
+		$classNames = $this->getObjectClassNames();
+		if (count($classNames) === 1 && $reflectionProvider->hasClass($classNames[0])) {
+			$reflection = $reflectionProvider->getClass($classNames[0]);
+			if ($reflection->isFinalByKeyword()) {
+				return new ConstantStringType($reflection->getName(), true);
+			}
+		}
+
+		return new IntersectionType([$this->getClassStringType(), new AccessoryLiteralStringType()]);
+	}
+
+	public function toObjectTypeForInstanceofCheck(): ClassNameToObjectTypeResult
+	{
+		// Definite-object types keep themselves as the comparison target —
+		// they're already an `ObjectType` (or its accessory). The
+		// uncertainty flag is set because the `instanceof` decision can
+		// only be made at runtime when comparing against a class name
+		// computed from the value.
+		return new ClassNameToObjectTypeResult($this, true);
+	}
+
+	public function toObjectTypeForIsACheck(Type $objectOrClassType, bool $allowString, bool $allowSameClass): ClassNameToObjectTypeResult
+	{
+		if ($allowString) {
+			return new ClassNameToObjectTypeResult(
+				new UnionType([new ObjectWithoutClassType(), new ClassStringType()]),
+				false,
+			);
+		}
+
+		return new ClassNameToObjectTypeResult(new ObjectWithoutClassType(), false);
+	}
+
+	public function isEnum(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
 
 	public function canAccessProperties(): TrinaryLogic
 	{
@@ -39,14 +105,56 @@ trait ObjectTypeTrait
 		return TrinaryLogic::createMaybe();
 	}
 
-	public function getProperty(string $propertyName, ClassMemberAccessAnswerer $scope): PropertyReflection
+	public function getProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
 	{
 		return $this->getUnresolvedPropertyPrototype($propertyName, $scope)->getTransformedProperty();
 	}
 
 	public function getUnresolvedPropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
 	{
-		$property = new DummyPropertyReflection();
+		$property = new DummyPropertyReflection($propertyName);
+		return new CallbackUnresolvedPropertyPrototypeReflection(
+			$property,
+			$property->getDeclaringClass(),
+			false,
+			static fn (Type $type): Type => $type,
+		);
+	}
+
+	public function hasInstanceProperty(string $propertyName): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function getInstanceProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
+	{
+		return $this->getUnresolvedInstancePropertyPrototype($propertyName, $scope)->getTransformedProperty();
+	}
+
+	public function getUnresolvedInstancePropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
+	{
+		$property = new DummyPropertyReflection($propertyName);
+		return new CallbackUnresolvedPropertyPrototypeReflection(
+			$property,
+			$property->getDeclaringClass(),
+			false,
+			static fn (Type $type): Type => $type,
+		);
+	}
+
+	public function hasStaticProperty(string $propertyName): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function getStaticProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
+	{
+		return $this->getUnresolvedStaticPropertyPrototype($propertyName, $scope)->getTransformedProperty();
+	}
+
+	public function getUnresolvedStaticPropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
+	{
+		$property = new DummyPropertyReflection($propertyName);
 		return new CallbackUnresolvedPropertyPrototypeReflection(
 			$property,
 			$property->getDeclaringClass(),
@@ -91,14 +199,69 @@ trait ObjectTypeTrait
 		return TrinaryLogic::createMaybe();
 	}
 
-	public function getConstant(string $constantName): ConstantReflection
+	public function getConstant(string $constantName): ClassConstantReflection
 	{
-		return new DummyConstantReflection($constantName);
+		return new DummyClassConstantReflection($constantName);
+	}
+
+	public function getConstantStrings(): array
+	{
+		return [];
 	}
 
 	public function isCloneable(): TrinaryLogic
 	{
 		return TrinaryLogic::createYes();
+	}
+
+	public function isNull(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantScalarValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getConstantScalarTypes(): array
+	{
+		return [];
+	}
+
+	public function getConstantScalarValues(): array
+	{
+		return [];
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isBoolean(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFloat(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isInteger(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
 	}
 
 	public function isString(): TrinaryLogic
@@ -107,6 +270,11 @@ trait ObjectTypeTrait
 	}
 
 	public function isNumericString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isDecimalIntegerString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
@@ -126,14 +294,64 @@ trait ObjectTypeTrait
 		return TrinaryLogic::createNo();
 	}
 
+	public function isLowercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isUppercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isClassString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return $this;
+	}
+
+	public function isVoid(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		return new BooleanType();
+	}
+
 	public function toNumber(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toBitwiseNotType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toAbsoluteNumber(): Type
 	{
 		return new ErrorType();
 	}
 
 	public function toString(): Type
 	{
-		return new StringType();
+		return new ErrorType();
 	}
 
 	public function toInteger(): Type
@@ -153,7 +371,16 @@ trait ObjectTypeTrait
 
 	public function toArrayKey(): Type
 	{
-		return new StringType();
+		return new ErrorType();
+	}
+
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		if (!$strictTypes) {
+			return TypeCombinator::union($this, $this->toString());
+		}
+
+		return $this;
 	}
 
 }

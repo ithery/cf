@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 13, 2018, 10:19:47 AM
- */
 class CServer {
     const OS_WINNT = 'WINNT';
 
@@ -20,24 +14,69 @@ class CServer {
      */
     const ARRAY_EXP = '/^return array \([^;]*\);$/';
 
-    public static function storage($sshConfig = null) {
-        return CServer_Storage::instance($sshConfig);
+    /**
+     * @var array
+     */
+    protected static $serverInstances = [];
+
+    /**
+     * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
+     *
+     * @return CServer_Server
+     */
+    public static function server($sshConfig = null) {
+        $key = 'localhost';
+        if ($sshConfig instanceof CRemote_SSH) {
+            $key = $sshConfig->getHost();
+        } elseif ($sshConfig instanceof CRemote_SSH_Config) {
+            $key = $sshConfig->getConnectionHost() . ':' . ($sshConfig->getPort() ?: 22) . ':' . ($sshConfig->getUsername() ?: 'root');
+        }
+
+        if (!isset(self::$serverInstances[$key])) {
+            self::$serverInstances[$key] = new CServer_Server($sshConfig);
+        }
+
+        return self::$serverInstances[$key];
     }
 
+    /**
+     * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
+     *
+     * @return CServer_Storage
+     */
+    public static function storage($sshConfig = null) {
+        return self::server($sshConfig)->storage();
+    }
+
+    /**
+     * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
+     *
+     * @return CServer_Php
+     */
     public static function php($sshConfig = null) {
-        return CServer_Php::instance($sshConfig);
+        return self::server($sshConfig)->php();
     }
 
     public static function database() {
         return CServer_Database::instance();
     }
 
+    /**
+     * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
+     *
+     * @return CServer_Memory
+     */
     public static function memory($sshConfig = null) {
-        return CServer_Memory::instance($sshConfig);
+        return self::server($sshConfig)->memory();
     }
 
+    /**
+     * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
+     *
+     * @return CServer_System
+     */
     public static function system($sshConfig = null) {
-        return CServer_System::instance($sshConfig);
+        return self::server($sshConfig)->system();
     }
 
     public static function error() {
@@ -45,20 +84,19 @@ class CServer {
     }
 
     /**
-     * @param type $sshConfig | optional
+     * @param null|CRemote_SSH|CRemote_SSH_Config $sshConfig
      *
-     * @return CServer_Command
+     * @return CServer_Config
      */
-    public static function command($sshConfig = null) {
-        return CServer_Command::instance($sshConfig);
+    public static function config($sshConfig = null) {
+        return self::server($sshConfig)->config();
     }
 
-    public static function config() {
-        return CServer_Config::instance();
-    }
-
+    /**
+     * @return CServer_PhpInfo
+     */
     public static function phpInfo() {
-        return new CServer_PhpInfo();
+        return self::server()->phpInfo();
     }
 
     public static function getHostname() {
@@ -71,13 +109,11 @@ class CServer {
         return carr::get($processUser, 'name');
     }
 
+    /**
+     * @return string
+     */
     public static function getOS() {
-        $os = self::config()->get('os');
-        if ($os == null) {
-            $os = PHP_OS;
-        }
-
-        return $os;
+        return self::server()->getOS();
     }
 
     public static function isWindows() {
@@ -113,12 +149,13 @@ class CServer {
     }
 
     /**
-     * @param mixed $options
+     * @param null|CServer_Server|array $server
+     * @param array                     $options
      *
      * @return \CServer_Service_Beanstalkd
      */
-    public static function createBeanstalkd($options = []) {
-        return new CServer_Service_Beanstalkd($options);
+    public static function createBeanstalkd($server = null, $options = []) {
+        return new CServer_Service_Beanstalkd($server, $options);
     }
 
     public static function isNpmInstalled() {

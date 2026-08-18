@@ -3,57 +3,69 @@
 namespace PHPStan\Type;
 
 use ArrayAccess;
+use ArrayObject;
 use Closure;
 use Countable;
-use DateTime;
-use DateTimeImmutable;
 use DateTimeInterface;
-use Error;
-use Exception;
 use Iterator;
 use IteratorAggregate;
 use PHPStan\Analyser\OutOfClassScope;
-use PHPStan\Broker\Broker;
 use PHPStan\Broker\ClassNotFoundException;
+use PHPStan\Php\PhpVersion;
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\Reflection\Callables\CallableParametersAcceptor;
+use PHPStan\Reflection\Callables\FunctionCallableVariant;
+use PHPStan\Reflection\ClassConstantReflection;
 use PHPStan\Reflection\ClassMemberAccessAnswerer;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\ConstantReflection;
+use PHPStan\Reflection\Dummy\DummyPropertyReflection;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\ParametersAcceptor;
-use PHPStan\Reflection\ParametersAcceptorSelector;
+use PHPStan\Reflection\ExtendedPropertyReflection;
 use PHPStan\Reflection\Php\UniversalObjectCratesClassReflectionExtension;
-use PHPStan\Reflection\PropertyReflection;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Reflection\ReflectionProviderStaticAccessor;
 use PHPStan\Reflection\TrivialParametersAcceptor;
+use PHPStan\Reflection\Type\CallbackUnresolvedPropertyPrototypeReflection;
 use PHPStan\Reflection\Type\CalledOnTypeUnresolvedMethodPrototypeReflection;
 use PHPStan\Reflection\Type\CalledOnTypeUnresolvedPropertyPrototypeReflection;
+use PHPStan\Reflection\Type\UnionTypeUnresolvedPropertyPrototypeReflection;
 use PHPStan\Reflection\Type\UnresolvedMethodPrototypeReflection;
 use PHPStan\Reflection\Type\UnresolvedPropertyPrototypeReflection;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\TrinaryLogic;
+use PHPStan\Type\Accessory\AccessoryLiteralStringType;
+use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
+use PHPStan\Type\Accessory\AccessoryNumericStringType;
+use PHPStan\Type\Accessory\HasOffsetValueType;
 use PHPStan\Type\Constant\ConstantArrayType;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\Enum\EnumCaseObjectType;
+use PHPStan\Type\Generic\GenericClassStringType;
 use PHPStan\Type\Generic\GenericObjectType;
+use PHPStan\Type\Generic\TemplateTypeHelper;
 use PHPStan\Type\Traits\MaybeIterableTypeTrait;
 use PHPStan\Type\Traits\NonArrayTypeTrait;
 use PHPStan\Type\Traits\NonGeneralizableTypeTrait;
 use PHPStan\Type\Traits\NonGenericTypeTrait;
+use PHPStan\Type\Traits\SubstractableTypeTrait;
 use PHPStan\Type\Traits\UndecidedComparisonTypeTrait;
+use Stringable;
 use Throwable;
 use Traversable;
 use function array_key_exists;
 use function array_map;
-use function array_merge;
 use function array_values;
 use function count;
+use function get_class;
 use function implode;
 use function in_array;
 use function sprintf;
 use function strtolower;
 
 /** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::isObject() or Type::getObjectClassNames()')]
 class ObjectType implements TypeWithClassName, SubtractableType
 {
 
@@ -62,12 +74,25 @@ class ObjectType implements TypeWithClassName, SubtractableType
 	use NonGenericTypeTrait;
 	use UndecidedComparisonTypeTrait;
 	use NonGeneralizableTypeTrait;
+	use SubstractableTypeTrait;
 
-	private const EXTRA_OFFSET_CLASSES = ['SimpleXMLElement', 'DOMNodeList', 'Threaded'];
+	private const EXTRA_OFFSET_CLASSES = [
+		'DOMNamedNodeMap', // Only read and existence
+		'Dom\NamedNodeMap', // Only read and existence
+		'DOMNodeList', // Only read and existence
+		'Dom\NodeList', // Only read and existence
+		'Dom\HTMLCollection', // Only read and existence
+		'Dom\DtdNamedNodeMap', // Only read and existence
+		'PDORow', // Only read and existence
+		'ResourceBundle', // Only read
+		'FFI\CData', // Very funky and weird
+		'SimpleXMLElement',
+		'Threaded',
+	];
 
 	private ?Type $subtractedType;
 
-	/** @var array<string, array<string, TrinaryLogic>> */
+	/** @var array<string, array<string, IsSuperTypeOfResult>> */
 	private static array $superTypes = [];
 
 	private ?self $cachedParent = null;
@@ -81,11 +106,37 @@ class ObjectType implements TypeWithClassName, SubtractableType
 	/** @var array<string, array<string, array<string, UnresolvedPropertyPrototypeReflection>>> */
 	private static array $properties = [];
 
+	/** @var array<string, array<string, array<string, UnresolvedPropertyPrototypeReflection>>> */
+	private static array $instanceProperties = [];
+
+	/** @var array<string, array<string, array<string, UnresolvedPropertyPrototypeReflection>>> */
+	private static array $staticProperties = [];
+
 	/** @var array<string, array<string, self|null>> */
 	private static array $ancestors = [];
 
 	/** @var array<string, self|null> */
 	private array $currentAncestors = [];
+
+	private ?string $cachedDescription = null;
+
+	/**
+	 * The reflection resolved on demand by getClassReflection(), kept apart from the one
+	 * handed to the constructor. The constructor's reflection is part of the type's value
+	 * — it can differ from what the provider would return (an anonymous class is identified
+	 * by its start line, a final-by-keyword override changes subtyping) — and so it belongs
+	 * in the cache key. A lazily fetched one is merely a cache: folding it into the key made
+	 * describe(VerbosityLevel::cache()) depend on whether the fetch had happened yet, which
+	 * made TypeCombinator::union() — which dedupes on that key — depend on cache warmth
+	 * rather than on its arguments' values.
+	 */
+	private ?ClassReflection $lazyClassReflection = null;
+
+	/** @var array<string, list<EnumCaseObjectType>> */
+	private static array $enumCases = [];
+
+	/** @var array<string, ExtendedMethodReflection> */
+	private array $methodCache = [];
 
 	/** @api */
 	public function __construct(
@@ -106,19 +157,10 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		self::$superTypes = [];
 		self::$methods = [];
 		self::$properties = [];
+		self::$instanceProperties = [];
+		self::$staticProperties = [];
 		self::$ancestors = [];
-	}
-
-	private static function createFromReflection(ClassReflection $reflection): self
-	{
-		if (!$reflection->isGeneric()) {
-			return new ObjectType($reflection->getName());
-		}
-
-		return new GenericObjectType(
-			$reflection->getName(),
-			$reflection->typeMapToList($reflection->getActiveTemplateTypeMap()),
-		);
+		self::$enumCases = [];
 	}
 
 	public function getClassName(): string
@@ -133,7 +175,8 @@ class ObjectType implements TypeWithClassName, SubtractableType
 			return TrinaryLogic::createMaybe();
 		}
 
-		if ($classReflection->hasProperty($propertyName)) {
+		$classHasProperty = RecursionGuard::run($this, static fn (): bool => $classReflection->hasProperty($propertyName));
+		if ($classHasProperty === true || $classHasProperty instanceof ErrorType) {
 			return TrinaryLogic::createYes();
 		}
 
@@ -141,10 +184,14 @@ class ObjectType implements TypeWithClassName, SubtractableType
 			return TrinaryLogic::createMaybe();
 		}
 
+		if (!$classReflection->isFinal()) {
+			return TrinaryLogic::createMaybe();
+		}
+
 		return TrinaryLogic::createNo();
 	}
 
-	public function getProperty(string $propertyName, ClassMemberAccessAnswerer $scope): PropertyReflection
+	public function getProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
 	{
 		return $this->getUnresolvedPropertyPrototype($propertyName, $scope)->getTransformedProperty();
 	}
@@ -167,6 +214,26 @@ class ObjectType implements TypeWithClassName, SubtractableType
 			throw new ClassNotFoundException($this->className);
 		}
 
+		if ($nakedClassReflection->isEnum()) {
+			if (
+				$propertyName === 'name'
+				|| ($propertyName === 'value' && $nakedClassReflection->isBackedEnum())
+			) {
+				$properties = [];
+				foreach ($this->getEnumCases() as $enumCase) {
+					$properties[] = $enumCase->getUnresolvedPropertyPrototype($propertyName, $scope);
+				}
+
+				if (count($properties) > 0) {
+					if (count($properties) === 1) {
+						return $properties[0];
+					}
+
+					return new UnionTypeUnresolvedPropertyPrototypeReflection($properties);
+				}
+			}
+		}
+
 		if (!$nakedClassReflection->hasNativeProperty($propertyName)) {
 			$nakedClassReflection = $this->getClassReflection();
 		}
@@ -175,11 +242,21 @@ class ObjectType implements TypeWithClassName, SubtractableType
 			throw new ClassNotFoundException($this->className);
 		}
 
-		$property = $nakedClassReflection->getProperty($propertyName, $scope);
+		$property = RecursionGuard::run($this, static fn () => $nakedClassReflection->getProperty($propertyName, $scope));
+		if ($property instanceof ErrorType) {
+			$property = new DummyPropertyReflection($propertyName);
+
+			return new CallbackUnresolvedPropertyPrototypeReflection(
+				$property,
+				$property->getDeclaringClass(),
+				false,
+				static fn (Type $type): Type => $type,
+			);
+		}
 
 		$ancestor = $this->getAncestorWithClassName($property->getDeclaringClass()->getName());
 		$resolvedClassReflection = null;
-		if ($ancestor !== null) {
+		if ($ancestor !== null && $ancestor->hasProperty($propertyName)->yes()) {
 			$resolvedClassReflection = $ancestor->getClassReflection();
 			if ($ancestor !== $this) {
 				$property = $ancestor->getUnresolvedPropertyPrototype($propertyName, $scope)->getNakedProperty();
@@ -197,33 +274,222 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		);
 	}
 
-	public function getPropertyWithoutTransformingStatic(string $propertyName, ClassMemberAccessAnswerer $scope): PropertyReflection
+	public function hasInstanceProperty(string $propertyName): TrinaryLogic
 	{
-		$classReflection = $this->getNakedClassReflection();
+		$classReflection = $this->getClassReflection();
 		if ($classReflection === null) {
-			throw new ClassNotFoundException($this->className);
+			return TrinaryLogic::createMaybe();
 		}
 
-		if (!$classReflection->hasProperty($propertyName)) {
-			$classReflection = $this->getClassReflection();
+		$classHasProperty = RecursionGuard::run($this, static fn (): bool => $classReflection->hasInstanceProperty($propertyName));
+		if ($classHasProperty === true || $classHasProperty instanceof ErrorType) {
+			return TrinaryLogic::createYes();
 		}
 
-		if ($classReflection === null) {
-			throw new ClassNotFoundException($this->className);
+		if ($classReflection->allowsDynamicProperties()) {
+			return TrinaryLogic::createMaybe();
 		}
 
-		return $classReflection->getProperty($propertyName, $scope);
+		if (!$classReflection->isFinal()) {
+			return TrinaryLogic::createMaybe();
+		}
+
+		return TrinaryLogic::createNo();
 	}
 
-	/**
-	 * @return string[]
-	 */
+	public function getInstanceProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
+	{
+		return $this->getUnresolvedInstancePropertyPrototype($propertyName, $scope)->getTransformedProperty();
+	}
+
+	public function getUnresolvedInstancePropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
+	{
+		if (!$scope->isInClass()) {
+			$canAccessProperty = 'no';
+		} else {
+			$canAccessProperty = $scope->getClassReflection()->getName();
+		}
+		$description = $this->describeCache();
+
+		if (isset(self::$instanceProperties[$description][$propertyName][$canAccessProperty])) {
+			return self::$instanceProperties[$description][$propertyName][$canAccessProperty];
+		}
+
+		$nakedClassReflection = $this->getNakedClassReflection();
+		if ($nakedClassReflection === null) {
+			throw new ClassNotFoundException($this->className);
+		}
+
+		if ($nakedClassReflection->isEnum()) {
+			if (
+				$propertyName === 'name'
+				|| ($propertyName === 'value' && $nakedClassReflection->isBackedEnum())
+			) {
+				$properties = [];
+				foreach ($this->getEnumCases() as $enumCase) {
+					$properties[] = $enumCase->getUnresolvedInstancePropertyPrototype($propertyName, $scope);
+				}
+
+				if (count($properties) > 0) {
+					if (count($properties) === 1) {
+						return $properties[0];
+					}
+
+					return new UnionTypeUnresolvedPropertyPrototypeReflection($properties);
+				}
+			}
+		}
+
+		if (!$nakedClassReflection->hasNativeProperty($propertyName)) {
+			$nakedClassReflection = $this->getClassReflection();
+		}
+
+		if ($nakedClassReflection === null) {
+			throw new ClassNotFoundException($this->className);
+		}
+
+		$property = RecursionGuard::run($this, static fn () => $nakedClassReflection->getInstanceProperty($propertyName, $scope));
+		if ($property instanceof ErrorType) {
+			$property = new DummyPropertyReflection($propertyName);
+
+			return new CallbackUnresolvedPropertyPrototypeReflection(
+				$property,
+				$property->getDeclaringClass(),
+				false,
+				static fn (Type $type): Type => $type,
+			);
+		}
+
+		$ancestor = $this->getAncestorWithClassName($property->getDeclaringClass()->getName());
+		$resolvedClassReflection = null;
+		if ($ancestor !== null && $ancestor->hasInstanceProperty($propertyName)->yes()) {
+			$resolvedClassReflection = $ancestor->getClassReflection();
+			if ($ancestor !== $this) {
+				$property = $ancestor->getUnresolvedInstancePropertyPrototype($propertyName, $scope)->getNakedProperty();
+			}
+		}
+		if ($resolvedClassReflection === null) {
+			$resolvedClassReflection = $property->getDeclaringClass();
+		}
+
+		return self::$instanceProperties[$description][$propertyName][$canAccessProperty] = new CalledOnTypeUnresolvedPropertyPrototypeReflection(
+			$property,
+			$resolvedClassReflection,
+			true,
+			$this,
+		);
+	}
+
+	public function hasStaticProperty(string $propertyName): TrinaryLogic
+	{
+		$classReflection = $this->getClassReflection();
+		if ($classReflection === null) {
+			return TrinaryLogic::createMaybe();
+		}
+
+		$classHasProperty = RecursionGuard::run($this, static fn (): bool => $classReflection->hasStaticProperty($propertyName));
+		if ($classHasProperty === true || $classHasProperty instanceof ErrorType) {
+			return TrinaryLogic::createYes();
+		}
+
+		if (!$classReflection->isFinal()) {
+			return TrinaryLogic::createMaybe();
+		}
+
+		return TrinaryLogic::createNo();
+	}
+
+	public function getStaticProperty(string $propertyName, ClassMemberAccessAnswerer $scope): ExtendedPropertyReflection
+	{
+		return $this->getUnresolvedStaticPropertyPrototype($propertyName, $scope)->getTransformedProperty();
+	}
+
+	public function getUnresolvedStaticPropertyPrototype(string $propertyName, ClassMemberAccessAnswerer $scope): UnresolvedPropertyPrototypeReflection
+	{
+		if (!$scope->isInClass()) {
+			$canAccessProperty = 'no';
+		} else {
+			$canAccessProperty = $scope->getClassReflection()->getName();
+		}
+		$description = $this->describeCache();
+
+		if (isset(self::$staticProperties[$description][$propertyName][$canAccessProperty])) {
+			return self::$staticProperties[$description][$propertyName][$canAccessProperty];
+		}
+
+		$nakedClassReflection = $this->getNakedClassReflection();
+		if ($nakedClassReflection === null) {
+			throw new ClassNotFoundException($this->className);
+		}
+
+		if (!$nakedClassReflection->hasNativeProperty($propertyName)) {
+			$nakedClassReflection = $this->getClassReflection();
+		}
+
+		if ($nakedClassReflection === null) {
+			throw new ClassNotFoundException($this->className);
+		}
+
+		$property = RecursionGuard::run($this, static fn () => $nakedClassReflection->getStaticProperty($propertyName));
+		if ($property instanceof ErrorType) {
+			$property = new DummyPropertyReflection($propertyName);
+
+			return new CallbackUnresolvedPropertyPrototypeReflection(
+				$property,
+				$property->getDeclaringClass(),
+				false,
+				static fn (Type $type): Type => $type,
+			);
+		}
+
+		$ancestor = $this->getAncestorWithClassName($property->getDeclaringClass()->getName());
+		$resolvedClassReflection = null;
+		if ($ancestor !== null && $ancestor->hasStaticProperty($propertyName)->yes()) {
+			$resolvedClassReflection = $ancestor->getClassReflection();
+			if ($ancestor !== $this) {
+				$property = $ancestor->getUnresolvedStaticPropertyPrototype($propertyName, $scope)->getNakedProperty();
+			}
+		}
+		if ($resolvedClassReflection === null) {
+			$resolvedClassReflection = $property->getDeclaringClass();
+		}
+
+		return self::$staticProperties[$description][$propertyName][$canAccessProperty] = new CalledOnTypeUnresolvedPropertyPrototypeReflection(
+			$property,
+			$resolvedClassReflection,
+			true,
+			$this,
+		);
+	}
+
 	public function getReferencedClasses(): array
 	{
+		if ($this->className === '') {
+			return [];
+		}
+
 		return [$this->className];
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function getObjectClassNames(): array
+	{
+		if ($this->className === '') {
+			return [];
+		}
+		return [$this->className];
+	}
+
+	public function getObjectClassReflections(): array
+	{
+		$classReflection = $this->getClassReflection();
+		if ($classReflection === null) {
+			return [];
+		}
+
+		return [$classReflection];
+	}
+
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
 		if ($type instanceof StaticType) {
 			return $this->checkSubclassAcceptability($type->getClassName());
@@ -234,24 +500,30 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		}
 
 		if ($type instanceof ClosureType) {
-			return $this->isInstanceOf(Closure::class);
+			return new AcceptsResult($this->isInstanceOf(Closure::class), []);
 		}
 
 		if ($type instanceof ObjectWithoutClassType) {
-			return TrinaryLogic::createMaybe();
+			return AcceptsResult::createMaybe();
 		}
 
-		if (!$type instanceof TypeWithClassName) {
-			return TrinaryLogic::createNo();
+		$thatClassNames = $type->getObjectClassNames();
+		if (count($thatClassNames) > 1) {
+			throw new ShouldNotHappenException();
 		}
 
-		return $this->checkSubclassAcceptability($type->getClassName());
+		if ($thatClassNames === []) {
+			return AcceptsResult::createNo();
+		}
+
+		return $this->checkSubclassAcceptability($thatClassNames[0]);
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
-		if (!$type instanceof CompoundType && !$type instanceof TypeWithClassName && !$type instanceof ObjectWithoutClassType) {
-			return TrinaryLogic::createNo();
+		$thatClassNames = $type->getObjectClassNames();
+		if (!$type instanceof CompoundType && $thatClassNames === [] && !$type instanceof ObjectWithoutClassType) {
+			return IsSuperTypeOfResult::createNo();
 		}
 
 		$thisDescription = $this->describeCache();
@@ -270,24 +542,28 @@ class ObjectType implements TypeWithClassName, SubtractableType
 			return self::$superTypes[$thisDescription][$description] = $type->isSubTypeOf($this);
 		}
 
+		if ($type instanceof ClosureType) {
+			return self::$superTypes[$thisDescription][$description] = new IsSuperTypeOfResult($this->isInstanceOf(Closure::class), []);
+		}
+
 		if ($type instanceof ObjectWithoutClassType) {
 			if ($type->getSubtractedType() !== null) {
 				$isSuperType = $type->getSubtractedType()->isSuperTypeOf($this);
 				if ($isSuperType->yes()) {
-					return self::$superTypes[$thisDescription][$description] = TrinaryLogic::createNo();
+					return self::$superTypes[$thisDescription][$description] = IsSuperTypeOfResult::createNo();
 				}
 			}
-			return self::$superTypes[$thisDescription][$description] = TrinaryLogic::createMaybe();
+			return self::$superTypes[$thisDescription][$description] = IsSuperTypeOfResult::createMaybe();
 		}
 
-		$transformResult = static fn (TrinaryLogic $result) => $result;
+		$transformResult = static fn (IsSuperTypeOfResult $result) => $result;
 		if ($this->subtractedType !== null) {
 			$isSuperType = $this->subtractedType->isSuperTypeOf($type);
 			if ($isSuperType->yes()) {
-				return self::$superTypes[$thisDescription][$description] = TrinaryLogic::createNo();
+				return self::$superTypes[$thisDescription][$description] = IsSuperTypeOfResult::createNo();
 			}
 			if ($isSuperType->maybe()) {
-				$transformResult = static fn (TrinaryLogic $result) => $result->and(TrinaryLogic::createMaybe());
+				$transformResult = static fn (IsSuperTypeOfResult $result) => $result->and(IsSuperTypeOfResult::createMaybe());
 			}
 		}
 
@@ -297,60 +573,74 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		) {
 			$isSuperType = $type->getSubtractedType()->isSuperTypeOf($this);
 			if ($isSuperType->yes()) {
-				return self::$superTypes[$thisDescription][$description] = TrinaryLogic::createNo();
+				return self::$superTypes[$thisDescription][$description] = IsSuperTypeOfResult::createNo();
 			}
 		}
 
 		$thisClassName = $this->className;
-		$thatClassName = $type->getClassName();
-
-		if ($thatClassName === $thisClassName) {
-			return $transformResult(TrinaryLogic::createYes());
-		}
-
-		$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
-
-		if ($this->getClassReflection() === null || !$reflectionProvider->hasClass($thatClassName)) {
-			return self::$superTypes[$thisDescription][$description] = TrinaryLogic::createMaybe();
+		if (count($thatClassNames) > 1) {
+			throw new ShouldNotHappenException();
 		}
 
 		$thisClassReflection = $this->getClassReflection();
-		$thatClassReflection = $reflectionProvider->getClass($thatClassName);
+		$thatClassReflections = $type->getObjectClassReflections();
+		if (count($thatClassReflections) === 1) {
+			$thatClassReflection = $thatClassReflections[0];
+		} else {
+			$thatClassReflection = null;
+		}
+
+		if ($thisClassReflection === null || $thatClassReflection === null) {
+			if ($thatClassNames[0] === $thisClassName) {
+				return self::$superTypes[$thisDescription][$description] = $transformResult(IsSuperTypeOfResult::createYes());
+			}
+			return self::$superTypes[$thisDescription][$description] = IsSuperTypeOfResult::createMaybe();
+		}
+
+		if ($thatClassNames[0] === $thisClassName) {
+			if ($thisClassReflection->getNativeReflection()->isFinal()) {
+				return self::$superTypes[$thisDescription][$description] = $transformResult(IsSuperTypeOfResult::createYes());
+			}
+
+			if ($thisClassReflection->hasFinalByKeywordOverride()) {
+				if (!$thatClassReflection->hasFinalByKeywordOverride()) {
+					return self::$superTypes[$thisDescription][$description] = $transformResult(IsSuperTypeOfResult::createMaybe());
+				}
+			}
+
+			return self::$superTypes[$thisDescription][$description] = $transformResult(IsSuperTypeOfResult::createYes());
+		}
 
 		if ($thisClassReflection->isTrait() || $thatClassReflection->isTrait()) {
-			return TrinaryLogic::createNo();
+			return self::$superTypes[$thisDescription][$description] = IsSuperTypeOfResult::createNo();
 		}
 
 		if ($thisClassReflection->getName() === $thatClassReflection->getName()) {
-			return self::$superTypes[$thisDescription][$description] = $transformResult(TrinaryLogic::createYes());
+			return self::$superTypes[$thisDescription][$description] = $transformResult(IsSuperTypeOfResult::createYes());
 		}
 
-		if ($thatClassReflection->isSubclassOf($thisClassName)) {
-			return self::$superTypes[$thisDescription][$description] = $transformResult(TrinaryLogic::createYes());
+		if ($thatClassReflection->isSubclassOfClass($thisClassReflection)) {
+			return self::$superTypes[$thisDescription][$description] = $transformResult(IsSuperTypeOfResult::createYes());
 		}
 
-		if ($thisClassReflection->isSubclassOf($thatClassName)) {
-			return self::$superTypes[$thisDescription][$description] = TrinaryLogic::createMaybe();
+		if ($thisClassReflection->isSubclassOfClass($thatClassReflection)) {
+			return self::$superTypes[$thisDescription][$description] = IsSuperTypeOfResult::createMaybe();
 		}
 
-		if ($thisClassReflection->isInterface() && !$thatClassReflection->getNativeReflection()->isFinal()) {
-			return self::$superTypes[$thisDescription][$description] = TrinaryLogic::createMaybe();
+		if ($thisClassReflection->isInterface() && !$thatClassReflection->isFinalByKeyword()) {
+			return self::$superTypes[$thisDescription][$description] = IsSuperTypeOfResult::createMaybe();
 		}
 
-		if ($thatClassReflection->isInterface() && !$thisClassReflection->getNativeReflection()->isFinal()) {
-			return self::$superTypes[$thisDescription][$description] = TrinaryLogic::createMaybe();
+		if ($thatClassReflection->isInterface() && !$thisClassReflection->isFinalByKeyword()) {
+			return self::$superTypes[$thisDescription][$description] = IsSuperTypeOfResult::createMaybe();
 		}
 
-		return self::$superTypes[$thisDescription][$description] = TrinaryLogic::createNo();
+		return self::$superTypes[$thisDescription][$description] = IsSuperTypeOfResult::createNo();
 	}
 
 	public function equals(Type $type): bool
 	{
-		if (!$type instanceof self) {
-			return false;
-		}
-
-		if ($type instanceof EnumCaseObjectType) {
+		if (get_class($type) !== static::class) {
 			return false;
 		}
 
@@ -359,11 +649,7 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		}
 
 		if ($this->subtractedType === null) {
-			if ($type->subtractedType === null) {
-				return true;
-			}
-
-			return false;
+			return $type->subtractedType === null;
 		}
 
 		if ($type->subtractedType === null) {
@@ -373,16 +659,16 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		return $this->subtractedType->equals($type->subtractedType);
 	}
 
-	private function checkSubclassAcceptability(string $thatClass): TrinaryLogic
+	private function checkSubclassAcceptability(string $thatClass): AcceptsResult
 	{
 		if ($this->className === $thatClass) {
-			return TrinaryLogic::createYes();
+			return AcceptsResult::createYes();
 		}
 
 		$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
 
 		if ($this->getClassReflection() === null || !$reflectionProvider->hasClass($thatClass)) {
-			return TrinaryLogic::createNo();
+			return AcceptsResult::createNo();
 		}
 
 		$thisReflection = $this->getClassReflection();
@@ -390,17 +676,17 @@ class ObjectType implements TypeWithClassName, SubtractableType
 
 		if ($thisReflection->getName() === $thatReflection->getName()) {
 			// class alias
-			return TrinaryLogic::createYes();
+			return AcceptsResult::createYes();
 		}
 
 		if ($thisReflection->isInterface() && $thatReflection->isInterface()) {
-			return TrinaryLogic::createFromBoolean(
-				$thatReflection->implementsInterface($this->className),
+			return AcceptsResult::createFromBoolean(
+				$thatReflection->implementsInterface($thisReflection->getName()),
 			);
 		}
 
-		return TrinaryLogic::createFromBoolean(
-			$thatReflection->isSubclassOf($this->className),
+		return AcceptsResult::createFromBoolean(
+			$thatReflection->isSubclassOfClass($thisReflection),
 		);
 	}
 
@@ -415,14 +701,7 @@ class ObjectType implements TypeWithClassName, SubtractableType
 			return $reflectionProvider->getClassName($this->className);
 		};
 
-		$preciseWithSubtracted = function () use ($level): string {
-			$description = $this->className;
-			if ($this->subtractedType !== null) {
-				$description .= sprintf('~%s', $this->subtractedType->describe($level));
-			}
-
-			return $description;
-		};
+		$preciseWithSubtracted = fn (): string => $this->className . $this->describeSubtractedType($this->subtractedType, $level);
 
 		return $level->handle(
 			$preciseNameCallback,
@@ -449,8 +728,12 @@ class ObjectType implements TypeWithClassName, SubtractableType
 
 	private function describeCache(): string
 	{
+		if ($this->cachedDescription !== null) {
+			return $this->cachedDescription;
+		}
+
 		if (static::class !== self::class) {
-			return $this->describe(VerbosityLevel::cache());
+			return $this->cachedDescription = $this->describe(VerbosityLevel::cache());
 		}
 
 		$description = $this->className;
@@ -464,23 +747,28 @@ class ObjectType implements TypeWithClassName, SubtractableType
 			$description .= '<' . implode(', ', $typeDescriptions) . '>';
 		}
 
-		if ($this->subtractedType !== null) {
-			$description .= sprintf('~%s', $this->subtractedType->describe(VerbosityLevel::cache()));
-		}
+		$description .= $this->describeSubtractedType($this->subtractedType, VerbosityLevel::cache());
 
 		$reflection = $this->classReflection;
 		if ($reflection !== null) {
 			$description .= '-';
 			$description .= (string) $reflection->getNativeReflection()->getStartLine();
 			$description .= '-';
+
+			if ($reflection->hasFinalByKeywordOverride()) {
+				$description .= 'f=' . ($reflection->isFinalByKeyword() ? 't' : 'f');
+			}
 		}
 
-		return $description;
+		return $this->cachedDescription = $description;
 	}
 
 	public function toNumber(): Type
 	{
-		if ($this->isInstanceOf('SimpleXMLElement')->yes()) {
+		if (
+			$this->isInstanceOf('SimpleXMLElement')->yes()
+			|| $this->isInstanceOf('GMP')->yes()
+		) {
 			return new UnionType([
 				new FloatType(),
 				new IntegerType(),
@@ -490,9 +778,56 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		return new ErrorType();
 	}
 
+	public function toBitwiseNotType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function toGetClassResultType(): Type
+	{
+		return $this->getClassStringType();
+	}
+
+	public function toClassConstantType(ReflectionProvider $reflectionProvider): Type
+	{
+		if ($reflectionProvider->hasClass($this->className)) {
+			$reflection = $reflectionProvider->getClass($this->className);
+			if ($reflection->isFinalByKeyword()) {
+				return new ConstantStringType($reflection->getName(), true);
+			}
+		}
+
+		return new IntersectionType([$this->getClassStringType(), new AccessoryLiteralStringType()]);
+	}
+
+	public function toObjectTypeForInstanceofCheck(): ClassNameToObjectTypeResult
+	{
+		return new ClassNameToObjectTypeResult($this, true);
+	}
+
+	public function toObjectTypeForIsACheck(Type $objectOrClassType, bool $allowString, bool $allowSameClass): ClassNameToObjectTypeResult
+	{
+		if ($allowString) {
+			return new ClassNameToObjectTypeResult(
+				new UnionType([new ObjectWithoutClassType(), new ClassStringType()]),
+				false,
+			);
+		}
+
+		return new ClassNameToObjectTypeResult(new ObjectWithoutClassType(), false);
+	}
+
+	public function toAbsoluteNumber(): Type
+	{
+		return $this->toNumber()->toAbsoluteNumber();
+	}
+
 	public function toInteger(): Type
 	{
-		if ($this->isInstanceOf('SimpleXMLElement')->yes()) {
+		if (
+			$this->isInstanceOf('SimpleXMLElement')->yes()
+			|| $this->isInstanceOf('GMP')->yes()
+		) {
 			return new IntegerType();
 		}
 
@@ -505,7 +840,10 @@ class ObjectType implements TypeWithClassName, SubtractableType
 
 	public function toFloat(): Type
 	{
-		if ($this->isInstanceOf('SimpleXMLElement')->yes()) {
+		if (
+			$this->isInstanceOf('SimpleXMLElement')->yes()
+			|| $this->isInstanceOf('GMP')->yes()
+		) {
 			return new FloatType();
 		}
 		return new ErrorType();
@@ -513,13 +851,24 @@ class ObjectType implements TypeWithClassName, SubtractableType
 
 	public function toString(): Type
 	{
+		if (
+			$this->isInstanceOf('BcMath\Number')->yes()
+			|| $this->isInstanceOf('GMP')->yes()
+		) {
+			return new IntersectionType([
+				new StringType(),
+				new AccessoryNumericStringType(),
+				new AccessoryNonEmptyStringType(),
+			]);
+		}
+
 		$classReflection = $this->getClassReflection();
 		if ($classReflection === null) {
 			return new ErrorType();
 		}
 
 		if ($classReflection->hasNativeMethod('__toString')) {
-			return ParametersAcceptorSelector::selectSingle($this->getMethod('__toString', new OutOfClassScope())->getVariants())->getReturnType();
+			return $this->getMethod('__toString', new OutOfClassScope())->getOnlyVariant()->getReturnType();
 		}
 
 		return new ErrorType();
@@ -536,9 +885,9 @@ class ObjectType implements TypeWithClassName, SubtractableType
 
 		if (
 			!$classReflection->getNativeReflection()->isUserDefined()
+			|| $classReflection->is(ArrayObject::class)
 			|| UniversalObjectCratesClassReflectionExtension::isUniversalObjectCrate(
 				$reflectionProvider,
-				Broker::getInstance()->getUniversalObjectCratesClasses(),
 				$classReflection,
 			)
 		) {
@@ -579,8 +928,17 @@ class ObjectType implements TypeWithClassName, SubtractableType
 			$classReflection = $classReflection->getParentClass();
 		} while ($classReflection !== null);
 
-		if (!$isFinal && count($arrayKeys) === 0) {
-			return new ArrayType(new MixedType(), new MixedType());
+		if (!$isFinal) {
+			if (count($arrayKeys) === 0 || count($arrayKeys) > 16) {
+				return new ArrayType(new MixedType(), new MixedType());
+			}
+
+			$types = [new ArrayType(new MixedType(), new MixedType())];
+			foreach ($arrayKeys as $i => $arrayKey) {
+				$types[] = new HasOffsetValueType($arrayKey, $arrayValues[$i]);
+			}
+
+			return new IntersectionType($types);
 		}
 
 		return new ConstantArrayType($arrayKeys, $arrayValues);
@@ -588,16 +946,73 @@ class ObjectType implements TypeWithClassName, SubtractableType
 
 	public function toArrayKey(): Type
 	{
-		return $this->toString();
+		return new ErrorType();
+	}
+
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		if (!$strictTypes) {
+			$classReflection = $this->getClassReflection();
+			if (
+				$classReflection === null
+				|| !$classReflection->hasNativeMethod('__toString')
+			) {
+				return $this;
+			}
+
+			return TypeCombinator::union($this, $this->toString());
+		}
+
+		return $this;
 	}
 
 	public function toBoolean(): BooleanType
 	{
-		if ($this->isInstanceOf('SimpleXMLElement')->yes()) {
+		if (
+			$this->isInstanceOf('SimpleXMLElement')->yes()
+			|| $this->isInstanceOf('BcMath\Number')->yes()
+			|| $this->isInstanceOf('GMP')->yes()
+		) {
 			return new BooleanType();
 		}
 
 		return new ConstantBooleanType(true);
+	}
+
+	public function isObject(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function getClassStringType(): Type
+	{
+		return new GenericClassStringType($this);
+	}
+
+	public function isEnum(): TrinaryLogic
+	{
+		$classReflection = $this->getClassReflection();
+		if ($classReflection === null) {
+			return TrinaryLogic::createMaybe();
+		}
+
+		if (
+			$classReflection->isEnum()
+			|| $classReflection->is('UnitEnum')
+		) {
+			return TrinaryLogic::createYes();
+		}
+
+		if (
+			$classReflection->isInterface()
+			&& !$classReflection->is(Stringable::class) // enums cannot have __toString
+			&& !$classReflection->is(Throwable::class) // enums cannot extend Exception/Error
+			&& !$classReflection->is(DateTimeInterface::class) // userland classes cannot extend DateTimeInterface
+		) {
+			return TrinaryLogic::createMaybe();
+		}
+
+		return TrinaryLogic::createNo();
 	}
 
 	public function canAccessProperties(): TrinaryLogic
@@ -634,7 +1049,11 @@ class ObjectType implements TypeWithClassName, SubtractableType
 
 	public function getMethod(string $methodName, ClassMemberAccessAnswerer $scope): ExtendedMethodReflection
 	{
-		return $this->getUnresolvedMethodPrototype($methodName, $scope)->getTransformedMethod();
+		$key = $methodName;
+		if ($scope->isInClass()) {
+			$key = sprintf('%s-%s', $key, $scope->getClassReflection()->getCacheKey());
+		}
+		return $this->methodCache[$key] ??= $this->getUnresolvedMethodPrototype($methodName, $scope)->getTransformedMethod();
 	}
 
 	public function getUnresolvedMethodPrototype(string $methodName, ClassMemberAccessAnswerer $scope): UnresolvedMethodPrototypeReflection
@@ -691,17 +1110,23 @@ class ObjectType implements TypeWithClassName, SubtractableType
 
 	public function hasConstant(string $constantName): TrinaryLogic
 	{
-		$class = $this->getClassReflection();
-		if ($class === null) {
+		$classReflection = $this->getClassReflection();
+		if ($classReflection === null) {
+			return TrinaryLogic::createMaybe();
+		}
+
+		if ($classReflection->hasConstant($constantName)) {
+			return TrinaryLogic::createYes();
+		}
+
+		if ($classReflection->isFinal()) {
 			return TrinaryLogic::createNo();
 		}
 
-		return TrinaryLogic::createFromBoolean(
-			$class->hasConstant($constantName),
-		);
+		return TrinaryLogic::createMaybe();
 	}
 
-	public function getConstant(string $constantName): ConstantReflection
+	public function getConstant(string $constantName): ClassConstantReflection
 	{
 		$class = $this->getClassReflection();
 		if ($class === null) {
@@ -709,6 +1134,46 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		}
 
 		return $class->getConstant($constantName);
+	}
+
+	public function getTemplateType(string $ancestorClassName, string $templateTypeName): Type
+	{
+		$classReflection = $this->getClassReflection();
+		if ($classReflection === null) {
+			return new ErrorType();
+		}
+
+		$ancestorClassReflection = $classReflection->getAncestorWithClassName($ancestorClassName);
+		if ($ancestorClassReflection === null) {
+			return new ErrorType();
+		}
+
+		$activeTemplateTypeMap = $ancestorClassReflection->getPossiblyIncompleteActiveTemplateTypeMap();
+		$type = $activeTemplateTypeMap->getType($templateTypeName);
+		if ($type === null) {
+			return new ErrorType();
+		}
+		if ($type instanceof ErrorType) {
+			$templateTypeMap = $ancestorClassReflection->getTemplateTypeMap();
+			$templateType = $templateTypeMap->getType($templateTypeName);
+			if ($templateType === null) {
+				return $type;
+			}
+
+			$bound = TemplateTypeHelper::resolveToBounds($templateType);
+			if ($bound instanceof MixedType && $bound->isExplicitMixed()) {
+				return new MixedType(false);
+			}
+
+			return TemplateTypeHelper::resolveToDefaults($templateType);
+		}
+
+		return $type;
+	}
+
+	public function getConstantStrings(): array
+	{
+		return [];
 	}
 
 	public function isIterable(): TrinaryLogic
@@ -728,16 +1193,18 @@ class ObjectType implements TypeWithClassName, SubtractableType
 			return new ErrorType();
 		}
 
-		return IntegerRangeType::fromInterval(0, null);
+		if ($this->hasMethod('count')->yes() === false) {
+			return IntegerRangeType::fromInterval(0, null);
+		}
+
+		return RecursionGuard::run($this, fn (): Type => $this->getMethod('count', new OutOfClassScope())->getOnlyVariant()->getReturnType());
 	}
 
 	public function getIterableKeyType(): Type
 	{
 		$isTraversable = false;
 		if ($this->isInstanceOf(IteratorAggregate::class)->yes()) {
-			$keyType = RecursionGuard::run($this, fn (): Type => ParametersAcceptorSelector::selectSingle(
-				$this->getMethod('getIterator', new OutOfClassScope())->getVariants(),
-			)->getReturnType()->getIterableKeyType());
+			$keyType = RecursionGuard::run($this, fn (): Type => $this->getMethod('getIterator', new OutOfClassScope())->getOnlyVariant()->getReturnType()->getIterableKeyType());
 			$isTraversable = true;
 			if (!$keyType instanceof MixedType || $keyType->isExplicitMixed()) {
 				return $keyType;
@@ -745,10 +1212,10 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		}
 
 		$extraOffsetAccessible = $this->isExtraOffsetAccessibleClass()->yes();
-		if ($this->isInstanceOf(Traversable::class)->yes() && !$extraOffsetAccessible) {
+		if (!$extraOffsetAccessible && $this->isInstanceOf(Traversable::class)->yes()) {
 			$isTraversable = true;
-			$tKey = GenericTypeVariableResolver::getType($this, Traversable::class, 'TKey');
-			if ($tKey !== null) {
+			$tKey = $this->getTemplateType(Traversable::class, 'TKey');
+			if (!$tKey instanceof ErrorType) {
 				if (!$tKey instanceof MixedType || $tKey->isExplicitMixed()) {
 					return $tKey;
 				}
@@ -756,9 +1223,7 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		}
 
 		if ($this->isInstanceOf(Iterator::class)->yes()) {
-			return RecursionGuard::run($this, fn (): Type => ParametersAcceptorSelector::selectSingle(
-				$this->getMethod('key', new OutOfClassScope())->getVariants(),
-			)->getReturnType());
+			return RecursionGuard::run($this, fn (): Type => $this->getMethod('key', new OutOfClassScope())->getOnlyVariant()->getReturnType());
 		}
 
 		if ($extraOffsetAccessible) {
@@ -786,9 +1251,7 @@ class ObjectType implements TypeWithClassName, SubtractableType
 	{
 		$isTraversable = false;
 		if ($this->isInstanceOf(IteratorAggregate::class)->yes()) {
-			$valueType = RecursionGuard::run($this, fn (): Type => ParametersAcceptorSelector::selectSingle(
-				$this->getMethod('getIterator', new OutOfClassScope())->getVariants(),
-			)->getReturnType()->getIterableValueType());
+			$valueType = RecursionGuard::run($this, fn (): Type => $this->getMethod('getIterator', new OutOfClassScope())->getOnlyVariant()->getReturnType()->getIterableValueType());
 			$isTraversable = true;
 			if (!$valueType instanceof MixedType || $valueType->isExplicitMixed()) {
 				return $valueType;
@@ -796,10 +1259,10 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		}
 
 		$extraOffsetAccessible = $this->isExtraOffsetAccessibleClass()->yes();
-		if ($this->isInstanceOf(Traversable::class)->yes() && !$extraOffsetAccessible) {
+		if (!$extraOffsetAccessible && $this->isInstanceOf(Traversable::class)->yes()) {
 			$isTraversable = true;
-			$tValue = GenericTypeVariableResolver::getType($this, Traversable::class, 'TValue');
-			if ($tValue !== null) {
+			$tValue = $this->getTemplateType(Traversable::class, 'TValue');
+			if (!$tValue instanceof ErrorType) {
 				if (!$tValue instanceof MixedType || $tValue->isExplicitMixed()) {
 					return $tValue;
 				}
@@ -807,9 +1270,7 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		}
 
 		if ($this->isInstanceOf(Iterator::class)->yes()) {
-			return RecursionGuard::run($this, fn (): Type => ParametersAcceptorSelector::selectSingle(
-				$this->getMethod('current', new OutOfClassScope())->getVariants(),
-			)->getReturnType());
+			return RecursionGuard::run($this, fn (): Type => $this->getMethod('current', new OutOfClassScope())->getOnlyVariant()->getReturnType());
 		}
 
 		if ($extraOffsetAccessible) {
@@ -833,12 +1294,67 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		return $this->getIterableValueType();
 	}
 
+	public function isNull(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isConstantScalarValue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getConstantScalarTypes(): array
+	{
+		return [];
+	}
+
+	public function getConstantScalarValues(): array
+	{
+		return [];
+	}
+
+	public function isTrue(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFalse(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isBoolean(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isFloat(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isInteger(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
 	public function isString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
 
 	public function isNumericString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isDecimalIntegerString(): TrinaryLogic
 	{
 		return TrinaryLogic::createNo();
 	}
@@ -858,6 +1374,52 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		return TrinaryLogic::createNo();
 	}
 
+	public function isLowercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isClassString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isUppercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		return new ErrorType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return $this;
+	}
+
+	public function isVoid(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function isScalar(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
+	}
+
+	public function looseCompare(Type $type, PhpVersion $phpVersion): BooleanType
+	{
+		if ($type->isTrue()->yes()) {
+			return new ConstantBooleanType(true);
+		}
+
+		return $type->isFalse()->yes()
+			? new ConstantBooleanType(false)
+			: new BooleanType();
+	}
+
 	private function isExtraOffsetAccessibleClass(): TrinaryLogic
 	{
 		$classReflection = $this->getClassReflection();
@@ -866,10 +1428,7 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		}
 
 		foreach (self::EXTRA_OFFSET_CLASSES as $extraOffsetClass) {
-			if ($classReflection->getName() === $extraOffsetClass) {
-				return TrinaryLogic::createYes();
-			}
-			if ($classReflection->isSubclassOf($extraOffsetClass)) {
+			if ($classReflection->is($extraOffsetClass)) {
 				return TrinaryLogic::createYes();
 			}
 		}
@@ -892,11 +1451,16 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		);
 	}
 
+	public function isOffsetAccessLegal(): TrinaryLogic
+	{
+		return $this->isOffsetAccessible();
+	}
+
 	public function hasOffsetValueType(Type $offsetType): TrinaryLogic
 	{
 		if ($this->isInstanceOf(ArrayAccess::class)->yes()) {
 			$acceptedOffsetType = RecursionGuard::run($this, function (): Type {
-				$parameters = ParametersAcceptorSelector::selectSingle($this->getMethod('offsetSet', new OutOfClassScope())->getVariants())->getParameters();
+				$parameters = $this->getMethod('offsetSet', new OutOfClassScope())->getOnlyVariant()->getParameters();
 				if (count($parameters) < 2) {
 					throw new ShouldNotHappenException(sprintf(
 						'Method %s::%s() has less than 2 parameters.',
@@ -923,12 +1487,12 @@ class ObjectType implements TypeWithClassName, SubtractableType
 
 	public function getOffsetValueType(Type $offsetType): Type
 	{
-		if (!$this->isExtraOffsetAccessibleClass()->no()) {
-			return new MixedType();
+		if ($this->isInstanceOf(ArrayAccess::class)->yes()) {
+			return RecursionGuard::run($this, fn (): Type => $this->getMethod('offsetGet', new OutOfClassScope())->getOnlyVariant()->getReturnType());
 		}
 
-		if ($this->isInstanceOf(ArrayAccess::class)->yes()) {
-			return RecursionGuard::run($this, fn (): Type => ParametersAcceptorSelector::selectSingle($this->getMethod('offsetGet', new OutOfClassScope())->getVariants())->getReturnType());
+		if (!$this->isExtraOffsetAccessibleClass()->no()) {
+			return new MixedType();
 		}
 
 		return new ErrorType();
@@ -943,7 +1507,7 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		if ($this->isInstanceOf(ArrayAccess::class)->yes()) {
 			$acceptedValueType = new NeverType();
 			$acceptedOffsetType = RecursionGuard::run($this, function () use (&$acceptedValueType): Type {
-				$parameters = ParametersAcceptorSelector::selectSingle($this->getMethod('offsetSet', new OutOfClassScope())->getVariants())->getParameters();
+				$parameters = $this->getMethod('offsetSet', new OutOfClassScope())->getOnlyVariant()->getParameters();
 				if (count($parameters) < 2) {
 					throw new ShouldNotHappenException(sprintf(
 						'Method %s::%s() has less than 2 parameters.',
@@ -974,6 +1538,15 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		return $this;
 	}
 
+	public function setExistingOffsetValueType(Type $offsetType, Type $valueType): Type
+	{
+		if ($this->isOffsetAccessible()->no()) {
+			return new ErrorType();
+		}
+
+		return $this;
+	}
+
 	public function unsetOffset(Type $offsetType): Type
 	{
 		if ($this->isOffsetAccessible()->no()) {
@@ -983,10 +1556,66 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		return $this;
 	}
 
+	public function getEnumCases(): array
+	{
+		$classReflection = $this->getClassReflection();
+		if ($classReflection === null) {
+			return [];
+		}
+
+		if (!$classReflection->isEnum()) {
+			return [];
+		}
+
+		$cacheKey = $this->describeCache();
+		if (array_key_exists($cacheKey, self::$enumCases)) {
+			return self::$enumCases[$cacheKey];
+		}
+
+		$className = $classReflection->getName();
+
+		if ($this->subtractedType !== null) {
+			$subtractedEnumCaseNames = [];
+
+			foreach ($this->subtractedType->getEnumCases() as $subtractedCase) {
+				$subtractedEnumCaseNames[$subtractedCase->getEnumCaseName()] = true;
+			}
+
+			$cases = [];
+			foreach ($classReflection->getEnumCases() as $enumCase) {
+				if (array_key_exists($enumCase->getName(), $subtractedEnumCaseNames)) {
+					continue;
+				}
+				$cases[] = new EnumCaseObjectType($className, $enumCase->getName(), $classReflection);
+			}
+		} else {
+			$cases = [];
+			foreach ($classReflection->getEnumCases() as $enumCase) {
+				$cases[] = new EnumCaseObjectType($className, $enumCase->getName(), $classReflection);
+			}
+		}
+
+		return self::$enumCases[$cacheKey] = $cases;
+	}
+
+	public function getEnumCaseObject(): ?EnumCaseObjectType
+	{
+		$cases = $this->getEnumCases();
+
+		if (count($cases) === 1) {
+			return $cases[0];
+		}
+
+		return null;
+	}
+
 	public function isCallable(): TrinaryLogic
 	{
-		$parametersAcceptors = $this->findCallableParametersAcceptors();
+		$parametersAcceptors = RecursionGuard::run($this, fn () => $this->findCallableParametersAcceptors());
 		if ($parametersAcceptors === null) {
+			return TrinaryLogic::createNo();
+		}
+		if ($parametersAcceptors instanceof ErrorType) {
 			return TrinaryLogic::createNo();
 		}
 
@@ -1000,13 +1629,10 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		return TrinaryLogic::createYes();
 	}
 
-	/**
-	 * @return ParametersAcceptor[]
-	 */
 	public function getCallableParametersAcceptors(ClassMemberAccessAnswerer $scope): array
 	{
 		if ($this->className === Closure::class) {
-			return [new TrivialParametersAcceptor()];
+			return [new TrivialParametersAcceptor('Closure')];
 		}
 		$parametersAcceptors = $this->findCallableParametersAcceptors();
 		if ($parametersAcceptors === null) {
@@ -1017,7 +1643,7 @@ class ObjectType implements TypeWithClassName, SubtractableType
 	}
 
 	/**
-	 * @return ParametersAcceptor[]|null
+	 * @return list<CallableParametersAcceptor>|null
 	 */
 	private function findCallableParametersAcceptors(): ?array
 	{
@@ -1027,10 +1653,14 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		}
 
 		if ($classReflection->hasNativeMethod('__invoke')) {
-			return $this->getMethod('__invoke', new OutOfClassScope())->getVariants();
+			$method = $this->getMethod('__invoke', new OutOfClassScope());
+			return FunctionCallableVariant::createFromVariants(
+				$method,
+				$method->getVariants(),
+			);
 		}
 
-		if (!$classReflection->getNativeReflection()->isFinal()) {
+		if (!$classReflection->isFinalByKeyword()) {
 			return [new TrivialParametersAcceptor()];
 		}
 
@@ -1042,17 +1672,6 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		return TrinaryLogic::createYes();
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
-	{
-		return new self(
-			$properties['className'],
-			$properties['subtractedType'] ?? null,
-		);
-	}
-
 	public function isInstanceOf(string $className): TrinaryLogic
 	{
 		$classReflection = $this->getClassReflection();
@@ -1060,8 +1679,16 @@ class ObjectType implements TypeWithClassName, SubtractableType
 			return TrinaryLogic::createMaybe();
 		}
 
-		if ($classReflection->isSubclassOf($className) || $classReflection->getName() === $className) {
+		if ($classReflection->is($className)) {
 			return TrinaryLogic::createYes();
+		}
+
+		$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
+		if ($reflectionProvider->hasClass($className)) {
+			$thatClassReflection = $reflectionProvider->getClass($className);
+			if ($thatClassReflection->isFinal()) {
+				return TrinaryLogic::createNo();
+			}
 		}
 
 		if ($classReflection->isInterface()) {
@@ -1089,31 +1716,20 @@ class ObjectType implements TypeWithClassName, SubtractableType
 	{
 		if ($subtractedType !== null) {
 			$classReflection = $this->getClassReflection();
-			$allowedSubTypesList = $classReflection !== null ? $classReflection->getAllowedSubTypes() : null;
-			if ($allowedSubTypesList !== null) {
-				$allowedSubTypes = [];
-				foreach ($allowedSubTypesList as $allowedSubType) {
-					$allowedSubTypes[$allowedSubType->describe(VerbosityLevel::precise())] = $allowedSubType;
-				}
+			$allowedSubTypes = $classReflection !== null ? $classReflection->getAllowedSubTypes() : null;
+			if ($allowedSubTypes !== null) {
+				$preciseVerbosity = VerbosityLevel::precise();
 
 				$originalAllowedSubTypes = $allowedSubTypes;
 				$subtractedSubTypes = [];
 
-				$subtractedTypesList = TypeUtils::flattenTypes($subtractedType);
-				if ($this->subtractedType !== null) {
-					$subtractedTypesList = array_merge($subtractedTypesList, TypeUtils::flattenTypes($this->subtractedType));
-				}
-
-				$subtractedTypes = [];
-				foreach ($subtractedTypesList as $type) {
-					$subtractedTypes[$type->describe(VerbosityLevel::precise())] = $type;
-				}
-
+				$subtractedTypes = TypeUtils::flattenTypes($subtractedType);
 				foreach ($subtractedTypes as $subType) {
-					foreach ($allowedSubTypes as $description => $allowedSubType) {
+					foreach ($allowedSubTypes as $key => $allowedSubType) {
 						if ($subType->equals($allowedSubType)) {
+							$description = $allowedSubType->describe($preciseVerbosity);
 							$subtractedSubTypes[$description] = $subType;
-							unset($allowedSubTypes[$description]);
+							unset($allowedSubTypes[$key]);
 							continue 2;
 						}
 					}
@@ -1169,10 +1785,20 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		return $this;
 	}
 
+	public function traverseSimultaneously(Type $right, callable $cb): Type
+	{
+		if ($this->subtractedType === null) {
+			return $this;
+		}
+
+		return new self($this->className);
+	}
+
 	public function getNakedClassReflection(): ?ClassReflection
 	{
-		if ($this->classReflection !== null) {
-			return $this->classReflection;
+		$classReflection = $this->resolvedClassReflection();
+		if ($classReflection !== null) {
+			return $classReflection;
 		}
 
 		$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
@@ -1185,16 +1811,16 @@ class ObjectType implements TypeWithClassName, SubtractableType
 
 	public function getClassReflection(): ?ClassReflection
 	{
-		if ($this->classReflection !== null) {
-			return $this->classReflection;
+		$classReflection = $this->resolvedClassReflection();
+		if ($classReflection === null) {
+			$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
+			if (!$reflectionProvider->hasClass($this->className)) {
+				return null;
+			}
+
+			$classReflection = $this->lazyClassReflection = $reflectionProvider->getClass($this->className);
 		}
 
-		$reflectionProvider = ReflectionProviderStaticAccessor::getInstance();
-		if (!$reflectionProvider->hasClass($this->className)) {
-			return null;
-		}
-
-		$classReflection = $reflectionProvider->getClass($this->className);
 		if ($classReflection->isGeneric()) {
 			return $classReflection->withTypes(array_values($classReflection->getTemplateTypeMap()->map(static fn (): Type => new ErrorType())->getTypes()));
 		}
@@ -1202,16 +1828,20 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		return $classReflection;
 	}
 
-	/**
-	 * @return self|null
-	 */
-	public function getAncestorWithClassName(string $className): ?TypeWithClassName
+	/** The reflection already known, from either source — never triggers a fetch. */
+	private function resolvedClassReflection(): ?ClassReflection
+	{
+		return $this->classReflection ?? $this->lazyClassReflection;
+	}
+
+	public function getAncestorWithClassName(string $className): ?self
 	{
 		if ($this->className === $className) {
 			return $this;
 		}
 
-		if ($this->classReflection !== null && $className === $this->classReflection->getName()) {
+		$resolvedClassReflection = $this->resolvedClassReflection();
+		if ($resolvedClassReflection !== null && $className === $resolvedClassReflection->getName()) {
 			return $this;
 		}
 
@@ -1274,7 +1904,7 @@ class ObjectType implements TypeWithClassName, SubtractableType
 			return null;
 		}
 
-		return $this->cachedParent = self::createFromReflection($parentReflection);
+		return $this->cachedParent = $parentReflection->getObjectType();
 	}
 
 	/** @return ObjectType[] */
@@ -1288,28 +1918,26 @@ class ObjectType implements TypeWithClassName, SubtractableType
 			return $this->cachedInterfaces = [];
 		}
 
-		return $this->cachedInterfaces = array_map(static fn (ClassReflection $interfaceReflection): self => self::createFromReflection($interfaceReflection), $thisReflection->getInterfaces());
+		return $this->cachedInterfaces = array_map(static fn (ClassReflection $interfaceReflection): self => $interfaceReflection->getObjectType(), $thisReflection->getInterfaces());
 	}
 
 	public function tryRemove(Type $typeToRemove): ?Type
 	{
-		if ($this->getClassName() === DateTimeInterface::class) {
-			if ($typeToRemove instanceof ObjectType && $typeToRemove->getClassName() === DateTimeImmutable::class) {
-				return new ObjectType(DateTime::class);
-			}
+		if ($typeToRemove instanceof ObjectType) {
+			foreach (UnionType::EQUAL_UNION_CLASSES as $baseClass => $classes) {
+				if ($this->getClassName() !== $baseClass) {
+					continue;
+				}
 
-			if ($typeToRemove instanceof ObjectType && $typeToRemove->getClassName() === DateTime::class) {
-				return new ObjectType(DateTimeImmutable::class);
-			}
-		}
+				foreach ($classes as $index => $class) {
+					if ($typeToRemove->getClassName() === $class) {
+						unset($classes[$index]);
 
-		if ($this->getClassName() === Throwable::class) {
-			if ($typeToRemove instanceof ObjectType && $typeToRemove->getClassName() === Error::class) {
-				return new ObjectType(Exception::class); // phpcs:ignore SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly.ReferencedGeneralException
-			}
-
-			if ($typeToRemove instanceof ObjectType && $typeToRemove->getClassName() === Exception::class) { // phpcs:ignore SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly.ReferencedGeneralException
-				return new ObjectType(Error::class);
+						return TypeCombinator::union(
+							...array_map(static fn (string $objectClass): Type => new ObjectType($objectClass), $classes),
+						);
+					}
+				}
 			}
 		}
 
@@ -1318,6 +1946,34 @@ class ObjectType implements TypeWithClassName, SubtractableType
 		}
 
 		return null;
+	}
+
+	public function getFiniteTypes(): array
+	{
+		return $this->getEnumCases();
+	}
+
+	public function exponentiate(Type $exponent): Type
+	{
+		$object = new ObjectWithoutClassType();
+		if (!$exponent instanceof NeverType && !$object->isSuperTypeOf($this)->no() && !$object->isSuperTypeOf($exponent)->no()) {
+			return TypeCombinator::union($this, $exponent);
+		}
+		return new ErrorType();
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode($this->getClassName());
+	}
+
+	public function hasTemplateOrLateResolvableType(): bool
+	{
+		if ($this->subtractedType === null) {
+			return false;
+		}
+
+		return $this->subtractedType->hasTemplateOrLateResolvableType();
 	}
 
 }

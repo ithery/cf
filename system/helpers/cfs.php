@@ -3,6 +3,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated 1.6 use CFile
+ */
 class cfs {
     /**
      * @param string $dir

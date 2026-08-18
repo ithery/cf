@@ -415,6 +415,7 @@ class Mock implements MockInterface
     /**
      * Forward calls to this magic method to the __call method
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return $this->__call('__toString', array());

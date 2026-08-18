@@ -1,12 +1,12 @@
 <?php
 
-use CarbonV3\CarbonImmutable;
+use Carbon\CarbonImmutable;
 
 class CDaemon_Supervisor_Listener_TrimRecentJobs {
     /**
      * The last time the recent jobs were trimmed.
      *
-     * @var \CarbonV3\CarbonImmutable
+     * @var \Carbon\CarbonImmutable
      */
     public $lastTrimmed;
 

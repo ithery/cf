@@ -57,6 +57,7 @@ final class GroupCollection implements IteratorAggregate {
         return empty($this->groups);
     }
 
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new GroupCollectionIterator($this);
     }

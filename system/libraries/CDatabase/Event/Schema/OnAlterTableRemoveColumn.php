@@ -3,13 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 1, 2018, 12:58:11 PM
- */
-
-/**
  * Event Arguments used when SQL queries for removing table columns are generated inside Doctrine\DBAL\Platform\*Platform.
  */
 class CDatabase_Event_Schema_OnAlterTableRemoveColumn extends CDatabase_Event_Schema {
@@ -76,6 +69,7 @@ class CDatabase_Event_Schema_OnAlterTableRemoveColumn extends CDatabase_Event_Sc
         } else {
             $this->sql[] = $sql;
         }
+
         return $this;
     }
 

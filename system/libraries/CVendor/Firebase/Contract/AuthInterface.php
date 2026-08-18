@@ -418,7 +418,7 @@ interface CVendor_Firebase_Contract_AuthInterface {
      *
      * @return CVendor_Firebase_Auth_SignInResult
      */
-    public function signInAsUser($user, array $claims = null);
+    public function signInAsUser($user, ?array $claims = null);
 
     /**
      * @param Token|string $token

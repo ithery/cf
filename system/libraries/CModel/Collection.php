@@ -1,5 +1,13 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
+/**
+ * @template TKey of array-key
+ * @template TModel of \CModel
+ *
+ * @extends \CCollection<TKey, TModel>
+ */
 class CModel_Collection extends CCollection implements CQueue_QueueableCollectionInterface {
     /**
      * Find a model in the collection by key.
@@ -14,7 +22,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
             $key = $key->getKey();
         }
 
-        if ($key instanceof CInterface_Arrayable) {
+        if ($key instanceof Arrayable) {
             $key = $key->toArray();
         }
 
@@ -295,7 +303,12 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
      */
     public function contains($key, $operator = null, $value = null) {
         if (func_num_args() > 1 || $this->useAsCallable($key)) {
-            return parent::contains($key, $operator, $value);
+            // Forward exactly the args our own caller gave us (not always all
+            // 3, even though $operator/$value default to null) - operatorForWhere()
+            // downstream in EnumeratesValuesTrait uses func_num_args() to tell a
+            // real 2-arg call from a 3-arg call with an explicit null $value, and
+            // always passing 3 here breaks that distinction.
+            return parent::contains(...func_get_args());
         }
 
         if ($key instanceof CModel) {

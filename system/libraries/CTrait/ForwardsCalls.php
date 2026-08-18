@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Aug 26, 2020
- */
 trait CTrait_ForwardsCalls {
     /**
      * Forward a method call to the given object.
@@ -52,6 +46,23 @@ trait CTrait_ForwardsCalls {
 
             static::throwBadMethodCallException($method);
         }
+    }
+
+    /**
+     * Forward a method call to the given object, returning $this if the forwarded call returned itself.
+     *
+     * @param mixed  $object
+     * @param string $method
+     * @param array  $parameters
+     *
+     * @throws \BadMethodCallException
+     *
+     * @return mixed
+     */
+    protected function forwardDecoratedCallTo($object, $method, $parameters) {
+        $result = $this->forwardCallTo($object, $method, $parameters);
+
+        return $result === $object ? $this : $result;
     }
 
     /**

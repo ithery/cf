@@ -33,6 +33,9 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
      */
     private static $instance = null;
 
+    /**
+     * CApp_SEO_Twitter constructor.
+     */
     private function __construct() {
         $this->config = CF::config('seo.twitter');
 
@@ -40,7 +43,7 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
     }
 
     /**
-     * @return CApp_SEO_MetaTags
+     * @return CApp_SEO_Twitter
      */
     public static function instance() {
         if (self::$instance == null) {
@@ -49,11 +52,6 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
 
         return self::$instance;
     }
-
-    /**
-     * @param array $defaults
-     * @param mixed $minify
-     */
 
     /**
      * @inheritdoc
@@ -70,6 +68,8 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
      *
      * @param array       $values
      * @param null|string $prefix
+     *
+     * @return void
      *
      * @internal param array $properties
      */
@@ -91,7 +91,7 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
 
     /**
      * @param string $key
-     * @param $value
+     * @param string $value
      *
      * @return string
      *
@@ -166,7 +166,7 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
     }
 
     /**
-     * @param $image
+     * @param string|array $image
      *
      * @return CApp_SEO_TwitterInterface
      */

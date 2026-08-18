@@ -2,19 +2,32 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 30, 2018, 4:32:01 PM
- */
 class CElement_FormInput_DateRange extends CElement_FormInput {
+    /**
+     * @var string
+     */
     protected $dateFormat;
 
+    /**
+     * @var null|string
+     */
     protected $dateStart;
 
+    /**
+     * @var null|string
+     */
     protected $dateEnd;
 
+    /**
+     * @var bool
+     */
+    protected $haveButton;
+
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -39,24 +52,44 @@ class CElement_FormInput_DateRange extends CElement_FormInput {
         $this->addClass('form-control');
     }
 
+    /**
+     * @param bool $boolean
+     *
+     * @return $this
+     */
     public function setHaveButton($boolean) {
         $this->haveButton = $boolean;
 
         return $this;
     }
 
+    /**
+     * @param string $dateStart
+     *
+     * @return $this
+     */
     public function setValueStart($dateStart) {
         $this->dateStart = $dateStart;
 
         return $this;
     }
 
+    /**
+     * @param string $dateEnd
+     *
+     * @return $this
+     */
     public function setValueEnd($dateEnd) {
         $this->dateEnd = $dateEnd;
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -82,23 +115,29 @@ class CElement_FormInput_DateRange extends CElement_FormInput {
         }
 
         $html->appendln('<div class="input-daterange input-group" id="' . $this->id . '">')->br();
-        $html->appendln('<input type="text" name="' . $this->name . '[start]"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '-start" class="datepicker input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
+        $html->appendln('<input type="text" name="' . $this->name . '[start]"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '-start" class="datepicker input-unstyled' . $classes . '" value="' . $this->dateStart . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
         $html->appendln('<div class="input-group-prepend"><span class="input-group-text">to</span></div>');
-        $html->appendln('<input type="text" name="' . $this->name . '[end]"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '-end" class="datepicker input-unstyled' . $classes . $this->validation->validationClass() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
+        $html->appendln('<input type="text" name="' . $this->name . '[end]"  data-date-format="' . $this->dateFormat . '" id="' . $this->id . '-end" class="datepicker input-unstyled' . $classes . '" value="' . $this->dateEnd . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
         $html->appendln('</div>');
 
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $option = '';
 
         $autoclose = 'true';
+        /** @phpstan-ignore-next-line */
         if (strlen($option) > 0) {
             $option .= ',';
         }
         $option .= 'autoclose: ' . $autoclose . '';
-
+        /** @phpstan-ignore-next-line */
         if (strlen($option) > 0) {
             $option = '{' . $option . '}';
         }

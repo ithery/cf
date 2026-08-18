@@ -1,12 +1,19 @@
 # View
 
-### Introduction
+Views separate your presentation logic from your controller logic. They contain the HTML and Blade template directives that render the final output sent to the browser.
 
-Views menyediakan cara yang mudah untuk menempatkan semua HTML kita dalam file terpisah. Views memisahkan controller logic dari presentation logic.
+Views are stored in the `views/` directory of your application (`application/{app_code}/default/views/`).
 
-Views disimpan di direktori `views`. Tampilan sederhana mungkin terlihat seperti ini:
+---
 
-```php
+### Creating Views
+
+Create a view by placing a file with the `.blade.php` extension in your `views/` directory. The `.blade.php` extension tells the framework to process the file using the Blade template engine.
+
+A simple view might look like this:
+
+**`views/greeting.blade.php`**
+```html
 <html>
     <body>
         <h1>Hello, {{ $name }}</h1>
@@ -14,55 +21,275 @@ Views disimpan di direktori `views`. Tampilan sederhana mungkin terlihat seperti
 </html>
 ```
 
-### Creating & Rendering Views
+---
 
-Anda dapat membuat tampilan dengan menempatkan file dengan ekstensi .blade.php di direktori `views` aplikasi Anda. Ekstensi .blade.php menginformasikan kerangka kerja bahwa file tersebut berisi template Blade. Template Blade berisi HTML Blade directives yang memungkinkan Anda untuk dengan mudah echo values, create "if" statements, iterate over data, dan banyak lagi.
+### Rendering Views
 
-Setelah membuat view, anda dapat melakukan return dari controller aplikasi dengan menggunakan c helper:
+Return a view from your controller using the `c::view()` helper:
 
 ```php
-return c::view('greeting', ['name' => 'James']);
+<?php
+public function index() {
+    return c::view('greeting', ['name' => 'James']);
+}
 ```
 
-Views dapat juga di return menggunakan class CView:
+You can also use `CView::make()`:
 
 ```php
 return CView::make('greeting', ['name' => 'James']);
 ```
 
+---
+
 ### Nested View Directories
 
-Views dapat jg ditempatkan dalam subdirectory. notasi "Dot" dapat digunakan untuk mereferensikan views yang ada dalam subdirectory. Sebagai contoh, jika view anda disimpan pada `views/admin/profie.blade.php` , anda dapat menuliskan pada controller aplikasi seperti:
+Views can be organized into subdirectories. Use dot notation to reference them.
+
+For example, a view stored at `views/admin/profile.blade.php` is referenced as:
 
 ```php
 return c::view('admin.profile', $data);
 ```
 
-### Determining If A View Exists
+More nesting levels work the same way:
 
-Jika anda memerlukan untuk mengechek apakah view tersedia, anda dapat menggunakan object CView. `exists` method akan mengembalikan nilai `true` jika view tersedia.
+```php
+// views/docs/nav.blade.php
+return c::view('docs.nav', ['navs' => $navs]);
+
+// views/demo/page/view/simple/index.blade.php
+return c::view('demo.page.view.simple.index', $data);
+```
+
+---
+
+### Checking If a View Exists
+
+Use `CView::exists()` to check if a view is available before rendering:
 
 ```php
 if (CView::exists('admin.profile')) {
-    //
+    return c::view('admin.profile');
 }
 ```
 
-### Passing Data To Views
+---
 
-Seperti yang anda lihat pada contoh-contoh sebelumnya, anda dapat melakukan passing data dari controller ke view sehingga data tersebut dapat digunakan dalam view.
+### Passing Data to Views
+
+#### As an Array
+
+Pass data as the second argument — an associative array of key/value pairs. Each key becomes a variable available in the view:
 
 ```php
-return c::view('greetings', ['name' => 'Victoria']);
+return c::view('greeting', ['name' => 'Victoria', 'age' => 30]);
 ```
 
-Saat melakukan passingg data dengan cara diatas, data harus berupa array key / value. Setelah memprovide data ke view, anda dapat mengakses tiap value didalam view anda dengan key sebagai nama variable, Contoh `<?php echo $name; ?>.`
+In the view:
+```html
+<h1>Hello, {{ $name }}</h1>
+<p>Age: {{ $age }}</p>
+```
 
-sebagai alternatif, anda dapat melakukan passing data ke view secara satu persatu dengan `with` method.
-`with` method me-return kembali instance view object, jadi anda dapat melakukan chaining methods:
+#### Using the with() Method
+
+Chain `with()` calls to pass data one value at a time:
 
 ```php
 return c::view('greeting')
     ->with('name', 'Victoria')
     ->with('occupation', 'Astronaut');
 ```
+
+#### Sharing Data Across All Views
+
+Use `CView::factory()->share()` to make data available to every view. This is typically done in your `bootstrap.php`:
+
+```php
+CView::factory()->share('appName', c::config('app.title'));
+```
+
+In any view:
+```html
+<title>{{ $appName }}</title>
+```
+
+---
+
+### Using Views with CApp
+
+The most common pattern in CF is using views through the `CApp` page builder. CApp handles the full page layout (theme, navigation, assets), and you set which view to render:
+
+```php
+<?php
+public function index() {
+    $app = c::app();
+    $app->title('Dashboard');
+    $app->setView('dashboard');
+
+    return $app;
+}
+```
+
+You can also add a view as an element inside CApp:
+
+```php
+<?php
+public function members() {
+    $app = c::app();
+    $app->title('Members');
+
+    $app->addView('member', [
+        'members' => MemberModel::all(),
+    ]);
+
+    return $app;
+}
+```
+
+---
+
+### Blade Directives
+
+Cresenity uses the Blade template engine (same syntax as Laravel). Here are the most common directives:
+
+#### Displaying Data
+
+```html
+<!-- Escaped output (safe from XSS) -->
+{{ $name }}
+
+<!-- Unescaped output (use with caution) -->
+{!! $html !!}
+
+<!-- Default value if variable is not set -->
+{{ $name ?? 'Guest' }}
+```
+
+#### Conditionals
+
+```html
+@if ($user)
+    <p>Welcome, {{ $user->name }}</p>
+@elseif ($guest)
+    <p>Welcome, Guest</p>
+@else
+    <p>Please log in</p>
+@endif
+
+@unless ($user->isAdmin())
+    <p>You are not an admin</p>
+@endunless
+
+@isset($name)
+    <p>{{ $name }}</p>
+@endisset
+
+@empty($records)
+    <p>No records found</p>
+@endempty
+```
+
+#### Loops
+
+```html
+@foreach ($users as $user)
+    <p>{{ $user->name }}</p>
+@endforeach
+
+@forelse ($users as $user)
+    <p>{{ $user->name }}</p>
+@empty
+    <p>No users found</p>
+@endforelse
+
+@for ($i = 0; $i < 10; $i++)
+    <p>Item {{ $i }}</p>
+@endfor
+
+@while ($condition)
+    <p>Looping...</p>
+@endwhile
+```
+
+The `$loop` variable is available inside `@foreach` and `@forelse`:
+
+```html
+@foreach ($users as $user)
+    @if ($loop->first) <strong> @endif
+    {{ $user->name }}
+    @if ($loop->first) </strong> @endif
+    @unless ($loop->last) , @endunless
+@endforeach
+```
+
+#### Including Sub-Views
+
+```html
+<!-- Include a partial -->
+@include('shared.header')
+
+<!-- Include with additional data -->
+@include('shared.alert', ['type' => 'danger', 'message' => 'Error!'])
+
+<!-- Include if exists -->
+@includeIf('custom.sidebar')
+
+<!-- Include based on condition -->
+@includeWhen($user->isAdmin(), 'admin.toolbar')
+```
+
+#### Layouts and Sections
+
+**`views/layouts/base.blade.php`**
+```html
+<html>
+<head>
+    <title>@yield('title') - My App</title>
+</head>
+<body>
+    <nav>@include('shared.nav')</nav>
+    <main>
+        @yield('content')
+    </main>
+</body>
+</html>
+```
+
+**`views/home.blade.php`**
+```html
+@extends('layouts.base')
+
+@section('title', 'Home')
+
+@section('content')
+    <h1>Welcome</h1>
+    <p>This is the home page.</p>
+@endsection
+```
+
+#### Raw PHP
+
+```html
+@php
+    $total = array_sum($prices);
+@endphp
+<p>Total: {{ $total }}</p>
+```
+
+---
+
+### CApp Blade Directives
+
+When using views inside a CApp theme, these special directives are available:
+
+```html
+<!-- Include CApp CSS assets -->
+@CAppStyles
+
+<!-- Include CApp JavaScript assets -->
+@CAppScripts
+```
+
+These are typically placed in the theme layout, not in individual views.

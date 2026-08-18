@@ -16,7 +16,7 @@ class CExporter_TaskQueue_QueueImport implements CQueue_ShouldQueueInterface {
     /**
      * @param CQueue_ShouldQueueInterface $import
      */
-    public function __construct(CQueue_ShouldQueueInterface $import = null) {
+    public function __construct(?CQueue_ShouldQueueInterface $import = null) {
         if ($import) {
             $this->timeout = $import->timeout ?? null;
             $this->tries = $import->tries ?? null;

@@ -1,130 +1,125 @@
-# CQueue
+# Module - Queue
 
-### Introduction
+The `CQueue` module allows you to defer time-intensive tasks to a background queue. This keeps web requests fast and improves user experience.
 
-Saat membangun aplikasi web, Anda mungkin memiliki beberapa tugas, seperti mengurai dan menyimpan file CSV yang diunggah, yang membutuhkan waktu terlalu lama untuk dijalankan selama permintaan web biasa. Untungnya, CF memungkinkan Anda dengan mudah membuat pekerjaan queue yang dapat diproses di background. Dengan memindahkan tugas yang membutuhkan banyak waktu ke queue, aplikasi Anda dapat merespons permintaan web dengan sangat cepat dan memberikan user experience yang lebih baik kepada user Anda.
+---
 
+### Creating a Task
 
+Create a task class that implements `CQueue_ShouldQueueInterface`:
 
-Contoh Kode Membuat Task Queue:
 ```php
+<?php
+class MyApp_TaskQueue_ProcessImport extends CQueue_AbstractTask {
+    protected $filePath;
 
-class MYTaskQueue_SomeQueue implements CQueue_ShouldQueueInterface {
+    public function __construct($filePath) {
+        $this->filePath = $filePath;
+    }
+
+    public function handle() {
+        // Process the import file
+    }
+}
+```
+
+Or implement the interface manually with traits:
+
+```php
+<?php
+class MyApp_TaskQueue_SendEmail implements CQueue_ShouldQueueInterface {
     use CQueue_Trait_DispatchableTrait;
     use CQueue_Trait_QueueableTrait;
     use CQueue_Trait_InteractsWithQueue;
     use CQueue_Trait_SerializesModels;
 
     public function execute() {
-        //do something here
+        // Send email
     }
 }
-
-
 ```
 
-Cara running job dengan queue:
+---
+
+### Dispatching Jobs
+
+#### Queued (background)
 
 ```php
-MYTaskQueue_SomeQueue::dispatch();
+MyApp_TaskQueue_ProcessImport::dispatch($filePath);
 ```
 
-Cara running job tanpa queue :
+#### Synchronous (immediate)
 
 ```php
-MYTaskQueue_SomeQueue::dispatchNow();
+MyApp_TaskQueue_ProcessImport::dispatchNow($filePath);
 ```
+
+#### Using the helper
+
+```php
+c::dispatch(new MyApp_TaskQueue_ProcessImport($filePath));
+```
+
+---
 
 ### Queue Batch
 
-Untuk menentukan Task Queue yang dapat digabungkan, Anda harus membuat tugas seperti biasa. namun, Anda harus menambahkan trait CQueue_Trait_BatchableTrait ke kelas Task Queue anda. Trait ini memberikan akses ke metode batch yang dapat digunakan untuk mengambil batch saat ini yang dijalankan oleh pekerjaan di dalam:
+Run multiple jobs as a batch with callbacks for success, failure, and completion:
 
-
-Contoh Kode Membuat Task Queue Batch:
 ```php
-
-class MYTaskQueue_SomeBatchQueue implements CQueue_ShouldQueueInterface {
+<?php
+class MyApp_TaskQueue_BatchJob extends CQueue_AbstractTask {
     use CQueue_Trait_BatchableTrait;
-    use CQueue_Trait_DispatchableTrait;
-    use CQueue_Trait_QueueableTrait;
-    use CQueue_Trait_InteractsWithQueue;
-    use CQueue_Trait_SerializesModels;
 
     public function execute() {
         if ($this->batch()->cancelled()) {
-            // Determine if the batch has been cancelled...
-
             return;
         }
-        //do something here
+        // do work
     }
 }
-
-
 ```
 
-Cara running job dengan queue batch:
+Dispatch a batch:
 
 ```php
 $batch = CQueue::dispatcher()->batch([
-    new MYTaskQueue_SomeBatchQueue(),
-    new MYTaskQueue_SomeBatchQueue(),
-    new MYTaskQueue_SomeBatchQueue(),
+    new MyApp_TaskQueue_BatchJob(),
+    new MyApp_TaskQueue_BatchJob(),
+    new MyApp_TaskQueue_BatchJob(),
 ])->then(function (CQueue_Batch $batch) {
-    // All jobs completed successfully...
+    // All jobs completed successfully
 })->catch(function (CQueue_Batch $batch, Throwable $e) {
-    // First batch job failure detected...
+    // First batch job failure detected
 })->finally(function (CQueue_Batch $batch) {
-    // The batch has finished executing...
-})->dispatch();
-
-return $batch->id
+    // The batch has finished executing
+})->name('ImportBatch')->dispatch();
 ```
 
-Memberi nama pada batch
-
-
-```php
-CQueue::dispatcher()->batch([
-    new MYTaskQueue_SomeBatchQueue(),
-    new MYTaskQueue_SomeBatchQueue(),
-    new MYTaskQueue_SomeBatchQueue(),
-])->name('Broadcasting with ID: '. $broadcastId)->dispatch();
-```
+---
 
 ### Inspecting Batches
 
-Instance CQueue_Batch yang disediakan untuk callback batch memiliki berbagai properti dan metode untuk membantu Anda dalam berinteraksi dengan dan memeriksa batch Task Queue tertentu:
-
 ```php
-// The UUID of the batch...
-$batch->id;
-
-// The name of the batch (if applicable)...
-$batch->name;
-
-// The number of jobs assigned to the batch...
-$batch->totalJobs;
-
-// The number of jobs that have not been processed by the queue...
-$batch->pendingJobs;
-
-// The number of jobs that have failed...
-$batch->failedJobs;
-
-// The number of jobs that have been processed thus far...
-$batch->processedJobs();
-
-// The completion percentage of the batch (0-100)...
-$batch->progress();
-
-// Indicates if the batch has finished executing...
-$batch->finished();
-
-// Cancel the execution of the batch...
-$batch->cancel();
-
-// Indicates if the batch has been cancelled...
-$batch->cancelled();
-
+$batch->id;              // UUID of the batch
+$batch->name;            // Name of the batch
+$batch->totalJobs;       // Total jobs in the batch
+$batch->pendingJobs;     // Jobs not yet processed
+$batch->failedJobs;      // Jobs that failed
+$batch->processedJobs(); // Jobs processed so far
+$batch->progress();      // Completion percentage (0-100)
+$batch->finished();      // Whether the batch is complete
+$batch->cancel();        // Cancel the batch
+$batch->cancelled();     // Whether the batch was cancelled
 ```
+
+---
+
+### Running the Queue Worker
+
+```bash
+php cf queue:run
+```
+
+Or configure a daemon to process queued jobs continuously. See [Daemon](/docs/module/daemon).

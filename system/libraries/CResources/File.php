@@ -2,20 +2,20 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 2, 2019, 12:56:36 AM
- */
 class CResources_File {
-    /** @var string */
+    /**
+     * @var string
+     */
     public $name;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     public $size;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     public $mimeType;
 
     public static function createFromResource($resource) {
@@ -28,6 +28,7 @@ class CResources_File {
         $this->mimeType = $mimeType;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return "name: {$this->name}, size: {$this->size}, mime: {$this->mimeType}";
     }

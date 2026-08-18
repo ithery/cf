@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 5, 2019, 5:35:15 PM
- */
 use Aws\DynamoDb\DynamoDbClient;
 
 class CQueue_FailerFactory {
@@ -32,7 +26,7 @@ class CQueue_FailerFactory {
      * @return \CQueue_FailedJob_DatabaseFailedJob
      */
     protected static function databaseFailedJobProvider($config) {
-        $db = CDatabase::instance(carr::get($config, 'database'));
+        $db = c::db(carr::get($config, 'database'));
 
         return new CQueue_FailedJob_DatabaseFailedJob(
             $db,

@@ -32,6 +32,7 @@ class CModel_Spatial_Geometry_MultiPoint extends CModel_Spatial_Geometry_PointCo
         return new static($points, $srid);
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return implode(',', array_map(function (CModel_Spatial_Geometry_Point $point) {
             return sprintf('(%s)', $point->toPair());
@@ -60,6 +61,7 @@ class CModel_Spatial_Geometry_MultiPoint extends CModel_Spatial_Geometry_PointCo
      *
      * @return \GeoJson\Geometry\MultiPoint
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         $points = [];
         foreach ($this->items as $point) {

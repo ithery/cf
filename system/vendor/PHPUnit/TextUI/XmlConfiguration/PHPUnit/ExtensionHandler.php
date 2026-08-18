@@ -14,7 +14,7 @@ use function class_exists;
 use function sprintf;
 use PHPUnit\Framework\Exception\Exception;
 use PHPUnit\Framework\TestListener;
-use PHPUnit\Runner\Hook;
+use PHPUnit\Runner\Hook\Hook;
 use ReflectionClass;
 use ReflectionException;
 

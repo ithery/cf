@@ -4,46 +4,70 @@ namespace PHPStan\Rules\Properties;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
+use PHPStan\Node\NullsafePropertyFetchExpressionNode;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\Type\NullType;
 use PHPStan\Type\VerbosityLevel;
 use function sprintf;
 
 /**
- * @implements Rule<Node\Expr\NullsafePropertyFetch>
+ * @implements Rule<NullsafePropertyFetchExpressionNode>
  */
-class NullsafePropertyFetchRule implements Rule
+#[RegisteredRule(level: 4)]
+final class NullsafePropertyFetchRule implements Rule
 {
 
-	public function __construct()
+	public function __construct(
+		#[AutowiredParameter]
+		private bool $treatPhpDocTypesAsCertain,
+		#[AutowiredParameter(ref: '%tips.treatPhpDocTypesAsCertain%')]
+		private bool $treatPhpDocTypesAsCertainTip,
+	)
 	{
 	}
 
 	public function getNodeType(): string
 	{
-		return Node\Expr\NullsafePropertyFetch::class;
+		return NullsafePropertyFetchExpressionNode::class;
 	}
 
 	public function processNode(Node $node, Scope $scope): array
 	{
-		$nullType = new NullType();
-		$calledOnType = $scope->getType($node->var);
-		if ($calledOnType->equals($nullType)) {
+		$originalNode = $node->getOriginalNode();
+		$calledOnType = $this->treatPhpDocTypesAsCertain ? $node->getCalledOnType() : $node->getCalledOnNativeType();
+		if (!$calledOnType->isNull()->no()) {
 			return [];
 		}
 
-		if (!$calledOnType->isSuperTypeOf($nullType)->no()) {
+		if ($scope->isUndefinedExpressionAllowed($originalNode)) {
 			return [];
 		}
 
-		if ($scope->isUndefinedExpressionAllowed($node)) {
-			return [];
-		}
+		$addTip = function (RuleErrorBuilder $ruleErrorBuilder) use ($node): RuleErrorBuilder {
+			if (!$this->treatPhpDocTypesAsCertain || !$this->treatPhpDocTypesAsCertainTip) {
+				return $ruleErrorBuilder;
+			}
 
-		return [
-			RuleErrorBuilder::message(sprintf('Using nullsafe property access on non-nullable type %s. Use -> instead.', $calledOnType->describe(VerbosityLevel::typeOnly())))->build(),
-		];
+			$calledOnNativeType = $node->getCalledOnNativeType();
+			if ($calledOnNativeType->isNull()->no()) {
+				return $ruleErrorBuilder;
+			}
+
+			return $ruleErrorBuilder->treatPhpDocTypesAsCertainTip();
+		};
+
+		$ruleErrorBuilder = $addTip(
+			RuleErrorBuilder::message(sprintf(
+				'Using nullsafe property access on non-nullable type %s. Use -> instead.',
+				$calledOnType->describe(VerbosityLevel::typeOnly()),
+			)),
+		)
+			->line($originalNode->name->getStartLine())
+			->identifier('nullsafe.neverNull');
+
+		return [$ruleErrorBuilder->build()];
 	}
 
 }

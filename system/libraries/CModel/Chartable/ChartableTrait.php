@@ -1,26 +1,40 @@
 <?php
 /**
- * @method static CModel_Chartable_GroupCollection countForGroup($groupColumn)
- * @method static CModel_Chartable_TimeCollection  countByHours($startDate = null, $stopDate = null, $dateColumn = 'created')
- * @method static CModel_Chartable_TimeCollection  countByDays($startDate = null, $stopDate = null, $dateColumn = 'created')
- * @method static CModel_Chartable_TimeCollection  countByWeeks($startDate = null, $stopDate = null, $dateColumn = 'created')
- * @method static CModel_Chartable_TimeCollection  countByMonths($startDate = null, $stopDate = null, $dateColumn = 'created')
- * @method static CModel_Chartable_TimeCollection  countByYears($startDate = null, $stopDate = null, $dateColumn = 'created')
- * @method static CModel_Chartable_TimeCollection  valuesByHours($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
- * @method static CModel_Chartable_TimeCollection  valuesByDays($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
- * @method static CModel_Chartable_TimeCollection  valuesByWeeks($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_GroupCollection      countForGroup($groupColumn)
+ * @method static CModel_Chartable_TimeCollection       countByHours($startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection       countByDays($startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection       countByWeeks($startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection       countByMonths($startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection       countByYears($startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_GroupTimeCollection  countByYearsForGroup($groupColumn, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_GroupTimeCollection  countByMonthsForGroup($groupColumn, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_GroupTimeCollection  countByWeeksForGroup($groupColumn, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_GroupTimeCollection  countByDaysForGroup($groupColumn, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_GroupTimeCollection  countByHoursForGroup($groupColumn, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_GroupCollection      sumForGroup($groupColumn, $sumColumn)
+ * @method static CModel_Chartable_GroupCollection      avgForGroup($groupColumn, $avgColumn)
+ * @method static CModel_Chartable_GroupCollection      maxForGroup($groupColumn, $maxColumn)
+ * @method static CModel_Chartable_GroupCollection      minForGroup($groupColumn, $minColumn)
+ * @method static CModel_Chartable_TimeCollection       countGroupBy($groupBy, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection       valuesByHours($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection       valuesByDays($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection       valuesByWeeks($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  valuesByMonths($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  valuesByYears($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection  valuesGroupBy($groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  sumByHours($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  sumByDays($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  sumByWeeks($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  sumByMonths($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  sumByYears($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection  sumGroupBy($groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  avgByHours($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  avgByDays($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  avgByWeeks($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  avgByMonths($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  * @method static CModel_Chartable_TimeCollection  avgByYears($value, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection  avgGroupBy($groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created')
+ * @method static CModel_Chartable_TimeCollection  aggregateGroupBy($method, $groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created')
  */
 trait CModel_Chartable_ChartableTrait {
     /**
@@ -32,7 +46,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_GroupCollection
      */
     public function scopeCountForGroup(CModel_Query $builder, $groupColumn) {
-        $group = $builder->select("${groupColumn} as label", CDatabase::raw('count(*) as value'))
+        $group = $builder->select("{$groupColumn} as label", CDatabase::raw('count(*) as value'))
             ->groupBy($groupColumn)
             ->orderBy('value', 'desc')
             ->get()
@@ -47,52 +61,149 @@ trait CModel_Chartable_ChartableTrait {
     }
 
     /**
+     * Sum a column grouped by another column.
+     *
      * @param CModel_Query $builder
-     * @param string       $value
-     * @param null|mixed   $startDate
-     * @param null|mixed   $stopDate
-     * @param string       $dateColumn
+     * @param string       $groupColumn
+     * @param string       $sumColumn
+     *
+     * @return CModel_Chartable_GroupCollection
+     */
+    public function scopeSumForGroup(CModel_Query $builder, $groupColumn, $sumColumn) {
+        $group = $builder->select("{$groupColumn} as label", CDatabase::raw("SUM({$sumColumn}) as value"))
+            ->groupBy($groupColumn)
+            ->orderBy('value', 'desc')
+            ->get()
+            ->map(function (CModel $model) {
+                return $model->forceFill([
+                    'label' => (string) $model->label,
+                    'value' => (float) $model->value,
+                ]);
+            });
+
+        return new CModel_Chartable_GroupCollection($group);
+    }
+
+    /**
+     * Average a column grouped by another column.
+     *
+     * @param CModel_Query $builder
+     * @param string       $groupColumn
+     * @param string       $avgColumn
+     *
+     * @return CModel_Chartable_GroupCollection
+     */
+    public function scopeAvgForGroup(CModel_Query $builder, $groupColumn, $avgColumn) {
+        $group = $builder->select("{$groupColumn} as label", CDatabase::raw("AVG({$avgColumn}) as value"))
+            ->groupBy($groupColumn)
+            ->orderBy('value', 'desc')
+            ->get()
+            ->map(function (CModel $model) {
+                return $model->forceFill([
+                    'label' => (string) $model->label,
+                    'value' => (float) $model->value,
+                ]);
+            });
+
+        return new CModel_Chartable_GroupCollection($group);
+    }
+
+    /**
+     * Max a column grouped by another column.
+     *
+     * @param CModel_Query $builder
+     * @param string       $groupColumn
+     * @param string       $maxColumn
+     *
+     * @return CModel_Chartable_GroupCollection
+     */
+    public function scopeMaxForGroup(CModel_Query $builder, $groupColumn, $maxColumn) {
+        $group = $builder->select("{$groupColumn} as label", CDatabase::raw("MAX({$maxColumn}) as value"))
+            ->groupBy($groupColumn)
+            ->orderBy('value', 'desc')
+            ->get()
+            ->map(function (CModel $model) {
+                return $model->forceFill([
+                    'label' => (string) $model->label,
+                    'value' => (float) $model->value,
+                ]);
+            });
+
+        return new CModel_Chartable_GroupCollection($group);
+    }
+
+    /**
+     * Min a column grouped by another column.
+     *
+     * @param CModel_Query $builder
+     * @param string       $groupColumn
+     * @param string       $minColumn
+     *
+     * @return CModel_Chartable_GroupCollection
+     */
+    public function scopeMinForGroup(CModel_Query $builder, $groupColumn, $minColumn) {
+        $group = $builder->select("{$groupColumn} as label", CDatabase::raw("MIN({$minColumn}) as value"))
+            ->groupBy($groupColumn)
+            ->orderBy('value', 'desc')
+            ->get()
+            ->map(function (CModel $model) {
+                return $model->forceFill([
+                    'label' => (string) $model->label,
+                    'value' => (float) $model->value,
+                ]);
+            });
+
+        return new CModel_Chartable_GroupCollection($group);
+    }
+
+    /**
+     * @param string      $period
+     * @param int         $intervals
+     * @param CCarbon     $startDate
+     * @param CCollection $items
      *
      * @return CModel_Chartable_TimeCollection
      */
-    private function groupByYears(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        $startDate = empty($startDate)
-            ? CCarbon::now()->subYear(10)->addYearsNoOverflow()->startOfYear()
-            : CCarbon::parse($startDate);
+    private function makeTimeCollection(
+        string $period,
+        int $intervals,
+        CCarbon $startDate,
+        $items
+    ) {
+        $startClone = $startDate->copy();
 
-        $stopDate = empty($stopDate)
-            ? CCarbon::now()->endOfYear()
-            : CCarbon::parse($stopDate);
+        return CModel_Chartable_TimeCollection::times(
+            $intervals,
+            function () use (&$startClone, $items, $period) {
+                if ($period === 'week') {
+                    $weekOfMonth = ceil($startClone->format('j') / 7);
+                    $label = $startClone->format('Ym') . '-W' . $weekOfMonth;
 
-        $newQuery = new CDatabase_Query_Builder();
-        $newQuery->from($builder);
-        $query = $newQuery->select(
-            CDatabase::raw("${value} as value"),
-            CDatabase::raw("YEAR(${dateColumn}) as label")
-        )
-            ->where($dateColumn, '>=', $startDate)
-            ->where($dateColumn, '<=', $stopDate)
-            ->orderBy('label')
-            ->groupBy('label')
-            ->get();
+                    $startClone->addWeek();
+                } elseif ($period === 'year') {
+                    $label = $startClone->format('Y');
+                    $startClone->addYearsNoOverflow();
+                } elseif ($period === 'month') {
+                    $label = $startClone->format('Ym');
+                    $startClone->addMonthsNoOverflow();
+                } elseif ($period === 'day') {
+                    $label = $startClone->format('Y-m-d');
+                    $startClone->addDay();
+                } elseif ($period === 'hour') {
+                    $label = $startClone->format('Y-m-d H');
+                    $startClone->addHour();
+                } else {
+                    throw new \InvalidArgumentException("Invalid period [$period]");
+                }
 
-        $years = $startDate->diffInYears($stopDate) + 1;
+                $found = $items->firstWhere('label', $label);
 
-        return CModel_Chartable_TimeCollection::times($years, function () use ($startDate, $query) {
-            $found = $query->firstWhere(
-                'label',
-                $startDate->format('Y'),
-            );
-
-            $result = [
-                'value' => ($found ? $found->value : 0),
-                'label' => $startDate->format('Y'),
-            ];
-
-            $startDate->addYearsNoOverflow();
-
-            return $result;
-        });
+                return [
+                    'value' => ($found ? $found->value : 0),
+                    'label' => $label,
+                ];
+            }
+        );
     }
 
     /**
@@ -101,10 +212,81 @@ trait CModel_Chartable_ChartableTrait {
      * @param null|mixed   $startDate
      * @param null|mixed   $stopDate
      * @param string       $dateColumn
+     * @param null|mixed   $groupColumn
      *
      * @return CModel_Chartable_TimeCollection
      */
-    private function groupByMonths(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+    private function groupByYears(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created', $groupColumn = null) {
+        $startDate = empty($startDate)
+            ? CCarbon::now()->subYears(10)->addYearsNoOverflow()->startOfYear()
+            : CCarbon::parse($startDate);
+
+        $stopDate = empty($stopDate)
+            ? CCarbon::now()->endOfYear()
+            : CCarbon::parse($stopDate);
+        $dateExpr = new CModel_Chartable_DateExpression($builder->getConnection()->getDriverName());
+        $dateExpression = $dateExpr->year($dateColumn);
+        $newQuery = new CDatabase_Query_Builder($builder->getConnection());
+        $newQuery->from($builder, 'chartable_sub');
+
+        $selects = [
+            CDatabase::raw("{$value} as value"),
+            CDatabase::raw("{$dateExpression} as label"),
+        ];
+
+        if ($groupColumn) {
+            $selects[] = $groupColumn;
+        }
+
+        $queryBuilder = $newQuery->select($selects)
+            ->where($dateColumn, '>=', $startDate)
+            ->where($dateColumn, '<=', $stopDate)
+            ->orderBy('label')
+            ->groupBy('label');
+
+        if ($groupColumn) {
+            $queryBuilder->groupBy($groupColumn);
+        }
+
+        $query = $queryBuilder->get();
+
+        $years = $startDate->diffInYears($stopDate) + 1;
+
+        if (!$groupColumn) {
+            return $this->makeTimeCollection(
+                'year',
+                $years,
+                $startDate,
+                $query
+            );
+        }
+        $grouped = $query->groupBy($groupColumn);
+
+        $result = [];
+
+        foreach ($grouped as $groupKey => $items) {
+            $result[$groupKey] = $this->makeTimeCollection(
+                'year',
+                $years,
+                $startDate,
+                $items
+            );
+        }
+
+        return new CModel_Chartable_GroupTimeCollection($result);
+    }
+
+    /**
+     * @param CModel_Query $builder
+     * @param string       $value
+     * @param null|mixed   $startDate
+     * @param null|mixed   $stopDate
+     * @param string       $dateColumn
+     * @param null|mixed   $groupColumn
+     *
+     * @return CModel_Chartable_TimeCollection|CModel_Chartable_GroupTimeCollection
+     */
+    private function groupByMonths(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created', $groupColumn = null) {
         $startDate = empty($startDate)
             ? CCarbon::now()->subYear()->addMonthsNoOverflow()->startOfMonth()
             : CCarbon::parse($startDate);
@@ -113,35 +295,54 @@ trait CModel_Chartable_ChartableTrait {
             ? CCarbon::now()->endOfMonth()
             : CCarbon::parse($stopDate);
 
-        $newQuery = new CDatabase_Query_Builder();
-        $newQuery->from($builder);
-        $query = $newQuery->select(
-            CDatabase::raw("${value} as value"),
-            CDatabase::raw("CONCAT(YEAR(${dateColumn}),LPAD(MONTH(${dateColumn}),2,'0')) as label")
-        )
+        $newQuery = new CDatabase_Query_Builder($builder->getConnection());
+        $dateExpr = new CModel_Chartable_DateExpression($builder->getConnection()->getDriverName());
+        $dateExpression = $dateExpr->yearMonth($dateColumn);
+
+        $newQuery->from($builder, 'chartable_sub');
+        $selects = [
+            CDatabase::raw("{$value} as value"),
+            CDatabase::raw($dateExpression . ' as label'),
+        ];
+
+        if ($groupColumn) {
+            $selects[] = $groupColumn;
+        }
+        $queryBuilder = $newQuery->select($selects)
             ->where($dateColumn, '>=', $startDate)
             ->where($dateColumn, '<=', $stopDate)
             ->orderBy('label')
-            ->groupBy('label')
-            ->get();
+            ->groupBy('label');
+
+        if ($groupColumn) {
+            $queryBuilder->groupBy($groupColumn);
+        }
+
+        $query = $queryBuilder->get();
 
         $months = $startDate->diffInMonths($stopDate) + 1;
-
-        return CModel_Chartable_TimeCollection::times($months, function () use ($startDate, $query) {
-            $found = $query->firstWhere(
-                'label',
-                $startDate->format('Ym'),
+        if (!$groupColumn) {
+            return $this->makeTimeCollection(
+                'month',
+                $months,
+                $startDate,
+                $query
             );
+        }
+        $grouped = $query->groupBy($groupColumn);
 
-            $result = [
-                'value' => ($found ? $found->value : 0),
-                'label' => $startDate->format('Ym'),
-            ];
+        $result = [];
 
-            $startDate->addMonthsNoOverflow();
+        foreach ($grouped as $groupKey => $items) {
+            $result[$groupKey] = $this->makeTimeCollection(
+                'month',
+                $months,
+                $startDate,
+                $items
+            );
+        }
 
-            return $result;
-        });
+        return new CModel_Chartable_GroupTimeCollection($result);
     }
 
     /**
@@ -150,10 +351,11 @@ trait CModel_Chartable_ChartableTrait {
      * @param null|mixed   $startDate
      * @param null|mixed   $stopDate
      * @param string       $dateColumn
+     * @param null|mixed   $groupColumn
      *
      * @return CModel_Chartable_TimeCollection
      */
-    private function groupByWeeks(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+    private function groupByWeeks(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created', $groupColumn = null) {
         $startDate = empty($startDate)
             ? CCarbon::now()->subYear()->addMonthsNoOverflow()->startOfWeek()
             : CCarbon::parse($startDate);
@@ -161,40 +363,56 @@ trait CModel_Chartable_ChartableTrait {
         $stopDate = empty($stopDate)
             ? CCarbon::now()->endOfWeek()
             : CCarbon::parse($stopDate);
+        $dateExpr = new CModel_Chartable_DateExpression($builder->getConnection()->getDriverName());
+        $dateExpression = $dateExpr->yearMonthWeek($dateColumn);
 
-        $newQuery = new CDatabase_Query_Builder();
-        $newQuery->from($builder);
-        $query = $newQuery->select(
-            CDatabase::raw("${value} as value"),
-            CDatabase::raw("CONCAT(YEAR(${dateColumn}),LPAD(MONTH(${dateColumn}),2,'0'),'-W',FLOOR((DayOfMonth(${dateColumn})-1)/7)+1) as label")
-        )
+        $newQuery = new CDatabase_Query_Builder($builder->getConnection());
+        $newQuery->from($builder, 'chartable_sub');
+
+        $selects = [
+            CDatabase::raw("{$value} as value"),
+            CDatabase::raw("{$dateExpression} as label"),
+        ];
+
+        if ($groupColumn) {
+            $selects[] = $groupColumn;
+        }
+
+        $queryBuilder = $newQuery->select($selects)
             ->where($dateColumn, '>=', $startDate)
             ->where($dateColumn, '<=', $stopDate)
             ->orderBy('label')
-            ->groupBy('label')
-            ->get();
+            ->groupBy('label');
+
+        if ($groupColumn) {
+            $queryBuilder->groupBy($groupColumn);
+        }
+
+        $query = $queryBuilder->get();
 
         $weeks = $startDate->diffInWeeks($stopDate) + 1;
-
-        $result = CModel_Chartable_TimeCollection::times($weeks, function () use ($startDate, $query) {
-            $weekOfMonth = ceil($startDate->format('j') / 7);
-
-            $found = $query->firstWhere(
-                'label',
-                $startDate->format('Ym') . '-W' . $weekOfMonth,
+        if (!$groupColumn) {
+            return $this->makeTimeCollection(
+                'week',
+                $weeks,
+                $startDate,
+                $query
             );
+        }
+        $grouped = $query->groupBy($groupColumn);
 
-            $result = [
-                'value' => ($found ? $found->value : 0),
-                'label' => $startDate->format('Ym') . '-W' . $weekOfMonth,
-            ];
+        $result = [];
 
-            $startDate->addWeek();
+        foreach ($grouped as $groupKey => $items) {
+            $result[$groupKey] = $this->makeTimeCollection(
+                'week',
+                $weeks,
+                $startDate,
+                $items
+            );
+        }
 
-            return $result;
-        });
-
-        return $result;
+        return new CModel_Chartable_GroupTimeCollection($result);
     }
 
     /**
@@ -203,10 +421,11 @@ trait CModel_Chartable_ChartableTrait {
      * @param null|mixed   $startDate
      * @param null|mixed   $stopDate
      * @param string       $dateColumn
+     * @param null|mixed   $groupColumn
      *
      * @return CModel_Chartable_TimeCollection
      */
-    private function groupByDays(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+    private function groupByDays(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created', $groupColumn = null) {
         $startDate = empty($startDate)
             ? CCarbon::now()->subMonth()
             : CCarbon::parse($startDate);
@@ -214,35 +433,58 @@ trait CModel_Chartable_ChartableTrait {
         $stopDate = empty($stopDate)
             ? CCarbon::now()
             : CCarbon::parse($stopDate);
-        $newQuery = new CDatabase_Query_Builder();
-        $newQuery->from($builder);
-        $query = $newQuery->select(
-            CDatabase::raw("${value} as value"),
-            CDatabase::raw("DATE(${dateColumn}) as label")
-        )
+        $newQuery = new CDatabase_Query_Builder($builder->getConnection());
+        $newQuery->from($builder, 'chartable_sub');
+        $dateExpr = new CModel_Chartable_DateExpression($builder->getConnection()->getDriverName());
+        $dateExpression = $dateExpr->date($dateColumn);
+        $selects = [
+            CDatabase::raw("{$value} as value"),
+            CDatabase::raw("{$dateExpression} as label"),
+        ];
+
+        if ($groupColumn) {
+            $selects[] = $groupColumn;
+        }
+
+        $queryBuilder = $newQuery->select($selects)
             ->where($dateColumn, '>=', $startDate)
             ->where($dateColumn, '<=', $stopDate)
             ->orderBy('label')
-            ->groupBy('label')
-            ->get();
+            ->groupBy('label');
+
+        if ($groupColumn) {
+            $queryBuilder->groupBy($groupColumn);
+        }
+
+        $query = $queryBuilder->get();
 
         $days = $startDate->diffInDays($stopDate) + 1;
 
-        return CModel_Chartable_TimeCollection::times($days, function () use ($startDate, $query) {
-            $found = $query->firstWhere(
-                'label',
-                $startDate->startOfDay()->toDateString()
+        // 🔹 SINGLE
+        if (!$groupColumn) {
+            return $this->makeTimeCollection(
+                'day',
+                $days,
+                $startDate,
+                $query
             );
+        }
 
-            $result = [
-                'value' => ($found ? $found->value : 0),
-                'label' => $startDate->toDateString(),
-            ];
+        // 🔹 MULTI
+        $grouped = $query->groupBy($groupColumn);
 
-            $startDate->addDay();
+        $result = [];
 
-            return $result;
-        });
+        foreach ($grouped as $groupKey => $items) {
+            $result[$groupKey] = $this->makeTimeCollection(
+                'day',
+                $days,
+                $startDate,
+                $items
+            );
+        }
+
+        return new CModel_Chartable_GroupTimeCollection($result);
     }
 
     /**
@@ -251,10 +493,11 @@ trait CModel_Chartable_ChartableTrait {
      * @param null|mixed   $startDate
      * @param null|mixed   $stopDate
      * @param string       $dateColumn
+     * @param null|mixed   $groupColumn
      *
      * @return CModel_Chartable_TimeCollection
      */
-    private function groupByHours(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+    private function groupByHours(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created', $groupColumn = null) {
         $startDate = empty($startDate)
             ? CCarbon::now()->subDay()
             : CCarbon::parse($startDate);
@@ -262,35 +505,60 @@ trait CModel_Chartable_ChartableTrait {
         $stopDate = empty($stopDate)
             ? CCarbon::now()->endOfDay()
             : CCarbon::parse($stopDate);
-        $newQuery = new CDatabase_Query_Builder();
-        $newQuery->from($builder);
-        $query = $newQuery->select(
-            CDatabase::raw("${value} as value"),
-            CDatabase::raw("DATE_FORMAT(${dateColumn}, '%Y-%m-%d %H') as label")
-        )
+
+        $newQuery = new CDatabase_Query_Builder($builder->getConnection());
+        $newQuery->from($builder, 'chartable_sub');
+
+        $dateExpr = new CModel_Chartable_DateExpression($builder->getConnection()->getDriverName());
+        $dateExpression = $dateExpr->dateHour($dateColumn);
+        $selects = [
+            CDatabase::raw("{$value} as value"),
+            CDatabase::raw("{$dateExpression} as label"),
+        ];
+
+        if ($groupColumn) {
+            $selects[] = $groupColumn;
+        }
+
+        $queryBuilder = $newQuery->select($selects)
             ->where($dateColumn, '>=', $startDate)
             ->where($dateColumn, '<=', $stopDate)
             ->orderBy('label')
-            ->groupBy('label')
-            ->get();
+            ->groupBy('label');
 
-        $days = $startDate->diffInHours($stopDate) + 1;
+        if ($groupColumn) {
+            $queryBuilder->groupBy($groupColumn);
+        }
 
-        return CModel_Chartable_TimeCollection::times($days, function () use ($startDate, $query) {
-            $found = $query->firstWhere(
-                'label',
-                $startDate->format('Y-m-d H')
+        $query = $queryBuilder->get();
+
+        $hours = $startDate->diffInHours($stopDate) + 1;
+
+        // 🔹 SINGLE
+        if (!$groupColumn) {
+            return $this->makeTimeCollection(
+                'hour',
+                $hours,
+                $startDate,
+                $query
             );
+        }
 
-            $result = [
-                'value' => ($found ? $found->value : 0),
-                'label' => $startDate->format('Y-m-d H'),
-            ];
+        // 🔹 MULTI
+        $grouped = $query->groupBy($groupColumn);
 
-            $startDate->addHour();
+        $result = [];
 
-            return $result;
-        });
+        foreach ($grouped as $groupKey => $items) {
+            $result[$groupKey] = $this->makeTimeCollection(
+                'hour',
+                $hours,
+                $startDate,
+                $items
+            );
+        }
+
+        return new CModel_Chartable_GroupTimeCollection($result);
     }
 
     /**
@@ -361,6 +629,21 @@ trait CModel_Chartable_ChartableTrait {
      */
     public function scopeCountByYears(CModel_Query $builder, $startDate = null, $stopDate = null, $dateColumn = 'created') {
         return $this->groupByYears($builder, 'count(*)', $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
+     * Get total models grouped by `created` years.
+     *
+     * @param CModel_Query                  $builder
+     * @param string                        $groupBy
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                        $dateColumn
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    public function scopeCountGroupBy(CModel_Query $builder, $groupBy, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        return $this->scopeAggregateGroupBy($builder, 'count', $groupBy, 'count(*)', $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -439,6 +722,22 @@ trait CModel_Chartable_ChartableTrait {
     }
 
     /**
+     * Get values models grouped by `created` years.
+     *
+     * @param CModel_Query                  $builder
+     * @param string                        $groupBy
+     * @param string                        $value
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                        $dateColumn
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    public function scopeValuesGroupBy(CModel_Query $builder, $groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        return $this->scopeAggregateGroupBy($builder, 'values', $groupBy, $value, $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
      * Get sum values models grouped by `created` hours.
      *
      * @param CModel_Query                  $builder
@@ -450,7 +749,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeSumByHours(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByHours($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByHours($builder, "SUM({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -465,7 +764,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeSumByDays(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByDays($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByDays($builder, "SUM({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -480,7 +779,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeSumByMonths(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByMonths($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByMonths($builder, "SUM({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -495,7 +794,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeSumByWeeks(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByWeeks($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByWeeks($builder, "SUM({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -510,7 +809,23 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeSumByYears(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByYears($builder, "SUM(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByYears($builder, "SUM({$value})", $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
+     * Get sum values models grouped by `created` years.
+     *
+     * @param CModel_Query                  $builder
+     * @param string                        $groupBy
+     * @param string                        $value
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                        $dateColumn
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    public function scopeSumGroupBy(CModel_Query $builder, $groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        return $this->scopeAggregateGroupBy($builder, 'sum', $groupBy, $value, $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -525,7 +840,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeAvgByHours(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByHours($builder, "AVG(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByHours($builder, "AVG({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -540,7 +855,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeAvgByDays(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByDays($builder, "AVG(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByDays($builder, "AVG({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -555,7 +870,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeAvgByMonths(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByMonths($builder, "AVG(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByMonths($builder, "AVG({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -570,7 +885,7 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeAvgByWeeks(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByWeeks($builder, "AVG(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByWeeks($builder, "AVG({$value})", $startDate, $stopDate, $dateColumn);
     }
 
     /**
@@ -585,6 +900,189 @@ trait CModel_Chartable_ChartableTrait {
      * @return CModel_Chartable_TimeCollection
      */
     public function scopeAvgByYears(CModel_Query $builder, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
-        return $this->groupByYears($builder, "AVG(${value})", $startDate, $stopDate, $dateColumn);
+        return $this->groupByYears($builder, "AVG({$value})", $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
+     * Get sum values models grouped by `created` years.
+     *
+     * @param CModel_Query                  $builder
+     * @param string                        $groupBy
+     * @param string                        $value
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                        $dateColumn
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    public function scopeAvgGroupBy(CModel_Query $builder, $groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        return $this->scopeAggregateGroupBy($builder, 'avg', $groupBy, $value, $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
+     * Get sum values models grouped by `created` years.
+     *
+     * @param CModel_Query                  $builder
+     * @param string                        $groupBy
+     * @param string                        $value
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                        $dateColumn
+     * @param mixed                         $method
+     *
+     * @return CModel_Chartable_TimeCollection
+     */
+    public function scopeAggregateGroupBy(CModel_Query $builder, $method, $groupBy, $value, $startDate = null, $stopDate = null, $dateColumn = 'created') {
+        $val = $value;
+        if ($method == 'sum') {
+            $val = "SUM({$value})";
+        }
+        if ($method == 'avg') {
+            $val = "AVG({$value})";
+        }
+        if ($groupBy == 'month') {
+            return $this->groupByMonths($builder, $val, $startDate, $stopDate, $dateColumn);
+        }
+        if ($groupBy == 'week') {
+            return $this->groupByWeeks($builder, $val, $startDate, $stopDate, $dateColumn);
+        }
+        if ($groupBy == 'day') {
+            return $this->groupByDays($builder, $val, $startDate, $stopDate, $dateColumn);
+        }
+        if ($groupBy == 'hour') {
+            return $this->groupByHours($builder, $val, $startDate, $stopDate, $dateColumn);
+        }
+
+        return $this->groupByYears($builder, $val, $startDate, $stopDate, $dateColumn);
+    }
+
+    /**
+     * @param CModel_Query                        $builder
+     * @param string                              $groupColumn
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                              $dateColumn
+     *
+     * @return CModel_Chartable_GroupTimeCollection
+     */
+    public function scopeCountByYearsForGroup(
+        CModel_Query $builder,
+        $groupColumn,
+        $startDate = null,
+        $stopDate = null,
+        $dateColumn = 'created'
+    ) {
+        return $this->groupByYears(
+            $builder,
+            'count(*)',
+            $startDate,
+            $stopDate,
+            $dateColumn,
+            $groupColumn
+        );
+    }
+
+    /**
+     * @param CModel_Query                        $builder
+     * @param string                              $groupColumn
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                              $dateColumn
+     *
+     * @return CModel_Chartable_GroupTimeCollection
+     */
+    public function scopeCountByMonthsForGroup(
+        CModel_Query $builder,
+        $groupColumn,
+        $startDate = null,
+        $stopDate = null,
+        $dateColumn = 'created'
+    ) {
+        return $this->groupByMonths(
+            $builder,
+            'count(*)',
+            $startDate,
+            $stopDate,
+            $dateColumn,
+            $groupColumn
+        );
+    }
+
+    /**
+     * @param CModel_Query                        $builder
+     * @param string                              $groupColumn
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                              $dateColumn
+     *
+     * @return CModel_Chartable_GroupTimeCollection
+     */
+    public function scopeCountByWeeksForGroup(
+        CModel_Query $builder,
+        $groupColumn,
+        $startDate = null,
+        $stopDate = null,
+        $dateColumn = 'created'
+    ) {
+        return $this->groupByWeeks(
+            $builder,
+            'count(*)',
+            $startDate,
+            $stopDate,
+            $dateColumn,
+            $groupColumn
+        );
+    }
+
+    /**
+     * @param CModel_Query                        $builder
+     * @param string                              $groupColumn
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                              $dateColumn
+     *
+     * @return CModel_Chartable_GroupTimeCollection
+     */
+    public function scopeCountByDaysForGroup(
+        CModel_Query $builder,
+        $groupColumn,
+        $startDate = null,
+        $stopDate = null,
+        $dateColumn = 'created'
+    ) {
+        return $this->groupByDays(
+            $builder,
+            'count(*)',
+            $startDate,
+            $stopDate,
+            $dateColumn,
+            $groupColumn
+        );
+    }
+
+    /**
+     * @param CModel_Query                        $builder
+     * @param string                              $groupColumn
+     * @param null|string|DateTimeInterface $startDate
+     * @param null|string|DateTimeInterface $stopDate
+     * @param string                              $dateColumn
+     *
+     * @return CModel_Chartable_GroupTimeCollection
+     */
+    public function scopeCountByHoursForGroup(
+        CModel_Query $builder,
+        $groupColumn,
+        $startDate = null,
+        $stopDate = null,
+        $dateColumn = 'created'
+    ) {
+        return $this->groupByHours(
+            $builder,
+            'count(*)',
+            $startDate,
+            $stopDate,
+            $dateColumn,
+            $groupColumn
+        );
     }
 }

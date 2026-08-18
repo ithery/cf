@@ -4,8 +4,13 @@ namespace PHPStan\Type\Generic;
 
 use function sprintf;
 
-class TemplateTypeScope
+final class TemplateTypeScope
 {
+
+	public static function createWithAnonymousFunction(): self
+	{
+		return new self(null, null);
+	}
 
 	public static function createWithFunction(string $functionName): self
 	{
@@ -48,6 +53,10 @@ class TemplateTypeScope
 	/** @api */
 	public function describe(): string
 	{
+		if ($this->className === null && $this->functionName === null) {
+			return 'anonymous function';
+		}
+
 		if ($this->className === null) {
 			return sprintf('function %s()', $this->functionName);
 		}
@@ -57,17 +66,6 @@ class TemplateTypeScope
 		}
 
 		return sprintf('method %s::%s()', $this->className, $this->functionName);
-	}
-
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): self
-	{
-		return new self(
-			$properties['className'],
-			$properties['functionName'],
-		);
 	}
 
 }

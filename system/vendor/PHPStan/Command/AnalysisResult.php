@@ -3,12 +3,15 @@
 namespace PHPStan\Command;
 
 use PHPStan\Analyser\Error;
+use PHPStan\Analyser\InternalError;
 use PHPStan\Collectors\CollectedData;
 use function count;
 use function usort;
 
-/** @api */
-class AnalysisResult
+/**
+ * @api
+ */
+final class AnalysisResult
 {
 
 	/** @var list<Error> sorted by their file name, line number and message */
@@ -17,9 +20,11 @@ class AnalysisResult
 	/**
 	 * @param list<Error> $fileSpecificErrors
 	 * @param list<string> $notFileSpecificErrors
-	 * @param list<string> $internalErrors
+	 * @param list<InternalError> $internalErrors
 	 * @param list<string> $warnings
 	 * @param list<CollectedData> $collectedData
+	 * @param array<string, string> $changedProjectExtensionFilesOutsideOfAnalysedPaths
+	 * @param list<string> $processedFiles
 	 */
 	public function __construct(
 		array $fileSpecificErrors,
@@ -30,6 +35,10 @@ class AnalysisResult
 		private bool $defaultLevelUsed,
 		private ?string $projectConfigFile,
 		private bool $savedResultCache,
+		private int $peakMemoryUsageBytes,
+		private bool $isResultCacheUsed,
+		private array $changedProjectExtensionFilesOutsideOfAnalysedPaths,
+		private array $processedFiles = [],
 	)
 	{
 		usort(
@@ -75,9 +84,9 @@ class AnalysisResult
 	}
 
 	/**
-	 * @return list<string>
+	 * @return list<InternalError>
 	 */
-	public function getInternalErrors(): array
+	public function getInternalErrorObjects(): array
 	{
 		return $this->internalErrors;
 	}
@@ -121,6 +130,54 @@ class AnalysisResult
 	public function isResultCacheSaved(): bool
 	{
 		return $this->savedResultCache;
+	}
+
+	public function getPeakMemoryUsageBytes(): int
+	{
+		return $this->peakMemoryUsageBytes;
+	}
+
+	public function isResultCacheUsed(): bool
+	{
+		return $this->isResultCacheUsed;
+	}
+
+	/**
+	 * @return array<string, string>
+	 */
+	public function getChangedProjectExtensionFilesOutsideOfAnalysedPaths(): array
+	{
+		return $this->changedProjectExtensionFilesOutsideOfAnalysedPaths;
+	}
+
+	/**
+	 * @return list<string>
+	 */
+	public function getProcessedFiles(): array
+	{
+		return $this->processedFiles;
+	}
+
+	/**
+	 * @api
+	 * @param list<Error> $fileSpecificErrors
+	 */
+	public function withFileSpecificErrors(array $fileSpecificErrors): self
+	{
+		return new self(
+			$fileSpecificErrors,
+			$this->notFileSpecificErrors,
+			$this->internalErrors,
+			$this->warnings,
+			$this->collectedData,
+			$this->defaultLevelUsed,
+			$this->projectConfigFile,
+			$this->savedResultCache,
+			$this->peakMemoryUsageBytes,
+			$this->isResultCacheUsed,
+			$this->changedProjectExtensionFilesOutsideOfAnalysedPaths,
+			$this->processedFiles,
+		);
 	}
 
 }

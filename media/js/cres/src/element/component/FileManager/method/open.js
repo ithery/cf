@@ -1,3 +1,3 @@
-export const openMethod = (item) => {
+export function openMethod(item) {
     this.goTo(item.url);
-};
+}

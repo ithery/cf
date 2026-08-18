@@ -61,10 +61,10 @@ final class CGeo_Provider_GoogleMaps extends CGeo_ProviderHttpAbstract implement
     public static function business(
         HttpClient $client,
         string $clientId,
-        string $privateKey = null,
-        string $region = null,
-        string $apiKey = null,
-        string $channel = null
+        ?string $privateKey = null,
+        ?string $region = null,
+        ?string $apiKey = null,
+        ?string $channel = null
     ) {
         $provider = new self($client, $region, $apiKey);
         $provider->clientId = $clientId;
@@ -79,7 +79,7 @@ final class CGeo_Provider_GoogleMaps extends CGeo_ProviderHttpAbstract implement
      * @param string     $region Region biasing (optional)
      * @param string     $apiKey Google Geocoding API key (optional)
      */
-    public function __construct(HttpClient $client, string $region = null, string $apiKey = null) {
+    public function __construct(HttpClient $client, ?string $region = null, ?string $apiKey = null) {
         parent::__construct($client);
 
         $this->region = $region;
@@ -140,7 +140,7 @@ final class CGeo_Provider_GoogleMaps extends CGeo_ProviderHttpAbstract implement
      *
      * @return string query with extra params
      */
-    private function buildQuery(string $url, string $locale = null, string $region = null): string {
+    private function buildQuery(string $url, ?string $locale = null, ?string $region = null): string {
         if (null === $this->apiKey && null === $this->clientId) {
             throw new CGeo_Exception_InvalidCredentials('You must provide an API key. Keyless access was removed in June, 2016');
         }
@@ -183,7 +183,7 @@ final class CGeo_Provider_GoogleMaps extends CGeo_ProviderHttpAbstract implement
      *
      * @return CGeo_Model_AddressCollection
      */
-    private function fetchUrl(string $url, string $locale = null, int $limit, string $region = null) {
+    private function fetchUrl(string $url, ?string $locale = null, int $limit, ?string $region = null) {
         $url = $this->buildQuery($url, $locale, $region);
         $content = $this->getUrlContents($url);
         $json = $this->validateResponse($url, $content);

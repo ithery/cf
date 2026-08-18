@@ -117,7 +117,7 @@ final class CTesting_PhpUnit_Style {
     /**
      * Writes the final recap.
      */
-    public function writeRecap(CTesting_PhpUnit_State $state, CTesting_PhpUnit_Timer $timer = null) {
+    public function writeRecap(CTesting_PhpUnit_State $state, ?CTesting_PhpUnit_Timer $timer = null) {
         $types = [
             CTesting_PhpUnit_TestResult::FAIL,
             CTesting_PhpUnit_TestResult::WARN,

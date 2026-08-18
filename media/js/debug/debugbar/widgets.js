@@ -53,13 +53,13 @@ if (typeof (PhpDebugBar) == 'undefined') {
                 return htmlize(code);
             }
             if (lang) {
-                return hljs.highlight(lang, code).value;
+                return window.hljs.highlight(lang, code).value;
             }
-            return hljs.highlightAuto(code).value;
+            return window.hljs.highlightAuto(code).value;
         }
 
         if (typeof (hljs) === 'object') {
-            code.each(function (i, e) { hljs.highlightBlock(e); });
+            code.each(function (i, e) { window.hljs.highlightBlock(e); });
         }
         return code;
     };
@@ -222,6 +222,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
      * Options:
      *  - data
      */
+    // eslint-disable-next-line no-unused-vars
     var VariableListWidget = PhpDebugBar.Widgets.VariableListWidget = KVListWidget.extend({
 
         className: csscls('kvlist varlist'),
@@ -256,6 +257,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
      * Options:
      *  - data
      */
+    // eslint-disable-next-line no-unused-vars
     var HtmlVariableListWidget = PhpDebugBar.Widgets.HtmlVariableListWidget = KVListWidget.extend({
 
         className: csscls('kvlist htmlvarlist'),
@@ -275,6 +277,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
      * Options:
      *  - data
      */
+    // eslint-disable-next-line no-unused-vars
     var IFrameWidget = PhpDebugBar.Widgets.IFrameWidget = PhpDebugBar.Widget.extend({
 
         tagName: 'iframe',
@@ -306,6 +309,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
      * Options:
      *  - data
      */
+    // eslint-disable-next-line no-unused-vars
     var MessagesWidget = PhpDebugBar.Widgets.MessagesWidget = PhpDebugBar.Widget.extend({
 
         className: csscls('messages'),
@@ -322,6 +326,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
                         m = m.substr(0, 100) + '...';
                     }
 
+                    // eslint-disable-next-line no-redeclare
                     var val = $('<span />').addClass(csscls('value')).text(m).appendTo(li);
                     if (!value.is_string || value.message.length > 100) {
                         var prettyVal = value.message;
@@ -418,6 +423,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
      * Options:
      *  - data
      */
+    // eslint-disable-next-line no-unused-vars
     var TimelineWidget = PhpDebugBar.Widgets.TimelineWidget = PhpDebugBar.Widget.extend({
 
         tagName: 'ul',
@@ -518,6 +524,7 @@ if (typeof (PhpDebugBar) == 'undefined') {
      * Options:
      *  - data
      */
+    // eslint-disable-next-line no-unused-vars
     var ExceptionsWidget = PhpDebugBar.Widgets.ExceptionsWidget = PhpDebugBar.Widget.extend({
 
         className: csscls('exceptions'),

@@ -1,12 +1,23 @@
 <?php
 
 class CElement_Component_DataTable_TaskQueue_AfterExportProgress extends CQueue_AbstractTask {
+    /**
+     * @var array
+     */
     protected $params;
 
+    /**
+     * @param array $params
+     *
+     * @return void
+     */
     public function __construct($params) {
         $this->params = $params;
     }
 
+    /**
+     * @return void
+     */
     public function execute() {
         $params = $this->params;
 

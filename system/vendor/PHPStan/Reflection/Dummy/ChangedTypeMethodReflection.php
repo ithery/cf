@@ -2,21 +2,34 @@
 
 namespace PHPStan\Reflection\Dummy;
 
+use PHPStan\PhpDoc\ResolvedPhpDocBlock;
 use PHPStan\Reflection\Assertions;
 use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\ParametersAcceptor;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
+use PHPStan\ShouldNotHappenException;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Type;
+use function count;
+use function is_bool;
 
-class ChangedTypeMethodReflection implements ExtendedMethodReflection
+final class ChangedTypeMethodReflection implements ExtendedMethodReflection
 {
 
 	/**
-	 * @param ParametersAcceptor[] $variants
+	 * @param list<ExtendedParametersAcceptor> $variants
+	 * @param list<ExtendedParametersAcceptor>|null $namedArgumentsVariants
 	 */
-	public function __construct(private ClassReflection $declaringClass, private ExtendedMethodReflection $reflection, private array $variants)
+	public function __construct(
+		private ClassReflection $declaringClass,
+		private ExtendedMethodReflection $reflection,
+		private array $variants,
+		private ?array $namedArgumentsVariants,
+		private ?Type $selfOutType,
+		private ?Type $throwType,
+		private Assertions $assertions,
+	)
 	{
 	}
 
@@ -60,6 +73,21 @@ class ChangedTypeMethodReflection implements ExtendedMethodReflection
 		return $this->variants;
 	}
 
+	public function getOnlyVariant(): ExtendedParametersAcceptor
+	{
+		$variants = $this->getVariants();
+		if (count($variants) !== 1) {
+			throw new ShouldNotHappenException();
+		}
+
+		return $variants[0];
+	}
+
+	public function getNamedArgumentsVariants(): ?array
+	{
+		return $this->namedArgumentsVariants;
+	}
+
 	public function isDeprecated(): TrinaryLogic
 	{
 		return $this->reflection->isDeprecated();
@@ -75,14 +103,29 @@ class ChangedTypeMethodReflection implements ExtendedMethodReflection
 		return $this->reflection->isFinal();
 	}
 
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return $this->reflection->isFinalByKeyword();
+	}
+
 	public function isInternal(): TrinaryLogic
 	{
 		return $this->reflection->isInternal();
 	}
 
+	public function isBuiltin(): TrinaryLogic
+	{
+		$builtin = $this->reflection->isBuiltin();
+		if (is_bool($builtin)) {
+			return TrinaryLogic::createFromBoolean($builtin);
+		}
+
+		return $builtin;
+	}
+
 	public function getThrowType(): ?Type
 	{
-		return $this->reflection->getThrowType();
+		return $this->throwType;
 	}
 
 	public function hasSideEffects(): TrinaryLogic
@@ -92,17 +135,57 @@ class ChangedTypeMethodReflection implements ExtendedMethodReflection
 
 	public function getAsserts(): Assertions
 	{
-		return $this->reflection->getAsserts();
+		return $this->assertions;
+	}
+
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return $this->reflection->acceptsNamedArguments();
 	}
 
 	public function getSelfOutType(): ?Type
 	{
-		return $this->reflection->getSelfOutType();
+		return $this->selfOutType;
 	}
 
 	public function returnsByReference(): TrinaryLogic
 	{
 		return $this->reflection->returnsByReference();
+	}
+
+	public function isAbstract(): TrinaryLogic
+	{
+		$abstract = $this->reflection->isAbstract();
+		if (is_bool($abstract)) {
+			return TrinaryLogic::createFromBoolean($abstract);
+		}
+
+		return $abstract;
+	}
+
+	public function isPure(): TrinaryLogic
+	{
+		return $this->reflection->isPure();
+	}
+
+	public function getPureUnlessCallableIsImpureParameters(): array
+	{
+		return $this->reflection->getPureUnlessCallableIsImpureParameters();
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->reflection->getAttributes();
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		return $this->reflection->mustUseReturnValue();
+	}
+
+	public function getResolvedPhpDoc(): ?ResolvedPhpDocBlock
+	{
+		return $this->reflection->getResolvedPhpDoc();
 	}
 
 }

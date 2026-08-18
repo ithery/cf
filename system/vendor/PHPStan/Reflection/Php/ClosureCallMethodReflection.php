@@ -2,19 +2,25 @@
 
 namespace PHPStan\Reflection\Php;
 
+use PHPStan\PhpDoc\ResolvedPhpDocBlock;
 use PHPStan\Reflection\Assertions;
 use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
+use PHPStan\Reflection\ExtendedFunctionVariant;
 use PHPStan\Reflection\ExtendedMethodReflection;
-use PHPStan\Reflection\FunctionVariant;
+use PHPStan\Reflection\ExtendedParameterReflection;
+use PHPStan\Reflection\ExtendedParametersAcceptor;
 use PHPStan\Reflection\Native\NativeParameterReflection;
-use PHPStan\Reflection\ParametersAcceptor;
+use PHPStan\Reflection\ParameterReflection;
 use PHPStan\Reflection\PassedByReference;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\ClosureType;
+use PHPStan\Type\MixedType;
 use PHPStan\Type\ObjectWithoutClassType;
 use PHPStan\Type\Type;
+use function array_map;
 use function array_unshift;
+use function is_bool;
 
 final class ClosureCallMethodReflection implements ExtendedMethodReflection
 {
@@ -61,32 +67,59 @@ final class ClosureCallMethodReflection implements ExtendedMethodReflection
 		return $this->nativeMethodReflection->getPrototype();
 	}
 
-	/**
-	 * @return ParametersAcceptor[]
-	 */
 	public function getVariants(): array
 	{
 		$parameters = $this->closureType->getParameters();
 		$newThis = new NativeParameterReflection(
 			'newThis',
-			false,
-			new ObjectWithoutClassType(),
-			PassedByReference::createNo(),
-			false,
-			null,
+			optional: false,
+			type: new ObjectWithoutClassType(),
+			passedByReference: PassedByReference::createNo(),
+			variadic: false,
+			defaultValue: null,
 		);
 
 		array_unshift($parameters, $newThis);
 
 		return [
-			new FunctionVariant(
+			new ExtendedFunctionVariant(
 				$this->closureType->getTemplateTypeMap(),
 				$this->closureType->getResolvedTemplateTypeMap(),
-				$parameters,
+				array_map(static fn (ParameterReflection $parameter): ExtendedParameterReflection => new ExtendedDummyParameter(
+					$parameter->getName(),
+					$parameter->getType(),
+					$parameter->isOptional(),
+					$parameter->passedByReference(),
+					$parameter->isVariadic(),
+					$parameter->getDefaultValue(),
+					new MixedType(),
+					$parameter->getType(),
+					null,
+					TrinaryLogic::createMaybe(),
+					null,
+					[],
+					null,
+					// pure-unless-callable-is-impure is not threaded here: a closure's own
+					// parameters cannot carry the tag.
+					TrinaryLogic::createNo(),
+				), $parameters),
 				$this->closureType->isVariadic(),
 				$this->closureType->getReturnType(),
+				$this->closureType->getReturnType(),
+				new MixedType(),
+				$this->closureType->getCallSiteVarianceMap(),
 			),
 		];
+	}
+
+	public function getOnlyVariant(): ExtendedParametersAcceptor
+	{
+		return $this->getVariants()[0];
+	}
+
+	public function getNamedArgumentsVariants(): ?array
+	{
+		return null;
 	}
 
 	public function isDeprecated(): TrinaryLogic
@@ -104,9 +137,24 @@ final class ClosureCallMethodReflection implements ExtendedMethodReflection
 		return $this->nativeMethodReflection->isFinal();
 	}
 
+	public function isFinalByKeyword(): TrinaryLogic
+	{
+		return $this->nativeMethodReflection->isFinalByKeyword();
+	}
+
 	public function isInternal(): TrinaryLogic
 	{
 		return $this->nativeMethodReflection->isInternal();
+	}
+
+	public function isBuiltin(): TrinaryLogic
+	{
+		$builtin = $this->nativeMethodReflection->isBuiltin();
+		if (is_bool($builtin)) {
+			return TrinaryLogic::createFromBoolean($builtin);
+		}
+
+		return $builtin;
 	}
 
 	public function getThrowType(): ?Type
@@ -124,6 +172,11 @@ final class ClosureCallMethodReflection implements ExtendedMethodReflection
 		return $this->nativeMethodReflection->getAsserts();
 	}
 
+	public function acceptsNamedArguments(): TrinaryLogic
+	{
+		return $this->nativeMethodReflection->acceptsNamedArguments();
+	}
+
 	public function getSelfOutType(): ?Type
 	{
 		return $this->nativeMethodReflection->getSelfOutType();
@@ -132,6 +185,41 @@ final class ClosureCallMethodReflection implements ExtendedMethodReflection
 	public function returnsByReference(): TrinaryLogic
 	{
 		return $this->nativeMethodReflection->returnsByReference();
+	}
+
+	public function isAbstract(): TrinaryLogic
+	{
+		$abstract = $this->nativeMethodReflection->isAbstract();
+		if (is_bool($abstract)) {
+			return TrinaryLogic::createFromBoolean($abstract);
+		}
+
+		return $abstract;
+	}
+
+	public function isPure(): TrinaryLogic
+	{
+		return $this->nativeMethodReflection->isPure();
+	}
+
+	public function getPureUnlessCallableIsImpureParameters(): array
+	{
+		return $this->nativeMethodReflection->getPureUnlessCallableIsImpureParameters();
+	}
+
+	public function getAttributes(): array
+	{
+		return $this->nativeMethodReflection->getAttributes();
+	}
+
+	public function mustUseReturnValue(): TrinaryLogic
+	{
+		return $this->nativeMethodReflection->mustUseReturnValue();
+	}
+
+	public function getResolvedPhpDoc(): ?ResolvedPhpDocBlock
+	{
+		return $this->nativeMethodReflection->getResolvedPhpDoc();
 	}
 
 }

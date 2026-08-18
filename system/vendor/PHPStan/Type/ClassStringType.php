@@ -2,10 +2,12 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\TrinaryLogic;
-use PHPStan\Type\Constant\ConstantStringType;
 
 /** @api */
+#[InstanceofDeprecated(insteadUse: 'Type::isClassStringType()')]
 class ClassStringType extends StringType
 {
 
@@ -20,46 +22,22 @@ class ClassStringType extends StringType
 		return 'class-string';
 	}
 
-	public function accepts(Type $type, bool $strictTypes): TrinaryLogic
+	public function accepts(Type $type, bool $strictTypes): AcceptsResult
 	{
 		if ($type instanceof CompoundType) {
 			return $type->isAcceptedBy($this, $strictTypes);
 		}
 
-		if ($type instanceof ConstantStringType) {
-			return TrinaryLogic::createFromBoolean($type->isClassString());
-		}
-
-		if ($type instanceof self) {
-			return TrinaryLogic::createYes();
-		}
-
-		if ($type instanceof StringType) {
-			return TrinaryLogic::createMaybe();
-		}
-
-		return TrinaryLogic::createNo();
+		return new AcceptsResult($type->isClassString(), []);
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
-		if ($type instanceof ConstantStringType) {
-			return TrinaryLogic::createFromBoolean($type->isClassString());
-		}
-
-		if ($type instanceof self) {
-			return TrinaryLogic::createYes();
-		}
-
-		if ($type instanceof parent) {
-			return TrinaryLogic::createMaybe();
-		}
-
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
 		}
 
-		return TrinaryLogic::createNo();
+		return new IsSuperTypeOfResult($type->isClassString(), []);
 	}
 
 	public function isString(): TrinaryLogic
@@ -69,7 +47,12 @@ class ClassStringType extends StringType
 
 	public function isNumericString(): TrinaryLogic
 	{
-		return TrinaryLogic::createMaybe();
+		return TrinaryLogic::createNo();
+	}
+
+	public function isDecimalIntegerString(): TrinaryLogic
+	{
+		return TrinaryLogic::createNo();
 	}
 
 	public function isNonEmptyString(): TrinaryLogic
@@ -87,12 +70,34 @@ class ClassStringType extends StringType
 		return TrinaryLogic::createMaybe();
 	}
 
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
+	public function isLowercaseString(): TrinaryLogic
 	{
-		return new self();
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isUppercaseString(): TrinaryLogic
+	{
+		return TrinaryLogic::createMaybe();
+	}
+
+	public function isClassString(): TrinaryLogic
+	{
+		return TrinaryLogic::createYes();
+	}
+
+	public function getClassStringObjectType(): Type
+	{
+		return new ObjectWithoutClassType();
+	}
+
+	public function getObjectTypeOrClassStringObjectType(): Type
+	{
+		return new ObjectWithoutClassType();
+	}
+
+	public function toPhpDocNode(): TypeNode
+	{
+		return new IdentifierTypeNode('class-string');
 	}
 
 }

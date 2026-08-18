@@ -3,7 +3,7 @@ set -e
 
 # Determine if the port config key exists, if not, create it
 function fix-config() {
-    local CONFIG="$HOME/.devsuite/config.json"
+    local CONFIG="$HOME/.config/devsuite/config.json"
 
     if [[ -f $CONFIG ]]
     then
@@ -17,11 +17,5 @@ function fix-config() {
         fi
     fi
 }
-
-if [[ "$1" = "update" ]]
-then
-    composer global update "cpriego/valet-linux"
-    valet install
-fi
 
 fix-config

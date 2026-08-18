@@ -51,7 +51,7 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      *
      * @return \CCollection
      */
-    public function getRawRecords(callable $processQuery = null) {
+    public function getRawRecords(?callable $processQuery = null) {
         $model = static::$model;
 
         return $model::query()
@@ -70,7 +70,7 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      *
      * @return array
      */
-    public function getRecords(callable $processQuery = null, callable $processCollection = null) {
+    public function getRecords(?callable $processQuery = null, ?callable $processCollection = null) {
         return $this->getRawRecords($processQuery)
             ->when(!is_null($processCollection), function ($collection) use ($processCollection) {
                 return call_user_func($processCollection, $collection);
@@ -90,7 +90,7 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      *
      * @return array
      */
-    public function getForGraph(callable $processQuery = null, callable $processCollection = null) {
+    public function getForGraph(?callable $processQuery = null, ?callable $processCollection = null) {
         $statistics = c::collect(
             $this->getRecords($processQuery, $processCollection)
         );

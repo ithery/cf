@@ -4,6 +4,7 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\BooleanType;
@@ -12,15 +13,14 @@ use PHPStan\Type\Constant\ConstantIntegerType;
 use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\IntegerRangeType;
-use PHPStan\Type\IntegerType;
 use PHPStan\Type\NeverType;
-use PHPStan\Type\NullType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
 use function in_array;
 use function strtolower;
 
-class MbSubstituteCharacterDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class MbSubstituteCharacterDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function __construct(private PhpVersion $phpVersion)
@@ -57,8 +57,8 @@ class MbSubstituteCharacterDynamicReturnTypeExtension implements DynamicFunction
 
 		$argType = $scope->getType($functionCall->getArgs()[0]->value);
 		$isString = $argType->isString();
-		$isNull = (new NullType())->isSuperTypeOf($argType);
-		$isInteger = (new IntegerType())->isSuperTypeOf($argType);
+		$isNull = $argType->isNull();
+		$isInteger = $argType->isInteger();
 
 		if ($isString->no() && $isNull->no() && $isInteger->no()) {
 			if ($this->phpVersion->throwsTypeErrorForInternalFunctions()) {
@@ -105,7 +105,7 @@ class MbSubstituteCharacterDynamicReturnTypeExtension implements DynamicFunction
 			if ($argType instanceof ConstantStringType) {
 				$value = strtolower($argType->getValue());
 
-				if ($value === 'none' || $value === 'long' || $value === 'entity') {
+				if (in_array($value, ['none', 'long', 'entity'], true)) {
 					return new ConstantBooleanType(true);
 				}
 

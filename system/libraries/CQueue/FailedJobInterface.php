@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 4, 2019, 5:16:03 PM
- */
 interface CQueue_FailedJobInterface {
     /**
      * Log a failed job into storage.
@@ -17,7 +11,7 @@ interface CQueue_FailedJobInterface {
      * @param string     $payload
      * @param \Exception $exception
      *
-     * @return string|int|null
+     * @return null|string|int
      */
     public function log($connection, $queue, $payload, $exception);
 
@@ -33,7 +27,7 @@ interface CQueue_FailedJobInterface {
      *
      * @param mixed $id
      *
-     * @return object|null
+     * @return null|object
      */
     public function find($id);
 

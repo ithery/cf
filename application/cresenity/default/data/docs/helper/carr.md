@@ -1,8 +1,10 @@
 # Helper carr
 
+The `carr` helper class provides array utility methods with dot notation support.
+
 ### carr::accessible
 
-`carr::accessible` method dapat menentukan apakah value adalah array accessible:
+The `carr::accessible` method determines if the given value is array accessible:
 ```php
 $isAccessible = carr::accessible(['a' => 1, 'b' => 2]);
 
@@ -21,22 +23,21 @@ $isAccessible = carr::accessible(new stdClass);
 
 
 ### carr::get
-`carr::get` method untuk mendapatkan value dari suatu array.
-value yang didapatkan bisa bersifat nested dengan menggunakan dot notation
+The `carr::get` method retrieves a value from a deeply nested array using dot notation:
 
 ```php
 $array = ['products' => ['desk' => ['price' => 100]]];
 
 $price = carr::get($array, 'products.desk.price');
 ```
-The `carr::get` juga dapat menerima default value pada parameter ketiga yang akan dikembalikan jika key tidak ditemukan pada array:
+The `carr::get` method also accepts a default value as the third argument, which is returned if the key is not found:
 ```php
 $discount = carr::get($array, 'products.desk.discount', 0);
 
 // 0
 ```
 ### carr::add
-`carr::add` method menambahkan key/value pair ke array walaupun key tidak tersedia ataupun berisi null
+The `carr::add` method adds a key/value pair to the array if the key doesn't exist or is null:
 
 ```php
 $array = carr::add(['name' => 'Desk'], 'price', 100);
@@ -49,7 +50,7 @@ $array = carr::add(['name' => 'Desk', 'price' => null], 'price', 100);
 ```
 
 ### carr::collapse
-`carr::collapse` method membuat multidimesi menjadi array satu dimensi
+The `carr::collapse` method collapses an array of arrays into a single flat array:
 
 ```php
 $array = carr::collapse([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
@@ -58,7 +59,7 @@ $array = carr::collapse([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
 ```
 
 ### carr::crossJoin
-crr::crossJoin method melakukan cross joins dari 2 array,  dan akan menghasilkan Cartesian product dengan semua kemungkinan permutasi
+The `carr::crossJoin` method cross joins the given arrays, returning a Cartesian product with all possible permutations:
 
 ```php
 $matrix = carr::crossJoin([1, 2], ['a', 'b']);
@@ -90,7 +91,7 @@ $matrix = carr::crossJoin([1, 2], ['a', 'b'], ['I', 'II']);
 ```
 
 ### carr::divide
-carr::divide method menghasilkan 2 array: 1 berisi keys array dan 1 lagi berisi values array
+The `carr::divide` method returns two arrays: one containing the keys and the other containing the values of the given array:
 
 ```php
 [$keys, $values] = carr::divide(['name' => 'Desk']);
@@ -106,7 +107,7 @@ list($keys, $values) = carr::divide(['name' => 'Desk']);
 ```
 
 ### carr::dot
-carr::dot method merubah multi-dimensional menjadi single array dengan "dot" notation untuk mengindikasikan kedalaman array
+The `carr::dot` method flattens a multi-dimensional array into a single-level array using dot notation to indicate depth:
 
 ```php
 $array = ['products' => ['desk' => ['price' => 100]]];
@@ -119,7 +120,7 @@ $flattened = carr::dot($array);
 
 ### carr::except
 
-carr::except method membuang key/value pair dari parameter yang dipassing ke suatu array
+The `carr::except` method removes the given key/value pairs from an array:
 
 ```php
 $array = ['name' => 'Desk', 'price' => 100];
@@ -133,7 +134,7 @@ $filtered = carr::except($array, ['price']);
 
 
 ### carr::exists
-carr::exists method melakukan pengecheckan apakah key yang dipassing terpada pada array yang diberikan
+The `carr::exists` method checks if the given key exists in the provided array:
 ```php
 
 $array = ['name' => 'John Doe', 'age' => 17];

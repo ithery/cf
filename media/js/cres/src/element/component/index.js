@@ -6,6 +6,11 @@ import { initProgressBar, ProgressBar } from './ProgressBar';
 import { initNestable, Nestable } from './Nestable';
 import { initImage, Image } from './Image';
 import { initCountDownTimer, CountDownTimer } from './CountDownTimer';
+import { initTreeView, TreeView } from './TreeView';
+import { initCalendar, Calendar } from './Calendar';
+import { initFileManager, FileManager } from './FileManager';
+import { initWidget, Widget } from './Widget';
+import { initTabList, TabList } from './TabList';
 
 const initComponent = (element) => {
     const elementName = element.getAttribute('cres-element');
@@ -33,6 +38,21 @@ const initComponent = (element) => {
     if(elementName == 'component:CountDownTimer') {
         initCountDownTimer(element);
     }
+    if(elementName == 'component:TreeView') {
+        initTreeView(element);
+    }
+    if(elementName == 'component:Calendar') {
+        initCalendar(element);
+    }
+    if(elementName == 'component:FileManager') {
+        initFileManager(element);
+    }
+    if(elementName == 'component:Widget') {
+        initWidget(element);
+    }
+    if(elementName == 'component:TabList') {
+        initTabList(element);
+    }
 };
 const component = {
     ShowMore,
@@ -42,7 +62,12 @@ const component = {
     ProgressBar,
     Nestable,
     Image,
-    CountDownTimer
+    CountDownTimer,
+    TreeView,
+    Calendar,
+    FileManager,
+    Widget,
+    TabList
 };
 export {
     component,

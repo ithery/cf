@@ -24,6 +24,7 @@ class CRenderable_RenderResult {
         return $this;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->html;
     }

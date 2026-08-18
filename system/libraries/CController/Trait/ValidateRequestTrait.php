@@ -11,7 +11,7 @@ trait CController_Trait_ValidateRequestTrait {
      *
      * @return array
      */
-    public function validateWith($validator, CHTTP_Request $request = null) {
+    public function validateWith($validator, ?CHTTP_Request $request = null) {
         $request = $request ?: c::request();
 
         if (is_array($validator)) {

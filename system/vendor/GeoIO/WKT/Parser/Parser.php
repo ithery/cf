@@ -1,68 +1,50 @@
 <?php
 
-declare(strict_types=1);
-
 namespace GeoIO\WKT\Parser;
 
-use GeoIO\Coordinates;
-use GeoIO\Dimension;
 use GeoIO\Factory;
+use GeoIO\Dimension;
+use JMS\Parser\AbstractParser;
 use GeoIO\WKT\Parser\Exception\ParserException;
 
-final class Parser
-{
-    private Factory $factory;
+class Parser extends AbstractParser {
+    private $factory;
 
-    public function __construct(Factory $factory)
-    {
+    private $srid;
+
+    public function __construct(Factory $factory) {
         $this->factory = $factory;
+        parent::__construct(new Lexer());
     }
 
-    public function parse(string $input): mixed
-    {
-        $lexer = new Lexer($input);
-
-        $geometry = $this->parseGeometry($lexer);
-
-        if (null !== $lexer->next) {
-            throw ParserException::create(
-                'end of input',
-                $lexer->next,
-            );
+    public function parse($str, $context = null) {
+        try {
+            return parent::parse($str, $context);
+        } catch (\Exception $e) {
+            throw new ParserException('Parsing failed: ' . $e->getMessage(), 0, $e);
         }
-
-        return $geometry;
     }
 
-    private function parseGeometry(Lexer $lexer): mixed
-    {
-        $srid = $this->srid($lexer);
-        $dimension = null;
+    protected function parseInternal() {
+        $this->srid();
 
-        return $this->geometry($lexer, $srid, $dimension);
+        return $this->geometry();
     }
 
-    private function srid(Lexer $lexer): ?int
-    {
-        $srid = null;
+    private function srid() {
+        $this->srid = null;
 
-        if ($lexer->isNext('SRID')) {
-            $lexer->match('SRID');
-            $lexer->match('=');
+        if ($this->lexer->isNext('SRID')) {
+            $this->match('SRID');
+            $this->match('=');
 
-            $srid = (int) $lexer->match('INTEGER');
+            $this->srid = $this->match('INTEGER');
 
-            $lexer->match(';');
+            $this->match(';');
         }
-
-        return $srid;
     }
 
-    private function geometry(
-        Lexer $lexer,
-        ?int $srid,
-        ?Dimension &$dimension,
-    ): mixed {
+    private function geometry(&$dimension = null) {
         $types = [
             'POINT',
             'LINESTRING',
@@ -73,72 +55,42 @@ final class Parser
             'GEOMETRYCOLLECTION',
         ];
 
-        return match ($lexer->matchAny($types)) {
-            'POINT' => $this->point(
-                $lexer,
-                $srid,
-                $dimension,
-            ),
-            'LINESTRING' => $this->lineString(
-                $lexer,
-                $srid,
-                $dimension,
-            ),
-            'POLYGON' => $this->polygon(
-                $lexer,
-                $srid,
-                $dimension,
-            ),
-            'MULTIPOINT' => $this->multiPoint(
-                $lexer,
-                $srid,
-                $dimension,
-            ),
-            'MULTILINESTRING' => $this->multiLineString(
-                $lexer,
-                $srid,
-                $dimension,
-            ),
-            'MULTIPOLYGON' => $this->multiPolygon(
-                $lexer,
-                $srid,
-                $dimension,
-            ),
-            default => $this->geometryCollection(
-                $lexer,
-                $srid,
-                $dimension,
-            ),
-        };
+        switch ($this->matchAny($types)) {
+            case 'POINT':
+                return $this->point($dimension);
+            case 'LINESTRING':
+                return $this->lineString($dimension);
+            case 'POLYGON':
+                return $this->polygon($dimension);
+            case 'MULTIPOINT':
+                return $this->multiPoint($dimension);
+            case 'MULTILINESTRING':
+                return $this->multiLineString($dimension);
+            case 'MULTIPOLYGON':
+                return $this->multiPolygon($dimension);
+            default:
+                return $this->geometryCollection($dimension);
+        }
     }
 
-    private function dimension(
-        Lexer $lexer,
-        ?Dimension $dimension,
-    ): ?Dimension {
-        if (
-            (Dimension::DIMENSION_4D === $dimension || null === $dimension) &&
-            $lexer->isNext('ZM')
-        ) {
-            $lexer->match('ZM');
+    private function dimension($dimension) {
+        if ((Dimension::DIMENSION_4D === $dimension || null === $dimension)
+            && $this->lexer->isNext('ZM')) {
+            $this->match('ZM');
 
             return Dimension::DIMENSION_4D;
         }
 
-        if (
-            (Dimension::DIMENSION_3DM === $dimension || null === $dimension) &&
-            $lexer->isNext('M')
-        ) {
-            $lexer->match('M');
+        if ((Dimension::DIMENSION_3DM === $dimension || null === $dimension)
+            && $this->lexer->isNext('M')) {
+            $this->match('M');
 
             return Dimension::DIMENSION_3DM;
         }
 
-        if (
-            (Dimension::DIMENSION_3DZ === $dimension || null === $dimension) &&
-            $lexer->isNext('Z')
-        ) {
-            $lexer->match('Z');
+        if ((Dimension::DIMENSION_3DZ === $dimension || null === $dimension)
+            && $this->lexer->isNext('Z')) {
+            $this->match('Z');
 
             return Dimension::DIMENSION_3DZ;
         }
@@ -146,32 +98,24 @@ final class Parser
         return $dimension;
     }
 
-    private function coordinates(
-        Lexer $lexer,
-        ?int $srid,
-        ?Dimension &$dimension,
-    ): mixed {
+    private function coordinates(&$dimension = null) {
         $coordinates = [
-            'x' => (float) $lexer->matchAny(['FLOAT', 'INTEGER']),
-            'y' => (float) $lexer->matchAny(['FLOAT', 'INTEGER']),
+            'x' => $this->matchAny(['FLOAT', 'INTEGER']),
+            'y' => $this->matchAny(['FLOAT', 'INTEGER']),
             'z' => null,
-            'm' => null,
+            'm' => null
         ];
 
-        if (
-            Dimension::DIMENSION_3DZ === $dimension ||
-            Dimension::DIMENSION_4D === $dimension ||
-            (null === $dimension && $lexer->isNextAny(['FLOAT', 'INTEGER']))
-        ) {
-            $coordinates['z'] = (float) $lexer->matchAny(['FLOAT', 'INTEGER']);
+        if (Dimension::DIMENSION_3DZ === $dimension
+            || Dimension::DIMENSION_4D === $dimension
+            || (null === $dimension && $this->lexer->isNextAny(['FLOAT', 'INTEGER']))) {
+            $coordinates['z'] = $this->matchAny(['FLOAT', 'INTEGER']);
         }
 
-        if (
-            Dimension::DIMENSION_3DM === $dimension ||
-            Dimension::DIMENSION_4D === $dimension ||
-            (null === $dimension && $lexer->isNextAny(['FLOAT', 'INTEGER']))
-        ) {
-            $coordinates['m'] = (float) $lexer->matchAny(['FLOAT', 'INTEGER']);
+        if (Dimension::DIMENSION_3DM === $dimension
+            || Dimension::DIMENSION_4D === $dimension
+            || (null === $dimension && $this->lexer->isNextAny(['FLOAT', 'INTEGER']))) {
+            $coordinates['m'] = $this->matchAny(['FLOAT', 'INTEGER']);
         }
 
         if (null === $dimension) {
@@ -184,369 +128,269 @@ final class Parser
 
         return $this->factory->createPoint(
             $dimension ?: Dimension::DIMENSION_2D,
-            $srid,
-            new Coordinates(...$coordinates),
+            $coordinates,
+            $this->srid
         );
     }
 
-    private function point(
-        Lexer $lexer,
-        ?int $srid,
-        ?Dimension &$dimension,
-    ): mixed {
-        $dimension = $this->dimension(
-            $lexer,
-            $dimension,
-        );
+    private function point(&$dimension = null) {
+        $dimension = $this->dimension($dimension);
 
-        if ($lexer->isNext('EMPTY')) {
-            $lexer->match('EMPTY');
+        if ($this->lexer->isNext('EMPTY')) {
+            $this->match('EMPTY');
 
             return $this->factory->createPoint(
                 $dimension ?: Dimension::DIMENSION_2D,
-                $srid,
-                null,
+                [],
+                $this->srid
             );
         }
 
-        $lexer->match('(');
-
-        $point = $this->coordinates(
-            $lexer,
-            $srid,
-            $dimension,
-        );
-
-        $lexer->match(')');
+        $this->match('(');
+        $point = $this->coordinates($dimension);
+        $this->match(')');
 
         return $point;
     }
 
-    private function lineStringText(
-        Lexer $lexer,
-        ?int $srid,
-        ?Dimension &$dimension,
-        bool $isLinearRing = false,
-    ): mixed {
-        $lexer->match('(');
+    private function lineStringText(&$dimension = null, $isLinearRing = false) {
+        $this->match('(');
         $points = [];
 
         while (true) {
-            $points[] = $this->coordinates(
-                $lexer,
-                $srid,
-                $dimension,
-            );
+            $points[] = $this->coordinates($dimension);
 
-            if (!$lexer->isNext(',')) {
+            if (!$this->lexer->isNext(',')) {
                 break;
             }
 
-            $lexer->match(',');
+            $this->match(',');
         }
-
-        $lexer->match(')');
+        $this->match(')');
 
         if ($isLinearRing) {
             return $this->factory->createLinearRing(
                 $dimension ?: Dimension::DIMENSION_2D,
-                $srid,
                 $points,
+                $this->srid
             );
         }
 
         return $this->factory->createLineString(
             $dimension ?: Dimension::DIMENSION_2D,
-            $srid,
             $points,
+            $this->srid
         );
     }
 
-    private function lineString(
-        Lexer $lexer,
-        ?int $srid,
-        ?Dimension &$dimension,
-    ): mixed {
-        $dimension = $this->dimension(
-            $lexer,
-            $dimension,
-        );
+    private function lineString(&$dimension = null) {
+        $dimension = $this->dimension($dimension);
 
-        if ($lexer->isNext('EMPTY')) {
-            $lexer->match('EMPTY');
+        if ($this->lexer->isNext('EMPTY')) {
+            $this->match('EMPTY');
 
             return $this->factory->createLineString(
                 $dimension ?: Dimension::DIMENSION_2D,
-                $srid,
                 [],
+                $this->srid
             );
         }
 
-        return $this->lineStringText(
-            $lexer,
-            $srid,
-            $dimension,
-        );
+        return $this->lineStringText($dimension);
     }
 
-    private function polygonText(
-        Lexer $lexer,
-        ?int $srid,
-        ?Dimension &$dimension,
-    ): mixed {
-        $lexer->match('(');
+    private function polygonText(&$dimension = null) {
+        $this->match('(');
 
-        $linearRings = [];
+        $lineStrings = [];
 
         while (true) {
-            $linearRings[] = $this->lineStringText(
-                $lexer,
-                $srid,
-                $dimension,
-                true,
-            );
+            $lineStrings[] = $this->lineStringText($dimension, true);
 
-            if (!$lexer->isNext(',')) {
+            if (!$this->lexer->isNext(',')) {
                 break;
             }
 
-            $lexer->match(',');
+            $this->match(',');
         }
 
-        $lexer->match(')');
+        $this->match(')');
 
         return $this->factory->createPolygon(
             $dimension ?: Dimension::DIMENSION_2D,
-            $srid,
-            $linearRings,
+            $lineStrings,
+            $this->srid
         );
     }
 
-    private function polygon(
-        Lexer $lexer,
-        ?int $srid,
-        ?Dimension &$dimension,
-    ): mixed {
-        $dimension = $this->dimension(
-            $lexer,
-            $dimension,
-        );
+    private function polygon(&$dimension = null) {
+        $dimension = $this->dimension($dimension);
 
-        if ($lexer->isNext('EMPTY')) {
-            $lexer->match('EMPTY');
+        if ($this->lexer->isNext('EMPTY')) {
+            $this->match('EMPTY');
 
             return $this->factory->createPolygon(
                 $dimension ?: Dimension::DIMENSION_2D,
-                $srid,
                 [],
+                $this->srid
             );
         }
 
-        return $this->polygonText(
-            $lexer,
-            $srid,
-            $dimension,
-        );
+        return $this->polygonText($dimension);
     }
 
-    private function multiPoint(
-        Lexer $lexer,
-        ?int $srid,
-        ?Dimension &$dimension,
-    ): mixed {
-        $dimension = $this->dimension(
-            $lexer,
-            $dimension,
-        );
+    private function multiPoint(&$dimension = null) {
+        $dimension = $this->dimension($dimension);
 
-        if ($lexer->isNext('EMPTY')) {
-            $lexer->match('EMPTY');
+        if ($this->lexer->isNext('EMPTY')) {
+            $this->match('EMPTY');
 
             return $this->factory->createMultiPoint(
                 $dimension ?: Dimension::DIMENSION_2D,
-                $srid,
                 [],
+                $this->srid
             );
         }
 
-        $lexer->match('(');
+        $this->match('(');
 
         $points = [];
 
         while (true) {
             $nonStandardPoint = true;
 
-            if ($lexer->isNext('(')) {
-                $lexer->match('(');
+            if ($this->lexer->isNext('(')) {
+                $this->match('(');
                 $nonStandardPoint = false;
             }
 
-            $points[] = $this->coordinates(
-                $lexer,
-                $srid,
-                $dimension,
-            );
+            $points[] = $this->coordinates($dimension);
 
             if (!$nonStandardPoint) {
-                $lexer->match(')');
+                $this->match(')');
             }
 
-            if (!$lexer->isNext(',')) {
+            if (!$this->lexer->isNext(',')) {
                 break;
             }
 
-            $lexer->match(',');
+            $this->match(',');
         }
 
-        $lexer->match(')');
+        $this->match(')');
 
         return $this->factory->createMultiPoint(
             $dimension ?: Dimension::DIMENSION_2D,
-            $srid,
             $points,
+            $this->srid
         );
     }
 
-    private function multiLineString(
-        Lexer $lexer,
-        ?int $srid,
-        ?Dimension &$dimension,
-    ): mixed {
-        $dimension = $this->dimension(
-            $lexer,
-            $dimension,
-        );
+    private function multiLineString(&$dimension = null) {
+        $dimension = $this->dimension($dimension);
 
-        if ($lexer->isNext('EMPTY')) {
-            $lexer->match('EMPTY');
+        if ($this->lexer->isNext('EMPTY')) {
+            $this->match('EMPTY');
 
             return $this->factory->createMultiLineString(
                 $dimension ?: Dimension::DIMENSION_2D,
-                $srid,
                 [],
+                $this->srid
             );
         }
 
-        $lexer->match('(');
+        $this->match('(');
 
         $lineStrings = [];
 
         while (true) {
-            $lineStrings[] = $this->lineStringText(
-                $lexer,
-                $srid,
-                $dimension,
-            );
+            $lineStrings[] = $this->lineStringText($dimension);
 
-            if (!$lexer->isNext(',')) {
+            if (!$this->lexer->isNext(',')) {
                 break;
             }
 
-            $lexer->match(',');
+            $this->match(',');
         }
 
-        $lexer->match(')');
+        $this->match(')');
 
         return $this->factory->createMultiLineString(
             $dimension ?: Dimension::DIMENSION_2D,
-            $srid,
             $lineStrings,
+            $this->srid
         );
     }
 
-    private function multiPolygon(
-        Lexer $lexer,
-        ?int $srid,
-        ?Dimension &$dimension,
-    ): mixed {
-        $dimension = $this->dimension(
-            $lexer,
-            $dimension,
-        );
+    private function multiPolygon(&$dimension = null) {
+        $dimension = $this->dimension($dimension);
 
-        if ($lexer->isNext('EMPTY')) {
-            $lexer->match('EMPTY');
+        if ($this->lexer->isNext('EMPTY')) {
+            $this->match('EMPTY');
 
             return $this->factory->createMultiPolygon(
                 $dimension ?: Dimension::DIMENSION_2D,
-                $srid,
                 [],
+                $this->srid
             );
         }
 
-        $lexer->match('(');
+        $this->match('(');
 
         $polygons = [];
 
         while (true) {
-            $polygons[] = $this->polygonText(
-                $lexer,
-                $srid,
-                $dimension,
-            );
+            $polygons[] = $this->polygonText($dimension);
 
-            if (!$lexer->isNext(',')) {
+            if (!$this->lexer->isNext(',')) {
                 break;
             }
 
-            $lexer->match(',');
+            $this->match(',');
         }
 
-        $lexer->match(')');
+        $this->match(')');
 
         return $this->factory->createMultiPolygon(
             $dimension ?: Dimension::DIMENSION_2D,
-            $srid,
             $polygons,
+            $this->srid
         );
     }
 
-    private function geometryCollection(
-        Lexer $lexer,
-        ?int $srid,
-        ?Dimension &$dimension,
-    ): mixed {
-        $dimension = $this->dimension(
-            $lexer,
-            $dimension,
-        );
+    private function geometryCollection(&$dimension = null) {
+        $dimension = $this->dimension($dimension);
 
-        if ($lexer->isNext('EMPTY')) {
-            $lexer->match('EMPTY');
+        if ($this->lexer->isNext('EMPTY')) {
+            $this->match('EMPTY');
 
             return $this->factory->createGeometryCollection(
                 $dimension ?: Dimension::DIMENSION_2D,
-                $srid,
                 [],
+                $this->srid
             );
         }
 
-        $lexer->match('(');
+        $this->match('(');
 
         $geometries = [];
 
         while (true) {
-            $geometry = $this->geometry(
-                $lexer,
-                $srid,
-                $dimension,
-            );
+            $geometries[] = $this->geometry($dimension);
 
-            $geometries[] = $geometry;
-
-            if (!$lexer->isNext(',')) {
+            if (!$this->lexer->isNext(',')) {
                 break;
             }
 
-            $lexer->match(',');
+            $this->match(',');
         }
 
-        $lexer->match(')');
+        $this->match(')');
 
         return $this->factory->createGeometryCollection(
             $dimension ?: Dimension::DIMENSION_2D,
-            $srid,
             $geometries,
+            $this->srid
         );
     }
 }

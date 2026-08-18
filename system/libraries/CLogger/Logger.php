@@ -1,6 +1,8 @@
 <?php
 
 use Psr\Log\LoggerInterface;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 
 class CLogger_Logger implements LoggerInterface {
     /**
@@ -32,7 +34,7 @@ class CLogger_Logger implements LoggerInterface {
      *
      * @return void
      */
-    public function __construct(LoggerInterface $logger, CEvent_DispatcherInterface $dispatcher = null) {
+    public function __construct(LoggerInterface $logger, ?CEvent_DispatcherInterface $dispatcher = null) {
         $this->logger = $logger;
         $this->dispatcher = $dispatcher;
     }
@@ -246,9 +248,9 @@ class CLogger_Logger implements LoggerInterface {
     protected function formatMessage($message) {
         if (is_array($message)) {
             return var_export($message, true);
-        } elseif ($message instanceof CInterface_Jsonable) {
+        } elseif ($message instanceof Jsonable) {
             return $message->toJson();
-        } elseif ($message instanceof CInterface_Arrayable) {
+        } elseif ($message instanceof Arrayable) {
             return var_export($message->toArray(), true);
         }
 

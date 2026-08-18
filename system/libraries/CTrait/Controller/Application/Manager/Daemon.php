@@ -2,8 +2,16 @@
 use Symfony\Component\Process\Process;
 
 trait CTrait_Controller_Application_Manager_Daemon {
+    protected $isShowStartTime = false;
+
     protected function getTitle() {
         return 'Daemon Manager';
+    }
+
+    protected function showStartTime() {
+        $this->isShowStartTime = true;
+
+        return $this->isShowStartTime;
     }
 
     public function index() {
@@ -21,12 +29,12 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $handlerActionClick->setUrl($this->controllerUrl() . 'reloadTabService');
 
         $reloadOptions = [];
-        static::reloadTabService($tableServiceDiv, $reloadOptions);
+        $this->reloadTabService($tableServiceDiv, $reloadOptions);
 
         return $app;
     }
 
-    public static function reloadTabService($container = null, $options = []) {
+    public function reloadTabService($container = null, $options = []) {
         $app = $container ?: c::app();
         $daemonManager = CManager_Daemon::instance();
         $request = array_merge(CApp_Base::getRequest(), $options);
@@ -38,7 +46,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
             $notGrouped = $daemonManager->daemons(false);
             if (count($notGrouped) > 0) {
                 $tab = $tabList->addTab()->setLabel('Not Grouped');
-                static::reloadTableService($tab, ['group' => false]);
+                $this->reloadTableService($tab, ['group' => false]);
             }
             foreach ($groupKeys as $groupName) {
                 $tab = $tabList->addTab()->setLabel($groupName);
@@ -46,23 +54,23 @@ trait CTrait_Controller_Application_Manager_Daemon {
                     $tab->setActive();
                 }
 
-                static::reloadTableService($tab, ['group' => $groupName]);
+                $this->reloadTableService($tab, ['group' => $groupName]);
             }
         } else {
             $div = $app->addDiv();
-            static::reloadTableService($div);
+            $this->reloadTableService($div);
         }
 
         return $app;
     }
 
-    public static function reloadTableService($container = null, $options = []) {
+    public function reloadTableService($container = null, $options = []) {
         $app = $container ?: c::app();
         $daemonManager = CManager_Daemon::instance();
 
         $request = array_merge(CApp_Base::getRequest(), $options);
         $group = carr::get($request, 'group');
-        $groupQueryString = '';
+        $groupQueryString = '?group=';
         if (strlen($group) > 0) {
             $groupQueryString = '?group=' . $group;
         }
@@ -74,17 +82,50 @@ trait CTrait_Controller_Application_Manager_Daemon {
             $dService['service_name'] = $vService;
             $dataService[] = $dService;
         }
+
         $table = $app->addTable();
         $table->setDataFromArray($dataService);
         $table->addColumn('service_name')->setLabel('Name')->setCallback(function ($row, $value) use ($groupQueryString) {
-            return CElement_Element_A::factory()->setHref(static::controllerUrl() . 'log/index/' . carr::get($row, 'service_class') . $groupQueryString)->add($value);
+            return CElement_Element_A::factory()->setHref($this->controllerUrl() . 'log/index/' . carr::get($row, 'service_class') . $groupQueryString)->add($value);
         });
         $table->addColumn('service_status')->setLabel('Service Status')->setCallback(function ($row, $value) {
             $isRunning = CManager::daemon()->isRunning(carr::get($row, 'service_class'));
             $badgeClass = $isRunning ? 'badge badge-success bg-success' : 'badge badge-danger bg-danger';
             $badgeLabel = $isRunning ? 'RUNNING' : 'STOPPED';
+            $div = c::div();
+            $div->addDiv()->add('<span class="' . $badgeClass . '">' . $badgeLabel . '</span>');
+            if ($this->showStartTime()) {
+                $runner = CDaemon::createRunner(carr::get($row, 'service_class'));
+                $startTime = $isRunning ? $runner->getStartTime() : '';
+                if ($startTime) {
+                    $div->addDiv()->add('<span>' . $startTime . '</span>');
+                }
+            }
 
-            return '<span class="' . $badgeClass . '">' . $badgeLabel . '</span>';
+            return $div;
+        });
+        // A leaking or spinning daemon still reports a normal memory
+        // footprint and a reassuring RUNNING status - this is the page
+        // people actually open when something seems wrong, so it's worth
+        // reading these directly rather than only in the CDaemon_Supervisor
+        // dashboard. One column (like Service Status above already stacks
+        // its badge + start time) rather than three, so getProcessMetrics()
+        // - a shell_exec("ps ...") plus a couple of /proc reads - runs once
+        // per row instead of three times.
+        $table->addColumn('service_class')->setLabel('Process')->setCallback(function ($row, $value) {
+            $isRunning = CManager::daemon()->isRunning($value);
+            if (!$isRunning) {
+                return '-';
+            }
+            $runner = CDaemon::createRunner($value);
+            $formatted = CDaemon_ProcessMetrics::format($runner->getProcessMetrics());
+
+            $div = c::div();
+            $div->addDiv()->add('<span title="File descriptors used / limit">fd: ' . c::e($formatted['fd']) . '</span>');
+            $div->addDiv()->add('<span title="Time since the process started">age: ' . c::e($formatted['age']) . '</span>');
+            $div->addDiv()->add('<span title="Cumulative CPU time and its share of the process\'s age">cpu: ' . c::e($formatted['cpu']) . '</span>');
+
+            return $div;
         });
         $table->setTitle('Service List');
         $table->setApplyDataTable(false);
@@ -100,6 +141,9 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $actStop = $table->addRowAction();
         $actStop->setIcon('fas fa-stop')->setLabel('Stop');
         $actStop->setLink(static::controllerUrl() . 'stop/{service_class}' . $groupQueryString)->setConfirm();
+        $actForceStop = $table->addRowAction();
+        $actForceStop->setIcon('fas fa-stop')->setLabel('Force Stop');
+        $actForceStop->setLink(static::controllerUrl() . 'stop/{service_class}' . $groupQueryString . '&force=1')->setConfirm();
         $actDebug = $table->addRowAction();
         $actDebug->setIcon('fas fa-life-ring')->setLabel('Debug');
         $actDebug->setLink(static::controllerUrl() . 'debug/{service_class}' . $groupQueryString);
@@ -132,9 +176,10 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $errCode = 0;
         $errMessage = '';
         $group = carr::get($_GET, 'group');
+        $force = (bool) carr::get($_GET, 'force');
 
         try {
-            $started = CManager::daemon()->stop($serviceClass);
+            $started = CManager::daemon()->stop($serviceClass, $force);
         } catch (Exception $ex) {
             $errCode++;
             $errMessage = $ex->getMessage();
@@ -155,19 +200,19 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
         switch ($method) {
             case 'index':
-                return call_user_func_array([$this, 'logIndex'], $logArgs);
+                return $this->logIndex(...$logArgs);
 
                 break;
             case 'file':
-                return call_user_func_array([$this, 'logFile'], $logArgs);
+                return $this->logFile(...$logArgs);
 
                 break;
             case 'restart':
-                return call_user_func_array([$this, 'logRestart'], $logArgs);
+                return $this->logRestart(...$logArgs);
 
                 break;
             case 'dump':
-                return call_user_func_array([$this, 'logDump'], $logArgs);
+                return $this->logDump(...$logArgs);
 
                 break;
             case 'back':
@@ -182,7 +227,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
             return c::redirect($this->controllerUrl());
         }
         $app = CApp::instance();
-        $db = CDatabase::instance();
         $group = carr::get($_GET, 'group');
         $app->addBreadcrumb($this->getTitle(), static::controllerUrl());
         $app->title(CManager::daemon()->getServiceName($serviceClass));
@@ -197,13 +241,13 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $logFile = CManager::daemon()->getLogFile($serviceClass);
         $basename = basename($logFile);
         if (file_exists($logFile)) {
-            $tabList->addTab()->setLabel('Current')->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '/' . $basename);
+            $tabList->addTab()->setLabel('Current')->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '?f=' . $basename);
         }
         for ($i = 1; $i <= 10; $i++) {
             $logFileRotate = $logFile . '.' . $i;
             if (file_exists($logFileRotate)) {
                 $basename = basename($logFileRotate);
-                $tabList->addTab()->setLabel('Rotate:' . $i)->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '/' . $basename);
+                $tabList->addTab()->setLabel('Rotate:' . $i)->setAjaxUrl(static::controllerUrl() . 'log/file/' . $serviceClass . '?f=' . $basename);
             }
         }
 
@@ -212,9 +256,8 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
     public function logFile($serviceClass = null, $filename = null) {
         $app = CApp::instance();
-        $db = CDatabase::instance();
+        $filename = $filename ?: c::request()->f;
         $logFile = CManager::daemon()->getLogFile($serviceClass, $filename);
-
         $divLog = $app->addDiv()->addClass('console');
         $log = '';
         if (file_exists($logFile)) {
@@ -231,8 +274,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
             return c::redirect($this->controllerUrl() . 'log/index' . static::groupQueryString());
         }
         $group = carr::get($_GET, 'group');
-        $app = CApp::instance();
-        $db = CDatabase::instance();
 
         $errCode = 0;
         $errMessage = '';
@@ -258,6 +299,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
             cmsg::add('error', $errMessage);
         }
         sleep(1);
+
         // curl::redirect($this->controllerUrl() . 'log/index/' . $serviceClass . static::groupQueryString());
         return c::redirect($this->controllerUrl() . 'log/index/' . $serviceClass . static::groupQueryString());
     }
@@ -269,7 +311,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
         }
 
         $app = CApp::instance();
-        $db = CDatabase::instance();
 
         $errCode = 0;
         $errMessage = '';
@@ -303,7 +344,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
             return c::redirect($this->controllerUrl());
         }
         $app = CApp::instance();
-        $db = CDatabase::instance();
         $group = carr::get($_GET, 'group');
         $app->addBreadcrumb($this->getTitle(), static::controllerUrl());
         $app->title(CManager::daemon()->getServiceName($serviceClass));

@@ -2,38 +2,45 @@
 
 namespace PHPStan\Reflection\BetterReflection\SourceLocator;
 
+use Override;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Namespace_;
-use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PHPStan\BetterReflection\Reflection\Exception\InvalidConstantNode;
 use PHPStan\BetterReflection\SourceLocator\Located\LocatedSource;
 use PHPStan\BetterReflection\Util\ConstantNodeChecker;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ConstantNameHelper;
 use function strtolower;
 
-class CachingVisitor extends NodeVisitorAbstract
+// autoTag: false - must not be tagged as a RichParser node visitor
+#[AutowiredService(autoTag: false)]
+final class CachingVisitor extends NodeVisitorAbstract
 {
 
 	private string $fileName;
 
 	private string $contents;
 
-	/** @var array<string, array<FetchedNode<Node\Stmt\ClassLike>>> */
+	/** @var array<string, list<FetchedNode<Node\Stmt\ClassLike>>> */
 	private array $classNodes;
 
-	/** @var array<string, array<FetchedNode<Node\Stmt\Function_>>> */
+	/** @var array<string, list<FetchedNode<Node\Stmt\Function_>>> */
 	private array $functionNodes;
 
-	/** @var array<string, array<FetchedNode<Node\Stmt\Const_|Node\Expr\FuncCall>>> */
+	/** @var array<string, list<FetchedNode<Node\Stmt\Const_|Node\Expr\FuncCall>>> */
 	private array $constantNodes;
 
 	private ?Node\Stmt\Namespace_ $currentNamespaceNode = null;
 
+	#[Override]
 	public function enterNode(Node $node): ?int
 	{
 		if ($node instanceof Namespace_) {
 			$this->currentNamespaceNode = $node;
+
+			return null;
 		}
 
 		if ($node instanceof Node\Stmt\ClassLike) {
@@ -45,12 +52,11 @@ class CachingVisitor extends NodeVisitorAbstract
 				$this->classNodes[strtolower($fullClassName)][] = new FetchedNode(
 					$node,
 					$this->currentNamespaceNode,
-					$this->fileName,
 					new LocatedSource($this->contents, $fullClassName, $this->fileName),
 				);
 			}
 
-			return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+			return NodeVisitor::DONT_TRAVERSE_CHILDREN;
 		}
 
 		if ($node instanceof Node\Stmt\Function_) {
@@ -59,12 +65,11 @@ class CachingVisitor extends NodeVisitorAbstract
 				$this->functionNodes[strtolower($functionName)][] = new FetchedNode(
 					$node,
 					$this->currentNamespaceNode,
-					$this->fileName,
 					new LocatedSource($this->contents, $functionName, $this->fileName),
 				);
 			}
 
-			return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+			return NodeVisitor::DONT_TRAVERSE_CHILDREN;
 		}
 
 		if ($node instanceof Node\Stmt\Const_) {
@@ -76,15 +81,14 @@ class CachingVisitor extends NodeVisitorAbstract
 				$this->constantNodes[ConstantNameHelper::normalize($const->namespacedName->toString())][] = new FetchedNode(
 					$node,
 					$this->currentNamespaceNode,
-					$this->fileName,
 					new LocatedSource($this->contents, null, $this->fileName),
 				);
 			}
 
-			return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+			return NodeVisitor::DONT_TRAVERSE_CHILDREN;
 		}
 
-		if ($node instanceof Node\Expr\FuncCall) {
+		if ($node instanceof Node\Expr\FuncCall && !$node->isFirstClassCallable()) {
 			try {
 				ConstantNodeChecker::assertValidDefineFunctionCall($node);
 			} catch (InvalidConstantNode) {
@@ -98,12 +102,11 @@ class CachingVisitor extends NodeVisitorAbstract
 			$constantNode = new FetchedNode(
 				$node,
 				$this->currentNamespaceNode,
-				$this->fileName,
 				new LocatedSource($this->contents, $constantName, $this->fileName),
 			);
 			$this->constantNodes[ConstantNameHelper::normalize($constantName)][] = $constantNode;
 
-			return NodeTraverser::DONT_TRAVERSE_CHILDREN;
+			return NodeVisitor::DONT_TRAVERSE_CHILDREN;
 		}
 
 		return null;
@@ -112,6 +115,7 @@ class CachingVisitor extends NodeVisitorAbstract
 	/**
 	 * @return null
 	 */
+	#[Override]
 	public function leaveNode(Node $node)
 	{
 		if (!$node instanceof Namespace_) {
@@ -123,7 +127,7 @@ class CachingVisitor extends NodeVisitorAbstract
 	}
 
 	/**
-	 * @return array<string, array<FetchedNode<Node\Stmt\ClassLike>>>
+	 * @return array<string, list<FetchedNode<Node\Stmt\ClassLike>>>
 	 */
 	public function getClassNodes(): array
 	{
@@ -131,7 +135,7 @@ class CachingVisitor extends NodeVisitorAbstract
 	}
 
 	/**
-	 * @return array<string, array<FetchedNode<Node\Stmt\Function_>>>
+	 * @return array<string, list<FetchedNode<Node\Stmt\Function_>>>
 	 */
 	public function getFunctionNodes(): array
 	{
@@ -139,7 +143,7 @@ class CachingVisitor extends NodeVisitorAbstract
 	}
 
 	/**
-	 * @return array<string, array<FetchedNode<Node\Stmt\Const_|Node\Expr\FuncCall>>>
+	 * @return array<string, list<FetchedNode<Node\Stmt\Const_|Node\Expr\FuncCall>>>
 	 */
 	public function getConstantNodes(): array
 	{

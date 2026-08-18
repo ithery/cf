@@ -41,7 +41,6 @@ class CHTTP_InputSanitizer {
             }
 
             // Warn the developer about register globals
-            CF::log(CLogger::DEBUG, 'Disable register_globals! It is evil and deprecated: http://php.net/register_globals');
         }
 
         if (is_array($_GET)) {
@@ -75,8 +74,6 @@ class CHTTP_InputSanitizer {
         } else {
             $_COOKIE = [];
         }
-
-        CF::log(CLogger::DEBUG, 'Global GET, POST and COOKIE data sanitized');
     }
 
     /**

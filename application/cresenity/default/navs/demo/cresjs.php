@@ -22,4 +22,16 @@ return [
         'label' => c::__('Confirm'),
         'uri' => 'demo/cresjs/confirm/index',
     ],
+
+    [
+        'name' => 'cresjs.reactive',
+        'label' => c::__('Reactive'),
+        'uri' => 'demo/cresjs/reactive/index',
+    ],
+
+    [
+        'name' => 'cresjs.style',
+        'label' => c::__('Style'),
+        'uri' => 'demo/cresjs/style/index',
+    ],
 ];

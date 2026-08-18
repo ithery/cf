@@ -1,9 +1,5 @@
 <?php
 
-// use Illuminate\Mail\SendQueuedMailable;
-
-// use Illuminate\Notifications\SendQueuedNotifications;
-
 /**
  * Job Payload class
  * Copied from laravel horizon.

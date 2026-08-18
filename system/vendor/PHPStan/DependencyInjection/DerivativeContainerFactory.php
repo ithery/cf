@@ -4,7 +4,8 @@ namespace PHPStan\DependencyInjection;
 
 use function array_merge;
 
-class DerivativeContainerFactory
+#[AutowiredService]
+final class DerivativeContainerFactory
 {
 
 	/**
@@ -14,16 +15,27 @@ class DerivativeContainerFactory
 	 * @param string[] $analysedPathsFromConfig
 	 */
 	public function __construct(
+		#[AutowiredParameter]
 		private string $currentWorkingDirectory,
+		#[AutowiredParameter(ref: '%tempDir%')]
 		private string $tempDirectory,
+		#[AutowiredParameter]
 		private array $additionalConfigFiles,
+		#[AutowiredParameter]
 		private array $analysedPaths,
+		#[AutowiredParameter]
 		private array $composerAutoloaderProjectPaths,
+		#[AutowiredParameter]
 		private array $analysedPathsFromConfig,
+		#[AutowiredParameter]
 		private string $usedLevel,
+		#[AutowiredParameter]
 		private ?string $generateBaselineFile,
+		#[AutowiredParameter]
 		private ?string $cliAutoloadFile,
+		#[AutowiredParameter]
 		private ?string $singleReflectionFile,
+		#[AutowiredParameter]
 		private ?string $singleReflectionInsteadOfFile,
 	)
 	{
@@ -31,12 +43,14 @@ class DerivativeContainerFactory
 
 	/**
 	 * @param string[] $additionalConfigFiles
+	 * @param array<mixed> $additionalParameters
 	 */
-	public function create(array $additionalConfigFiles): Container
+	public function create(array $additionalConfigFiles, array $additionalParameters = []): Container
 	{
 		$containerFactory = new ContainerFactory(
 			$this->currentWorkingDirectory,
 		);
+		$containerFactory->setJournalContainer();
 
 		return $containerFactory->create(
 			$this->tempDirectory,
@@ -49,6 +63,7 @@ class DerivativeContainerFactory
 			$this->cliAutoloadFile,
 			$this->singleReflectionFile,
 			$this->singleReflectionInsteadOfFile,
+			$additionalParameters,
 		);
 	}
 

@@ -1,12 +1,18 @@
 <?php
 
 trait CElement_Component_DataTable_Trait_JavascriptTrait {
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
-        $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'".c::__('element/datatable.search')." ' + title";
+        $quickSearchPlaceholder = $this->quickSearchPlaceholder ? "'" . $this->quickSearchPlaceholder . "'" : "'" . c::__('element/datatable.search') . " ' + title";
 
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
-        $ajax_url = '';
+        $ajaxUrl = '';
+        $varNameOTable = null;
         if ($this->ajax) {
             $columns = [];
             foreach ($this->columns as $col) {
@@ -40,7 +46,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             if (c::app()->isAuthEnabled()) {
                 $ajaxMethod->enableAuth();
             }
-            $ajax_url = $ajaxMethod->makeUrl();
+            $ajaxUrl = $ajaxMethod->makeUrl();
         }
 
         $js = new CStringBuilder();
@@ -71,11 +77,11 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $km .= $k;
                 $vm .= "'" . $v . "'";
             }
-            $hs_val = $this->headerSortable ? 'true' : 'false';
+            $hsVal = $this->headerSortable ? 'true' : 'false';
             $varName = 'table_' . cstr::slug($this->id(), '_');
             $varNameOTable = 'otable_' . cstr::slug($this->id(), '_');
             $js->appendln('var ' . $varName . " = jQuery('#" . $this->id . "');")->br();
-            $js->appendln('var header_sortable = ' . $hs_val . ';')->br();
+            $js->appendln('var header_sortable = ' . $hsVal . ';')->br();
             $js->appendln('var vaoColumns = [];')->br();
             if ($this->numbering) {
                 $aojson = [];
@@ -178,7 +184,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                     ->appendln('bRetrieve: true,')->br()
                     ->appendln($this->options->toJsonRow('processing'))->br()
                     ->appendln($this->options->toJsonRow('serverSide'))->br()
-                    ->appendln("sAjaxSource: '" . $ajax_url . "',")->br()
+                    ->appendln("sAjaxSource: '" . $ajaxUrl . "',")->br()
                     ->appendln("sServerMethod: '" . strtoupper($this->ajax_method) . "',")->br()
                     ->appendln("fnServerData: function ( sSource, aoData, fnCallback, oSettings ) {
         var data_quick_search = [];
@@ -248,7 +254,8 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
 
             $jqueryui = 'bJQueryUI: false,';
-            if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
+
+            if (c::manager()->asset()->module()->isRegisteredModule('jquery.ui') || c::manager()->asset()->module()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
                 $jqueryui = 'bJQueryUI: true,';
             }
             $js->appendln('buttons:        ' . json_encode($this->buttons) . ',')->br();
@@ -276,8 +283,8 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
              *
              */
             $js->appendln($jqueryui)->br()
-                ->appendln('iDisplayLength: ' . $this->display_length . ',')->br()
-                ->appendln('bSortCellsTop: ' . $hs_val . ',')->br()
+                ->appendln('iDisplayLength: ' . $this->displayLength . ',')->br()
+                ->appendln('bSortCellsTop: ' . $hsVal . ',')->br()
                 ->appendln('aaSorting: [],')->br()
 
                 ->appendln('oLanguage: ' . json_encode($this->getLegacyLabels()) . ',')->br()
@@ -478,6 +485,11 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         }
         if ($this->applyDataTable) {
             $js->appendln("$('#" . $this->id . "').data('cappDataTable'," . $varNameOTable . ');');
+            if ($this->autoRefreshInterval) {
+                $js->appendln("$('#" . $this->id . "').data('cappDataTableAutoRefreshHandler', setInterval( function () {
+                    $('#" . $this->id . "').DataTable().ajax.reload(null, false);
+                }, " . ((int) $this->autoRefreshInterval) . ' * 1000));');
+            }
         }
 
         return $js->text();

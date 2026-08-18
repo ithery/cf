@@ -65,10 +65,9 @@ class B extends A {
 
 if (PHP_MAJOR_VERSION >= 8) {
     eval('
-namespace Illuminate\Tests\Support;
 class F
 {
-    public function f(A|Model $x)
+    public function f(A|CModel $x)
     {
         //
     }

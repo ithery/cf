@@ -2,17 +2,19 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 24, 2019, 12:41:06 PM
- */
 class CElement_Element_Img extends CElement_Element {
     use CTrait_Compat_Element_Img;
 
+    /**
+     * @var null|string
+     */
     protected $progressiveImage = null;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id = '') {
         parent::__construct($id);
         $this->isOneTag = true;
@@ -32,6 +34,8 @@ class CElement_Element_Img extends CElement_Element {
      * Set Attribute src.
      *
      * @param string $src
+     *
+     * @return $this
      */
     public function setSrc($src) {
         $this->setAttr('src', $src);
@@ -43,6 +47,8 @@ class CElement_Element_Img extends CElement_Element {
      * Set Attribute alt.
      *
      * @param string $alt
+     *
+     * @return $this
      */
     public function setAlt($alt) {
         $this->setAttr('alt', $alt);

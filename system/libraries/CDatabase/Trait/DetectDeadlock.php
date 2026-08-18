@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 30, 2019, 7:34:27 PM
- */
 trait CDatabase_Trait_DetectDeadlock {
     /**
      * Determine if the given exception was caused by a deadlock.
@@ -18,6 +12,7 @@ trait CDatabase_Trait_DetectDeadlock {
      */
     protected function causedByDeadlock(Exception $e) {
         $message = $e->getMessage();
+
         return cstr::contains($message, [
             'Deadlock found when trying to get lock',
             'deadlock detected',

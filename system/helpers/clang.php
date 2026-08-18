@@ -1,6 +1,9 @@
 <?php
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated 1.6, use c::__
+ */
 class clang {
     private static $lang = null;
 
@@ -177,7 +180,7 @@ class clang {
                 $directory = 'core.' . $directory;
 
                 // If the file is required, throw an exception
-                throw new CException('core.resource_not_found', [c::__($directory)], $filename);
+                throw new Exception(c::__('core.resource_not_found', ['filename' => c::__($directory)], $filename));
             } else {
                 // Nothing was found, return FALSE
                 $found = false;

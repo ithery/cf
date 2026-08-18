@@ -1,8 +1,6 @@
 <?php
 
 return [
-    'api_key' => c::env('DEVCLOUD_KEY'),
-    'secret_key' => c::env('DEVCLOUD_SECRET'),
     'inspector' => [
         /*
         |--------------------------------------------------------------------------
@@ -24,7 +22,7 @@ return [
         |
         */
 
-        'url' => c::env('DEVCLOUD_INSPECTOR_URL', 'https://cpanel.ittron.co.id/inspector'),
+        'url' => c::env('DEVCLOUD_INSPECTOR_URL', 'https://devcloud.cresenity.com/inspector'),
 
         /*
         |--------------------------------------------------------------------------

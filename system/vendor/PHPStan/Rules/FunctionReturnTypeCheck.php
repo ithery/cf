@@ -6,16 +6,16 @@ use Generator;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PHPStan\Analyser\Scope;
-use PHPStan\Type\GenericTypeVariableResolver;
+use PHPStan\DependencyInjection\AutowiredService;
+use PHPStan\Type\ErrorType;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeUtils;
-use PHPStan\Type\TypeWithClassName;
 use PHPStan\Type\VerbosityLevel;
-use PHPStan\Type\VoidType;
 use function sprintf;
 
-class FunctionReturnTypeCheck
+#[AutowiredService]
+final class FunctionReturnTypeCheck
 {
 
 	public function __construct(private RuleLevelHelper $ruleLevelHelper)
@@ -23,7 +23,7 @@ class FunctionReturnTypeCheck
 	}
 
 	/**
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
 	public function checkReturnType(
 		Scope $scope,
@@ -42,27 +42,20 @@ class FunctionReturnTypeCheck
 		if ($returnType instanceof NeverType && $returnType->isExplicit()) {
 			return [
 				RuleErrorBuilder::message($neverMessage)
-					->line($returnNode->getLine())
+					->line($returnNode->getStartLine())
+					->identifier('return.never')
 					->build(),
 			];
 		}
 
 		if ($isGenerator) {
-			if (!$returnType instanceof TypeWithClassName) {
-				return [];
-			}
-
-			$returnType = GenericTypeVariableResolver::getType(
-				$returnType,
-				Generator::class,
-				'TReturn',
-			);
-			if ($returnType === null) {
+			$returnType = $returnType->getTemplateType(Generator::class, 'TReturn');
+			if ($returnType instanceof ErrorType) {
 				return [];
 			}
 		}
 
-		$isVoidSuperType = (new VoidType())->isSuperTypeOf($returnType);
+		$isVoidSuperType = $returnType->isVoid();
 		$verbosityLevel = VerbosityLevel::getRecommendedLevelByType($returnType, null);
 		if ($returnValue === null) {
 			if (!$isVoidSuperType->no()) {
@@ -73,7 +66,10 @@ class FunctionReturnTypeCheck
 				RuleErrorBuilder::message(sprintf(
 					$emptyReturnStatementMessage,
 					$returnType->describe($verbosityLevel),
-				))->line($returnNode->getLine())->build(),
+				))
+					->line($returnNode->getStartLine())
+					->identifier('return.empty')
+					->build(),
 			];
 		}
 
@@ -89,17 +85,25 @@ class FunctionReturnTypeCheck
 				RuleErrorBuilder::message(sprintf(
 					$voidMessage,
 					$returnValueType->describe($verbosityLevel),
-				))->line($returnNode->getLine())->build(),
+				))
+					->line($returnNode->getStartLine())
+					->identifier('return.void')
+					->build(),
 			];
 		}
 
-		if (!$this->ruleLevelHelper->accepts($returnType, $returnValueType, $scope->isDeclareStrictTypes())) {
+		$accepts = $this->ruleLevelHelper->accepts($returnType, $returnValueType, $scope->isDeclareStrictTypes());
+		if (!$accepts->result) {
 			return [
 				RuleErrorBuilder::message(sprintf(
 					$typeMismatchMessage,
 					$returnType->describe($verbosityLevel),
 					$returnValueType->describe($verbosityLevel),
-				))->line($returnNode->getLine())->build(),
+				))
+					->line($returnNode->getStartLine())
+					->identifier('return.type')
+					->acceptsReasonsTip($accepts->reasons)
+					->build(),
 			];
 		}
 

@@ -69,6 +69,18 @@ class CBase_Reflector {
             return;
         }
 
+        return static::getTypeName($parameter, $type);
+    }
+
+    /**
+     * Get the given type's class name.
+     *
+     * @param \ReflectionParameter $parameter
+     * @param \ReflectionNamedType $type
+     *
+     * @return string
+     */
+    protected static function getTypeName($parameter, $type) {
         $name = $type->getName();
 
         if (!is_null($class = $parameter->getDeclaringClass())) {

@@ -1,10 +1,12 @@
 <?php
-
+/**
+ * @see CRedis
+ */
 interface CRedis_FactoryInterface {
     /**
      * Get a Redis connection by name.
      *
-     * @param string|null $name
+     * @param null|string $name
      *
      * @return CRedis_ConnectionInterface
      */

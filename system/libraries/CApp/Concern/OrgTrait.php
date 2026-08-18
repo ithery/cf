@@ -1,13 +1,14 @@
 <?php
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 27, 2019, 10:53:10 PM
- */
+
 trait CApp_Concern_OrgTrait {
+    /**
+     * @var null|CModel|CApp_Model_Org
+     */
     private $org = null;
 
+    /**
+     * @var null|int
+     */
     private $orgId = null;
 
     /**
@@ -31,6 +32,9 @@ trait CApp_Concern_OrgTrait {
         return null;
     }
 
+    /**
+     * @return null|int
+     */
     public function orgId() {
         return CApp_Base::orgId();
     }

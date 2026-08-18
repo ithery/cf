@@ -2,14 +2,8 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 2, 2018, 5:12:31 PM
- */
 trait CObservable_Trait_EventsTrait {
-    public function onClick(Closure $event = null, $options = []) {
+    public function onClick(?Closure $event = null, $options = []) {
         /** @var CObservable $this */
         $compiledJs = $this->getCompiledEventJs($event);
 
@@ -18,7 +12,7 @@ trait CObservable_Trait_EventsTrait {
         return $this;
     }
 
-    public function onHover(Closure $event = null, $options = []) {
+    public function onHover(?Closure $event = null, $options = []) {
         /** @var CObservable $this */
         $compiledJs = $this->getCompiledEventJs($event);
 
@@ -27,7 +21,7 @@ trait CObservable_Trait_EventsTrait {
         return $this;
     }
 
-    public function onMouseEnter(Closure $event = null, $options = []) {
+    public function onMouseEnter(?Closure $event = null, $options = []) {
         /** @var CObservable $this */
         $compiledJs = $this->getCompiledEventJs($event);
 
@@ -36,7 +30,7 @@ trait CObservable_Trait_EventsTrait {
         return $this;
     }
 
-    public function onMouseLeave(Closure $event = null, $options = []) {
+    public function onMouseLeave(?Closure $event = null, $options = []) {
         /** @var CObservable $this */
         $compiledJs = $this->getCompiledEventJs($event);
 

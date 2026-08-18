@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 3:47:40 AM
- */
 use League\Flysystem\Visibility;
 use League\Flysystem\PathPrefixer;
 use League\Flysystem\Ftp\FtpAdapter;
@@ -29,7 +23,7 @@ use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
 
 /**
- * @mixin \League\Flysystem\FilesystemInterface
+ * @mixin \League\Flysystem\FilesystemOperator
  *
  * @see CStorage
  */
@@ -104,18 +98,18 @@ class CStorage_Adapter implements CStorage_CloudInterface {
     public function assertExists($path, $content = null) {
         clearstatcache();
         $paths = carr::wrap($path);
-        foreach ($paths as $path) {
+        foreach ($paths as $singlePath) {
             PHPUnit::assertTrue(
-                $this->exists($path),
-                "Unable to find a file at path [{$path}]."
+                $this->exists($singlePath),
+                "Unable to find a file at path [{$singlePath}]."
             );
             if (!is_null($content)) {
-                $actual = $this->get($path);
+                $actual = $this->get($singlePath);
 
                 PHPUnit::assertSame(
                     $content,
                     $actual,
-                    "File or directory [{$path}] was found, but content [{$actual}] does not match [{$content}]."
+                    "File or directory [{$singlePath}] was found, but content [{$actual}] does not match [{$content}]."
                 );
             }
         }
@@ -135,10 +129,10 @@ class CStorage_Adapter implements CStorage_CloudInterface {
 
         $paths = carr::wrap($path);
 
-        foreach ($paths as $path) {
+        foreach ($paths as $singlePath) {
             PHPUnit::assertFalse(
-                $this->exists($path),
-                "Found unexpected file or directory at path [{$path}]."
+                $this->exists($singlePath),
+                "Found unexpected file or directory at path [{$singlePath}]."
             );
         }
 
@@ -614,7 +608,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
         if (method_exists($adapter, 'getUrl')) {
             return $adapter->getUrl($path);
         } elseif (method_exists($this->driver, 'getUrl')) {
-            return $this->driver->getUrl($path);
+            return call_user_func([$this->driver, 'getUrl'], $path);
         } elseif ($adapter instanceof FtpAdapter || $adapter instanceof SftpAdapter) {
             return $this->getFtpUrl($path);
         } elseif ($adapter instanceof LocalAdapter) {
@@ -682,7 +676,7 @@ class CStorage_Adapter implements CStorage_CloudInterface {
      */
     public function temporaryUrl($path, $expiration, array $options = []) {
         if (method_exists($this->adapter, 'getTemporaryUrl')) {
-            return $this->adapter->getTemporaryUrl($path, $expiration, $options);
+            return call_user_func([$this->adapter, 'getTemporaryUrl'], $path, $expiration, $options);
         }
 
         if ($this->temporaryUrlCallback) {

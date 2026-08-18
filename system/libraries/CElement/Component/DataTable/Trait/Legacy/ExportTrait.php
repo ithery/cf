@@ -1,6 +1,13 @@
 <?php
 
 trait CElement_Component_DataTable_Trait_Legacy_ExportTrait {
+    /**
+     * @param string                             $filename
+     * @param null|string                        $sheet_name
+     * @param null|CElement_Component_DataTable  $table
+     *
+     * @return void
+     */
     private static function exportExcelxmlStatic($filename, $sheet_name = null, $table = null) {
         header('Cache-Control: no-cache, no-store, must-revalidate');
         header('Content-Type: application/vnd.ms-excel');
@@ -120,7 +127,7 @@ trait CElement_Component_DataTable_Trait_Legacy_ExportTrait {
         $no = 0;
         $data = $table->data;
         if (!is_resource($data)) {
-            $data = CDatabase::instance()->query($table->query);
+            $data = c::db()->query($table->query);
         }
         if (!is_resource($data)) {
             if (is_object($data)) {
@@ -227,18 +234,18 @@ trait CElement_Component_DataTable_Trait_Legacy_ExportTrait {
                 $additionColumn++;
             }
 
-            foreach ($table->footer_field as $f) {
+            foreach ($table->footerFields as $f) {
                 echo '<tr>';
 
-                $colspan = $f['labelcolspan'];
+                $colspan = $f->getLabelColSpan();
                 if ($colspan == 0) {
                     $colspan = $totalColumn + $additionColumn - 1;
                 }
                 echo '<td class="tfoot" colspan="' . ($colspan) . '">';
-                echo $f['label'];
+                echo $f->getLabel();
                 echo '</td>';
                 $class = '';
-                switch ($f['align']) {
+                switch ($f->getAlign()) {
                     case 'left':
                         $class .= ' align-left';
 
@@ -253,7 +260,7 @@ trait CElement_Component_DataTable_Trait_Legacy_ExportTrait {
                         break;
                 }
 
-                $fval = $f['value'];
+                $fval = $f->getValue();
 
                 if (is_array($fval)) {
                     $skip_column = 0;

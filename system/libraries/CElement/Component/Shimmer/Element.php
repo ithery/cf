@@ -6,6 +6,17 @@ class CElement_Component_Shimmer_Element {
      */
     protected $builder;
 
+    /**
+     * @var string
+     */
+    protected $class;
+
+    /**
+     * @param string        $class
+     * @param callable|null $builderCallback
+     *
+     * @return void
+     */
     public function __construct($class, $builderCallback) {
         $this->class = $class;
         if ($builderCallback) {
@@ -13,6 +24,9 @@ class CElement_Component_Shimmer_Element {
         }
     }
 
+    /**
+     * @return string
+     */
     public function toHtml() {
         $html = '<div class="' . $this->class . '">';
         if ($this->builder) {

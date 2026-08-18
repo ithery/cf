@@ -2,12 +2,15 @@
 
 namespace PHPStan\Node;
 
+use Override;
 use PhpParser\Node\Stmt\Catch_;
 use PhpParser\NodeAbstract;
 use PHPStan\Type\Type;
 
-/** @api */
-class CatchWithUnthrownExceptionNode extends NodeAbstract implements VirtualNode
+/**
+ * @api
+ */
+final class CatchWithUnthrownExceptionNode extends NodeAbstract implements VirtualNode
 {
 
 	public function __construct(private Catch_ $originalNode, private Type $caughtType, private Type $originalCaughtType)
@@ -30,6 +33,7 @@ class CatchWithUnthrownExceptionNode extends NodeAbstract implements VirtualNode
 		return $this->originalCaughtType;
 	}
 
+	#[Override]
 	public function getType(): string
 	{
 		return 'PHPStan_Node_CatchWithUnthrownExceptionNode';
@@ -38,6 +42,7 @@ class CatchWithUnthrownExceptionNode extends NodeAbstract implements VirtualNode
 	/**
 	 * @return string[]
 	 */
+	#[Override]
 	public function getSubNodeNames(): array
 	{
 		return [];

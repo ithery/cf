@@ -1,6 +1,9 @@
 <?php
 
 class CElement_Component_Chart_Morris extends CElement_Component_Chart {
+    /**
+     * @return void
+     */
     public function __construct() {
         parent::__construct();
         CManager::instance()->registerModule('eve');
@@ -8,11 +11,19 @@ class CElement_Component_Chart_Morris extends CElement_Component_Chart {
         CManager::instance()->registerModule('morris');
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         parent::build();
         $this->addClass('cchart cchart-morris');
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);
@@ -21,7 +32,7 @@ class CElement_Component_Chart_Morris extends CElement_Component_Chart {
         $js->append("
 	    	new Chart($('#" . $this->id . "'), {
 	    		type: '" . $this->type . "',
-	    		data: " . $this->data . ',
+	    		data: " . json_encode($this->data) . ',
 	    		options: {},
     		})
 	    ')->br();

@@ -4,15 +4,20 @@ namespace PHPStan\Rules\Generics;
 
 use PhpParser\Node;
 use PhpParser\Node\Name;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Reflection\ReflectionProvider;
-use PHPStan\Rules\MissingTypehintCheck;
-use PHPStan\Rules\RuleError;
+use PHPStan\Rules\IdentifierRuleError;
+use PHPStan\Rules\PhpDoc\UnresolvableTypeHelper;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\Generic\GenericObjectType;
+use PHPStan\Type\Generic\TemplateType;
 use PHPStan\Type\Generic\TemplateTypeVariance;
+use PHPStan\Type\Generic\TypeProjectionHelper;
 use PHPStan\Type\Type;
 use PHPStan\Type\VerbosityLevel;
 use function array_fill_keys;
+use function array_filter;
 use function array_keys;
 use function array_map;
 use function array_merge;
@@ -21,7 +26,8 @@ use function implode;
 use function in_array;
 use function sprintf;
 
-class GenericAncestorsCheck
+#[AutowiredService]
+final class GenericAncestorsCheck
 {
 
 	/**
@@ -31,8 +37,11 @@ class GenericAncestorsCheck
 		private ReflectionProvider $reflectionProvider,
 		private GenericObjectTypeCheck $genericObjectTypeCheck,
 		private VarianceCheck $varianceCheck,
-		private bool $checkGenericClassInNonGenericObjectType,
+		private UnresolvableTypeHelper $unresolvableTypeHelper,
+		#[AutowiredParameter(ref: '%featureToggles.skipCheckGenericClasses%')]
 		private array $skipCheckGenericClasses,
+		#[AutowiredParameter]
+		private bool $checkMissingTypehints,
 	)
 	{
 	}
@@ -40,18 +49,20 @@ class GenericAncestorsCheck
 	/**
 	 * @param array<Node\Name> $nameNodes
 	 * @param array<Type> $ancestorTypes
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
 	public function check(
 		array $nameNodes,
 		array $ancestorTypes,
 		string $incompatibleTypeMessage,
+		string $unresolvableTypeMessage,
 		string $noNamesMessage,
 		string $noRelatedNameMessage,
 		string $classNotGenericMessage,
 		string $notEnoughTypesMessage,
 		string $extraTypesMessage,
 		string $typeIsNotSubtypeMessage,
+		string $typeProjectionIsNotAllowedMessage,
 		string $invalidTypeMessage,
 		string $genericClassInNonGenericObjectType,
 		string $invalidVarianceMessage,
@@ -64,16 +75,22 @@ class GenericAncestorsCheck
 		$messages = [];
 		foreach ($ancestorTypes as $ancestorType) {
 			if (!$ancestorType instanceof GenericObjectType) {
-				$messages[] = RuleErrorBuilder::message(sprintf($incompatibleTypeMessage, $ancestorType->describe(VerbosityLevel::typeOnly())))->build();
+				$messages[] = RuleErrorBuilder::message(sprintf($incompatibleTypeMessage, $ancestorType->describe(VerbosityLevel::typeOnly())))
+					->identifier('generics.notCompatible')
+					->build();
 				continue;
 			}
 
 			$ancestorTypeClassName = $ancestorType->getClassName();
 			if (!isset($names[$ancestorTypeClassName])) {
 				if (count($names) === 0) {
-					$messages[] = RuleErrorBuilder::message($noNamesMessage)->build();
+					$messages[] = RuleErrorBuilder::message($noNamesMessage)
+						->identifier('generics.noParent')
+						->build();
 				} else {
-					$messages[] = RuleErrorBuilder::message(sprintf($noRelatedNameMessage, $ancestorTypeClassName, implode(', ', array_keys($names))))->build();
+					$messages[] = RuleErrorBuilder::message(sprintf($noRelatedNameMessage, $ancestorTypeClassName, implode(', ', array_keys($names))))
+						->identifier('generics.wrongParent')
+						->build();
 				}
 
 				continue;
@@ -87,18 +104,44 @@ class GenericAncestorsCheck
 				$notEnoughTypesMessage,
 				$extraTypesMessage,
 				$typeIsNotSubtypeMessage,
+				'',
+				'',
 			);
 			$messages = array_merge($messages, $genericObjectTypeCheckMessages);
 
+			$unresolvableType = $this->unresolvableTypeHelper->getUnresolvableType($ancestorType);
+			if ($unresolvableType !== null) {
+				$errorBuilder = RuleErrorBuilder::message($unresolvableTypeMessage)
+					->identifier('generics.unresolvable');
+				foreach ($unresolvableType->reasons as $reason) {
+					$errorBuilder->addTip($reason);
+				}
+				$messages[] = $errorBuilder->build();
+			}
+
 			foreach ($ancestorType->getReferencedClasses() as $referencedClass) {
-				if ($this->reflectionProvider->hasClass($referencedClass)) {
+				if (!$this->reflectionProvider->hasClass($referencedClass)) {
+					$messages[] = RuleErrorBuilder::message(sprintf($invalidTypeMessage, $referencedClass))
+						->identifier('class.notFound')
+						->build();
 					continue;
 				}
 
-				$messages[] = RuleErrorBuilder::message(sprintf($invalidTypeMessage, $referencedClass))->build();
+				if ($referencedClass === $ancestorType->getClassName()) {
+					continue;
+				}
+
+				$classReflection = $this->reflectionProvider->getClass($referencedClass);
+				if (!$classReflection->isTrait()) {
+					continue;
+				}
+
+				$messages[] = RuleErrorBuilder::message(sprintf($invalidTypeMessage, $referencedClass))
+					->identifier('generics.trait')
+					->build();
 			}
 
-			$variance = TemplateTypeVariance::createInvariant();
+			$variance = TemplateTypeVariance::createStatic();
 			$messageContext = sprintf(
 				$invalidVarianceMessage,
 				$ancestorType->describe(VerbosityLevel::typeOnly()),
@@ -106,9 +149,21 @@ class GenericAncestorsCheck
 			foreach ($this->varianceCheck->check($variance, $ancestorType, $messageContext) as $message) {
 				$messages[] = $message;
 			}
+
+			foreach ($ancestorType->getVariances() as $index => $typeVariance) {
+				if ($typeVariance->invariant()) {
+					continue;
+				}
+
+				$messages[] = RuleErrorBuilder::message(sprintf(
+					$typeProjectionIsNotAllowedMessage,
+					TypeProjectionHelper::describe($ancestorType->getTypes()[$index], $typeVariance, VerbosityLevel::typeOnly()),
+					$ancestorType->describe(VerbosityLevel::typeOnly()),
+				))->identifier('generics.callSiteVarianceNotAllowed')->build();
+			}
 		}
 
-		if ($this->checkGenericClassInNonGenericObjectType) {
+		if ($this->checkMissingTypehints) {
 			foreach (array_keys($unusedNames) as $unusedName) {
 				if (!$this->reflectionProvider->hasClass($unusedName)) {
 					continue;
@@ -122,11 +177,25 @@ class GenericAncestorsCheck
 					continue;
 				}
 
+				$templateTypes = $unusedNameClassReflection->getTemplateTypeMap()->getTypes();
+				$templateTypesCount = count($templateTypes);
+				$requiredTemplateTypesCount = count(array_filter($templateTypes, static fn (Type $type) => $type instanceof TemplateType && $type->getDefault() === null));
+				if ($requiredTemplateTypesCount === 0) {
+					continue;
+				}
+
+				$templateTypesList = implode(', ', array_keys($templateTypes));
+				if ($requiredTemplateTypesCount !== $templateTypesCount) {
+					$templateTypesList .= sprintf(' (%d-%d required)', $requiredTemplateTypesCount, $templateTypesCount);
+				}
+
 				$messages[] = RuleErrorBuilder::message(sprintf(
 					$genericClassInNonGenericObjectType,
 					$unusedName,
-					implode(', ', array_keys($unusedNameClassReflection->getTemplateTypeMap()->getTypes())),
-				))->tip(MissingTypehintCheck::TURN_OFF_NON_GENERIC_CHECK_TIP)->build();
+					$templateTypesList,
+				))
+					->identifier('missingType.generics')
+					->build();
 			}
 		}
 

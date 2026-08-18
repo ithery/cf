@@ -2,22 +2,27 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 14, 2018, 3:50:56 PM
- */
 class CElement_FormInput_SelectTag extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectTag;
 
+    /**
+     * @var bool
+     */
     protected $multiple;
 
+    /**
+     * @param null|string $id
+     */
     public function __construct($id = null) {
         parent::__construct($id);
         $this->multiple = true;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         if (CManager::instance()->isRegisteredModule('bootstrap-4-material') || CManager::instance()->isRegisteredModule('bootstrap-4')) {
             $html = new CStringBuilder();
@@ -53,7 +58,7 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
             foreach ($this->attr as $k => $v) {
                 $addition_attribute .= ' ' . $k . '="' . $v . '"';
             }
-            $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="form-control select' . $classes . $this->validation->validationClass() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')
+            $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="form-control select' . $classes . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')
                 ->incIndent()->br();
 
             if ($this->list != null) {
@@ -111,6 +116,11 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         if (CManager::instance()->isRegisteredModule('bootstrap-4-material') || CManager::instance()->isRegisteredModule('bootstrap-4')) {
             $js = "

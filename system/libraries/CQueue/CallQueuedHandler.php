@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Nov 4, 2019, 4:59:02 PM
- */
 class CQueue_CallQueuedHandler {
     /**
      * The bus dispatcher implementation.
@@ -22,6 +16,15 @@ class CQueue_CallQueuedHandler {
      * @var CContainer_Container
      */
     protected $container;
+
+    /**
+     * The command currently being run.
+     *
+     * Kept so the worker can pass an interrupt signal on to it.
+     *
+     * @var null|mixed
+     */
+    protected $runningCommand;
 
     /**
      * Create a new handler instance.
@@ -52,13 +55,15 @@ class CQueue_CallQueuedHandler {
         } catch (CModel_Exception_ModelNotFoundException $e) {
             return $this->handleModelNotFound($job, $e);
         }
+        $this->runningCommand = $command;
+
+        $this->dispatchThroughMiddleware($job, $command);
+
         if ($command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
 
-        $this->dispatchThroughMiddleware($job, $command);
-
-        if (! $job->isReleased() && ! $command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
+        if (!$job->isReleased() && !$command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
         if (!$job->hasFailed() && !$job->isReleased()) {
@@ -68,6 +73,16 @@ class CQueue_CallQueuedHandler {
         if (!$job->isDeletedOrReleased()) {
             $job->delete();
         }
+        $this->runningCommand = null;
+    }
+
+    /**
+     * Get the command currently being run, if any.
+     *
+     * @return null|mixed
+     */
+    public function getRunningCommand() {
+        return $this->runningCommand;
     }
 
     /**
@@ -98,9 +113,17 @@ class CQueue_CallQueuedHandler {
      * @return mixed
      */
     protected function dispatchThroughMiddleware(CQueue_AbstractJob $job, $command) {
+        if ($command instanceof \__PHP_Incomplete_Class) {
+            throw new Exception('Job is incomplete class: ' . json_encode($command));
+        }
+
         return (new CQueue_Pipeline($this->container))->send($command)
             ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], isset($command->middleware) ? $command->middleware : []))
             ->then(function ($command) use ($job) {
+                if ($command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
+                    $this->ensureUniqueJobLockIsReleased($command);
+                }
+
                 return $this->dispatcher->dispatchNow(
                     $command,
                     $this->resolveHandler($job, $command)
@@ -228,7 +251,7 @@ class CQueue_CallQueuedHandler {
     public function failed(array $data, $e, $uuid) {
         $command = $this->getCommand($data);
 
-        if (! $command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
+        if (!$command instanceof CQueue_Contract_ShouldBeUniqueUntilProcessingInterface) {
             $this->ensureUniqueJobLockIsReleased($command);
         }
 

@@ -2,21 +2,31 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 11, 2019, 2:08:47 AM
- */
 class CManager_File_Connector_FileManager_FM {
     const PACKAGE_NAME = 'capp-filemanager';
 
     const DS = '/';
 
+    /**
+     * Raw config array passed in from CElement_Component_FileManager::buildConfig(),
+     * merged over the framework's filemanager.php config in config().
+     *
+     * @var array
+     */
     protected $config = [];
 
+    /**
+     * Cached translation array, lazily loaded by getTranslation().
+     *
+     * @var null|array
+     */
     protected $labels;
 
+    /**
+     * @param array $config
+     *
+     * @return void
+     */
     public function __construct($config = []) {
         $this->config = $config;
 
@@ -24,11 +34,9 @@ class CManager_File_Connector_FileManager_FM {
     }
 
     /**
-     * Dispatch an event and call the listeners.
-     *
-     * //@param string|object $event
-     * //@param mixed         $payload
-     * //@param bool          $halt
+     * Dispatch an event and call the listeners. Takes variadic arguments instead of a
+     * fixed signature: the first is the event instance/name, the rest are passed
+     * through to the listeners as the event payload.
      *
      * @return null|array
      */
@@ -40,6 +48,9 @@ class CManager_File_Connector_FileManager_FM {
         return CEvent::dispatcher()->dispatch($event, $payload);
     }
 
+    /**
+     * @return CManager_File_Connector_FileManager_FM_Path
+     */
     public function path() {
         return new CManager_File_Connector_FileManager_FM_Path($this);
     }
@@ -55,10 +66,23 @@ class CManager_File_Connector_FileManager_FM {
         return $this->translateFromUtf8(CHTTP::request()->input($key));
     }
 
+    /**
+     * Reads a config key (dot notation), preferring the value passed in via the
+     * element's setConfig()/buildConfig(), falling back to the framework's own
+     * filemanager.php config file.
+     *
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
     public function config($key, $default = null) {
         return carr::get($this->config, $key, CF::config('filemanager.' . $key, $default));
     }
 
+    /**
+     * @return array
+     */
     public function configData() {
         return $this->config;
     }
@@ -79,6 +103,9 @@ class CManager_File_Connector_FileManager_FM {
         return $fmType;
     }
 
+    /**
+     * @return array
+     */
     public function availableMimeTypes() {
         return $this->config('folder_categories.' . $this->currentFmType() . '.valid_mime');
     }
@@ -107,10 +134,21 @@ class CManager_File_Connector_FileManager_FM {
         return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
     }
 
+    /**
+     * Max upload size for the current fm type/category, in KB.
+     *
+     * @return int
+     */
     public function maxUploadSize() {
         return $this->config('folder_categories.' . $this->currentFmType() . '.max_size');
     }
 
+    /**
+     * Lazily loads and caches the element/filemanager language file for the
+     * current locale.
+     *
+     * @return array
+     */
     public function getTranslation() {
         if ($this->labels == null) {
             $translator = CTranslation::translator();
@@ -120,10 +158,21 @@ class CManager_File_Connector_FileManager_FM {
         return $this->labels;
     }
 
+    /**
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
     public function getLabel($key, $default = null) {
         return carr::get($this->getTranslation(), $key, $default);
     }
 
+    /**
+     * @param string $type 'user' for private per-user folders, anything else for the shared folder
+     *
+     * @return bool
+     */
     public function allowFolderType($type) {
         if ($type == 'user') {
             return $this->allowMultiUser();
@@ -155,6 +204,12 @@ class CManager_File_Connector_FileManager_FM {
         return $this->config('allow_share_folder') === true;
     }
 
+    /**
+     * 'grid' or 'list', from the showList request input, falling back to the
+     * current fm type's configured startup_view.
+     *
+     * @return string
+     */
     public function getDisplayMode() {
         $typeKey = $this->currentFmType();
         $startupView = $this->config('folder_categories.' . $typeKey . '.startup_view');
@@ -167,10 +222,22 @@ class CManager_File_Connector_FileManager_FM {
         return $viewType;
     }
 
+    /**
+     * @param string $storagePath
+     *
+     * @return CManager_File_Connector_FileManager_FM_StorageRepository
+     */
     public function getStorage($storagePath) {
         return new CManager_File_Connector_FileManager_FM_StorageRepository($storagePath, $this);
     }
 
+    /**
+     * The current fm type's category subfolder (e.g. 'files'/'photos'), prefixed
+     * with root_path -- see CElement_Component_FileManager's own docblock re:
+     * root_path being a container directory rather than the browsable root itself.
+     *
+     * @return string
+     */
     public function getCategoryName() {
         $type = $this->currentFmType();
 
@@ -183,10 +250,18 @@ class CManager_File_Connector_FileManager_FM {
         return $rootPath;
     }
 
+    /**
+     * @param null|string $type currently unused; always returns the site root
+     *
+     * @return string
+     */
     public function getRootFolder($type = null) {
         return '/';
     }
 
+    /**
+     * @return string
+     */
     public function getUserSlug() {
         $config = $this->config('user_folder_name');
         if (is_callable($config)) {
@@ -195,7 +270,7 @@ class CManager_File_Connector_FileManager_FM {
         if (class_exists($config)) {
             // return app()->make($config)->userField();
         }
-        $app = CApp::instance();
+        $app = c::app();
         $user = $app->user();
 
         return $user ? $user->username : '';
@@ -216,15 +291,17 @@ class CManager_File_Connector_FileManager_FM {
     }
 
     /**
-     * Shorter function of getting localized error message..
+     * Shorter function for throwing a localized error message (key looked up
+     * under element/filemanager.error-{$errorType}) -- always throws, never
+     * actually returns.
      *
      * @param string $errorType key of message in lang file
      * @param array  $variables variables the message needs
      *
-     * @return string
+     * @throws \Exception
      */
     public function error($errorType, array $variables = []) {
-        throw new \Exception(clang::__('filemanager.error-' . $errorType, $variables));
+        throw new \Exception(c::__('element/filemanager.error-' . $errorType, $variables));
     }
 
     /**
@@ -238,18 +315,34 @@ class CManager_File_Connector_FileManager_FM {
         return pathinfo($path, PATHINFO_BASENAME);
     }
 
+    /**
+     * @return string
+     */
     public function getThumbFolderName() {
         return $this->config('thumb_folder_name');
     }
 
+    /**
+     * @param string $ext file extension, without the leading dot
+     *
+     * @return string
+     */
     public function getFileIcon($ext) {
         return $this->config("file_icon_array.{$ext}", 'fa-file-o');
     }
 
+    /**
+     * @param string $ext file extension, without the leading dot
+     *
+     * @return string
+     */
     public function getFileType($ext) {
         return $this->config("file_type_array.{$ext}", 'File');
     }
 
+    /**
+     * @return string
+     */
     public function connectorUrl() {
         return $this->config('connector_url', curl::base() . 'cresenity/connector/fm');
     }

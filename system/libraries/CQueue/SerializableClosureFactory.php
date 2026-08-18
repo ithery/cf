@@ -14,7 +14,6 @@ class CQueue_SerializableClosureFactory {
             return new OpisSerializableClosure($closure);
         }
 
-        return new OpisSerializableClosure($closure);
-        //return new SerializableClosure($closure);
+        return new CFunction_SerializableClosure($closure);
     }
 }

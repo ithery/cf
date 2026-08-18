@@ -4,25 +4,30 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\FunctionReflection;
-use PHPStan\Reflection\ParametersAcceptorSelector;
-use PHPStan\Type\Accessory\AccessoryNonEmptyStringType;
+use PHPStan\ShouldNotHappenException;
+use PHPStan\Type\Accessory\AccessoryLowercaseStringType;
+use PHPStan\Type\Accessory\AccessoryNonFalsyStringType;
+use PHPStan\Type\BenevolentUnionType;
 use PHPStan\Type\Constant\ConstantBooleanType;
 use PHPStan\Type\Constant\ConstantStringType;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
 use PHPStan\Type\IntersectionType;
-use PHPStan\Type\MixedType;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\StringType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
-use PHPStan\Type\TypeUtils;
+use function array_key_exists;
 use function array_map;
+use function count;
 use function hash_algos;
 use function in_array;
+use function is_bool;
 use function strtolower;
 
+#[AutowiredService]
 final class HashFunctionsReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
@@ -30,26 +35,32 @@ final class HashFunctionsReturnTypeExtension implements DynamicFunctionReturnTyp
 		'hash' => [
 			'cryptographic' => false,
 			'possiblyFalse' => false,
+			'binary' => 2,
 		],
 		'hash_file' => [
 			'cryptographic' => false,
 			'possiblyFalse' => true,
+			'binary' => 2,
 		],
 		'hash_hkdf' => [
 			'cryptographic' => true,
 			'possiblyFalse' => false,
+			'binary' => true,
 		],
 		'hash_hmac' => [
 			'cryptographic' => true,
 			'possiblyFalse' => false,
+			'binary' => 3,
 		],
 		'hash_hmac_file' => [
 			'cryptographic' => true,
 			'possiblyFalse' => true,
+			'binary' => 3,
 		],
 		'hash_pbkdf2' => [
 			'cryptographic' => true,
 			'possiblyFalse' => false,
+			'binary' => 5,
 		],
 	];
 
@@ -86,37 +97,51 @@ final class HashFunctionsReturnTypeExtension implements DynamicFunctionReturnTyp
 		return isset(self::SUPPORTED_FUNCTIONS[$name]);
 	}
 
-	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): Type
+	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		$defaultReturnType = ParametersAcceptorSelector::selectSingle($functionReflection->getVariants())->getReturnType();
-
-		if (!isset($functionCall->getArgs()[0])) {
-			return $defaultReturnType;
+		$args = $functionCall->getArgs();
+		if (!isset($args[0])) {
+			return null;
 		}
 
-		$algorithmType = $scope->getType($functionCall->getArgs()[0]->value);
-		if ($algorithmType instanceof MixedType) {
-			return TypeUtils::toBenevolentUnion($defaultReturnType);
+		$lowerFunctionName = strtolower($functionReflection->getName());
+		if (!array_key_exists($lowerFunctionName, self::SUPPORTED_FUNCTIONS)) {
+			throw new ShouldNotHappenException();
+		}
+		$functionData = self::SUPPORTED_FUNCTIONS[$lowerFunctionName];
+		if (is_bool($functionData['binary'])) {
+			$binaryType = new ConstantBooleanType($functionData['binary']);
+		} elseif (isset($args[$functionData['binary']])) {
+			$binaryType = $scope->getType($args[$functionData['binary']]->value);
+		} else {
+			$binaryType = new ConstantBooleanType(false);
 		}
 
-		$constantAlgorithmTypes = TypeUtils::getConstantStrings($algorithmType);
+		$stringTypes = [
+			new StringType(),
+			new AccessoryNonFalsyStringType(),
+		];
+		if ($binaryType->isFalse()->yes()) {
+			$stringTypes[] = new AccessoryLowercaseStringType();
+		}
+		$stringReturnType = new IntersectionType($stringTypes);
 
-		if ($constantAlgorithmTypes === []) {
-			return TypeUtils::toBenevolentUnion($defaultReturnType);
+		$algorithmType = $scope->getType($args[0]->value);
+		$constantAlgorithmTypes = $algorithmType->getConstantStrings();
+		if (count($constantAlgorithmTypes) === 0) {
+			if ($functionData['possiblyFalse'] || !$this->phpVersion->throwsValueErrorForInternalFunctions()) {
+				return new BenevolentUnionType([$stringReturnType, new ConstantBooleanType(false)]);
+			}
+
+			return $stringReturnType;
 		}
 
 		$neverType = new NeverType();
 		$falseType = new ConstantBooleanType(false);
-		$nonEmptyString = new IntersectionType([
-			new StringType(),
-			new AccessoryNonEmptyStringType(),
-		]);
-
 		$invalidAlgorithmType = $this->phpVersion->throwsValueErrorForInternalFunctions() ? $neverType : $falseType;
-		$functionData = self::SUPPORTED_FUNCTIONS[strtolower($functionReflection->getName())];
 
 		$returnTypes = array_map(
-			function (ConstantStringType $type) use ($functionData, $nonEmptyString, $invalidAlgorithmType) {
+			function (ConstantStringType $type) use ($functionData, $stringReturnType, $invalidAlgorithmType) {
 				$algorithm = strtolower($type->getValue());
 				if (!in_array($algorithm, $this->hashAlgorithms, true)) {
 					return $invalidAlgorithmType;
@@ -124,7 +149,7 @@ final class HashFunctionsReturnTypeExtension implements DynamicFunctionReturnTyp
 				if ($functionData['cryptographic'] && in_array($algorithm, self::NON_CRYPTOGRAPHIC_ALGORITHMS, true)) {
 					return $invalidAlgorithmType;
 				}
-				return $nonEmptyString;
+				return $stringReturnType;
 			},
 			$constantAlgorithmTypes,
 		);

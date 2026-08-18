@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Oct 1, 2019, 3:14:05 PM
- */
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CExporter_FileTypeDetector {

@@ -40,6 +40,7 @@ class CComponent_CresDirective implements CInterface_Htmlable {
         return (string) $this;
     }
 
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return (string) $this->value;
     }

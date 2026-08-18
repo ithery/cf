@@ -1,8 +1,13 @@
 <?php
 
-class CException_Config implements CInterface_Arrayable {
+use Illuminate\Contracts\Support\Arrayable;
+
+class CException_Config implements Arrayable {
     use CTrait_HasOptions;
 
+    /**
+     * @var CException_Config
+     */
     private static $instance;
 
     public static function instance() {
@@ -14,7 +19,7 @@ class CException_Config implements CInterface_Arrayable {
     }
 
     public function __construct() {
-        $this->options = CConfig::instance('exception')->all();
+        $this->options = CConfig::repository()->get('exception');
     }
 
     public function editor() {

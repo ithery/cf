@@ -107,6 +107,8 @@ class CBot_Bot {
      */
     protected $runsOnSocket = false;
 
+    protected $matches;
+
     /**
      * @var CCache_Repository
      */
@@ -117,7 +119,7 @@ class CBot_Bot {
         CBot_Contract_DriverInterface $driver,
         CBot_Contract_StorageInterface $storage,
         CCache_Repository $cache,
-        CBot_Message_Matcher $matcher = null
+        ?CBot_Message_Matcher $matcher = null
     ) {
         $this->config = $config;
         $this->driver = $driver;

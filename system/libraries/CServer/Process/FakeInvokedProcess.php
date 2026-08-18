@@ -247,7 +247,7 @@ class CServer_Process_FakeInvokedProcess implements CServer_Process_Contract_Inv
      *
      * @return \CServer_Process_Contract_ProcessResultInterface
      */
-    public function wait(callable $output = null) {
+    public function wait(?callable $output = null) {
         $this->outputHandler = $output ?: $this->outputHandler;
 
         if (!$this->outputHandler) {

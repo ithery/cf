@@ -31,7 +31,7 @@ class CEmail_Client_StreamWrapper_Literal {
      *
      * @return resource|bool
      */
-    public static function createStream($rStream, $iLiteralLen, CEmail_Client_Loader $loader = null) {
+    public static function createStream($rStream, $iLiteralLen, ?CEmail_Client_Loader $loader = null) {
         if (!in_array(self::STREAM_NAME, stream_get_wrappers())) {
             stream_wrapper_register(self::STREAM_NAME, 'CEmail_Client_StreamWrapper_Literal');
         }

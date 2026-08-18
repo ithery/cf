@@ -2,16 +2,15 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 24, 2018, 6:26:04 PM
- */
 class CElement_FormInput_Currency extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Currency,
         CTrait_Element_Property_Placeholder;
 
+    /**
+     * @param string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -21,11 +20,19 @@ class CElement_FormInput_Currency extends CElement_FormInput {
         $this->addClass('form-control');
     }
 
+    /**
+     * @return void
+     */
     protected function build() {
         $this->setAttr('type', $this->type);
         $this->setAttr('value', $this->value);
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

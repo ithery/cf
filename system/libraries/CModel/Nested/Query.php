@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 23, 2018, 5:17:17 AM
- */
 use Carbon\Carbon;
 
 class CModel_Nested_Query extends CModel_Query {
@@ -129,7 +123,7 @@ class CModel_Nested_Query extends CModel_Query {
      *
      * @since 2.0
      *
-     * @return \Kalnoy\Nestedset\Collection
+     * @return CModel_Nested_Collection
      */
     public function ancestorsOf($id, array $columns = ['*']) {
         return $this->whereAncestorOf($id)->get($columns);
@@ -139,7 +133,7 @@ class CModel_Nested_Query extends CModel_Query {
      * @param $id
      * @param array $columns
      *
-     * @return \Kalnoy\Nestedset\Collection
+     * @return CModel_Nested_Collection
      */
     public function ancestorsAndSelf($id, array $columns = ['*']) {
         return $this->whereAncestorOf($id, true)->get($columns);
@@ -254,7 +248,7 @@ class CModel_Nested_Query extends CModel_Query {
      *
      * @since 2.0
      *
-     * @return CCollection
+     * @return CModel_Nested_Collection
      */
     public function descendantsOf($id, array $columns = ['*'], $andSelf = false) {
         try {
@@ -268,7 +262,7 @@ class CModel_Nested_Query extends CModel_Query {
      * @param $id
      * @param array $columns
      *
-     * @return Collection
+     * @return CModel_Nested_Collection
      */
     public function descendantsAndSelf($id, array $columns = ['*']) {
         return $this->descendantsOf($id, $columns, true);
@@ -335,13 +329,13 @@ class CModel_Nested_Query extends CModel_Query {
     public function whereIsLeaf() {
         list($lft, $rgt) = $this->wrappedColumns();
 
-        return $this->whereRaw("${lft} = ${rgt} - 1");
+        return $this->whereRaw("{$lft} = {$rgt} - 1");
     }
 
     /**
      * @param array $columns
      *
-     * @return Collection
+     * @return CModel_Nested_Collection
      */
     public function leaves(array $columns = ['*']) {
         return $this->whereIsLeaf()->get($columns);
@@ -672,7 +666,7 @@ class CModel_Nested_Query extends CModel_Query {
         $query = $this->model
             ->newNestedSetQuery('c')
             ->toBase()
-            ->from($this->query->raw("{$table} as {$waChild}, {$table} as {$waParent}, ${table} as {$waInterm}"))
+            ->from($this->query->raw("{$table} as {$waChild}, {$table} as {$waParent}, {$table} as {$waInterm}"))
             ->whereRaw("{$waChild}.{$parentIdName}={$waParent}.{$keyName}")
             ->whereRaw("{$waInterm}.{$keyName} <> {$waParent}.{$keyName}")
             ->whereRaw("{$waInterm}.{$keyName} <> {$waChild}.{$keyName}")
@@ -784,18 +778,25 @@ class CModel_Nested_Query extends CModel_Query {
     protected function fixNodes(array &$dictionary, $parent = null) {
         $parentId = $parent ? $parent->getKey() : null;
         $cut = $parent ? $parent->getLft() + 1 : 1;
+        // Depth of the nodes directly under $parentId. Computed here (once,
+        // from $parent's own already-correct depth) rather than left for
+        // rawNode() to derive via a fresh static::find($parentId) lookup -
+        // during this recursive fix, parents haven't been saved yet, so that
+        // lookup would return each parent's stale pre-fix depth instead of
+        // its freshly recomputed one.
+        $depth = $parent ? $parent->getDepth() + 1 : 0;
         $updated = [];
         $moved = 0;
-        $cut = self::reorderNodes($dictionary, $updated, $parentId, $cut);
+        $cut = self::reorderNodes($dictionary, $updated, $parentId, $cut, $depth);
         // Save nodes that have invalid parent as roots
         while (!empty($dictionary)) {
             $dictionary[null] = reset($dictionary);
             unset($dictionary[key($dictionary)]);
-            $cut = self::reorderNodes($dictionary, $updated, $parentId, $cut);
+            $cut = self::reorderNodes($dictionary, $updated, $parentId, $cut, $depth);
         }
         if ($parent && ($grown = $cut - $parent->getRgt()) != 0) {
             $moved = $this->model->newScopedQuery()->makeGap($parent->getRgt() + 1, $grown);
-            $updated[] = $parent->rawNode($parent->getLft(), $cut, $parent->getParentId());
+            $updated[] = $parent->rawNode($parent->getLft(), $cut, $parent->getParentId(), $parent->getDepth());
         }
         foreach ($updated as $model) {
             $model->save();
@@ -809,6 +810,7 @@ class CModel_Nested_Query extends CModel_Query {
      * @param array $updated
      * @param $parentId
      * @param int $cut
+     * @param int $depth
      *
      * @return int
      *
@@ -818,7 +820,8 @@ class CModel_Nested_Query extends CModel_Query {
         array &$dictionary,
         array &$updated,
         $parentId = null,
-        $cut = 1
+        $cut = 1,
+        $depth = 0
     ) {
         if (!isset($dictionary[$parentId])) {
             return $cut;
@@ -826,8 +829,8 @@ class CModel_Nested_Query extends CModel_Query {
         /** @var CModel|CModel_Nested_Trait $model */
         foreach ($dictionary[$parentId] as $model) {
             $lft = $cut;
-            $cut = self::reorderNodes($dictionary, $updated, $model->getKey(), $cut + 1);
-            if ($model->rawNode($lft, $cut, $parentId)->isDirty()) {
+            $cut = self::reorderNodes($dictionary, $updated, $model->getKey(), $cut + 1, $depth + 1);
+            if ($model->rawNode($lft, $cut, $parentId, $depth)->isDirty()) {
                 $updated[] = $model;
             }
             ++$cut;

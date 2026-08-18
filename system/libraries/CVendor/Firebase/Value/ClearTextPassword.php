@@ -23,6 +23,7 @@ final class CVendor_Firebase_Value_ClearTextPassword implements \JsonSerializabl
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->value;
     }
@@ -30,6 +31,7 @@ final class CVendor_Firebase_Value_ClearTextPassword implements \JsonSerializabl
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->value;
     }

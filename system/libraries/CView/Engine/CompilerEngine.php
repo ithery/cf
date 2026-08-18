@@ -59,7 +59,6 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
         // typical PHP just like any other templates. We also keep a stack of views
         // which have been rendered for right exception messages to be generated.
         $results = $this->evaluatePath($this->compiler->getCompiledPath($path), $data);
-
         array_pop($this->lastCompiled);
 
         return $results;

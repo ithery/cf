@@ -13,7 +13,7 @@ class CApi_Exception_RateLimitExceededException extends HttpException {
      *
      * @return void
      */
-    public function __construct($message = null, Exception $previous = null, $headers = [], $code = 0) {
+    public function __construct($message = null, ?Exception $previous = null, $headers = [], $code = 0) {
         if (array_key_exists('X-RateLimit-Reset', $headers)) {
             $headers['Retry-After'] = $headers['X-RateLimit-Reset'] - time();
         }

@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @license Ittron Global Teknologi
- *
- * @since Dec 6, 2020
- */
 class CView_Component_AnonymousComponent extends CView_ComponentAbstract {
     /**
      * The component view.
@@ -51,7 +45,7 @@ class CView_Component_AnonymousComponent extends CView_ComponentAbstract {
      * @return array
      */
     public function data() {
-        $this->attributes = $this->attributes ?: new CView_ComponentAttributeBag;
+        $this->attributes = $this->attributes ?: new CView_ComponentAttributeBag();
 
         return $this->data + ['attributes' => $this->attributes];
     }

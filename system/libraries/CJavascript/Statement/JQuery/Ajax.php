@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Sep 3, 2018, 1:26:28 AM
- */
 class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_CompilableInterface {
     protected $method = 'GET';
 

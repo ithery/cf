@@ -1,6 +1,11 @@
 <?php
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
 
 class CNotification_Message_Firebase extends CNotification_MessageAbstract {
+    /**
+     * @return CVendor_Firebase_Messaging_MulticastSendReport
+     */
     public function send() {
         $firebase = CVendor::firebase(carr::get($this->config, 'key'), carr::except($this->config, ['key']));
         $tokens = carr::wrap($this->getOption('recipient'));
@@ -8,11 +13,12 @@ class CNotification_Message_Firebase extends CNotification_MessageAbstract {
         $data = $this->getOption('data');
         $androidConfig = $this->getOption('android');
         $apnsConfig = $this->getOption('apns');
+        $webpushConfig = $this->getOption('webpush');
 
         $messaging = $firebase->createMessaging();
 
-        $message = $messaging->createCloudMessage()
-            ->withNotification($messaging->createNotification($this->getOption('subject'), $this->getOption('message'), $this->getOption('imageUrl')));
+        $message = CloudMessage::new()
+            ->withNotification(Notification::create($this->getOption('subject'), $this->getOption('message'), $this->getOption('imageUrl')));
 
         if (is_array($data)) {
             $message = $message->withData($data);
@@ -25,14 +31,19 @@ class CNotification_Message_Firebase extends CNotification_MessageAbstract {
         if (is_array($apnsConfig)) {
             $message = $message->withApnsConfig($apnsConfig);
         }
+        if (is_array($webpushConfig)) {
+            $message = $message->withWebPushConfig($webpushConfig);
+        }
 
         $multicastReport = $messaging->sendMulticast($message, $tokens);
-
         foreach ($multicastReport->successes()->getItems() as $report) {
             CDaemon::log('Success send to ' . $report->target()->type() . ':' . $report->target()->value());
+            // CLogger::info('Success send to ' . $report->target()->type() . ':' . $report->target()->value());
         }
         foreach ($multicastReport->failures()->getItems() as $report) {
+            c::event(new CNotification_Event_FirebaseFailure($report));
             CDaemon::log('Fail send to ' . $report->target()->type() . ':' . $report->target()->value() . ', reason:' . $report->error()->getMessage());
+            CLogger::info('Fail send to ' . $report->target()->type() . ':' . $report->target()->value() . ', reason:' . $report->error()->getMessage());
         }
 
         return $multicastReport;

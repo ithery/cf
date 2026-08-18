@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 15, 2019, 8:13:37 PM
- */
 use League\OAuth1\Client\Server\Twitter as TwitterServer;
 
 class CSocialLogin_DriverManager {
@@ -98,6 +92,24 @@ class CSocialLogin_DriverManager {
      */
     protected function createInstagramDriver() {
         return $this->buildProvider(CSocialLogin_OAuth2_Provider_InstagramProvider::class, $this->config);
+    }
+
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return CSocialLogin_OAuth2_AbstractProvider
+     */
+    protected function createFigmaDriver() {
+        return $this->buildProvider(CSocialLogin_OAuth2_Provider_FigmaProvider::class, $this->config);
+    }
+
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return CSocialLogin_OAuth2_AbstractProvider
+     */
+    protected function createDropboxDriver() {
+        return $this->buildProvider(CSocialLogin_OAuth2_Provider_DropboxProvider::class, $this->config);
     }
 
     /**

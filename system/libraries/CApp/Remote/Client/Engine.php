@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 14, 2018, 9:32:14 PM
- */
 abstract class CApp_Remote_Client_Engine {
     /**
      * @var string
@@ -24,6 +18,9 @@ abstract class CApp_Remote_Client_Engine {
      */
     protected $baseApiUrl;
 
+    /**
+     * @param array $options
+     */
     public function __construct($options) {
         $this->domain = carr::get($options, 'domain');
         $this->options = $options;
@@ -32,6 +29,12 @@ abstract class CApp_Remote_Client_Engine {
         $this->baseApiUrl = $protocol . '://' . $this->domain . ':' . $port . '/cresenity/api/';
     }
 
+    /**
+     * @param string $url
+     * @param array  $post
+     *
+     * @return mixed
+     */
     public function request($url, $post = []) {
         $curl = CCurl::factory($url);
         $curl->setPost($post);

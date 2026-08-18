@@ -2,14 +2,22 @@
 
 namespace PHPStan\Type;
 
+use PHPStan\Turbo\ReferencedByTurboExtension;
+
 /** @api */
+#[ReferencedByTurboExtension(key: 'errorType')]
 class ErrorType extends MixedType
 {
 
 	/** @api */
-	public function __construct()
+	public function __construct(private ?string $reason = null)
 	{
 		parent::__construct();
+	}
+
+	public function getReason(): ?string
+	{
+		return $this->reason;
 	}
 
 	public function describe(VerbosityLevel $level): string
@@ -39,14 +47,6 @@ class ErrorType extends MixedType
 	public function equals(Type $type): bool
 	{
 		return $type instanceof self;
-	}
-
-	/**
-	 * @param mixed[] $properties
-	 */
-	public static function __set_state(array $properties): Type
-	{
-		return new self();
 	}
 
 }

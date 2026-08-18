@@ -4,11 +4,12 @@ namespace PHPStan\Rules\Constants;
 
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\RegisteredRule;
 use PHPStan\Reflection\ClassConstantReflection;
 use PHPStan\Reflection\ClassReflection;
-use PHPStan\Reflection\ConstantReflection;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
-use PHPStan\Rules\RuleError;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\ShouldNotHappenException;
 use PHPStan\Type\VerbosityLevel;
@@ -18,10 +19,12 @@ use function sprintf;
 /**
  * @implements Rule<Node\Stmt\ClassConst>
  */
-class OverridingConstantRule implements Rule
+#[RegisteredRule(level: 0)]
+final class OverridingConstantRule implements Rule
 {
 
 	public function __construct(
+		#[AutowiredParameter]
 		private bool $checkPhpDocMethodSignatures,
 	)
 	{
@@ -48,29 +51,25 @@ class OverridingConstantRule implements Rule
 	}
 
 	/**
-	 * @return RuleError[]
+	 * @return list<IdentifierRuleError>
 	 */
 	private function processSingleConstant(ClassReflection $classReflection, string $constantName): array
 	{
 		$prototype = $this->findPrototype($classReflection, $constantName);
-		if (!$prototype instanceof ClassConstantReflection) {
+		if ($prototype === null) {
 			return [];
 		}
 
 		$constantReflection = $classReflection->getConstant($constantName);
-		if (!$constantReflection instanceof ClassConstantReflection) {
-			return [];
-		}
-
 		$errors = [];
 		if ($prototype->isFinal()) {
 			$errors[] = RuleErrorBuilder::message(sprintf(
 				'Constant %s::%s overrides final constant %s::%s.',
-				$classReflection->getDisplayName(),
+				$classReflection->getDisplayName(false),
 				$constantReflection->getName(),
-				$prototype->getDeclaringClass()->getDisplayName(),
+				$prototype->getDeclaringClass()->getDisplayName(false),
 				$prototype->getName(),
-			))->nonIgnorable()->build();
+			))->identifier('classConstant.final')->nonIgnorable()->build();
 		}
 
 		if ($prototype->isPublic()) {
@@ -78,24 +77,52 @@ class OverridingConstantRule implements Rule
 				$errors[] = RuleErrorBuilder::message(sprintf(
 					'%s constant %s::%s overriding public constant %s::%s should also be public.',
 					$constantReflection->isPrivate() ? 'Private' : 'Protected',
-					$constantReflection->getDeclaringClass()->getDisplayName(),
+					$constantReflection->getDeclaringClass()->getDisplayName(false),
 					$constantReflection->getName(),
-					$prototype->getDeclaringClass()->getDisplayName(),
+					$prototype->getDeclaringClass()->getDisplayName(false),
 					$prototype->getName(),
-				))->nonIgnorable()->build();
+				))->identifier('classConstant.visibility')->nonIgnorable()->build();
 			}
 		} elseif ($constantReflection->isPrivate()) {
 			$errors[] = RuleErrorBuilder::message(sprintf(
 				'Private constant %s::%s overriding protected constant %s::%s should be protected or public.',
-				$constantReflection->getDeclaringClass()->getDisplayName(),
+				$constantReflection->getDeclaringClass()->getDisplayName(false),
 				$constantReflection->getName(),
-				$prototype->getDeclaringClass()->getDisplayName(),
+				$prototype->getDeclaringClass()->getDisplayName(false),
 				$prototype->getName(),
-			))->nonIgnorable()->build();
+			))->identifier('classConstant.visibility')->nonIgnorable()->build();
 		}
 
 		if (!$this->checkPhpDocMethodSignatures) {
 			return $errors;
+		}
+
+		$prototypeNativeType = $prototype->getNativeType();
+		$constantNativeType = $constantReflection->getNativeType();
+		if ($prototypeNativeType !== null) {
+			if ($constantNativeType !== null) {
+				if (!$prototypeNativeType->isSuperTypeOf($constantNativeType)->yes()) {
+					$errors[] = RuleErrorBuilder::message(sprintf(
+						'Native type %s of constant %s::%s is not covariant with native type %s of constant %s::%s.',
+						$constantNativeType->describe(VerbosityLevel::typeOnly()),
+						$constantReflection->getDeclaringClass()->getDisplayName(false),
+						$constantReflection->getName(),
+						$prototypeNativeType->describe(VerbosityLevel::typeOnly()),
+						$prototype->getDeclaringClass()->getDisplayName(false),
+						$prototype->getName(),
+					))->identifier('classConstant.nativeType')->nonIgnorable()->build();
+				}
+			} else {
+				$errors[] = RuleErrorBuilder::message(sprintf(
+					'Constant %s::%s overriding constant %s::%s (%s) should also have native type %s.',
+					$constantReflection->getDeclaringClass()->getDisplayName(false),
+					$constantReflection->getName(),
+					$prototype->getDeclaringClass()->getDisplayName(false),
+					$prototype->getName(),
+					$prototypeNativeType->describe(VerbosityLevel::typeOnly()),
+					$prototypeNativeType->describe(VerbosityLevel::typeOnly()),
+				))->identifier('classConstant.missingNativeType')->nonIgnorable()->build();
+			}
 		}
 
 		if (!$prototype->hasPhpDocType()) {
@@ -110,18 +137,18 @@ class OverridingConstantRule implements Rule
 			$errors[] = RuleErrorBuilder::message(sprintf(
 				'Type %s of constant %s::%s is not covariant with type %s of constant %s::%s.',
 				$constantReflection->getValueType()->describe(VerbosityLevel::value()),
-				$constantReflection->getDeclaringClass()->getDisplayName(),
+				$constantReflection->getDeclaringClass()->getDisplayName(false),
 				$constantReflection->getName(),
 				$prototype->getValueType()->describe(VerbosityLevel::value()),
-				$prototype->getDeclaringClass()->getDisplayName(),
+				$prototype->getDeclaringClass()->getDisplayName(false),
 				$prototype->getName(),
-			))->build();
+			))->identifier('classConstant.type')->build();
 		}
 
 		return $errors;
 	}
 
-	private function findPrototype(ClassReflection $classReflection, string $constantName): ?ConstantReflection
+	private function findPrototype(ClassReflection $classReflection, string $constantName): ?ClassConstantReflection
 	{
 		foreach ($classReflection->getImmediateInterfaces() as $immediateInterface) {
 			if ($immediateInterface->hasConstant($constantName)) {

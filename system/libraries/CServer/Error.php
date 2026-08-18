@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 15, 2018, 3:05:45 PM
- */
 class CServer_Error {
     /**
      * Holds the instance of this class.
@@ -59,7 +53,7 @@ class CServer_Error {
      * @return void
      */
     public function __clone() {
-        throw new CException("Can't be cloned", [], E_USER_ERROR);
+        throw new Exception("Can't be cloned", E_USER_ERROR);
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 trait CDatabase_Query_Concern_BuilderWhereTrait {
     /**
      * Add a basic where clause to the query.
@@ -12,6 +14,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      * @return $this
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and') {
+        /** @var CDatabase_Query_Builder $this */
         // If the column is an array, we will assume it is an array of key-value pairs
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
@@ -68,14 +71,20 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
 
         $type = 'Basic';
 
+        $columnString = ($column instanceof CDatabase_Contract_Query_ExpressionInterface)
+            ? $this->grammar->getValue($column)
+            : $column;
         // If the column is making a JSON reference we'll check to see if the value
         // is a boolean. If it is, we'll add the raw boolean string as an actual
         // value to the query to ensure this is properly handled by the query.
-        if (cstr::contains($column, '->') && is_bool($value)) {
+        if (cstr::contains($columnString, '->') && is_bool($value)) {
             $value = new CDatabase_Query_Expression($value ? 'true' : 'false');
             if (is_string($column)) {
                 $type = 'JsonBoolean';
             }
+        }
+        if ($this->isBitwiseOperator($operator)) {
+            $type = 'Bitwise';
         }
 
         // Now that we are working with just a simple query we can put the elements
@@ -90,7 +99,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
             'boolean'
         );
 
-        if (!$value instanceof CDatabase_Query_Expression) {
+        if (!$value instanceof CDatabase_Contract_Query_ExpressionInterface) {
             $this->addBinding($value, 'where');
         }
 
@@ -129,7 +138,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
      *
      * @return array
      */
-    protected function prepareValueAndOperator($value, $operator, $useDefault = false) {
+    public function prepareValueAndOperator($value, $operator, $useDefault = false) {
         if ($useDefault) {
             return [$operator, '='];
         } elseif ($this->invalidOperatorAndValue($operator, $value)) {
@@ -164,6 +173,18 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
     protected function invalidOperator($operator) {
         return !in_array(strtolower($operator), $this->operators, true)
                 && !in_array(strtolower($operator), $this->grammar->getOperators(), true);
+    }
+
+    /**
+     * Determine if the operator is a bitwise operator.
+     *
+     * @param string $operator
+     *
+     * @return bool
+     */
+    protected function isBitwiseOperator($operator) {
+        return in_array(strtolower($operator), $this->bitwiseOperators, true)
+               || in_array(strtolower($operator), $this->grammar->getBitwiseOperators(), true);
     }
 
     /**
@@ -307,7 +328,7 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
         // Next, if the value is Arrayable we need to cast it to its raw array form so we
         // have the underlying array value instead of an Arrayable object which is not
         // able to be added as a binding, etc. We will then add to the wheres array.
-        if ($values instanceof CInterface_Arrayable) {
+        if ($values instanceof Arrayable) {
             $values = $values->toArray();
         }
 
@@ -361,17 +382,17 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
     /**
      * Add a "where in raw" clause for integer values to the query.
      *
-     * @param string                      $column
-     * @param \CInterface_Arrayable|array $values
-     * @param string                      $boolean
-     * @param bool                        $not
+     * @param string                                        $column
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
+     * @param string                                        $boolean
+     * @param bool                                          $not
      *
      * @return $this
      */
     public function whereIntegerInRaw($column, $values, $boolean = 'and', $not = false) {
         $type = $not ? 'NotInRaw' : 'InRaw';
 
-        if ($values instanceof CInterface_Arrayable) {
+        if ($values instanceof Arrayable) {
             $values = $values->toArray();
         }
 
@@ -387,8 +408,8 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
     /**
      * Add an "or where in raw" clause for integer values to the query.
      *
-     * @param string                      $column
-     * @param \CInterface_Arrayable|array $values
+     * @param string                                        $column
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
      *
      * @return $this
      */
@@ -399,9 +420,9 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
     /**
      * Add a "where not in raw" clause for integer values to the query.
      *
-     * @param string                      $column
-     * @param \CInterface_Arrayable|array $values
-     * @param string                      $boolean
+     * @param string                                        $column
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
+     * @param string                                        $boolean
      *
      * @return $this
      */
@@ -412,8 +433,8 @@ trait CDatabase_Query_Concern_BuilderWhereTrait {
     /**
      * Add an "or where not in raw" clause for integer values to the query.
      *
-     * @param string                      $column
-     * @param \CInterface_Arrayable|array $values
+     * @param string                                        $column
+     * @param \Illuminate\Contracts\Support\Arrayable|array $values
      *
      * @return $this
      */

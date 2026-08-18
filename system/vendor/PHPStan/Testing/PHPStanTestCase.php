@@ -2,127 +2,73 @@
 
 namespace PHPStan\Testing;
 
+use Override;
 use PHPStan\Analyser\ConstantResolver;
-use PHPStan\Analyser\DirectInternalScopeFactory;
+use PHPStan\Analyser\DirectInternalScopeFactoryFactory;
 use PHPStan\Analyser\Error;
-use PHPStan\Analyser\MutatingScope;
-use PHPStan\Analyser\NodeScopeResolver;
 use PHPStan\Analyser\ScopeFactory;
 use PHPStan\Analyser\TypeSpecifier;
-use PHPStan\BetterReflection\Reflector\ClassReflector;
-use PHPStan\BetterReflection\Reflector\ConstantReflector;
-use PHPStan\BetterReflection\Reflector\FunctionReflector;
 use PHPStan\BetterReflection\Reflector\Reflector;
-use PHPStan\Broker\Broker;
-use PHPStan\DependencyInjection\Container;
-use PHPStan\DependencyInjection\ContainerFactory;
 use PHPStan\DependencyInjection\Reflection\ClassReflectionExtensionRegistryProvider;
-use PHPStan\DependencyInjection\Type\DynamicReturnTypeExtensionRegistryProvider;
-use PHPStan\DependencyInjection\Type\OperatorTypeSpecifyingExtensionRegistryProvider;
-use PHPStan\File\FileHelper;
 use PHPStan\Node\Printer\ExprPrinter;
 use PHPStan\Parser\Parser;
+use PHPStan\Php\ComposerPhpVersionFactory;
+use PHPStan\Php\ConfiguredPhpVersionRangeHelper;
 use PHPStan\Php\PhpVersion;
 use PHPStan\PhpDoc\TypeNodeResolver;
 use PHPStan\PhpDoc\TypeStringResolver;
+use PHPStan\Reflection\AttributeReflectionFactory;
 use PHPStan\Reflection\InitializerExprTypeResolver;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Reflection\ReflectionProvider\DirectReflectionProviderProvider;
 use PHPStan\Rules\Properties\PropertyReflectionFinder;
+use PHPStan\Type\Constant\OversizedArrayBuilder;
+use PHPStan\Type\ExpressionTypeResolverExtension;
+use PHPStan\Type\OperatorTypeSpecifyingExtensionRegistry;
 use PHPStan\Type\TypeAliasResolver;
+use PHPStan\Type\UnaryOperatorTypeSpecifyingExtensionRegistry;
 use PHPStan\Type\UsefulTypeAliasResolver;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use function array_merge;
 use function count;
 use function implode;
-use function is_dir;
-use function mkdir;
 use function rtrim;
-use function sha1;
 use function sprintf;
-use function sys_get_temp_dir;
 use const DIRECTORY_SEPARATOR;
-use const PHP_VERSION_ID;
 
 /** @api */
 abstract class PHPStanTestCase extends TestCase
 {
 
-	/** @deprecated */
-	public static bool $useStaticReflectionProvider = true;
-
-	/** @var array<string, Container> */
-	private static array $containers = [];
-
-	/** @api */
-	public static function getContainer(): Container
-	{
-		$additionalConfigFiles = static::getAdditionalConfigFiles();
-		$additionalConfigFiles[] = __DIR__ . '/TestCase.neon';
-		$cacheKey = sha1(implode("\n", $additionalConfigFiles));
-
-		if (!isset(self::$containers[$cacheKey])) {
-			$tmpDir = sys_get_temp_dir() . '/phpstan-tests';
-			if (!@mkdir($tmpDir, 0777) && !is_dir($tmpDir)) {
-				self::fail(sprintf('Cannot create temp directory %s', $tmpDir));
-			}
-
-			$rootDir = __DIR__ . '/../..';
-			$fileHelper = new FileHelper($rootDir);
-			$rootDir = $fileHelper->normalizePath($rootDir, '/');
-			$containerFactory = new ContainerFactory($rootDir);
-			$container = $containerFactory->create($tmpDir, array_merge([
-				$containerFactory->getConfigDirectory() . '/config.level8.neon',
-			], $additionalConfigFiles), []);
-			self::$containers[$cacheKey] = $container;
-
-			foreach ($container->getParameter('bootstrapFiles') as $bootstrapFile) {
-				(static function (string $file) use ($container): void {
-					require_once $file;
-				})($bootstrapFile);
-			}
-
-			if (PHP_VERSION_ID >= 80000) {
-				require_once __DIR__ . '/../../stubs/runtime/Enum/UnitEnum.php';
-				require_once __DIR__ . '/../../stubs/runtime/Enum/BackedEnum.php';
-				require_once __DIR__ . '/../../stubs/runtime/Enum/ReflectionEnum.php';
-				require_once __DIR__ . '/../../stubs/runtime/Enum/ReflectionEnumUnitCase.php';
-				require_once __DIR__ . '/../../stubs/runtime/Enum/ReflectionEnumBackedCase.php';
-			}
-		} else {
-			ContainerFactory::postInitializeContainer(self::$containers[$cacheKey]);
-		}
-
-		return self::$containers[$cacheKey];
-	}
+	use PHPStanTestCaseTrait;
 
 	/**
-	 * @return string[]
+	 * Re-register the runtime container as the global static reflection provider before
+	 * every test. Enable this in tests that construct Type objects directly and assert
+	 * PHP-version-dependent reflection results, so a foreign PhpVersion leaked by another
+	 * test can't flake them. See https://github.com/phpstan/phpstan/issues/14860
 	 */
-	public static function getAdditionalConfigFiles(): array
+	protected bool $reinitializeContainerBeforeEachTest = false;
+
+	#[Override]
+	protected function setUp(): void
 	{
-		return [];
+		if (!$this->reinitializeContainerBeforeEachTest) {
+			return;
+		}
+
+		self::getContainer();
 	}
 
-	public function getParser(): Parser
+	public static function getParser(): Parser
 	{
 		/** @var Parser $parser */
 		$parser = self::getContainer()->getService('defaultAnalysisParser');
 		return $parser;
 	}
 
-	/**
-	 * @api
-	 * @deprecated Use createReflectionProvider() instead
-	 */
-	public function createBroker(): Broker
-	{
-		return self::getContainer()->getByType(Broker::class);
-	}
-
 	/** @api */
-	public function createReflectionProvider(): ReflectionProvider
+	public static function createReflectionProvider(): ReflectionProvider
 	{
 		return self::getContainer()->getByType(ReflectionProvider::class);
 	}
@@ -132,20 +78,7 @@ abstract class PHPStanTestCase extends TestCase
 		return self::getContainer()->getService('betterReflectionReflector');
 	}
 
-	/**
-	 * @deprecated Use getReflector() instead.
-	 * @return array{ClassReflector, FunctionReflector, ConstantReflector}
-	 */
-	public static function getReflectors(): array
-	{
-		return [
-			self::getContainer()->getService('betterReflectionClassReflector'),
-			self::getContainer()->getService('betterReflectionFunctionReflector'),
-			self::getContainer()->getService('betterReflectionConstantReflector'),
-		];
-	}
-
-	public function getClassReflectionExtensionRegistryProvider(): ClassReflectionExtensionRegistryProvider
+	public static function getClassReflectionExtensionRegistryProvider(): ClassReflectionExtensionRegistryProvider
 	{
 		return self::getContainer()->getByType(ClassReflectionExtensionRegistryProvider::class);
 	}
@@ -153,7 +86,7 @@ abstract class PHPStanTestCase extends TestCase
 	/**
 	 * @param string[] $dynamicConstantNames
 	 */
-	public function createScopeFactory(ReflectionProvider $reflectionProvider, TypeSpecifier $typeSpecifier, array $dynamicConstantNames = []): ScopeFactory
+	public static function createScopeFactory(ReflectionProvider $reflectionProvider, TypeSpecifier $typeSpecifier, array $dynamicConstantNames = []): ScopeFactory
 	{
 		$container = self::getContainer();
 
@@ -162,23 +95,32 @@ abstract class PHPStanTestCase extends TestCase
 		}
 
 		$reflectionProviderProvider = new DirectReflectionProviderProvider($reflectionProvider);
-		$constantResolver = new ConstantResolver($reflectionProviderProvider, $dynamicConstantNames);
+		$composerPhpVersionFactory = $container->getByType(ComposerPhpVersionFactory::class);
+		$constantResolver = new ConstantResolver($reflectionProviderProvider, $dynamicConstantNames, new ConfiguredPhpVersionRangeHelper(null, $composerPhpVersionFactory), container: $container);
+
+		$initializerExprTypeResolver = new InitializerExprTypeResolver(
+			$constantResolver,
+			$reflectionProviderProvider,
+			$container->getByType(PhpVersion::class),
+			$container->getByType(OperatorTypeSpecifyingExtensionRegistry::class),
+			$container->getByType(UnaryOperatorTypeSpecifyingExtensionRegistry::class),
+			new OversizedArrayBuilder(),
+			$container->getParameter('usePathConstantsAsConstantString'),
+		);
 
 		return new ScopeFactory(
-			new DirectInternalScopeFactory(
-				MutatingScope::class,
+			new DirectInternalScopeFactoryFactory(
+				$container,
 				$reflectionProvider,
-				new InitializerExprTypeResolver($constantResolver, $reflectionProviderProvider, new PhpVersion(PHP_VERSION_ID), $container->getByType(OperatorTypeSpecifyingExtensionRegistryProvider::class)),
-				$container->getByType(DynamicReturnTypeExtensionRegistryProvider::class),
+				$initializerExprTypeResolver,
+				$container->getExtensionsCollection(ExpressionTypeResolverExtension::class),
 				$container->getByType(ExprPrinter::class),
 				$typeSpecifier,
 				new PropertyReflectionFinder(),
-				$this->getParser(),
-				$container->getByType(NodeScopeResolver::class),
-				$this->shouldTreatPhpDocTypesAsCertain(),
+				self::getParser(),
 				$container->getByType(PhpVersion::class),
-				$container->getParameter('featureToggles')['explicitMixedInUnknownGenericNew'],
-				$container->getParameter('featureToggles')['explicitMixedForGlobalVariables'],
+				$container->getByType(AttributeReflectionFactory::class),
+				$container->getParameter('phpVersion'),
 				$constantResolver,
 			),
 		);
@@ -187,7 +129,7 @@ abstract class PHPStanTestCase extends TestCase
 	/**
 	 * @param array<string, string> $globalTypeAliases
 	 */
-	public function createTypeAliasResolver(array $globalTypeAliases, ReflectionProvider $reflectionProvider): TypeAliasResolver
+	public static function createTypeAliasResolver(array $globalTypeAliases, ReflectionProvider $reflectionProvider): TypeAliasResolver
 	{
 		$container = self::getContainer();
 
@@ -196,17 +138,13 @@ abstract class PHPStanTestCase extends TestCase
 			$container->getByType(TypeStringResolver::class),
 			$container->getByType(TypeNodeResolver::class),
 			$reflectionProvider,
+			0,
 		);
 	}
 
 	protected function shouldTreatPhpDocTypesAsCertain(): bool
 	{
 		return true;
-	}
-
-	public function getFileHelper(): FileHelper
-	{
-		return self::getContainer()->getByType(FileHelper::class);
 	}
 
 	/**
@@ -232,7 +170,7 @@ abstract class PHPStanTestCase extends TestCase
 			$messages = [];
 			foreach ($errors as $error) {
 				if ($error instanceof Error) {
-					$messages[] = sprintf("- %s\n  in %s on line %d\n", rtrim($error->getMessage(), '.'), $error->getFile(), $error->getLine());
+					$messages[] = sprintf("- %s\n  in %s on line %d%s\n", rtrim($error->getMessage(), '.'), $error->getFile(), $error->getLine() ?? 0, $error->getTip() !== null ? sprintf("\n💡 %s", $error->getTip()) : '');
 				} else {
 					$messages[] = $error;
 				}

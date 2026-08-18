@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 17, 2019, 7:55:48 PM
- */
 class CVendor_Xendit {
     const VERSION = '2.5.0';
 
@@ -53,10 +47,14 @@ class CVendor_Xendit {
     }
 
     public function createInvoice($external_id, $amount, $payer_email, $description, $invoiceOptions = []) {
+        $data = $invoiceOptions;
         $data['external_id'] = $external_id;
         $data['amount'] = (int) $amount;
-        $data['payer_email'] = $payer_email;
         $data['description'] = $description;
+
+        if (strlen($payer_email) > 0) {
+            $data['payer_email'] = $payer_email;
+        }
 
         if (!isset($invoiceOptions['callback_virtual_account_id']) && !empty($invoiceOptions['callback_virtual_account_id'])) {
             $data['callback_virtual_account_id'] = $invoiceOptions['callback_virtual_account_id'];
@@ -242,6 +240,7 @@ class CVendor_Xendit {
      * Send GET request to retrieve data.
      *
      * @param string $accountType account type (CASH|HOLDING|TAX)
+     * @param string $currency    (IDR|PHP|USD)
      *
      * @throws CVendor_Xendit_Exception_ApiException
      *
@@ -249,8 +248,8 @@ class CVendor_Xendit {
      *                'balance' => int
      *                ]
      */
-    public function getBalance($accountType = 'CASH') {
-        return $this->factory()->balance()->getBalance($accountType);
+    public function getBalance($accountType = 'CASH', $currency = 'IDR') {
+        return $this->factory()->balance()->getBalance($accountType, $currency);
     }
 
     public function captureCreditCardPayment($external_id, $token_id, $amount, $capture_options = null) {

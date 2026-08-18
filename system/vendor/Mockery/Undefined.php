@@ -39,6 +39,7 @@ class Undefined
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString()
     {
         return __CLASS__ . ":" . spl_object_hash($this);

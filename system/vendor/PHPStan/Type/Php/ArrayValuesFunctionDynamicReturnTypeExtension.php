@@ -4,6 +4,7 @@ namespace PHPStan\Type\Php;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\DependencyInjection\AutowiredService;
 use PHPStan\Php\PhpVersion;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Type\DynamicFunctionReturnTypeExtension;
@@ -13,7 +14,8 @@ use PHPStan\Type\Type;
 use function count;
 use function strtolower;
 
-class ArrayValuesFunctionDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
+#[AutowiredService]
+final class ArrayValuesFunctionDynamicReturnTypeExtension implements DynamicFunctionReturnTypeExtension
 {
 
 	public function __construct(private PhpVersion $phpVersion)
@@ -27,11 +29,12 @@ class ArrayValuesFunctionDynamicReturnTypeExtension implements DynamicFunctionRe
 
 	public function getTypeFromFunctionCall(FunctionReflection $functionReflection, FuncCall $functionCall, Scope $scope): ?Type
 	{
-		if (count($functionCall->getArgs()) !== 1) {
+		$args = $functionCall->getArgs();
+		if (count($args) !== 1) {
 			return null;
 		}
 
-		$arrayType = $scope->getType($functionCall->getArgs()[0]->value);
+		$arrayType = $scope->getType($args[0]->value);
 		if ($arrayType->isArray()->no()) {
 			return $this->phpVersion->arrayFunctionsReturnNullWithNonArray() ? new NullType() : new NeverType();
 		}

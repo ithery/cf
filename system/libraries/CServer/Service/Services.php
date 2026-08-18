@@ -150,6 +150,7 @@ class CServer_Service_Services {
     /**
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->name;
     }

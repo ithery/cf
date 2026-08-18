@@ -52,6 +52,7 @@ class CVendor_SendGrid_Mail_Category implements \JsonSerializable {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->getCategory();
     }

@@ -3,27 +3,20 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 11:09:44 AM
- */
-
-/**
  * Type that maps interval string to a PHP DateInterval Object.
  */
 class CDatabase_Type_DateIntervalType extends CDatabase_Type {
     const FORMAT = '%RP%YY%MM%DDT%HH%IM%SS';
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getName() {
         return CDatabase_Type::DATEINTERVAL;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getSQLDeclaration(array $fieldDeclaration, CDatabase_Platform $platform) {
         $fieldDeclaration['length'] = 255;
@@ -32,7 +25,7 @@ class CDatabase_Type_DateIntervalType extends CDatabase_Type {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function convertToDatabaseValue($value, CDatabase_Platform $platform) {
         if (null === $value) {
@@ -47,7 +40,7 @@ class CDatabase_Type_DateIntervalType extends CDatabase_Type {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function convertToPHPValue($value, CDatabase_Platform $platform) {
         if ($value === null || $value instanceof \DateInterval) {
@@ -75,7 +68,7 @@ class CDatabase_Type_DateIntervalType extends CDatabase_Type {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function requiresSQLCommentHint(CDatabase_Platform $platform) {
         return true;

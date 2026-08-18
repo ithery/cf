@@ -23,6 +23,13 @@ class CModel_Casts_Attribute {
     public $withObjectCaching = true;
 
     /**
+     * Indicates if caching of the attribute's value is enabled.
+     *
+     * @var bool
+     */
+    public $withCaching = false;
+
+    /**
      * Create a new attribute accessor / mutator.
      *
      * @param null|callable $get

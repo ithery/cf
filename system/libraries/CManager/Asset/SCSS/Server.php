@@ -142,7 +142,7 @@ class CManager_Asset_SCSS_Server {
 
         $v = CManager_Asset_SCSS_Compiler::$VERSION;
         $t = @date('r');
-        $css = "/* compiled by scssphp ${v} on ${t} (${elapsed}s) */\n\n" . $css;
+        $css = "/* compiled by scssphp {$v} on {$t} ({$elapsed}s) */\n\n" . $css;
 
         file_put_contents($out, $css);
         file_put_contents(
@@ -210,7 +210,7 @@ class CManager_Asset_SCSS_Server {
         header('Content-type: text/plain');
 
         $v = CManager_Asset_SCSS_Compiler::$VERSION;
-        echo "/* INPUT NOT FOUND scss ${v} */\n";
+        echo "/* INPUT NOT FOUND scss {$v} */\n";
     }
 
     /**

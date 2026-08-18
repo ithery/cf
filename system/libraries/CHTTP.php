@@ -2,9 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- */
 class CHTTP {
     protected static $middlewareEnabled = true;
 
@@ -22,6 +19,11 @@ class CHTTP {
      * @var CHTTP_Kernel
      */
     protected static $kernel;
+
+    /**
+     * @var CHTTP_Sitemap
+     */
+    protected static $sitemap;
 
     /**
      * @return CHTTP_Request
@@ -113,6 +115,24 @@ class CHTTP {
     }
 
     /**
+     * Disable all HTTP-level route middleware for subsequent requests (used in testing).
+     *
+     * @return void
+     */
+    public static function withoutMiddleware() {
+        static::$middlewareEnabled = false;
+    }
+
+    /**
+     * Re-enable HTTP-level route middleware for subsequent requests.
+     *
+     * @return void
+     */
+    public static function withMiddleware() {
+        static::$middlewareEnabled = true;
+    }
+
+    /**
      * @return CHTTP_Cookie
      */
     public static function cookie() {
@@ -160,5 +180,16 @@ class CHTTP {
      */
     public static function robotsTxt() {
         return CHTTP_RobotsTxt::instance();
+    }
+
+    /**
+     * @return CHTTP_Sitemap
+     */
+    public static function sitemap() {
+        if (self::$sitemap == null) {
+            self::$sitemap = CHTTP_Sitemap::create();
+        }
+
+        return self::$sitemap;
     }
 }

@@ -1,9 +1,6 @@
 <?php
 
-use Illuminate\Support\Arr;
-use CarbonV3\CarbonImmutable;
-use Laravel\Horizon\MasterSupervisor;
-use Laravel\Horizon\Contracts\SupervisorRepository;
+use Carbon\CarbonImmutable;
 
 class CDaemon_Supervisor_Repository_RedisMasterSupervisorRepository implements CDaemon_Supervisor_Contract_MasterSupervisorRepositoryInterface {
     /**

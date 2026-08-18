@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2019, 3:51:23 PM
- */
 class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDriver_EngineAbstract {
     protected $tempFiles;
 
@@ -28,7 +22,7 @@ class CCache_Driver_FileDriver_Engine_TempEngine extends CCache_Driver_FileDrive
     public function getTempFiles($key) {
         if (!isset($this->tempFiles[$key])) {
             $parts = array_slice(str_split($hash = sha1($key), 2), 0, 2);
-            $path = 'cache/' . trim($this->directory, '/') . '/' . implode('/', $parts) . '/' . $hash . '.cache';
+            $path = 'cache/' . trim((string) $this->directory, '/') . '/' . implode('/', $parts) . '/' . $hash . '.cache';
             $this->tempFiles[$key] = CTemporary::createFile($path);
         }
 

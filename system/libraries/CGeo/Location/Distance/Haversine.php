@@ -1,20 +1,13 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @since Aug 18, 2018, 7:29:30 PM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
-
-/**
- * Implementation of distance calculation with http://en.wikipedia.org/wiki/Law_of_haversines
- * @see      http://en.wikipedia.org/wiki/Law_of_haversines
+ * Implementation of distance calculation with http://en.wikipedia.org/wiki/Law_of_haversines.
  *
+ * @see      http://en.wikipedia.org/wiki/Law_of_haversines
  */
 class CGeo_Location_Distance_Haversine implements CGeo_Location_Distance_DistanceInterface {
-
     /**
      * @param Coordinate $point1
      * @param Coordinate $point2
@@ -35,11 +28,11 @@ class CGeo_Location_Distance_Haversine implements CGeo_Location_Distance_Distanc
         $dLng = $lng2 - $lng1;
         $radius = $point1->getEllipsoid()->getArithmeticMeanRadius();
         $distance = 2 * $radius * asin(
-                        sqrt(
-                                (sin($dLat / 2) ** 2) + cos($lat1) * cos($lat2) * (sin($dLng / 2) ** 2)
-                        )
+            sqrt(
+                (sin($dLat / 2) ** 2) + cos($lat1) * cos($lat2) * (sin($dLng / 2) ** 2)
+            )
         );
+
         return round($distance, 3);
     }
-
 }

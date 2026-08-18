@@ -1,26 +1,54 @@
 <?php
 
-/**
- * Description of Textarea.
- *
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 28, 2018, 9:50:24 PM
- */
+use Illuminate\Contracts\Support\Arrayable;
+
 class CElement_FormInput_QueryBuilder extends CElement_FormInput {
+    /**
+     * @var null|CElement_FormInput_QueryBuilder_FilterBuilder
+     */
     protected $filters;
 
+    /**
+     * @var string
+     */
     protected $inputId;
 
+    /**
+     * @var CElement_FormInput_Hidden
+     */
     protected $input;
 
+    /**
+     * @var CElement_Element_Div
+     */
     protected $container;
 
+    /**
+     * @var string
+     */
     protected $containerId;
 
-    public function __construct($id) {
-        if ($id == '') {
+    /**
+     * Whether to initialize select2 on the rule value `<select>` inputs rendered by the builder.
+     *
+     * @var null|bool
+     */
+    protected $isApplySelect2;
+
+    /**
+     * Whether to show a toast when the rules can't be parsed.
+     *
+     * @var bool
+     */
+    protected $isToastOnError;
+
+    /**
+     * @param null|string $id
+     *
+     * @return void
+     */
+    public function __construct($id = null) {
+        if ($id == null) {
             $id = spl_object_hash($this);
         }
         $this->id = $id;
@@ -36,14 +64,31 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         $this->add($this->container);
         $this->add($this->input);
         $this->addClass('capp-query-builder capp-input');
+        $this->value = [];
+        $this->isToastOnError = false;
     }
 
+    /**
+     * Parse the given rules and return a CModel_Query object from the given model class.
+     *
+     * @param string $rules
+     * @param string $modelClass
+     *
+     * @return CModel_Query|CDatabase_Query_Builder
+     */
     public static function parseToModelQuery($rules, $modelClass) {
         $parser = new CElement_FormInput_QueryBuilder_Parser($modelClass);
 
         return $parser->parse($rules);
     }
 
+    /**
+     * Create the filter builder and pass it to the given callback for configuration.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
     public function withFilterBuilder($callback) {
         $this->filters = c::tap(new CElement_FormInput_QueryBuilder_FilterBuilder(), $callback);
 
@@ -61,12 +106,46 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         return $this->filters;
     }
 
+    /**
+     * @param string $val
+     *
+     * @return $this
+     */
     public function setName($val) {
         $this->input->setName($val);
 
         return $this;
     }
 
+    /**
+     * Whether to show a toast when the rules can't be parsed.
+     *
+     * @param bool $bool
+     *
+     * @return $this
+     */
+    public function withToastOnError($bool) {
+        $this->isToastOnError = $bool;
+
+        return $this;
+    }
+
+    /**
+     * Whether to initialize select2 on the rule value `<select>` inputs rendered by the builder.
+     *
+     * @param bool $bool
+     *
+     * @return $this
+     */
+    public function setApplySelect2($bool = true) {
+        $this->isApplySelect2 = $bool;
+
+        return $this;
+    }
+
+    /**
+     * @return void
+     */
     public function build() {
         parent::build();
         if ($this->readonly) {
@@ -77,42 +156,85 @@ class CElement_FormInput_QueryBuilder extends CElement_FormInput {
         }
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $filters = $this->filters;
-        if ($filters instanceof CInterface_Arrayable) {
+        if ($filters instanceof Arrayable) {
             $filters = $filters->toArray();
         }
-
-        return "
-        $('#" . $this->containerId . "').queryBuilder({
-
+        $js = parent::js($indent);
+        $js .= '
+        let qb_' . $this->inputId . " = $('#" . $this->containerId . "').queryBuilder({
+            plugins: ['bt-tooltip-errors'],
             filters: " . c::json($filters) . ',
-
+            allow_empty: true,
             rules: ' . c::json($this->value) . ',
         });
-        let error_' . $this->inputId . "= null;
-        $('#" . $this->containerId . "').on('validationError.queryBuilder', function(e, rule, error, value) {
-            error_" . $this->inputId . "= error;
 
+        const qbEl = qb_' . $this->inputId . ';
+        window.error_query_builder_error_' . $this->inputId . " = null;
+        $('#" . $this->containerId . "').on('validationError.queryBuilder', function(e, rule, error, value) {
+            window.error_query_builder_" . $this->inputId . ' = error;
+        ';
+        if ($this->isToastOnError) {
+            $js .= "
+                    cresenity.toast('error', Array.isArray(window.error_query_builder_" . $this->inputId . '  ) ? window.error_query_builder_' . $this->inputId . '[0] : window.error_query_builder_' . $this->inputId . ');
+            ';
+        }
+        $js .= "
         });
         let form = $('#" . $this->inputId . "').closest('form');
         if(form.length>0) {
             form.on('submit',()=>{
-
-
                 const result = $('#" . $this->containerId . "').queryBuilder('getRules');
                 console.log('form submit', error_" . $this->inputId . ');
-                if(error_' . $this->inputId . ") {
-                    cresenity.toast('error', Array.isArray(error_" . $this->inputId . '  )?error_' . $this->inputId . '[0]:error_' . $this->inputId . ');
-                    error_' . $this->inputId . " = null;
+                if(window.error_query_builder_' . $this->inputId . ") {
+                    cresenity.toast('error', Array.isArray(window.error_query_builder_" . $this->inputId . '  ) ? window.error_query_builder_' . $this->inputId . '[0] : window.error_query_builder_' . $this->inputId . ');
+                    window.error_query_builder_' . $this->inputId . " = null;
                     return false;
                 }
                 $('#" . $this->inputId . "').val(JSON.stringify(result, null, 2));
                 return true;
             });
+        }";
+
+        if ($this->isApplySelect2) {
+            $js .= "
+
+        if ($.fn.select2) {
+            function initSelect2InBuilder(root) {
+                root.find('.rule-value-container select').each(function() {
+                    const select = $(this);
+                    if (!select.hasClass('select2-hidden-accessible')) {
+                        select.css('min-width', '200px').select2();
+                    }
+                });
+            }
+            qbEl.on('afterCreateRuleInput.queryBuilder', function(e, rule) {
+                if(rule.__ && rule.\$el) {
+                    if(rule.__.filter) {
+                        if(rule.__.filter.input && rule.__.filter.input=='select') {
+                            initSelect2InBuilder(\$(rule.\$el));
+                        }
+                    }
+                }
+
+            });
+            // Jika rules di-set secara programatis, inisialisasi select2 setelah selesai setRules
+            setTimeout(() => {
+                if (qbEl.find('.rule-value-container select').length > 0) {
+                    initSelect2InBuilder(qbEl);
+                }
+            }, 500);
         }
 
-
         ";
+        }
+
+        return $js;
     }
 }

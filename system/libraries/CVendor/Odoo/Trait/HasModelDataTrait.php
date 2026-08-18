@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 25, 2019, 10:10:42 PM
- */
 trait CVendor_Odoo_Trait_HasModelDataTrait {
     /**
      * Data structure as returned by the API and converted to
@@ -46,6 +40,7 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
         return $this->get($name);
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return $this->data;
     }
@@ -55,6 +50,7 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset) {
         return $this->get($offset) !== null;
     }
@@ -64,6 +60,7 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset) {
         return $this->get($offset);
     }
@@ -74,6 +71,7 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
      * @param mixed $offset
      * @param mixed $value
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         carr::set($this->data, $offset, $value);
     }
@@ -83,6 +81,7 @@ trait CVendor_Odoo_Trait_HasModelDataTrait {
      *
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset) {
         $this->offsetSet($offset, null);
     }

@@ -2,25 +2,44 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 24, 2019, 1:54:36 AM
- */
 class CElement_FormInput_Radio extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Radio,
         CTrait_Element_Property_Label;
 
+    /**
+     * Whether the radio input renders as `checked`.
+     *
+     * @var bool
+     */
     protected $checked;
 
     // protected $label;
+    /**
+     * Which JS widget library decorates this radio (`'uniform'`, `'switch'`,
+     * `'icheck'`), or empty for a plain `<input type="radio">`.
+     *
+     * @var string
+     */
     protected $applyjs;
 
+    /**
+     * @var bool
+     */
     protected $label_wrap;
 
+    /**
+     * @var bool
+     */
     protected $inline;
 
+    /**
+     * @var string
+     */
+    protected $themeType = 'radio';
+
+    /**
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
 
@@ -30,39 +49,67 @@ class CElement_FormInput_Radio extends CElement_FormInput {
         $this->checked = false;
         $this->inline = false;
         $this->label_wrap = false;
-        $js_radio = c::theme('radio.js');
-        if (strlen($js_radio) > 0) {
-            $this->applyjs = $js_radio;
+        $jsRadio = c::theme('radio.js');
+        if (strlen($jsRadio) > 0) {
+            $this->applyjs = $jsRadio;
         }
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         /** @phpstan-ignore-next-line */
         return new static($id);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setChecked($bool = true) {
         $this->checked = $bool;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setLabelWrap($bool) {
         $this->label_wrap = $bool;
 
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function getInline() {
         return $this->inline;
     }
 
+    /**
+     * @param bool $inline
+     *
+     * @return $this
+     */
     public function setInline($inline) {
         $this->inline = $inline;
 
         return $this;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
@@ -98,7 +145,7 @@ class CElement_FormInput_Radio extends CElement_FormInput {
             $html->append('<div class="switch">');
         }
 
-        $html->append('<input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . $this->validation->validation_class() . '" ' . $addition_attribute . ' value="' . $this->value . '"' . $disabled . $checked . '>');
+        $html->append('<input type="radio" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled' . '" ' . $addition_attribute . ' value="' . $this->value . '"' . $disabled . $checked . '>');
         if (strlen($this->label) > 0) {
             $html->appendln('&nbsp;' . $this->label);
         }
@@ -112,6 +159,11 @@ class CElement_FormInput_Radio extends CElement_FormInput {
         return $html->text();
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);

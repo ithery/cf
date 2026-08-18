@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 17, 2019, 4:45:32 PM
- */
 class CDaemon_Event {
     use CEvent_Trait_Eventable;
 

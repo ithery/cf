@@ -2,15 +2,20 @@
 
 namespace PHPStan\Analyser\ResultCache;
 
-use Symfony\Component\Finder\Finder;
+use PHPStan\DependencyInjection\AutowiredParameter;
+use PHPStan\DependencyInjection\AutowiredService;
 use function dirname;
 use function is_file;
 use function unlink;
 
-class ResultCacheClearer
+#[AutowiredService]
+final class ResultCacheClearer
 {
 
-	public function __construct(private string $cacheFilePath, private string $tempResultCachePath)
+	public function __construct(
+		#[AutowiredParameter(ref: '%resultCachePath%')]
+		private string $cacheFilePath,
+	)
 	{
 	}
 
@@ -24,14 +29,6 @@ class ResultCacheClearer
 		@unlink($this->cacheFilePath);
 
 		return $dir;
-	}
-
-	public function clearTemporaryCaches(): void
-	{
-		$finder = new Finder();
-		foreach ($finder->files()->name('*.php')->in($this->tempResultCachePath) as $tmpResultCacheFile) {
-			@unlink($tmpResultCacheFile->getPathname());
-		}
 	}
 
 }

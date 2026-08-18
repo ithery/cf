@@ -146,6 +146,7 @@ class MethodNode
      * @deprecated use getReturnTypeNode instead
      * @return string|null
      */
+    #[\ReturnTypeWillChange]
     public function getReturnType()
     {
         if ($types = $this->returnTypeNode->getNonNullTypes())

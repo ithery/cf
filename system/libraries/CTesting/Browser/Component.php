@@ -32,6 +32,7 @@ abstract class CTesting_Browser_Component {
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return '';
     }

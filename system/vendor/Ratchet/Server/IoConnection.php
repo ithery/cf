@@ -1,17 +1,17 @@
 <?php
+
 namespace Ratchet\Server;
 use Ratchet\ConnectionInterface;
 use React\Socket\ConnectionInterface as ReactConn;
 
 /**
- * {@inheritdoc}
+ * @inheritdoc
  */
 class IoConnection implements ConnectionInterface {
     /**
      * @var \React\Socket\ConnectionInterface
      */
     protected $conn;
-
 
     /**
      * @param \React\Socket\ConnectionInterface $conn
@@ -21,7 +21,7 @@ class IoConnection implements ConnectionInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function send($data) {
         $this->conn->write($data);
@@ -30,7 +30,7 @@ class IoConnection implements ConnectionInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function close() {
         $this->conn->end();

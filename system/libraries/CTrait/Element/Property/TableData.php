@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jun 2, 2019, 10:52:01 PM
- */
 trait CTrait_Element_Property_TableData {
     /**
      * @var array
@@ -145,13 +139,13 @@ trait CTrait_Element_Property_TableData {
     public function getTableData() {
         switch ($this->tableDataType) {
             case 'query':
-                $db = CDatabase::instance();
+                $db = c::db();
                 if ($this->isUseTrait('CTrait_Element_Property_Database')) {
                     $db = $this->db();
                 }
                 $r = $db->query($this->tableDataQuery);
 
-                return $r->result_array(false);
+                return $r->resultArray(false);
 
                 break;
             default:

@@ -24,6 +24,7 @@ final class CVendor_Firebase_Http_Requests implements IteratorAggregate {
      *
      * @return Generator|RequestInterface[]
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         return new ArrayIterator($this->requests);
     }

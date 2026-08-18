@@ -22,6 +22,7 @@ final class CVendor_Firebase_Messaging_TopicSubscriptions implements Countable, 
      *
      * @return Traversable<CVendor_Firebase_Messaging_TopicSubscription>|CVendor_Firebase_Messaging_TopicSubscription[]
      */
+    #[\ReturnTypeWillChange]
     public function getIterator() {
         yield from $this->subscriptions;
     }
@@ -29,6 +30,7 @@ final class CVendor_Firebase_Messaging_TopicSubscriptions implements Countable, 
     /**
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count() {
         return \count($this->subscriptions);
     }

@@ -1,55 +1,111 @@
 <?php
 
-/**
- * Description of Summernote.
- *
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jan 28, 2018, 9:43:02 PM
- */
 class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea {
+    /**
+     * One of the presets handled by {@see getToolbarJson()} (`'default'`
+     * leaves summernote's built-in toolbar untouched).
+     *
+     * @var string
+     */
     protected $toolbarType = 'default';
 
+    /**
+     * Raw toolbar JSON used when `$toolbarType` is `'custom'`.
+     *
+     * @var string
+     */
+    protected $customToolbarJson = '[]';
+
+    /**
+     * @var bool
+     */
     protected $haveDragDrop = false;
 
+    /**
+     * @var null|string
+     */
     protected $uploadUrl;
 
+    /**
+     * @var bool
+     */
     protected $sanitizePaste = false;
 
+    /**
+     * @param string $id
+     */
     public function __construct($id) {
         parent::__construct($id);
         CManager::registerModule('summernote');
     }
 
+    /**
+     * @return void
+     */
     public function build() {
         $this->addClass('summernote-control');
     }
 
+    /**
+     * @param string $toolbarType
+     *
+     * @return $this
+     */
     public function setToolbarType($toolbarType) {
         $this->toolbarType = $toolbarType;
 
         return $this;
     }
 
+    /**
+     * @param string $json
+     *
+     * @return $this
+     */
+    public function setCustomToolbarJson($json) {
+        $this->customToolbarJson = $json;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setDragDrop($bool = true) {
         $this->haveDragDrop = $bool;
 
         return $this;
     }
 
+    /**
+     * @param string $url
+     *
+     * @return $this
+     */
     public function setUploadUrl($url) {
         $this->uploadUrl = $url;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setSanitizePaste($bool = true) {
         $this->sanitizePaste = $bool;
 
         return $this;
     }
 
+    /**
+     * @param null|string $toolbarType
+     *
+     * @return string
+     */
     protected function getToolbarJson($toolbarType = null) {
         if ($toolbarType == null) {
             $toolbarType = $this->toolbarType;
@@ -138,7 +194,8 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                         ['link', ['link']],
                     ]
                 ";
-                // no break
+
+                break;
             case 'text-link':
                 $json = "
                     [
@@ -148,12 +205,26 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                 ";
 
                 break;
+            case 'custom':
+                $json = $this->customToolbarJson;
+
+                break;
         }
 
         return $json;
     }
 
+    /**
+     * @param int $indent
+     *
+     * @return string
+     */
     public function js($indent = 0) {
+        $placeholder = '';
+        if ($this->placeholder) {
+            $placeholder = 'placeholder: "' . $this->placeholder . '",';
+        }
+
         $additionalOptions = 'disableDragAndDrop: true,';
         if ($this->haveDragDrop) {
             $additionalOptions = 'disableDragAndDrop: false,';
@@ -214,17 +285,24 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
             height: '300px',
             codeviewFilter: true,
 			codeviewIframeFilter: true,
+            " . $placeholder . '
             // shortcuts: false,
-            " . $additionalOptions . '
+            ' . $additionalOptions . "
             maximumImageFileSize:1024*1024, // 1 MB
             onCreateLink: function(originalLink) {
                 return originalLink; // return originalLink
             },
             callbacks: {
-                ' . $additionalCallbackOptions . "
+                onInit: function (e, layoutInfo) {
+                    // to prevent error in validation.js in cres.js, to be able to get form input name
+                    if (e.editable[0]) {
+                        e.editable[0].setAttribute('name', '" . $this->name . "');
+                    }
+                },
+                " . $additionalCallbackOptions . "
                 onImageUploadError: function(msg){
                     alert('Oops, something went wrong with image url');
-                },
+                }
             }
         });
         ";

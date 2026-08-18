@@ -1,0 +1,42 @@
+.cres\:element\:component\:TreeView {
+    border: 1px solid var(--light-300, #e9ecef);
+    border-radius: .5rem;
+    overflow: auto;
+    max-height: 420px;
+    padding: .75rem .5rem;
+    background-color: var(--white, #fff);
+
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--light-300, #e9ecef);
+        border-radius: .5rem;
+    }
+
+    // jstree cosmetic overrides so the default theme fits the framework better
+    .jstree-default {
+        .jstree-anchor {
+            height: 26px !important;
+            line-height: 26px !important;
+            border-radius: .25rem;
+        }
+
+        .jstree-hovered {
+            background-color: var(--light-200, #f1f3f5);
+            box-shadow: none;
+        }
+
+        .jstree-clicked {
+            background-color: var(--primary, #0d6efd);
+            color: var(--white, #fff);
+            box-shadow: none;
+        }
+
+        .jstree-themeicon-custom {
+            height: 26px !important;
+            width: 26px !important;
+        }
+    }
+}

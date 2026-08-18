@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 7:37:37 AM
- */
 class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * @var CDatabase_Schema_Table[]
@@ -37,7 +31,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      * @param CDatabase_Schema_Config     $schemaConfig
      * @param array                       $namespaces
      */
-    public function __construct(array $tables = [], array $sequences = [], CDatabase_Schema_Config $schemaConfig = null, array $namespaces = []) {
+    public function __construct(array $tables = [], array $sequences = [], ?CDatabase_Schema_Config $schemaConfig = null, array $namespaces = []) {
         if ($schemaConfig == null) {
             $schemaConfig = new CDatabase_Schema_Config();
         }

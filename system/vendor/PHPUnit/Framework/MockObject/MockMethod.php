@@ -234,6 +234,7 @@ final class MockMethod {
         return $template->render();
     }
 
+    #[\ReturnTypeWillChange]
     public function getReturnType() {
         return $this->returnType;
     }

@@ -2,14 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Feb 16, 2019, 2:44:05 PM
- */
 class CCache_Driver_NullDriver extends CCache_DriverAbstract {
     use CCache_Trait_RetrievesMultipleKeys;
+
     /**
      * The array of stored values.
      *

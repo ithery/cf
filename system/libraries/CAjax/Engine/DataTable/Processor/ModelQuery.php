@@ -2,12 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Jul 8, 2018, 2:58:18 AM
- */
 class CAjax_Engine_DataTable_Processor_ModelQuery extends CAjax_Engine_DataTable_Processor {
     use CAjax_Engine_DataTable_Trait_ProcessorTrait;
     use CAjax_Engine_DataTable_Trait_ProcessorModelQueryTrait;

@@ -1,58 +1,104 @@
 # Installation
 
+### Requirements
 
-1. Setting `SSH Key`
-    - Generate SSH Key
+Before installing Cresenity Framework, make sure your environment meets the following requirements:
 
-        [Machintosh](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=mac)
+- PHP >= 7.4
+- Composer (globally installed)
+- Git
+- Apache with `mod_rewrite` enabled (or Nginx equivalent)
 
-        [Windows](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=windows)
+For a full list of required PHP extensions, see [Configuration](/docs/starter/configuration).
 
-        [Linux](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=linux)
+---
 
-        *setelah public key berhasil dibuat, buka dengan text editor kemudian copy*
+### Install the phpcf CLI Tool
 
-    - Add SSH Key
+The `phpcf` command-line tool is used to create and manage Cresenity applications.
 
-        Login ke [https://git.ittron.co.id/](https://git.ittron.co.id/)
+```bash
+composer global require cresenity/phpcf
+```
 
-        Navigasikan ke `account preference` kemudian pilih menu `SSH Keys`, lanjutkan dengan paste public key ke textarea
+Make sure the Composer global `vendor/bin` directory is in your system `PATH`. You can verify the installation by running:
 
-        ![add ssh key to git server](http://dev.ittron.co.id/application/cresenity/default/media/img/docs/starter/add-ssh-key.jpg)
+```bash
+phpcf --version
+```
 
+---
 
-2. Clone `Cresenity Framework`
+### Clone the Framework
 
-        git clone git@git.ittron.co.id:root/CApp.git
+```bash
+git clone git@github.com:cresenity/cf.git
+cd cf
+```
 
-    *setelah melakukan clone git, ganti nama file index.php.sample menjadi index.php*
+After cloning, copy the sample entry point to create your `index.php`:
 
+```bash
+cp index.php.sample index.php
+```
 
-3. Install `phpcf extension`.
+---
 
-    [phpcf](/docs/phpcf/install)
+### Set Up an Existing Project
 
+If you are working on an existing project, clone its repository into the `application/` directory:
 
-4. Clone Project
+```bash
+cd application
+git clone git@github.com:your-org/myproject.git
+```
 
-    clone project yang di handle di folder `application` melalui ssh.
-    contoh misalnya project dengan nama projectsatu, maka struktur direktori menjadi `application/projectsatu`
+This will create the structure `application/myproject/`.
 
+---
 
-5. Project Baru **Khusus untuk pembuatan project baru*
+### Create a New Project
 
-    1. run command
+To scaffold a new application, first create the app's directory under `application/`, then run `phpcf init` from inside it:
 
-            phpcf app:create nama_project
+```bash
+mkdir -p application/myproject
+cd application/myproject
+phpcf init
+```
 
-        contoh: `phpcf app:create projectdua` (enter lalu buat kode projek yang belum digunakan)
+The application code is taken from the folder name, so `phpcf init` must be run from inside `application/{code}/`. This launches an interactive wizard that asks for the application's class prefix (and optionally an admin preset), then generates the project scaffolding. You can also pass `--prefix=`, `--domain=`, `--title=` up front to skip the corresponding question.
 
-    2. upload folder `projectdua` untuk remote ke subdomain ittron
+#### Configure the Domain
 
-    3. set up domain di folder data/domain (jika tidak ada folder data buat folder lalu download)
+1. Create a domain configuration file in the `data/domain/` directory. If the `data/` directory does not exist, create it first:
 
-    4. buat file `projectdua.dev.ittron.co.id.php` di folder data/domain
+    ```bash
+    mkdir -p data/domain
+    ```
 
-    5. isi file copy paste dengan yang sebelumnya dan sesuaikan
+2. Create a file named after your development domain, for example `myproject.dev.cresenity.com.php`:
 
-    6. run web dengan di address bar `projectdua.dev.ittron.co.id`
+    ```php
+    <?php
+    return [
+        'app_code' => 'myproject',
+        'app_id'   => '1',
+        'org_code' => 'myproject',
+        'org_id'   => 1,
+    ];
+    ```
+
+3. Point your local web server (or `/etc/hosts`) to the domain and open it in your browser:
+
+    ```
+    http://myproject.dev.cresenity.com
+    ```
+
+---
+
+### Next Steps
+
+- [Directory Structure](/docs/starter/directory) — understand how the framework is organized
+- [Configuration](/docs/starter/configuration) — configure your application
+- [Routing](/docs/basic/routing) — learn how URLs map to controllers

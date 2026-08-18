@@ -18,10 +18,25 @@ class CModel_Spatial_Geometry_MultiPolygon extends CModel_Spatial_Geometry_Geome
      */
     protected $collectionItemType = CModel_Spatial_Geometry_Polygon::class;
 
+    /**
+     * Returns a Well-Known Text (WKT) representation of the MultiPolygon.
+     *
+     * @return string The WKT representation of the MultiPolygon
+     */
     public function toWKT() {
         return sprintf('MULTIPOLYGON(%s)', (string) $this);
     }
 
+    /**
+     * Returns a string representation of the MultiPolygon.
+     *
+     * The MultiPolygon is represented as a comma-separated list of polygons.
+     * Each polygon is represented as a string enclosed in parentheses, with its
+     * points separated by commas.
+     *
+     * @return string The string representation of the MultiPolygon
+     */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return implode(',', array_map(function (CModel_Spatial_Geometry_Polygon $polygon) {
             return sprintf('(%s)', (string) $polygon);
@@ -80,12 +95,22 @@ class CModel_Spatial_Geometry_MultiPolygon extends CModel_Spatial_Geometry_Geome
         return $polygons;
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value) {
         $this->validateItemType($value);
 
         parent::offsetSet($offset, $value);
     }
 
+    /**
+     * Creates a new MultiPolygon from a GeoJson MultiPolygon object.
+     *
+     * @param mixed $geoJson The GeoJson object to create a MultiPolygon from
+     *
+     * @throws CModel_Spatial_Exception_InvalidGeoJsonException If the passed GeoJson object is not of the correct type
+     *
+     * @return CModel_Spatial_Geometry_MultiPolygon A new MultiPolygon object
+     */
     public static function fromJson($geoJson) {
         if (is_string($geoJson)) {
             $geoJson = GeoJson::jsonUnserialize(json_decode($geoJson));
@@ -116,6 +141,7 @@ class CModel_Spatial_Geometry_MultiPolygon extends CModel_Spatial_Geometry_Geome
      *
      * @return \GeoJson\Geometry\MultiPolygon
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         $polygons = [];
         foreach ($this->items as $polygon) {
@@ -123,5 +149,27 @@ class CModel_Spatial_Geometry_MultiPolygon extends CModel_Spatial_Geometry_Geome
         }
 
         return new GeoJsonMultiPolygon($polygons);
+    }
+
+    public function getCentroid() {
+        // Ambil GeoJSON.
+        $geoJson = json_encode($this->jsonSerialize());
+
+        // Load ke geoPHP Geometry.
+        $geometry = \geoPHP::load($geoJson, 'json');
+
+        if (!$geometry) {
+            throw new \Exception('Failed to parse polygon GeoJSON via geoPHP');
+        }
+
+        // Hitung centroid menggunakan geoPHP.
+        $centroid = $geometry->centroid();
+
+        if (!$centroid) {
+            throw new \Exception('Failed to calculate centroid via geoPHP');
+        }
+
+        // geoPHP Point: ->y() = lat, ->x() = lng
+        return new CModel_Spatial_Geometry_Point($centroid->y(), $centroid->x());
     }
 }

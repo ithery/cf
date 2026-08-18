@@ -11,7 +11,7 @@ class CPeriod_Exception_CannotCeilLowerPrecisionException extends CPeriod_Except
         $from = self::unitName($a);
         $to = self::unitName($b);
 
-        return new self("Cannot get the latest ${from} of a ${to}.");
+        return new self("Cannot get the latest {$from} of a {$to}.");
     }
 
     protected static function unitName(CPeriod_Precision $precision) {

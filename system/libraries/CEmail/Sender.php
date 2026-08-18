@@ -12,7 +12,6 @@ class CEmail_Sender {
         if (!($config instanceof CEmail_Config)) {
             $config = new CEmail_Config($config);
         }
-
         $this->driver = CEmail_Factory::createDriver($config);
     }
 
@@ -37,13 +36,18 @@ class CEmail_Sender {
 
     protected function rebuildOptions($options) {
         if (!isset($options['from'])) {
-            $options['from'] = carr::get($options, 'smtp_from', CF::config('app.smtp_from'));
+            //`app.email.from` dibaca lebih dulu, sejalan dengan baris
+            //`from_name` di bawah. Sebelumnya hanya `app.smtp_from` yang
+            //dibaca, sehingga aplikasi yang memakai bentuk `app.email.*`
+            //diam-diam mengirim dengan alamat bawaan kerangka kerja - dan
+            //penyedia email menolaknya karena pengirimnya tidak terautentikasi.
+            $options['from'] = carr::get($options, 'smtp_from', CF::config('app.email.from', CF::config('app.smtp_from')));
         }
         if (!isset($options['domain'])) {
             $options['domain'] = carr::get($options, 'smtp_domain', CF::config('app.smtp_domain'));
         }
 
-        if (!isset($options['from'])) {
+        if (!isset($options['from_name'])) {
             $options['from_name'] = carr::get($options, 'smtp_from_name', CF::config('app.email.from_name', CF::config('app.smtp_from_name')));
         }
 

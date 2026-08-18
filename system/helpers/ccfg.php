@@ -1,9 +1,12 @@
 <?php
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated since 1.6 use CF::config
+ */
 class ccfg {
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param string $name
      * @param string $appCode

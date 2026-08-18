@@ -2,17 +2,14 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since May 12, 2018, 9:08:07 PM
- */
 class CElement_Component_Action extends CElement_Component {
     use CTrait_Compat_Element_Action,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
 
+    /**
+     * @var string
+     */
     protected $jsfunc;
 
     /**
@@ -20,22 +17,49 @@ class CElement_Component_Action extends CElement_Component {
      */
     protected $disabled;
 
+    /**
+     * @var string
+     */
     protected $type;
 
+    /**
+     * @var string
+     */
     protected $linkTarget;
 
+    /**
+     * @var string
+     */
     protected $link;
 
+    /**
+     * @var null|string
+     */
     protected $orig_label;
 
+    /**
+     * @var bool
+     */
     protected $submit;
 
+    /**
+     * @var bool|string
+     */
     protected $submitTo;
 
+    /**
+     * @var bool|string
+     */
     protected $submitToTarget;
 
+    /**
+     * @var null|string
+     */
     protected $submitValue;
 
+    /**
+     * @var array
+     */
     protected $jsparam;
 
     /**
@@ -43,6 +67,9 @@ class CElement_Component_Action extends CElement_Component {
      */
     protected $confirm;
 
+    /**
+     * @var string
+     */
     protected $style;
 
     /**
@@ -50,10 +77,19 @@ class CElement_Component_Action extends CElement_Component {
      */
     protected $confirmMessage;
 
+    /**
+     * @var bool
+     */
     protected $button;
 
+    /**
+     * @var string
+     */
     protected $btn_style;
 
+    /**
+     * @var string
+     */
     protected $value;
 
     /**
@@ -66,6 +102,11 @@ class CElement_Component_Action extends CElement_Component {
      */
     protected $name;
 
+    /**
+     * @param null|string $id
+     *
+     * @return void
+     */
     public function __construct($id) {
         parent::__construct($id);
         $this->name = $this->id;
@@ -91,6 +132,11 @@ class CElement_Component_Action extends CElement_Component {
         $this->isActive = false;
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return static
+     */
     public static function factory($id = null) {
         // @phpstan-ignore-next-line
         return new static($id);
@@ -114,7 +160,7 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     /**
-     * @param mixed $message
+     * @param string $message
      *
      * @return $this
      */
@@ -124,12 +170,22 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param array $jsparam
+     *
+     * @return $this
+     */
     public function setJsParam($jsparam) {
         $this->jsparam = $jsparam;
 
         return $this;
     }
 
+    /**
+     * @param string $link
+     *
+     * @return $this
+     */
     public function setLink($link) {
         $this->type = 'link';
         $this->link = $link;
@@ -143,17 +199,27 @@ class CElement_Component_Action extends CElement_Component {
      * @return $this
      */
     public function setActive($bool = true) {
-        $this->isActive = true;
+        $this->isActive = $bool;
 
         return $this;
     }
 
+    /**
+     * @param string $linkTarget
+     *
+     * @return $this
+     */
     public function setLinkTarget($linkTarget) {
         $this->linkTarget = $linkTarget;
 
         return $this;
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     */
     public function setSubmit($bool = true) {
         $this->submit = $bool;
 
@@ -209,6 +275,9 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     protected function renderAsInput() {
         $renderAsInput = false;
         if ($this->submit) {
@@ -218,6 +287,9 @@ class CElement_Component_Action extends CElement_Component {
         return $renderAsInput;
     }
 
+    /**
+     * @return void
+     */
     public function reassignConfirm() {
         if ($this->confirm) {
             //we check the listener
@@ -230,6 +302,9 @@ class CElement_Component_Action extends CElement_Component {
         }
     }
 
+    /**
+     * @return array
+     */
     public function toArray() {
         $data = [];
 
@@ -248,6 +323,11 @@ class CElement_Component_Action extends CElement_Component {
         return $data;
     }
 
+    /**
+     * @param string $link
+     *
+     * @return string
+     */
     protected function buildLink($link) {
         $jsparam = $this->jsparam;
         $param = '';
@@ -275,6 +355,9 @@ class CElement_Component_Action extends CElement_Component {
         return $link;
     }
 
+    /**
+     * @return string
+     */
     public function getSubmitValue() {
         return $this->submitValue ?: $this->label;
     }
@@ -379,7 +462,7 @@ class CElement_Component_Action extends CElement_Component {
             }
             //prefix
             if ($this->style == 'btn-dropdown') {
-                $html->appendln('<li>');
+                $html->appendln('<li class="dropdown-item">');
             } elseif ($this->style == 'btn-group-toggle-radio') {
                 if ($this->isActive) {
                     $classes .= ' active';

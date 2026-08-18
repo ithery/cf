@@ -15,7 +15,9 @@ class CConsole_Command_Phpcs_FixCommand extends CConsole_Command {
      *
      * @var string
      */
-    protected $signature = 'phpcs:fix {file?} {--format=table : format to display} {--debug} {--no-progress}';
+    protected $signature = 'phpcs:fix {path?} {--format=table : format to display} {--debug} {--no-progress}';
+
+    protected $description = 'Run PHPCS fix on the given path';
 
     public function handle() {
         $isFramework = CF::appCode() == null;
@@ -23,10 +25,22 @@ class CConsole_Command_Phpcs_FixCommand extends CConsole_Command {
         $debug = $this->option('debug');
         $noProgress = $this->option('no-progress');
         $appDir = $isFramework ? DOCROOT . 'system/libraries/CElement' : c::appRoot();
-        $file = $this->argument('file');
+        $path = $this->argument('path');
+        // Get the current working directory
+        $currentWorkingDirectory = getcwd();
+        $fullPath = $path;
+        // Check if the path is relative or absolute
+        if (!$this->isAbsolutePath($path)) {
+            // If the path is relative, convert it to an absolute path
+            $fullPath = realpath($currentWorkingDirectory . DIRECTORY_SEPARATOR . $path);
+        } else {
+            // If the path is absolute, use it directly
+            $fullPath = realpath($path);
+        }
+
         $scanPath = $appDir;
-        if ($file) {
-            $scanPath = $file;
+        if ($path) {
+            $scanPath = $fullPath;
         }
 
         if (!$this->isPhpCbfInstalled()) {
@@ -35,7 +49,7 @@ class CConsole_Command_Phpcs_FixCommand extends CConsole_Command {
 
         chdir($isFramework ? DOCROOT : c::appRoot());
         //$command = [$this->phpBinary(), $this->getPhpCsPhar(),$appDir];
-        $command = [$this->phpBinary(), $this->getPhpCbfPhar(), '--standard='.CQC::phpcs()->phpcsConfiguration()];
+        $command = [$this->phpBinary(), $this->getPhpCbfPhar(), '--standard=' . CQC::phpcs()->phpcsConfiguration()];
         $command[] = $scanPath;
         $process = Process::fromShellCommandline($command, c::appRoot());
         $process->setTimeout(60 * 60);
@@ -66,5 +80,10 @@ class CConsole_Command_Phpcs_FixCommand extends CConsole_Command {
 
     private function phpBinary() {
         return (new PhpExecutableFinder())->find(false);
+    }
+
+    // Helper function to check if a path is absolute
+    private function isAbsolutePath($path) {
+        return $path[0] === '/' || $path[1] === ':' || substr($path, 0, 2) === '\\\\';
     }
 }

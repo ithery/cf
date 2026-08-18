@@ -2,17 +2,23 @@
 
 namespace PHPStan\Type\Constant;
 
-use PHPStan\TrinaryLogic;
+use PHPStan\PhpDocParser\Ast\ConstExpr\ConstExprIntegerNode;
+use PHPStan\PhpDocParser\Ast\Type\ConstTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\Type\CompoundType;
 use PHPStan\Type\ConstantScalarType;
 use PHPStan\Type\GeneralizePrecision;
 use PHPStan\Type\IntegerRangeType;
 use PHPStan\Type\IntegerType;
+use PHPStan\Type\IsSuperTypeOfResult;
 use PHPStan\Type\Traits\ConstantNumericComparisonTypeTrait;
 use PHPStan\Type\Traits\ConstantScalarTypeTrait;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
 use PHPStan\Type\VerbosityLevel;
+use function abs;
 use function sprintf;
+use const PHP_INT_MIN;
 
 /** @api */
 class ConstantIntegerType extends IntegerType implements ConstantScalarType
@@ -33,31 +39,31 @@ class ConstantIntegerType extends IntegerType implements ConstantScalarType
 		return $this->value;
 	}
 
-	public function isSuperTypeOf(Type $type): TrinaryLogic
+	public function isSuperTypeOf(Type $type): IsSuperTypeOfResult
 	{
 		if ($type instanceof self) {
-			return $this->value === $type->value ? TrinaryLogic::createYes() : TrinaryLogic::createNo();
+			return $this->value === $type->value ? IsSuperTypeOfResult::createYes() : IsSuperTypeOfResult::createNo();
 		}
 
 		if ($type instanceof IntegerRangeType) {
 			$min = $type->getMin();
 			$max = $type->getMax();
 			if (($min === null || $min <= $this->value) && ($max === null || $this->value <= $max)) {
-				return TrinaryLogic::createMaybe();
+				return IsSuperTypeOfResult::createMaybe();
 			}
 
-			return TrinaryLogic::createNo();
+			return IsSuperTypeOfResult::createNo();
 		}
 
 		if ($type instanceof parent) {
-			return TrinaryLogic::createMaybe();
+			return IsSuperTypeOfResult::createMaybe();
 		}
 
 		if ($type instanceof CompoundType) {
 			return $type->isSubTypeOf($this);
 		}
 
-		return TrinaryLogic::createNo();
+		return IsSuperTypeOfResult::createNo();
 	}
 
 	public function describe(VerbosityLevel $level): string
@@ -73,6 +79,23 @@ class ConstantIntegerType extends IntegerType implements ConstantScalarType
 		return new ConstantFloatType($this->value);
 	}
 
+	public function toBitwiseNotType(): Type
+	{
+		return new self(~$this->value);
+	}
+
+	public function toAbsoluteNumber(): Type
+	{
+		if ($this->value === PHP_INT_MIN) {
+			// The absolute value of the smallest integer is not representable as an int.
+			// Checking is_int(abs($this->value)) instead is dead code to PHPStan itself,
+			// which infers abs(int) as int<0, max>.
+			return new ConstantFloatType(-(float) $this->value);
+		}
+
+		return new self(abs($this->value));
+	}
+
 	public function toString(): Type
 	{
 		return new ConstantStringType((string) $this->value);
@@ -83,17 +106,26 @@ class ConstantIntegerType extends IntegerType implements ConstantScalarType
 		return $this;
 	}
 
+	public function toCoercedArgumentType(bool $strictTypes): Type
+	{
+		if (!$strictTypes) {
+			return TypeCombinator::union($this, $this->toFloat(), $this->toString(), $this->toBoolean());
+		}
+
+		return TypeCombinator::union($this, $this->toFloat());
+	}
+
 	public function generalize(GeneralizePrecision $precision): Type
 	{
 		return new IntegerType();
 	}
 
 	/**
-	 * @param mixed[] $properties
+	 * @return ConstTypeNode
 	 */
-	public static function __set_state(array $properties): Type
+	public function toPhpDocNode(): TypeNode
 	{
-		return new self($properties['value']);
+		return new ConstTypeNode(new ConstExprIntegerNode((string) $this->value));
 	}
 
 }

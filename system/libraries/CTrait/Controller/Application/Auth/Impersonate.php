@@ -5,11 +5,15 @@ trait CTrait_Controller_Application_Auth_Impersonate {
         return 'Impersonate';
     }
 
+    protected function getAuth() {
+        return null;
+    }
+
     public function listImpersonate($guard = null, $redirect = null) {
         $app = c::app();
         $app->setTitle($this->getTitle());
         if ($guard == null) {
-            $guard = c::app()->auth()->guardName();
+            $guard = c::app()->auth($this->getAuth())->guardName();
         }
         $providerConfig = c::app()->auth($guard)->getProviderConfig();
 
@@ -89,6 +93,7 @@ trait CTrait_Controller_Application_Auth_Impersonate {
                 if ($manager->start($request->user(), $userToImpersonate, $guardName)) {
                     $redirectUrl = carr::get(CApp_Base::getRequestGet(), 'r');
                     if ($redirectUrl) {
+                        $redirectUrl = urldecode($redirectUrl);
                         return c::redirect($redirectUrl);
                     }
                 }

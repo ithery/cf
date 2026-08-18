@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Contracts\Support\Arrayable;
+
 /**
  * Description of View.
  *
@@ -49,7 +51,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
         $this->path = $path;
         $this->engine = $engine;
 
-        $this->data = $data instanceof CInterface_Arrayable ? $data->toArray() : (array) $data;
+        $this->data = $data instanceof Arrayable ? $data->toArray() : (array) $data;
     }
 
     /**
@@ -175,6 +177,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
      *
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key) {
         return $this->data[$key];
     }
@@ -265,6 +268,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
      *
      * @return string
      */
+    #[\ReturnTypeWillChange]
     public function __toString() {
         return $this->render();
     }
@@ -278,7 +282,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
      *
      * @return array|string
      */
-    public function render(callable $callback = null) {
+    public function render(?callable $callback = null) {
         try {
             $contents = $this->renderContents();
             $response = isset($callback) ? $callback($this, $contents) : null;
