@@ -144,8 +144,11 @@ class CResources_Filesystem {
         $this->customRemoteHeaders = $customRemoteHeaders;
     }
 
-    public function getRemoteHeadersForFile($file, array $resourceCustomHeaders = []) {
-        $mimeTypeHeader = ['ContentType' => CResources_Helpers_File::getMimeType($file)];
+    public function getRemoteHeadersForFile($file, array $resourceCustomHeaders = [], $mimeType = null) {
+        if ($mimeType === null) {
+            $mimeType = CResources_Helpers_File::getMimeType($file);
+        }
+        $mimeTypeHeader = ['ContentType' => $mimeType ?: 'application/octet-stream'];
         $extraHeaders = CF::config('resource.remote.extra_headers');
 
         return array_merge($mimeTypeHeader, $extraHeaders, $this->customRemoteHeaders, $resourceCustomHeaders);
