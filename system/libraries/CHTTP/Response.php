@@ -78,6 +78,15 @@ class CHTTP_Response extends SymfonyResponse {
     /**
      * Morph the given content into JSON.
      *
+     * JSON_INVALID_UTF8_SUBSTITUTE replaces malformed UTF-8 bytes instead of
+     * making json_encode() fail outright - content crawled/extracted from
+     * third-party sources (PDFs, arbitrary web pages) isn't guaranteed valid
+     * UTF-8, and json_encode() silently returning false here used to reach
+     * parent::setContent() as a raw boolean, surfacing as an opaque
+     * "Response content must be a string ..., boolean given" that masked
+     * whatever the real payload/error actually was. Doesn't change output
+     * for already-valid content.
+     *
      * @param mixed $content
      *
      * @return string
@@ -86,9 +95,11 @@ class CHTTP_Response extends SymfonyResponse {
         if ($content instanceof Jsonable) {
             return $content->toJson();
         } elseif ($content instanceof Arrayable) {
-            return json_encode($content->toArray());
+            $content = $content->toArray();
         }
 
-        return json_encode($content);
+        $json = json_encode($content, JSON_INVALID_UTF8_SUBSTITUTE);
+
+        return $json !== false ? $json : json_encode(['error' => 'Failed to encode response content: ' . json_last_error_msg()]);
     }
 }
